@@ -13,17 +13,19 @@ import {
   Book,
   Heart
 } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { t } = useLanguage();
 
   const quickLinks = [
-    { title: "Catalogue en ligne", href: "#catalogue" },
-    { title: "Collections numériques", href: "#collections" },
-    { title: "Horaires & accès", href: "#horaires" },
-    { title: "Inscription", href: "#inscription" },
-    { title: "Dépôt légal", href: "#depot-legal" },
-    { title: "Contact", href: "#contact" }
+    { title: t('header.catalog'), href: "#catalogue" },
+    { title: t('header.collections'), href: "#collections" },
+    { title: t('footer.hours'), href: "#horaires" },
+    { title: t('footer.about'), href: "#inscription" },
+    { title: t('header.services'), href: "#depot-legal" },
+    { title: t('footer.contact'), href: "#contact" }
   ];
 
   const legalLinks = [
@@ -78,7 +80,7 @@ const Footer = () => {
 
           {/* Quick links */}
           <div>
-            <h4 className="text-lg font-semibold mb-6">Accès rapide</h4>
+            <h4 className="text-lg font-semibold mb-6">{t('footer.quickLinks')}</h4>
             <ul className="space-y-3">
               {quickLinks.map((link, index) => (
                 <li key={index}>
@@ -95,28 +97,28 @@ const Footer = () => {
 
           {/* Contact info */}
           <div>
-            <h4 className="text-lg font-semibold mb-6">Contact</h4>
+            <h4 className="text-lg font-semibold mb-6">{t('footer.contact')}</h4>
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 mt-0.5 text-accent" />
                 <div className="text-primary-foreground/80">
-                  <p>Avenue Ibn Khaldoun</p>
-                  <p>Agdal - Rabat, Maroc</p>
+                  <p>{t('footer.location')}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-accent" />
-                <span className="text-primary-foreground/80">+212 537 27 16 33</span>
+                <span className="text-primary-foreground/80">{t('footer.phone')}: +212 537 27 16 33</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-accent" />
-                <span className="text-primary-foreground/80">contact@bnrm.ma</span>
+                <span className="text-primary-foreground/80">{t('footer.email')}: contact@bnrm.ma</span>
               </div>
               <div className="flex items-start space-x-3">
                 <Clock className="h-5 w-5 mt-0.5 text-accent" />
                 <div className="text-primary-foreground/80">
-                  <p>Lun-Ven: 8h30-16h30</p>
-                  <p>Sam: 8h30-12h30</p>
+                  <p>{t('footer.monday')}</p>
+                  <p>{t('footer.saturday')}</p>
+                  <p>{t('footer.sunday')}</p>
                 </div>
               </div>
             </div>
@@ -153,7 +155,7 @@ const Footer = () => {
           {/* Copyright */}
           <div className="text-center lg:text-left">
             <p className="text-primary-foreground/80">
-              © {currentYear} Bibliothèque Nationale du Royaume du Maroc. Tous droits réservés.
+              © {currentYear} {t('header.title')}. {t('footer.rights')}
             </p>
           </div>
 

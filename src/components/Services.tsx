@@ -10,57 +10,59 @@ import {
   Smartphone,
   Shield
 } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const Services = () => {
+  const { t } = useLanguage();
   const services = [
     {
       icon: <BookOpen className="h-8 w-8" />,
-      title: "Consultation sur Place",
-      description: "Accès libre aux collections en salle de lecture avec assistance personnalisée",
+      title: t('services.consultation.title'),
+      description: t('services.consultation.desc'),
       features: ["Salles de lecture spécialisées", "Assistance bibliographique", "Accès WiFi gratuit"]
     },
     {
-      icon: <Search className="h-8 w-8" />,
-      title: "Recherche Avancée",
-      description: "Outils de recherche sophistiqués dans l'ensemble de nos collections",
-      features: ["Catalogue en ligne", "Recherche multicritères", "Alertes personnalisées"]
-    },
-    {
       icon: <Download className="h-8 w-8" />,
-      title: "Bibliothèque Numérique",
-      description: "Accès aux collections numérisées et ressources électroniques",
+      title: t('services.digitization.title'),
+      description: t('services.digitization.desc'),
       features: ["Manuscrits numérisés", "Livres rares", "Documents patrimoniaux"]
     },
     {
+      icon: <Search className="h-8 w-8" />,
+      title: t('services.research.title'),
+      description: t('services.research.desc'),
+      features: ["Catalogue en ligne", "Recherche multicritères", "Alertes personnalisées"]
+    },
+    {
+      icon: <Shield className="h-8 w-8" />,
+      title: t('services.legal.title'),
+      description: t('services.legal.desc'),
+      features: ["Dépôt obligatoire", "ISBN/ISSN", "Conservation légale"]
+    },
+    {
       icon: <Users className="h-8 w-8" />,
-      title: "Formation & Ateliers",
-      description: "Programmes de formation à la recherche documentaire et aux outils numériques",
+      title: t('services.training.title'),
+      description: t('services.training.desc'),
       features: ["Ateliers étudiants", "Formation professionnelle", "Visites guidées"]
     },
     {
       icon: <Smartphone className="h-8 w-8" />,
-      title: "Application Mobile",
-      description: "Accès mobile aux services et collections de la bibliothèque",
-      features: ["Consultation mobile", "Réservations", "Notifications"]
-    },
-    {
-      icon: <Shield className="h-8 w-8" />,
-      title: "Dépôt Légal",
-      description: "Service de dépôt légal pour les publications marocaines",
-      features: ["Dépôt obligatoire", "ISBN/ISSN", "Conservation légale"]
+      title: t('services.exhibitions.title'),
+      description: t('services.exhibitions.desc'),
+      features: ["Exposition permanente", "Manifestations culturelles", "Événements"]
     }
   ];
 
   const quickServices = [
     {
       icon: <Clock className="h-6 w-6" />,
-      title: "Horaires",
-      description: "Lun-Ven: 8h30-16h30\nSam: 8h30-12h30"
+      title: t('footer.hours'),
+      description: `${t('footer.monday')}\n${t('footer.saturday')}`
     },
     {
       icon: <MapPin className="h-6 w-6" />,
       title: "Localisation",
-      description: "Avenue Ibn Khaldoun\nAgdal - Rabat"
+      description: t('footer.location')
     },
     {
       icon: <Users className="h-6 w-6" />,
@@ -75,11 +77,10 @@ const Services = () => {
         {/* Section header */}
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Nos Services
+            {t('services.title')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            La Bibliothèque Nationale offre une gamme complète de services pour accompagner 
-            vos recherches et valoriser le patrimoine documentaire marocain
+            {t('services.subtitle')}
           </p>
         </div>
 

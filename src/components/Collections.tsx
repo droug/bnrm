@@ -11,56 +11,42 @@ import {
   ArrowRight,
   Eye
 } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const Collections = () => {
+  const { t } = useLanguage();
   const collections = [
     {
       icon: <Scroll className="h-8 w-8" />,
-      title: "Manuscrits Anciens",
-      description: "Collection exceptionnelle de manuscrits arabes, berbères et hébraïques",
-      count: "50,000+",
+      title: t('collections.manuscripts.title'),
+      description: t('collections.manuscripts.desc'),
+      count: t('collections.manuscripts.count'),
       highlights: ["Coran enluminés", "Textes scientifiques médiévaux", "Poésie andalouse"],
       color: "bg-accent",
       featured: true
     },
     {
       icon: <BookOpen className="h-8 w-8" />,
-      title: "Livres Rares",
-      description: "Ouvrages précieux et éditions originales de la littérature marocaine",
-      count: "25,000+",
+      title: t('collections.rare.title'),
+      description: t('collections.rare.desc'),
+      count: t('collections.rare.count'),
       highlights: ["Premières éditions", "Livres d'artistes", "Reliures historiques"],
       color: "bg-primary"
     },
     {
-      icon: <Newspaper className="h-8 w-8" />,
-      title: "Presse Historique",
-      description: "Archives complètes de la presse marocaine depuis le protectorat",
-      count: "15,000+",
-      highlights: ["Journaux indépendantistes", "Presse coloniale", "Revues culturelles"],
-      color: "bg-highlight"
-    },
-    {
       icon: <Image className="h-8 w-8" />,
-      title: "Documents Iconographiques",
-      description: "Photographies, cartes et illustrations du patrimoine marocain",
-      count: "30,000+",
+      title: t('collections.maps.title'),
+      description: t('collections.maps.desc'),
+      count: t('collections.maps.count'),
       highlights: ["Photos historiques", "Cartes anciennes", "Gravures orientalistes"],
       color: "bg-accent"
     },
     {
-      icon: <Music className="h-8 w-8" />,
-      title: "Archives Sonores",
-      description: "Enregistrements de musique traditionnelle et témoignages oraux",
-      count: "5,000+",
-      highlights: ["Musique andalouse", "Traditions orales", "Conférences historiques"],
-      color: "bg-primary"
-    },
-    {
-      icon: <Globe className="h-8 w-8" />,
-      title: "Collections Numériques",
-      description: "Ressources électroniques et bases de données spécialisées",
-      count: "100,000+",
-      highlights: ["Thèses numériques", "Revues en ligne", "Portails spécialisés"],
+      icon: <Newspaper className="h-8 w-8" />,
+      title: t('collections.periodicals.title'),
+      description: t('collections.periodicals.desc'),
+      count: t('collections.periodicals.count'),
+      highlights: ["Journaux indépendantistes", "Presse coloniale", "Revues culturelles"],
       color: "bg-highlight"
     }
   ];
@@ -89,10 +75,10 @@ const Collections = () => {
         {/* Section header */}
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Collections & Patrimoine
+            {t('collections.title')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Découvrez nos trésors documentaires qui retracent l'histoire et la culture du Maroc
+            {t('collections.subtitle')}
           </p>
         </div>
 
