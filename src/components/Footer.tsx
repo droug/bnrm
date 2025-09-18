@@ -1,0 +1,185 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Clock, 
+  Facebook, 
+  Twitter, 
+  Youtube, 
+  Instagram,
+  Book,
+  Heart
+} from "lucide-react";
+
+const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
+  const quickLinks = [
+    { title: "Catalogue en ligne", href: "#catalogue" },
+    { title: "Collections numériques", href: "#collections" },
+    { title: "Horaires & accès", href: "#horaires" },
+    { title: "Inscription", href: "#inscription" },
+    { title: "Dépôt légal", href: "#depot-legal" },
+    { title: "Contact", href: "#contact" }
+  ];
+
+  const legalLinks = [
+    { title: "Mentions légales", href: "#mentions" },
+    { title: "Politique de confidentialité", href: "#confidentialite" },
+    { title: "Conditions d'utilisation", href: "#conditions" },
+    { title: "Accessibilité", href: "#accessibilite" },
+    { title: "Plan du site", href: "#plan" }
+  ];
+
+  const socialLinks = [
+    { icon: <Facebook className="h-5 w-5" />, href: "#facebook", label: "Facebook" },
+    { icon: <Twitter className="h-5 w-5" />, href: "#twitter", label: "Twitter" },
+    { icon: <Youtube className="h-5 w-5" />, href: "#youtube", label: "YouTube" },
+    { icon: <Instagram className="h-5 w-5" />, href: "#instagram", label: "Instagram" }
+  ];
+
+  return (
+    <footer className="bg-primary text-primary-foreground">
+      {/* Main footer content */}
+      <div className="container mx-auto px-4 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          {/* Organization info */}
+          <div className="lg:col-span-1">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center">
+                <Book className="h-6 w-6 text-accent-foreground" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">BNRM</h3>
+                <p className="text-sm text-primary-foreground/80">Bibliothèque Nationale</p>
+              </div>
+            </div>
+            <p className="text-primary-foreground/90 mb-6 leading-relaxed">
+              La Bibliothèque Nationale du Royaume du Maroc, gardienne du patrimoine écrit 
+              et promotrice du savoir au service de tous.
+            </p>
+            <div className="flex space-x-4">
+              {socialLinks.map((social, index) => (
+                <Button 
+                  key={index}
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-white/10 p-2"
+                  aria-label={social.label}
+                >
+                  {social.icon}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Quick links */}
+          <div>
+            <h4 className="text-lg font-semibold mb-6">Accès rapide</h4>
+            <ul className="space-y-3">
+              {quickLinks.map((link, index) => (
+                <li key={index}>
+                  <a 
+                    href={link.href} 
+                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                  >
+                    {link.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact info */}
+          <div>
+            <h4 className="text-lg font-semibold mb-6">Contact</h4>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <MapPin className="h-5 w-5 mt-0.5 text-accent" />
+                <div className="text-primary-foreground/80">
+                  <p>Avenue Ibn Khaldoun</p>
+                  <p>Agdal - Rabat, Maroc</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Phone className="h-5 w-5 text-accent" />
+                <span className="text-primary-foreground/80">+212 537 27 16 33</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Mail className="h-5 w-5 text-accent" />
+                <span className="text-primary-foreground/80">contact@bnrm.ma</span>
+              </div>
+              <div className="flex items-start space-x-3">
+                <Clock className="h-5 w-5 mt-0.5 text-accent" />
+                <div className="text-primary-foreground/80">
+                  <p>Lun-Ven: 8h30-16h30</p>
+                  <p>Sam: 8h30-12h30</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Newsletter */}
+          <div>
+            <h4 className="text-lg font-semibold mb-6">Newsletter</h4>
+            <p className="text-primary-foreground/80 mb-4">
+              Restez informé de nos actualités et nouvelles acquisitions.
+            </p>
+            <div className="space-y-3">
+              <Input 
+                type="email" 
+                placeholder="Votre email"
+                className="bg-white/10 border-white/20 text-primary-foreground placeholder:text-primary-foreground/60 focus:border-accent"
+              />
+              <Button 
+                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-medium"
+              >
+                S'abonner
+              </Button>
+            </div>
+            <p className="text-xs text-primary-foreground/60 mt-3">
+              En vous abonnant, vous acceptez de recevoir nos communications.
+            </p>
+          </div>
+        </div>
+
+        <Separator className="bg-white/20 mb-8" />
+
+        {/* Bottom section */}
+        <div className="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
+          {/* Copyright */}
+          <div className="text-center lg:text-left">
+            <p className="text-primary-foreground/80">
+              © {currentYear} Bibliothèque Nationale du Royaume du Maroc. Tous droits réservés.
+            </p>
+          </div>
+
+          {/* Legal links */}
+          <div className="flex flex-wrap justify-center lg:justify-end gap-6">
+            {legalLinks.map((link, index) => (
+              <a 
+                key={index}
+                href={link.href}
+                className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+              >
+                {link.title}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Kingdom attribution */}
+        <div className="text-center mt-8 pt-8 border-t border-white/20">
+          <p className="text-primary-foreground/60 flex items-center justify-center gap-2">
+            Fait avec <Heart className="h-4 w-4 text-highlight fill-current" /> pour le Royaume du Maroc
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
