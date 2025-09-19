@@ -87,7 +87,7 @@ const Collections = () => {
           <h3 className="text-2xl font-bold text-foreground mb-8 text-center">Manuscrits à la Une</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {featuredManuscripts.map((manuscript, index) => (
-              <Card key={index} className="bg-card border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 group animate-slide-in"
+              <Card key={index} className="bg-card bg-pattern-moroccan-stars border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 group animate-slide-in relative overflow-hidden"
                     style={{ animationDelay: `${index * 0.1}s` }}>
                 <CardContent className="p-6">
                   <div className="aspect-[4/3] bg-gradient-accent rounded-lg mb-4 flex items-center justify-center group-hover:animate-glow">
@@ -114,7 +114,7 @@ const Collections = () => {
         {/* Collections grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {collections.map((collection, index) => (
-            <Card key={index} className={`bg-card border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 group animate-fade-in ${collection.featured ? 'md:col-span-2 lg:col-span-1' : ''}`}
+            <Card key={index} className={`bg-card bg-pattern-geometric border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 group animate-fade-in relative overflow-hidden ${collection.featured ? 'md:col-span-2 lg:col-span-1' : ''}`}
                   style={{ animationDelay: `${(index + 3) * 0.1}s` }}>
               <CardContent className="p-8">
                 <div className={`w-16 h-16 ${collection.color} rounded-lg flex items-center justify-center mb-6 group-hover:animate-glow`}>

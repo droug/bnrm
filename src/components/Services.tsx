@@ -87,7 +87,7 @@ const Services = () => {
         {/* Quick info cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {quickServices.map((service, index) => (
-            <Card key={index} className="bg-card border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 animate-slide-in"
+            <Card key={index} className="bg-card bg-pattern-moroccan-stars border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 animate-slide-in relative overflow-hidden"
                   style={{ animationDelay: `${index * 0.1}s` }}>
               <CardContent className="p-6 text-center">
                 <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
@@ -103,7 +103,7 @@ const Services = () => {
         {/* Main services grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => (
-            <Card key={index} className="bg-card border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 group animate-fade-in"
+            <Card key={index} className="bg-card bg-pattern-zellige border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 group animate-fade-in relative overflow-hidden"
                   style={{ animationDelay: `${(index + 3) * 0.1}s` }}>
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-gradient-accent rounded-lg flex items-center justify-center mb-6 group-hover:animate-glow">

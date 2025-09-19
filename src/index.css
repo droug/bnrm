@@ -57,6 +57,30 @@ All colors MUST be HSL.
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
     --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--secondary)));
     
+    /* Motifs marocains - Patterns géométriques traditionnels */
+    --pattern-moroccan-stars: radial-gradient(circle at 25% 25%, hsl(var(--gold) / 0.1) 2px, transparent 2px),
+                              radial-gradient(circle at 75% 75%, hsl(var(--accent) / 0.1) 2px, transparent 2px);
+    --pattern-zellige: 
+      linear-gradient(45deg, hsl(var(--primary) / 0.05) 25%, transparent 25%),
+      linear-gradient(-45deg, hsl(var(--primary) / 0.05) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, hsl(var(--accent) / 0.05) 75%),
+      linear-gradient(-45deg, transparent 75%, hsl(var(--accent) / 0.05) 75%);
+    --pattern-geometric: 
+      repeating-linear-gradient(
+        45deg,
+        hsl(var(--gold) / 0.03) 0px,
+        hsl(var(--gold) / 0.03) 1px,
+        transparent 1px,
+        transparent 12px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        hsl(var(--primary) / 0.03) 0px,
+        hsl(var(--primary) / 0.03) 1px,
+        transparent 1px,
+        transparent 12px
+      );
+    
     /* Elegant shadows */
     --shadow-moroccan: 0 10px 40px -10px hsl(var(--primary) / 0.2);
     --shadow-gold: 0 8px 25px -8px hsl(var(--gold) / 0.3);

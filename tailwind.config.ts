@@ -83,6 +83,9 @@ export default {
         'gradient-accent': 'var(--gradient-accent)',
         'gradient-hero': 'var(--gradient-hero)',
         'gradient-subtle': 'var(--gradient-subtle)',
+        'pattern-moroccan-stars': 'var(--pattern-moroccan-stars)',
+        'pattern-zellige': 'var(--pattern-zellige)',
+        'pattern-geometric': 'var(--pattern-geometric)',
       },
       boxShadow: {
         'moroccan': 'var(--shadow-moroccan)',
