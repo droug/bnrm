@@ -90,8 +90,8 @@ const Collections = () => {
               <Card key={index} className="bg-card bg-pattern-moroccan-stars border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 group animate-slide-in relative overflow-hidden"
                     style={{ animationDelay: `${index * 0.1}s` }}>
                 <CardContent className="p-6">
-                  <div className="aspect-[4/3] bg-gradient-accent rounded-lg mb-4 flex items-center justify-center group-hover:animate-glow">
-                    <Scroll className="h-12 w-12 text-accent-foreground opacity-60" />
+                  <div className="w-16 h-16 bg-gradient-accent rounded-lg flex items-center justify-center mb-4 group-hover:animate-glow">
+                    <Scroll className="h-8 w-8 text-accent-foreground" />
                   </div>
                   <h4 className="font-bold text-foreground mb-2">{manuscript.title}</h4>
                   <p className="text-sm text-muted-foreground mb-4">{manuscript.description}</p>
