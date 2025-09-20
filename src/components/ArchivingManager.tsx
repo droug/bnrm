@@ -368,15 +368,20 @@ export default function ArchivingManager() {
                       </div>
                     )}
 
-                    <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-                      <AlertTriangle className="h-4 w-4 text-orange-500" />
-                      <p className="text-sm">
-                        {setting.auto_archive_enabled 
-                          ? `Les contenus publiés depuis plus de ${setting.archive_after_days} jours seront automatiquement archivés`
-                          : 'L\'archivage automatique est désactivé pour ce type de contenu'
-                        }
-                      </p>
-                    </div>
+                <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                  <AlertTriangle className="h-4 w-4 text-orange-500" />
+                  <div className="space-y-1">
+                    <p className="text-sm">
+                      {setting.auto_archive_enabled 
+                        ? `Les contenus publiés depuis plus de ${setting.archive_after_days} jours seront automatiquement archivés`
+                        : 'L\'archivage automatique est désactivé pour ce type de contenu'
+                      }
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Note: L'archivage automatique doit être exécuté manuellement ou via un cron job externe.
+                    </p>
+                  </div>
+                </div>
                   </CardContent>
                 </Card>
               );
