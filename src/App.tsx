@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Manuscripts from "./pages/Manuscripts";
 import AccessRequest from "./pages/AccessRequest";
 import Profile from "./pages/Profile";
+import UserManagement from "./pages/UserManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/manuscripts" element={<Manuscripts />} />
             <Route path="/access-request" element={<AccessRequest />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/admin/users" element={<UserManagement />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

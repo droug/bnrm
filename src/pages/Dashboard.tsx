@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, FileText, Clock, Library, User, Settings, LogOut } from "lucide-react";
+import { BookOpen, Users, FileText, Clock, Library, User, Settings, LogOut, Shield } from "lucide-react";
 
 export default function Dashboard() {
   const { user, profile, signOut, loading } = useAuth();
@@ -94,6 +94,12 @@ export default function Dashboard() {
             <Button variant="ghost" size="sm">
               <Settings className="h-4 w-4" />
             </Button>
+            
+            {profile?.role === 'admin' && (
+              <Button variant="ghost" size="sm" onClick={() => window.location.href = '/admin/users'}>
+                <Shield className="h-4 w-4" />
+              </Button>
+            )}
             
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut className="h-4 w-4" />
