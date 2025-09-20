@@ -27,10 +27,13 @@ import {
   Tag,
   Archive,
   Workflow,
-  Shield
+  Shield,
+  ArrowLeft,
+  Home
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import Header from "@/components/Header";
 import ContentEditor from "@/components/ContentEditor";
 import ArchivingManager from "@/components/ArchivingManager";
@@ -277,6 +280,26 @@ export default function ContentManagement() {
       <Header />
       
       <main className="container py-8">
+        {/* Breadcrumb Navigation */}
+        <div className="mb-6">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/dashboard" className="flex items-center gap-2">
+                    <Home className="h-4 w-4" />
+                    Tableau de bord
+                  </Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Gestion de contenu</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
@@ -288,16 +311,24 @@ export default function ContentManagement() {
                 Créez et gérez actualités, événements, expositions et pages informatives
               </p>
             </div>
-            <Button 
-              onClick={() => {
-                setEditingContent(null);
-                setShowEditor(true);
-              }}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Nouveau Contenu
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button asChild variant="outline">
+                <Link to="/dashboard" className="flex items-center gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Retour
+                </Link>
+              </Button>
+              <Button 
+                onClick={() => {
+                  setEditingContent(null);
+                  setShowEditor(true);
+                }}
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Nouveau Contenu
+              </Button>
+            </div>
           </div>
         </div>
 

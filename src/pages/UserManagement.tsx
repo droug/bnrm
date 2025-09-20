@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Shield, Users, CheckCircle, XCircle, Clock, Settings, User, Mail, Phone, Building, Calendar, UserCheck, UserX, Edit } from "lucide-react";
+import { Shield, Users, CheckCircle, XCircle, Clock, Settings, User, Mail, Phone, Building, Calendar, UserCheck, UserX, Edit, ArrowLeft, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import Header from "@/components/Header";
 import SubscriptionPlansManager from "@/components/SubscriptionPlansManager";
 import AddInternalUserDialog from "@/components/AddInternalUserDialog";
@@ -276,14 +277,44 @@ export default function UserManagement() {
       <Header />
       
       <main className="container py-8">
+        {/* Breadcrumb Navigation */}
+        <div className="mb-6">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/dashboard" className="flex items-center gap-2">
+                    <Home className="h-4 w-4" />
+                    Tableau de bord
+                  </Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Gestion des utilisateurs</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-            <Shield className="h-8 w-8 text-primary" />
-            Gestion des Droits et Permissions
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Administration des utilisateurs, rôles et permissions
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                <Shield className="h-8 w-8 text-primary" />
+                Gestion des Droits et Permissions
+              </h1>
+              <p className="text-muted-foreground mt-2">
+                Administration des utilisateurs, rôles et permissions
+              </p>
+            </div>
+            <Button asChild variant="outline">
+              <Link to="/dashboard" className="flex items-center gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Retour au tableau de bord
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
