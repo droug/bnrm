@@ -279,41 +279,62 @@ export type Database = {
       }
       profiles: {
         Row: {
+          access_level_details: Json | null
           created_at: string | null
           first_name: string
           id: string
           institution: string | null
           is_approved: boolean | null
           last_name: string
+          partner_organization: string | null
           phone: string | null
+          profile_preferences: Json | null
           research_field: string | null
+          research_specialization: string[] | null
           role: Database["public"]["Enums"]["user_role"] | null
+          subscription_end_date: string | null
+          subscription_start_date: string | null
+          subscription_type: string | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          access_level_details?: Json | null
           created_at?: string | null
           first_name: string
           id?: string
           institution?: string | null
           is_approved?: boolean | null
           last_name: string
+          partner_organization?: string | null
           phone?: string | null
+          profile_preferences?: Json | null
           research_field?: string | null
+          research_specialization?: string[] | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          subscription_type?: string | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          access_level_details?: Json | null
           created_at?: string | null
           first_name?: string
           id?: string
           institution?: string | null
           is_approved?: boolean | null
           last_name?: string
+          partner_organization?: string | null
           phone?: string | null
+          profile_preferences?: Json | null
           research_field?: string | null
+          research_specialization?: string[] | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          subscription_type?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -340,7 +361,14 @@ export type Database = {
         | "reserved"
         | "maintenance"
         | "digitization"
-      user_role: "admin" | "librarian" | "researcher" | "visitor"
+      user_role:
+        | "admin"
+        | "librarian"
+        | "researcher"
+        | "visitor"
+        | "public_user"
+        | "subscriber"
+        | "partner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -475,7 +503,15 @@ export const Constants = {
         "maintenance",
         "digitization",
       ],
-      user_role: ["admin", "librarian", "researcher", "visitor"],
+      user_role: [
+        "admin",
+        "librarian",
+        "researcher",
+        "visitor",
+        "public_user",
+        "subscriber",
+        "partner",
+      ],
     },
   },
 } as const
