@@ -8,12 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Shield, Users, CheckCircle, XCircle, Clock, Settings, User, Mail, Phone, Building, Calendar, UserCheck, UserX } from "lucide-react";
+import { Shield, Users, CheckCircle, XCircle, Clock, Settings, User, Mail, Phone, Building, Calendar, UserCheck, UserX, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import SubscriptionPlansManager from "@/components/SubscriptionPlansManager";
 import AddInternalUserDialog from "@/components/AddInternalUserDialog";
+import { EditUserDialog } from "@/components/EditUserDialog";
 
 interface Profile {
   id: string;
@@ -115,6 +116,8 @@ export default function UserManagement() {
   const [pendingRequests, setPendingRequests] = useState<AccessRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState("users");
+  const [editingUser, setEditingUser] = useState<Profile | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   useEffect(() => {
     if (user && profile?.role === 'admin') {
@@ -470,6 +473,19 @@ export default function UserManagement() {
                           </TableCell>
                           <TableCell>
                             <div className="flex gap-2">
+                              {/* Bouton Modifier */}
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => {
+                                  setEditingUser(userProfile);
+                                  setShowEditDialog(true);
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              
+                              {/* Boutons Approuver/Révoquer */}
                               {!userProfile.is_approved ? (
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
@@ -691,6 +707,14 @@ export default function UserManagement() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialogue de modification d'utilisateur */}
+        <EditUserDialog
+          user={editingUser}
+          open={showEditDialog}
+          onOpenChange={setShowEditDialog}
+          onUserUpdated={fetchData}
+        />
       </main>
     </div>
   );
