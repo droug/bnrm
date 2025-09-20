@@ -25,6 +25,11 @@ interface Profile {
   is_approved: boolean;
   created_at: string;
   updated_at: string;
+  subscription_type?: string;
+  partner_organization?: string;
+  research_specialization?: string[];
+  access_level_details?: any;
+  profile_preferences?: any;
 }
 
 interface AccessRequest {
@@ -49,25 +54,54 @@ interface AccessRequest {
 }
 
 const ROLE_PERMISSIONS = {
-  visitor: {
-    name: 'Visiteur',
-    permissions: ['view_public_manuscripts'],
-    description: 'Accès de base aux manuscrits publics'
+  public_user: {
+    name: 'Grand Public',
+    permissions: ['Consultation publique', 'Demandes limitées (5/mois)'],
+    description: 'Accès de base aux ressources publiques',
+    maxRequests: 5,
+    accessLevel: 'basic'
+  },
+  subscriber: {
+    name: 'Abonné Premium',
+    permissions: ['Recherche avancée', 'Téléchargements illimités', 'Support prioritaire'],
+    description: 'Accès premium avec fonctionnalités avancées',
+    maxRequests: 100,
+    accessLevel: 'premium'
   },
   researcher: {
     name: 'Chercheur',
-    permissions: ['view_public_manuscripts', 'view_restricted_manuscripts', 'request_access'],
-    description: 'Accès étendu et possibilité de faire des demandes'
+    permissions: ['Demandes d\'accès étendues (50/mois)', 'Téléchargement', 'Recherche avancée'],
+    description: 'Accès privilégié pour la recherche académique',
+    maxRequests: 50,
+    accessLevel: 'academic'
+  },
+  partner: {
+    name: 'Partenaire Institutionnel',
+    permissions: ['Accès prioritaire (200/mois)', 'Collaboration inter-institutionnelle', 'Projets spéciaux'],
+    description: 'Accès privilégié pour les partenaires institutionnels',
+    maxRequests: 200,
+    accessLevel: 'institutional'
   },
   librarian: {
     name: 'Bibliothécaire',
-    permissions: ['view_all_manuscripts', 'manage_requests', 'manage_manuscripts'],
-    description: 'Gestion des manuscrits et demandes'
+    permissions: ['Gestion des manuscrits', 'Approbation des demandes', 'Gestion des collections'],
+    description: 'Gestion des ressources et approbation des accès',
+    maxRequests: 999,
+    accessLevel: 'extended'
   },
   admin: {
     name: 'Administrateur',
-    permissions: ['full_access', 'manage_users', 'manage_permissions'],
-    description: 'Accès complet à toutes les fonctionnalités'
+    permissions: ['Gestion complète', 'Gestion des utilisateurs', 'Approbation des demandes'],
+    description: 'Accès complet à toutes les fonctionnalités',
+    maxRequests: 999,
+    accessLevel: 'full'
+  },
+  visitor: {
+    name: 'Visiteur (Legacy)',
+    permissions: ['Consultation publique', 'Demandes basiques'],
+    description: 'Ancien rôle - migrer vers Grand Public',
+    maxRequests: 5,
+    accessLevel: 'basic'
   }
 };
 
@@ -201,7 +235,11 @@ export default function UserManagement() {
     switch (role) {
       case 'admin': return 'destructive';
       case 'librarian': return 'default';
+      case 'partner': return 'default';
+      case 'subscriber': return 'secondary';
       case 'researcher': return 'secondary';
+      case 'public_user': return 'outline';
+      case 'visitor': return 'outline';
       default: return 'outline';
     }
   };
@@ -298,6 +336,16 @@ export default function UserManagement() {
                                 <div className="text-sm text-muted-foreground">
                                   ID: {userProfile.id.slice(0, 8)}...
                                 </div>
+                                {userProfile.partner_organization && (
+                                  <div className="text-xs text-blue-600 font-medium">
+                                    Partenaire: {userProfile.partner_organization}
+                                  </div>
+                                )}
+                                {userProfile.subscription_type && (
+                                  <div className="text-xs text-green-600 font-medium">
+                                    Abonnement: {userProfile.subscription_type}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </TableCell>
@@ -328,10 +376,13 @@ export default function UserManagement() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="visitor">Visiteur</SelectItem>
+                                <SelectItem value="public_user">Grand Public</SelectItem>
+                                <SelectItem value="subscriber">Abonné Premium</SelectItem>
                                 <SelectItem value="researcher">Chercheur</SelectItem>
+                                <SelectItem value="partner">Partenaire Institutionnel</SelectItem>
                                 <SelectItem value="librarian">Bibliothécaire</SelectItem>
                                 <SelectItem value="admin">Administrateur</SelectItem>
+                                <SelectItem value="visitor">Visiteur (Legacy)</SelectItem>
                               </SelectContent>
                             </Select>
                           </TableCell>
@@ -424,17 +475,29 @@ export default function UserManagement() {
                       {roleData.description}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <h4 className="font-medium text-sm">Permissions :</h4>
-                      <ul className="space-y-1">
-                        {roleData.permissions.map((permission) => (
-                          <li key={permission} className="flex items-center gap-2 text-sm">
-                            <CheckCircle className="h-3 w-3 text-green-600" />
-                            {permission.replace(/_/g, ' ').toLowerCase()}
-                          </li>
-                        ))}
-                      </ul>
+                   <CardContent>
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Demandes max/mois:</span>
+                          <span className="font-medium">{roleData.maxRequests === 999 ? 'Illimité' : roleData.maxRequests}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Niveau d'accès:</span>
+                          <span className="font-medium capitalize">{roleData.accessLevel}</span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">Permissions :</h4>
+                        <ul className="space-y-1">
+                          {roleData.permissions.map((permission) => (
+                            <li key={permission} className="flex items-center gap-2 text-sm">
+                              <CheckCircle className="h-3 w-3 text-green-600" />
+                              {permission}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

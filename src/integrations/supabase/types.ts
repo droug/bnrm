@@ -387,6 +387,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_profile_permissions: {
+        Args: { user_uuid: string }
+        Returns: Json
+      }
       get_user_role: {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["user_role"]
