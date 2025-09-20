@@ -24,13 +24,17 @@ import {
   BookOpen,
   Image as ImageIcon,
   Tag,
-  Archive
+  Archive,
+  Workflow,
+  Shield
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import ContentEditor from "@/components/ContentEditor";
 import ArchivingManager from "@/components/ArchivingManager";
+import WorkflowManager from "@/components/WorkflowManager";
+import LegalDepositManager from "@/components/LegalDepositManager";
 
 interface Content {
   id: string;
@@ -376,12 +380,20 @@ export default function ContentManagement() {
 
         {/* Onglets par type */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="all">Tous ({stats.total})</TabsTrigger>
             <TabsTrigger value="news">Actualités ({stats.byType.news})</TabsTrigger>
             <TabsTrigger value="event">Événements ({stats.byType.event})</TabsTrigger>
             <TabsTrigger value="exhibition">Expositions ({stats.byType.exhibition})</TabsTrigger>
             <TabsTrigger value="page">Pages ({stats.byType.page})</TabsTrigger>
+            <TabsTrigger value="workflows" className="flex items-center gap-2">
+              <Workflow className="h-4 w-4" />
+              Workflows
+            </TabsTrigger>
+            <TabsTrigger value="legal-deposits" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Dépôts Légaux
+            </TabsTrigger>
             <TabsTrigger value="archiving" className="flex items-center gap-2">
               <Archive className="h-4 w-4" />
               Archivage
@@ -389,7 +401,7 @@ export default function ContentManagement() {
           </TabsList>
 
           <TabsContent value={selectedTab} className="space-y-6">
-            <Card>
+            {(selectedTab === "workflows" || selectedTab === "legal-deposits" || selectedTab === "archiving") ? null : (
               <CardHeader>
                 <CardTitle>
                   {selectedTab === "all" ? "Tous les contenus" : CONTENT_TYPES[selectedTab as keyof typeof CONTENT_TYPES]?.name}
@@ -580,6 +592,16 @@ export default function ContentManagement() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Onglet Workflows */}
+          <TabsContent value="workflows" className="space-y-6">
+            <WorkflowManager />
+          </TabsContent>
+
+          {/* Onglet Dépôts Légaux */}
+          <TabsContent value="legal-deposits" className="space-y-6">
+            <LegalDepositManager />
           </TabsContent>
 
           {/* Onglet Archivage */}
