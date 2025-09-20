@@ -23,12 +23,14 @@ import {
   Clock,
   BookOpen,
   Image as ImageIcon,
-  Tag
+  Tag,
+  Archive
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import ContentEditor from "@/components/ContentEditor";
+import ArchivingManager from "@/components/ArchivingManager";
 
 interface Content {
   id: string;
@@ -374,12 +376,16 @@ export default function ContentManagement() {
 
         {/* Onglets par type */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="all">Tous ({stats.total})</TabsTrigger>
             <TabsTrigger value="news">Actualités ({stats.byType.news})</TabsTrigger>
             <TabsTrigger value="event">Événements ({stats.byType.event})</TabsTrigger>
             <TabsTrigger value="exhibition">Expositions ({stats.byType.exhibition})</TabsTrigger>
             <TabsTrigger value="page">Pages ({stats.byType.page})</TabsTrigger>
+            <TabsTrigger value="archiving" className="flex items-center gap-2">
+              <Archive className="h-4 w-4" />
+              Archivage
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value={selectedTab} className="space-y-6">
@@ -574,6 +580,11 @@ export default function ContentManagement() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Onglet Archivage */}
+          <TabsContent value="archiving" className="space-y-6">
+            <ArchivingManager />
           </TabsContent>
         </Tabs>
       </main>

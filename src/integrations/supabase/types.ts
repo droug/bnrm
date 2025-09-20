@@ -122,6 +122,81 @@ export type Database = {
           },
         ]
       }
+      archiving_logs: {
+        Row: {
+          action: string
+          content_id: string
+          content_title: string
+          content_type: Database["public"]["Enums"]["content_type"]
+          executed_at: string | null
+          executed_by: string | null
+          id: string
+          new_status: Database["public"]["Enums"]["content_status"] | null
+          old_status: Database["public"]["Enums"]["content_status"] | null
+          reason: string | null
+        }
+        Insert: {
+          action: string
+          content_id: string
+          content_title: string
+          content_type: Database["public"]["Enums"]["content_type"]
+          executed_at?: string | null
+          executed_by?: string | null
+          id?: string
+          new_status?: Database["public"]["Enums"]["content_status"] | null
+          old_status?: Database["public"]["Enums"]["content_status"] | null
+          reason?: string | null
+        }
+        Update: {
+          action?: string
+          content_id?: string
+          content_title?: string
+          content_type?: Database["public"]["Enums"]["content_type"]
+          executed_at?: string | null
+          executed_by?: string | null
+          id?: string
+          new_status?: Database["public"]["Enums"]["content_status"] | null
+          old_status?: Database["public"]["Enums"]["content_status"] | null
+          reason?: string | null
+        }
+        Relationships: []
+      }
+      archiving_settings: {
+        Row: {
+          archive_after_days: number | null
+          archive_condition: string | null
+          auto_archive_enabled: boolean | null
+          content_type: Database["public"]["Enums"]["content_type"]
+          created_at: string | null
+          exclude_featured: boolean | null
+          id: string
+          min_view_count: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          archive_after_days?: number | null
+          archive_condition?: string | null
+          auto_archive_enabled?: boolean | null
+          content_type: Database["public"]["Enums"]["content_type"]
+          created_at?: string | null
+          exclude_featured?: boolean | null
+          id?: string
+          min_view_count?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          archive_after_days?: number | null
+          archive_condition?: string | null
+          auto_archive_enabled?: boolean | null
+          content_type?: Database["public"]["Enums"]["content_type"]
+          created_at?: string | null
+          exclude_featured?: boolean | null
+          id?: string
+          min_view_count?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string | null
@@ -643,6 +718,17 @@ export type Database = {
       }
       is_admin_or_librarian: {
         Args: { user_uuid: string }
+        Returns: boolean
+      }
+      perform_automatic_archiving: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      should_content_be_archived: {
+        Args: {
+          content_row: Record<string, unknown>
+          settings_row: Record<string, unknown>
+        }
         Returns: boolean
       }
       user_has_permission: {
