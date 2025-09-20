@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Users, FileText, Clock, Library, User, Settings, LogOut, Shield } from "lucide-react";
+import { PermissionGuard } from "@/hooks/usePermissions";
 
 export default function Dashboard() {
   const { user, profile, signOut, loading } = useAuth();
@@ -95,11 +96,11 @@ export default function Dashboard() {
               <Settings className="h-4 w-4" />
             </Button>
             
-            {profile?.role === 'admin' && (
+            <PermissionGuard permission="users.view">
               <Button variant="ghost" size="sm" onClick={() => window.location.href = '/admin/users'}>
                 <Shield className="h-4 w-4" />
               </Button>
-            )}
+            </PermissionGuard>
             
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut className="h-4 w-4" />
