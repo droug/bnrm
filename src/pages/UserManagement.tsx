@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import SubscriptionPlansManager from "@/components/SubscriptionPlansManager";
+import AddInternalUserDialog from "@/components/AddInternalUserDialog";
 
 interface Profile {
   id: string;
@@ -306,15 +307,70 @@ export default function UserManagement() {
           <TabsContent value="users" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Gestion des Utilisateurs
-                </CardTitle>
-                <CardDescription>
-                  Gérez les rôles et approbations des utilisateurs
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      Gestion des Utilisateurs
+                    </CardTitle>
+                    <CardDescription>
+                      Gérez les rôles et approbations des utilisateurs
+                    </CardDescription>
+                  </div>
+                  <AddInternalUserDialog onUserAdded={fetchData} />
+                </div>
               </CardHeader>
               <CardContent>
+                {/* Statistiques des utilisateurs internes */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-red-600" />
+                        <span className="text-sm font-medium">Administrateurs</span>
+                      </div>
+                      <div className="text-2xl font-bold text-red-700 dark:text-red-400">
+                        {users.filter(u => u.role === 'admin').length}
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-medium">Bibliothécaires</span>
+                      </div>
+                      <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+                        {users.filter(u => u.role === 'librarian').length}
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2">
+                        <Building className="h-4 w-4 text-purple-600" />
+                        <span className="text-sm font-medium">Partenaires</span>
+                      </div>
+                      <div className="text-2xl font-bold text-purple-700 dark:text-purple-400">
+                        {users.filter(u => u.role === 'partner').length}
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium">Approuvés</span>
+                      </div>
+                      <div className="text-2xl font-bold text-green-700 dark:text-green-400">
+                        {users.filter(u => u.is_approved).length}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
@@ -333,10 +389,20 @@ export default function UserManagement() {
                         <TableRow key={userProfile.id}>
                           <TableCell>
                             <div className="flex items-center gap-3">
-                              <User className="h-4 w-4 text-muted-foreground" />
+                              <div className="relative">
+                                <User className="h-4 w-4 text-muted-foreground" />
+                                {['admin', 'librarian', 'partner'].includes(userProfile.role) && (
+                                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" title="Utilisateur interne" />
+                                )}
+                              </div>
                               <div>
                                 <div className="font-medium">
                                   {userProfile.first_name} {userProfile.last_name}
+                                  {['admin', 'librarian', 'partner'].includes(userProfile.role) && (
+                                    <Badge variant="outline" className="ml-2 text-xs">
+                                      Interne
+                                    </Badge>
+                                  )}
                                 </div>
                                 <div className="text-sm text-muted-foreground">
                                   ID: {userProfile.id.slice(0, 8)}...
