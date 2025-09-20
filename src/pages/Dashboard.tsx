@@ -226,6 +226,26 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           
+          
+          <PermissionGuard permission="manuscripts.create">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <FileText className="h-5 w-5" />
+                  <span>Gestion de contenu</span>
+                </CardTitle>
+                <CardDescription>
+                  Créer et gérer actualités, événements et expositions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full" variant="outline" onClick={() => window.location.href = '/admin/content'}>
+                  Gérer le contenu
+                </Button>
+              </CardContent>
+            </Card>
+          </PermissionGuard>
+          
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
