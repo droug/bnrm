@@ -400,183 +400,175 @@ export default function ContentManagement() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value={selectedTab} className="space-y-6">
-            {(selectedTab === "workflows" || selectedTab === "legal-deposits" || selectedTab === "archiving") ? null : (
-              <CardHeader>
-                <CardTitle>
-                  {selectedTab === "all" ? "Tous les contenus" : CONTENT_TYPES[selectedTab as keyof typeof CONTENT_TYPES]?.name}
-                </CardTitle>
-                <CardDescription>
-                  {filteredContents.length} contenu(s) trouvé(s)
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Titre</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead>Auteur</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Vues</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredContents.map((content) => {
-                        const ContentIcon = CONTENT_TYPES[content.content_type].icon;
-                        const StatusIcon = STATUS_CONFIG[content.status].icon;
-                        
-                        return (
-                          <TableRow key={content.id}>
-                            <TableCell>
-                              <div className="flex items-center gap-3">
-                                <ContentIcon className="h-4 w-4 text-muted-foreground" />
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <div className="font-medium">{content.title}</div>
-                                    {content.is_featured && (
-                                      <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                                    )}
-                                  </div>
-                                  {content.excerpt && (
-                                    <div className="text-sm text-muted-foreground line-clamp-1">
-                                      {content.excerpt}
-                                    </div>
-                                  )}
-                                  {content.tags && content.tags.length > 0 && (
-                                    <div className="flex gap-1 mt-1">
-                                      {content.tags.slice(0, 3).map((tag, index) => (
-                                        <Badge key={index} variant="outline" className="text-xs">
-                                          {tag}
-                                        </Badge>
-                                      ))}
-                                      {content.tags.length > 3 && (
-                                        <Badge variant="outline" className="text-xs">
-                                          +{content.tags.length - 3}
-                                        </Badge>
+          {/* Onglets de contenu */}
+          {selectedTab !== "workflows" && selectedTab !== "legal-deposits" && selectedTab !== "archiving" && (
+            <TabsContent value={selectedTab} className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    {selectedTab === "all" ? "Tous les contenus" : CONTENT_TYPES[selectedTab as keyof typeof CONTENT_TYPES]?.name}
+                  </CardTitle>
+                  <CardDescription>
+                    {filteredContents.length} contenu(s) trouvé(s)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Titre</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Statut</TableHead>
+                          <TableHead>Auteur</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Vues</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredContents.map((content) => {
+                          const ContentIcon = CONTENT_TYPES[content.content_type].icon;
+                          
+                          return (
+                            <TableRow key={content.id}>
+                              <TableCell>
+                                <div className="flex items-center gap-3">
+                                  <ContentIcon className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <div className="font-medium">{content.title}</div>
+                                      {content.is_featured && (
+                                        <Star className="h-3 w-3 text-yellow-500 fill-current" />
                                       )}
                                     </div>
+                                    {content.excerpt && (
+                                      <div className="text-sm text-muted-foreground line-clamp-1">
+                                        {content.excerpt}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge className={CONTENT_TYPES[content.content_type].color}>
+                                  {CONTENT_TYPES[content.content_type].name}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Select
+                                  value={content.status}
+                                  onValueChange={(value) => handleChangeStatus(content.id, value)}
+                                >
+                                  <SelectTrigger className="w-32">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="draft">
+                                      <div className="flex items-center gap-2">
+                                        <Clock className="h-3 w-3" />
+                                        Brouillon
+                                      </div>
+                                    </SelectItem>
+                                    <SelectItem value="published">
+                                      <div className="flex items-center gap-2">
+                                        <Eye className="h-3 w-3" />
+                                        Publié
+                                      </div>
+                                    </SelectItem>
+                                    <SelectItem value="archived">
+                                      <div className="flex items-center gap-2">
+                                        <Archive className="h-3 w-3" />
+                                        Archivé
+                                      </div>
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </TableCell>
+                              <TableCell>
+                                {content.profiles && (
+                                  <div className="text-sm">
+                                    {content.profiles.first_name} {content.profiles.last_name}
+                                  </div>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <div className="text-sm">
+                                  {content.published_at ? (
+                                    <div>Publié: {formatDate(content.published_at)}</div>
+                                  ) : (
+                                    <div>Créé: {formatDate(content.created_at)}</div>
                                   )}
                                 </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge className={CONTENT_TYPES[content.content_type].color}>
-                                {CONTENT_TYPES[content.content_type].name}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Select
-                                value={content.status}
-                                onValueChange={(value) => handleChangeStatus(content.id, value)}
-                              >
-                                <SelectTrigger className="w-32">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="draft">Brouillon</SelectItem>
-                                  <SelectItem value="published">Publié</SelectItem>
-                                  <SelectItem value="archived">Archivé</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                            <TableCell>
-                              {content.profiles ? 
-                                `${content.profiles.first_name} ${content.profiles.last_name}` : 
-                                'Inconnu'
-                              }
-                            </TableCell>
-                            <TableCell>
-                              <div className="text-sm">
-                                {content.status === 'published' && content.published_at ? 
-                                  formatDate(content.published_at) : 
-                                  formatDate(content.updated_at)
-                                }
-                              </div>
-                              {(content.content_type === 'event' || content.content_type === 'exhibition') && content.start_date && (
-                                <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                  <Calendar className="h-3 w-3" />
-                                  {formatDate(content.start_date)}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-1">
+                                  <Eye className="h-3 w-3 text-muted-foreground" />
+                                  {content.view_count}
                                 </div>
-                              )}
-                              {content.location && (
-                                <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                  <MapPin className="h-3 w-3" />
-                                  {content.location}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleToggleFeature(content.id, content.is_featured)}
+                                  >
+                                    <Star className={`h-3 w-3 ${content.is_featured ? 'fill-current text-yellow-500' : ''}`} />
+                                  </Button>
+                                  
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      setEditingContent(content);
+                                      setShowEditor(true);
+                                    }}
+                                  >
+                                    <Edit className="h-3 w-3" />
+                                  </Button>
+                                  
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button variant="outline" size="sm">
+                                        <Trash2 className="h-3 w-3" />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Êtes-vous sûr de vouloir supprimer "{content.title}" ? Cette action est irréversible.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDeleteContent(content.id)}>
+                                          Supprimer
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
                                 </div>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-1">
-                                <Eye className="h-3 w-3 text-muted-foreground" />
-                                {content.view_count}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleToggleFeature(content.id, content.is_featured)}
-                                >
-                                  <Star className={`h-4 w-4 ${content.is_featured ? 'text-yellow-500 fill-current' : ''}`} />
-                                </Button>
-                                
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => {
-                                    setEditingContent(content);
-                                    setShowEditor(true);
-                                  }}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button size="sm" variant="outline">
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Supprimer le contenu</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Êtes-vous sûr de vouloir supprimer "{content.title}" ? Cette action est irréversible.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() => handleDeleteContent(content.id)}
-                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                      >
-                                        Supprimer
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
                   
                   {filteredContents.length === 0 && (
                     <div className="text-center py-8">
                       <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold">Aucun contenu trouvé</h3>
-                      <p className="text-muted-foreground">
-                        {searchTerm ? "Aucun contenu ne correspond à votre recherche" : "Commencez par créer votre premier contenu"}
+                      <h3 className="text-lg font-medium text-muted-foreground mb-2">
+                        Aucun contenu trouvé
+                      </h3>
+                      <p className="text-muted-foreground mb-4">
+                        {selectedTab === "all" ? "Aucun contenu n'a été créé" : `Aucun contenu de type "${CONTENT_TYPES[selectedTab as keyof typeof CONTENT_TYPES]?.name}" trouvé`}
                       </p>
-                      {!searchTerm && (
-                        <Button 
+                      {selectedTab === "all" && (
+                        <Button
                           className="mt-4"
                           onClick={() => {
                             setEditingContent(null);
@@ -589,10 +581,10 @@ export default function ContentManagement() {
                       )}
                     </div>
                   )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
 
           {/* Onglet Workflows */}
           <TabsContent value="workflows" className="space-y-6">
