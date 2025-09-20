@@ -402,6 +402,105 @@ export type Database = {
           },
         ]
       }
+      content_translations: {
+        Row: {
+          content_body: string
+          content_id: string
+          created_at: string | null
+          excerpt: string | null
+          id: string
+          is_approved: boolean | null
+          language_code: string
+          meta_description: string | null
+          meta_title: string | null
+          seo_keywords: string[] | null
+          slug: string
+          title: string
+          translated_by: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content_body: string
+          content_id: string
+          created_at?: string | null
+          excerpt?: string | null
+          id?: string
+          is_approved?: boolean | null
+          language_code: string
+          meta_description?: string | null
+          meta_title?: string | null
+          seo_keywords?: string[] | null
+          slug: string
+          title: string
+          translated_by?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content_body?: string
+          content_id?: string
+          created_at?: string | null
+          excerpt?: string | null
+          id?: string
+          is_approved?: boolean | null
+          language_code?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          seo_keywords?: string[] | null
+          slug?: string
+          title?: string
+          translated_by?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_translations_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_translations_language_code_fkey"
+            columns: ["language_code"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      languages: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          is_rtl: boolean | null
+          name: string
+          native_name: string
+          sort_order: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_rtl?: boolean | null
+          name: string
+          native_name: string
+          sort_order?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_rtl?: boolean | null
+          name?: string
+          native_name?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       manuscripts: {
         Row: {
           access_level: Database["public"]["Enums"]["access_level"] | null
@@ -650,6 +749,78 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      translation_keys: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          key_name: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key_name: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key_name?: string
+        }
+        Relationships: []
+      }
+      translations: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_approved: boolean | null
+          language_code: string
+          translated_by: string | null
+          translation_key_id: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_approved?: boolean | null
+          language_code: string
+          translated_by?: string | null
+          translation_key_id: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_approved?: boolean | null
+          language_code?: string
+          translated_by?: string | null
+          translation_key_id?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "translations_language_code_fkey"
+            columns: ["language_code"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "translations_translation_key_id_fkey"
+            columns: ["translation_key_id"]
+            isOneToOne: false
+            referencedRelation: "translation_keys"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_permissions: {
         Row: {
