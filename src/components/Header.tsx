@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, X, Book, Globe, Users } from "lucide-react";
+import { Search, Menu, X, Book, Globe, Users, User, LogIn } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { language, setLanguage, t, isRTL } = useLanguage();
+  const { user, profile } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border shadow-elegant">
@@ -50,6 +53,24 @@ const Header = () => {
             >
               English
             </Button>
+            
+            {user ? (
+              <Link to="/dashboard">
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">
+                    {profile?.first_name || 'Dashboard'}
+                  </span>
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/auth">
+                <Button size="sm" className="flex items-center space-x-2">
+                  <LogIn className="h-4 w-4" />
+                  <span>Connexion</span>
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
 
