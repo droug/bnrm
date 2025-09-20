@@ -340,6 +340,48 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          has_advanced_search: boolean | null
+          has_priority_support: boolean | null
+          id: string
+          max_downloads_per_month: number | null
+          max_manuscript_requests: number | null
+          name: string
+          price_monthly: number | null
+          price_yearly: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          has_advanced_search?: boolean | null
+          has_priority_support?: boolean | null
+          id?: string
+          max_downloads_per_month?: number | null
+          max_manuscript_requests?: number | null
+          name: string
+          price_monthly?: number | null
+          price_yearly?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          has_advanced_search?: boolean | null
+          has_priority_support?: boolean | null
+          id?: string
+          max_downloads_per_month?: number | null
+          max_manuscript_requests?: number | null
+          name?: string
+          price_monthly?: number | null
+          price_yearly?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
