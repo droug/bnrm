@@ -468,6 +468,53 @@ export type Database = {
           },
         ]
       }
+      content_validation: {
+        Row: {
+          comments: string | null
+          content_id: string
+          created_at: string | null
+          id: string
+          status: string
+          updated_at: string | null
+          validated_at: string | null
+          validation_criteria: Json | null
+          validation_type: string
+          validator_id: string | null
+        }
+        Insert: {
+          comments?: string | null
+          content_id: string
+          created_at?: string | null
+          id?: string
+          status?: string
+          updated_at?: string | null
+          validated_at?: string | null
+          validation_criteria?: Json | null
+          validation_type: string
+          validator_id?: string | null
+        }
+        Update: {
+          comments?: string | null
+          content_id?: string
+          created_at?: string | null
+          id?: string
+          status?: string
+          updated_at?: string | null
+          validated_at?: string | null
+          validation_criteria?: Json | null
+          validation_type?: string
+          validator_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_validation_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       languages: {
         Row: {
           code: string
@@ -500,6 +547,56 @@ export type Database = {
           sort_order?: number | null
         }
         Relationships: []
+      }
+      legal_deposits: {
+        Row: {
+          acknowledgment_date: string | null
+          content_id: string
+          created_at: string | null
+          deposit_number: string | null
+          deposit_type: string
+          id: string
+          metadata: Json | null
+          status: string
+          submission_date: string | null
+          submitter_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          acknowledgment_date?: string | null
+          content_id: string
+          created_at?: string | null
+          deposit_number?: string | null
+          deposit_type: string
+          id?: string
+          metadata?: Json | null
+          status?: string
+          submission_date?: string | null
+          submitter_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          acknowledgment_date?: string | null
+          content_id?: string
+          created_at?: string | null
+          deposit_number?: string | null
+          deposit_type?: string
+          id?: string
+          metadata?: Json | null
+          status?: string
+          submission_date?: string | null
+          submitter_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_deposits_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       manuscripts: {
         Row: {
@@ -866,6 +963,149 @@ export type Database = {
           },
         ]
       }
+      workflow_instances: {
+        Row: {
+          completed_at: string | null
+          content_id: string
+          created_at: string | null
+          current_step: number | null
+          id: string
+          metadata: Json | null
+          started_at: string | null
+          started_by: string
+          status: string
+          updated_at: string | null
+          workflow_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          content_id: string
+          created_at?: string | null
+          current_step?: number | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string | null
+          started_by: string
+          status?: string
+          updated_at?: string | null
+          workflow_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          content_id?: string
+          created_at?: string | null
+          current_step?: number | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string | null
+          started_by?: string
+          status?: string
+          updated_at?: string | null
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_instances_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_instances_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_step_executions: {
+        Row: {
+          assigned_to: string | null
+          comments: string | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          started_at: string | null
+          status: string
+          step_name: string
+          step_number: number
+          updated_at: string | null
+          workflow_instance_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          comments?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string | null
+          status?: string
+          step_name: string
+          step_number: number
+          updated_at?: string | null
+          workflow_instance_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          comments?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string | null
+          status?: string
+          step_name?: string
+          step_number?: number
+          updated_at?: string | null
+          workflow_instance_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_step_executions_workflow_instance_id_fkey"
+            columns: ["workflow_instance_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflows: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          steps: Json
+          updated_at: string | null
+          workflow_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          steps?: Json
+          updated_at?: string | null
+          workflow_type: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          steps?: Json
+          updated_at?: string | null
+          workflow_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -873,6 +1113,10 @@ export type Database = {
     Functions: {
       generate_content_slug: {
         Args: { title: string }
+        Returns: string
+      }
+      generate_deposit_number: {
+        Args: Record<PropertyKey, never>
         Returns: string
       }
       get_profile_permissions: {
