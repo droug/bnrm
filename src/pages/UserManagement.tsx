@@ -12,6 +12,7 @@ import { Shield, Users, CheckCircle, XCircle, Clock, Settings, User, Mail, Phone
 import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
+import SubscriptionPlansManager from "@/components/SubscriptionPlansManager";
 
 interface Profile {
   id: string;
@@ -282,7 +283,7 @@ export default function UserManagement() {
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Utilisateurs
@@ -290,6 +291,10 @@ export default function UserManagement() {
             <TabsTrigger value="permissions" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Permissions
+            </TabsTrigger>
+            <TabsTrigger value="plans" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Profils & Plans
             </TabsTrigger>
             <TabsTrigger value="requests" className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
@@ -503,6 +508,11 @@ export default function UserManagement() {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          {/* Profils et Plans d'abonnement */}
+          <TabsContent value="plans" className="space-y-6">
+            <SubscriptionPlansManager />
           </TabsContent>
 
           {/* Demandes en attente */}
