@@ -196,7 +196,7 @@ export default function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">
+              <Button className="w-full" onClick={() => window.location.href = '/manuscripts'}>
                 Accéder aux manuscrits
               </Button>
             </CardContent>
@@ -213,7 +213,7 @@ export default function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" variant="outline">
+              <Button className="w-full" variant="outline" onClick={() => window.location.href = '/access-request'}>
                 Nouvelle demande
               </Button>
             </CardContent>
@@ -230,7 +230,7 @@ export default function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" variant="outline">
+              <Button className="w-full" variant="outline" onClick={() => window.location.href = '/profile'}>
                 Modifier le profil
               </Button>
             </CardContent>
