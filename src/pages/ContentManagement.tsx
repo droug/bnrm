@@ -36,6 +36,7 @@ import ContentEditor from "@/components/ContentEditor";
 import ArchivingManager from "@/components/ArchivingManager";
 import WorkflowManager from "@/components/WorkflowManager";
 import LegalDepositManager from "@/components/LegalDepositManager";
+import { ActivityMonitor } from "@/components/ActivityMonitor";
 
 interface Content {
   id: string;
@@ -389,7 +390,7 @@ export default function ContentManagement() {
 
         {/* Onglets par type */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8">
+          <TabsList className="grid w-full grid-cols-9">
             <TabsTrigger value="all">Tous ({stats.total})</TabsTrigger>
             <TabsTrigger value="news">Actualités ({stats.byType.news})</TabsTrigger>
             <TabsTrigger value="event">Événements ({stats.byType.event})</TabsTrigger>
@@ -407,10 +408,14 @@ export default function ContentManagement() {
               <Archive className="h-4 w-4" />
               Archivage
             </TabsTrigger>
+            <TabsTrigger value="security" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Sécurité
+            </TabsTrigger>
           </TabsList>
 
           {/* Onglets de contenu */}
-          {selectedTab !== "workflows" && selectedTab !== "legal-deposits" && selectedTab !== "archiving" && (
+          {selectedTab !== "workflows" && selectedTab !== "legal-deposits" && selectedTab !== "archiving" && selectedTab !== "security" && (
             <TabsContent value={selectedTab} className="space-y-6">
               <Card>
                 <CardHeader>
@@ -608,6 +613,11 @@ export default function ContentManagement() {
           {/* Onglet Archivage */}
           <TabsContent value="archiving" className="space-y-6">
             <ArchivingManager />
+          </TabsContent>
+
+          {/* Onglet Sécurité et Surveillance */}
+          <TabsContent value="security" className="space-y-6">
+            <ActivityMonitor />
           </TabsContent>
         </Tabs>
       </main>
