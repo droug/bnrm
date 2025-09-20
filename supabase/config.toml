@@ -1,1 +1,12 @@
 project_id = "safeppmznupzqkqmzjzt"
+
+[auth]
+enabled = true
+site_url = "https://lovable.dev"
+additional_redirect_urls = ["https://lovable.dev"]
+
+[functions.cleanup-activity-logs]
+verify_jwt = false
+
+[functions.auto-archive-content]
+verify_jwt = false

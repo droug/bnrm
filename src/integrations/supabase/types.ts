@@ -1111,6 +1111,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      anonymize_ip: {
+        Args: { ip_addr: unknown }
+        Returns: unknown
+      }
+      anonymize_user_agent: {
+        Args: { user_agent_str: string }
+        Returns: string
+      }
+      cleanup_old_activity_logs: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       generate_content_slug: {
         Args: { title: string }
         Returns: string
@@ -1130,6 +1142,17 @@ export type Database = {
       get_user_role: {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["user_role"]
+      }
+      insert_activity_log: {
+        Args: {
+          p_action: string
+          p_details?: Json
+          p_ip_address?: unknown
+          p_resource_id?: string
+          p_resource_type: string
+          p_user_agent?: string
+        }
+        Returns: string
       }
       is_admin_or_librarian: {
         Args: { user_uuid: string }
