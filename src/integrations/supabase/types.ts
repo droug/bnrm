@@ -189,6 +189,144 @@ export type Database = {
           },
         ]
       }
+      content: {
+        Row: {
+          author_id: string
+          content_body: string
+          content_type: Database["public"]["Enums"]["content_type"]
+          created_at: string | null
+          end_date: string | null
+          excerpt: string | null
+          featured_image_url: string | null
+          id: string
+          is_featured: boolean | null
+          location: string | null
+          meta_description: string | null
+          meta_title: string | null
+          published_at: string | null
+          seo_keywords: string[] | null
+          slug: string
+          start_date: string | null
+          status: Database["public"]["Enums"]["content_status"] | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          view_count: number | null
+        }
+        Insert: {
+          author_id: string
+          content_body: string
+          content_type: Database["public"]["Enums"]["content_type"]
+          created_at?: string | null
+          end_date?: string | null
+          excerpt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          is_featured?: boolean | null
+          location?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          published_at?: string | null
+          seo_keywords?: string[] | null
+          slug: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["content_status"] | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          author_id?: string
+          content_body?: string
+          content_type?: Database["public"]["Enums"]["content_type"]
+          created_at?: string | null
+          end_date?: string | null
+          excerpt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          is_featured?: boolean | null
+          location?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          published_at?: string | null
+          seo_keywords?: string[] | null
+          slug?: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["content_status"] | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Relationships: []
+      }
+      content_categories: {
+        Row: {
+          color: string | null
+          content_type: Database["public"]["Enums"]["content_type"]
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          color?: string | null
+          content_type: Database["public"]["Enums"]["content_type"]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          color?: string | null
+          content_type?: Database["public"]["Enums"]["content_type"]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      content_category_relations: {
+        Row: {
+          category_id: string
+          content_id: string
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          category_id: string
+          content_id: string
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          category_id?: string
+          content_id?: string
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_category_relations_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "content_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_category_relations_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       manuscripts: {
         Row: {
           access_level: Database["public"]["Enums"]["access_level"] | null
@@ -487,6 +625,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_content_slug: {
+        Args: { title: string }
+        Returns: string
+      }
       get_profile_permissions: {
         Args: { user_uuid: string }
         Returns: Json
@@ -510,6 +652,8 @@ export type Database = {
     }
     Enums: {
       access_level: "public" | "restricted" | "confidential"
+      content_status: "draft" | "published" | "archived"
+      content_type: "news" | "event" | "exhibition" | "page"
       manuscript_status:
         | "available"
         | "reserved"
@@ -651,6 +795,8 @@ export const Constants = {
   public: {
     Enums: {
       access_level: ["public", "restricted", "confidential"],
+      content_status: ["draft", "published", "archived"],
+      content_type: ["news", "event", "exhibition", "page"],
       manuscript_status: [
         "available",
         "reserved",
