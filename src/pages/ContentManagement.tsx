@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { WatermarkContainer } from "@/components/ui/watermark";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -263,7 +264,15 @@ export default function ContentManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <WatermarkContainer 
+      watermarkProps={{ 
+        text: "BNRM Admin - Gestion de Contenu", 
+        variant: "subtle", 
+        position: "pattern",
+        opacity: 0.02
+      }}
+    >
+      <div className="min-h-screen bg-gradient-subtle">
       <Header />
       
       <main className="container py-8">
@@ -602,6 +611,7 @@ export default function ContentManagement() {
           </TabsContent>
         </Tabs>
       </main>
-    </div>
+      </div>
+    </WatermarkContainer>
   );
 }

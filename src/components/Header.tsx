@@ -5,6 +5,7 @@ import { Search, Menu, X, Book, Globe, Users, User, LogIn } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
+import { WatermarkContainer } from "@/components/ui/watermark";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,7 +13,15 @@ const Header = () => {
   const { user, profile } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border shadow-elegant">
+    <WatermarkContainer 
+      watermarkProps={{ 
+        text: "BNRM Portal - Bibliothèque Nationale", 
+        variant: "subtle", 
+        position: "corner",
+        opacity: 0.03
+      }}
+    >
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border shadow-elegant">
       <div className="container mx-auto px-4">
         {/* Top bar with language and contact */}
         <div className="flex justify-between items-center py-2 text-sm border-b border-border/50">
@@ -169,7 +178,8 @@ const Header = () => {
           </nav>
         </div>
       )}
-    </header>
+      </header>
+    </WatermarkContainer>
   );
 };
 

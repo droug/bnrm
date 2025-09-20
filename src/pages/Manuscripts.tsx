@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BookOpen, Search, Eye, Download, Calendar, User, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
+import { WatermarkContainer } from "@/components/ui/watermark";
+import { ProtectedWatermark } from "@/components/ui/protected-watermark";
 
 interface Manuscript {
   id: string;
@@ -140,7 +142,19 @@ export default function Manuscripts() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <WatermarkContainer 
+      watermarkProps={{ 
+        text: "BNRM Manuscrits - Collection Protégée", 
+        variant: "subtle", 
+        position: "pattern",
+        opacity: 0.03
+      }}
+    >
+      <div className="min-h-screen bg-gradient-subtle relative">
+        <ProtectedWatermark 
+          userRole={user ? "researcher" : "visitor"}
+          isProtected={true}
+        />
       <Header />
       
       <main className="container py-8">
@@ -303,6 +317,7 @@ export default function Manuscripts() {
           </div>
         )}
       </main>
-    </div>
+      </div>
+    </WatermarkContainer>
   );
 }

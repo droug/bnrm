@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Users, FileText, Clock, Library, User, Settings, LogOut, Shield } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
+import { WatermarkContainer } from "@/components/ui/watermark";
 
 export default function Dashboard() {
   const { user, profile, signOut, loading } = useAuth();
@@ -70,7 +71,15 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <WatermarkContainer 
+      watermarkProps={{ 
+        text: "BNRM Dashboard - Accès Protégé", 
+        variant: "subtle", 
+        position: "pattern",
+        opacity: 0.02
+      }}
+    >
+      <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
@@ -264,6 +273,7 @@ export default function Dashboard() {
           </Card>
         </div>
       </main>
-    </div>
+      </div>
+    </WatermarkContainer>
   );
 }
