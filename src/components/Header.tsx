@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail } from "lucide-react";
+import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
@@ -107,193 +107,323 @@ const Header = () => {
           {/* Desktop Navigation */}
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList className="space-x-6">
-              {/* Bibliothèque */}
+              {/* Découvrir la Bibliothèque */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
                   <BookOpen className="w-4 h-4 mr-2" />
-                  Bibliothèque
+                  Découvrir la Bibliothèque
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="grid gap-3 p-6 w-[500px] md:w-[600px] lg:grid-cols-[.75fr_1fr] bg-card border border-border rounded-lg shadow-moroccan">
-                    <div className="row-span-3 bg-gradient-primary rounded-md p-4 text-primary-foreground">
-                      <div className="mb-2 mt-4 text-lg font-medium">
-                        À propos de la BNRM
-                      </div>
-                      <p className="text-sm leading-tight text-primary-foreground/90">
-                        Découvrez l'histoire et la mission de la Bibliothèque Nationale du Royaume du Maroc
-                      </p>
+                  <div className="grid gap-3 p-6 w-[600px] md:w-[700px] lg:grid-cols-2 bg-card border border-border rounded-lg shadow-moroccan">
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-primary mb-3">Informations pratiques</h4>
+                      <NavigationMenuLink asChild>
+                        <a href="/informations-pratiques" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Horaires et accès</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Heures d'ouverture et plan d'accès
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/services-tarifs" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Catalogue de services et tarifs</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Services proposés et grilles tarifaires
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/visites-virtuelles" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Visites virtuelles</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Découverte virtuelle de nos espaces
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/donateurs" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Nos donateurs</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Recherche par donateur/œuvre
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
                     </div>
-                    <NavigationMenuLink asChild>
-                      <a href="/resources" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none flex items-center">
-                          <FileText className="w-4 h-4 mr-2" />
-                          Ressources
-                        </div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Nouvelles acquisitions et documents spécialisés
-                        </p>
-                      </a>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <a href="/collections" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none flex items-center">
-                          <Book className="w-4 h-4 mr-2" />
-                          Nos collections
-                        </div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Manuscrits, livres rares et patrimoine documentaire
-                        </p>
-                      </a>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <a href="/cooperation" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none flex items-center">
-                          <Users className="w-4 h-4 mr-2" />
-                          Coopération
-                        </div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Partenariats et échanges internationaux
-                        </p>
-                      </a>
-                    </NavigationMenuLink>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-primary mb-3">Histoire et missions</h4>
+                      <NavigationMenuLink asChild>
+                        <a href="/histoire" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Histoire de la bibliothèque</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Missions et valeurs prônées
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/mot-direction" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Mot de la Direction</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Message de notre directeur
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/organigramme" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Organigramme</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Structure organisationnelle
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                    </div>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
-              {/* Activités Culturelles */}
+              {/* Accéder à nos services */}
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
+                  <Users className="w-4 h-4 mr-2" />
+                  Accéder à nos services
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="grid gap-3 p-6 w-[600px] md:w-[700px] lg:grid-cols-2 bg-card border border-border rounded-lg shadow-moroccan">
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-primary mb-3">Inscription et accès</h4>
+                      <NavigationMenuLink asChild>
+                        <a href="/inscription" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Inscription en ligne / réinscription</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Parcours "je m'inscris"
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/consulter-bn" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Consulter la Bibliothèque Nationale</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Accès aux collections de référence
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/reserver-ouvrage" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Réserver un ouvrage</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Réservation en ligne de documents
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/reserver-espaces" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Réserver nos espaces</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Réservation d'espaces de travail
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                    </div>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-primary mb-3">Services spécialisés</h4>
+                      <NavigationMenuLink asChild>
+                        <a href="/depot-legal" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none flex items-center">
+                            <FileText className="w-4 h-4 mr-2" />
+                            Dépôt légal
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Description du service et texte de loi
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/demande-reproduction" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none flex items-center">
+                            <Download className="w-4 h-4 mr-2" />
+                            Demande de reproduction
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Reproduction de documents
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/demande-restauration" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Demande de restauration</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Restauration de documents anciens
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                    </div>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              {/* Explorer le patrimoine */}
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
+                  <Book className="w-4 h-4 mr-2" />
+                  Explorer le patrimoine
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="grid gap-3 p-6 w-[700px] md:w-[900px] lg:grid-cols-3 bg-card border border-border rounded-lg shadow-moroccan">
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-primary mb-3">Collections</h4>
+                      <NavigationMenuLink asChild>
+                        <a href="/collections-specialisees" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Collections spécialisées</div>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/collections-numerisees" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Collections numérisées</div>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/collections-offertes" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Collections offertes</div>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/manuscripts" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Manuscrits</div>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/monographies" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Monographies</div>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/periodiques" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Périodiques</div>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/audiovisuels" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Audiovisuels et multimédias</div>
+                        </a>
+                      </NavigationMenuLink>
+                    </div>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-primary mb-3">Catalogues</h4>
+                      <NavigationMenuLink asChild>
+                        <a href="/catalogue-general" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Catalogue général en ligne</div>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/archives-manuscrits" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Archives et manuscrits</div>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/autres-catalogues" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Autres catalogues et bases</div>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/catalogue-numerise" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Catalogue numérisé</div>
+                        </a>
+                      </NavigationMenuLink>
+                    </div>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-primary mb-3">Ressources</h4>
+                      <NavigationMenuLink asChild>
+                        <a href="/galerie-medias" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Galerie des médias</div>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/lire-ecouter-voir" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Lire écouter et voir</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Bibliographies, rapports, trésors
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/chercher-document" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none flex items-center">
+                            <Search className="w-4 h-4 mr-2" />
+                            Chercher un document
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Recherche avancée
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                    </div>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              {/* Consulter nos actualités */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
                   <Calendar className="w-4 h-4 mr-2" />
-                  Activités Culturelles
+                  Consulter nos actualités
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="grid gap-3 p-6 w-[400px] md:w-[500px] lg:grid-cols-2 bg-card border border-border rounded-lg shadow-moroccan">
-                    <NavigationMenuLink asChild>
-                      <a href="/rencontres-debats" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none">Rencontres débats</div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Conférences et discussions littéraires
-                        </p>
-                      </a>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <a href="/presentations-ouvrages" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none">Présentations d'ouvrages</div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Lancements et signatures de livres
-                        </p>
-                      </a>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <a href="/expositions" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none">Expositions</div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Expositions patrimoniales et artistiques
-                        </p>
-                      </a>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <a href="/activites-artistiques" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none">Activités artistiques</div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Performances et événements culturels
-                        </p>
-                      </a>
-                    </NavigationMenuLink>
+                  <div className="grid gap-3 p-6 w-[500px] md:w-[600px] lg:grid-cols-2 bg-card border border-border rounded-lg shadow-moroccan">
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-primary mb-3">Actualités</h4>
+                      <NavigationMenuLink asChild>
+                        <a href="/news" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Actualités et publications</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Nouvelles acquisitions, actualités du fonds
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <a href="/ils-parlent-de-nous" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Ils parlent de nous</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Revue de presse et mentions
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                    </div>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-primary mb-3">Culture</h4>
+                      <NavigationMenuLink asChild>
+                        <a href="/programmation-culturelle" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Notre programmation culturelle</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Agenda, expositions
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                    </div>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
-              {/* Agence Bibliographique */}
+              {/* Collaborer avec nous */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
                   <Building className="w-4 h-4 mr-2" />
-                  Agence Bibliographique
+                  Collaborer avec nous
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="grid gap-3 p-6 w-[400px] md:w-[500px] lg:grid-cols-1 bg-card border border-border rounded-lg shadow-moroccan">
+                  <div className="grid gap-3 p-6 w-[400px] bg-card border border-border rounded-lg shadow-moroccan">
                     <NavigationMenuLink asChild>
-                      <a href="/isbn-issn" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none flex items-center">
-                          <FileText className="w-4 h-4 mr-2" />
-                          Numéros ISBN et ISSN
-                        </div>
+                      <a href="/collaborations-nationales" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <div className="text-sm font-medium leading-none">Collaborations nationales</div>
                         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Attribution des identifiants internationaux
+                          Partenariats avec les institutions marocaines
                         </p>
                       </a>
                     </NavigationMenuLink>
                     <NavigationMenuLink asChild>
-                      <a href="/depot-legal" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none flex items-center">
-                          <Download className="w-4 h-4 mr-2" />
-                          Dépôt légal
-                        </div>
+                      <a href="/collaborations-internationales" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <div className="text-sm font-medium leading-none">Collaborations internationales</div>
                         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Formulaires et procédures de dépôt
-                        </p>
-                      </a>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <a href="/bibliographie-nationale" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none flex items-center">
-                          <Book className="w-4 h-4 mr-2" />
-                          Bibliographie nationale marocaine
-                        </div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Catalogue national des publications
-                        </p>
-                      </a>
-                    </NavigationMenuLink>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-
-              {/* Catalogues en Ligne */}
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <a href="/manuscripts" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none">
-                    <Search className="w-4 h-4 mr-2" />
-                    Catalogues en Ligne
-                  </a>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-
-              {/* Contact */}
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
-                  <Phone className="w-4 h-4 mr-2" />
-                  Informations
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="grid gap-3 p-6 w-[300px] bg-card border border-border rounded-lg shadow-moroccan">
-                    <NavigationMenuLink asChild>
-                      <a href="/horaires" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none">Horaires d'ouverture</div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Planning et heures de visite
-                        </p>
-                      </a>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <a href="/acces" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none flex items-center">
-                          <MapPin className="w-4 h-4 mr-2" />
-                          Plan d'accès
-                        </div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Localisation et transports
-                        </p>
-                      </a>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <a href="/contact" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none flex items-center">
-                          <Mail className="w-4 h-4 mr-2" />
-                          Nous contacter
-                        </div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Coordonnées et formulaires
+                          Échanges et coopération internationale
                         </p>
                       </a>
                     </NavigationMenuLink>

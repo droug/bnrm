@@ -29,11 +29,21 @@ const Footer = () => {
   ];
 
   const legalLinks = [
-    { title: "Mentions légales", href: "#mentions" },
-    { title: "Politique de confidentialité", href: "#confidentialite" },
+    { title: "Paramètres du site", href: "/settings" },
+    { title: "Empreinte carbone du site", href: "#empreinte-carbone" },
+    { title: "Marché public", href: "#marche-public" },
+    { title: "Nous rejoindre", href: "#recrutement" },
     { title: "Conditions d'utilisation", href: "#conditions" },
-    { title: "Accessibilité", href: "#accessibilite" },
-    { title: "Plan du site", href: "#plan" }
+    { title: "Mentions légales", href: "#mentions" },
+    { title: "Flux RSS", href: "#rss" },
+    { title: "Confidentialité", href: "#confidentialite" }
+  ];
+
+  const supportLinks = [
+    { title: "FAQ", href: "#faq" },
+    { title: "Règlements", href: "#reglements" },
+    { title: "Contacts", href: "#contacts" },
+    { title: "Chatbot d'assistance", href: "#chatbot" }
   ];
 
   const socialLinks = [
@@ -47,7 +57,7 @@ const Footer = () => {
     <footer className="bg-primary text-primary-foreground">
       {/* Main footer content */}
       <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Organization info */}
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-3 mb-6">
@@ -95,6 +105,23 @@ const Footer = () => {
             </ul>
           </div>
 
+          {/* Support and Help */}
+          <div>
+            <h4 className="text-lg font-semibold mb-6">Aide et support</h4>
+            <ul className="space-y-3">
+              {supportLinks.map((link, index) => (
+                <li key={index}>
+                  <a 
+                    href={link.href} 
+                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                  >
+                    {link.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Contact info */}
           <div>
             <h4 className="text-lg font-semibold mb-6">{t('footer.contact')}</h4>
@@ -126,9 +153,9 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div>
-            <h4 className="text-lg font-semibold mb-6">Newsletter</h4>
+            <h4 className="text-lg font-semibold mb-6">Nous suivre</h4>
             <p className="text-primary-foreground/80 mb-4">
-              Restez informé de nos actualités et nouvelles acquisitions.
+              Newsletter - Restez informé de nos actualités et nouvelles acquisitions.
             </p>
             <div className="space-y-3">
               <Input 
