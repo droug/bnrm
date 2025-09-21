@@ -14,9 +14,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        'serif': ['Playfair Display', 'serif'],
-        'sans': ['Inter', 'sans-serif'],
-        'arabic': ['Amiri', 'serif'],
+        'serif': ['Playfair Display', 'Crimson Text', 'serif'],
+        'sans': ['Inter', 'Noto Sans Arabic', 'sans-serif'],
+        'arabic': ['Amiri', 'Noto Sans Arabic', 'serif'],
+        'moroccan': ['Playfair Display', 'Amiri', 'serif'],
+        'elegant': ['Crimson Text', 'Playfair Display', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -45,14 +47,25 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
           glow: "hsl(var(--accent-glow))",
+          bright: "hsl(var(--accent-bright))",
         },
         highlight: {
           DEFAULT: "hsl(var(--highlight))",
           foreground: "hsl(var(--highlight-foreground))",
+          deep: "hsl(var(--highlight-deep))",
         },
         gold: {
           DEFAULT: "hsl(var(--gold))",
           foreground: "hsl(var(--gold-foreground))",
+          bright: "hsl(var(--gold-bright))",
+        },
+        coral: {
+          DEFAULT: "hsl(var(--coral))",
+          foreground: "hsl(var(--coral-foreground))",
+        },
+        royal: {
+          DEFAULT: "hsl(var(--royal))",
+          foreground: "hsl(var(--royal-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -81,16 +94,23 @@ export default {
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
         'gradient-accent': 'var(--gradient-accent)',
-        'gradient-hero': 'var(--gradient-hero)',
+        'gradient-zellige': 'var(--gradient-zellige)',
+        'gradient-sunset': 'var(--gradient-sunset)',
+        'gradient-berber': 'var(--gradient-berber)',
         'gradient-subtle': 'var(--gradient-subtle)',
-        'pattern-moroccan-stars': 'var(--pattern-moroccan-stars)',
-        'pattern-zellige': 'var(--pattern-zellige)',
-        'pattern-geometric': 'var(--pattern-geometric)',
+        'pattern-zellige-complex': 'var(--pattern-zellige-complex)',
+        'pattern-berber-complex': 'var(--pattern-berber-complex)',
+        'pattern-embroidery': 'var(--pattern-embroidery)',
+        'pattern-medina': 'var(--pattern-medina)',
+        'pattern-metal-engraving': 'var(--pattern-metal-engraving)',
       },
       boxShadow: {
         'moroccan': 'var(--shadow-moroccan)',
         'gold': 'var(--shadow-gold)',
         'elegant': 'var(--shadow-elegant)',
+        'berber': 'var(--shadow-berber)',
+        'zellige': 'var(--shadow-zellige)',
+        'royal': 'var(--shadow-royal)',
       },
       keyframes: {
         "accordion-down": {
