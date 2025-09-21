@@ -4,6 +4,7 @@
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
+Enhanced Moroccan Heritage Design System
 */
 
 @layer base {
@@ -81,10 +82,12 @@ All colors MUST be HSL.
         transparent 12px
       );
     
-    /* Elegant shadows */
-    --shadow-moroccan: 0 10px 40px -10px hsl(var(--primary) / 0.2);
-    --shadow-gold: 0 8px 25px -8px hsl(var(--gold) / 0.3);
-    --shadow-elegant: 0 4px 20px -4px hsl(var(--accent) / 0.15);
+    /* Elegant shadows with Moroccan inspiration */
+    --shadow-moroccan: 0 10px 40px -10px hsl(var(--primary) / 0.25), 0 4px 6px -1px hsl(var(--gold) / 0.1);
+    --shadow-gold: 0 8px 25px -8px hsl(var(--gold) / 0.35), 0 2px 4px -1px hsl(var(--gold) / 0.2);
+    --shadow-elegant: 0 4px 20px -4px hsl(var(--accent) / 0.2), 0 2px 8px -2px hsl(var(--primary) / 0.1);
+    --shadow-soft: 0 2px 8px -2px hsl(var(--primary) / 0.1);
+    --shadow-card: 0 1px 3px 0 hsl(var(--primary) / 0.1), 0 1px 2px -1px hsl(var(--primary) / 0.1);
 
     --radius: 0.5rem;
 
@@ -159,5 +162,31 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: 'liga', 'kern';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Enhanced animations with Moroccan flair */
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from {
+      box-shadow: 0 4px 20px -4px hsl(var(--accent) / 0.15);
+    }
+    to {
+      box-shadow: 0 8px 32px -8px hsl(var(--gold) / 0.3), 0 4px 20px -4px hsl(var(--accent) / 0.25);
+    }
+  }
+
+  /* Improved text rendering for Arabic and Berber scripts */
+  .font-arabic {
+    font-family: 'Noto Sans Arabic', 'Arial Unicode MS', sans-serif;
+  }
+
+  .font-berber {
+    font-family: 'Noto Sans Tifinagh', 'Arial Unicode MS', sans-serif;
   }
 }

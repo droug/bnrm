@@ -1,422 +1,264 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Calendar, 
-  Eye, 
-  Tag, 
-  Search,
-  Filter,
-  Clock,
-  Star,
-  ArrowRight
-} from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Clock, User, ArrowRight, MessageSquare, Heart, Share2 } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
-interface NewsItem {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content_body: string;
-  featured_image_url?: string;
-  published_at: string;
-  tags?: string[];
-  is_featured: boolean;
-  view_count: number;
-  profiles?: {
-    first_name: string;
-    last_name: string;
-  };
-}
+const News = () => {
+  const { t } = useLanguage();
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  color: string;
-}
-
-export default function News() {
-  const { toast } = useToast();
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedTag, setSelectedTag] = useState("all");
-
-  useEffect(() => {
-    fetchNews();
-    fetchCategories();
-  }, []);
-
-  const fetchNews = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('content')
-        .select(`
-          id,
-          title,
-          slug,
-          excerpt,
-          content_body,
-          featured_image_url,
-          published_at,
-          tags,
-          is_featured,
-          view_count,
-          profiles:author_id (first_name, last_name)
-        `)
-        .eq('content_type', 'news')
-        .eq('status', 'published')
-        .order('is_featured', { ascending: false })
-        .order('published_at', { ascending: false });
-
-      if (error) throw error;
-      setNews((data as any) || []);
-    } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les actualités",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+  const newsArticles = [
+    {
+      id: 1,
+      title: "La BNRM accueille les directeurs des Archives nationales d'Autriche et de Hongrie",
+      excerpt: "Madame Samira El Malizi, Directrice de la Bibliothèque nationale du Royaume du Maroc, a reçu dans la matinée du mercredi 10 septembre 2025...",
+      content: "Une délégation de haut niveau composée de Monsieur Csaba Szabó, Directeur général des Archives nationales de Hongrie, ainsi que Monsieur Helmut Wohnout, Directeur général des Archives d'État d'Autriche, a été reçue par la direction de la BNRM pour discuter des opportunités de coopération internationale.",
+      date: "2025-09-10",
+      author: "Service Communication BNRM",
+      category: "Coopération internationale",
+      readTime: "3 min",
+      likes: 42,
+      comments: 8,
+      featured: true,
+      image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&h=400&fit=crop"
+    },
+    {
+      id: 2,
+      title: "Le 4ème Colloque des Réseaux de Bibliothèques Marocaines",
+      excerpt: "Sous le thème 'Vers une transformation numérique des bibliothèques marocaines', la BNRM organise son colloque annuel...",
+      content: "Cet événement majeur réunit les professionnels de l'information documentaire du Royaume pour échanger sur les défis et opportunités de la digitalisation.",
+      date: "2025-09-05",
+      author: "Direction des Affaires Culturelles",
+      category: "Événements",
+      readTime: "4 min",
+      likes: 67,
+      comments: 15,
+      featured: false
+    },
+    {
+      id: 3,
+      title: "Nouveaux Bouquets Électroniques Disponibles",
+      excerpt: "La BNRM enrichit son offre numérique avec de nouvelles ressources scientifiques internationales...",
+      content: "Plus de 10 000 nouvelles ressources numériques sont désormais accessibles via nos bouquets électroniques, couvrant les domaines des sciences humaines, sociales et exactes.",
+      date: "2025-08-28",
+      author: "Service des Ressources Numériques",
+      category: "Ressources",
+      readTime: "2 min",
+      likes: 89,
+      comments: 23,
+      featured: false
+    },
+    {
+      id: 4,
+      title: "Exposition : Manuscrits Andalous du Moyen Âge",
+      excerpt: "Découvrez la richesse du patrimoine manuscrit andalou à travers une exposition exceptionnelle...",
+      content: "Une sélection de manuscrits rares datant du XIIe au XVe siècle, témoignant de l'âge d'or de la civilisation arabo-andalouse.",
+      date: "2025-08-20",
+      author: "Département des Manuscrits",
+      category: "Expositions",
+      readTime: "5 min",
+      likes: 156,
+      comments: 34,
+      featured: false
     }
-  };
+  ];
 
-  const fetchCategories = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('content_categories')
-        .select('id, name, slug, color')
-        .eq('content_type', 'news')
-        .order('name');
-
-      if (error) throw error;
-      setCategories(data || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
-
-  const incrementViewCount = async (newsId: string) => {
-    try {
-      // Get current view count and increment it
-      const { data: currentData } = await supabase
-        .from('content')
-        .select('view_count')
-        .eq('id', newsId)
-        .single();
-      
-      if (currentData) {
-        await supabase
-          .from('content')
-          .update({ view_count: (currentData.view_count || 0) + 1 })
-          .eq('id', newsId);
-      }
-    } catch (error) {
-      console.error('Error incrementing view count:', error);
-    }
-  };
-
-  const handleNewsClick = (newsItem: NewsItem) => {
-    incrementViewCount(newsItem.id);
-    // Navigate to news detail page (to be implemented)
-    console.log('Navigate to:', `/news/${newsItem.slug}`);
-  };
-
-  // Get all unique tags from news
-  const allTags = Array.from(
-    new Set(news.flatMap(item => item.tags || []))
-  ).sort();
-
-  const filteredNews = news.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesTag = selectedTag === "all" || item.tags?.includes(selectedTag);
-    
-    return matchesSearch && matchesTag;
-  });
-
-  const featuredNews = filteredNews.filter(item => item.is_featured).slice(0, 3);
-  const regularNews = filteredNews.filter(item => !item.is_featured);
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return text.substr(0, maxLength) + '...';
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-subtle">
-        <Header />
-        <main className="container py-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  const categories = [
+    { name: "Tout", count: newsArticles.length, active: true },
+    { name: "Coopération internationale", count: 1 },
+    { name: "Événements", count: 1 },
+    { name: "Ressources", count: 1 },
+    { name: "Expositions", count: 1 }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <Header />
-      
-      <main className="container py-8">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground mb-4">
-            Actualités
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Découvrez les dernières nouvelles et actualités de la Bibliothèque Nationale du Royaume du Maroc
-          </p>
-        </div>
-
-        {/* Search and Filters */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Rechercher dans les actualités..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              
-              <Select value={selectedTag} onValueChange={setSelectedTag}>
-                <SelectTrigger className="w-48">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les sujets</SelectItem>
-                  {allTags.map((tag) => (
-                    <SelectItem key={tag} value={tag}>
-                      {tag}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <section className="bg-gradient-hero py-20 text-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center animate-fade-in">
+            <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6 shadow-gold border border-white/20">
+              <MessageSquare className="h-8 w-8 text-white" />
             </div>
-          </CardContent>
-        </Card>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">Actualités</h1>
+            <div className="w-24 h-1 bg-gradient-accent mx-auto mb-6 rounded-full"></div>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+              Suivez les dernières nouvelles et événements de la Bibliothèque Nationale du Royaume du Maroc
+            </p>
+          </div>
+        </div>
+      </section>
 
-        {/* Featured News */}
-        {featuredNews.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <Star className="h-6 w-6 text-yellow-500" />
-              À la une
-            </h2>
-            
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {featuredNews.map((item) => (
-                <Card 
-                  key={item.id} 
-                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-                  onClick={() => handleNewsClick(item)}
-                >
-                  {item.featured_image_url && (
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={item.featured_image_url}
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute top-4 left-4">
-                        <Badge className="bg-yellow-500 text-yellow-900">
-                          <Star className="h-3 w-3 mr-1" />
-                          À la une
-                        </Badge>
-                      </div>
+      {/* Categories Filter */}
+      <section className="py-8 border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-wrap gap-3 justify-center">
+            {categories.map((category, index) => (
+              <Button
+                key={index}
+                variant={category.active ? "default" : "outline"}
+                className={`rounded-full ${category.active ? 'bg-primary' : 'hover:bg-accent'}`}
+              >
+                {category.name}
+                <Badge variant="secondary" className="ml-2">
+                  {category.count}
+                </Badge>
+              </Button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Featured Article */}
+            <div className="lg:col-span-2">
+              {newsArticles.filter(article => article.featured).map((article) => (
+                <Card key={article.id} className="mb-8 overflow-hidden shadow-moroccan hover:shadow-elegant transition-all duration-300 group">
+                  <div 
+                    className="h-64 bg-cover bg-center relative"
+                    style={{ backgroundImage: `url(${article.image})` }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <Badge className="absolute top-4 left-4 bg-primary">
+                      À la Une
+                    </Badge>
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <Badge variant="secondary" className="mb-2">
+                        {article.category}
+                      </Badge>
+                      <h2 className="text-2xl font-bold mb-2 group-hover:text-gold transition-colors">
+                        {article.title}
+                      </h2>
                     </div>
-                  )}
+                  </div>
                   
                   <CardContent className="p-6">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                      <Calendar className="h-4 w-4" />
-                      {formatDate(item.published_at)}
-                      <span>•</span>
-                      <Eye className="h-4 w-4" />
-                      {item.view_count} vues
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        {new Date(article.date).toLocaleDateString('fr-FR')}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <User className="h-4 w-4" />
+                        {article.author}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        {article.readTime}
+                      </div>
                     </div>
                     
-                    <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">
-                      {item.title}
-                    </h3>
-                    
-                    {item.excerpt && (
-                      <p className="text-muted-foreground mb-4">
-                        {truncateText(item.excerpt, 120)}
-                      </p>
-                    )}
-                    
-                    {item.tags && item.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {item.tags.slice(0, 3).map((tag, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            <Tag className="h-3 w-3 mr-1" />
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
+                    <p className="text-muted-foreground mb-6 leading-relaxed">
+                      {article.content}
+                    </p>
                     
                     <div className="flex items-center justify-between">
-                      {item.profiles && (
-                        <span className="text-sm text-muted-foreground">
-                          Par {item.profiles.first_name} {item.profiles.last_name}
-                        </span>
-                      )}
-                      
-                      <Button variant="ghost" size="sm" className="group-hover:bg-primary group-hover:text-primary-foreground">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <button className="flex items-center gap-1 hover:text-primary transition-colors">
+                          <Heart className="h-4 w-4" />
+                          {article.likes}
+                        </button>
+                        <button className="flex items-center gap-1 hover:text-primary transition-colors">
+                          <MessageSquare className="h-4 w-4" />
+                          {article.comments}
+                        </button>
+                        <button className="flex items-center gap-1 hover:text-primary transition-colors">
+                          <Share2 className="h-4 w-4" />
+                          Partager
+                        </button>
+                      </div>
+                      <Button className="group">
                         Lire la suite
-                        <ArrowRight className="h-4 w-4 ml-2" />
+                        <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
               ))}
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-8">
+              {/* Recent Articles */}
+              <Card className="shadow-soft">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-primary" />
+                    Articles récents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {newsArticles.filter(article => !article.featured).map((article, index) => (
+                    <div key={article.id} className="group cursor-pointer animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+                      <div className="flex gap-3 p-3 rounded-lg hover:bg-accent/10 transition-colors">
+                        <div className="flex-1">
+                          <Badge variant="outline" className="text-xs mb-2">
+                            {article.category}
+                          </Badge>
+                          <h4 className="font-semibold text-sm group-hover:text-primary transition-colors line-clamp-2">
+                            {article.title}
+                          </h4>
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                            {article.excerpt}
+                          </p>
+                          <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(article.date).toLocaleDateString('fr-FR')}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Newsletter */}
+              <Card className="bg-gradient-primary text-primary-foreground shadow-moroccan">
+                <CardContent className="p-6 text-center">
+                  <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-90" />
+                  <h3 className="text-xl font-bold mb-3">
+                    Newsletter BNRM
+                  </h3>
+                  <p className="text-primary-foreground/90 text-sm mb-4">
+                    Recevez nos dernières actualités et événements directement dans votre boîte mail
+                  </p>
+                  <Button variant="secondary" className="w-full">
+                    S'abonner
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Quick Stats */}
+              <Card className="shadow-soft">
+                <CardHeader>
+                  <CardTitle>En chiffres</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Articles publiés</span>
+                      <span className="font-bold text-primary">1,247</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Événements organisés</span>
+                      <span className="font-bold text-accent">156</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Expositions</span>
+                      <span className="font-bold text-highlight">23</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
-        )}
-
-        {/* Regular News */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-6">
-            {featuredNews.length > 0 ? 'Autres actualités' : 'Toutes les actualités'}
-          </h2>
-          
-          {regularNews.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {regularNews.map((item) => (
-                <Card 
-                  key={item.id} 
-                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-                  onClick={() => handleNewsClick(item)}
-                >
-                  {item.featured_image_url && (
-                    <div className="relative h-40 overflow-hidden">
-                      <img
-                        src={item.featured_image_url}
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                  )}
-                  
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                      <Calendar className="h-4 w-4" />
-                      {formatDate(item.published_at)}
-                      <span>•</span>
-                      <Eye className="h-4 w-4" />
-                      {item.view_count} vues
-                    </div>
-                    
-                    <h3 className="text-lg font-bold mb-3 group-hover:text-primary transition-colors">
-                      {item.title}
-                    </h3>
-                    
-                    {item.excerpt && (
-                      <p className="text-muted-foreground mb-4 text-sm">
-                        {truncateText(item.excerpt, 100)}
-                      </p>
-                    )}
-                    
-                    {item.tags && item.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {item.tags.slice(0, 2).map((tag, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                        {item.tags.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{item.tags.length - 2}
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center justify-between">
-                      {item.profiles && (
-                        <span className="text-xs text-muted-foreground">
-                          {item.profiles.first_name} {item.profiles.last_name}
-                        </span>
-                      )}
-                      
-                      <Button variant="ghost" size="sm" className="text-xs">
-                        Lire
-                        <ArrowRight className="h-3 w-3 ml-1" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <Card>
-              <CardContent className="text-center py-12">
-                <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Aucune actualité trouvée</h3>
-                <p className="text-muted-foreground">
-                  {searchTerm ? "Aucune actualité ne correspond à votre recherche" : "Aucune actualité disponible pour le moment"}
-                </p>
-              </CardContent>
-            </Card>
-          )}
         </div>
-
-        {/* Newsletter Subscription */}
-        <Card className="bg-primary text-primary-foreground">
-          <CardContent className="p-8 text-center">
-            <h3 className="text-2xl font-bold mb-4">
-              Restez informé des dernières actualités
-            </h3>
-            <p className="mb-6 opacity-90">
-              Recevez nos actualités directement dans votre boîte e-mail
-            </p>
-            <div className="flex gap-4 max-w-md mx-auto">
-              <Input 
-                placeholder="Votre adresse e-mail"
-                className="bg-white text-foreground"
-              />
-              <Button variant="secondary">
-                S'abonner
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
-      
-      <Footer />
+      </section>
     </div>
   );
-}
+};
+
+export default News;

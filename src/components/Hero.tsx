@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, BookOpen, Scroll, Users } from "lucide-react";
+import { Search, BookOpen, Scroll, Users, Book, Star } from "lucide-react";
 import heroImage from "@/assets/hero-library.jpg";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -28,13 +28,28 @@ const Hero = () => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center animate-fade-in">
         <div className="max-w-4xl mx-auto">
+          {/* Logo and decorative elements */}
+          <div className="mb-8 animate-fade-in">
+            <div className="w-24 h-24 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6 shadow-gold border border-white/20 hover:shadow-moroccan transition-all duration-500">
+              <Book className="h-12 w-12 text-white" />
+            </div>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="h-5 w-5 text-gold fill-gold animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }} />
+              ))}
+            </div>
+          </div>
+
           {/* Main title */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight bg-gradient-to-r from-white to-white/90 bg-clip-text animate-fade-in">
             {t('hero.title')}
           </h1>
+          
+          {/* Decorative line */}
+          <div className="w-32 h-1 bg-gradient-accent mx-auto mb-8 rounded-full animate-fade-in"></div>
 
           {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed animate-fade-in">
             {t('hero.subtitle')}
           </p>
 
@@ -56,20 +71,20 @@ const Hero = () => {
           </div>
 
           {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12 animate-fade-in">
             <Button 
               size="lg" 
-              className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-elegant px-8 py-6 text-lg font-medium"
+              className="bg-white/95 backdrop-blur-sm text-primary hover:bg-white hover:shadow-gold px-10 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 rounded-xl border border-white/20 group"
             >
-              <BookOpen className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              <Search className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'} group-hover:scale-110 transition-transform`} />
               {t('hero.exploreBtn')}
             </Button>
             <Button 
               variant="outline" 
               size="lg"
-              className="border-white/30 text-white hover:bg-white/10 backdrop-blur px-8 py-6 text-lg font-medium"
+              className="border-2 border-white/60 bg-white/5 backdrop-blur-sm text-white hover:bg-white/10 hover:border-white hover:shadow-elegant px-10 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 rounded-xl group"
             >
-              <Scroll className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              <BookOpen className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'} group-hover:scale-110 transition-transform`} />
               {t('hero.digitaBtn')}
             </Button>
           </div>
