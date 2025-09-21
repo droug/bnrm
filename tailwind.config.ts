@@ -94,15 +94,15 @@ export default {
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
         'gradient-accent': 'var(--gradient-accent)',
-        'gradient-zellige': 'var(--gradient-zellige)',
-        'gradient-sunset': 'var(--gradient-sunset)',
-        'gradient-berber': 'var(--gradient-berber)',
+        'gradient-neutral': 'var(--gradient-neutral)',
+        'gradient-zellige-main': 'var(--gradient-zellige-main)',
+        'gradient-mosaique': 'var(--gradient-mosaique)',
         'gradient-subtle': 'var(--gradient-subtle)',
         'pattern-zellige-complex': 'var(--pattern-zellige-complex)',
-        'pattern-berber-complex': 'var(--pattern-berber-complex)',
-        'pattern-embroidery': 'var(--pattern-embroidery)',
-        'pattern-medina': 'var(--pattern-medina)',
-        'pattern-metal-engraving': 'var(--pattern-metal-engraving)',
+        'pattern-mosaique-geometric': 'var(--pattern-mosaique-geometric)',
+        'pattern-moroccan-stars': 'var(--pattern-moroccan-stars)',
+        'pattern-zellige-tiles': 'var(--pattern-zellige-tiles)',
+        'pattern-filigrane': 'var(--pattern-filigrane)',
       },
       boxShadow: {
         'moroccan': 'var(--shadow-moroccan)',
@@ -111,6 +111,7 @@ export default {
         'berber': 'var(--shadow-berber)',
         'zellige': 'var(--shadow-zellige)',
         'royal': 'var(--shadow-royal)',
+        'mosaique': 'var(--shadow-mosaique)',
       },
       keyframes: {
         "accordion-down": {

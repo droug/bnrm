@@ -11,26 +11,27 @@ const Index = () => {
   return (
     <LanguageProvider>
       <div className="min-h-screen bg-background relative overflow-hidden">
-        {/* Arrière-plan de la page avec motifs zellige complexes */}
+        {/* Arrière-plan de la page avec mosaïques zellige raffinées */}
         <div className="fixed inset-0 z-0">
-          <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20"></div>
-          <div className="absolute inset-0 bg-pattern-berber-complex opacity-15"></div>
-          <div className="absolute inset-0 bg-pattern-embroidery opacity-10"></div>
+          <div className="absolute inset-0 bg-pattern-zellige-complex opacity-25"></div>
+          <div className="absolute inset-0 bg-pattern-mosaique-geometric opacity-20"></div>
+          <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-15"></div>
+          <div className="absolute inset-0 bg-pattern-filigrane opacity-10"></div>
         </div>
         
         <div className="relative z-10">
           <Header />
           
-          {/* Bannière Artistique avec arrière-plan bibliothèque traditionnelle */}
-          <section className="relative py-12 border-b-4 border-gold/40 overflow-hidden">
+          {/* Bannière avec mosaïques et arrière-plan bibliothèque */}
+          <section className="relative py-12 border-b-4 border-gold/30 overflow-hidden">
             {/* Image de fond bibliothèque traditionnelle */}
             <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-25"
               style={{ backgroundImage: `url(${traditionalLibraryBg})` }}
             ></div>
-            {/* Overlay gradient avec motifs */}
-            <div className="absolute inset-0 bg-gradient-zellige opacity-85"></div>
-            <div className="absolute inset-0 bg-pattern-metal-engraving opacity-25"></div>
+            {/* Overlay avec mosaïques zellige */}
+            <div className="absolute inset-0 bg-gradient-zellige-main opacity-85"></div>
+            <div className="absolute inset-0 bg-pattern-zellige-tiles opacity-30"></div>
             
             <div className="container mx-auto px-4 text-center relative z-10">
               <div className="flex items-center justify-center space-x-4 mb-6">
@@ -60,11 +61,11 @@ const Index = () => {
               {/* Zone principale avec arrière-plans zellige */}
               <div className="xl:col-span-3 space-y-8">
                 
-                {/* Zone de recherche avec arrière-plan complexe */}
+                {/* Zone de recherche avec mosaïques raffinées */}
                 <div className="text-center mb-10 relative">
-                  <div className="absolute inset-0 bg-pattern-zellige-complex opacity-40 rounded-3xl blur-sm"></div>
-                  <div className="absolute inset-0 bg-pattern-metal-engraving opacity-20 rounded-3xl"></div>
-                  <div className="max-w-2xl mx-auto relative bg-gradient-subtle backdrop-blur-md p-8 rounded-3xl shadow-moroccan border-3 border-gold/30">
+                  <div className="absolute inset-0 bg-pattern-zellige-complex opacity-35 rounded-3xl blur-sm"></div>
+                  <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-25 rounded-3xl"></div>
+                  <div className="max-w-2xl mx-auto relative bg-gradient-mosaique backdrop-blur-md p-8 rounded-3xl shadow-mosaique border-3 border-gold/25">
                     <h2 className="text-2xl font-moroccan font-bold text-foreground mb-4">
                       Recherchez dans nos collections
                     </h2>
@@ -72,11 +73,11 @@ const Index = () => {
                       <Input
                         type="search"
                         placeholder="Explorez les trésors de la connaissance marocaine..."
-                        className="w-full h-16 text-lg bg-white/98 shadow-zellige border-3 border-gold/40 focus:border-primary pl-6 pr-16 rounded-full font-serif"
+                        className="w-full h-16 text-lg bg-white/98 shadow-zellige border-3 border-gold/30 focus:border-primary pl-6 pr-16 rounded-full font-serif"
                       />
                       <Button 
                         size="lg" 
-                        className="absolute right-2 top-2 h-12 w-12 rounded-full bg-gradient-sunset shadow-gold hover:shadow-berber transition-all duration-300 transform hover:scale-105"
+                        className="absolute right-2 top-2 h-12 w-12 rounded-full bg-gradient-neutral shadow-gold hover:shadow-berber transition-all duration-300 transform hover:scale-105"
                       >
                         <Search className="h-6 w-6" />
                       </Button>
@@ -87,19 +88,20 @@ const Index = () => {
                   </div>
                 </div>
 
-                {/* Grille de contenu avec arrière-plans artistiques */}
+                {/* Grille de contenu avec mosaïques et tons neutres */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   
-                  {/* Carte Découvrir avec motifs berbères */}
-                  <Card className="md:col-span-1 relative overflow-hidden group border-3 border-gold/50 shadow-moroccan hover:shadow-royal transition-all duration-700">
-                    <div className="absolute inset-0 bg-pattern-berber-complex opacity-15 group-hover:opacity-30 transition-opacity duration-700"></div>
-                    <div className="absolute inset-0 bg-gradient-subtle opacity-80"></div>
+                  {/* Carte Découvrir avec mosaïques zellige */}
+                  <Card className="md:col-span-1 relative overflow-hidden group border-3 border-gold/40 shadow-mosaique hover:shadow-moroccan transition-all duration-700">
+                    <div className="absolute inset-0 bg-pattern-zellige-complex opacity-25 group-hover:opacity-40 transition-opacity duration-700"></div>
+                    <div className="absolute inset-0 bg-pattern-filigrane opacity-15 group-hover:opacity-25 transition-opacity duration-700"></div>
+                    <div className="absolute inset-0 bg-gradient-neutral opacity-90"></div>
                     <CardContent className="p-10 min-h-[350px] flex flex-col justify-center items-center text-center space-y-6 relative z-10">
                       <div className="relative">
-                        <div className="w-24 h-24 bg-gradient-berber rounded-3xl flex items-center justify-center mb-6 shadow-berber transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-                          <BookOpen className="h-12 w-12 text-white" />
+                        <div className="w-24 h-24 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-6 shadow-mosaique transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border-2 border-gold/20">
+                          <BookOpen className="h-12 w-12 text-primary" />
                         </div>
-                        <Sparkles className="absolute -top-3 -right-3 h-8 w-8 text-gold animate-spin" />
+                        <Sparkles className="absolute -top-3 -right-3 h-8 w-8 text-gold animate-pulse" />
                       </div>
                       <h3 className="text-2xl font-moroccan font-bold text-foreground">
                         Découvrir la Bibliothèque
@@ -109,22 +111,23 @@ const Index = () => {
                       </p>
                       <div className="flex space-x-2">
                         {[...Array(5)].map((_, i) => (
-                          <div key={i} className="w-3 h-3 bg-gold rounded-full animate-pulse" style={{ animationDelay: `${i * 0.2}s` }}></div>
+                          <div key={i} className="w-3 h-3 bg-gold/60 rounded-full animate-pulse border border-gold/30" style={{ animationDelay: `${i * 0.2}s` }}></div>
                         ))}
                       </div>
                     </CardContent>
                   </Card>
 
-                  {/* Carte Actualités avec arrière-plan royal */}
-                  <Card className="relative overflow-hidden group border-3 border-royal/50 shadow-royal hover:shadow-gold transition-all duration-700">
-                    <div className="absolute inset-0 bg-pattern-metal-engraving opacity-20 group-hover:opacity-35 transition-opacity duration-700"></div>
-                    <div className="absolute inset-0 bg-gradient-primary opacity-90"></div>
+                  {/* Carte Actualités avec mosaïques subtiles */}
+                  <Card className="relative overflow-hidden group border-3 border-primary/30 shadow-zellige hover:shadow-mosaique transition-all duration-700">
+                    <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-20 group-hover:opacity-35 transition-opacity duration-700"></div>
+                    <div className="absolute inset-0 bg-pattern-zellige-tiles opacity-15 group-hover:opacity-25 transition-opacity duration-700"></div>
+                    <div className="absolute inset-0 bg-gradient-primary opacity-80"></div>
                     <CardContent className="p-10 min-h-[350px] flex flex-col justify-center items-center text-center space-y-6 relative z-10">
                       <div className="relative">
-                        <div className="w-24 h-24 bg-gradient-sunset rounded-3xl flex items-center justify-center mb-6 shadow-gold transform group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500">
+                        <div className="w-24 h-24 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-6 shadow-zellige transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 border-2 border-white/20">
                           <Calendar className="h-12 w-12 text-white" />
                         </div>
-                        <Gem className="absolute -top-3 -right-3 h-8 w-8 text-coral animate-bounce" />
+                        <Gem className="absolute -top-3 -right-3 h-8 w-8 text-gold animate-bounce" />
                       </div>
                       <h3 className="text-2xl font-moroccan font-bold text-white">
                         Actualités & Publications
@@ -135,16 +138,17 @@ const Index = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Carte Patrimoine avec zellige */}
-                  <Card className="relative overflow-hidden group border-3 border-coral/50 shadow-elegant hover:shadow-zellige transition-all duration-700">
-                    <div className="absolute inset-0 bg-pattern-embroidery opacity-20 group-hover:opacity-35 transition-opacity duration-700"></div>
-                    <div className="absolute inset-0 bg-gradient-accent opacity-90"></div>
+                  {/* Carte Patrimoine avec motifs zellige */}
+                  <Card className="relative overflow-hidden group border-3 border-accent/30 shadow-elegant hover:shadow-zellige transition-all duration-700">
+                    <div className="absolute inset-0 bg-pattern-filigrane opacity-20 group-hover:opacity-35 transition-opacity duration-700"></div>
+                    <div className="absolute inset-0 bg-pattern-mosaique-geometric opacity-15 group-hover:opacity-25 transition-opacity duration-700"></div>
+                    <div className="absolute inset-0 bg-gradient-accent opacity-80"></div>
                     <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
                       <div className="relative">
-                        <div className="w-20 h-20 bg-coral/95 rounded-3xl flex items-center justify-center mb-4 shadow-berber transform group-hover:scale-110 transition-all duration-500">
+                        <div className="w-20 h-20 bg-gradient-neutral rounded-3xl flex items-center justify-center mb-4 shadow-mosaique transform group-hover:scale-110 transition-all duration-500 border-2 border-white/20">
                           <Book className="h-10 w-10 text-white" />
                         </div>
-                        <Star className="absolute -top-2 -right-2 h-6 w-6 text-gold fill-gold animate-pulse" />
+                        <Star className="absolute -top-2 -right-2 h-6 w-6 text-gold fill-gold/70 animate-pulse" />
                       </div>
                       <h3 className="text-xl font-moroccan font-bold text-white">
                         Explorer le Patrimoine
@@ -155,46 +159,48 @@ const Index = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Carte Services avec motifs traditionnels */}
-                  <Card className="relative overflow-hidden group border-3 border-accent/50 shadow-berber hover:shadow-moroccan transition-all duration-700">
-                    <div className="absolute inset-0 bg-pattern-berber-complex opacity-20 group-hover:opacity-35 transition-opacity duration-700"></div>
-                    <div className="absolute inset-0 bg-gradient-sunset opacity-90"></div>
+                  {/* Carte Services avec mosaïques traditionnelles */}
+                  <Card className="relative overflow-hidden group border-3 border-highlight/30 shadow-berber hover:shadow-mosaique transition-all duration-700">
+                    <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20 group-hover:opacity-35 transition-opacity duration-700"></div>
+                    <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-15 group-hover:opacity-25 transition-opacity duration-700"></div>
+                    <div className="absolute inset-0 bg-gradient-neutral opacity-85"></div>
                     <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
                       <div className="relative">
-                        <div className="w-20 h-20 bg-royal/95 rounded-3xl flex items-center justify-center mb-4 shadow-royal transform group-hover:scale-110 transition-all duration-500">
+                        <div className="w-20 h-20 bg-highlight/70 rounded-3xl flex items-center justify-center mb-4 shadow-zellige transform group-hover:scale-110 transition-all duration-500 border-2 border-highlight/30">
                           <Users className="h-10 w-10 text-white" />
                         </div>
                         <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-pulse" />
                       </div>
-                      <h3 className="text-xl font-moroccan font-bold text-white">
+                      <h3 className="text-xl font-moroccan font-bold text-foreground">
                         Accéder à nos Services
                       </h3>
-                      <p className="text-white/95 font-elegant">
+                      <p className="text-muted-foreground font-elegant">
                         Inscription, réservation, dépôt légal et services numériques
                       </p>
                     </CardContent>
                   </Card>
                 </div>
 
-                {/* Services rapides avec arrière-plan artistique enrichi */}
-                <Card className="relative overflow-hidden border-3 border-gold/40 shadow-moroccan">
-                  <div className="absolute inset-0 bg-pattern-zellige-complex opacity-25"></div>
-                  <div className="absolute inset-0 bg-gradient-subtle opacity-95"></div>
+                {/* Services rapides avec mosaïques zellige raffinées */}
+                <Card className="relative overflow-hidden border-3 border-gold/25 shadow-mosaique">
+                  <div className="absolute inset-0 bg-pattern-zellige-complex opacity-30"></div>
+                  <div className="absolute inset-0 bg-pattern-filigrane opacity-20"></div>
+                  <div className="absolute inset-0 bg-gradient-mosaique opacity-95"></div>
                   <CardContent className="p-8 relative z-10">
                     <div className="text-center mb-6">
                       <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">Services Rapides</h3>
-                      <div className="w-32 h-2 bg-gradient-berber mx-auto rounded-full shadow-gold"></div>
+                      <div className="w-32 h-2 bg-gradient-neutral mx-auto rounded-full shadow-gold"></div>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                       {[
-                        { icon: FileText, label: "Dépôt légal", color: "text-primary", bg: "bg-primary/15", border: "border-primary/30" },
-                        { icon: BookOpen, label: "Réserver un ouvrage", color: "text-accent", bg: "bg-accent/15", border: "border-accent/30" },
-                        { icon: Download, label: "Reproduction", color: "text-coral", bg: "bg-coral/15", border: "border-coral/30" },
-                        { icon: Users, label: "Inscription", color: "text-royal", bg: "bg-royal/15", border: "border-royal/30" },
-                        { icon: Calendar, label: "Événements", color: "text-gold", bg: "bg-gold/15", border: "border-gold/30" }
+                        { icon: FileText, label: "Dépôt légal", color: "text-primary", bg: "bg-primary/10", border: "border-primary/25" },
+                        { icon: BookOpen, label: "Réserver un ouvrage", color: "text-accent", bg: "bg-accent/10", border: "border-accent/25" },
+                        { icon: Download, label: "Reproduction", color: "text-highlight", bg: "bg-highlight/10", border: "border-highlight/25" },
+                        { icon: Users, label: "Inscription", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25" },
+                        { icon: Calendar, label: "Événements", color: "text-gold", bg: "bg-gold/10", border: "border-gold/25" }
                       ].map((service, index) => (
                         <div key={index} className={`text-center p-5 rounded-2xl ${service.bg} hover:shadow-zellige transition-all duration-300 transform hover:scale-105 border-2 ${service.border} relative overflow-hidden group`}>
-                          <div className="absolute inset-0 bg-pattern-embroidery opacity-10 group-hover:opacity-20 transition-opacity duration-300"></div>
+                          <div className="absolute inset-0 bg-pattern-filigrane opacity-10 group-hover:opacity-20 transition-opacity duration-300"></div>
                           <service.icon className={`h-10 w-10 ${service.color} mx-auto mb-3 relative z-10`} />
                           <p className="text-sm font-semibold text-foreground font-serif relative z-10">{service.label}</p>
                         </div>
@@ -204,67 +210,70 @@ const Index = () => {
                 </Card>
               </div>
 
-              {/* Sidebar avec arrière-plans artistiques enrichis */}
+              {/* Sidebar avec mosaïques et tons neutres */}
               <div className="xl:col-span-1 space-y-6">
                 
-                {/* Mon espace avec motifs traditionnels */}
-                <Card className="relative overflow-hidden group border-3 border-primary/40 shadow-moroccan hover:shadow-royal transition-all duration-500">
-                  <div className="absolute inset-0 bg-pattern-embroidery opacity-15 group-hover:opacity-25 transition-opacity duration-500"></div>
-                  <div className="absolute inset-0 bg-gradient-subtle opacity-90"></div>
+                {/* Mon espace avec mosaïques raffinées */}
+                <Card className="relative overflow-hidden group border-3 border-primary/25 shadow-mosaique hover:shadow-zellige transition-all duration-500">
+                  <div className="absolute inset-0 bg-pattern-filigrane opacity-15 group-hover:opacity-25 transition-opacity duration-500"></div>
+                  <div className="absolute inset-0 bg-pattern-zellige-tiles opacity-10 group-hover:opacity-20 transition-opacity duration-500"></div>
+                  <div className="absolute inset-0 bg-gradient-mosaique opacity-90"></div>
                   <CardContent className="p-5 text-center relative z-10">
-                    <div className="w-16 h-16 bg-gradient-berber rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-berber transform group-hover:scale-110 transition-transform duration-300">
-                      <Users className="h-8 w-8 text-white" />
+                    <div className="w-16 h-16 bg-gradient-neutral rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-mosaique transform group-hover:scale-110 transition-transform duration-300 border-2 border-primary/20">
+                      <Users className="h-8 w-8 text-primary" />
                     </div>
                     <h4 className="font-moroccan font-bold text-foreground mb-3">Mon Espace</h4>
-                    <Button size="sm" className="w-full bg-gradient-primary shadow-gold hover:shadow-moroccan font-serif">
+                    <Button size="sm" className="w-full bg-gradient-primary shadow-gold hover:shadow-mosaique font-serif">
                       Connexion
                     </Button>
                   </CardContent>
                 </Card>
 
-                {/* Cartes suivantes avec différents motifs */}
+                {/* Cartes sidebar avec différentes mosaïques */}
                 {[
-                  { title: "Aide & Support", subtitle: "FAQ, règlements, contacts", icon: MousePointer, gradient: "bg-gradient-accent", pattern: "bg-pattern-berber-complex", border: "border-accent/40", shadow: "shadow-elegant hover:shadow-zellige" },
-                  { title: "Services numériques", subtitle: "Catalogue, reproduction", icon: Download, gradient: "bg-gradient-sunset", pattern: "bg-pattern-metal-engraving", border: "border-gold/40", shadow: "shadow-gold hover:shadow-moroccan" },
-                  { title: "Langues", subtitle: "", icon: Globe, gradient: "bg-coral/20", pattern: "bg-pattern-embroidery", border: "border-coral/40", shadow: "shadow-berber hover:shadow-gold" },
-                  { title: "Accessibilité", subtitle: "Options d'accessibilité", icon: Accessibility, gradient: "bg-royal/20", pattern: "bg-pattern-berber-complex", border: "border-royal/40", shadow: "shadow-royal hover:shadow-moroccan" },
-                  { title: "Partager", subtitle: "Réseaux sociaux", icon: Share2, gradient: "bg-highlight/20", pattern: "bg-pattern-metal-engraving", border: "border-highlight/40", shadow: "shadow-elegant hover:shadow-gold" }
+                  { title: "Aide & Support", subtitle: "FAQ, règlements, contacts", icon: MousePointer, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-moroccan-stars", border: "border-accent/25", shadow: "shadow-elegant hover:shadow-zellige" },
+                  { title: "Services numériques", subtitle: "Catalogue, reproduction", icon: Download, gradient: "bg-gradient-neutral", pattern: "bg-pattern-filigrane", border: "border-gold/25", shadow: "shadow-gold hover:shadow-mosaique" },
+                  { title: "Langues", subtitle: "", icon: Globe, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-highlight/25", shadow: "shadow-berber hover:shadow-gold" },
+                  { title: "Accessibilité", subtitle: "Options d'accessibilité", icon: Accessibility, gradient: "bg-gradient-neutral", pattern: "bg-pattern-moroccan-stars", border: "border-royal/25", shadow: "shadow-royal hover:shadow-mosaique" },
+                  { title: "Partager", subtitle: "Réseaux sociaux", icon: Share2, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-filigrane", border: "border-accent/25", shadow: "shadow-elegant hover:shadow-gold" }
                 ].map((item, index) => (
                   <Card key={index} className={`relative overflow-hidden group border-3 ${item.border} ${item.shadow} transition-all duration-500`}>
                     <div className={`absolute inset-0 ${item.pattern} opacity-15 group-hover:opacity-25 transition-opacity duration-500`}></div>
+                    <div className={`absolute inset-0 bg-pattern-zellige-complex opacity-10 group-hover:opacity-20 transition-opacity duration-500`}></div>
                     <div className={`absolute inset-0 ${item.gradient} opacity-90`}></div>
                     <CardContent className="p-5 text-center relative z-10">
-                      <div className="w-16 h-16 bg-card/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border-2 border-white/20 shadow-elegant transform group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-16 h-16 bg-card/30 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border-2 border-white/15 shadow-elegant transform group-hover:scale-110 transition-transform duration-300">
                         <item.icon className="h-8 w-8 text-foreground" />
                       </div>
                       <h4 className="font-moroccan font-bold text-foreground mb-2">{item.title}</h4>
                       {item.subtitle && <p className="text-xs text-muted-foreground font-serif">{item.subtitle}</p>}
                       {item.title === "Langues" && (
                         <div className="flex flex-wrap gap-2 justify-center mt-3">
-                          <span className="text-xs px-3 py-1 bg-primary/20 rounded-full text-primary border border-primary/30 font-serif">FR</span>
-                          <span className="text-xs px-3 py-1 bg-accent/20 rounded-full text-accent border border-accent/30 font-arabic">AR</span>
-                          <span className="text-xs px-3 py-1 bg-coral/20 rounded-full text-coral border border-coral/30 font-serif">EN</span>
+                          <span className="text-xs px-3 py-1 bg-primary/15 rounded-full text-primary border border-primary/25 font-serif">FR</span>
+                          <span className="text-xs px-3 py-1 bg-accent/15 rounded-full text-accent border border-accent/25 font-arabic">AR</span>
+                          <span className="text-xs px-3 py-1 bg-highlight/15 rounded-full text-highlight border border-highlight/25 font-serif">EN</span>
                         </div>
                       )}
                     </CardContent>
                   </Card>
                 ))}
 
-                {/* Chatbot avec arrière-plan bibliothèque et ornements */}
-                <Card className="relative overflow-hidden border-3 border-gold/50 shadow-royal">
-                  <div className="absolute inset-0 bg-pattern-embroidery opacity-25"></div>
-                  <div className="absolute inset-0 bg-gradient-berber opacity-95"></div>
+                {/* Chatbot avec mosaïques et ornements subtils */}
+                <Card className="relative overflow-hidden border-3 border-gold/30 shadow-mosaique">
+                  <div className="absolute inset-0 bg-pattern-zellige-complex opacity-25"></div>
+                  <div className="absolute inset-0 bg-pattern-filigrane opacity-20"></div>
+                  <div className="absolute inset-0 bg-gradient-neutral opacity-90"></div>
                   <CardContent className="p-8 text-center min-h-[160px] flex flex-col justify-center relative z-10">
                     <div className="relative mx-auto mb-6">
-                      <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center shadow-gold border-2 border-white/30">
-                        <MousePointer className="h-10 w-10 text-white" />
+                      <div className="w-20 h-20 bg-primary/20 backdrop-blur-sm rounded-3xl flex items-center justify-center shadow-mosaique border-2 border-primary/25">
+                        <MousePointer className="h-10 w-10 text-primary" />
                       </div>
-                      <div className="absolute -top-3 -right-3 w-8 h-8 bg-gold rounded-full flex items-center justify-center border-2 border-white/50">
+                      <div className="absolute -top-3 -right-3 w-8 h-8 bg-gold/70 rounded-full flex items-center justify-center border-2 border-gold/40">
                         <Sparkles className="h-4 w-4 text-white" />
                       </div>
                     </div>
-                    <h4 className="font-moroccan font-bold mb-3 text-white text-lg">Assistant Intelligent</h4>
-                    <p className="text-sm text-white/95 font-elegant">
+                    <h4 className="font-moroccan font-bold mb-3 text-foreground text-lg">Assistant Intelligent</h4>
+                    <p className="text-sm text-muted-foreground font-elegant">
                       Assistance personnalisée pour vos recherches
                     </p>
                   </CardContent>

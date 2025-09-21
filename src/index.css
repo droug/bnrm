@@ -9,142 +9,166 @@ Enhanced Moroccan Heritage Design System
 
 @layer base {
   :root {
-    /* Palette Authentique Marocaine - Couleurs Vives et Traditionnelles */
-    --background: 42 45% 96%;
-    --foreground: 30 35% 12%;
+    /* Palette Neutres et Mosaïques - Inspiration Zellige */
+    --background: 42 25% 97%;
+    --foreground: 30 15% 20%;
 
-    --card: 44 50% 92%;
-    --card-foreground: 30 35% 12%;
+    --card: 40 20% 94%;
+    --card-foreground: 30 15% 20%;
 
-    --popover: 44 50% 92%;
-    --popover-foreground: 30 35% 12%;
+    --popover: 40 20% 94%;
+    --popover-foreground: 30 15% 20%;
 
-    /* Bleu Majorelle Intense - Couleur emblématique du Maroc */
-    --primary: 220 85% 45%;
-    --primary-foreground: 44 25% 98%;
-    --primary-glow: 220 75% 60%;
-    --primary-deep: 220 90% 35%;
+    /* Bleu Zellige Subtil */
+    --primary: 220 30% 45%;
+    --primary-foreground: 44 15% 98%;
+    --primary-glow: 220 25% 55%;
+    --primary-deep: 220 35% 35%;
 
-    /* Ocre et sable chaud - Tons du désert */
-    --secondary: 35 65% 75%;
-    --secondary-foreground: 30 35% 12%;
-    --secondary-warm: 30 70% 65%;
+    /* Terre Cuite et Sable - Tons Neutres */
+    --secondary: 35 25% 85%;
+    --secondary-foreground: 30 15% 20%;
+    --secondary-warm: 30 30% 80%;
 
-    /* Tons neutres chauds */
-    --muted: 40 45% 88%;
-    --muted-foreground: 35 25% 35%;
+    /* Tons neutres doux */
+    --muted: 40 15% 90%;
+    --muted-foreground: 35 10% 40%;
 
-    /* Vert Émeraude Vibrant - Couleur du drapeau */
-    --accent: 155 75% 35%;
-    --accent-foreground: 44 25% 98%;
-    --accent-glow: 155 65% 50%;
-    --accent-bright: 155 85% 45%;
+    /* Vert Olive Subtil */
+    --accent: 155 25% 45%;
+    --accent-foreground: 44 15% 98%;
+    --accent-glow: 155 20% 55%;
+    --accent-bright: 155 30% 50%;
 
-    /* Rouge Brique Intense - Couleur de Marrakech */
-    --highlight: 12 85% 55%;
-    --highlight-foreground: 44 25% 98%;
-    --highlight-deep: 8 90% 45%;
+    /* Brique Douce */
+    --highlight: 12 35% 65%;
+    --highlight-foreground: 44 15% 98%;
+    --highlight-deep: 8 40% 55%;
 
-    /* Or Royal - Artisanat traditionnel */
-    --gold: 48 95% 55%;
-    --gold-foreground: 30 35% 12%;
-    --gold-bright: 50 100% 50%;
+    /* Or Ancien - Mosaïque */
+    --gold: 48 40% 65%;
+    --gold-foreground: 30 15% 20%;
+    --gold-bright: 50 45% 60%;
 
-    /* Rouge corail - Tapis berbères */
-    --coral: 15 85% 60%;
-    --coral-foreground: 44 25% 98%;
+    /* Corail Doux */
+    --coral: 15 30% 70%;
+    --coral-foreground: 44 15% 98%;
 
-    /* Violet royal - Broderies traditionnelles */
-    --royal: 280 75% 50%;
-    --royal-foreground: 44 25% 98%;
+    /* Violet Mosaïque */
+    --royal: 280 25% 60%;
+    --royal-foreground: 44 15% 98%;
 
-    --destructive: 0 80% 55%;
-    --destructive-foreground: 44 25% 98%;
+    --destructive: 0 50% 60%;
+    --destructive-foreground: 44 15% 98%;
 
-    --border: 40 30% 82%;
-    --input: 40 35% 88%;
-    --ring: 220 85% 45%;
+    --border: 40 15% 85%;
+    --input: 40 20% 90%;
+    --ring: 220 30% 45%;
 
-    /* Dégradés Marocains Authentiques */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)), hsl(var(--accent-bright)));
-    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)), hsl(var(--gold)));
-    --gradient-zellige: linear-gradient(45deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 25%, hsl(var(--gold)) 50%, hsl(var(--highlight)) 75%, hsl(var(--coral)) 100%);
-    --gradient-sunset: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--coral)) 50%, hsl(var(--highlight)) 100%);
-    --gradient-berber: linear-gradient(90deg, hsl(var(--royal)) 0%, hsl(var(--primary)) 33%, hsl(var(--accent)) 66%, hsl(var(--coral)) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--secondary-warm)));
+    /* Dégradés Mosaïques Zellige */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)), hsl(var(--secondary-warm)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)), hsl(var(--secondary)));
+    --gradient-neutral: linear-gradient(45deg, hsl(var(--secondary)) 0%, hsl(var(--muted)) 25%, hsl(var(--card)) 50%, hsl(var(--secondary-warm)) 75%, hsl(var(--background)) 100%);
+    --gradient-zellige-main: linear-gradient(60deg, hsl(var(--primary) / 0.8) 0%, hsl(var(--accent) / 0.6) 35%, hsl(var(--gold) / 0.7) 70%, hsl(var(--secondary)) 100%);
+    --gradient-mosaique: linear-gradient(120deg, hsl(var(--muted)) 0%, hsl(var(--card)) 33%, hsl(var(--secondary)) 66%, hsl(var(--background)) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--secondary)));
     
-    /* Motifs Complexes Marocains Traditionnels */
+    /* Motifs Zellige Complexes et Raffinés */
     
-    /* Zellige Mosaïques Colorées */
+    /* Zellige Mosaïques Traditionnelles */
     --pattern-zellige-complex: 
-      radial-gradient(circle at 0% 50%, hsl(var(--primary) / 0.15) 6px, transparent 6px),
-      radial-gradient(circle at 50% 0%, hsl(var(--accent) / 0.15) 6px, transparent 6px),
-      radial-gradient(circle at 100% 50%, hsl(var(--gold) / 0.15) 6px, transparent 6px),
-      radial-gradient(circle at 50% 100%, hsl(var(--coral) / 0.15) 6px, transparent 6px),
-      radial-gradient(circle at 25% 25%, hsl(var(--highlight) / 0.1) 4px, transparent 4px),
-      radial-gradient(circle at 75% 75%, hsl(var(--royal) / 0.1) 4px, transparent 4px);
+      radial-gradient(circle at 0% 50%, hsl(var(--primary) / 0.12) 8px, transparent 8px),
+      radial-gradient(circle at 50% 0%, hsl(var(--accent) / 0.10) 6px, transparent 6px),
+      radial-gradient(circle at 100% 50%, hsl(var(--gold) / 0.08) 8px, transparent 8px),
+      radial-gradient(circle at 50% 100%, hsl(var(--secondary-warm) / 0.10) 6px, transparent 6px),
+      radial-gradient(circle at 25% 25%, hsl(var(--highlight) / 0.06) 4px, transparent 4px),
+      radial-gradient(circle at 75% 75%, hsl(var(--royal) / 0.08) 5px, transparent 5px),
+      linear-gradient(45deg, hsl(var(--muted) / 0.15) 25%, transparent 25%),
+      linear-gradient(-45deg, hsl(var(--card) / 0.12) 25%, transparent 25%);
 
-    /* Motifs Tapis Berbères */
-    --pattern-berber-complex:
+    /* Mosaïque Géométrique Raffinée */
+    --pattern-mosaique-geometric:
       repeating-linear-gradient(
         0deg,
-        hsl(var(--primary) / 0.08) 0px,
-        hsl(var(--primary) / 0.08) 2px,
-        transparent 2px,
+        hsl(var(--primary) / 0.06) 0px,
+        hsl(var(--primary) / 0.06) 1px,
+        transparent 1px,
+        transparent 16px
+      ),
+      repeating-linear-gradient(
+        45deg,
+        hsl(var(--accent) / 0.05) 0px,
+        hsl(var(--accent) / 0.05) 1px,
+        transparent 1px,
+        transparent 12px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        hsl(var(--gold) / 0.04) 0px,
+        hsl(var(--gold) / 0.04) 1px,
+        transparent 1px,
         transparent 20px
       ),
       repeating-linear-gradient(
-        60deg,
-        hsl(var(--accent) / 0.06) 0px,
-        hsl(var(--accent) / 0.06) 2px,
-        transparent 2px,
-        transparent 15px
+        135deg,
+        hsl(var(--secondary-warm) / 0.06) 0px,
+        hsl(var(--secondary-warm) / 0.06) 1px,
+        transparent 1px,
+        transparent 14px
+      );
+
+    /* Motif Étoiles Marocaines */
+    --pattern-moroccan-stars:
+      radial-gradient(ellipse at center, hsl(var(--gold) / 0.08) 2px, transparent 2px),
+      conic-gradient(from 0deg at 30% 30%, 
+        hsl(var(--primary) / 0.04) 0deg,
+        hsl(var(--accent) / 0.05) 60deg,
+        hsl(var(--gold) / 0.04) 120deg,
+        hsl(var(--secondary-warm) / 0.05) 180deg,
+        hsl(var(--muted) / 0.04) 240deg,
+        hsl(var(--card) / 0.05) 300deg,
+        hsl(var(--primary) / 0.04) 360deg
       ),
-      repeating-linear-gradient(
-        120deg,
-        hsl(var(--coral) / 0.06) 0px,
-        hsl(var(--coral) / 0.06) 2px,
-        transparent 2px,
-        transparent 15px
+      conic-gradient(from 45deg at 70% 70%, 
+        hsl(var(--accent) / 0.04) 0deg,
+        hsl(var(--gold) / 0.05) 72deg,
+        hsl(var(--primary) / 0.04) 144deg,
+        hsl(var(--secondary) / 0.05) 216deg,
+        hsl(var(--muted) / 0.04) 288deg,
+        hsl(var(--accent) / 0.04) 360deg
       );
 
-    /* Broderie Complexe */
-    --pattern-embroidery:
-      radial-gradient(ellipse at center, hsl(var(--gold) / 0.1) 1px, transparent 1px),
-      conic-gradient(from 0deg at 50% 50%, 
-        hsl(var(--royal) / 0.05) 0deg,
-        hsl(var(--primary) / 0.05) 60deg,
-        hsl(var(--accent) / 0.05) 120deg,
-        hsl(var(--coral) / 0.05) 180deg,
-        hsl(var(--gold) / 0.05) 240deg,
-        hsl(var(--highlight) / 0.05) 300deg,
-        hsl(var(--royal) / 0.05) 360deg
-      );
-
-    /* Architecture - Médina */
-    --pattern-medina:
-      linear-gradient(45deg, hsl(var(--secondary-warm) / 0.1) 25%, transparent 25%),
-      linear-gradient(-45deg, hsl(var(--secondary-warm) / 0.1) 25%, transparent 25%),
-      linear-gradient(45deg, transparent 75%, hsl(var(--gold) / 0.08) 75%),
-      linear-gradient(-45deg, transparent 75%, hsl(var(--gold) / 0.08) 75%);
-
-    /* Gravure sur Métaux */
-    --pattern-metal-engraving:
+    /* Carreaux Zellige */
+    --pattern-zellige-tiles:
       repeating-conic-gradient(
-        from 45deg at 50% 50%,
-        hsl(var(--gold) / 0.12) 0deg 90deg,
-        transparent 90deg 180deg
+        from 0deg at 25% 25%,
+        hsl(var(--primary) / 0.08) 0deg 30deg,
+        hsl(var(--accent) / 0.06) 30deg 60deg,
+        hsl(var(--gold) / 0.05) 60deg 90deg,
+        transparent 90deg 120deg
       ),
-      radial-gradient(circle at 25% 25%, hsl(var(--primary) / 0.06) 20%, transparent 21%),
-      radial-gradient(circle at 75% 75%, hsl(var(--accent) / 0.06) 20%, transparent 21%);
+      repeating-conic-gradient(
+        from 45deg at 75% 75%,
+        hsl(var(--secondary-warm) / 0.07) 0deg 45deg,
+        hsl(var(--muted) / 0.05) 45deg 90deg,
+        transparent 90deg 135deg
+      );
+
+    /* Filigrane Marocain */
+    --pattern-filigrane:
+      radial-gradient(circle at 20% 80%, hsl(var(--gold) / 0.06) 15%, transparent 16%),
+      radial-gradient(circle at 80% 20%, hsl(var(--primary) / 0.05) 15%, transparent 16%),
+      radial-gradient(circle at 40% 40%, hsl(var(--accent) / 0.04) 10%, transparent 11%),
+      linear-gradient(45deg, hsl(var(--secondary) / 0.08) 50%, transparent 50%);
     
-    /* Ombres Artistiques Marocaines */
-    --shadow-moroccan: 0 15px 50px -15px hsl(var(--primary) / 0.35), 0 8px 16px -4px hsl(var(--gold) / 0.2), inset 0 1px 0 hsl(var(--gold) / 0.1);
-    --shadow-gold: 0 12px 35px -12px hsl(var(--gold) / 0.45), 0 4px 8px -2px hsl(var(--gold) / 0.3), 0 0 0 1px hsl(var(--gold) / 0.1);
-    --shadow-elegant: 0 8px 32px -8px hsl(var(--accent) / 0.3), 0 4px 12px -2px hsl(var(--primary) / 0.15), inset 0 1px 0 hsl(var(--accent) / 0.1);
-    --shadow-berber: 0 10px 40px -10px hsl(var(--coral) / 0.4), 0 6px 12px -3px hsl(var(--royal) / 0.2);
-    --shadow-zellige: 0 6px 25px -6px hsl(var(--highlight) / 0.35), 0 2px 8px -1px hsl(var(--gold) / 0.25);
-    --shadow-royal: 0 8px 30px -8px hsl(var(--royal) / 0.4), 0 4px 8px -2px hsl(var(--primary) / 0.2);
+    /* Ombres Subtiles et Raffinées */
+    --shadow-moroccan: 0 8px 32px -8px hsl(var(--primary) / 0.15), 0 4px 8px -2px hsl(var(--gold) / 0.10), inset 0 1px 0 hsl(var(--gold) / 0.05);
+    --shadow-gold: 0 6px 24px -6px hsl(var(--gold) / 0.20), 0 2px 6px -1px hsl(var(--gold) / 0.15);
+    --shadow-elegant: 0 4px 20px -4px hsl(var(--accent) / 0.15), 0 2px 8px -2px hsl(var(--primary) / 0.08);
+    --shadow-berber: 0 6px 24px -6px hsl(var(--secondary-warm) / 0.20), 0 3px 8px -2px hsl(var(--muted) / 0.15);
+    --shadow-zellige: 0 4px 16px -4px hsl(var(--card) / 0.25), 0 2px 6px -1px hsl(var(--border) / 0.20);
+    --shadow-royal: 0 6px 20px -6px hsl(var(--royal) / 0.18), 0 2px 6px -1px hsl(var(--primary) / 0.12);
+    --shadow-mosaique: 0 8px 28px -8px hsl(var(--muted) / 0.25), 0 4px 8px -2px hsl(var(--secondary) / 0.15), inset 0 1px 0 hsl(var(--background) / 0.8);
 
     --radius: 0.5rem;
 
