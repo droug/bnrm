@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 import UserManagement from "./pages/UserManagement";
 import ContentManagement from "./pages/ContentManagement";
 import News from "./pages/News";
+import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -29,6 +30,7 @@ const App = () => (
         <Route path="/admin/users" element={<UserManagement />} />
         <Route path="/admin/content" element={<ContentManagement />} />
         <Route path="/news" element={<News />} />
+        <Route path="/settings" element={<SettingsPage />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
