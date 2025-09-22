@@ -1,6 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { DndContext, closestCenter, DragEndEvent, DragOverEvent, useDroppable } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,12 +15,14 @@ import {
   Redo,
   Palette,
   Layout,
-  Settings
+  Settings,
+  Heading1,
+  Container,
+  Trash2,
+  Edit
 } from 'lucide-react';
-import { ComponentToolbar } from './ComponentToolbar';
-import { DesignCanvas } from './DesignCanvas';
-import { PropertiesPanel } from './PropertiesPanel';
 import { useLanguage } from '@/hooks/useLanguage';
+import ContentEditable from 'react-contenteditable';
 
 export interface ElementData {
   id: string;
@@ -41,25 +41,293 @@ export interface ElementData {
     height?: string;
     textAlign?: 'left' | 'center' | 'right';
   };
-  children?: ElementData[];
 }
 
+// Composant de la barre latérale des composants
+const ComponentToolbar: React.FC<{ onAddElement: (type: ElementData['type']) => void }> = ({ onAddElement }) => {
+  const components = [
+    { type: 'heading' as const, label: 'Titre', icon: Heading1, description: 'Ajouter un titre' },
+    { type: 'text' as const, label: 'Texte', icon: Type, description: 'Ajouter du texte' },
+    { type: 'button' as const, label: 'Bouton', icon: Mouse, description: 'Ajouter un bouton' },
+    { type: 'image' as const, label: 'Image', icon: Image, description: 'Ajouter une image' },
+    { type: 'container' as const, label: 'Conteneur', icon: Container, description: 'Ajouter un conteneur' }
+  ];
+
+  return (
+    <div className="space-y-2">
+      <h3 className="font-semibold text-sm text-muted-foreground mb-3">
+        Cliquez pour ajouter des composants
+      </h3>
+      
+      {components.map((component) => (
+        <Card 
+          key={component.type}
+          className="p-3 cursor-pointer hover:bg-accent transition-colors border-l-4 border-l-primary/20 hover:border-l-primary"
+          onClick={() => onAddElement(component.type)}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
+              <component.icon className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <div className="font-medium text-sm">{component.label}</div>
+              <div className="text-xs text-muted-foreground">
+                {component.description}
+              </div>
+            </div>
+          </div>
+        </Card>
+      ))}
+      
+      <div className="mt-6 p-3 bg-muted/50 rounded-lg">
+        <p className="text-xs text-muted-foreground">
+          💡 Astuce : Cliquez sur un élément pour le sélectionner et modifier ses propriétés.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// Composant d'un élément éditable
+const EditableElement: React.FC<{
+  element: ElementData;
+  isSelected: boolean;
+  onSelect: () => void;
+  onUpdate: (updates: Partial<ElementData>) => void;
+  onDelete: () => void;
+  previewMode: boolean;
+}> = ({ element, isSelected, onSelect, onUpdate, onDelete, previewMode }) => {
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleContentChange = (evt: any) => {
+    onUpdate({ content: evt.target.value });
+  };
+
+  const elementStyle = {
+    ...element.styles,
+    position: 'relative' as const,
+    cursor: previewMode ? 'default' : 'pointer',
+    minHeight: element.type === 'container' ? '100px' : 'auto',
+    border: isSelected && !previewMode ? '2px solid #3b82f6' : element.styles.border || 'none',
+    outline: 'none'
+  };
+
+  const renderElement = () => {
+    switch (element.type) {
+      case 'heading':
+        return (
+          <ContentEditable
+            html={element.content}
+            onChange={handleContentChange}
+            disabled={previewMode}
+            tagName="h1"
+            style={elementStyle}
+            className="outline-none"
+          />
+        );
+      
+      case 'text':
+        return (
+          <ContentEditable
+            html={element.content}
+            onChange={handleContentChange}
+            disabled={previewMode}
+            tagName="p"
+            style={elementStyle}
+            className="outline-none"
+          />
+        );
+      
+      case 'button':
+        return (
+          <div style={elementStyle} className="inline-block">
+            <ContentEditable
+              html={element.content}
+              onChange={handleContentChange}
+              disabled={previewMode}
+              tagName="button"
+              className="px-4 py-2 outline-none cursor-pointer"
+              style={{ backgroundColor: element.styles.backgroundColor, color: element.styles.color, borderRadius: element.styles.borderRadius }}
+            />
+          </div>
+        );
+      
+      case 'image':
+        return (
+          <div style={elementStyle} className="overflow-hidden">
+            <img
+              src={element.content}
+              alt="Element"
+              style={{
+                width: element.styles.width || '300px',
+                height: element.styles.height || '200px',
+                objectFit: 'cover'
+              }}
+              onError={(e) => {
+                e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Image';
+              }}
+            />
+          </div>
+        );
+      
+      case 'container':
+        return (
+          <div
+            style={elementStyle}
+            className="min-h-20 flex items-center justify-center text-muted-foreground border-2 border-dashed border-border"
+          >
+            {element.content || 'Conteneur vide - Cliquez pour éditer'}
+          </div>
+        );
+      
+      default:
+        return <div style={elementStyle}>{element.content}</div>;
+    }
+  };
+
+  return (
+    <div
+      className={`relative group mb-4 ${isSelected && !previewMode ? 'ring-2 ring-primary rounded' : ''}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!previewMode) onSelect();
+      }}
+    >
+      {renderElement()}
+      
+      {/* Contrôles d'édition */}
+      {isSelected && !previewMode && (
+        <div className="absolute -top-8 right-0 flex gap-1 bg-primary text-primary-foreground rounded p-1 shadow-lg z-10">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 w-6 p-0 hover:bg-primary-foreground/20"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsEditing(!isEditing);
+            }}
+            title="Éditer"
+          >
+            <Edit className="h-3 w-3" />
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 w-6 p-0 hover:bg-destructive"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            title="Supprimer"
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Panneau de propriétés
+const PropertiesPanel: React.FC<{
+  selectedElement: ElementData | null;
+  onUpdateElement: (id: string, updates: Partial<ElementData>) => void;
+}> = ({ selectedElement, onUpdateElement }) => {
+  if (!selectedElement) {
+    return (
+      <div className="text-center text-muted-foreground py-8">
+        <Settings className="h-8 w-8 mx-auto mb-2 opacity-50" />
+        <p>Sélectionnez un élément pour modifier ses propriétés</p>
+      </div>
+    );
+  }
+
+  const updateStyle = (key: keyof ElementData['styles'], value: string) => {
+    onUpdateElement(selectedElement.id, {
+      styles: { ...selectedElement.styles, [key]: value }
+    });
+  };
+
+  const updateContent = (content: string) => {
+    onUpdateElement(selectedElement.id, { content });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label>Contenu</Label>
+        <Input
+          value={selectedElement.content}
+          onChange={(e) => updateContent(e.target.value)}
+          placeholder="Tapez votre contenu..."
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Couleur de fond</Label>
+        <Input
+          type="color"
+          value={selectedElement.styles.backgroundColor || '#ffffff'}
+          onChange={(e) => updateStyle('backgroundColor', e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Couleur du texte</Label>
+        <Input
+          type="color"
+          value={selectedElement.styles.color || '#000000'}
+          onChange={(e) => updateStyle('color', e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Taille de police</Label>
+        <Input
+          value={selectedElement.styles.fontSize || '16px'}
+          onChange={(e) => updateStyle('fontSize', e.target.value)}
+          placeholder="16px"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Padding</Label>
+        <Input
+          value={selectedElement.styles.padding || '16px'}
+          onChange={(e) => updateStyle('padding', e.target.value)}
+          placeholder="16px"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Bordure arrondie</Label>
+        <Input
+          value={selectedElement.styles.borderRadius || '0px'}
+          onChange={(e) => updateStyle('borderRadius', e.target.value)}
+          placeholder="8px"
+        />
+      </div>
+    </div>
+  );
+};
+
+// Composant principal
 const WysiwygEditor = () => {
   const [elements, setElements] = useState<ElementData[]>([]);
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
   const [history, setHistory] = useState<ElementData[][]>([[]]);
   const [historyIndex, setHistoryIndex] = useState(0);
-  const { t } = useLanguage();
 
   const addElement = useCallback((type: ElementData['type']) => {
     const newElement: ElementData = {
       id: `element-${Date.now()}`,
       type,
-      content: type === 'text' ? 'Nouveau texte' : 
+      content: type === 'text' ? 'Nouveau texte - cliquez pour éditer' : 
                type === 'heading' ? 'Nouveau titre' :
                type === 'button' ? 'Bouton' :
-               type === 'image' ? 'https://via.placeholder.com/300x200' : '',
+               type === 'image' ? 'https://via.placeholder.com/300x200?text=Image' : 
+               type === 'container' ? 'Conteneur' : 'Contenu',
       styles: {
         padding: '16px',
         margin: '8px',
@@ -76,6 +344,7 @@ const WysiwygEditor = () => {
 
     const newElements = [...elements, newElement];
     setElements(newElements);
+    setSelectedElement(newElement.id);
     updateHistory(newElements);
   }, [elements]);
 
@@ -116,31 +385,6 @@ const WysiwygEditor = () => {
       setElements(history[historyIndex + 1]);
     }
   }, [historyIndex, history]);
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    
-    if (!over) return;
-
-    // Si on fait glisser un composant depuis la toolbar
-    if (active.id.toString().startsWith('toolbar-')) {
-      const componentType = active.id.toString().replace('toolbar-', '') as ElementData['type'];
-      addElement(componentType);
-      return;
-    }
-
-    // Si on réorganise les éléments existants
-    if (active.id !== over.id) {
-      const oldIndex = elements.findIndex(el => el.id === active.id);
-      const newIndex = elements.findIndex(el => el.id === over.id);
-      
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newElements = arrayMove(elements, oldIndex, newIndex);
-        setElements(newElements);
-        updateHistory(newElements);
-      }
-    }
-  };
 
   const exportDesign = () => {
     const design = {
@@ -189,7 +433,7 @@ const WysiwygEditor = () => {
         
         <div className="flex items-center gap-2">
           <Button
-            variant="ghost"
+            variant={previewMode ? "default" : "ghost"}
             size="sm"
             onClick={() => setPreviewMode(!previewMode)}
           >
@@ -239,26 +483,47 @@ const WysiwygEditor = () => {
 
         {/* Zone de conception principale */}
         <div className="flex-1 flex flex-col">
-          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={elements.map(el => el.id)} strategy={verticalListSortingStrategy}>
-              <DesignCanvas
-                elements={elements}
-                selectedElement={selectedElement}
-                onSelectElement={setSelectedElement}
-                onUpdateElement={updateElement}
-                onDeleteElement={deleteElement}
-                previewMode={previewMode}
-              />
-            </SortableContext>
-          </DndContext>
+          <div 
+            className={`flex-1 overflow-auto ${previewMode ? 'bg-background' : 'bg-muted/30'}`}
+            onClick={() => !previewMode && setSelectedElement(null)}
+          >
+            <div className={`min-h-full ${previewMode ? 'p-4' : 'p-8'}`}>
+              {elements.length === 0 ? (
+                !previewMode && (
+                  <div className="flex items-center justify-center h-64 border-2 border-dashed border-border rounded-lg">
+                    <div className="text-center text-muted-foreground">
+                      <div className="text-lg font-medium mb-2">Zone de conception vide</div>
+                      <div className="text-sm">
+                        Cliquez sur les composants dans la barre latérale pour commencer
+                      </div>
+                    </div>
+                  </div>
+                )
+              ) : (
+                <div className="space-y-2">
+                  {elements.map((element) => (
+                    <EditableElement
+                      key={element.id}
+                      element={element}
+                      isSelected={selectedElement === element.id}
+                      onSelect={() => setSelectedElement(element.id)}
+                      onUpdate={(updates) => updateElement(element.id, updates)}
+                      onDelete={() => deleteElement(element.id)}
+                      previewMode={previewMode}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Panneau de propriétés à droite */}
-        {!previewMode && selectedElementData && (
+        {!previewMode && (
           <div className="w-80 border-l bg-card p-4">
             <div className="flex items-center gap-2 mb-4">
               <Settings className="h-4 w-4" />
-              <h3 className="font-semibold">Propriétés de l'élément</h3>
+              <h3 className="font-semibold">Propriétés</h3>
             </div>
             <PropertiesPanel
               selectedElement={selectedElementData}
