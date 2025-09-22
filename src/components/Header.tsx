@@ -112,7 +112,7 @@ const Header = () => {
         {/* Main navigation */}
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
             <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center shadow-moroccan">
               <Book className="h-6 w-6 text-primary-foreground" />
             </div>
@@ -120,7 +120,7 @@ const Header = () => {
               <h1 className="text-lg font-bold text-foreground">BNRM</h1>
               <p className="text-xs text-muted-foreground hidden sm:block">Bibliothèque Nationale</p>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <NavigationMenu className="hidden md:flex">
