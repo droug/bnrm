@@ -14,6 +14,7 @@ import ContentManagement from "./pages/ContentManagement";
 import News from "./pages/News";
 import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import WysiwygPage from "./pages/WysiwygPage";
 
 const App = () => (
   <TooltipProvider>
@@ -31,6 +32,7 @@ const App = () => (
         <Route path="/admin/content" element={<ContentManagement />} />
         <Route path="/news" element={<News />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/wysiwyg" element={<WysiwygPage />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
