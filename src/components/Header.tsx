@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive } from "lucide-react";
+import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
@@ -14,6 +14,12 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -37,39 +43,48 @@ const Header = () => {
             <span className="text-muted-foreground">{t('header.title')}</span>
           </div>
           <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className={`text-muted-foreground hover:text-foreground ${language === 'ar' ? 'text-primary' : ''}`}
-              onClick={() => setLanguage('ar')}
-            >
-              <Globe className="h-4 w-4 mr-1" />
-              العربية
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className={`text-muted-foreground hover:text-foreground ${language === 'ber' ? 'text-primary' : ''}`}
-              onClick={() => setLanguage('ber')}
-            >
-              ⵜⴰⵎⴰⵣⵉⵖⵜ
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className={`text-muted-foreground hover:text-foreground ${language === 'fr' ? 'text-primary' : ''}`}
-              onClick={() => setLanguage('fr')}
-            >
-              Français
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className={`text-muted-foreground hover:text-foreground ${language === 'en' ? 'text-primary' : ''}`}
-              onClick={() => setLanguage('en')}
-            >
-              English
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-muted-foreground hover:text-foreground flex items-center gap-1"
+                >
+                  <Globe className="h-4 w-4" />
+                  {language === 'ar' && 'العربية'}
+                  {language === 'ber' && 'ⵜⴰⵎⴰⵣⵉⵖⵜ'}
+                  {language === 'fr' && 'Français'}
+                  {language === 'en' && 'English'}
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-card border border-border shadow-moroccan">
+                <DropdownMenuItem 
+                  onClick={() => setLanguage('ar')}
+                  className={`cursor-pointer ${language === 'ar' ? 'bg-accent text-accent-foreground' : ''}`}
+                >
+                  العربية
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setLanguage('ber')}
+                  className={`cursor-pointer ${language === 'ber' ? 'bg-accent text-accent-foreground' : ''}`}
+                >
+                  ⵜⴰⵎⴰⵣⵉⵖⵜ
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setLanguage('fr')}
+                  className={`cursor-pointer ${language === 'fr' ? 'bg-accent text-accent-foreground' : ''}`}
+                >
+                  Français
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setLanguage('en')}
+                  className={`cursor-pointer ${language === 'en' ? 'bg-accent text-accent-foreground' : ''}`}
+                >
+                  English
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             
             {user ? (
               <Link to="/dashboard">
