@@ -61,10 +61,15 @@ const SettingsPage = () => {
         <header className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/60">
           <div className="container flex h-16 items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link to="/dashboard">
+              <Link to="/">
                 <Button variant="ghost" size="sm">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Retour au Dashboard
+                  Accueil
+                </Button>
+              </Link>
+              <Link to="/dashboard">
+                <Button variant="outline" size="sm">
+                  Dashboard
                 </Button>
               </Link>
               <Separator orientation="vertical" className="h-6" />
