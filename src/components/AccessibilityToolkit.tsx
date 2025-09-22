@@ -42,6 +42,8 @@ export const AccessibilityToolkit = () => {
   const [settings, setSettings] = useState<AccessibilitySettings>(defaultSettings);
   const { t } = useLanguage();
 
+  console.log('AccessibilityToolkit rendered');
+
   useEffect(() => {
     const root = document.documentElement;
     
@@ -104,8 +106,16 @@ export const AccessibilityToolkit = () => {
       {/* Bouton CTA flottant */}
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 z-50 rounded-full w-14 h-14 shadow-moroccan bg-primary hover:bg-primary/90"
+        className="fixed bottom-6 left-6 z-50 rounded-full w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
         size="icon"
+        style={{ 
+          position: 'fixed',
+          bottom: '24px',
+          left: '24px',
+          zIndex: 9999,
+          backgroundColor: '#2563eb',
+          color: 'white'
+        }}
       >
         <Accessibility className="h-6 w-6" />
       </Button>
