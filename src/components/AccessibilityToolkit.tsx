@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { 
   Accessibility, 
-  X, 
   RotateCcw, 
   MousePointer, 
   Type, 
   Eye, 
-  Volume2,
   Play,
   Pause
 } from 'lucide-react';
@@ -113,196 +116,183 @@ export const AccessibilityToolkit = () => {
         <Accessibility className="h-4 w-4" />
       </Button>
 
-      {/* Panel d'accessibilité */}
-      {isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-md bg-card border border-border shadow-moroccan">
-            <div className="p-6">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold">Accessibilité</h2>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={resetSettings}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <RotateCcw className="h-4 w-4 mr-1" />
-                    Réinitialiser
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+      {/* Dialog d'accessibilité */}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Accessibilité</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={resetSettings}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <RotateCcw className="h-4 w-4 mr-1" />
+                Réinitialiser
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
 
-              {/* Grille des contrôles */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Curseur */}
-                <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
-                  <MousePointer className="h-6 w-6 mb-2 text-muted-foreground" />
-                  <span className="text-sm font-medium mb-2">Curseur</span>
-                  <Slider
-                    value={[settings.cursorSize]}
-                    onValueChange={([value]) => updateSetting('cursorSize', value)}
-                    min={1}
-                    max={3}
-                    step={0.5}
-                    className="w-full"
-                  />
-                </div>
+          {/* Grille des contrôles */}
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            {/* Curseur */}
+            <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
+              <MousePointer className="h-6 w-6 mb-2 text-muted-foreground" />
+              <span className="text-sm font-medium mb-2">Curseur</span>
+              <Slider
+                value={[settings.cursorSize]}
+                onValueChange={([value]) => updateSetting('cursorSize', value)}
+                min={1}
+                max={3}
+                step={0.5}
+                className="w-full"
+              />
+            </div>
 
-                {/* Espacement des mots */}
-                <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
-                  <div className="text-lg mb-2 text-muted-foreground font-bold">H</div>
-                  <span className="text-sm font-medium mb-1">Espacement des mots</span>
-                  <span className="text-xs text-muted-foreground mb-2">{settings.wordSpacing}px</span>
-                  <Slider
-                    value={[settings.wordSpacing]}
-                    onValueChange={([value]) => updateSetting('wordSpacing', value)}
-                    min={0}
-                    max={10}
-                    step={1}
-                    className="w-full"
-                  />
-                </div>
+            {/* Espacement des mots */}
+            <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
+              <div className="text-lg mb-2 text-muted-foreground font-bold">H</div>
+              <span className="text-sm font-medium mb-1">Espacement des mots</span>
+              <span className="text-xs text-muted-foreground mb-2">{settings.wordSpacing}px</span>
+              <Slider
+                value={[settings.wordSpacing]}
+                onValueChange={([value]) => updateSetting('wordSpacing', value)}
+                min={0}
+                max={10}
+                step={1}
+                className="w-full"
+              />
+            </div>
 
-                {/* Espacement des lettres */}
-                <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
-                  <div className="text-lg mb-2 text-muted-foreground font-bold">A a</div>
-                  <span className="text-sm font-medium mb-1">Espacement des lettres</span>
-                  <span className="text-xs text-muted-foreground mb-2">{settings.letterSpacing}px</span>
-                  <Slider
-                    value={[settings.letterSpacing]}
-                    onValueChange={([value]) => updateSetting('letterSpacing', value)}
-                    min={0}
-                    max={5}
-                    step={0.5}
-                    className="w-full"
-                  />
-                </div>
+            {/* Espacement des lettres */}
+            <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
+              <div className="text-lg mb-2 text-muted-foreground font-bold">A a</div>
+              <span className="text-sm font-medium mb-1">Espacement des lettres</span>
+              <span className="text-xs text-muted-foreground mb-2">{settings.letterSpacing}px</span>
+              <Slider
+                value={[settings.letterSpacing]}
+                onValueChange={([value]) => updateSetting('letterSpacing', value)}
+                min={0}
+                max={5}
+                step={0.5}
+                className="w-full"
+              />
+            </div>
 
-                {/* Espacement des lignes */}
-                <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
-                  <div className="text-lg mb-2 text-muted-foreground">≡</div>
-                  <span className="text-sm font-medium mb-1">Espacement des lignes</span>
-                  <span className="text-xs text-muted-foreground mb-2">{settings.lineHeight}px</span>
-                  <Slider
-                    value={[settings.lineHeight]}
-                    onValueChange={([value]) => updateSetting('lineHeight', value)}
-                    min={0}
-                    max={10}
-                    step={1}
-                    className="w-full"
-                  />
-                </div>
+            {/* Espacement des lignes */}
+            <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
+              <div className="text-lg mb-2 text-muted-foreground">≡</div>
+              <span className="text-sm font-medium mb-1">Espacement des lignes</span>
+              <span className="text-xs text-muted-foreground mb-2">{settings.lineHeight}px</span>
+              <Slider
+                value={[settings.lineHeight]}
+                onValueChange={([value]) => updateSetting('lineHeight', value)}
+                min={0}
+                max={10}
+                step={1}
+                className="w-full"
+              />
+            </div>
 
-                {/* Taille de texte */}
-                <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
-                  <Type className="h-6 w-6 mb-2 text-muted-foreground" />
-                  <span className="text-sm font-medium mb-2">Taille de texte</span>
-                  <Slider
-                    value={[settings.fontSize]}
-                    onValueChange={([value]) => updateSetting('fontSize', value)}
-                    min={75}
-                    max={150}
-                    step={5}
-                    className="w-full"
-                  />
-                </div>
+            {/* Taille de texte */}
+            <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
+              <Type className="h-6 w-6 mb-2 text-muted-foreground" />
+              <span className="text-sm font-medium mb-2">Taille de texte</span>
+              <Slider
+                value={[settings.fontSize]}
+                onValueChange={([value]) => updateSetting('fontSize', value)}
+                min={75}
+                max={150}
+                step={5}
+                className="w-full"
+              />
+            </div>
 
-                {/* Contraste */}
-                <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
-                  <Eye className="h-6 w-6 mb-2 text-muted-foreground" />
-                  <span className="text-sm font-medium mb-2">Contraste</span>
-                  <div className="flex gap-1">
-                    <Button
-                      variant={settings.contrast === 'normal' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => updateSetting('contrast', 'normal')}
-                      className="text-xs px-2"
-                    >
-                      Normal
-                    </Button>
-                    <Button
-                      variant={settings.contrast === 'light' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => updateSetting('contrast', 'light')}
-                      className="text-xs px-2"
-                    >
-                      Léger
-                    </Button>
-                    <Button
-                      variant={settings.contrast === 'dark' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => updateSetting('contrast', 'dark')}
-                      className="text-xs px-2"
-                    >
-                      Foncé
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Saturation */}
-                <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
-                  <div className="w-6 h-6 mb-2 rounded-full bg-gradient-to-r from-red-500 to-blue-500"></div>
-                  <span className="text-sm font-medium mb-2">Saturation</span>
-                  <div className="flex gap-1">
-                    <Button
-                      variant={settings.saturation === 50 ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => updateSetting('saturation', 50)}
-                      className="text-xs px-2"
-                    >
-                      Faible
-                    </Button>
-                    <Button
-                      variant={settings.saturation === 100 ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => updateSetting('saturation', 100)}
-                      className="text-xs px-2"
-                    >
-                      Normal
-                    </Button>
-                    <Button
-                      variant={settings.saturation === 150 ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => updateSetting('saturation', 150)}
-                      className="text-xs px-2"
-                    >
-                      Élevée
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Lecture */}
-                <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
-                  {settings.isReading ? (
-                    <Pause className="h-6 w-6 mb-2 text-muted-foreground" />
-                  ) : (
-                    <Play className="h-6 w-6 mb-2 text-muted-foreground" />
-                  )}
-                  <span className="text-sm font-medium mb-2">Lecture</span>
-                  <Button
-                    variant={settings.isReading ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={toggleReading}
-                    className="w-full"
-                  >
-                    {settings.isReading ? 'Arrêter' : 'Lire'}
-                  </Button>
-                </div>
+            {/* Contraste */}
+            <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
+              <Eye className="h-6 w-6 mb-2 text-muted-foreground" />
+              <span className="text-sm font-medium mb-2">Contraste</span>
+              <div className="flex gap-1">
+                <Button
+                  variant={settings.contrast === 'normal' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => updateSetting('contrast', 'normal')}
+                  className="text-xs px-2"
+                >
+                  Normal
+                </Button>
+                <Button
+                  variant={settings.contrast === 'light' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => updateSetting('contrast', 'light')}
+                  className="text-xs px-2"
+                >
+                  Léger
+                </Button>
+                <Button
+                  variant={settings.contrast === 'dark' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => updateSetting('contrast', 'dark')}
+                  className="text-xs px-2"
+                >
+                  Foncé
+                </Button>
               </div>
             </div>
-          </Card>
-        </div>
-      )}
 
+            {/* Saturation */}
+            <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
+              <div className="w-6 h-6 mb-2 rounded-full bg-gradient-to-r from-red-500 to-blue-500"></div>
+              <span className="text-sm font-medium mb-2">Saturation</span>
+              <div className="flex gap-1">
+                <Button
+                  variant={settings.saturation === 50 ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => updateSetting('saturation', 50)}
+                  className="text-xs px-2"
+                >
+                  Faible
+                </Button>
+                <Button
+                  variant={settings.saturation === 100 ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => updateSetting('saturation', 100)}
+                  className="text-xs px-2"
+                >
+                  Normal
+                </Button>
+                <Button
+                  variant={settings.saturation === 150 ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => updateSetting('saturation', 150)}
+                  className="text-xs px-2"
+                >
+                  Élevée
+                </Button>
+              </div>
+            </div>
+
+            {/* Lecture */}
+            <div className="flex flex-col items-center p-3 rounded-lg bg-accent/20">
+              {settings.isReading ? (
+                <Pause className="h-6 w-6 mb-2 text-muted-foreground" />
+              ) : (
+                <Play className="h-6 w-6 mb-2 text-muted-foreground" />
+              )}
+              <span className="text-sm font-medium mb-2">Lecture</span>
+              <Button
+                variant={settings.isReading ? 'default' : 'outline'}
+                size="sm"
+                onClick={toggleReading}
+                className="w-full"
+              >
+                {settings.isReading ? 'Arrêter' : 'Lire'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
