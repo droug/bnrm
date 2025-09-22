@@ -103,21 +103,14 @@ export const AccessibilityToolkit = () => {
 
   return (
     <>
-      {/* Bouton CTA flottant */}
+      {/* Bouton dans le header */}
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 z-50 rounded-full w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
-        size="icon"
-        style={{ 
-          position: 'fixed',
-          bottom: '24px',
-          left: '24px',
-          zIndex: 9999,
-          backgroundColor: '#2563eb',
-          color: 'white'
-        }}
+        variant="ghost"
+        size="sm"
+        className="text-muted-foreground hover:text-foreground flex items-center gap-1"
       >
-        <Accessibility className="h-6 w-6" />
+        <Accessibility className="h-4 w-4" />
       </Button>
 
       {/* Panel d'accessibilité */}
