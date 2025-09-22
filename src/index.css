@@ -270,4 +270,28 @@ Enhanced Moroccan Heritage Design System
   .font-berber {
     font-family: 'Noto Sans Tifinagh', 'Arial Unicode MS', sans-serif;
   }
+
+  /* Accessibility styles */
+  :root {
+    --font-size-multiplier: 1;
+    --letter-spacing: 0px;
+    --word-spacing: 0px;
+    --line-height-add: 0;
+    --cursor-size: 1;
+  }
+
+  * {
+    font-size: calc(1em * var(--font-size-multiplier, 1)) !important;
+    letter-spacing: calc(var(--letter-spacing, 0px)) !important;
+    word-spacing: calc(var(--word-spacing, 0px)) !important;
+    line-height: calc(1.5 + var(--line-height-add, 0)) !important;
+  }
+
+  .contrast-light {
+    filter: grayscale(0.5) contrast(0.8) brightness(1.2) !important;
+  }
+
+  .contrast-dark {
+    filter: grayscale(1) contrast(2) brightness(0.8) !important;
+  }
 }
