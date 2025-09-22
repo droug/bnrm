@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useDroppable } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import ContentEditable from 'react-contenteditable';
@@ -193,19 +194,26 @@ export const DesignCanvas: React.FC<DesignCanvasProps> = ({
   onDeleteElement,
   previewMode
 }) => {
+  const { setNodeRef, isOver } = useDroppable({
+    id: 'design-canvas'
+  });
+
   return (
     <div 
-      className={`flex-1 overflow-auto ${previewMode ? 'bg-background' : 'bg-muted/30'}`}
+      ref={setNodeRef}
+      className={`flex-1 overflow-auto ${previewMode ? 'bg-background' : 'bg-muted/30'} ${
+        isOver && !previewMode ? 'bg-primary/10 border-2 border-dashed border-primary' : ''
+      }`}
       onClick={() => !previewMode && onSelectElement(null)}
     >
       <div className={`min-h-full ${previewMode ? '' : 'p-8'}`}>
         {elements.length === 0 ? (
           !previewMode && (
-            <div className="flex items-center justify-center h-64 border-2 border-dashed border-border rounded-lg">
+            <div className="flex items-center justify-center h-64 border-2 border-dashed border-border rounded-lg m-8">
               <div className="text-center text-muted-foreground">
                 <div className="text-lg font-medium mb-2">Zone de conception vide</div>
                 <div className="text-sm">
-                  Ajoutez des composants depuis la barre latérale pour commencer
+                  {isOver ? '🎯 Déposez le composant ici' : 'Glissez et déposez des composants depuis la barre latérale pour commencer'}
                 </div>
               </div>
             </div>

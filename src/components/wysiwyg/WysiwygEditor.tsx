@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { DndContext, closestCenter, DragEndEvent, DragOverEvent, useDroppable } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -120,14 +120,22 @@ const WysiwygEditor = () => {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     
-    if (over && active.id !== over.id) {
+    if (!over) return;
+
+    // Si on fait glisser un composant depuis la toolbar
+    if (active.id.toString().startsWith('toolbar-')) {
+      const componentType = active.id.toString().replace('toolbar-', '') as ElementData['type'];
+      addElement(componentType);
+      return;
+    }
+
+    // Si on réorganise les éléments existants
+    if (active.id !== over.id) {
       const oldIndex = elements.findIndex(el => el.id === active.id);
       const newIndex = elements.findIndex(el => el.id === over.id);
       
       if (oldIndex !== -1 && newIndex !== -1) {
-        const newElements = [...elements];
-        const [movedElement] = newElements.splice(oldIndex, 1);
-        newElements.splice(newIndex, 0, movedElement);
+        const newElements = arrayMove(elements, oldIndex, newIndex);
         setElements(newElements);
         updateHistory(newElements);
       }
