@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { 
   Accessibility, 
@@ -132,6 +133,9 @@ export const AccessibilityToolkit = () => {
                 Réinitialiser
               </Button>
             </DialogTitle>
+            <DialogDescription>
+              Ajustez les paramètres d'accessibilité pour améliorer votre expérience de navigation.
+            </DialogDescription>
           </DialogHeader>
 
           {/* Grille des contrôles */}
