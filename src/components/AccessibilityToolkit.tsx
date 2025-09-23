@@ -109,7 +109,9 @@ export const AccessibilityToolkit = () => {
     <>
       {/* Bouton dans le header */}
       <Button
-        onClick={() => {
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
           console.log('Accessibility button clicked, setting isOpen to true');
           setIsOpen(true);
         }}
