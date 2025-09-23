@@ -119,7 +119,7 @@ export const AccessibilityToolkit = () => {
 
       {/* Dialog d'accessibilité */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-full max-w-md max-h-[90vh] overflow-y-auto z-[9999]">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>Accessibilité</span>
