@@ -120,9 +120,9 @@ export const AccessibilityToolkit = () => {
       {/* Dialog d'accessibilité */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="w-full max-w-md z-[9999] p-0">
-          <div className="p-4 border-b border-border">
+          <DialogHeader className="p-4 border-b border-border">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Accessibilité</h2>
+              <DialogTitle className="text-lg font-semibold">Accessibilité</DialogTitle>
               <Button
                 variant="ghost"
                 size="sm"
@@ -133,7 +133,10 @@ export const AccessibilityToolkit = () => {
                 Réinitialiser
               </Button>
             </div>
-          </div>
+            <DialogDescription className="sr-only">
+              Ajustez les paramètres d'accessibilité pour améliorer votre expérience de navigation.
+            </DialogDescription>
+          </DialogHeader>
 
           {/* Grille des contrôles - 2 colonnes, 4 lignes */}
           <div className="p-4">
