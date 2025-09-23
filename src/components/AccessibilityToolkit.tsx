@@ -46,7 +46,7 @@ export const AccessibilityToolkit = () => {
   const [settings, setSettings] = useState<AccessibilitySettings>(defaultSettings);
   const { t } = useLanguage();
 
-  console.log('AccessibilityToolkit rendered');
+  console.log('AccessibilityToolkit rendered, isOpen:', isOpen);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -109,7 +109,10 @@ export const AccessibilityToolkit = () => {
     <>
       {/* Bouton dans le header */}
       <Button
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          console.log('Accessibility button clicked, setting isOpen to true');
+          setIsOpen(true);
+        }}
         variant="ghost"
         size="sm"
         className="text-muted-foreground hover:text-foreground flex items-center gap-1"
@@ -118,7 +121,10 @@ export const AccessibilityToolkit = () => {
       </Button>
 
       {/* Dialog d'accessibilité */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={isOpen} onOpenChange={(open) => {
+        console.log('Dialog onOpenChange called with:', open);
+        setIsOpen(open);
+      }}>
         <DialogContent className="w-full max-w-md z-[9999] p-0">
           <DialogHeader className="p-4 border-b border-border">
             <div className="flex items-center justify-between">
