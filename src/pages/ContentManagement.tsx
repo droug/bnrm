@@ -421,33 +421,16 @@ export default function ContentManagement() {
 
         {/* Onglets par type */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-9">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="all">Tous ({stats.total})</TabsTrigger>
             <TabsTrigger value="news">Actualités ({stats.byType.news})</TabsTrigger>
             <TabsTrigger value="event">Événements ({stats.byType.event})</TabsTrigger>
             <TabsTrigger value="exhibition">Expositions ({stats.byType.exhibition})</TabsTrigger>
             <TabsTrigger value="page">Pages ({stats.byType.page})</TabsTrigger>
-            <TabsTrigger value="workflows" className="flex items-center gap-2">
-              <Workflow className="h-4 w-4" />
-              Workflows
-            </TabsTrigger>
-            <TabsTrigger value="legal-deposits" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Dépôts Légaux
-            </TabsTrigger>
-            <TabsTrigger value="archiving" className="flex items-center gap-2">
-              <Archive className="h-4 w-4" />
-              Archivage
-            </TabsTrigger>
-            <TabsTrigger value="security" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Sécurité
-            </TabsTrigger>
           </TabsList>
 
           {/* Onglets de contenu */}
-          {selectedTab !== "workflows" && selectedTab !== "legal-deposits" && selectedTab !== "archiving" && selectedTab !== "security" && (
-            <TabsContent value={selectedTab} className="space-y-6">
+          <TabsContent value={selectedTab} className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>
@@ -629,27 +612,6 @@ export default function ContentManagement() {
                 </CardContent>
               </Card>
             </TabsContent>
-          )}
-
-          {/* Onglet Workflows */}
-          <TabsContent value="workflows" className="space-y-6">
-            <WorkflowManager />
-          </TabsContent>
-
-          {/* Onglet Dépôts Légaux */}
-          <TabsContent value="legal-deposits" className="space-y-6">
-            <LegalDepositManager />
-          </TabsContent>
-
-          {/* Onglet Archivage */}
-          <TabsContent value="archiving" className="space-y-6">
-            <ArchivingManager />
-          </TabsContent>
-
-          {/* Onglet Sécurité et Surveillance */}
-          <TabsContent value="security" className="space-y-6">
-            <ActivityMonitor />
-          </TabsContent>
         </Tabs>
       </main>
       </div>

@@ -490,9 +490,9 @@ const LegalDepositManager = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Gestion du Dépôt Légal</h2>
+          <h2 className="text-2xl font-bold">Gestion du Dépôt Légal BNRM</h2>
           <p className="text-muted-foreground">
-            Système de gestion des demandes et procédures de dépôt légal BNRM
+            Procédure P1: Attribution du n° Dépôt Légal - Système de gestion BNRM
           </p>
         </div>
       </div>
