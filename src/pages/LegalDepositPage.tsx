@@ -9,6 +9,7 @@ import {
   Home
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Navigate } from "react-router-dom";
 import LegalDepositManager from "@/components/LegalDepositManager";
 import Header from "@/components/Header";
@@ -17,6 +18,7 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbS
 const LegalDepositPage = () => {
   console.log("LegalDepositPage component is rendering");
   const { user, profile, loading } = useAuth();
+  const { hasPermission } = usePermissions();
 
   if (loading) {
     return (
@@ -26,7 +28,7 @@ const LegalDepositPage = () => {
     );
   }
 
-  if (!user || (profile?.role !== 'admin' && profile?.role !== 'librarian')) {
+  if (!user || !hasPermission('legal_deposit.manage')) {
     return <Navigate to="/dashboard" replace />;
   }
 

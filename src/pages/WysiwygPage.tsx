@@ -9,6 +9,7 @@ import {
   Home
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Navigate } from "react-router-dom";
 import WysiwygEditor from "@/components/wysiwyg/WysiwygEditor";
 import Header from "@/components/Header";
@@ -16,6 +17,7 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbS
 
 const WysiwygPage = () => {
   const { user, profile, loading } = useAuth();
+  const { hasPermission } = usePermissions();
 
   if (loading) {
     return (
@@ -25,7 +27,7 @@ const WysiwygPage = () => {
     );
   }
 
-  if (!user || (profile?.role !== 'admin' && profile?.role !== 'librarian')) {
+  if (!user || !hasPermission('content.manage')) {
     return <Navigate to="/dashboard" replace />;
   }
 
