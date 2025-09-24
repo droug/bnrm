@@ -197,6 +197,140 @@ export type Database = {
         }
         Relationships: []
       }
+      bnrm_parametres: {
+        Row: {
+          commentaire: string | null
+          created_at: string | null
+          parametre: string
+          updated_at: string | null
+          valeur: string
+        }
+        Insert: {
+          commentaire?: string | null
+          created_at?: string | null
+          parametre: string
+          updated_at?: string | null
+          valeur: string
+        }
+        Update: {
+          commentaire?: string | null
+          created_at?: string | null
+          parametre?: string
+          updated_at?: string | null
+          valeur?: string
+        }
+        Relationships: []
+      }
+      bnrm_services: {
+        Row: {
+          categorie: string
+          created_at: string | null
+          description: string
+          id_service: string
+          nom_service: string
+          public_cible: string
+          reference_legale: string
+          updated_at: string | null
+        }
+        Insert: {
+          categorie: string
+          created_at?: string | null
+          description: string
+          id_service: string
+          nom_service: string
+          public_cible: string
+          reference_legale: string
+          updated_at?: string | null
+        }
+        Update: {
+          categorie?: string
+          created_at?: string | null
+          description?: string
+          id_service?: string
+          nom_service?: string
+          public_cible?: string
+          reference_legale?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      bnrm_tarifs: {
+        Row: {
+          condition_tarif: string | null
+          created_at: string | null
+          devise: string
+          id_service: string
+          id_tarif: string
+          is_active: boolean | null
+          montant: number
+          periode_validite: string
+          updated_at: string | null
+        }
+        Insert: {
+          condition_tarif?: string | null
+          created_at?: string | null
+          devise?: string
+          id_service: string
+          id_tarif: string
+          is_active?: boolean | null
+          montant: number
+          periode_validite: string
+          updated_at?: string | null
+        }
+        Update: {
+          condition_tarif?: string | null
+          created_at?: string | null
+          devise?: string
+          id_service?: string
+          id_tarif?: string
+          is_active?: boolean | null
+          montant?: number
+          periode_validite?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bnrm_tarifs_id_service_fkey"
+            columns: ["id_service"]
+            isOneToOne: false
+            referencedRelation: "bnrm_services"
+            referencedColumns: ["id_service"]
+          },
+        ]
+      }
+      bnrm_tarifs_historique: {
+        Row: {
+          action: string
+          ancienne_valeur: number | null
+          commentaire: string | null
+          date_modification: string | null
+          id: string
+          id_tarif: string
+          nouvelle_valeur: number | null
+          utilisateur_responsable: string | null
+        }
+        Insert: {
+          action: string
+          ancienne_valeur?: number | null
+          commentaire?: string | null
+          date_modification?: string | null
+          id?: string
+          id_tarif: string
+          nouvelle_valeur?: number | null
+          utilisateur_responsable?: string | null
+        }
+        Update: {
+          action?: string
+          ancienne_valeur?: number | null
+          commentaire?: string | null
+          date_modification?: string | null
+          id?: string
+          id_tarif?: string
+          nouvelle_valeur?: number | null
+          utilisateur_responsable?: string | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string | null
