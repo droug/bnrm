@@ -33,8 +33,25 @@ const LegalDepositPage = () => {
     );
   }
 
-  if (!user || (profile?.role !== 'admin' && profile?.role !== 'librarian')) {
-    console.log("LegalDepositPage - Access denied. User:", !!user, "Profile role:", profile?.role);
+  // Wait for profile to load if user is authenticated
+  if (!user) {
+    console.log("LegalDepositPage - No user, redirecting to dashboard");
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // If user exists but profile is still loading, wait
+  if (user && !profile) {
+    console.log("LegalDepositPage - User exists but profile not loaded yet, showing spinner");
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Check role once profile is loaded
+  if (profile?.role !== 'admin' && profile?.role !== 'librarian') {
+    console.log("LegalDepositPage - Access denied. Profile role:", profile?.role);
     return <Navigate to="/dashboard" replace />;
   }
 

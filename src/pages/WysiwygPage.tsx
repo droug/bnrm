@@ -27,7 +27,22 @@ const WysiwygPage = () => {
     );
   }
 
-  if (!user || (profile?.role !== 'admin' && profile?.role !== 'librarian')) {
+  // Wait for profile to load if user is authenticated
+  if (!user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // If user exists but profile is still loading, wait
+  if (user && !profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Check role once profile is loaded
+  if (profile?.role !== 'admin' && profile?.role !== 'librarian') {
     return <Navigate to="/dashboard" replace />;
   }
 
