@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Users, FileText, Clock, Library, LogOut, Settings, Cog } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { UserProfileDialog } from "@/components/UserProfileDialog";
@@ -104,9 +105,19 @@ export default function Dashboard() {
             <UserProfileDialog />
             
             <PermissionGuard permission="users.manage">
-              <Button variant="ghost" size="sm" onClick={() => window.location.href = '/admin/settings'}>
-                <Cog className="h-4 w-4" />
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="sm" onClick={() => window.location.href = '/admin/settings'}>
+                      <Cog className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Paramétrage</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Administration et Paramétrage</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </PermissionGuard>
             
             <Button variant="ghost" size="sm" onClick={signOut}>
