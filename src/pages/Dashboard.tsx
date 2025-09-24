@@ -5,9 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, FileText, Clock, Library, User, Settings, LogOut, Shield } from "lucide-react";
+import { BookOpen, Users, FileText, Clock, Library, LogOut, Settings } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
+import { UserProfileDialog } from "@/components/UserProfileDialog";
+import { AdminSettingsCards } from "@/components/AdminSettingsCards";
 
 export default function Dashboard() {
   const { user, profile, signOut, loading } = useAuth();
@@ -92,7 +94,6 @@ export default function Dashboard() {
           
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <User className="h-4 w-4" />
               <span className="text-sm font-medium">
                 {profile?.first_name} {profile?.last_name}
               </span>
@@ -101,13 +102,11 @@ export default function Dashboard() {
               </Badge>
             </div>
             
-            <Button variant="ghost" size="sm" onClick={() => window.location.href = '/settings'}>
-              <Settings className="h-4 w-4" />
-            </Button>
+            <UserProfileDialog />
             
-            <PermissionGuard permission="users.view">
-              <Button variant="ghost" size="sm" onClick={() => window.location.href = '/admin/users'}>
-                <Shield className="h-4 w-4" />
+            <PermissionGuard permission="users.manage">
+              <Button variant="ghost" size="sm" onClick={() => window.location.href = '#admin-settings'}>
+                <Settings className="h-4 w-4" />
               </Button>
             </PermissionGuard>
             
@@ -200,7 +199,7 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -235,43 +234,30 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           
-          
-          <PermissionGuard permission="manuscripts.create">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <FileText className="h-5 w-5" />
-                  <span>Gestion de contenu</span>
-                </CardTitle>
-                <CardDescription>
-                  Créer et gérer actualités, événements et expositions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full" variant="outline" onClick={() => window.location.href = '/admin/content'}>
-                  Gérer le contenu
-                </Button>
-              </CardContent>
-            </Card>
-          </PermissionGuard>
-          
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <User className="h-5 w-5" />
-                <span>Mon profil</span>
+                <Library className="h-5 w-5" />
+                <span>Explorer les collections</span>
               </CardTitle>
               <CardDescription>
-                Gérer mes informations personnelles et préférences
+                Découvrez nos collections thématiques organisées
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" variant="outline" onClick={() => window.location.href = '/profile'}>
-                Modifier le profil
+              <Button className="w-full" variant="outline" onClick={() => window.location.href = '/collections'}>
+                Voir les collections
               </Button>
             </CardContent>
           </Card>
         </div>
+
+        {/* Admin Settings Section */}
+        <PermissionGuard permission="users.manage">
+          <div id="admin-settings">
+            <AdminSettingsCards />
+          </div>
+        </PermissionGuard>
       </main>
       </div>
     </WatermarkContainer>
