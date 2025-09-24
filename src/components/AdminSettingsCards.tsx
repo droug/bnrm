@@ -46,6 +46,13 @@ export function AdminSettingsCards() {
       description: "Éditeur visuel pour créer et modifier du contenu",
       href: "/admin/wysiwyg",
       permission: "content.manage"
+    },
+    {
+      icon: Settings,
+      title: "Gestion des Tarifs BNRM",
+      description: "Gérer les tarifs et services de la BNRM",
+      href: "/admin/bnrm-tariffs",
+      permission: "content.manage"
     }
   ];
 
