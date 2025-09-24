@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, FileText, CheckCircle, XCircle, Clock, AlertCircle, Eye, Download } from "lucide-react";
+import { Search, FileText, CheckCircle, XCircle, Clock, AlertCircle, Eye, Download, ArrowRight, Check, Circle } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import logigrammeImage from "@/assets/logigramme-depot-legal.png";
@@ -42,6 +42,227 @@ interface DepositRequest {
   dl_number?: string;
   metadata: any;
 }
+
+const LegalDepositWorkflow = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+  
+  const workflowSteps = [
+    {
+      id: "E0",
+      title: "Réception de la Demande",
+      description: "Le déclarant soumet sa demande de dépôt légal",
+      details: [
+        "Vérification de la complétude du formulaire",
+        "Contrôle des informations obligatoires",
+        "Validation de l'identité du déclarant"
+      ],
+      status: "completed"
+    },
+    {
+      id: "E1",
+      title: "Traitement de la Demande",
+      description: "Validation et saisie système des informations",
+      details: [
+        "Saisie des métadonnées dans le système",
+        "Validation du contenu de la demande",
+        "Vérification de la conformité réglementaire"
+      ],
+      status: "completed"
+    },
+    {
+      id: "E2",
+      title: "Attribution N° DL et ISBN/ISSN",
+      description: "Attribution des identifiants officiels",
+      details: [
+        "Génération du numéro de dépôt légal",
+        "Attribution ISBN pour les monographies",
+        "Attribution ISSN pour les périodiques",
+        "Enregistrement dans la base nationale"
+      ],
+      status: "current"
+    },
+    {
+      id: "E3",
+      title: "Notification au Déclarant",
+      description: "Envoi de l'accusé de réception avec numéros",
+      details: [
+        "Préparation de l'accusé de réception",
+        "Envoi des identifiants au déclarant",
+        "Archivage de la correspondance"
+      ],
+      status: "pending"
+    },
+    {
+      id: "E4",
+      title: "Attente des Documents",
+      description: "Réception des exemplaires physiques ou numériques",
+      details: [
+        "Surveillance des délais de dépôt",
+        "Réception des exemplaires",
+        "Contrôle de conformité"
+      ],
+      status: "pending"
+    },
+    {
+      id: "E5",
+      title: "Vérification Conformité",
+      description: "Contrôle de la conformité des documents déposés",
+      details: [
+        "Vérification de la correspondance avec la demande",
+        "Contrôle qualité des exemplaires",
+        "Validation des métadonnées"
+      ],
+      status: "pending"
+    },
+    {
+      id: "E6",
+      title: "Traitement Catalogage",
+      description: "Catalogage et indexation des documents",
+      details: [
+        "Création de la notice bibliographique",
+        "Indexation matière",
+        "Attribution des cotes de classement"
+      ],
+      status: "pending"
+    },
+    {
+      id: "E7",
+      title: "Archivage Physique",
+      description: "Stockage et conservation des exemplaires",
+      details: [
+        "Étiquetage et conditionnement",
+        "Rangement en magasin",
+        "Mise à jour des localisations"
+      ],
+      status: "pending"
+    },
+    {
+      id: "E8",
+      title: "Finalisation",
+      description: "Clôture du processus de dépôt légal",
+      details: [
+        "Validation finale du dossier",
+        "Archivage des documents administratifs",
+        "Mise à disposition au public"
+      ],
+      status: "pending"
+    }
+  ];
+
+  const getStepIcon = (step: any, index: number) => {
+    if (step.status === "completed") {
+      return <Check className="w-5 h-5 text-white" />;
+    } else if (step.status === "current") {
+      return <Circle className="w-5 h-5 text-white fill-current" />;
+    } else {
+      return <Circle className="w-5 h-5 text-muted-foreground" />;
+    }
+  };
+
+  const getStepColor = (step: any) => {
+    switch (step.status) {
+      case "completed":
+        return "bg-green-500";
+      case "current":
+        return "bg-blue-500";
+      default:
+        return "bg-gray-300";
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Stepper Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold">Workflow de Dépôt Légal</h3>
+          <p className="text-sm text-muted-foreground">
+            Étape {workflowSteps.findIndex(s => s.status === "current") + 1} sur {workflowSteps.length}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span className="text-xs text-muted-foreground">Terminé</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            <span className="text-xs text-muted-foreground">En cours</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
+            <span className="text-xs text-muted-foreground">En attente</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="w-full bg-gray-200 rounded-full h-2">
+        <div 
+          className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+          style={{ width: `${((workflowSteps.findIndex(s => s.status === "current") + 1) / workflowSteps.length) * 100}%` }}
+        ></div>
+      </div>
+
+      {/* Steps */}
+      <div className="space-y-4">
+        {workflowSteps.map((step, index) => (
+          <div key={step.id} className="flex gap-4">
+            {/* Step Icon */}
+            <div className="flex flex-col items-center">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStepColor(step)}`}>
+                {getStepIcon(step, index)}
+              </div>
+              {index < workflowSteps.length - 1 && (
+                <div className="w-px h-12 bg-gray-200 mt-2"></div>
+              )}
+            </div>
+
+            {/* Step Content */}
+            <div className="flex-1 pb-8">
+              <div className="flex items-center gap-2 mb-2">
+                <h4 className="font-semibold">{step.id}: {step.title}</h4>
+                <Badge variant={step.status === "completed" ? "default" : step.status === "current" ? "secondary" : "outline"}>
+                  {step.status === "completed" ? "Terminé" : step.status === "current" ? "En cours" : "En attente"}
+                </Badge>
+              </div>
+              <p className="text-muted-foreground text-sm mb-3">{step.description}</p>
+              
+              {/* Step Details */}
+              <div className="bg-muted/50 rounded-lg p-3">
+                <p className="text-xs font-medium text-muted-foreground mb-2">Activités :</p>
+                <ul className="space-y-1">
+                  {step.details.map((detail, detailIndex) => (
+                    <li key={detailIndex} className="text-xs text-muted-foreground flex items-center gap-2">
+                      <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
+                      {detail}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-between pt-4 border-t">
+        <div className="text-sm text-muted-foreground">
+          Dernière mise à jour: {format(new Date(), "dd/MM/yyyy HH:mm", { locale: fr })}
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm">
+            <Download className="w-4 h-4 mr-2" />
+            Exporter le processus
+          </Button>
+          <Button size="sm">
+            Avancer à l'étape suivante
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const LegalDepositManager = () => {
   const [deposits, setDeposits] = useState<LegalDeposit[]>([]);
@@ -343,66 +564,22 @@ const LegalDepositManager = () => {
         <TabsContent value="process" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Logigramme du Processus de Dépôt Légal</CardTitle>
+              <CardTitle>Workflow du Processus de Dépôt Légal</CardTitle>
               <CardDescription>
                 Processus complet de gestion du dépôt légal selon la procédure BNRM
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center">
-                <img 
-                  src={logigrammeImage} 
-                  alt="Logigramme du processus de dépôt légal"
-                  className="max-w-full h-auto mx-auto border rounded-lg shadow-sm"
-                />
-              </div>
+              <LegalDepositWorkflow />
               
-              <div className="mt-6 space-y-4">
-                <h3 className="text-lg font-semibold">Étapes du processus :</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">E0: Réception de la Demande</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-sm text-muted-foreground">
-                        Vérification et validation des demandes des déclarants
-                      </p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">E1: Traitement de la Demande</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-sm text-muted-foreground">
-                        Saisie système et validation du contenu
-                      </p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">E2: Attribution N° DL</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-sm text-muted-foreground">
-                        Attribution ISBN/ISSN et numéro de dépôt légal
-                      </p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">E4-E8: Gestion Documents</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-sm text-muted-foreground">
-                        Réception, vérification et classement
-                      </p>
-                    </CardContent>
-                  </Card>
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold mb-4">Logigramme de référence :</h3>
+                <div className="text-center">
+                  <img 
+                    src={logigrammeImage} 
+                    alt="Logigramme du processus de dépôt légal"
+                    className="max-w-full h-auto mx-auto border rounded-lg shadow-sm"
+                  />
                 </div>
               </div>
             </CardContent>
