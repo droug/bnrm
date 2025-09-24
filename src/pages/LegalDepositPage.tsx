@@ -20,7 +20,12 @@ const LegalDepositPage = () => {
   const { user, profile, loading } = useAuth();
   const { hasPermission } = usePermissions();
 
+  console.log("LegalDepositPage - User:", user?.id);
+  console.log("LegalDepositPage - Profile:", profile);
+  console.log("LegalDepositPage - Loading:", loading);
+
   if (loading) {
+    console.log("LegalDepositPage - Still loading, showing spinner");
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-subtle">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -29,8 +34,11 @@ const LegalDepositPage = () => {
   }
 
   if (!user || (profile?.role !== 'admin' && profile?.role !== 'librarian')) {
+    console.log("LegalDepositPage - Access denied. User:", !!user, "Profile role:", profile?.role);
     return <Navigate to="/dashboard" replace />;
   }
+
+  console.log("LegalDepositPage - Access granted, rendering page");
 
   return (
     <WatermarkContainer 
