@@ -7,15 +7,13 @@ import {
   Settings as SettingsIcon, 
   ArrowLeft,
   Key,
-  Archive,
-  Edit
+  Archive
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { PermissionsManager } from "@/components/PermissionsManager";
 import ArchivingManager from "@/components/ArchivingManager";
-import WysiwygEditor from "@/components/wysiwyg/WysiwygEditor";
 
 const SettingsPage = () => {
   const { profile } = useAuth();
@@ -75,18 +73,14 @@ const SettingsPage = () => {
 
               {/* Settings Tabs */}
               <Tabs defaultValue="permissions" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-3 lg:w-[500px]">
+                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
                   <TabsTrigger value="permissions" className="flex items-center gap-2">
                     <Key className="h-4 w-4" />
-                    Permissions
+                    Gestion des Permissions
                   </TabsTrigger>
                   <TabsTrigger value="archiving" className="flex items-center gap-2">
                     <Archive className="h-4 w-4" />
-                    Archivage
-                  </TabsTrigger>
-                  <TabsTrigger value="wysiwyg" className="flex items-center gap-2">
-                    <Edit className="h-4 w-4" />
-                    Éditeur WYSIWYG
+                    Configuration Archivage
                   </TabsTrigger>
                 </TabsList>
 
@@ -98,23 +92,6 @@ const SettingsPage = () => {
                 {/* Archiving Tab */}
                 <TabsContent value="archiving" className="space-y-6">
                   <ArchivingManager />
-                </TabsContent>
-
-                {/* WYSIWYG Editor Tab */}
-                <TabsContent value="wysiwyg" className="space-y-6">
-                  <Card className="shadow-soft">
-                    <CardHeader>
-                      <CardTitle>Éditeur WYSIWYG</CardTitle>
-                      <CardDescription>
-                        Éditeur visuel pour créer et modifier du contenu de manière intuitive
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                      <div className="border rounded-lg overflow-hidden">
-                        <WysiwygEditor />
-                      </div>
-                    </CardContent>
-                  </Card>
                 </TabsContent>
               </Tabs>
             </div>

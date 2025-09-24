@@ -36,6 +36,7 @@ const App = () => (
         <Route path="/news" element={<News />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/wysiwyg" element={<WysiwygPage />} />
+        <Route path="/admin/wysiwyg" element={<WysiwygPage />} />
         <Route path="/bnrm" element={<BNRMPortal />} />
         <Route path="/services-tarifs" element={<BNRMPortal />} />
         <Route path="/admin/settings" element={<AdminSettings />} />

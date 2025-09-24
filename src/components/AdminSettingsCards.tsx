@@ -44,7 +44,7 @@ export function AdminSettingsCards() {
       icon: Edit,
       title: "Éditeur WYSIWYG",
       description: "Éditeur visuel pour créer et modifier du contenu",
-      href: "/settings?tab=wysiwyg",
+      href: "/admin/wysiwyg",
       permission: "content.manage"
     }
   ];
