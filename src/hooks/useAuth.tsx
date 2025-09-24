@@ -50,18 +50,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Get initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      console.log("AuthProvider - Initial session:", session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
+        console.log("AuthProvider - Fetching profile for user:", session.user.id);
         // Fetch user profile for initial session
-        const { data: profileData } = await supabase
+        const { data: profileData, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('user_id', session.user.id)
           .single();
+        console.log("AuthProvider - Profile query result:", { profileData, error });
         setProfile(profileData);
       } else {
+        console.log("AuthProvider - No session, setting profile to null");
         setProfile(null);
       }
       
