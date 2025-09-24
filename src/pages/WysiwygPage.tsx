@@ -27,7 +27,7 @@ const WysiwygPage = () => {
     );
   }
 
-  if (!user || !hasPermission('content.manage')) {
+  if (!user || (profile?.role !== 'admin' && profile?.role !== 'librarian')) {
     return <Navigate to="/dashboard" replace />;
   }
 

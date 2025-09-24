@@ -28,7 +28,7 @@ const LegalDepositPage = () => {
     );
   }
 
-  if (!user || !hasPermission('legal_deposit.manage')) {
+  if (!user || (profile?.role !== 'admin' && profile?.role !== 'librarian')) {
     return <Navigate to="/dashboard" replace />;
   }
 

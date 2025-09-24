@@ -26,7 +26,7 @@ const ArchivingPage = () => {
     );
   }
 
-  if (!user || !hasPermission('content.archive')) {
+  if (!user || (profile?.role !== 'admin' && profile?.role !== 'librarian')) {
     return <Navigate to="/dashboard" replace />;
   }
 
