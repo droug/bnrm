@@ -15,6 +15,7 @@ import Header from "@/components/Header";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 
 const LegalDepositPage = () => {
+  console.log("LegalDepositPage component is rendering");
   const { user, profile, loading } = useAuth();
 
   if (loading) {

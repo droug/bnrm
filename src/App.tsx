@@ -40,9 +40,9 @@ const App = () => (
         <Route path="/admin/wysiwyg" element={<WysiwygPage />} />
         <Route path="/bnrm" element={<BNRMPortal />} />
         <Route path="/services-tarifs" element={<BNRMPortal />} />
-        <Route path="/admin/settings" element={<AdminSettings />} />
         <Route path="/admin/legal-deposit" element={<LegalDepositPage />} />
         <Route path="/admin/archiving" element={<ArchivingPage />} />
+        <Route path="/admin/settings" element={<AdminSettings />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
