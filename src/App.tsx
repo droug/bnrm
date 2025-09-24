@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import WysiwygPage from "./pages/WysiwygPage";
 import BNRMPortal from "./pages/BNRMPortal";
 import AdminSettings from "./pages/AdminSettings";
+import LegalDepositPage from "./pages/LegalDepositPage";
 
 const App = () => (
   <TooltipProvider>
@@ -38,6 +39,7 @@ const App = () => (
         <Route path="/bnrm" element={<BNRMPortal />} />
         <Route path="/services-tarifs" element={<BNRMPortal />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
+        <Route path="/admin/legal-deposit" element={<LegalDepositPage />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

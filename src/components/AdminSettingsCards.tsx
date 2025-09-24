@@ -30,7 +30,7 @@ export function AdminSettingsCards() {
       icon: Scale,
       title: "Dépôt légal",
       description: "Gérer le processus de dépôt légal et les soumissions",
-      href: "/settings?tab=legal-deposit",
+      href: "/admin/legal-deposit",
       permission: "legal_deposit.manage"
     },
     {
