@@ -6,14 +6,12 @@ import { Separator } from "@/components/ui/separator";
 import { 
   Settings as SettingsIcon, 
   ArrowLeft,
-  Key,
-  Archive
+  Key
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { PermissionsManager } from "@/components/PermissionsManager";
-import ArchivingManager from "@/components/ArchivingManager";
 
 const SettingsPage = () => {
   const { profile } = useAuth();
@@ -63,37 +61,19 @@ const SettingsPage = () => {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold">
-                    Configuration Système - {profile?.first_name} {profile?.last_name}
+                    Gestion des Permissions - {profile?.first_name} {profile?.last_name}
                   </h1>
                   <p className="text-primary-foreground/80">
-                    Gérez les permissions utilisateurs et les paramètres d'archivage
+                    Gérez les permissions utilisateurs du système BNRM
                   </p>
                 </div>
               </div>
 
-              {/* Settings Tabs */}
-              <Tabs defaultValue="permissions" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-                  <TabsTrigger value="permissions" className="flex items-center gap-2">
-                    <Key className="h-4 w-4" />
-                    Gestion des Permissions
-                  </TabsTrigger>
-                  <TabsTrigger value="archiving" className="flex items-center gap-2">
-                    <Archive className="h-4 w-4" />
-                    Configuration Archivage
-                  </TabsTrigger>
-                </TabsList>
+              {/* Permissions Management */}
+              <Card className="shadow-soft">
+                <PermissionsManager />
+              </Card>
 
-                {/* Permissions Tab */}
-                <TabsContent value="permissions" className="space-y-6">
-                  <PermissionsManager />
-                </TabsContent>
-
-                {/* Archiving Tab */}
-                <TabsContent value="archiving" className="space-y-6">
-                  <ArchivingManager />
-                </TabsContent>
-              </Tabs>
             </div>
           </div>
         </main>

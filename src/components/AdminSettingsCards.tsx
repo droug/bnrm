@@ -9,7 +9,7 @@ export function AdminSettingsCards() {
       icon: Shield,
       title: "Gestion des Droits et Permissions",
       description: "Gérer les rôles utilisateurs et les permissions d'accès",
-      href: "/settings?tab=permissions",
+      href: "/settings",
       permission: "users.manage"
     },
     {
@@ -37,7 +37,7 @@ export function AdminSettingsCards() {
       icon: Archive,
       title: "Archivage",
       description: "Configurer l'archivage automatique du contenu",
-      href: "/settings?tab=archiving",
+      href: "/admin/archiving",
       permission: "content.archive"
     },
     {
