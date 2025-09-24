@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, FileText, Clock, Library, LogOut, Settings } from "lucide-react";
+import { BookOpen, Users, FileText, Clock, Library, LogOut, Settings, Cog } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { UserProfileDialog } from "@/components/UserProfileDialog";
@@ -105,8 +105,10 @@ export default function Dashboard() {
             <UserProfileDialog />
             
             <PermissionGuard permission="users.manage">
-              <Button variant="ghost" size="sm" onClick={() => window.location.href = '#admin-settings'}>
-                <Settings className="h-4 w-4" />
+              <Button variant="ghost" size="sm" onClick={() => {
+                document.getElementById('admin-settings')?.scrollIntoView({ behavior: 'smooth' });
+              }}>
+                <Cog className="h-4 w-4" />
               </Button>
             </PermissionGuard>
             
