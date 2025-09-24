@@ -23,12 +23,17 @@ import {
   ChevronRight,
   Key,
   Mail,
-  Smartphone
+  Smartphone,
+  FileText,
+  Archive
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
 import { WatermarkContainer } from "@/components/ui/watermark";
+import LegalDepositManager from "@/components/LegalDepositManager";
+import { PermissionsManager } from "@/components/PermissionsManager";
+import ArchivingManager from "@/components/ArchivingManager";
 
 const SettingsPage = () => {
   const { language, setLanguage } = useLanguage();
@@ -102,7 +107,7 @@ const SettingsPage = () => {
 
               {/* Settings Tabs */}
               <Tabs defaultValue="profile" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-4 lg:w-[400px]">
+                <TabsList className="grid w-full grid-cols-7 lg:w-[600px]">
                   <TabsTrigger value="profile" className="flex items-center gap-2">
                     <User className="h-4 w-4" />
                     Profil
@@ -118,6 +123,18 @@ const SettingsPage = () => {
                   <TabsTrigger value="security" className="flex items-center gap-2">
                     <Shield className="h-4 w-4" />
                     Sécurité
+                  </TabsTrigger>
+                  <TabsTrigger value="permissions" className="flex items-center gap-2">
+                    <Key className="h-4 w-4" />
+                    Permissions
+                  </TabsTrigger>
+                  <TabsTrigger value="legal-deposit" className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Dépôt Légal
+                  </TabsTrigger>
+                  <TabsTrigger value="archiving" className="flex items-center gap-2">
+                    <Archive className="h-4 w-4" />
+                    Archivage
                   </TabsTrigger>
                 </TabsList>
 
@@ -471,6 +488,18 @@ const SettingsPage = () => {
                       </div>
                     </CardContent>
                   </Card>
+                </TabsContent>
+
+                <TabsContent value="permissions">
+                  <PermissionsManager />
+                </TabsContent>
+
+                <TabsContent value="legal-deposit">
+                  <LegalDepositManager />
+                </TabsContent>
+
+                <TabsContent value="archiving">
+                  <ArchivingManager />
                 </TabsContent>
               </Tabs>
             </div>

@@ -1,186 +1,110 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { 
-  Archive, 
-  CheckCircle, 
-  FileCheck, 
-  Calendar, 
-  Hash,
-  Download,
-  Search,
-  Plus,
-  Eye,
-  RefreshCw
-} from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Search, FileText, CheckCircle, XCircle, Clock, AlertCircle, Eye, Download } from "lucide-react";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import logigrammeImage from "@/assets/logigramme-depot-legal.png";
 
 interface LegalDeposit {
   id: string;
-  content_id: string;
   deposit_number: string;
+  content_id: string;
+  submitter_id: string;
+  deposit_type: string;
+  status: string;
   submission_date: string;
   acknowledgment_date?: string;
-  status: 'submitted' | 'acknowledged' | 'processed' | 'archived' | 'rejected';
-  deposit_type: 'mandatory' | 'voluntary' | 'special';
-  submitter_id: string;
   metadata: any;
   created_at: string;
   updated_at: string;
-  content: {
-    title: string;
-    content_type: string;
-    author_id: string;
-  };
-  profiles: {
-    first_name: string;
-    last_name: string;
-  };
 }
 
-interface Content {
+interface DepositRequest {
   id: string;
-  title: string;
-  content_type: string;
-  status: string;
+  declarant_name: string;
+  publication_title: string;
+  publication_type: 'monographie' | 'periodique';
+  isbn_issn?: string;
+  status: 'pending' | 'validated' | 'rejected' | 'processed';
+  submission_date: string;
+  documents_deposited: boolean;
+  dl_number?: string;
+  metadata: any;
 }
 
-export default function LegalDepositManager() {
-  const { user, profile } = useAuth();
-  const { toast } = useToast();
-  
+const LegalDepositManager = () => {
   const [deposits, setDeposits] = useState<LegalDeposit[]>([]);
-  const [contents, setContents] = useState<Content[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [requests, setRequests] = useState<DepositRequest[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [selectedContent, setSelectedContent] = useState("");
-  const [depositType, setDepositType] = useState<'mandatory' | 'voluntary' | 'special'>('mandatory');
+  const [selectedDeposit, setSelectedDeposit] = useState<LegalDeposit | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    if (user && (profile?.role === 'admin' || profile?.role === 'librarian')) {
-      fetchData();
-    }
-  }, [user, profile]);
+    fetchDeposits();
+  }, []);
 
-  const fetchData = async () => {
+  const fetchDeposits = async () => {
     try {
-      // Fetch legal deposits
-      const { data: depositsData, error: depositsError } = await supabase
-        .from('legal_deposits')
-        .select(`
-          *,
-          content (id, title, content_type, author_id),
-          profiles:submitter_id (first_name, last_name)
-        `)
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase
+        .from("legal_deposits")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-      if (depositsError) throw depositsError;
-      setDeposits((depositsData as any) || []);
-
-      // Fetch available content for deposit
-      const { data: contentsData, error: contentsError } = await supabase
-        .from('content')
-        .select('id, title, content_type, status')
-        .eq('status', 'published')
-        .order('title');
-
-      if (contentsError) throw contentsError;
-      setContents(contentsData || []);
-
-    } catch (error: any) {
+      if (error) throw error;
+      setDeposits(data || []);
+    } catch (error) {
+      console.error("Error fetching deposits:", error);
       toast({
         title: "Erreur",
-        description: "Impossible de charger les données des dépôts légaux",
+        description: "Impossible de charger les dépôts légaux",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const createLegalDeposit = async () => {
-    if (!selectedContent) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez sélectionner un contenu",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const updateDepositStatus = async (depositId: string, newStatus: string, metadata?: any) => {
     try {
-      // Generate deposit number
-      const { data: depositNumber, error: numberError } = await supabase
-        .rpc('generate_deposit_number');
-
-      if (numberError) throw numberError;
-
-      // Create deposit
-      const { error } = await supabase
-        .from('legal_deposits')
-        .insert({
-          content_id: selectedContent,
-          deposit_number: depositNumber,
-          deposit_type: depositType,
-          submitter_id: user?.id,
-          status: 'submitted'
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Dépôt légal créé",
-        description: `Numéro de dépôt: ${depositNumber}`,
-      });
-
-      setShowCreateDialog(false);
-      setSelectedContent("");
-      fetchData();
-    } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: error.message || "Impossible de créer le dépôt légal",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const updateDepositStatus = async (depositId: string, newStatus: string) => {
-    try {
-      const updates: any = { 
-        status: newStatus,
-        updated_at: new Date().toISOString()
-      };
-
+      const updateData: any = { status: newStatus };
+      
       if (newStatus === 'acknowledged') {
-        updates.acknowledgment_date = new Date().toISOString();
+        updateData.acknowledgment_date = new Date().toISOString();
+      }
+      
+      if (metadata) {
+        updateData.metadata = metadata;
       }
 
       const { error } = await supabase
-        .from('legal_deposits')
-        .update(updates)
-        .eq('id', depositId);
+        .from("legal_deposits")
+        .update(updateData)
+        .eq("id", depositId);
 
       if (error) throw error;
 
+      await fetchDeposits();
       toast({
-        title: "Statut mis à jour",
-        description: `Le dépôt légal est maintenant ${getStatusLabel(newStatus)}`,
+        title: "Succès",
+        description: "Statut mis à jour avec succès",
       });
-
-      fetchData();
-    } catch (error: any) {
+    } catch (error) {
+      console.error("Error updating deposit:", error);
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour le statut",
@@ -189,55 +113,53 @@ export default function LegalDepositManager() {
     }
   };
 
+  const generateDepositNumber = async () => {
+    try {
+      const { data, error } = await supabase.rpc('generate_deposit_number');
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error generating deposit number:", error);
+      return null;
+    }
+  };
+
   const getStatusBadge = (status: string) => {
-    const config = {
-      submitted: { variant: 'secondary' as const, label: 'Soumis' },
-      acknowledged: { variant: 'default' as const, label: 'Accusé de réception' },
-      processed: { variant: 'default' as const, label: 'Traité' },
-      archived: { variant: 'outline' as const, label: 'Archivé' },
-      rejected: { variant: 'destructive' as const, label: 'Rejeté' }
+    const statusConfig = {
+      submitted: { color: "bg-blue-100 text-blue-800", label: "Soumis", icon: Clock },
+      validated: { color: "bg-yellow-100 text-yellow-800", label: "Validé", icon: AlertCircle },
+      processed: { color: "bg-green-100 text-green-800", label: "Traité", icon: CheckCircle },
+      acknowledged: { color: "bg-purple-100 text-purple-800", label: "Accusé", icon: CheckCircle },
+      rejected: { color: "bg-red-100 text-red-800", label: "Rejeté", icon: XCircle },
     };
-    
-    const { variant, label } = config[status as keyof typeof config] || config.submitted;
-    
-    return <Badge variant={variant}>{label}</Badge>;
-  };
 
-  const getStatusLabel = (status: string) => {
-    const labels = {
-      submitted: 'soumis',
-      acknowledged: 'accusé de réception',
-      processed: 'traité',
-      archived: 'archivé',
-      rejected: 'rejeté'
-    };
-    return labels[status as keyof typeof labels] || status;
-  };
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.submitted;
+    const Icon = config.icon;
 
-  const getTypeLabel = (type: string) => {
-    const labels = {
-      mandatory: 'Obligatoire',
-      voluntary: 'Volontaire',
-      special: 'Spécial'
-    };
-    return labels[type as keyof typeof labels] || type;
+    return (
+      <Badge className={config.color}>
+        <Icon className="w-3 h-3 mr-1" />
+        {config.label}
+      </Badge>
+    );
   };
 
   const getTypeBadge = (type: string) => {
-    const config = {
-      mandatory: { variant: 'destructive' as const, label: 'Obligatoire' },
-      voluntary: { variant: 'secondary' as const, label: 'Volontaire' },
-      special: { variant: 'default' as const, label: 'Spécial' }
+    const typeConfig = {
+      monographie: { color: "bg-emerald-100 text-emerald-800", label: "Monographie" },
+      periodique: { color: "bg-orange-100 text-orange-800", label: "Périodique" },
+      document: { color: "bg-gray-100 text-gray-800", label: "Document" },
     };
-    
-    const { variant, label } = config[type as keyof typeof config] || config.mandatory;
-    
-    return <Badge variant={variant}>{label}</Badge>;
+
+    const config = typeConfig[type as keyof typeof typeConfig] || typeConfig.document;
+
+    return <Badge className={config.color}>{config.label}</Badge>;
   };
 
-  const filteredDeposits = deposits.filter(deposit => {
-    const matchesSearch = deposit.content.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         deposit.deposit_number.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredDeposits = deposits.filter((deposit) => {
+    const matchesSearch = 
+      deposit.deposit_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      deposit.deposit_type.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === "all" || deposit.status === statusFilter;
     const matchesType = typeFilter === "all" || deposit.deposit_type === typeFilter;
@@ -245,284 +167,444 @@ export default function LegalDepositManager() {
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const getDepositStats = () => {
-    return {
-      total: deposits.length,
-      submitted: deposits.filter(d => d.status === 'submitted').length,
-      processed: deposits.filter(d => d.status === 'processed').length,
-      archived: deposits.filter(d => d.status === 'archived').length,
-      byType: {
-        mandatory: deposits.filter(d => d.deposit_type === 'mandatory').length,
-        voluntary: deposits.filter(d => d.deposit_type === 'voluntary').length,
-        special: deposits.filter(d => d.deposit_type === 'special').length,
-      }
-    };
-  };
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Chargement des dépôts légaux...</p>
+        </div>
       </div>
     );
   }
-
-  const stats = getDepositStats();
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-3">
-            <Archive className="h-6 w-6 text-primary" />
-            Gestion des Dépôts Légaux
-          </h2>
+          <h2 className="text-2xl font-bold">Gestion du Dépôt Légal</h2>
           <p className="text-muted-foreground">
-            Suivi et gestion des dépôts légaux officiels
+            Système de gestion des demandes et procédures de dépôt légal BNRM
           </p>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Nouveau Dépôt
-        </Button>
       </div>
 
-      {/* Statistiques */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Archive className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Total</span>
-            </div>
-            <div className="text-2xl font-bold">{stats.total}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <FileCheck className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium">Soumis</span>
-            </div>
-            <div className="text-2xl font-bold text-blue-600">{stats.submitted}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium">Traités</span>
-            </div>
-            <div className="text-2xl font-bold text-green-600">{stats.processed}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Archive className="h-4 w-4 text-orange-600" />
-              <span className="text-sm font-medium">Archivés</span>
-            </div>
-            <div className="text-2xl font-bold text-orange-600">{stats.archived}</div>
-          </CardContent>
-        </Card>
-      </div>
+      <Tabs defaultValue="requests" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="requests">Demandes</TabsTrigger>
+          <TabsTrigger value="process">Processus</TabsTrigger>
+          <TabsTrigger value="deposits">Dépôts</TabsTrigger>
+          <TabsTrigger value="statistics">Statistiques</TabsTrigger>
+        </TabsList>
 
-      {/* Filtres et recherche */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Rechercher par titre ou numéro de dépôt..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+        <TabsContent value="requests" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Demandes de Dépôt Légal
+              </CardTitle>
+              <CardDescription>
+                Gestion des demandes selon le processus E0-E1 (Réception et traitement)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 mb-6">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Rechercher par numéro de dépôt, type..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-8"
+                    />
+                  </div>
+                </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Statut" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les statuts</SelectItem>
+                    <SelectItem value="submitted">Soumis</SelectItem>
+                    <SelectItem value="validated">Validé</SelectItem>
+                    <SelectItem value="processed">Traité</SelectItem>
+                    <SelectItem value="acknowledged">Accusé</SelectItem>
+                    <SelectItem value="rejected">Rejeté</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les types</SelectItem>
+                    <SelectItem value="monographie">Monographie</SelectItem>
+                    <SelectItem value="periodique">Périodique</SelectItem>
+                    <SelectItem value="document">Document</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="border rounded-lg">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>N° Dépôt</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Statut</TableHead>
+                      <TableHead>Date de soumission</TableHead>
+                      <TableHead>Date d'accusé</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredDeposits.map((deposit) => (
+                      <TableRow key={deposit.id}>
+                        <TableCell className="font-medium">
+                          {deposit.deposit_number || "En attente"}
+                        </TableCell>
+                        <TableCell>{getTypeBadge(deposit.deposit_type)}</TableCell>
+                        <TableCell>{getStatusBadge(deposit.status)}</TableCell>
+                        <TableCell>
+                          {format(new Date(deposit.submission_date), "dd/MM/yyyy HH:mm", { locale: fr })}
+                        </TableCell>
+                        <TableCell>
+                          {deposit.acknowledgment_date 
+                            ? format(new Date(deposit.acknowledgment_date), "dd/MM/yyyy HH:mm", { locale: fr })
+                            : "-"
+                          }
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setSelectedDeposit(deposit)}
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl">
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Détails du dépôt {selectedDeposit?.deposit_number}
+                                  </DialogTitle>
+                                </DialogHeader>
+                                {selectedDeposit && (
+                                  <DepositDetails 
+                                    deposit={selectedDeposit} 
+                                    onStatusUpdate={updateDepositStatus}
+                                  />
+                                )}
+                              </DialogContent>
+                            </Dialog>
+                            
+                            {deposit.status === 'submitted' && (
+                              <Button
+                                size="sm"
+                                onClick={() => updateDepositStatus(deposit.id, 'validated')}
+                              >
+                                Valider
+                              </Button>
+                            )}
+                            
+                            {deposit.status === 'validated' && (
+                              <Button
+                                size="sm"
+                                onClick={() => updateDepositStatus(deposit.id, 'processed')}
+                              >
+                                Traiter
+                              </Button>
+                            )}
+                            
+                            {deposit.status === 'processed' && (
+                              <Button
+                                size="sm"
+                                onClick={() => updateDepositStatus(deposit.id, 'acknowledged')}
+                              >
+                                Accusé
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="process" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Logigramme du Processus de Dépôt Légal</CardTitle>
+              <CardDescription>
+                Processus complet de gestion du dépôt légal selon la procédure BNRM
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center">
+                <img 
+                  src={logigrammeImage} 
+                  alt="Logigramme du processus de dépôt légal"
+                  className="max-w-full h-auto mx-auto border rounded-lg shadow-sm"
                 />
               </div>
-            </div>
-            
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="submitted">Soumis</SelectItem>
-                <SelectItem value="acknowledged">Accusé de réception</SelectItem>
-                <SelectItem value="processed">Traités</SelectItem>
-                <SelectItem value="archived">Archivés</SelectItem>
-                <SelectItem value="rejected">Rejetés</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les types</SelectItem>
-                <SelectItem value="mandatory">Obligatoire</SelectItem>
-                <SelectItem value="voluntary">Volontaire</SelectItem>
-                <SelectItem value="special">Spécial</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+              
+              <div className="mt-6 space-y-4">
+                <h3 className="text-lg font-semibold">Étapes du processus :</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">E0: Réception de la Demande</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <p className="text-sm text-muted-foreground">
+                        Vérification et validation des demandes des déclarants
+                      </p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">E1: Traitement de la Demande</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <p className="text-sm text-muted-foreground">
+                        Saisie système et validation du contenu
+                      </p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">E2: Attribution N° DL</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <p className="text-sm text-muted-foreground">
+                        Attribution ISBN/ISSN et numéro de dépôt légal
+                      </p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">E4-E8: Gestion Documents</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <p className="text-sm text-muted-foreground">
+                        Réception, vérification et classement
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Liste des dépôts */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Dépôts Légaux</CardTitle>
-          <CardDescription>
-            {filteredDeposits.length} dépôt(s) trouvé(s)
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Numéro de Dépôt</TableHead>
-                  <TableHead>Contenu</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead>Soumis par</TableHead>
-                  <TableHead>Date de soumission</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredDeposits.map((deposit) => (
-                  <TableRow key={deposit.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Hash className="h-3 w-3" />
-                        <span className="font-mono text-sm">{deposit.deposit_number}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{deposit.content.title}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {deposit.content.content_type}
+        <TabsContent value="deposits" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Historique des Dépôts</CardTitle>
+              <CardDescription>
+                Consultation de tous les dépôts légaux traités
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Total</p>
+                          <p className="text-2xl font-bold">{deposits.length}</p>
                         </div>
+                        <FileText className="w-8 h-8 text-primary" />
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      {getTypeBadge(deposit.deposit_type)}
-                    </TableCell>
-                    <TableCell>
-                      {getStatusBadge(deposit.status)}
-                    </TableCell>
-                    <TableCell>
-                      {deposit.profiles.first_name} {deposit.profiles.last_name}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-3 w-3" />
-                        {formatDate(deposit.submission_date)}
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">En attente</p>
+                          <p className="text-2xl font-bold">
+                            {deposits.filter(d => d.status === 'submitted').length}
+                          </p>
+                        </div>
+                        <Clock className="w-8 h-8 text-yellow-500" />
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-3 w-3 mr-1" />
-                          Voir
-                        </Button>
-                        {deposit.status === 'submitted' && (
-                          <Select
-                            value={deposit.status}
-                            onValueChange={(value) => updateDepositStatus(deposit.id, value)}
-                          >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="acknowledged">Accusé réception</SelectItem>
-                              <SelectItem value="processed">Traiter</SelectItem>
-                              <SelectItem value="rejected">Rejeter</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        )}
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Traités</p>
+                          <p className="text-2xl font-bold">
+                            {deposits.filter(d => d.status === 'processed').length}
+                          </p>
+                        </div>
+                        <CheckCircle className="w-8 h-8 text-green-500" />
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Accusés</p>
+                          <p className="text-2xl font-bold">
+                            {deposits.filter(d => d.status === 'acknowledged').length}
+                          </p>
+                        </div>
+                        <Download className="w-8 h-8 text-purple-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Dialog de création */}
-      <AlertDialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Nouveau Dépôt Légal</AlertDialogTitle>
-            <AlertDialogDescription>
-              Créer un nouveau dépôt légal pour un contenu publié
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="content">Contenu à déposer</Label>
-              <Select value={selectedContent} onValueChange={setSelectedContent}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un contenu" />
-                </SelectTrigger>
-                <SelectContent>
-                  {contents.map((content) => (
-                    <SelectItem key={content.id} value={content.id}>
-                      {content.title} ({content.content_type})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="type">Type de dépôt</Label>
-              <Select value={depositType} onValueChange={(value: any) => setDepositType(value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="mandatory">Obligatoire</SelectItem>
-                  <SelectItem value="voluntary">Volontaire</SelectItem>
-                  <SelectItem value="special">Spécial</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={createLegalDeposit}
-              disabled={!selectedContent}
-            >
-              Créer le Dépôt
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        <TabsContent value="statistics" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Statistiques du Dépôt Légal</CardTitle>
+              <CardDescription>
+                Analyse et métriques des dépôts légaux
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center text-muted-foreground py-8">
+                <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                <p>Module de statistiques en cours de développement</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
-}
+};
+
+// Composant pour les détails d'un dépôt
+const DepositDetails = ({ 
+  deposit, 
+  onStatusUpdate 
+}: { 
+  deposit: LegalDeposit;
+  onStatusUpdate: (id: string, status: string, metadata?: any) => void;
+}) => {
+  const [comments, setComments] = useState("");
+  const [isbnIssn, setIsbnIssn] = useState("");
+
+  const handleAttributeNumber = async () => {
+    const newMetadata = {
+      ...deposit.metadata,
+      isbn_issn: isbnIssn,
+      attribution_date: new Date().toISOString(),
+      comments
+    };
+    
+    await onStatusUpdate(deposit.id, 'processed', newMetadata);
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      submitted: { color: "bg-blue-100 text-blue-800", label: "Soumis", icon: Clock },
+      validated: { color: "bg-yellow-100 text-yellow-800", label: "Validé", icon: AlertCircle },
+      processed: { color: "bg-green-100 text-green-800", label: "Traité", icon: CheckCircle },
+      acknowledged: { color: "bg-purple-100 text-purple-800", label: "Accusé", icon: CheckCircle },
+      rejected: { color: "bg-red-100 text-red-800", label: "Rejeté", icon: XCircle },
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.submitted;
+    const Icon = config.icon;
+
+    return (
+      <Badge className={config.color}>
+        <Icon className="w-3 h-3 mr-1" />
+        {config.label}
+      </Badge>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label className="text-sm font-medium">Numéro de dépôt</Label>
+          <p className="text-sm">{deposit.deposit_number || "En attente d'attribution"}</p>
+        </div>
+        <div>
+          <Label className="text-sm font-medium">Type</Label>
+          <p className="text-sm">{deposit.deposit_type}</p>
+        </div>
+        <div>
+          <Label className="text-sm font-medium">Statut actuel</Label>
+          <div className="mt-1">{getStatusBadge(deposit.status)}</div>
+        </div>
+        <div>
+          <Label className="text-sm font-medium">Date de soumission</Label>
+          <p className="text-sm">
+            {format(new Date(deposit.submission_date), "dd/MM/yyyy HH:mm", { locale: fr })}
+          </p>
+        </div>
+      </div>
+
+      {deposit.status === 'validated' && (
+        <div className="space-y-4 border-t pt-4">
+          <h3 className="font-medium">Attribution ISBN/ISSN</h3>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="isbn-issn">Numéro ISBN/ISSN</Label>
+              <Input
+                id="isbn-issn"
+                value={isbnIssn}
+                onChange={(e) => setIsbnIssn(e.target.value)}
+                placeholder="Saisir le numéro ISBN ou ISSN"
+              />
+            </div>
+            <div>
+              <Label htmlFor="comments">Commentaires</Label>
+              <Textarea
+                id="comments"
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
+                placeholder="Commentaires optionnels"
+                rows={3}
+              />
+            </div>
+            <Button onClick={handleAttributeNumber} className="w-full">
+              Attribuer le numéro et traiter
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {deposit.metadata && Object.keys(deposit.metadata).length > 0 && (
+        <div className="border-t pt-4">
+          <h3 className="font-medium mb-3">Métadonnées</h3>
+          <pre className="text-xs bg-muted p-3 rounded overflow-auto">
+            {JSON.stringify(deposit.metadata, null, 2)}
+          </pre>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default LegalDepositManager;
