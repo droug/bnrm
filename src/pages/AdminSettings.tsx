@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 
@@ -10,7 +10,7 @@ export default function AdminSettings() {
       icon: Shield,
       title: "Gestion des Droits et Permissions",
       description: "Gérer les rôles utilisateurs et les permissions d'accès",
-      href: "/settings?tab=permissions",
+      href: "/settings",
       permission: "users.manage"
     },
     {
@@ -31,15 +31,22 @@ export default function AdminSettings() {
       icon: Scale,
       title: "Dépôt légal",
       description: "Gérer le processus de dépôt légal et les soumissions",
-      href: "/settings?tab=legal-deposit",
+      href: "/admin/legal-deposit",
       permission: "legal_deposit.manage"
     },
     {
       icon: Archive,
       title: "Archivage",
       description: "Configurer l'archivage automatique du contenu",
-      href: "/settings?tab=archiving",
+      href: "/admin/archiving",
       permission: "content.archive"
+    },
+    {
+      icon: Edit,
+      title: "Éditeur WYSIWYG",
+      description: "Éditeur visuel pour créer et modifier du contenu",
+      href: "/admin/wysiwyg",
+      permission: "content.manage"
     }
   ];
 
