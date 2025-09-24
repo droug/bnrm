@@ -16,6 +16,7 @@ import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import WysiwygPage from "./pages/WysiwygPage";
 import BNRMPortal from "./pages/BNRMPortal";
+import BNRMTariffsPage from "./pages/BNRMTariffsPage";
 import AdminSettings from "./pages/AdminSettings";
 import LegalDepositPage from "./pages/LegalDepositPage";
 import ArchivingPage from "./pages/ArchivingPage";
@@ -37,7 +38,8 @@ const App = () => (
         <Route path="/news" element={<News />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/wysiwyg" element={<WysiwygPage />} />
-        <Route path="/admin/wysiwyg" element={<WysiwygPage />} />
+            <Route path="/admin/bnrm-tariffs" element={<BNRMTariffsPage />} />
+            <Route path="/admin/wysiwyg" element={<WysiwygPage />} />
         <Route path="/bnrm" element={<BNRMPortal />} />
         <Route path="/services-tarifs" element={<BNRMPortal />} />
         <Route path="/admin/legal-deposit" element={<LegalDepositPage />} />
