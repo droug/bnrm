@@ -9,7 +9,6 @@ import { BookOpen, Users, FileText, Clock, Library, LogOut, Settings, Cog } from
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { UserProfileDialog } from "@/components/UserProfileDialog";
-import { AdminSettingsCards } from "@/components/AdminSettingsCards";
 
 export default function Dashboard() {
   const { user, profile, signOut, loading } = useAuth();
@@ -105,9 +104,7 @@ export default function Dashboard() {
             <UserProfileDialog />
             
             <PermissionGuard permission="users.manage">
-              <Button variant="ghost" size="sm" onClick={() => {
-                document.getElementById('admin-settings')?.scrollIntoView({ behavior: 'smooth' });
-              }}>
+              <Button variant="ghost" size="sm" onClick={() => window.location.href = '/admin/settings'}>
                 <Cog className="h-4 w-4" />
               </Button>
             </PermissionGuard>
@@ -253,13 +250,6 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Admin Settings Section */}
-        <PermissionGuard permission="users.manage">
-          <div id="admin-settings">
-            <AdminSettingsCards />
-          </div>
-        </PermissionGuard>
       </main>
       </div>
     </WatermarkContainer>
