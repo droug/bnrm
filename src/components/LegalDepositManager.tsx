@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, FileText, CheckCircle, XCircle, Clock, AlertCircle, Eye, Download, ArrowRight, Check, Circle } from "lucide-react";
+import { Search, FileText, CheckCircle, XCircle, Clock, AlertCircle, Eye, Download, ArrowRight, Check, Circle, Send, UserCheck, BookOpen, Archive, Printer, Mail } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import logigrammeImage from "@/assets/logigramme-depot-legal.png";
@@ -49,102 +49,137 @@ const LegalDepositWorkflow = () => {
   const workflowSteps = [
     {
       id: "E0",
-      title: "Réception de la Demande",
-      description: "Le déclarant soumet sa demande de dépôt légal",
-      details: [
-        "Vérification de la complétude du formulaire",
-        "Contrôle des informations obligatoires",
-        "Validation de l'identité du déclarant"
+      title: "Réception des demandes des déclarants",
+      description: "Procéder à la réception et vérification des demandes",
+      actions: [
+        { label: "Recevoir la demande", icon: FileText, variant: "default" as const },
+        { label: "Vérifier la demande", icon: UserCheck, variant: "outline" as const },
+        { label: "Valider la demande", icon: CheckCircle, variant: "default" as const },
+        { label: "Rejeter (si invalide)", icon: XCircle, variant: "destructive" as const }
       ],
+      documents: ["Formulaire de demande"],
+      intervenants: ["Cellule DL", "Service DLBN", "Déclarant"],
+      validateur: "Département ABN",
       status: "completed"
     },
     {
-      id: "E1",
-      title: "Traitement de la Demande",
-      description: "Validation et saisie système des informations",
-      details: [
-        "Saisie des métadonnées dans le système",
-        "Validation du contenu de la demande",
-        "Vérification de la conformité réglementaire"
+      id: "E1", 
+      title: "Traitement de la demande",
+      description: "Saisir et valider le contenu des publications",
+      actions: [
+        { label: "Saisir au système", icon: BookOpen, variant: "default" as const },
+        { label: "Valider le contenu", icon: CheckCircle, variant: "default" as const },
+        { label: "Comité validation", icon: UserCheck, variant: "outline" as const },
+        { label: "Suspendre (si invalide)", icon: Clock, variant: "secondary" as const }
       ],
-      status: "completed"
-    },
-    {
-      id: "E2",
-      title: "Attribution N° DL et ISBN/ISSN",
-      description: "Attribution des identifiants officiels",
-      details: [
-        "Génération du numéro de dépôt légal",
-        "Attribution ISBN pour les monographies",
-        "Attribution ISSN pour les périodiques",
-        "Enregistrement dans la base nationale"
-      ],
+      documents: ["Système de gestion"],
+      intervenants: ["Cellule DL", "Comité de validation"],
+      validateur: "Département ABN",
       status: "current"
     },
     {
-      id: "E3",
-      title: "Notification au Déclarant",
-      description: "Envoi de l'accusé de réception avec numéros",
-      details: [
-        "Préparation de l'accusé de réception",
-        "Envoi des identifiants au déclarant",
-        "Archivage de la correspondance"
+      id: "E2",
+      title: "Attribution du N° DL",
+      description: "Attribution des numéros DL, ISBN/ISSN",
+      actions: [
+        { label: "Attribuer N° DL", icon: FileText, variant: "default" as const },
+        { label: "Attribution ISBN", icon: BookOpen, variant: "default" as const },
+        { label: "Formulaire ISBN", icon: Send, variant: "outline" as const },
+        { label: "Traitement ISSN+", icon: Archive, variant: "default" as const },
+        { label: "Mise à jour portail", icon: CheckCircle, variant: "default" as const }
       ],
+      documents: ["Formulaire ISBN", "Portail ISSN+"],
+      intervenants: ["Service DLBN", "Département ABN", "Déclarant"],
+      validateur: "Agence ISBN/ISSN",
+      status: "pending"
+    },
+    {
+      id: "E3",
+      title: "Envoi de l'accusé de réception",
+      description: "Notification au déclarant avec numéros attribués",
+      actions: [
+        { label: "Préparer accusé", icon: Mail, variant: "default" as const },
+        { label: "Envoyer au déclarant", icon: Send, variant: "default" as const },
+        { label: "Archiver correspondance", icon: Archive, variant: "outline" as const }
+      ],
+      documents: ["Accusé de réception", "Correspondance"],
+      intervenants: ["Service DLBN", "Déclarant"],
+      validateur: "Département ABN",
       status: "pending"
     },
     {
       id: "E4",
-      title: "Attente des Documents",
-      description: "Réception des exemplaires physiques ou numériques",
-      details: [
-        "Surveillance des délais de dépôt",
-        "Réception des exemplaires",
-        "Contrôle de conformité"
+      title: "Réception des exemplaires",
+      description: "Attente et réception des documents physiques/numériques",
+      actions: [
+        { label: "Surveiller délais", icon: Clock, variant: "outline" as const },
+        { label: "Recevoir exemplaires", icon: Download, variant: "default" as const },
+        { label: "Contrôler conformité", icon: CheckCircle, variant: "default" as const },
+        { label: "Relancer si retard", icon: Mail, variant: "secondary" as const }
       ],
+      documents: ["Exemplaires physiques/numériques", "Bordereau de dépôt"],
+      intervenants: ["Service DLBN", "Déclarant"],
+      validateur: "Département ABN",
       status: "pending"
     },
     {
       id: "E5",
-      title: "Vérification Conformité",
+      title: "Vérification de conformité",
       description: "Contrôle de la conformité des documents déposés",
-      details: [
-        "Vérification de la correspondance avec la demande",
-        "Contrôle qualité des exemplaires",
-        "Validation des métadonnées"
+      actions: [
+        { label: "Vérifier correspondance", icon: Eye, variant: "default" as const },
+        { label: "Contrôle qualité", icon: CheckCircle, variant: "default" as const },
+        { label: "Valider métadonnées", icon: FileText, variant: "default" as const },
+        { label: "Demander corrections", icon: AlertCircle, variant: "destructive" as const }
       ],
+      documents: ["Documents déposés", "Métadonnées", "Rapport de contrôle"],
+      intervenants: ["Service DLBN", "Cellule DL"],
+      validateur: "Département ABN",
       status: "pending"
     },
     {
       id: "E6",
-      title: "Traitement Catalogage",
-      description: "Catalogage et indexation des documents",
-      details: [
-        "Création de la notice bibliographique",
-        "Indexation matière",
-        "Attribution des cotes de classement"
+      title: "Catalogage et indexation",
+      description: "Traitement bibliographique des documents",
+      actions: [
+        { label: "Créer notice", icon: FileText, variant: "default" as const },
+        { label: "Indexation matière", icon: BookOpen, variant: "default" as const },
+        { label: "Attribuer cotes", icon: Archive, variant: "default" as const },
+        { label: "Valider catalogage", icon: CheckCircle, variant: "default" as const }
       ],
+      documents: ["Notice bibliographique", "Index matière", "Cotes"],
+      intervenants: ["Service catalogage", "Service DLBN"],
+      validateur: "Responsable catalogage",
       status: "pending"
     },
     {
       id: "E7",
-      title: "Archivage Physique",
+      title: "Archivage physique",
       description: "Stockage et conservation des exemplaires",
-      details: [
-        "Étiquetage et conditionnement",
-        "Rangement en magasin",
-        "Mise à jour des localisations"
+      actions: [
+        { label: "Étiqueter documents", icon: Printer, variant: "default" as const },
+        { label: "Conditionner", icon: Archive, variant: "default" as const },
+        { label: "Ranger en magasin", icon: Archive, variant: "default" as const },
+        { label: "Mettre à jour localisation", icon: CheckCircle, variant: "default" as const }
       ],
+      documents: ["Étiquettes", "Conditionnement", "Registre localisation"],
+      intervenants: ["Service conservation", "Magasinier"],
+      validateur: "Responsable conservation",
       status: "pending"
     },
     {
       id: "E8",
-      title: "Finalisation",
-      description: "Clôture du processus de dépôt légal",
-      details: [
-        "Validation finale du dossier",
-        "Archivage des documents administratifs",
-        "Mise à disposition au public"
+      title: "Finalisation du processus",
+      description: "Clôture et mise à disposition",
+      actions: [
+        { label: "Validation finale", icon: CheckCircle, variant: "default" as const },
+        { label: "Archiver dossier", icon: Archive, variant: "default" as const },
+        { label: "Mise à disposition", icon: Eye, variant: "default" as const },
+        { label: "Clôturer processus", icon: CheckCircle, variant: "default" as const }
       ],
+      documents: ["Dossier complet", "Rapport final"],
+      intervenants: ["Service DLBN", "Public"],
+      validateur: "Département ABN",
       status: "pending"
     }
   ];
@@ -170,14 +205,19 @@ const LegalDepositWorkflow = () => {
     }
   };
 
+  const handleActionClick = (stepId: string, actionLabel: string) => {
+    console.log(`Action "${actionLabel}" for step ${stepId}`);
+    // Ici on peut ajouter la logique pour chaque action
+  };
+
   return (
     <div className="space-y-6">
       {/* Stepper Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Workflow de Dépôt Légal</h3>
+          <h3 className="text-lg font-semibold">Workflow de Dépôt Légal BNRM</h3>
           <p className="text-sm text-muted-foreground">
-            Étape {workflowSteps.findIndex(s => s.status === "current") + 1} sur {workflowSteps.length}
+            Procédure P1: Attribution du n° Dépôt Légal - Version CEMP-BNRM/2025
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -205,7 +245,7 @@ const LegalDepositWorkflow = () => {
       </div>
 
       {/* Steps */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {workflowSteps.map((step, index) => (
           <div key={step.id} className="flex gap-4">
             {/* Step Icon */}
@@ -214,7 +254,7 @@ const LegalDepositWorkflow = () => {
                 {getStepIcon(step, index)}
               </div>
               {index < workflowSteps.length - 1 && (
-                <div className="w-px h-12 bg-gray-200 mt-2"></div>
+                <div className="w-px h-16 bg-gray-200 mt-2"></div>
               )}
             </div>
 
@@ -226,26 +266,68 @@ const LegalDepositWorkflow = () => {
                   {step.status === "completed" ? "Terminé" : step.status === "current" ? "En cours" : "En attente"}
                 </Badge>
               </div>
-              <p className="text-muted-foreground text-sm mb-3">{step.description}</p>
+              <p className="text-muted-foreground text-sm mb-4">{step.description}</p>
               
+              {/* Actions Buttons */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
+                {step.actions.map((action, actionIndex) => {
+                  const Icon = action.icon;
+                  return (
+                    <Button
+                      key={actionIndex}
+                      variant={action.variant}
+                      size="sm"
+                      className="justify-start"
+                      onClick={() => handleActionClick(step.id, action.label)}
+                      disabled={step.status === "pending"}
+                    >
+                      <Icon className="w-4 h-4 mr-2" />
+                      {action.label}
+                    </Button>
+                  );
+                })}
+              </div>
+
               {/* Step Details */}
-              <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-xs font-medium text-muted-foreground mb-2">Activités :</p>
-                <ul className="space-y-1">
-                  {step.details.map((detail, detailIndex) => (
-                    <li key={detailIndex} className="text-xs text-muted-foreground flex items-center gap-2">
-                      <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
-                      {detail}
-                    </li>
-                  ))}
-                </ul>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Documents :</p>
+                  <ul className="space-y-1">
+                    {step.documents.map((doc, docIndex) => (
+                      <li key={docIndex} className="text-xs text-muted-foreground flex items-center gap-2">
+                        <FileText className="w-3 h-3" />
+                        {doc}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Intervenants :</p>
+                  <ul className="space-y-1">
+                    {step.intervenants.map((intervenant, intIndex) => (
+                      <li key={intIndex} className="text-xs text-muted-foreground flex items-center gap-2">
+                        <UserCheck className="w-3 h-3" />
+                        {intervenant}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Validateur :</p>
+                  <div className="text-xs text-muted-foreground flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3" />
+                    {step.validateur}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Action Buttons */}
+      {/* Global Actions */}
       <div className="flex justify-between pt-4 border-t">
         <div className="text-sm text-muted-foreground">
           Dernière mise à jour: {format(new Date(), "dd/MM/yyyy HH:mm", { locale: fr })}
@@ -253,10 +335,15 @@ const LegalDepositWorkflow = () => {
         <div className="flex gap-2">
           <Button variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
-            Exporter le processus
+            Exporter le workflow
+          </Button>
+          <Button variant="outline" size="sm">
+            <Printer className="w-4 h-4 mr-2" />
+            Imprimer procédure
           </Button>
           <Button size="sm">
-            Avancer à l'étape suivante
+            <Send className="w-4 h-4 mr-2" />
+            Avancer processus
           </Button>
         </div>
       </div>
@@ -413,7 +500,7 @@ const LegalDepositManager = () => {
       <Tabs defaultValue="requests" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="requests">Demandes</TabsTrigger>
-          <TabsTrigger value="process">Processus</TabsTrigger>
+          <TabsTrigger value="workflow">Workflow</TabsTrigger>
           <TabsTrigger value="deposits">Dépôts</TabsTrigger>
           <TabsTrigger value="statistics">Statistiques</TabsTrigger>
         </TabsList>
@@ -561,7 +648,7 @@ const LegalDepositManager = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="process" className="space-y-6">
+        <TabsContent value="workflow" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Workflow du Processus de Dépôt Légal</CardTitle>
@@ -571,17 +658,6 @@ const LegalDepositManager = () => {
             </CardHeader>
             <CardContent>
               <LegalDepositWorkflow />
-              
-              <div className="mt-8">
-                <h3 className="text-lg font-semibold mb-4">Logigramme de référence :</h3>
-                <div className="text-center">
-                  <img 
-                    src={logigrammeImage} 
-                    alt="Logigramme du processus de dépôt légal"
-                    className="max-w-full h-auto mx-auto border rounded-lg shadow-sm"
-                  />
-                </div>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
