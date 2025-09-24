@@ -34,7 +34,7 @@ const App = () => (
         <Route path="/news" element={<News />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/wysiwyg" element={<WysiwygPage />} />
-        <Route path="/admin/bnrm" element={<BNRMPortal />} />
+        <Route path="/bnrm" element={<BNRMPortal />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
