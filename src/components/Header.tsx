@@ -89,13 +89,6 @@ const Header = () => {
             
             <AccessibilityToolkit />
             
-            <Link to="/wysiwyg">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground flex items-center gap-1">
-                <FileText className="h-4 w-4" />
-                <span className="hidden sm:inline">WYSIWYG</span>
-              </Button>
-            </Link>
-            
             {user ? (
               <Link to="/dashboard">
                 <Button variant="ghost" size="sm" className="flex items-center space-x-2">

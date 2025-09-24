@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, Edit } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 
 export function AdminSettingsCards() {
@@ -39,6 +39,13 @@ export function AdminSettingsCards() {
       description: "Configurer l'archivage automatique du contenu",
       href: "/settings?tab=archiving",
       permission: "content.archive"
+    },
+    {
+      icon: Edit,
+      title: "Éditeur WYSIWYG",
+      description: "Éditeur visuel pour créer et modifier du contenu",
+      href: "/settings?tab=wysiwyg",
+      permission: "content.manage"
     }
   ];
 
