@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/hooks/useLanguage";
 import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import SignupPage from "./pages/SignupPage";
 import Dashboard from "./pages/Dashboard";
 import Manuscripts from "./pages/Manuscripts";
 import AccessRequest from "./pages/AccessRequest";
@@ -29,6 +30,7 @@ const App = () => (
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/manuscripts" element={<Manuscripts />} />
         <Route path="/access-request" element={<AccessRequest />} />
