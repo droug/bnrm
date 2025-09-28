@@ -102,6 +102,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
     setIsLoading(true);
 
     try {
+      console.log('Sending message to chatbot:', content.trim());
       const { data, error } = await supabase.functions.invoke('chatbot-ai', {
         body: {
           message: content.trim(),
@@ -110,7 +111,12 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
         }
       });
 
-      if (error) throw error;
+      console.log('Chatbot response:', { data, error });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
 
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -479,17 +485,29 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
 
         {/* Input */}
         <div className="p-4 border-t bg-muted/30">
-          <div className="flex items-center gap-2">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (inputMessage.trim()) {
+                sendMessage(inputMessage);
+              }
+            }}
+            className="flex items-center gap-2"
+          >
             <div className="flex-1">
               <Input
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder={t('Tapez votre message...')}
                 disabled={isLoading || isRecording}
-                onKeyPress={(e) => {
+                onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    sendMessage(inputMessage);
+                    e.stopPropagation();
+                    if (inputMessage.trim()) {
+                      sendMessage(inputMessage);
+                    }
                   }
                 }}
                 className="rounded-full"
@@ -520,14 +538,14 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
             )}
 
             <Button
-              onClick={() => sendMessage(inputMessage)}
+              type="submit"
               disabled={!inputMessage.trim() || isLoading || isRecording}
               size="sm"
               className="rounded-full w-10 h-10 p-0"
             >
               <Send className="w-4 h-4" />
             </Button>
-          </div>
+          </form>
         </div>
       </div>
     </div>
