@@ -49,7 +49,7 @@ export default function BNRMBackOffice() {
   return (
     <WatermarkContainer 
       watermarkProps={{ 
-        text: "BNRM Back Office - Système de Gestion du Dépôt Légal", 
+        text: "BNRM - Système de Gestion du Dépôt Légal", 
         variant: "subtle", 
         position: "pattern",
         opacity: 0.02
@@ -71,7 +71,7 @@ export default function BNRMBackOffice() {
               </Button>
               <div className="flex items-center space-x-2">
                 <BookOpen className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">BNRM Back Office</span>
+                <span className="text-xl font-bold">BNRM - Système BNRM</span>
                 <Badge variant="outline" className="ml-2">
                   Système de Gestion du Dépôt Légal
                 </Badge>
@@ -108,7 +108,7 @@ export default function BNRMBackOffice() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">
-                  Back Office BNRM - Dépôt Légal
+                  BNRM - Dépôt Légal
                 </h1>
                 <p className="text-muted-foreground mt-2">
                   Interface de gestion complète pour le processus de dépôt légal conforme aux exigences CPS
