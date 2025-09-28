@@ -183,11 +183,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     return (
       <Card className="w-full max-w-lg mx-auto">
         <CardHeader>
-          <CardTitle>Authentification Imprimeur</CardTitle>
+          <CardTitle>
+            {depositType === "bd_logiciels" ? "Authentification Distributeur" : "Authentification Imprimeur"}
+          </CardTitle>
           <CardDescription>
             {userType === "editor" ? 
-              "En attente de l'identification de l'imprimeur partenaire" : 
-              "Veuillez vous identifier en tant qu'imprimeur"
+              `En attente de l'identification du ${depositType === "bd_logiciels" ? "distributeur" : "imprimeur"} partenaire` : 
+              `Veuillez vous identifier en tant que ${depositType === "bd_logiciels" ? "distributeur" : "imprimeur"}`
             }
           </CardDescription>
         </CardHeader>
@@ -196,21 +198,23 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             <div className="text-center py-8">
               <Clock className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <p className="text-muted-foreground">
-                En attente de la confirmation de l'imprimeur partenaire...
+                En attente de la confirmation du {depositType === "bd_logiciels" ? "distributeur" : "imprimeur"} partenaire...
               </p>
               <Button
                 variant="outline"
                 className="mt-4"
                 onClick={handlePartnerConfirmation}
               >
-                Simuler la confirmation de l'imprimeur
+                Simuler la confirmation du {depositType === "bd_logiciels" ? "distributeur" : "imprimeur"}
               </Button>
             </div>
           ) : (
             <>
               <div className="space-y-2">
-                <Label htmlFor="printer-name">Nom de l'imprimerie</Label>
-                <Input id="printer-name" placeholder="Nom de l'imprimerie" />
+                <Label htmlFor="printer-name">
+                  {depositType === "bd_logiciels" ? "Nom de distributeur" : "Nom de l'imprimerie"}
+                </Label>
+                <Input id="printer-name" placeholder={depositType === "bd_logiciels" ? "Nom de distributeur" : "Nom de l'imprimerie"} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="printer-address">Adresse</Label>
@@ -261,7 +265,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
   if (currentStep === "form_filling") {
     return (
-      <Card className="w-full max-w-4xl mx-auto">
+      <Card className="w-full max-w-6xl mx-auto max-h-[90vh] overflow-y-auto">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-6 w-6" />
@@ -277,7 +281,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             </Badge>
             <Badge variant="outline" className="flex items-center gap-1">
               <CheckCircle className="h-3 w-3" />
-              Imprimeur confirmé
+              {depositType === "bd_logiciels" ? "Distributeur" : "Imprimeur"} confirmé
             </Badge>
             {partnerConfirmed && (
               <Badge variant="default" className="flex items-center gap-1">
@@ -288,26 +292,71 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Section Auteur */}
+          {/* Section Auteur/Directeur selon le type */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Identification de l'auteur</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              {depositType === "periodique" ? "Directeur de la publication" : "Identification de l'auteur"}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {depositType !== "periodique" && (
+                <div className="space-y-2">
+                  <Label>Type de l'auteur</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner le type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="physique">Personne physique</SelectItem>
+                      <SelectItem value="morale">Personne morale (collectivités)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              
               <div className="space-y-2">
-                <Label>Type de l'auteur</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner le type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="physique">Personne physique</SelectItem>
-                    <SelectItem value="morale">Personne morale</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>
+                  {depositType === "periodique" ? "Nom et prénom" : 
+                   depositType === "bd_logiciels" ? "Nom de la collectivité / Nom de l'Auteur" :
+                   "Nom de la collectivité / Nom de l'auteur"}
+                </Label>
+                <Input placeholder="Nom complet" />
               </div>
-              <div className="space-y-2">
-                <Label>Nom de l'auteur</Label>
-                <Input placeholder="Nom complet de l'auteur" />
-              </div>
+
+              {depositType !== "periodique" && (
+                <div className="space-y-2">
+                  <Label>Sigle</Label>
+                  <Input placeholder="Sigle de l'organisation" />
+                </div>
+              )}
+
+              {depositType !== "periodique" && (
+                <div className="space-y-2">
+                  <Label>Nature du déclarant</Label>
+                  <Input placeholder="Nature du déclarant" />
+                </div>
+              )}
+
+              {depositType === "periodique" && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Pseudonyme</Label>
+                    <Input placeholder="Pseudonyme (optionnel)" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Profession</Label>
+                    <Input placeholder="Profession" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Date de naissance</Label>
+                    <Input type="date" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Lieu de naissance</Label>
+                    <Input placeholder="Lieu de naissance" />
+                  </div>
+                </>
+              )}
+
               <div className="space-y-2">
                 <Label>Téléphone</Label>
                 <Input placeholder="Numéro de téléphone" />
@@ -320,6 +369,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <Label>Adresse</Label>
                 <Textarea placeholder="Adresse complète" />
               </div>
+
+              {depositType === "periodique" && (
+                <div className="md:col-span-2 space-y-2">
+                  <Label>Résumé de l'ouvrage</Label>
+                  <Textarea placeholder="Résumé détaillé" className="min-h-[100px]" />
+                </div>
+              )}
             </div>
           </div>
 
@@ -329,36 +385,73 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           <div>
             <h3 className="text-lg font-semibold mb-4">Identification de la publication</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2 space-y-2">
-                <Label>Titre de {depositType === "periodique" ? "la publication" : "l'ouvrage"}</Label>
+              {depositType === "periodique" && (
+                <div className="space-y-2">
+                  <Label>Type de publication</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Type de publication" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="magazine">Magazine</SelectItem>
+                      <SelectItem value="journal">Journal</SelectItem>
+                      <SelectItem value="revue">Revue</SelectItem>
+                      <SelectItem value="bulletin">Bulletin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              <div className={`space-y-2 ${depositType === "periodique" ? "" : "md:col-span-2"}`}>
+                <Label>
+                  {depositType === "periodique" ? "Titre du périodique" : 
+                   depositType === "monographie" ? "Titre de l'ouvrage" :
+                   "Titre de la publication"}
+                </Label>
                 <Input placeholder="Titre complet" />
               </div>
               
-              {depositType !== "bd_logiciels" && (
+              <div className="space-y-2">
+                <Label>Type de support</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner le support" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectItem value="papier">Papier</SelectItem>
+                    <SelectItem value="numerique">Numérique</SelectItem>
+                    <SelectItem value="mixte">Mixte</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {(depositType === "monographie" || depositType === "collections_specialisees") && (
                 <div className="space-y-2">
-                  <Label>Type de support</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner le support" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="papier">Papier</SelectItem>
-                      <SelectItem value="numerique">Numérique</SelectItem>
-                      <SelectItem value="mixte">Mixte</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label>Titre de la collection</Label>
+                  <Input placeholder="Titre de la collection" />
+                </div>
+              )}
+
+              {depositType === "monographie" && (
+                <div className="space-y-2">
+                  <Label>Numéro dans la collection</Label>
+                  <Input placeholder="Numéro dans la collection" />
                 </div>
               )}
 
               {depositType === "periodique" && (
                 <>
                   <div className="space-y-2">
+                    <Label>Fascicule N°</Label>
+                    <Input placeholder="Numéro du fascicule" />
+                  </div>
+                  <div className="space-y-2">
                     <Label>Périodicité</Label>
                     <Select>
                       <SelectTrigger>
                         <SelectValue placeholder="Fréquence de publication" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border shadow-lg z-50">
                         <SelectItem value="quotidien">Quotidien</SelectItem>
                         <SelectItem value="hebdomadaire">Hebdomadaire</SelectItem>
                         <SelectItem value="mensuel">Mensuel</SelectItem>
@@ -369,11 +462,39 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Fascicule N°</Label>
-                    <Input placeholder="Numéro du fascicule" />
+                    <Label>Mention d'édition</Label>
+                    <Input placeholder="Mention d'édition" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>URL</Label>
+                    <Input placeholder="URL du site web (pour périodiques électroniques)" />
                   </div>
                 </>
               )}
+
+              <div className="space-y-2">
+                <Label>
+                  {depositType === "periodique" ? "Discipline" : 
+                   depositType === "monographie" ? "Disciplines de l'ouvrage" :
+                   "Disciplines de la publication"}
+                </Label>
+                <Input placeholder="Domaine(s) de la publication" />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Langue</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Langue principale" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectItem value="ar">Arabe</SelectItem>
+                    <SelectItem value="fr">Français</SelectItem>
+                    <SelectItem value="en">Anglais</SelectItem>
+                    <SelectItem value="es">Espagnol</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
               {depositType === "monographie" && (
                 <>
@@ -391,7 +512,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       <SelectTrigger>
                         <SelectValue placeholder="Oui / Non" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border shadow-lg z-50">
                         <SelectItem value="oui">Oui</SelectItem>
                         <SelectItem value="non">Non</SelectItem>
                       </SelectContent>
@@ -400,37 +521,90 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </>
               )}
 
+              {depositType !== "periodique" && (
+                <div className="space-y-2">
+                  <Label>Mots clés</Label>
+                  <Input placeholder="Mots clés séparés par des virgules" />
+                </div>
+              )}
+
+              {(depositType === "bd_logiciels" || depositType === "collections_specialisees") && (
+                <div className="space-y-2">
+                  <Label>Mention d'Edition</Label>
+                  <Input placeholder="Mention d'édition" />
+                </div>
+              )}
+
+              {depositType !== "periodique" && (
+                <div className="md:col-span-2 space-y-2">
+                  <Label>
+                    {depositType === "monographie" ? "Résumé de l'ouvrage" : "Résumé de la publication"}
+                  </Label>
+                  <Textarea 
+                    placeholder="Résumé détaillé du contenu" 
+                    className="min-h-[100px]"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Section Éditeur */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Identification de l'Éditeur</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Langue</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Langue principale" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ar">Arabe</SelectItem>
-                    <SelectItem value="fr">Français</SelectItem>
-                    <SelectItem value="en">Anglais</SelectItem>
-                    <SelectItem value="es">Espagnol</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Éditeur</Label>
+                <Input placeholder="Nom de l'éditeur" defaultValue={editorData.name} className="bg-muted" readOnly />
               </div>
-
               <div className="space-y-2">
-                <Label>Disciplines</Label>
-                <Input placeholder="Domaine(s) de la publication" />
+                <Label>Téléphone</Label>
+                <Input placeholder="Téléphone éditeur" defaultValue={editorData.phone} className="bg-muted" readOnly />
               </div>
-
-              <div className="md:col-span-2 space-y-2">
-                <Label>Mots clés</Label>
-                <Input placeholder="Mots clés séparés par des virgules" />
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Input placeholder="Email éditeur" defaultValue={editorData.email} className="bg-muted" readOnly />
               </div>
-
+              <div className="space-y-2">
+                <Label>Date prévue de parution</Label>
+                <Input type="date" defaultValue={editorData.publicationDate} className="bg-muted" readOnly />
+              </div>
               <div className="md:col-span-2 space-y-2">
-                <Label>Résumé de {depositType === "periodique" ? "la publication" : "l'ouvrage"}</Label>
-                <Textarea 
-                  placeholder="Résumé détaillé du contenu" 
-                  className="min-h-[100px]"
-                />
+                <Label>Adresse</Label>
+                <Textarea placeholder="Adresse éditeur" defaultValue={editorData.address} className="bg-muted" readOnly />
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Section Imprimeur/Distributeur */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">
+              {depositType === "bd_logiciels" ? "Identification du distributeur" : "Identification de l'Imprimeur"}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>{depositType === "bd_logiciels" ? "Nom de distributeur" : "Imprimerie"}</Label>
+                <Input defaultValue={printerData.name} className="bg-muted" readOnly />
+              </div>
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Input defaultValue={printerData.email} className="bg-muted" readOnly />
+              </div>
+              <div className="space-y-2">
+                <Label>Tél</Label>
+                <Input defaultValue={printerData.phone} className="bg-muted" readOnly />
+              </div>
+              <div className="space-y-2">
+                <Label>Chiffre de tirage</Label>
+                <Input defaultValue={printerData.printRun} className="bg-muted" readOnly />
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <Label>Adresse</Label>
+                <Textarea defaultValue={printerData.address} className="bg-muted" readOnly />
               </div>
             </div>
           </div>
@@ -443,29 +617,94 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Checkbox id="cover" />
-                <Label htmlFor="cover">Couverture (format JPG, moins de 1 Mo)</Label>
+                <Label htmlFor="cover">Joindre la couverture (format « jpg » moins de 1 MO)</Label>
               </div>
               
               {(depositType === "monographie" || depositType === "periodique") && (
                 <div className="flex items-center space-x-2">
                   <Checkbox id="summary" />
-                  <Label htmlFor="summary">Sommaire (format PDF, moins de 2 Mo)</Label>
+                  <Label htmlFor="summary">Joindre le sommaire (format « PDF » moins de 2 MO)</Label>
                 </div>
               )}
               
               <div className="flex items-center space-x-2">
                 <Checkbox id="cin" />
                 <Label htmlFor="cin">
-                  Copie de la CIN de {depositType === "periodique" ? "directeur de publication" : "l'auteur"}
+                  Envoyer une copie de la CIN de {depositType === "periodique" ? "directeur de publication" : "l'auteur"}
                 </Label>
               </div>
 
               {depositType === "periodique" && (
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="court-decision" />
-                  <Label htmlFor="court-decision">
-                    Décision du tribunal de première instance (pour éditeurs non-étatiques)
-                  </Label>
+                <>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="court-decision" />
+                    <Label htmlFor="court-decision">
+                      Pour les périodiques dont l'éditeur n'est pas étatique, envoyer la décision du tribunal de première instance
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="active-url" />
+                    <Label htmlFor="active-url">
+                      Pour les périodiques électroniques, l'URL du site web doit être active et inclure les articles du premier numéro
+                    </Label>
+                  </div>
+                </>
+              )}
+
+              {depositType === "monographie" && (
+                <>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="thesis-recommendation" />
+                    <Label htmlFor="thesis-recommendation">
+                      Pour les thèses : Envoyer la recommandation de publication
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="quran-authorization" />
+                    <Label htmlFor="quran-authorization">
+                      Pour les Corans : Envoyer l'autorisation de publication de la part de la Fondation Mohammed VI pour l'édition du Saint Coran
+                    </Label>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+              <h4 className="font-semibold mb-2">Adresse d'envoi :</h4>
+              <p className="text-sm text-muted-foreground">
+                Les pièces doivent être envoyées à l'adresse e-mail suivante : <strong>depot.legal@bnrm.ma</strong>
+              </p>
+            </div>
+
+            <div className="mt-4 p-4 bg-accent/10 rounded-lg">
+              <h4 className="font-semibold mb-2">Modalités et nombre d'exemplaires à déposer :</h4>
+              <p className="text-sm text-muted-foreground mb-2">
+                Une fois l'ouvrage publié, les exemplaires doivent être déposés à l'Agence Bibliographique Nationale :
+              </p>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                {depositType === "monographie" && (
+                  <>
+                    <li>• 4 exemplaires pour les monographies imprimées</li>
+                    <li>• 2 exemplaires pour les e-books</li>
+                  </>
+                )}
+                {depositType === "periodique" && (
+                  <li>• 4 exemplaires pour les périodiques imprimés</li>
+                )}
+                {(depositType === "bd_logiciels" || depositType === "collections_specialisees") && (
+                  <li>• 2 exemplaires de format identique (CD, DVD, clés USB, etc.)</li>
+                )}
+              </ul>
+              
+              {depositType === "monographie" && (
+                <div className="mt-3 p-3 bg-background/50 rounded border-l-4 border-primary">
+                  <h5 className="font-medium text-sm mb-1">Pour les e-books :</h5>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>• Déposer deux exemplaires sur le même type de support</li>
+                    <li>• Munir chaque exemplaire d'une pochette avec le titre et les numéros obtenus (DL, ISBN)</li>
+                    <li>• Inclure le résumé sous format texte (Word par exemple)</li>
+                    <li>• Recommandation : utiliser des USB au format carte pour une meilleure préservation</li>
+                  </ul>
                 </div>
               )}
             </div>
@@ -480,9 +719,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               Clause de protection de données à caractère personnel
             </h4>
             <p className="text-sm text-muted-foreground mb-4">
-              Les informations recueillies font l'objet d'un traitement destiné à la Gestion des attributions 
-              des numéros du Dépôt Légal et des numéros ISBN et ISSN. Conformément à la loi n° 09-08, 
-              vous bénéficiez d'un droit d'accès et de rectification.
+              Les informations recueillies sur le site www.bnrm.ma font l'objet d'un traitement destiné à la Gestion des attributions 
+              des numéros du Dépôt Légal et des numéros ISBN et ISSN. Le destinataire des données est le service de dépôt légal.
+              Conformément à la loi n° 09-08 promulguée par le Dahir 1-09-15 du 18 février 2009, relative à la protection des personnes physiques à l'égard du traitement des données à caractère personnel, 
+              vous bénéficiez d'un droit d'accès et de rectification aux informations qui vous concernent, 
+              que vous pouvez exercer en vous adressant à depot.legal@bnrm.ma.
+              Ce traitement a été notifié par la CNDP au titre du récépissé n°D-90/2023 du 18/01/2023.
             </p>
             <div className="flex items-center space-x-2">
               <Checkbox 
@@ -515,7 +757,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500" />
           <CardTitle>Déclaration soumise avec succès</CardTitle>
           <CardDescription>
-            Votre déclaration de dépôt légal a été enregistrée. Vous recevrez une confirmation par email.
+            Votre déclaration de dépôt légal a été enregistrée. Vous recevrez une confirmation par email avec le numéro de dépôt légal attribué.
           </CardDescription>
         </CardHeader>
         <CardFooter>
