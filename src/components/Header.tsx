@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
 import ChatBot from "@/components/ChatBot";
 import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
-import { WatermarkContainer } from "@/components/ui/watermark";
+// import { WatermarkContainer, Watermark } from "@/components/ui/watermark"; // Removed to fix runtime error
 import logoImage from "@/assets/logo-bnrm.png";
 import {
   NavigationMenu,
@@ -32,15 +32,7 @@ const Header = () => {
   const { user, profile } = useAuth();
 
   return (
-    <WatermarkContainer 
-      watermarkProps={{ 
-        text: "BNRM Portal - Bibliothèque Nationale", 
-        variant: "subtle", 
-        position: "corner",
-        opacity: 0.03
-      }}
-    >
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b-4 border-primary/30 shadow-2xl">
+    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b-4 border-primary/30 shadow-2xl">
       <div className="container mx-auto px-4">
         {/* Bannière réduite et plus compacte */}
         <div className="flex justify-between items-center py-3 text-base bg-gradient-to-r from-primary/20 via-secondary/15 to-primary/20 border-b-2 border-primary/30 relative overflow-hidden">
@@ -586,7 +578,6 @@ const Header = () => {
         />
       )}
       </header>
-    </WatermarkContainer>
   );
 };
 
