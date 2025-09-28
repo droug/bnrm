@@ -290,7 +290,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
   if (!isOpen) return null;
 
   return (
-    <Card className="fixed top-16 right-4 w-96 max-w-[calc(100vw-2rem)] h-[750px] max-h-[calc(100vh-5rem)] shadow-2xl border-2 border-primary/30 bg-background/95 backdrop-blur-lg z-[9999] sm:w-96 w-[95vw] transition-all duration-300">
+    <Card className="fixed-chat top-16 right-4 w-96 max-w-[calc(100vw-2rem)] h-[750px] max-h-[calc(100vh-5rem)] shadow-2xl border-2 border-primary/30 bg-background/95 backdrop-blur-lg sm:w-96 w-[95vw] transition-all duration-300">
       <CardContent className="p-0 h-full flex flex-col overflow-hidden relative">
         {/* Barre de déplacement */}
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-primary/30 rounded-full mt-2 cursor-move"></div>

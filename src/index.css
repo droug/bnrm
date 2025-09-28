@@ -294,4 +294,12 @@ Enhanced Moroccan Heritage Design System
   .contrast-dark {
     filter: grayscale(1) contrast(2) brightness(0.8) !important;
   }
+
+  /* Fixed chat window that stays on top during scroll */
+  .fixed-chat {
+    position: fixed !important;
+    z-index: 99999 !important;
+    transform: translateZ(0);
+    will-change: transform;
+  }
 }
