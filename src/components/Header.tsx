@@ -37,12 +37,12 @@ const Header = () => {
         opacity: 0.03
       }}
     >
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border shadow-elegant">
+      <header className="sticky top-0 z-50 bg-background border-b-2 border-primary/20 shadow-xl">
       <div className="container mx-auto px-4">
-        {/* Top bar with language and contact - Plus grande hauteur */}
-        <div className="flex justify-between items-center py-4 text-sm border-b border-border/50 bg-gradient-to-r from-primary/5 to-secondary/5">
+        {/* Bannière plus visible et colorée */}
+        <div className="flex justify-between items-center py-6 text-sm bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-b-2 border-primary/30">
           <div className="flex items-center gap-4">
-            <span className="text-foreground font-medium text-base">{t('header.title')}</span>
+            <span className="text-foreground font-bold text-lg tracking-wide">{t('header.title')}</span>
           </div>
           <div className="flex items-center gap-4">
             <DropdownMenu>
@@ -103,27 +103,27 @@ const Header = () => {
               <Link to="/auth">
                 <Button size="sm" className="flex items-center space-x-2">
                   <LogIn className="h-4 w-4" />
-                  <span>Connexion</span>
+                  <span>{t('nav.login')}</span>
                 </Button>
               </Link>
             )}
           </div>
         </div>
 
-        {/* Main navigation - Plus grande hauteur */}
-        <div className="flex items-center justify-between py-6">
-          {/* Logo avec image */}
-          <Link to="/" className="flex items-center space-x-4 hover:opacity-80 transition-opacity">
-            <div className="w-16 h-16 flex items-center justify-center">
+        {/* Main navigation - Logo plus grand */}
+        <div className="flex items-center justify-between py-8">
+          {/* Logo avec image plus grande */}
+          <Link to="/" className="flex items-center space-x-6 hover:opacity-80 transition-opacity">
+            <div className="w-20 h-20 flex items-center justify-center">
               <img 
                 src={logoImage} 
                 alt="Logo BNRM" 
-                className="h-14 w-auto object-contain"
+                className="h-18 w-auto object-contain"
               />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">BNRM</h1>
-              <p className="text-sm text-muted-foreground hidden sm:block">Bibliothèque Nationale</p>
+              <h1 className="text-2xl font-bold text-foreground">BNRM</h1>
+              <p className="text-base text-muted-foreground hidden sm:block">{t('header.title')}</p>
             </div>
           </Link>
 
@@ -134,15 +134,15 @@ const Header = () => {
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
                   <BookOpen className="w-4 h-4 mr-2" />
-                  Découvrir la Bibliothèque
+                  {t('nav.discover')}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="grid gap-3 p-6 w-[600px] md:w-[700px] lg:grid-cols-2 bg-card border border-border rounded-lg shadow-moroccan">
                     <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">Informations pratiques</h4>
+                      <h4 className="text-sm font-medium text-primary mb-3">{t('nav.practical.info')}</h4>
                       <NavigationMenuLink asChild>
                         <a href="/informations-pratiques" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Horaires et accès</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.schedules.access')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Heures d'ouverture et plan d'accès
                           </p>
@@ -150,7 +150,7 @@ const Header = () => {
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/services-tarifs" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Catalogue de services et tarifs</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.services.catalog')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Services proposés et grilles tarifaires
                           </p>
@@ -158,7 +158,7 @@ const Header = () => {
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/visites-virtuelles" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Visites virtuelles</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.virtual.tours')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Découverte virtuelle de nos espaces
                           </p>
@@ -166,7 +166,7 @@ const Header = () => {
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/donateurs" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Nos donateurs</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.donors')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Recherche par donateur/œuvre
                           </p>
@@ -174,10 +174,10 @@ const Header = () => {
                       </NavigationMenuLink>
                     </div>
                     <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">Histoire et missions</h4>
+                      <h4 className="text-sm font-medium text-primary mb-3">{t('nav.history.missions')}</h4>
                       <NavigationMenuLink asChild>
                         <a href="/histoire" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Histoire de la bibliothèque</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.library.history')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Missions et valeurs prônées
                           </p>
@@ -185,7 +185,7 @@ const Header = () => {
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/mot-direction" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Mot de la Direction</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.management.message')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Message de notre directeur
                           </p>
@@ -193,7 +193,7 @@ const Header = () => {
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/organigramme" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Organigramme</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.organization.chart')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Structure organisationnelle
                           </p>
@@ -208,12 +208,12 @@ const Header = () => {
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
                   <Users className="w-4 h-4 mr-2" />
-                  Accéder à nos services
+                  {t('nav.services')}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="grid gap-3 p-6 w-[600px] md:w-[700px] lg:grid-cols-2 bg-card border border-border rounded-lg shadow-moroccan">
                     <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">Inscription et accès</h4>
+                      <h4 className="text-sm font-medium text-primary mb-3">{t('nav.inscription.access')}</h4>
                       <NavigationMenuLink asChild>
                         <a href="/inscription" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                           <div className="text-sm font-medium leading-none">Inscription en ligne / réinscription</div>
@@ -288,12 +288,12 @@ const Header = () => {
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
                   <Book className="w-4 h-4 mr-2" />
-                  Explorer le patrimoine
+                  {t('nav.explore')}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="grid gap-3 p-6 w-[700px] md:w-[900px] lg:grid-cols-3 bg-card border border-border rounded-lg shadow-moroccan">
                     <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">Collections</h4>
+                      <h4 className="text-sm font-medium text-primary mb-3">{t('nav.collections')}</h4>
                       <NavigationMenuLink asChild>
                         <a href="/collections-specialisees" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                           <div className="text-sm font-medium leading-none">Collections spécialisées</div>
