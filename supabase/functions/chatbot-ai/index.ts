@@ -20,6 +20,8 @@ serve(async (req) => {
   }
 
   try {
+    console.log('OPENAI_API_KEY value:', OPENAI_API_KEY ? `${OPENAI_API_KEY.substring(0, 10)}...` : 'undefined');
+    
     // Vérifier si la clé API est disponible
     if (!OPENAI_API_KEY || OPENAI_API_KEY === 'secret') {
       console.error('OpenAI API key is missing or invalid');
