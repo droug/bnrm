@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { LanguageProvider } from "@/hooks/useLanguage";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Crown, Gem } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import traditionalLibraryBg from "@/assets/traditional-library-bg.jpg";
 import LegalDepositDeclaration from "@/components/LegalDepositDeclaration";
 
 const Index = () => {
+  const { t } = useLanguage(); // Utiliser le hook au lieu de créer un nouveau provider
   const [showLegalDeposit, setShowLegalDeposit] = useState(false);
   const [selectedDepositType, setSelectedDepositType] = useState<"monographie" | "periodique" | "bd_logiciels" | "collections_specialisees" | null>(null);
 
@@ -33,7 +34,6 @@ const Index = () => {
   }
 
   return (
-    <LanguageProvider>
       <div className="min-h-screen bg-background relative overflow-hidden">
         {/* Arrière-plan de la page avec mosaïques zellige raffinées */}
         <div className="fixed inset-0 z-0">
@@ -61,7 +61,7 @@ const Index = () => {
               <div className="flex items-center justify-center space-x-4 mb-6">
                 <Crown className="h-10 w-10 text-gold animate-pulse drop-shadow-lg" />
                 <h1 className="text-4xl md:text-5xl font-moroccan font-bold text-white drop-shadow-2xl">
-                  Bibliothèque Nationale du Royaume du Maroc
+                  {t('header.title')}
                 </h1>
                 <Crown className="h-10 w-10 text-gold animate-pulse drop-shadow-lg" />
               </div>
@@ -91,7 +91,7 @@ const Index = () => {
                   <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-25 rounded-3xl"></div>
                   <div className="max-w-2xl mx-auto relative bg-gradient-mosaique backdrop-blur-md p-8 rounded-3xl shadow-mosaique border-3 border-gold/25">
                     <h2 className="text-2xl font-moroccan font-bold text-foreground mb-4">
-                      Recherchez dans nos collections
+                      {t('header.search')}
                     </h2>
                     <div className="relative">
                       <Input
@@ -128,7 +128,7 @@ const Index = () => {
                         <Sparkles className="absolute -top-3 -right-3 h-8 w-8 text-gold animate-pulse" />
                       </div>
                       <h3 className="text-2xl font-moroccan font-bold text-foreground">
-                        Découvrir la Bibliothèque
+                        {t('nav.discover')}
                       </h3>
                       <p className="text-muted-foreground font-elegant text-lg">
                         Explorez l'histoire, les missions et les services de notre institution millénaire
@@ -175,7 +175,7 @@ const Index = () => {
                         <Star className="absolute -top-2 -right-2 h-6 w-6 text-gold fill-gold/70 animate-pulse" />
                       </div>
                       <h3 className="text-xl font-moroccan font-bold text-white">
-                        Explorer le Patrimoine
+                        {t('nav.explore')}
                       </h3>
                       <p className="text-white/95 font-elegant">
                         Collections manuscrites, fonds documentaires et trésors numériques
@@ -196,7 +196,7 @@ const Index = () => {
                         <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-pulse" />
                       </div>
                       <h3 className="text-xl font-moroccan font-bold text-foreground">
-                        Accéder à nos Services
+                        {t('nav.services')}
                       </h3>
                       <p className="text-muted-foreground font-elegant">
                         Inscription, réservation, dépôt légal et services numériques
@@ -325,7 +325,6 @@ const Index = () => {
           <Footer />
         </div>
       </div>
-    </LanguageProvider>
   );
 };
 

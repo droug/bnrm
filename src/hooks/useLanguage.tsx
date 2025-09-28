@@ -823,7 +823,15 @@ const translations = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('fr');
+  const [language, setLanguage] = useState<Language>(() => {
+    const savedLanguage = localStorage.getItem('bnrm-language');
+    return (savedLanguage as Language) || 'fr';
+  });
+
+  const handleSetLanguage = (lang: Language) => {
+    setLanguage(lang);
+    localStorage.setItem('bnrm-language', lang);
+  };
 
   const t = (key: string): string => {
     return translations[language][key] || key;
@@ -837,7 +845,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, [language, isRTL]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, isRTL }}>
+    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t, isRTL }}>
       {children}
     </LanguageContext.Provider>
   );
