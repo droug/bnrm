@@ -1265,6 +1265,19 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_admin_profile_summary: {
+        Args: { user_uuid: string }
+        Returns: {
+          created_at: string
+          first_name: string
+          institution: string
+          is_approved: boolean
+          last_name: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }[]
+      }
       get_profile_permissions: {
         Args: { user_uuid: string }
         Returns: Json
