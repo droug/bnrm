@@ -150,17 +150,32 @@ const Header = () => {
 
         {/* Navigation principale compacte */}
         <div className="flex items-center justify-between py-4 relative">
-          {/* Logo compact avec effet hover */}
-          <Link to="/" className="flex items-center hover:scale-105 transition-all duration-300 group">
-            <div className="w-20 h-20 flex items-center justify-center relative">
-              <div className="absolute inset-0 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-all duration-300"></div>
-              <img 
-                src={logoImage} 
-                alt="Logo BNRM" 
-                className="h-16 w-auto object-contain relative z-10 drop-shadow-lg"
-              />
-            </div>
-          </Link>
+          {/* Bouton Retour + Logo BNRM */}
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => window.history.back()}
+              className="flex items-center space-x-2 hover:bg-accent transition-all duration-300"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="hidden sm:inline">Retour</span>
+            </Button>
+            
+            {/* Logo compact avec effet hover */}
+            <Link to="/" className="flex items-center hover:scale-105 transition-all duration-300 group">
+              <div className="w-20 h-20 flex items-center justify-center relative">
+                <div className="absolute inset-0 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-all duration-300"></div>
+                <img 
+                  src={logoImage} 
+                  alt="Logo BNRM" 
+                  className="h-16 w-auto object-contain relative z-10 drop-shadow-lg"
+                />
+              </div>
+            </Link>
+          </div>
 
           {/* Navigation Desktop agrandie et améliorée */}
           <NavigationMenu className="hidden md:flex">

@@ -23,6 +23,7 @@ import {
   Globe
 } from "lucide-react";
 import { WatermarkContainer } from "@/components/ui/watermark";
+import { AdminHeader } from "@/components/AdminHeader";
 import { BNRMDashboard } from "@/components/bnrm/BNRMDashboard";
 import { BNRMRequestManager } from "@/components/bnrm/BNRMRequestManager";
 import { BNRMNumberAttribution } from "@/components/bnrm/BNRMNumberAttribution";
@@ -59,50 +60,12 @@ export default function BNRMBackOffice() {
       }}
     >
       <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-          <div className="container flex h-16 items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => window.history.back()}
-                className="flex items-center space-x-2 hover:bg-accent"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                <span>{t('bnrm.back.btn')}</span>
-              </Button>
-              <div className="flex items-center space-x-2">
-                <BookOpen className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">BNRM - Système BNRM</span>
-                <Badge variant="outline" className="ml-2">
-                  Système de Gestion du Dépôt Légal
-                </Badge>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">
-                  {profile?.first_name} {profile?.last_name}
-                </span>
-                <Badge variant="default">
-                  {profile?.role === 'admin' ? 'Administrateur' : 'Agent DL'}
-                </Badge>
-              </div>
-              
-              <Button variant="outline" size="sm">
-                <Bell className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Notifications</span>
-              </Button>
-              
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Paramètres</span>
-              </Button>
-            </div>
-          </div>
-        </header>
+        {/* Header standardisé */}
+        <AdminHeader 
+          title="BNRM - Système BNRM"
+          badgeText="Système de Gestion du Dépôt Légal"
+          subtitle="Interface de gestion complète du dépôt légal BNRM"
+        />
 
         {/* Main Content */}
         <main className="container py-6">

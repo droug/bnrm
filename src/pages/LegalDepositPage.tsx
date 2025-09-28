@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Navigate } from "react-router-dom";
 import LegalDepositBackoffice from "@/components/LegalDepositBackoffice";
-import Header from "@/components/Header";
+import { AdminHeader } from "@/components/AdminHeader";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 
 const LegalDepositPage = () => {
@@ -67,7 +67,12 @@ const LegalDepositPage = () => {
       }}
     >
       <div className="min-h-screen bg-background">
-        <Header />
+        {/* Header standardisé */}
+        <AdminHeader 
+          title="Backoffice Dépôt Légal"
+          badgeText="Workflow CPS"
+          subtitle="Interface de gestion des dépôts légaux et processus CPS"
+        />
         
         <main className="container py-8">
           {/* Breadcrumb Navigation */}

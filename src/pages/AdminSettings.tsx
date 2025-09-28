@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
+import { AdminHeader } from "@/components/AdminHeader";
 import { useNavigate } from "react-router-dom";
 
 export default function AdminSettings() {
@@ -69,26 +70,11 @@ export default function AdminSettings() {
       }}
     >
       <div className="min-h-screen bg-background">
-        {/* Header with breadcrumb */}
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container flex h-16 items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate(-1)}
-                className="flex items-center space-x-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                <span>Retour</span>
-              </Button>
-              <div className="flex items-center space-x-2">
-                <Settings className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">Paramétrage et Administration</span>
-              </div>
-            </div>
-          </div>
-        </header>
+        {/* Header standardisé */}
+        <AdminHeader 
+          title="Paramétrage et Administration"
+          subtitle="Gérez les paramètres système et les fonctionnalités administratives"
+        />
 
         {/* Main Content */}
         <main className="container py-8">
