@@ -111,7 +111,7 @@ export default function BNRMBackOffice() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">
-                  {t('bnrm.backoffice.title')}
+                  {t('bnrm.backoffice.subtitle')}
                 </h1>
                 <p className="text-muted-foreground mt-2">
                   {t('bnrm.backoffice.subtitle')}
