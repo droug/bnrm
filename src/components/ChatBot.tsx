@@ -50,11 +50,15 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [signLanguageEnabled, setSignLanguageEnabled] = useState(false);
   const [currentBotMessage, setCurrentBotMessage] = useState('');
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const chatWindowRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom when new message is added
   useEffect(() => {
@@ -287,16 +291,74 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  // Fonctions de drag and drop
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    });
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging) return;
+    
+    const newX = e.clientX - dragStart.x;
+    const newY = e.clientY - dragStart.y;
+    
+    // Limiter la position dans la fenêtre
+    const maxX = window.innerWidth - 400; // largeur de la fenêtre
+    const maxY = window.innerHeight - 750; // hauteur de la fenêtre
+    
+    setPosition({
+      x: Math.max(0, Math.min(newX, maxX)),
+      y: Math.max(0, Math.min(newY, maxY))
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, dragStart]);
+
   if (!isOpen) return null;
 
   return (
-    <Card className="fixed-chat top-16 right-4 w-96 max-w-[calc(100vw-2rem)] h-[750px] max-h-[calc(100vh-5rem)] shadow-2xl border-2 border-primary/30 bg-background/95 backdrop-blur-lg sm:w-96 w-[95vw] transition-all duration-300 transform-gpu">
-      <CardContent className="p-0 h-full flex flex-col overflow-hidden relative">
+    <div
+      ref={chatWindowRef}
+      className="fixed shadow-2xl border-2 border-primary/30 bg-background/95 backdrop-blur-lg transition-all duration-300 transform-gpu rounded-lg overflow-hidden"
+      style={{
+        left: `${16 + position.x}px`,
+        top: `${64 + position.y}px`,
+        width: window.innerWidth < 640 ? 'calc(100vw - 2rem)' : '384px',
+        height: '750px',
+        maxHeight: 'calc(100vh - 5rem)',
+        zIndex: 99999,
+        cursor: isDragging ? 'grabbing' : 'default'
+      }}
+    >
+      <div className="p-0 h-full flex flex-col overflow-hidden relative">
         {/* Barre de déplacement */}
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-primary/30 rounded-full mt-2 cursor-move"></div>
+        <div 
+          className="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-primary/30 rounded-full mt-2 cursor-grab active:cursor-grabbing"
+          onMouseDown={handleMouseDown}
+        ></div>
         
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary/10 to-secondary/10 backdrop-blur-sm">
+        <div 
+          className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary/10 to-secondary/10 backdrop-blur-sm cursor-grab active:cursor-grabbing"
+          onMouseDown={handleMouseDown}
+        >
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
               <Bot className="w-4 h-4 text-white" />
@@ -347,11 +409,17 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
         {/* Avatar pour la langue des signes */}
         {signLanguageEnabled && (
           <div className="border-b bg-gradient-to-br from-blue-50/50 to-purple-50/50 p-2">
-            <SimpleAvatar 
-              isActive={signLanguageEnabled}
-              currentText={messages.filter(m => m.sender === 'bot').slice(-1)[0]?.content || ''}
-              language={language}
-            />
+            <div className="w-full h-64 bg-gradient-to-br from-blue-500/20 via-purple-500/10 to-pink-500/20 rounded-xl overflow-hidden relative shadow-2xl border border-primary/20 flex items-center justify-center">
+              {/* Avatar simple visible */}
+              <div className="text-center">
+                <div className="text-6xl mb-2 animate-bounce">🤖</div>
+                <div className="text-lg font-semibold text-blue-600 mb-2">Assistant IA</div>
+                <div className="flex items-center justify-center gap-2 bg-black/20 backdrop-blur-md rounded-full px-3 py-1">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-white font-semibold">Actif</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -461,8 +529,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
             </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
