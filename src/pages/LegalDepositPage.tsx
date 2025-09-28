@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Navigate } from "react-router-dom";
-import LegalDepositManager from "@/components/LegalDepositManager";
+import LegalDepositBackoffice from "@/components/LegalDepositBackoffice";
 import Header from "@/components/Header";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 
@@ -60,7 +60,7 @@ const LegalDepositPage = () => {
   return (
     <WatermarkContainer 
       watermarkProps={{ 
-        text: "BNRM Legal Deposit - Dépôt Légal", 
+        text: "BNRM Legal Deposit - Workflow CPS", 
         variant: "subtle", 
         position: "corner",
         opacity: 0.03
@@ -84,7 +84,7 @@ const LegalDepositPage = () => {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Gestion du Dépôt Légal</BreadcrumbPage>
+                  <BreadcrumbPage>Backoffice Dépôt Légal</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -95,10 +95,10 @@ const LegalDepositPage = () => {
               <div>
                 <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
                   <Scale className="h-8 w-8 text-primary" />
-                  Gestion du Dépôt Légal BNRM
+                  Backoffice Dépôt Légal - CPS Conforme
                 </h1>
                 <p className="text-muted-foreground mt-2">
-                  Procédure P1: Attribution du n° Dépôt Légal - Système de gestion complet
+                  Workflow complet : Professionnel A & B, Validation 4 niveaux, Attribution automatique DL/ISBN/ISSN/ISMN
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -112,8 +112,8 @@ const LegalDepositPage = () => {
             </div>
           </div>
 
-          {/* Legal Deposit Manager Component */}
-          <LegalDepositManager />
+          {/* Nouveau Backoffice Dépôt Légal conforme au CPS */}
+          <LegalDepositBackoffice />
         </main>
       </div>
     </WatermarkContainer>
