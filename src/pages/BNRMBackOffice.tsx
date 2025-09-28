@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Navigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ import { BNRMWorkflowManager } from "@/components/bnrm/BNRMWorkflowManager";
 
 export default function BNRMBackOffice() {
   const { user, profile, loading } = useAuth();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("dashboard");
 
   if (loading) {
@@ -68,7 +70,7 @@ export default function BNRMBackOffice() {
                 className="flex items-center space-x-2 hover:bg-accent"
               >
                 <ArrowLeft className="h-4 w-4" />
-                <span>Retour</span>
+                <span>{t('bnrm.back.btn')}</span>
               </Button>
               <div className="flex items-center space-x-2">
                 <BookOpen className="h-6 w-6 text-primary" />
@@ -109,10 +111,10 @@ export default function BNRMBackOffice() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">
-                  BNRM - Dépôt Légal
+                  {t('bnrm.backoffice.title')}
                 </h1>
                 <p className="text-muted-foreground mt-2">
-                  Interface de gestion complète pour le processus de dépôt légal conforme aux exigences CPS
+                  {t('bnrm.backoffice.subtitle')}
                 </p>
               </div>
               
@@ -123,7 +125,7 @@ export default function BNRMBackOffice() {
                   className="hover:bg-accent"
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  Rapports
+                  {t('bnrm.reports.btn')}
                 </Button>
                 <Button 
                   variant="outline"
@@ -131,7 +133,7 @@ export default function BNRMBackOffice() {
                   className="hover:bg-accent"
                 >
                   <Globe className="w-4 h-4 mr-2" />
-                  Portail Public
+                  {t('bnrm.publicPortal.btn')}
                 </Button>
               </div>
             </div>
@@ -141,11 +143,11 @@ export default function BNRMBackOffice() {
               <TabsList className="grid w-full grid-cols-7">
                 <TabsTrigger value="dashboard" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
-                  <span className="hidden lg:inline">Tableau de bord</span>
+                  <span className="hidden lg:inline">{t('bnrm.dashboard.tab')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="requests" className="flex items-center gap-2">
                   <FileText className="h-4 w-4" />
-                  <span className="hidden lg:inline">Demandes</span>
+                  <span className="hidden lg:inline">{t('bnrm.requests.tab')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="attribution" className="flex items-center gap-2">
                   <Hash className="h-4 w-4" />
@@ -157,11 +159,11 @@ export default function BNRMBackOffice() {
                 </TabsTrigger>
                 <TabsTrigger value="workflow" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
-                  <span className="hidden lg:inline">Workflow</span>
+                  <span className="hidden lg:inline">{t('bnrm.workflow.tab')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="reports" className="flex items-center gap-2">
                   <Database className="h-4 w-4" />
-                  <span className="hidden lg:inline">Rapports</span>
+                  <span className="hidden lg:inline">{t('bnrm.reports.tab')}</span>
                 </TabsTrigger>
               </TabsList>
 

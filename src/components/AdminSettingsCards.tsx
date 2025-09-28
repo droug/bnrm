@@ -2,20 +2,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Settings, Shield, FileText, Clock, Archive, Scale, Edit } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export function AdminSettingsCards() {
+  const { t } = useLanguage();
+  
   const adminCards = [
     {
       icon: Shield,
-      title: "Gestion des Droits et Permissions",
-      description: "Gérer les rôles utilisateurs et les permissions d'accès",
+      title: t('admin.permissions.title'),
+      description: t('admin.permissions.description'),
       href: "/settings",
       permission: "users.manage"
     },
     {
       icon: FileText,
-      title: "Gestion de contenu",
-      description: "Créer et modérer les actualités, événements et expositions",
+      title: t('admin.content.title'),
+      description: t('admin.content.description'),
       href: "/admin/content",
       permission: "content.manage"
     },
@@ -28,15 +31,15 @@ export function AdminSettingsCards() {
     },
     {
       icon: Scale,
-      title: "Dépôt légal",
-      description: "Gérer le processus de dépôt légal et les soumissions",
+      title: t('admin.legal.deposit.title'),
+      description: t('admin.legal.deposit.description'),
       href: "/admin/legal-deposit",
       permission: "legal_deposit.manage"
     },
     {
       icon: Archive,
-      title: "Archivage",
-      description: "Configurer l'archivage automatique du contenu",
+      title: t('admin.archiving.title'),
+      description: t('admin.archiving.description'),
       href: "/admin/archiving",
       permission: "content.archive"
     },
@@ -49,8 +52,8 @@ export function AdminSettingsCards() {
     },
     {
       icon: Settings,
-      title: "Gestion des Tarifs BNRM",
-      description: "Gérer les tarifs et services de la BNRM",
+      title: t('admin.bnrm.tariffs.title'),
+      description: t('admin.bnrm.tariffs.description'),
       href: "/admin/bnrm-tariffs",
       permission: "content.manage"
     }
@@ -60,7 +63,7 @@ export function AdminSettingsCards() {
     <div className="space-y-6">
       <div className="flex items-center space-x-2 mb-6">
         <Settings className="h-6 w-6 text-primary" />
-        <h2 className="text-2xl font-bold">Administration et Paramétrage</h2>
+        <h2 className="text-2xl font-bold">{t('admin.settings.title')}</h2>
       </div>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -82,7 +85,7 @@ export function AdminSettingsCards() {
                   variant="outline"
                   onClick={() => window.location.href = card.href}
                 >
-                  Accéder
+                  {t('common.view')}
                 </Button>
               </CardContent>
             </Card>
