@@ -8,6 +8,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { 
   Accessibility, 
   RotateCcw, 
@@ -106,21 +112,29 @@ export const AccessibilityToolkit = () => {
   };
 
   return (
-    <>
+    <TooltipProvider>
       {/* Bouton dans le header */}
-      <Button
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('Accessibility button clicked, setting isOpen to true');
-          setIsOpen(true);
-        }}
-        variant="ghost"
-        size="sm"
-        className="text-muted-foreground hover:text-foreground flex items-center gap-1"
-      >
-        <Accessibility className="h-4 w-4" />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Accessibility button clicked, setting isOpen to true');
+              setIsOpen(true);
+            }}
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center gap-2 px-2 py-1.5"
+          >
+            <Accessibility className="h-4 w-4" />
+            <span className="hidden sm:inline text-xs">Accessibilité</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Outils d'accessibilité</p>
+        </TooltipContent>
+      </Tooltip>
 
       {/* Dialog d'accessibilité */}
       <Dialog open={isOpen} onOpenChange={(open) => {
@@ -308,6 +322,6 @@ export const AccessibilityToolkit = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </TooltipProvider>
   );
 };
