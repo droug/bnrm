@@ -128,10 +128,10 @@ export default function UserManagement() {
 
   const fetchData = async () => {
     try {
-      // Fetch all users
+      // Fetch all users - RLS will ensure only admins can see this data
       const { data: usersData, error: usersError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, user_id, first_name, last_name, phone, institution, research_field, role, is_approved, created_at, updated_at, subscription_type, partner_organization, research_specialization, access_level_details, profile_preferences')
         .order('created_at', { ascending: false });
 
       if (usersError) throw usersError;
