@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Crown, Gem } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,19 @@ const Index = () => {
   const { t } = useLanguage(); // Utiliser le hook au lieu de créer un nouveau provider
   const [showLegalDeposit, setShowLegalDeposit] = useState(false);
   const [selectedDepositType, setSelectedDepositType] = useState<"monographie" | "periodique" | "bd_logiciels" | "collections_specialisees" | null>(null);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+
+  // Vérifier si le popup d'accueil doit être affiché
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem('bnrm-welcome-popup-dismissed');
+    if (!hasSeenWelcome) {
+      // Attendre un petit délai pour une meilleure expérience utilisateur
+      const timer = setTimeout(() => {
+        setShowWelcomePopup(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const handleLegalDepositClick = (type: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees") => {
     setSelectedDepositType(type);
@@ -34,6 +48,12 @@ const Index = () => {
   }
 
   return (
+    <>
+      {/* Popup d'accueil */}
+      <WelcomePopup 
+        isOpen={showWelcomePopup} 
+        onClose={() => setShowWelcomePopup(false)} 
+      />
       <div className="min-h-screen bg-background relative overflow-hidden">
         {/* Arrière-plan de la page avec mosaïques zellige raffinées */}
         <div className="fixed inset-0 z-0">
@@ -325,6 +345,7 @@ const Index = () => {
           <Footer />
         </div>
       </div>
+    </>
   );
 };
 
