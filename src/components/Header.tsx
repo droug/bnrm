@@ -38,52 +38,71 @@ const Header = () => {
         opacity: 0.03
       }}
     >
-      <header className="sticky top-0 z-50 bg-background border-b-2 border-primary/20 shadow-xl">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b-4 border-primary/30 shadow-2xl">
       <div className="container mx-auto px-4">
-        {/* Bannière plus visible et colorée */}
-        <div className="flex justify-between items-center py-6 text-sm bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-b-2 border-primary/30">
-          <div className="flex items-center gap-4">
-            <span className="text-foreground font-bold text-lg tracking-wide">{t('header.title')}</span>
+        {/* Bannière agrandie et plus attractive */}
+        <div className="flex justify-between items-center py-8 text-base bg-gradient-to-r from-primary/20 via-secondary/15 to-primary/20 border-b-4 border-primary/40 relative overflow-hidden">
+          {/* Effet de fond décoratif */}
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 animate-pulse"></div>
+          <div className="absolute top-0 left-1/4 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-24 h-24 bg-secondary/10 rounded-full blur-2xl"></div>
+          
+          <div className="flex items-center gap-6 relative z-10">
+            <div className="flex flex-col">
+              <span className="text-foreground font-bold text-2xl tracking-wide mb-1 animate-fade-in">
+                {t('header.title')}
+              </span>
+              <span className="text-muted-foreground text-sm italic">
+                Bibliothèque Nationale du Royaume du Maroc
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
+          
+          <div className="flex items-center gap-6 relative z-10">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-muted-foreground hover:text-foreground flex items-center gap-1"
+                  variant="outline" 
+                  size="lg" 
+                  className="text-foreground border-primary/30 hover:border-primary bg-background/80 backdrop-blur-sm hover:bg-primary/10 flex items-center gap-2 px-4 py-2 transition-all duration-300 hover:scale-105"
                 >
-                  <Globe className="h-4 w-4" />
-                  {language === 'ar' && 'العربية'}
-                  {language === 'ber' && 'ⵜⴰⵎⴰⵣⵉⵖⵜ'}
-                  {language === 'fr' && 'Français'}
-                  {language === 'en' && 'English'}
-                  <ChevronDown className="h-3 w-3" />
+                  <Globe className="h-5 w-5" />
+                  <span className="font-medium">
+                    {language === 'ar' && 'العربية'}
+                    {language === 'ber' && 'ⵜⴰⵎⴰⵣⵉⵖⵜ'}
+                    {language === 'fr' && 'Français'}
+                    {language === 'en' && 'English'}
+                  </span>
+                  <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-card border border-border shadow-moroccan">
+              <DropdownMenuContent className="bg-background/95 backdrop-blur-lg border border-primary/20 shadow-2xl min-w-[180px] z-50">
                 <DropdownMenuItem 
                   onClick={() => setLanguage('ar')}
-                  className={`cursor-pointer ${language === 'ar' ? 'bg-accent text-accent-foreground' : ''}`}
+                  className={`cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10 ${language === 'ar' ? 'bg-primary/20 text-primary font-medium' : ''}`}
                 >
+                  <span className="mr-3">🇲🇦</span>
                   العربية
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => setLanguage('ber')}
-                  className={`cursor-pointer ${language === 'ber' ? 'bg-accent text-accent-foreground' : ''}`}
+                  className={`cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10 ${language === 'ber' ? 'bg-primary/20 text-primary font-medium' : ''}`}
                 >
+                  <span className="mr-3">ⵣ</span>
                   ⵜⴰⵎⴰⵣⵉⵖⵜ
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => setLanguage('fr')}
-                  className={`cursor-pointer ${language === 'fr' ? 'bg-accent text-accent-foreground' : ''}`}
+                  className={`cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10 ${language === 'fr' ? 'bg-primary/20 text-primary font-medium' : ''}`}
                 >
+                  <span className="mr-3">🇫🇷</span>
                   Français
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => setLanguage('en')}
-                  className={`cursor-pointer ${language === 'en' ? 'bg-accent text-accent-foreground' : ''}`}
+                  className={`cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10 ${language === 'en' ? 'bg-primary/20 text-primary font-medium' : ''}`}
                 >
+                  <span className="mr-3">🇺🇸</span>
                   English
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -93,105 +112,106 @@ const Header = () => {
             
             {user ? (
               <Link to="/dashboard">
-                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">
+                <Button variant="default" size="lg" className="flex items-center gap-2 px-6 py-2 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                  <User className="h-5 w-5" />
+                  <span className="hidden sm:inline font-medium">
                     {profile?.first_name || 'Dashboard'}
                   </span>
                 </Button>
               </Link>
             ) : (
               <Link to="/auth">
-                <Button size="sm" className="flex items-center space-x-2">
-                  <LogIn className="h-4 w-4" />
-                  <span>{t('nav.login')}</span>
+                <Button size="lg" className="flex items-center gap-2 px-6 py-2 transition-all duration-300 hover:scale-105 hover:shadow-lg bg-primary hover:bg-primary/90">
+                  <LogIn className="h-5 w-5" />
+                  <span className="font-medium">{t('nav.login')}</span>
                 </Button>
               </Link>
             )}
           </div>
         </div>
 
-        {/* Main navigation - Logo plus grand */}
-        <div className="flex items-center justify-between py-8">
-          {/* Logo seul, plus grand */}
-          <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
-            <div className="w-24 h-24 flex items-center justify-center">
+        {/* Navigation principale agrandie */}
+        <div className="flex items-center justify-between py-12 relative">
+          {/* Logo agrandi avec effet hover */}
+          <Link to="/" className="flex items-center hover:scale-105 transition-all duration-300 group">
+            <div className="w-36 h-36 flex items-center justify-center relative">
+              <div className="absolute inset-0 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-all duration-300"></div>
               <img 
                 src={logoImage} 
                 alt="Logo BNRM" 
-                className="h-22 w-auto object-contain"
+                className="h-32 w-auto object-contain relative z-10 drop-shadow-lg"
               />
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Navigation Desktop agrandie et améliorée */}
           <NavigationMenu className="hidden md:flex">
-            <NavigationMenuList className="space-x-6">
+            <NavigationMenuList className="space-x-8">
               {/* Découvrir la Bibliothèque */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
-                  <BookOpen className="w-4 h-4 mr-2" />
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground hover:text-primary font-semibold text-lg px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-primary/20">
+                  <BookOpen className="w-5 h-5 mr-3" />
                   {t('nav.discover')}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="grid gap-3 p-6 w-[600px] md:w-[700px] lg:grid-cols-2 bg-card border border-border rounded-lg shadow-moroccan">
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">{t('nav.practical.info')}</h4>
+                  <div className="grid gap-4 p-8 w-[700px] md:w-[800px] lg:grid-cols-2 bg-background/95 backdrop-blur-lg border-2 border-primary/20 rounded-2xl shadow-2xl">
+                    <div className="space-y-4">
+                      <h4 className="text-lg font-bold text-primary mb-4 border-b border-primary/20 pb-2">{t('nav.practical.info')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/informations-pratiques" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.schedules.access')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        <a href="/informations-pratiques" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
+                          <div className="text-base font-semibold leading-none">{t('nav.schedules.access')}</div>
+                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                             Heures d'ouverture et plan d'accès
                           </p>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/services-tarifs" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.services.catalog')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        <a href="/services-tarifs" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
+                          <div className="text-base font-semibold leading-none">{t('nav.services.catalog')}</div>
+                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                             Services proposés et grilles tarifaires
                           </p>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/visites-virtuelles" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.virtual.tours')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        <a href="/visites-virtuelles" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
+                          <div className="text-base font-semibold leading-none">{t('nav.virtual.tours')}</div>
+                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                             Découverte virtuelle de nos espaces
                           </p>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/donateurs" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.donors')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        <a href="/donateurs" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
+                          <div className="text-base font-semibold leading-none">{t('nav.donors')}</div>
+                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                             Recherche par donateur/œuvre
                           </p>
                         </a>
                       </NavigationMenuLink>
                     </div>
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">{t('nav.history.missions')}</h4>
+                    <div className="space-y-4">
+                      <h4 className="text-lg font-bold text-primary mb-4 border-b border-primary/20 pb-2">{t('nav.history.missions')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/histoire" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.library.history')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        <a href="/histoire" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
+                          <div className="text-base font-semibold leading-none">{t('nav.library.history')}</div>
+                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                             Missions et valeurs prônées
                           </p>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/mot-direction" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.management.message')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        <a href="/mot-direction" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
+                          <div className="text-base font-semibold leading-none">{t('nav.management.message')}</div>
+                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                             Message de notre directeur
                           </p>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/organigramme" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.organization.chart')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        <a href="/organigramme" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
+                          <div className="text-base font-semibold leading-none">{t('nav.organization.chart')}</div>
+                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                             Structure organisationnelle
                           </p>
                         </a>
@@ -203,12 +223,12 @@ const Header = () => {
 
               {/* Accéder à nos services */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
-                  <Users className="w-4 h-4 mr-2" />
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground hover:text-primary font-semibold text-lg px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-primary/20">
+                  <Users className="w-5 h-5 mr-3" />
                   {t('nav.services')}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="grid gap-3 p-6 w-[600px] md:w-[700px] lg:grid-cols-2 bg-card border border-border rounded-lg shadow-moroccan">
+                  <div className="grid gap-4 p-8 w-[700px] md:w-[800px] lg:grid-cols-2 bg-background/95 backdrop-blur-lg border-2 border-primary/20 rounded-2xl shadow-2xl">
                     <div className="space-y-3">
                       <h4 className="text-sm font-medium text-primary mb-3">{t('nav.inscription.access')}</h4>
                       <NavigationMenuLink asChild>
@@ -283,17 +303,17 @@ const Header = () => {
 
               {/* Explorer le patrimoine */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
-                  <Book className="w-4 h-4 mr-2" />
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground hover:text-primary font-semibold text-lg px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-primary/20">
+                  <Book className="w-5 h-5 mr-3" />
                   {t('nav.explore')}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="grid gap-3 p-6 w-[700px] md:w-[900px] lg:grid-cols-3 bg-card border border-border rounded-lg shadow-moroccan">
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">{t('nav.collections')}</h4>
+                  <div className="grid gap-4 p-8 w-[800px] md:w-[1000px] lg:grid-cols-3 bg-background/95 backdrop-blur-lg border-2 border-primary/20 rounded-2xl shadow-2xl">
+                    <div className="space-y-4">
+                      <h4 className="text-lg font-bold text-primary mb-4 border-b border-primary/20 pb-2">{t('nav.collections')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/collections-specialisees" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.specialized.collections')}</div>
+                        <a href="/collections-specialisees" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
+                          <div className="text-base font-semibold leading-none">{t('nav.specialized.collections')}</div>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
@@ -383,12 +403,12 @@ const Header = () => {
 
               {/* Consulter nos actualités */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
-                  <Calendar className="w-4 h-4 mr-2" />
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground hover:text-primary font-semibold text-lg px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-primary/20">
+                  <Calendar className="w-5 h-5 mr-3" />
                   {t('nav.consult.news')}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="grid gap-3 p-6 w-[500px] md:w-[600px] lg:grid-cols-2 bg-card border border-border rounded-lg shadow-moroccan">
+                  <div className="grid gap-4 p-8 w-[600px] md:w-[700px] lg:grid-cols-2 bg-background/95 backdrop-blur-lg border-2 border-primary/20 rounded-2xl shadow-2xl">
                     <div className="space-y-3">
                       <h4 className="text-sm font-medium text-primary mb-3">{t('nav.news.section')}</h4>
                       <NavigationMenuLink asChild>
@@ -425,12 +445,12 @@ const Header = () => {
 
               {/* Collaborer avec nous */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
-                  <Building className="w-4 h-4 mr-2" />
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground hover:text-primary font-semibold text-lg px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-primary/20">
+                  <Building className="w-5 h-5 mr-3" />
                   {t('nav.collaborate')}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="grid gap-3 p-6 w-[400px] bg-card border border-border rounded-lg shadow-moroccan">
+                  <div className="grid gap-4 p-8 w-[500px] bg-background/95 backdrop-blur-lg border-2 border-primary/20 rounded-2xl shadow-2xl">
                     <NavigationMenuLink asChild>
                       <a href="/collaborations-nationales" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                         <div className="text-sm font-medium leading-none">{t('nav.national.collaborations')}</div>
@@ -453,59 +473,87 @@ const Header = () => {
             </NavigationMenuList>
           </NavigationMenu>
 
-          {/* Search and Mobile Menu */}
-          <div className="flex items-center space-x-4">
-            <div className="hidden sm:block w-64">
+          {/* Search and Mobile Menu améliorés */}
+          <div className="flex items-center space-x-6">
+            <div className="hidden sm:block w-80">
               <SearchBar 
                 variant="compact"
                 showSuggestions={true}
-                className="w-full"
+                className="w-full border-2 border-primary/20 rounded-xl hover:border-primary/40 transition-all duration-300"
               />
             </div>
             
             <Button
-              variant="ghost"
-              size="sm"
-              className="md:hidden"
+              variant="outline"
+              size="lg"
+              className="md:hidden border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 hover:scale-105"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
 
-        {/* Mobile Search */}
-        <div className="pb-4 sm:hidden">
+        {/* Mobile Search améliorée */}
+        <div className="pb-6 sm:hidden">
           <SearchBar 
             variant="compact"
             showSuggestions={true}
-            className="w-full"
+            className="w-full border-2 border-primary/20 rounded-xl"
           />
         </div>
       </div>
 
-      {/* Mobile Navigation Menu */}
+      {/* Menu Mobile Navigation amélioré */}
       {isMenuOpen && (
-        <div className="md:hidden bg-card border-t border-border shadow-elegant animate-fade-in">
-          <nav className="container mx-auto px-4 py-4 space-y-4">
-            <a href="#accueil" className="block py-2 text-foreground hover:text-primary transition-colors font-medium">
-              {t('header.home')}
-            </a>
-            <a href="#catalogue" className="block py-2 text-foreground hover:text-primary transition-colors font-medium">
-              {t('header.catalog')}
-            </a>
-            <a href="#collections" className="block py-2 text-foreground hover:text-primary transition-colors font-medium">
-              {t('header.collections')}
-            </a>
-            <a href="#services" className="block py-2 text-foreground hover:text-primary transition-colors font-medium">
-              {t('header.services')}
-            </a>
-            <a href="#patrimoine" className="block py-2 text-foreground hover:text-primary transition-colors font-medium">
-              {t('header.heritage')}
-            </a>
-            <a href="#contact" className="block py-2 text-foreground hover:text-primary transition-colors font-medium">
-              {t('header.contact')}
-            </a>
+        <div className="md:hidden bg-background/98 backdrop-blur-lg border-t-4 border-primary/30 shadow-2xl animate-slide-in-right">
+          <nav className="container mx-auto px-6 py-8 space-y-6">
+            {/* Liens principaux avec icônes */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-primary border-b border-primary/20 pb-2">Navigation</h3>
+              
+              <Link to="/" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
+                <BookOpen className="w-5 h-5" />
+                <span className="font-medium">{t('nav.discover')}</span>
+              </Link>
+              
+              <a href="/services" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
+                <Users className="w-5 h-5" />
+                <span className="font-medium">{t('nav.services')}</span>
+              </a>
+              
+              <a href="/collections" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
+                <Book className="w-5 h-5" />
+                <span className="font-medium">{t('nav.explore')}</span>
+              </a>
+              
+              <a href="/news" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
+                <Calendar className="w-5 h-5" />
+                <span className="font-medium">{t('nav.consult.news')}</span>
+              </a>
+              
+              <a href="/collaboration" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
+                <Building className="w-5 h-5" />
+                <span className="font-medium">{t('nav.collaborate')}</span>
+              </a>
+            </div>
+
+            {/* Section contact rapide */}
+            <div className="space-y-3 pt-4 border-t border-primary/20">
+              <h4 className="text-base font-semibold text-primary">Contact rapide</h4>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Phone className="w-4 h-4" />
+                <span>+212 5 37 77 30 01</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Mail className="w-4 h-4" />
+                <span>contact@bnrm.ma</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <MapPin className="w-4 h-4" />
+                <span>Rabat, Maroc</span>
+              </div>
+            </div>
           </nav>
         </div>
       )}
