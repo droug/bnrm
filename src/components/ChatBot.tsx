@@ -281,8 +281,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
   if (!isOpen) return null;
 
   return (
-    <Card className="fixed bottom-4 right-4 w-96 h-[600px] shadow-2xl border-2 border-primary/20 bg-background z-[9990]">
-      <CardContent className="p-0 h-full flex flex-col">
+    <Card className="fixed top-20 right-4 w-96 max-w-[calc(100vw-2rem)] h-[600px] max-h-[calc(100vh-6rem)] shadow-2xl border-2 border-primary/20 bg-background z-[9990] sm:w-96 w-[95vw]">
+      <CardContent className="p-0 h-full flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-primary/5">
           <div className="flex items-center gap-2">
@@ -319,7 +319,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
         </div>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 p-4">
+        <ScrollArea className="flex-1 p-4 min-h-0">
           <div className="space-y-4">
             {messages.map((message) => (
               <div
