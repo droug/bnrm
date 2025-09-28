@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -141,6 +142,14 @@ export function BNRMWorkflowManager() {
   const [showAlertsDialog, setShowAlertsDialog] = useState(false);
   const [selectedStepExecution, setSelectedStepExecution] = useState<StepExecution | null>(null);
   const [selectedWorkflowForStart, setSelectedWorkflowForStart] = useState<WorkflowDefinition | null>(null);
+  
+  // Confirmation dialogs
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showToggleConfirm, setShowToggleConfirm] = useState(false);
+  const [showCompleteConfirm, setShowCompleteConfirm] = useState(false);
+  const [showRejectConfirm, setShowRejectConfirm] = useState(false);
+  const [pendingAction, setPendingAction] = useState<any>(null);
+  
   const { toast } = useToast();
 
   // Forms
@@ -519,6 +528,56 @@ export function BNRMWorkflowManager() {
     }
   };
 
+  // Confirmation handlers
+  const confirmDeleteWorkflow = (workflow: WorkflowDefinition) => {
+    setPendingAction({ type: 'delete', workflow });
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmToggleWorkflow = (workflow: WorkflowDefinition) => {
+    setPendingAction({ type: 'toggle', workflow });
+    setShowToggleConfirm(true);
+  };
+
+  const confirmCompleteStep = (stepId: string, status: string) => {
+    setPendingAction({ type: 'complete', stepId, status });
+    if (status === 'completed') {
+      setShowCompleteConfirm(true);
+    } else {
+      setShowRejectConfirm(true);
+    }
+  };
+
+  const executeConfirmedAction = async () => {
+    if (!pendingAction) return;
+
+    try {
+      switch (pendingAction.type) {
+        case 'delete':
+          await deleteWorkflow(pendingAction.workflow.id);
+          break;
+        case 'toggle':
+          await toggleWorkflowStatus(pendingAction.workflow.id, !pendingAction.workflow.is_active);
+          break;
+        case 'complete':
+          await completeStep(pendingAction.stepId, pendingAction.status);
+          break;
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setPendingAction(null);
+      setShowDeleteConfirm(false);
+      setShowToggleConfirm(false);
+      setShowCompleteConfirm(false);
+      setShowRejectConfirm(false);
+    }
+  };
+
   const updateWorkflow = async (workflowId: string, data: Partial<WorkflowFormData>) => {
     try {
       const { error } = await supabase
@@ -570,6 +629,31 @@ export function BNRMWorkflowManager() {
     }
   };
 
+  const toggleWorkflowStatus = async (workflowId: string, isActive: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('workflows')
+        .update({ is_active: isActive })
+        .eq('id', workflowId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: `Workflow ${isActive ? 'activé' : 'désactivé'} avec succès`,
+      });
+
+      loadWorkflowData();
+
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const assignStepToUser = async (data: AssignmentFormData) => {
     try {
       const { error } = await supabase
@@ -601,30 +685,6 @@ export function BNRMWorkflowManager() {
     }
   };
 
-  const toggleWorkflowStatus = async (workflowId: string, isActive: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('workflows')
-        .update({ is_active: !isActive })
-        .eq('id', workflowId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Succès",
-        description: `Workflow ${!isActive ? 'activé' : 'désactivé'}`,
-      });
-
-      loadWorkflowData();
-
-    } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
 
   const completeStep = async (stepExecutionId: string, status: 'completed' | 'rejected', comments?: string) => {
     try {
@@ -767,7 +827,7 @@ export function BNRMWorkflowManager() {
                 Nouveau Workflow
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl bg-background">
+            <DialogContent className="max-w-2xl bg-background max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Créer un nouveau workflow</DialogTitle>
                 <DialogDescription>
@@ -958,19 +1018,15 @@ export function BNRMWorkflowManager() {
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => toggleWorkflowStatus(workflow.id, workflow.is_active)}
+                          onClick={() => confirmToggleWorkflow(workflow)}
                         >
                           {workflow.is_active ? <Pause className="h-4 w-4 mr-1" /> : <Play className="h-4 w-4 mr-1" />}
                           {workflow.is_active ? 'Désactiver' : 'Activer'}
                         </Button>
                         <Button 
-                          variant="outline" 
+                          variant="destructive" 
                           size="sm"
-                          onClick={() => {
-                            if (confirm('Êtes-vous sûr de vouloir supprimer ce workflow ?')) {
-                              deleteWorkflow(workflow.id);
-                            }
-                          }}
+                          onClick={() => confirmDeleteWorkflow(workflow)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -1123,7 +1179,7 @@ export function BNRMWorkflowManager() {
 
       {/* Edit Workflow Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="max-w-2xl bg-background">
+        <DialogContent className="max-w-2xl bg-background max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Modifier le workflow</DialogTitle>
             <DialogDescription>
@@ -1288,7 +1344,7 @@ export function BNRMWorkflowManager() {
 
       {/* Instance Details Dialog */}
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent className="max-w-4xl bg-background">
+        <DialogContent className="max-w-4xl bg-background max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Détails de l'instance de workflow</DialogTitle>
             <DialogDescription>
@@ -1330,7 +1386,7 @@ export function BNRMWorkflowManager() {
                       <div className="flex space-x-2 mt-3">
                         <Button 
                           size="sm" 
-                          onClick={() => completeStep(step.id, 'completed')}
+                          onClick={() => confirmCompleteStep(step.id, 'completed')}
                         >
                           <CheckCircle className="h-4 w-4 mr-1" />
                           Approuver
@@ -1338,7 +1394,7 @@ export function BNRMWorkflowManager() {
                         <Button 
                           variant="destructive" 
                           size="sm"
-                          onClick={() => completeStep(step.id, 'rejected')}
+                          onClick={() => confirmCompleteStep(step.id, 'rejected')}
                         >
                           <XCircle className="h-4 w-4 mr-1" />
                           Rejeter
@@ -1421,7 +1477,7 @@ export function BNRMWorkflowManager() {
 
       {/* Start Workflow Dialog */}
       <Dialog open={showStartDialog} onOpenChange={setShowStartDialog}>
-        <DialogContent className="max-w-3xl bg-background">
+        <DialogContent className="max-w-3xl bg-background max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Démarrer un nouveau workflow</DialogTitle>
             <DialogDescription>
@@ -1705,6 +1761,93 @@ export function BNRMWorkflowManager() {
           </Form>
         </DialogContent>
       </Dialog>
+
+      {/* Confirmation Dialogs */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent className="bg-background">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer le workflow "{pendingAction?.workflow?.name}" ?
+              Cette action est irréversible et supprimera toutes les instances associées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={executeConfirmedAction}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Supprimer définitivement
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showToggleConfirm} onOpenChange={setShowToggleConfirm}>
+        <AlertDialogContent className="bg-background">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingAction?.workflow?.is_active ? 'Désactiver' : 'Activer'} le workflow
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Voulez-vous vraiment {pendingAction?.workflow?.is_active ? 'désactiver' : 'activer'} le workflow 
+              "{pendingAction?.workflow?.name}" ?
+              {pendingAction?.workflow?.is_active && 
+                " Les instances en cours continueront de fonctionner mais aucune nouvelle instance ne pourra être créée."
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={executeConfirmedAction}>
+              {pendingAction?.workflow?.is_active ? 'Désactiver' : 'Activer'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showCompleteConfirm} onOpenChange={setShowCompleteConfirm}>
+        <AlertDialogContent className="bg-background">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer l'approbation</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir approuver cette étape du workflow ?
+              Cette action marquera l'étape comme terminée et passera à l'étape suivante.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={executeConfirmedAction}
+              className="bg-green-600 text-white hover:bg-green-700"
+            >
+              Approuver l'étape
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showRejectConfirm} onOpenChange={setShowRejectConfirm}>
+        <AlertDialogContent className="bg-background">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer le rejet</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir rejeter cette étape du workflow ?
+              Cette action nécessitera une correction avant de pouvoir continuer le processus.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={executeConfirmedAction}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Rejeter l'étape
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
