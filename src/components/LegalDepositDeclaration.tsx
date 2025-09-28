@@ -162,6 +162,928 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     );
   };
 
+  const renderFrenchForm = () => {
+    const renderFormsByType = () => {
+      if (depositType === "monographie") {
+        return (
+          <>
+            {/* Identification de l'auteur */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de l'auteur</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Type de l'auteur</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner le type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="physique">Personne physique</SelectItem>
+                      <SelectItem value="morale">Personne morale (collectivités)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Nom de la collectivité / Nom de l'auteur</Label>
+                  <Input placeholder="Nom complet" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Sigle</Label>
+                  <Input placeholder="Sigle" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Nature du déclarant</Label>
+                  <Input placeholder="Nature du déclarant" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Numéro de téléphone" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Adresse email" />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse complète" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Identification de la publication */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de la publication</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Titre de l'ouvrage</Label>
+                  <Input placeholder="Titre de l'ouvrage" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Type de support</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner le type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="printed">Imprimé</SelectItem>
+                      <SelectItem value="electronic">Électronique</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Titre de la collection</Label>
+                  <Input placeholder="Titre de la collection" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Numéro dans la collection</Label>
+                  <Input placeholder="Numéro dans la collection" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Disciplines de l'ouvrage</Label>
+                  <Input placeholder="Disciplines de l'ouvrage" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Mots clés</Label>
+                  <Input placeholder="Mots clés" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Langue</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner la langue" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="ar">Arabe</SelectItem>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="en">Anglais</SelectItem>
+                      <SelectItem value="ber">Amazigh</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Nombre de volumes</Label>
+                  <Input type="number" placeholder="Nombre de volumes" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Nombre de pages</Label>
+                  <Input type="number" placeholder="Nombre de pages" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Première demande d'ISBN</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="yes">Oui</SelectItem>
+                      <SelectItem value="no">Non</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Résumé de l'ouvrage</Label>
+                  <Textarea placeholder="Résumé de l'ouvrage" rows={4} />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Identification de l'Éditeur */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de l'Éditeur</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Éditeur</Label>
+                  <Input placeholder="Nom de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Téléphone de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Email de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Date prévue de parution</Label>
+                  <Input type="month" placeholder="Date prévue de parution" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Identification de l'imprimeur */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de l'imprimeur</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Imprimerie</Label>
+                  <Input placeholder="Nom de l'imprimerie" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Email de l'imprimerie" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Téléphone de l'imprimerie" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse de l'imprimerie" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Chiffre de tirage</Label>
+                  <Input type="number" placeholder="Chiffre de tirage" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+          </>
+        );
+      }
+
+      if (depositType === "periodique") {
+        return (
+          <>
+            {/* Directeur de la publication */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Directeur de la publication</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Nom et prénom</Label>
+                  <Input placeholder="Nom et prénom" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Téléphone" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Email" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Pseudonyme</Label>
+                  <Input placeholder="Pseudonyme" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Profession</Label>
+                  <Input placeholder="Profession" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Date de naissance</Label>
+                  <Input type="date" placeholder="Date de naissance" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Lieu de naissance</Label>
+                  <Input placeholder="Lieu de naissance" />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Résumé de l'ouvrage</Label>
+                  <Textarea placeholder="Résumé de l'ouvrage" rows={4} />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Identification de la publication */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de la publication</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Type de publication</Label>
+                  <Input placeholder="Type de publication" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Titre du périodique</Label>
+                  <Input placeholder="Titre du périodique" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Type de support</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner le type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="printed">Imprimé</SelectItem>
+                      <SelectItem value="electronic">Électronique</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Discipline</Label>
+                  <Input placeholder="Discipline" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Fascicule N°</Label>
+                  <Input placeholder="Numéro du fascicule" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Périodicité</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner la périodicité" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="daily">Quotidien</SelectItem>
+                      <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                      <SelectItem value="monthly">Mensuel</SelectItem>
+                      <SelectItem value="quarterly">Trimestriel</SelectItem>
+                      <SelectItem value="yearly">Annuel</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Langue</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner la langue" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="ar">Arabe</SelectItem>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="en">Anglais</SelectItem>
+                      <SelectItem value="ber">Amazigh</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Mention d'édition</Label>
+                  <Input placeholder="Mention d'édition" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>URL</Label>
+                  <Input type="url" placeholder="URL du site web" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Identification de l'Éditeur */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de l'Éditeur</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Éditeur</Label>
+                  <Input placeholder="Nom de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Téléphone de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>E-mail</Label>
+                  <Input type="email" placeholder="Email de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Date prévue de parution</Label>
+                  <Input type="month" placeholder="Date prévue de parution" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Identification de l'Imprimeur */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de l'Imprimeur</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Imprimerie</Label>
+                  <Input placeholder="Nom de l'imprimerie" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Email de l'imprimerie" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Téléphone de l'imprimerie" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse de l'imprimerie" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Chiffre de tirage</Label>
+                  <Input type="number" placeholder="Chiffre de tirage" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+          </>
+        );
+      }
+
+      if (depositType === "bd_logiciels") {
+        return (
+          <>
+            {/* Identification de l'auteur */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de l'auteur</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Type de l'auteur</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner le type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="physique">Personne physique</SelectItem>
+                      <SelectItem value="morale">Personne morale (collectivités)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Nom de la collectivité / Nom de l'Auteur</Label>
+                  <Input placeholder="Nom complet" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Sigle</Label>
+                  <Input placeholder="Sigle" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Nature du déclarant</Label>
+                  <Input placeholder="Nature du déclarant" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Numéro de téléphone" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Adresse email" />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse complète" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Identification de la publication */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de la publication</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Titre de la publication</Label>
+                  <Input placeholder="Titre de la publication" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Type de publication</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner le type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="database">Base de données</SelectItem>
+                      <SelectItem value="software">Logiciel</SelectItem>
+                      <SelectItem value="audiovisual">Document audiovisuel</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Langue</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner la langue" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="ar">Arabe</SelectItem>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="en">Anglais</SelectItem>
+                      <SelectItem value="ber">Amazigh</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Disciplines de la publication</Label>
+                  <Input placeholder="Disciplines de la publication" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Mots clés</Label>
+                  <Input placeholder="Mots clés" />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Résumé de la publication</Label>
+                  <Textarea placeholder="Résumé de la publication" rows={4} />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Identification de l'Éditeur */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de l'Éditeur</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Éditeur</Label>
+                  <Input placeholder="Nom de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Téléphone de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Email de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Date prévue de parution</Label>
+                  <Input type="month" placeholder="Date prévue de parution" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Mention d'Edition</Label>
+                  <Input placeholder="Mention d'Edition" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Identification de distributeur */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de distributeur</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Nom de distributeur</Label>
+                  <Input placeholder="Nom du distributeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Email du distributeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Téléphone du distributeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse du distributeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Chiffre de tirage</Label>
+                  <Input type="number" placeholder="Chiffre de tirage" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+          </>
+        );
+      }
+
+      if (depositType === "collections_specialisees") {
+        return (
+          <>
+            {/* Identification de l'auteur */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de l'auteur</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Type de l'auteur</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner le type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="physique">Personne physique</SelectItem>
+                      <SelectItem value="morale">Personne morale (collectivités)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Nom de la collectivité / Nom de l'auteur</Label>
+                  <Input placeholder="Nom complet" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Sigle</Label>
+                  <Input placeholder="Sigle" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Nature du déclarant</Label>
+                  <Input placeholder="Nature du déclarant" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Numéro de téléphone" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Adresse email" />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse complète" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Identification de la publication */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de la publication</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Type de publication</Label>
+                  <Input placeholder="Type de publication" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Titre de la publication</Label>
+                  <Input placeholder="Titre de la publication" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Titre de la collection</Label>
+                  <Input placeholder="Titre de la collection" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Langue</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner la langue" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border shadow-lg z-50">
+                      <SelectItem value="ar">Arabe</SelectItem>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="en">Anglais</SelectItem>
+                      <SelectItem value="ber">Amazigh</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Disciplines de la publication</Label>
+                  <Input placeholder="Disciplines de la publication" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Mots clés</Label>
+                  <Input placeholder="Mots clés" />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Résumé de la publication</Label>
+                  <Textarea placeholder="Résumé de la publication" rows={4} />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Identification de l'Éditeur */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de l'Éditeur</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Éditeur</Label>
+                  <Input placeholder="Nom de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Téléphone de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Email de l'éditeur" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Date prévue de parution</Label>
+                  <Input type="month" placeholder="Date prévue de parution" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Mention d'édition</Label>
+                  <Input placeholder="Mention d'édition" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Identification de l'Imprimeur */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Identification de l'Imprimeur</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Imprimerie</Label>
+                  <Input placeholder="Nom de l'imprimerie" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Email de l'imprimerie" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Téléphone de l'imprimerie" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse de l'imprimerie" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Chiffre de tirage</Label>
+                  <Input type="number" placeholder="Chiffre de tirage" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+          </>
+        );
+      }
+
+      return null;
+    };
+
+    return (
+      <>
+        {renderFormsByType()}
+        
+        {/* Pièces à fournir */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Pièces à fournir</h3>
+          <div className="space-y-4">
+            {renderFileUpload("cover", "Joindre la couverture (format « jpg » moins de 1 MO)", true, "image/jpeg")}
+            
+            {(depositType === "monographie" || depositType === "periodique") && (
+              renderFileUpload("summary", "Joindre le sommaire (format « PDF » moins de 2 MO)", true, "application/pdf")
+            )}
+            
+            {renderFileUpload("cin", "Envoyer une copie de la CIN de l'auteur", true, "image/jpeg,application/pdf")}
+            
+            {depositType === "periodique" && (
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-700">
+                  Pour les périodiques dont l'éditeur n'est pas étatique, il est nécessaire d'envoyer la décision du tribunal de première instance, 
+                  dont le délai de réception ne doit pas excéder une année.
+                </p>
+                {renderFileUpload("court-decision", "Décision du tribunal (pour les périodiques non étatiques)", false, "application/pdf")}
+              </div>
+            )}
+
+            {depositType === "monographie" && (
+              <>
+                {renderFileUpload(
+                  "thesis-recommendation", 
+                  "Recommandation de publication (pour les thèses)", 
+                  false, 
+                  "application/pdf"
+                )}
+                {renderFileUpload(
+                  "quran-authorization", 
+                  "Autorisation de publication de la Fondation Mohammed VI (pour les Corans)", 
+                  false, 
+                  "application/pdf"
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Résumé des fichiers joints */}
+          {Object.keys(uploadedFiles).length > 0 && (
+            <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+              <h4 className="font-medium text-green-800 mb-2">Documents joints :</h4>
+              <div className="space-y-1">
+                {Object.entries(uploadedFiles).map(([type, file]) => (
+                  <div key={type} className="flex items-center text-sm text-green-700">
+                    <CheckCircle className="w-3 h-3 mr-2" />
+                    <span className="font-medium">{type}:</span>
+                    <span className="ml-1">{file.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+            <h4 className="font-semibold mb-2">Adresse d'envoi :</h4>
+            <p className="text-sm text-muted-foreground">
+              Les pièces doivent être envoyées à l'adresse e-mail suivante : <strong>depot.legal@bnrm.ma</strong>
+            </p>
+          </div>
+
+          <div className="mt-4 p-4 bg-accent/10 rounded-lg">
+            <h4 className="font-semibold mb-2">Modalités et nombre d'exemplaires à déposer :</h4>
+            <p className="text-sm text-muted-foreground mb-2">
+              Une fois l'ouvrage publié, les exemplaires doivent être déposés à l'Agence Bibliographique Nationale :
+            </p>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              {depositType === "monographie" && (
+                <>
+                  <li>• 4 exemplaires pour les monographies imprimées</li>
+                  <li>• 2 exemplaires pour les e-books</li>
+                </>
+              )}
+              {depositType === "periodique" && (
+                <li>• 4 exemplaires pour les périodiques imprimés</li>
+              )}
+              {(depositType === "bd_logiciels" || depositType === "collections_specialisees") && (
+                <li>• 2 exemplaires de format identique (CD, DVD, clés USB, etc.)</li>
+              )}
+            </ul>
+            
+            {depositType === "monographie" && (
+              <div className="mt-3 p-3 bg-background/50 rounded border-l-4 border-primary">
+                <h5 className="font-medium text-sm mb-1">Pour les e-books :</h5>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Déposer deux exemplaires sur le même type de support</li>
+                  <li>• Munir chaque exemplaire d'une pochette avec le titre et les numéros obtenus (DL, ISBN)</li>
+                  <li>• Inclure le résumé sous format texte (Word par exemple)</li>
+                  <li>• Recommandation : utiliser des USB au format carte pour une meilleure préservation</li>
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Clause de protection des données */}
+        <div className="bg-muted/50 p-4 rounded-lg">
+          <h4 className="font-semibold mb-2 flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            Clause de protection de données à caractère personnel
+          </h4>
+          <p className="text-sm text-muted-foreground mb-4">
+            Les informations recueillies sur le site www.bnrm.ma font l'objet d'un traitement destiné à la Gestion des attributions 
+            des numéros du Dépôt Légal et des numéros ISBN et ISSN. Le destinataire des données est le service de dépôt légal.
+            Conformément à la loi n° 09-08 promulguée par le Dahir 1-09-15 du 18 février 2009, relative à la protection des personnes physiques à l'égard du traitement des données à caractère personnel, 
+            vous bénéficiez d'un droit d'accès et de rectification aux informations qui vous concernent, 
+            que vous pouvez exercer en vous adressant à depot.legal@bnrm.ma.
+            Ce traitement a été notifié par la CNDP au titre du récépissé n°D-90/2023 du 18/01/2023.
+          </p>
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="privacy" 
+              checked={acceptedPrivacy}
+              onCheckedChange={(checked) => setAcceptedPrivacy(checked === true)}
+            />
+            <Label htmlFor="privacy" className="text-sm">
+              J'ai lu et j'accepte la clause de protection de données à caractère personnel
+            </Label>
+          </div>
+        </div>
+      </>
+    );
+  };
+
   const renderPrivacyClauseArabic = () => (
     <div className="bg-muted/50 p-4 rounded-lg">
       <h4 className="font-semibold mb-2 flex items-center gap-2">
@@ -431,24 +1353,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
         </div>
 
         <div className="mt-4 p-4 bg-accent/10 rounded-lg">
-          <h4 className="font-semibold mb-2">الشروط وعدد النسخ الواجب إرسالها:</h4>
+          <h4 className="font-semibold mb-2">طرائق وعدد النسخ الواجب إيداعها:</h4>
           <p className="text-sm text-muted-foreground mb-2">
-            بمجرد نشر العمل، يجب إيداع النسخ لدى الوكالة البيبليوغرافية الوطنية:
+            بعد نشر الكتاب، يجب إيداع النسخ في الوكالة الببليوغرافية الوطنية:
           </p>
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>• 4 نسخ للكتب المطبوعة</li>
-            <li>• 2 نسخ للكتب الإلكترونية</li>
+            <li>• نسختان للكتب الإلكترونية</li>
           </ul>
-          
-          <div className="mt-3 p-3 bg-background/50 rounded border-l-4 border-primary">
-            <h5 className="font-medium text-sm mb-1">للكتب الإلكترونية:</h5>
-            <ul className="text-xs text-muted-foreground space-y-1">
-              <li>• إيداع نسختين متطابقتين بنفس نوعية الحامل</li>
-              <li>• إيداع كل نسخة في غلاف خاص بها مع إظهار العنوان والأرقام التي تم الحصول عليها</li>
-              <li>• تضمين الملخص بصيغة نصية داخل النسخة المقدمة</li>
-              <li>• ملحوظة: يوصى باستخدام حامل وسائط على شكل بطاقة بشكل أفضل لضمان حفظ المحتوى على المدى الطويل</li>
-            </ul>
-          </div>
         </div>
       </div>
 
@@ -465,169 +1377,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     // Simplified for other types for now
     return renderMonographieArabicForm();
   };
-
-  const renderFrenchForm = () => (
-    <>
-      {/* Section Auteur/Directeur selon le type */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4">
-          {depositType === "periodique" ? "Directeur de la publication" : "Identification de l'auteur"}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {depositType !== "periodique" && (
-            <div className="space-y-2">
-              <Label>Type de l'auteur</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner le type" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border shadow-lg z-50">
-                  <SelectItem value="physique">Personne physique</SelectItem>
-                  <SelectItem value="morale">Personne morale (collectivités)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          
-          <div className="space-y-2">
-            <Label>
-              {depositType === "periodique" ? "Nom et prénom" : 
-               depositType === "bd_logiciels" ? "Nom de la collectivité / Nom de l'Auteur" :
-               "Nom de la collectivité / Nom de l'auteur"}
-            </Label>
-            <Input placeholder="Nom complet" />
-          </div>
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* Pièces à fournir */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Pièces à fournir</h3>
-        <div className="space-y-4">
-          {renderFileUpload("cover", "Joindre la couverture (format « jpg » moins de 1 MO)", true, "image/jpeg")}
-          
-          {(depositType === "monographie" || depositType === "periodique") && (
-            renderFileUpload("summary", "Joindre le sommaire (format « PDF » moins de 2 MO)", true, "application/pdf")
-          )}
-          
-          {renderFileUpload("cin", "Envoyer une copie de la CIN de l'auteur", true, "image/jpeg,application/pdf")}
-          
-          {depositType === "periodique" && (
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-sm text-blue-700">
-                Pour les périodiques dont l'éditeur n'est pas étatique, il est nécessaire d'envoyer la décision du tribunal de première instance, 
-                dont le délai de réception ne doit pas excéder une année.
-              </p>
-              {renderFileUpload("court-decision", "Décision du tribunal (pour les périodiques non étatiques)", false, "application/pdf")}
-            </div>
-          )}
-
-          {depositType === "monographie" && (
-            <>
-              {renderFileUpload(
-                "thesis-recommendation", 
-                "Recommandation de publication (pour les thèses)", 
-                false, 
-                "application/pdf"
-              )}
-              {renderFileUpload(
-                "quran-authorization", 
-                "Autorisation de publication de la Fondation Mohammed VI (pour les Corans)", 
-                false, 
-                "application/pdf"
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Résumé des fichiers joints */}
-        {Object.keys(uploadedFiles).length > 0 && (
-          <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-            <h4 className="font-medium text-green-800 mb-2">Documents joints :</h4>
-            <div className="space-y-1">
-              {Object.entries(uploadedFiles).map(([type, file]) => (
-                <div key={type} className="flex items-center text-sm text-green-700">
-                  <CheckCircle className="w-3 h-3 mr-2" />
-                  <span className="font-medium">{type}:</span>
-                  <span className="ml-1">{file.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="mt-4 p-4 bg-muted/30 rounded-lg">
-          <h4 className="font-semibold mb-2">Adresse d'envoi :</h4>
-          <p className="text-sm text-muted-foreground">
-            Les pièces doivent être envoyées à l'adresse e-mail suivante : <strong>depot.legal@bnrm.ma</strong>
-          </p>
-        </div>
-
-        <div className="mt-4 p-4 bg-accent/10 rounded-lg">
-          <h4 className="font-semibold mb-2">Modalités et nombre d'exemplaires à déposer :</h4>
-          <p className="text-sm text-muted-foreground mb-2">
-            Une fois l'ouvrage publié, les exemplaires doivent être déposés à l'Agence Bibliographique Nationale :
-          </p>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            {depositType === "monographie" && (
-              <>
-                <li>• 4 exemplaires pour les monographies imprimées</li>
-                <li>• 2 exemplaires pour les e-books</li>
-              </>
-            )}
-            {depositType === "periodique" && (
-              <li>• 4 exemplaires pour les périodiques imprimés</li>
-            )}
-            {(depositType === "bd_logiciels" || depositType === "collections_specialisees") && (
-              <li>• 2 exemplaires de format identique (CD, DVD, clés USB, etc.)</li>
-            )}
-          </ul>
-          
-          {depositType === "monographie" && (
-            <div className="mt-3 p-3 bg-background/50 rounded border-l-4 border-primary">
-              <h5 className="font-medium text-sm mb-1">Pour les e-books :</h5>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                <li>• Déposer deux exemplaires sur le même type de support</li>
-                <li>• Munir chaque exemplaire d'une pochette avec le titre et les numéros obtenus (DL, ISBN)</li>
-                <li>• Inclure le résumé sous format texte (Word par exemple)</li>
-                <li>• Recommandation : utiliser des USB au format carte pour une meilleure préservation</li>
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* Clause de protection des données */}
-      <div className="bg-muted/50 p-4 rounded-lg">
-        <h4 className="font-semibold mb-2 flex items-center gap-2">
-          <AlertTriangle className="h-4 w-4" />
-          Clause de protection de données à caractère personnel
-        </h4>
-        <p className="text-sm text-muted-foreground mb-4">
-          Les informations recueillies sur le site www.bnrm.ma font l'objet d'un traitement destiné à la Gestion des attributions 
-          des numéros du Dépôt Légal et des numéros ISBN et ISSN. Le destinataire des données est le service de dépôt légal.
-          Conformément à la loi n° 09-08 promulguée par le Dahir 1-09-15 du 18 février 2009, relative à la protection des personnes physiques à l'égard du traitement des données à caractère personnel, 
-          vous bénéficiez d'un droit d'accès et de rectification aux informations qui vous concernent, 
-          que vous pouvez exercer en vous adressant à depot.legal@bnrm.ma.
-          Ce traitement a été notifié par la CNDP au titre du récépissé n°D-90/2023 du 18/01/2023.
-        </p>
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="privacy" 
-            checked={acceptedPrivacy}
-            onCheckedChange={(checked) => setAcceptedPrivacy(checked === true)}
-          />
-          <Label htmlFor="privacy" className="text-sm">
-            J'ai lu et j'accepte la clause de protection de données à caractère personnel
-          </Label>
-        </div>
-      </div>
-    </>
-  );
 
   const handleAuthentication = async (type: "editor" | "printer", credentials: any) => {
     // Simulate authentication
@@ -699,36 +1448,39 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>{language === 'ar' ? 'تحديد نوع المستخدم' : 'Identification du Type d\'Utilisateur'}</CardTitle>
-          <CardDescription>
-            {language === 'ar' 
-              ? 'اختر ملفك الشخصي لتصريح الإيداع القانوني'
-              : 'Sélectionnez votre profil pour la déclaration de dépôt légal'
+          <CardTitle className="text-center">
+            {language === 'ar' ? 'نوع المستخدم' : 'Type d\'utilisateur'}
+          </CardTitle>
+          <CardDescription className="text-center">
+            {language === 'ar' ? 
+              'اختر نوع المستخدم للمتابعة' : 
+              'Sélectionnez votre type d\'utilisateur pour continuer'
             }
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button
-            variant="outline"
-            className="w-full h-20 flex flex-col items-center justify-center space-y-2"
+          <Button 
             onClick={() => {
               setUserType("editor");
               setCurrentStep("editor_auth");
             }}
-          >
-            <FileText className="h-6 w-6" />
-            <span>{language === 'ar' ? 'أنا ناشر' : 'Je suis un Éditeur'}</span>
-          </Button>
-          <Button
+            className="w-full h-20 text-lg flex flex-col items-center justify-center gap-2"
             variant="outline"
-            className="w-full h-20 flex flex-col items-center justify-center space-y-2"
+          >
+            <FileText className="h-8 w-8" />
+            {language === 'ar' ? 'ناشر' : 'Éditeur'}
+          </Button>
+          
+          <Button 
             onClick={() => {
               setUserType("printer");
               setCurrentStep("printer_auth");
             }}
+            className="w-full h-20 text-lg flex flex-col items-center justify-center gap-2"
+            variant="outline"
           >
-            <FileText className="h-6 w-6" />
-            <span>{language === 'ar' ? 'أنا طابع' : 'Je suis un Imprimeur'}</span>
+            <FileText className="h-8 w-8" />
+            {language === 'ar' ? 'طابع' : 'Imprimeur/Distributeur'}
           </Button>
         </CardContent>
         <CardFooter>
@@ -742,58 +1494,58 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
   if (currentStep === "editor_auth") {
     return (
-      <Card className="w-full max-w-lg mx-auto">
+      <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle>{language === 'ar' ? 'مصادقة الناشر' : 'Authentification Éditeur'}</CardTitle>
+          <CardTitle>
+            {language === 'ar' ? 'تحديد هوية الناشر' : 'Identification de l\'éditeur'}
+          </CardTitle>
           <CardDescription>
-            {language === 'ar' 
-              ? 'يرجى تحديد هويتك كناشر'
-              : 'Veuillez vous identifier en tant qu\'éditeur'
+            {language === 'ar' ? 
+              'يرجى تقديم معلومات الناشر للمصادقة' :
+              'Veuillez fournir les informations de l\'éditeur pour authentification'
             }
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="editor-name">{language === 'ar' ? 'اسم الناشر' : 'Nom de l\'éditeur'}</Label>
-            <Input id="editor-name" placeholder={language === 'ar' ? 'اسم الناشر' : 'Nom de l\'éditeur'} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="editor-address">{language === 'ar' ? 'العنوان' : 'Adresse'}</Label>
-            <Textarea id="editor-address" placeholder={language === 'ar' ? 'العنوان الكامل' : 'Adresse complète'} />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="editor-phone">{language === 'ar' ? 'الهاتف' : 'Téléphone'}</Label>
-              <Input id="editor-phone" placeholder={language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'} />
+              <Label>{language === 'ar' ? 'الاسم' : 'Nom'}</Label>
+              <Input placeholder={language === 'ar' ? 'اسم الناشر' : 'Nom de l\'éditeur'} />
             </div>
+            
             <div className="space-y-2">
-              <Label htmlFor="editor-email">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
-              <Input id="editor-email" type="email" placeholder={language === 'ar' ? 'البريد الإلكتروني' : 'Email'} />
+              <Label>{language === 'ar' ? 'العنوان' : 'Adresse'}</Label>
+              <Input placeholder={language === 'ar' ? 'العنوان' : 'Adresse'} />
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="publication-date">{language === 'ar' ? 'تاريخ النشر المتوقع' : 'Date prévue de parution'}</Label>
-            <Input id="publication-date" type="date" />
+            
+            <div className="space-y-2">
+              <Label>{language === 'ar' ? 'الهاتف' : 'Téléphone'}</Label>
+              <Input placeholder={language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'} />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
+              <Input type="email" placeholder={language === 'ar' ? 'البريد الإلكتروني' : 'Adresse email'} />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>{language === 'ar' ? 'تاريخ النشر المتوقع' : 'Date de publication prévue'}</Label>
+              <Input type="date" />
+            </div>
           </div>
         </CardContent>
-        <CardFooter className="flex gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => setCurrentStep("type_selection")}
-          >
+        <CardFooter className="flex justify-between">
+          <Button variant="ghost" onClick={() => setCurrentStep("type_selection")}>
             {language === 'ar' ? 'رجوع' : 'Retour'}
           </Button>
-          <Button
-            onClick={() => handleAuthentication("editor", {
-              name: (document.getElementById("editor-name") as HTMLInputElement)?.value,
-              address: (document.getElementById("editor-address") as HTMLTextAreaElement)?.value,
-              phone: (document.getElementById("editor-phone") as HTMLInputElement)?.value,
-              email: (document.getElementById("editor-email") as HTMLInputElement)?.value,
-              publicationDate: (document.getElementById("publication-date") as HTMLInputElement)?.value,
-            })}
-            className="flex-1"
-          >
-            {language === 'ar' ? 'تأكيد التحديد' : 'Confirmer l\'identification'}
+          <Button onClick={() => handleAuthentication("editor", {
+            name: "",
+            address: "",
+            phone: "",
+            email: "",
+            publicationDate: ""
+          })}>
+            {language === 'ar' ? 'متابعة' : 'Continuer'}
           </Button>
         </CardFooter>
       </Card>
@@ -802,104 +1554,85 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
   if (currentStep === "printer_auth") {
     return (
-      <Card className="w-full max-w-lg mx-auto">
+      <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>
-            {depositType === "bd_logiciels" ? 
-              (language === 'ar' ? 'مصادقة الموزع' : 'Authentification Distributeur') : 
-              (language === 'ar' ? 'مصادقة الطابع' : 'Authentification Imprimeur')
-            }
+            {language === 'ar' ? 'تحديد هوية الطابع/الموزع' : 'Identification de l\'imprimeur/distributeur'}
           </CardTitle>
           <CardDescription>
             {userType === "editor" ? 
               (language === 'ar' ? 
-                `في انتظار تحديد ${depositType === "bd_logiciels" ? "الموزع" : "الطابع"} الشريك` : 
-                `En attente de l'identification du ${depositType === "bd_logiciels" ? "distributeur" : "imprimeur"} partenaire`
-              ) : 
-              (language === 'ar' ? 
-                `يرجى تحديد هويتك كـ${depositType === "bd_logiciels" ? "موزع" : "طابع"}` : 
-                `Veuillez vous identifier en tant que ${depositType === "bd_logiciels" ? "distributeur" : "imprimeur"}`
+                'الآن نحتاج لمعلومات الطابع/الموزع' :
+                'Nous avons maintenant besoin des informations de l\'imprimeur/distributeur'
+              ) :
+              (language === 'ar' ?
+                'يرجى تقديم معلومات الطابع/الموزع للمصادقة' :
+                'Veuillez fournir les informations de l\'imprimeur/distributeur pour authentification'
               )
             }
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {userType === "editor" ? (
-            <div className="text-center py-8">
-              <Clock className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{language === 'ar' ? 'الاسم' : 'Nom'}</Label>
+              <Input placeholder={language === 'ar' ? 'اسم الطابع/الموزع' : 'Nom de l\'imprimeur/distributeur'} />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>{language === 'ar' ? 'العنوان' : 'Adresse'}</Label>
+              <Input placeholder={language === 'ar' ? 'العنوان' : 'Adresse'} />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>{language === 'ar' ? 'الهاتف' : 'Téléphone'}</Label>
+              <Input placeholder={language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'} />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
+              <Input type="email" placeholder={language === 'ar' ? 'البريد الإلكتروني' : 'Adresse email'} />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>{language === 'ar' ? 'عدد النسخ' : 'Tirage'}</Label>
+              <Input type="number" placeholder={language === 'ar' ? 'عدد النسخ' : 'Nombre d\'exemplaires'} />
+            </div>
+          </div>
+
+          {userType === "printer" && (
+            <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center space-x-2 mb-3">
+                <Clock className="h-5 w-5 text-muted-foreground" />
+                <h4 className="font-medium">
+                  {language === 'ar' ? 'تأكيد التعاون' : 'Confirmation de partenariat'}
+                </h4>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
                 {language === 'ar' ? 
-                  `في انتظار تأكيد ${depositType === "bd_logiciels" ? "الموزع" : "الطابع"} الشريك...` :
-                  `En attente de la confirmation du ${depositType === "bd_logiciels" ? "distributeur" : "imprimeur"} partenaire...`
+                  'في انتظار تأكيد الناشر للتعاون المتبادل' :
+                  'En attente de la confirmation réciproque de l\'éditeur'
                 }
               </p>
-              <Button
-                variant="outline"
-                className="mt-4"
-                onClick={handlePartnerConfirmation}
-              >
-                {language === 'ar' ? 
-                  `محاكاة تأكيد ${depositType === "bd_logiciels" ? "الموزع" : "الطابع"}` :
-                  `Simuler la confirmation du ${depositType === "bd_logiciels" ? "distributeur" : "imprimeur"}`
-                }
+              <Button onClick={handlePartnerConfirmation} size="sm">
+                {language === 'ar' ? 'تأكيد التعاون' : 'Confirmer le partenariat'}
               </Button>
             </div>
-          ) : (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="printer-name">
-                  {depositType === "bd_logiciels" ? 
-                    (language === 'ar' ? 'اسم الموزع' : 'Nom de distributeur') : 
-                    (language === 'ar' ? 'اسم المطبعة' : 'Nom de l\'imprimerie')
-                  }
-                </Label>
-                <Input id="printer-name" placeholder={depositType === "bd_logiciels" ? 
-                  (language === 'ar' ? 'اسم الموزع' : 'Nom de distributeur') : 
-                  (language === 'ar' ? 'اسم المطبعة' : 'Nom de l\'imprimerie')
-                } />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="printer-address">{language === 'ar' ? 'العنوان' : 'Adresse'}</Label>
-                <Textarea id="printer-address" placeholder={language === 'ar' ? 'العنوان الكامل' : 'Adresse complète'} />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="printer-phone">{language === 'ar' ? 'الهاتف' : 'Téléphone'}</Label>
-                  <Input id="printer-phone" placeholder={language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="printer-email">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
-                  <Input id="printer-email" type="email" placeholder={language === 'ar' ? 'البريد الإلكتروني' : 'Email'} />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="print-run">{language === 'ar' ? 'عدد النسخ' : 'Chiffre de tirage'}</Label>
-                <Input id="print-run" type="number" placeholder={language === 'ar' ? 'عدد النسخ' : 'Nombre d\'exemplaires'} />
-              </div>
-            </>
           )}
         </CardContent>
-        <CardFooter className="flex gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => setCurrentStep(userType === "editor" ? "editor_auth" : "type_selection")}
-          >
+        <CardFooter className="flex justify-between">
+          <Button variant="ghost" onClick={() => setCurrentStep(userType === "editor" ? "editor_auth" : "type_selection")}>
             {language === 'ar' ? 'رجوع' : 'Retour'}
           </Button>
-          {userType === "printer" && (
-            <Button
-              onClick={() => handleAuthentication("printer", {
-                name: (document.getElementById("printer-name") as HTMLInputElement)?.value,
-                address: (document.getElementById("printer-address") as HTMLTextAreaElement)?.value,
-                phone: (document.getElementById("printer-phone") as HTMLInputElement)?.value,
-                email: (document.getElementById("printer-email") as HTMLInputElement)?.value,
-                printRun: (document.getElementById("print-run") as HTMLInputElement)?.value,
-              })}
-              className="flex-1"
-            >
-              {language === 'ar' ? 'تأكيد التحديد' : 'Confirmer l\'identification'}
-            </Button>
-          )}
+          <Button onClick={() => handleAuthentication("printer", {
+            name: "",
+            address: "",
+            phone: "",
+            email: "",
+            printRun: ""
+          })}>
+            {language === 'ar' ? 'متابعة' : 'Continuer'}
+          </Button>
         </CardFooter>
       </Card>
     );
@@ -907,46 +1640,37 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
   if (currentStep === "form_filling") {
     return (
-      <Card className={`w-full max-w-6xl mx-auto max-h-[90vh] overflow-y-auto ${isRTL ? 'rtl' : ''}`}>
+      <Card className="w-full max-w-6xl mx-auto">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-6 w-6" />
-            {language === 'ar' ? 'تصريح بالإيداع القانوني' : 'Déclaration de Dépôt Légal'} - {depositTypeLabels[depositType]}
+          <CardTitle>
+            <div className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              {language === 'ar' ? 
+                `تصريح الإيداع القانوني - ${depositTypeLabels[depositType]}` :
+                `Déclaration de dépôt légal - ${depositTypeLabels[depositType]}`
+              }
+            </div>
           </CardTitle>
           <CardDescription>
-            {language === 'ar' 
-              ? 'املأ نموذج التصريح للحصول على رقم الإيداع القانوني'
-              : 'Remplissez le formulaire de déclaration pour obtenir le numéro de dépôt légal'
+            {language === 'ar' ? 
+              'يرجى ملء جميع الحقول المطلوبة' :
+              'Veuillez remplir tous les champs requis'
             }
           </CardDescription>
-          <div className="flex gap-2 mt-4">
-            <Badge variant="outline" className="flex items-center gap-1">
-              <CheckCircle className="h-3 w-3" />
-              {language === 'ar' ? 'ناشر مؤكد' : 'Éditeur confirmé'}
-            </Badge>
-            <Badge variant="outline" className="flex items-center gap-1">
-              <CheckCircle className="h-3 w-3" />
-              {depositType === "bd_logiciels" ? 
-                (language === 'ar' ? 'موزع مؤكد' : 'Distributeur confirmé') : 
-                (language === 'ar' ? 'طابع مؤكد' : 'Imprimeur confirmé')
-              }
-            </Badge>
-            {partnerConfirmed && (
-              <Badge variant="default" className="flex items-center gap-1">
-                <CheckCircle className="h-3 w-3" />
-                {language === 'ar' ? 'تأكيد متبادل' : 'Confirmation réciproque'}
-              </Badge>
-            )}
-          </div>
         </CardHeader>
-        <CardContent className="space-y-6">
+        
+        <CardContent className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
           {language === 'ar' ? renderArabicForm() : renderFrenchForm()}
         </CardContent>
+
         <CardFooter className="flex justify-between">
           <Button variant="ghost" onClick={() => setCurrentStep("printer_auth")}>
             {language === 'ar' ? 'رجوع' : 'Retour'}
           </Button>
-          <Button onClick={handleFormSubmit} disabled={!acceptedPrivacy || !partnerConfirmed}>
+          <Button 
+            onClick={handleFormSubmit}
+            disabled={!acceptedPrivacy || !partnerConfirmed}
+          >
             {language === 'ar' ? 'إرسال التصريح' : 'Soumettre la déclaration'}
           </Button>
         </CardFooter>
@@ -956,17 +1680,42 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
   if (currentStep === "confirmation") {
     return (
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader className="text-center">
-          <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500" />
-          <CardTitle>{language === 'ar' ? 'تم إرسال التصريح بنجاح' : 'Déclaration soumise avec succès'}</CardTitle>
-          <CardDescription>
-            {language === 'ar' 
-              ? 'تم تسجيل تصريح الإيداع القانوني الخاص بك. ستتلقى تأكيداً عبر البريد الإلكتروني مع رقم الإيداع القانوني المخصص.'
-              : 'Votre déclaration de dépôt légal a été enregistrée. Vous recevrez une confirmation par email avec le numéro de dépôt légal attribué.'
-            }
-          </CardDescription>
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardHeader>
+          <div className="text-center">
+            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <CardTitle className="text-green-700">
+              {language === 'ar' ? 'تم الإرسال بنجاح!' : 'Soumission réussie !'}
+            </CardTitle>
+            <CardDescription>
+              {language === 'ar' ? 
+                'تم إرسال تصريح الإيداع القانوني بنجاح' :
+                'Votre déclaration de dépôt légal a été soumise avec succès'
+              }
+            </CardDescription>
+          </div>
         </CardHeader>
+        
+        <CardContent className="text-center space-y-4">
+          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+            <p className="text-sm text-green-700">
+              {language === 'ar' ? 
+                'ستتلقى رقم الإيداع القانوني قريباً عبر البريد الإلكتروني' :
+                'Vous recevrez bientôt votre numéro de dépôt légal par email'
+              }
+            </p>
+          </div>
+          
+          <div className="space-y-2">
+            <Badge variant="secondary" className="mr-2">
+              {language === 'ar' ? 'نوع الإيداع' : 'Type de dépôt'}: {depositTypeLabels[depositType]}
+            </Badge>
+            <Badge variant="secondary">
+              {language === 'ar' ? 'الوثائق المرفقة' : 'Documents joints'}: {Object.keys(uploadedFiles).length}
+            </Badge>
+          </div>
+        </CardContent>
+
         <CardFooter>
           <Button onClick={onClose} className="w-full">
             {language === 'ar' ? 'إغلاق' : 'Fermer'}
