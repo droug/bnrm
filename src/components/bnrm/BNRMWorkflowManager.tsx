@@ -1,0 +1,649 @@
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { 
+  Settings, 
+  Play, 
+  Pause, 
+  CheckCircle, 
+  XCircle, 
+  Clock, 
+  User, 
+  FileText, 
+  AlertTriangle,
+  BarChart3,
+  Plus,
+  Edit,
+  Trash2
+} from "lucide-react";
+
+interface WorkflowStep {
+  id: string;
+  name: string;
+  description: string;
+  role_required: string;
+  estimated_duration_hours: number;
+  is_mandatory: boolean;
+  order_index: number;
+}
+
+interface WorkflowDefinition {
+  id: string;
+  name: string;
+  workflow_type: string;
+  description: string;
+  steps: WorkflowStep[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface WorkflowInstance {
+  id: string;
+  workflow_id: string;
+  content_id: string;
+  status: string;
+  current_step: number;
+  started_by: string;
+  started_at: string;
+  completed_at?: string;
+  metadata: any;
+}
+
+interface StepExecution {
+  id: string;
+  workflow_instance_id: string;
+  step_number: number;
+  step_name: string;
+  status: string;
+  assigned_to?: string;
+  started_at?: string;
+  completed_at?: string;
+  comments?: string;
+  metadata: any;
+}
+
+export function BNRMWorkflowManager() {
+  const [workflows, setWorkflows] = useState<WorkflowDefinition[]>([]);
+  const [instances, setInstances] = useState<WorkflowInstance[]>([]);
+  const [stepExecutions, setStepExecutions] = useState<StepExecution[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowDefinition | null>(null);
+  const [selectedInstance, setSelectedInstance] = useState<WorkflowInstance | null>(null);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    loadWorkflowData();
+  }, []);
+
+  const loadWorkflowData = async () => {
+    try {
+      setLoading(true);
+
+      // Load workflow definitions
+      const { data: workflowData, error: workflowError } = await supabase
+        .from('workflows')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (workflowError) throw workflowError;
+
+      // Load workflow instances
+      const { data: instanceData, error: instanceError } = await supabase
+        .from('workflow_instances')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (instanceError) throw instanceError;
+
+      // Load step executions
+      const { data: stepData, error: stepError } = await supabase
+        .from('workflow_step_executions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (stepError) throw stepError;
+
+      setWorkflows((workflowData || []).map(w => ({
+        ...w,
+        steps: Array.isArray(w.steps) ? w.steps as unknown as WorkflowStep[] : []
+      })));
+      setInstances(instanceData || []);
+      setStepExecutions(stepData || []);
+
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createDefaultWorkflow = async () => {
+    try {
+      const defaultWorkflow = {
+        name: "Workflow Dépôt Légal Standard",
+        workflow_type: "legal_deposit",
+        description: "Processus standard de traitement des dépôts légaux conforme au CPS",
+        is_active: true,
+        steps: [
+          {
+            id: "step-1",
+            name: "Réception et Enregistrement",
+            description: "Réception de la demande et vérification des informations de base",
+            role_required: "agent_dl",
+            estimated_duration_hours: 2,
+            is_mandatory: true,
+            order_index: 1
+          },
+          {
+            id: "step-2", 
+            name: "Vérification Documents",
+            description: "Contrôle de conformité des documents fournis",
+            role_required: "validateur",
+            estimated_duration_hours: 4,
+            is_mandatory: true,
+            order_index: 2
+          },
+          {
+            id: "step-3",
+            name: "Attribution Numéros",
+            description: "Attribution des numéros ISBN/ISSN/DL selon le type",
+            role_required: "agent_isbn",
+            estimated_duration_hours: 1,
+            is_mandatory: true,
+            order_index: 3
+          },
+          {
+            id: "step-4",
+            name: "Contrôle Qualité",
+            description: "Vérification finale de la conformité avant archivage",
+            role_required: "agent_dl",
+            estimated_duration_hours: 2,
+            is_mandatory: true,
+            order_index: 4
+          },
+          {
+            id: "step-5",
+            name: "Archivage et Finalisation",
+            description: "Archivage définitif et génération des documents finaux",
+            role_required: "conservateur",
+            estimated_duration_hours: 1,
+            is_mandatory: true,
+            order_index: 5
+          }
+        ]
+      };
+
+      const { data, error } = await supabase
+        .from('workflows')
+        .insert([defaultWorkflow])
+        .select();
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "Workflow par défaut créé avec succès",
+      });
+
+      loadWorkflowData();
+
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const startWorkflowInstance = async (workflowId: string, contentId: string) => {
+    try {
+      const workflow = workflows.find(w => w.id === workflowId);
+      if (!workflow) return;
+
+      // Create workflow instance
+      const { data: instance, error: instanceError } = await supabase
+        .from('workflow_instances')
+        .insert([{
+          workflow_id: workflowId,
+          content_id: contentId,
+          status: 'active',
+          current_step: 0,
+          started_by: 'current_user_id', // Replace with actual user ID
+          metadata: { workflow_name: workflow.name }
+        }])
+        .select()
+        .single();
+
+      if (instanceError) throw instanceError;
+
+      // Create step executions for all workflow steps
+      const stepExecutions = workflow.steps.map(step => ({
+        workflow_instance_id: instance.id,
+        step_number: step.order_index,
+        step_name: step.name,
+        status: step.order_index === 1 ? 'active' : 'pending',
+        metadata: { 
+          role_required: step.role_required,
+          estimated_duration_hours: step.estimated_duration_hours,
+          is_mandatory: step.is_mandatory
+        }
+      }));
+
+      const { error: stepsError } = await supabase
+        .from('workflow_step_executions')
+        .insert(stepExecutions);
+
+      if (stepsError) throw stepsError;
+
+      toast({
+        title: "Succès",
+        description: "Instance de workflow créée et démarrée",
+      });
+
+      loadWorkflowData();
+
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const completeStep = async (stepExecutionId: string, status: 'completed' | 'rejected', comments?: string) => {
+    try {
+      // Update step execution
+      const { error: updateError } = await supabase
+        .from('workflow_step_executions')
+        .update({
+          status,
+          completed_at: new Date().toISOString(),
+          comments
+        })
+        .eq('id', stepExecutionId);
+
+      if (updateError) throw updateError;
+
+      // If step completed, advance workflow
+      if (status === 'completed') {
+        const stepExecution = stepExecutions.find(s => s.id === stepExecutionId);
+        if (stepExecution) {
+          const instance = instances.find(i => i.id === stepExecution.workflow_instance_id);
+          if (instance) {
+            const nextStepNumber = stepExecution.step_number + 1;
+            const workflow = workflows.find(w => w.id === instance.workflow_id);
+            
+            if (workflow && nextStepNumber <= workflow.steps.length) {
+              // Activate next step
+              await supabase
+                .from('workflow_step_executions')
+                .update({ status: 'active', started_at: new Date().toISOString() })
+                .eq('workflow_instance_id', instance.id)
+                .eq('step_number', nextStepNumber);
+
+              // Update instance current step
+              await supabase
+                .from('workflow_instances')
+                .update({ current_step: nextStepNumber })
+                .eq('id', instance.id);
+            } else {
+              // Complete workflow
+              await supabase
+                .from('workflow_instances')
+                .update({ 
+                  status: 'completed',
+                  completed_at: new Date().toISOString()
+                })
+                .eq('id', instance.id);
+            }
+          }
+        }
+      }
+
+      toast({
+        title: "Succès",
+        description: `Étape ${status === 'completed' ? 'complétée' : 'rejetée'}`,
+      });
+
+      loadWorkflowData();
+
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const variants = {
+      'pending': { variant: "secondary" as const, icon: Clock, label: "En attente", className: "" },
+      'active': { variant: "default" as const, icon: Play, label: "En cours", className: "" },
+      'completed': { variant: "default" as const, icon: CheckCircle, label: "Terminé", className: "bg-green-100 text-green-800" },
+      'rejected': { variant: "destructive" as const, icon: XCircle, label: "Rejeté", className: "" },
+      'paused': { variant: "secondary" as const, icon: Pause, label: "En pause", className: "" }
+    };
+
+    const config = variants[status as keyof typeof variants] || variants.pending;
+    const Icon = config.icon;
+
+    return (
+      <Badge variant={config.variant} className={config.className}>
+        <Icon className="h-3 w-3 mr-1" />
+        {config.label}
+      </Badge>
+    );
+  };
+
+  const getInstanceSteps = (instanceId: string) => {
+    return stepExecutions.filter(step => step.workflow_instance_id === instanceId);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Gestion des Workflows</h2>
+          <p className="text-muted-foreground">
+            Configuration et suivi des processus de dépôt légal
+          </p>
+        </div>
+        <div className="flex space-x-2">
+          <Button onClick={createDefaultWorkflow} variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Workflow par défaut
+          </Button>
+          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Nouveau Workflow
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Créer un nouveau workflow</DialogTitle>
+                <DialogDescription>
+                  Définir un nouveau processus de traitement
+                </DialogDescription>
+              </DialogHeader>
+              {/* Form content would go here */}
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Workflows Actifs</CardTitle>
+            <Settings className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{workflows.filter(w => w.is_active).length}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Instances en Cours</CardTitle>
+            <Play className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{instances.filter(i => i.status === 'active').length}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Étapes En Attente</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stepExecutions.filter(s => s.status === 'pending').length}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Complétés ce mois</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{instances.filter(i => i.status === 'completed').length}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="definitions" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="definitions">Définitions</TabsTrigger>
+          <TabsTrigger value="instances">Instances Actives</TabsTrigger>
+          <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
+        </TabsList>
+
+        {/* Workflow Definitions */}
+        <TabsContent value="definitions" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Workflows Configurés</CardTitle>
+              <CardDescription>
+                Gestion des modèles de processus pour le dépôt légal
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {workflows.map((workflow) => (
+                  <div key={workflow.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <h3 className="font-semibold">{workflow.name}</h3>
+                        {getStatusBadge(workflow.is_active ? 'active' : 'paused')}
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => startWorkflowInstance(workflow.id, 'demo-content-id')}
+                        >
+                          <Play className="h-4 w-4 mr-1" />
+                          Démarrer
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">{workflow.description}</p>
+                    <div className="flex items-center space-x-4 text-sm">
+                      <span>{workflow.steps.length} étapes</span>
+                      <span>Type: {workflow.workflow_type}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Active Instances */}
+        <TabsContent value="instances" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Instances de Workflow en Cours</CardTitle>
+              <CardDescription>
+                Suivi en temps réel des processus actifs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-2">Instance</th>
+                      <th className="text-left p-2">Workflow</th>
+                      <th className="text-left p-2">Étape Actuelle</th>
+                      <th className="text-left p-2">Statut</th>
+                      <th className="text-left p-2">Démarré</th>
+                      <th className="text-left p-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {instances.map((instance) => {
+                      const workflow = workflows.find(w => w.id === instance.workflow_id);
+                      const currentSteps = getInstanceSteps(instance.id);
+                      const activeStep = currentSteps.find(s => s.status === 'active');
+                      
+                      return (
+                        <tr key={instance.id} className="border-b">
+                          <td className="p-2">{instance.id.slice(0, 8)}...</td>
+                          <td className="p-2">{workflow?.name || 'N/A'}</td>
+                          <td className="p-2">
+                            {activeStep ? `${activeStep.step_number}. ${activeStep.step_name}` : 'N/A'}
+                          </td>
+                          <td className="p-2">{getStatusBadge(instance.status)}</td>
+                          <td className="p-2">{new Date(instance.started_at).toLocaleDateString()}</td>
+                          <td className="p-2">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="ghost" size="sm" onClick={() => setSelectedInstance(instance)}>
+                                  Voir détails
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl">
+                                <DialogHeader>
+                                  <DialogTitle>Détails de l'instance</DialogTitle>
+                                  <DialogDescription>
+                                    Suivi détaillé du workflow {workflow?.name}
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                  {currentSteps.map((step) => (
+                                    <div key={step.id} className="border rounded-lg p-4">
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h4 className="font-semibold">{step.step_number}. {step.step_name}</h4>
+                                        {getStatusBadge(step.status)}
+                                      </div>
+                                      {step.status === 'active' && (
+                                        <div className="flex space-x-2 mt-3">
+                                          <Button 
+                                            size="sm" 
+                                            onClick={() => completeStep(step.id, 'completed')}
+                                          >
+                                            <CheckCircle className="h-4 w-4 mr-1" />
+                                            Approuver
+                                          </Button>
+                                          <Button 
+                                            variant="destructive" 
+                                            size="sm"
+                                            onClick={() => completeStep(step.id, 'rejected')}
+                                          >
+                                            <XCircle className="h-4 w-4 mr-1" />
+                                            Rejeter
+                                          </Button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Monitoring */}
+        <TabsContent value="monitoring" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <BarChart3 className="h-5 w-5" />
+                  <span>Performance des Workflows</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Délai moyen de traitement</span>
+                    <span className="font-semibold">2.3 jours</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Taux de completion</span>
+                    <span className="font-semibold">94.2%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Workflows en retard</span>
+                    <span className="font-semibold text-red-600">3</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  <span>Alertes et Notifications</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 text-sm">
+                    <AlertTriangle className="h-4 w-4 text-orange-500" />
+                    <span>3 étapes dépassent le délai prévu</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <User className="h-4 w-4 text-blue-500" />
+                    <span>2 validateurs non assignés</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <FileText className="h-4 w-4 text-green-500" />
+                    <span>15 documents en attente de validation</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

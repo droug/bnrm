@@ -25,6 +25,7 @@ import { WatermarkContainer } from "@/components/ui/watermark";
 import { BNRMDashboard } from "@/components/bnrm/BNRMDashboard";
 import { BNRMRequestManager } from "@/components/bnrm/BNRMRequestManager";
 import { BNRMNumberAttribution } from "@/components/bnrm/BNRMNumberAttribution";
+import { BNRMWorkflowManager } from "@/components/bnrm/BNRMWorkflowManager";
 
 export default function BNRMBackOffice() {
   const { user, profile, loading } = useAuth();
@@ -329,148 +330,7 @@ export default function BNRMBackOffice() {
 
               {/* Workflow Management Tab */}
               <TabsContent value="workflow" className="space-y-4">
-                <div className="grid gap-6 md:grid-cols-2">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2">
-                        <Settings className="h-5 w-5" />
-                        <span>Configuration des Processus</span>
-                      </CardTitle>
-                      <CardDescription>
-                        Définition des étapes de validation et responsabilités
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="bg-background rounded-lg border p-4">
-                          <h4 className="font-semibold text-sm mb-2">Workflow Dépôt Légal</h4>
-                          <div className="text-xs text-muted-foreground space-y-1">
-                            <div>1. Réception demande (Agent DL)</div>
-                            <div>2. Vérification documents (Validateur)</div>
-                            <div>3. Attribution numéros (Agent ISBN/ISSN)</div>
-                            <div>4. Contrôle conformité (Agent DL)</div>
-                            <div>5. Archivage final (Conservateur)</div>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Button variant="outline" className="w-full justify-start">
-                            <Settings className="h-4 w-4 mr-2" />
-                            Modifier étapes
-                          </Button>
-                          <Button variant="outline" className="w-full justify-start">
-                            <Users className="h-4 w-4 mr-2" />
-                            Assigner responsables
-                          </Button>
-                          <Button variant="outline" className="w-full justify-start">
-                            <Bell className="h-4 w-4 mr-2" />
-                            Configurer alertes
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2">
-                        <BarChart3 className="h-5 w-5" />
-                        <span>Suivi des Performances</span>
-                      </CardTitle>
-                      <CardDescription>
-                        Délais et indicateurs de performance des workflows
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="grid gap-4 md:grid-cols-2">
-                          <div className="bg-background rounded-lg border p-4">
-                            <h4 className="font-semibold text-sm mb-2">Délai moyen</h4>
-                            <div className="text-2xl font-bold text-blue-600">2.3j</div>
-                            <p className="text-xs text-muted-foreground">Traitement complet</p>
-                          </div>
-                          <div className="bg-background rounded-lg border p-4">
-                            <h4 className="font-semibold text-sm mb-2">Processus actifs</h4>
-                            <div className="text-2xl font-bold text-orange-600">47</div>
-                            <p className="text-xs text-muted-foreground">En cours</p>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Button variant="outline" className="w-full justify-start">
-                            <BarChart3 className="h-4 w-4 mr-2" />
-                            Tableau de bord
-                          </Button>
-                          <Button variant="outline" className="w-full justify-start">
-                            <Download className="h-4 w-4 mr-2" />
-                            Export performances
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Instances de Workflow Actives</CardTitle>
-                    <CardDescription>
-                      Suivi en temps réel des processus en cours
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="border-b">
-                            <th className="text-left p-2">N° Instance</th>
-                            <th className="text-left p-2">Publication</th>
-                            <th className="text-left p-2">Étape Actuelle</th>
-                            <th className="text-left p-2">Responsable</th>
-                            <th className="text-left p-2">Délai</th>
-                            <th className="text-left p-2">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr className="border-b">
-                            <td className="p-2">WF-2024-0156</td>
-                            <td className="p-2">Guide pratique React</td>
-                            <td className="p-2">Vérification documents</td>
-                            <td className="p-2">M. Alami</td>
-                            <td className="p-2">
-                              <Badge variant="default" className="bg-green-100 text-green-800">Dans les temps</Badge>
-                            </td>
-                            <td className="p-2">
-                              <Button variant="ghost" size="sm">Voir détails</Button>
-                            </td>
-                          </tr>
-                          <tr className="border-b">
-                            <td className="p-2">WF-2024-0157</td>
-                            <td className="p-2">Revue Architecture</td>
-                            <td className="p-2">Attribution ISSN</td>
-                            <td className="p-2">Mme. Bennani</td>
-                            <td className="p-2">
-                              <Badge variant="destructive">En retard</Badge>
-                            </td>
-                            <td className="p-2">
-                              <Button variant="ghost" size="sm">Relancer</Button>
-                            </td>
-                          </tr>
-                          <tr className="border-b">
-                            <td className="p-2">WF-2024-0158</td>
-                            <td className="p-2">Histoire du Maroc</td>
-                            <td className="p-2">Contrôle conformité</td>
-                            <td className="p-2">M. Hajjami</td>
-                            <td className="p-2">
-                              <Badge variant="secondary">En cours</Badge>
-                            </td>
-                            <td className="p-2">
-                              <Button variant="ghost" size="sm">Suivre</Button>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </CardContent>
-                </Card>
+                <BNRMWorkflowManager />
               </TabsContent>
 
               {/* User Management Tab */}
