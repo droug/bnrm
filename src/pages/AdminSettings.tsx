@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 
@@ -54,6 +54,13 @@ export default function AdminSettings() {
       description: "Gérer les tarifs et services de la Bibliothèque Nationale",
       href: "/admin/bnrm-tariffs",
       permission: "content.manage"
+    },
+    {
+      icon: BookOpen,
+      title: "Back Office BNRM",
+      description: "Interface complète de gestion du dépôt légal BNRM",
+      href: "/admin/bnrm-backoffice",
+      permission: "legal_deposit.manage"
     }
   ];
 
