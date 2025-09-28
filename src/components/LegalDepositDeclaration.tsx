@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File } from "lucide-react";
 import { toast } from "sonner";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface LegalDepositDeclarationProps {
   depositType: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees";
@@ -17,6 +18,7 @@ interface LegalDepositDeclarationProps {
 }
 
 export default function LegalDepositDeclaration({ depositType, onClose }: LegalDepositDeclarationProps) {
+  const { language, isRTL } = useLanguage();
   const [currentStep, setCurrentStep] = useState<"type_selection" | "editor_auth" | "printer_auth" | "form_filling" | "confirmation">("type_selection");
   const [userType, setUserType] = useState<"editor" | "printer" | null>(null);
   const [partnerConfirmed, setPartnerConfirmed] = useState(false);
@@ -33,6 +35,21 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     bd_logiciels: "Bases de données, Logiciels et Documents audiovisuels",
     collections_specialisees: "Collections spécialisées"
   };
+
+  const renderArabicForm = () => {
+    if (depositType === "monographie") {
+      return renderMonographieArabicForm();
+    } else if (depositType === "periodique") {
+      return renderPeriodiqueArabicForm();
+    } else if (depositType === "bd_logiciels") {
+      return renderBDLogicielsArabicForm();
+    } else if (depositType === "collections_specialisees") {
+      return renderCollectionsSpecialisesArabicForm();
+    }
+    return null;
+  };
+
+  // French form will be defined later
 
   const handleFileUpload = (documentType: string, file: File | null) => {
     if (!file) return;
@@ -411,14 +428,17 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
   if (currentStep === "form_filling") {
     return (
-      <Card className="w-full max-w-6xl mx-auto max-h-[90vh] overflow-y-auto">
+      <Card className={`w-full max-w-6xl mx-auto max-h-[90vh] overflow-y-auto ${isRTL ? 'rtl' : ''}`}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-6 w-6" />
-            Déclaration de Dépôt Légal - {depositTypeLabels[depositType]}
+            {language === 'ar' ? 'تصريح بالإيداع القانوني' : 'Déclaration de Dépôt Légal'} - {depositTypeLabels[depositType]}
           </CardTitle>
           <CardDescription>
-            Remplissez le formulaire de déclaration pour obtenir le numéro de dépôt légal
+            {language === 'ar' 
+              ? 'املأ نموذج التصريح للحصول على رقم الإيداع القانوني'
+              : 'Remplissez le formulaire de déclaration pour obtenir le numéro de dépôt légal'
+            }
           </CardDescription>
           <div className="flex gap-2 mt-4">
             <Badge variant="outline" className="flex items-center gap-1">
@@ -438,11 +458,1005 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Section Auteur/Directeur selon le type */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">
-              {depositType === "periodique" ? "Directeur de la publication" : "Identification de l'auteur"}
-            </h3>
+          {language === 'ar' ? renderArabicForm() : renderFrenchForm()}
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="ghost" onClick={() => setCurrentStep("printer_auth")}>
+            {language === 'ar' ? 'رجوع' : 'Retour'}
+          </Button>
+          <Button onClick={handleFormSubmit} disabled={!acceptedPrivacy || !partnerConfirmed}>
+            {language === 'ar' ? 'إرسال التصريح' : 'Soumettre la déclaration'}
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+
+  const renderMonographieArabicForm = () => (
+    <>
+      {/* التعريف بالمؤلف */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالمؤلف</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>نوع المؤلف</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر النوع" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="physique">شخص مادي</SelectItem>
+                <SelectItem value="morale">شخص معنوي (هيئة)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label>اسم المؤلف / اسم الهيئة</Label>
+            <Input placeholder="الاسم الكامل" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>اختصار اسم الهيئة</Label>
+            <Input placeholder="اختصار اسم الهيئة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>نوع المصرح</Label>
+            <Input placeholder="نوع المصرح" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>رقم الهاتف</Label>
+            <Input placeholder="رقم الهاتف" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>البريد الإلكتروني</Label>
+            <Input type="email" placeholder="البريد الإلكتروني" />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label>العنوان</Label>
+            <Textarea placeholder="العنوان الكامل" />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* التعريف بالوثيقة */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالوثيقة</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2 md:col-span-2">
+            <Label>عنوان الكتاب</Label>
+            <Input placeholder="عنوان الكتاب" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>نوع الحامل</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر نوع الحامل" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="printed">مطبوع</SelectItem>
+                <SelectItem value="electronic">إلكتروني</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>عنوان السلسلة</Label>
+            <Input placeholder="عنوان السلسلة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الرقم في السلسلة</Label>
+            <Input placeholder="الرقم في السلسلة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>موضوع الكتاب</Label>
+            <Input placeholder="موضوع الكتاب" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>رؤوس للمواضيع</Label>
+            <Input placeholder="رؤوس للمواضيع" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>اللغة</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر اللغة" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="ar">العربية</SelectItem>
+                <SelectItem value="fr">الفرنسية</SelectItem>
+                <SelectItem value="en">الإنجليزية</SelectItem>
+                <SelectItem value="ber">الأمازيغية</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>عدد الأجزاء</Label>
+            <Input type="number" placeholder="عدد الأجزاء" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>عدد الصفحات</Label>
+            <Input type="number" placeholder="عدد الصفحات" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>أول طلب للردمك</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="yes">نعم</SelectItem>
+                <SelectItem value="no">لا</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label>ملخص الكتاب</Label>
+            <Textarea placeholder="ملخص الكتاب" rows={4} />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* التعريف بالناشر */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالناشر</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>اسم الناشر بالعربية والفرنسية</Label>
+            <Input placeholder="اسم الناشر" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>العنوان بالعربية والفرنسية</Label>
+            <Textarea placeholder="عنوان الناشر" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الهاتف</Label>
+            <Input placeholder="رقم هاتف الناشر" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>البريد الإلكتروني</Label>
+            <Input type="email" placeholder="بريد الناشر الإلكتروني" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>التاريخ المتوقع للإصدار (الشهر / السنة)</Label>
+            <Input type="month" />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* التعريف بالطابع */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالطابع</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>اسم المطبعة</Label>
+            <Input placeholder="اسم المطبعة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>البريد الإلكتروني</Label>
+            <Input type="email" placeholder="بريد المطبعة الإلكتروني" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الهاتف</Label>
+            <Input placeholder="هاتف المطبعة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>العنوان</Label>
+            <Textarea placeholder="عنوان المطبعة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>عدد النسخ المطبوعة</Label>
+            <Input type="number" placeholder="عدد النسخ" />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* الوثائق المطلوب تقديمها */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">الوثائق المطلوب تقديمها</h3>
+        <div className="space-y-4">
+          {renderFileUpload("cover", "إرفاق الغلاف (Format « jpg » moins de 1 MO)", true, "image/jpeg")}
+          {renderFileUpload("summary", "إرفاق الفهرس (Format « PDF » moins de 2 MO)", true, "application/pdf")}
+          {renderFileUpload("cin", "إرسال نسخة من البطاقة الوطنية للمؤلف", true, "image/jpeg,application/pdf")}
+          {renderFileUpload("thesis-recommendation", "إرسال توصية النشر (للأطروحات)", false, "application/pdf")}
+          {renderFileUpload("quran-authorization", "إرسال توصية النشر من مؤسسة محمد السادس لنشر القرآن الكريم (للمصاحف)", false, "application/pdf")}
+        </div>
+
+        {Object.keys(uploadedFiles).length > 0 && (
+          <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+            <h4 className="font-medium text-green-800 mb-2">الوثائق المرفقة:</h4>
+            <div className="space-y-1">
+              {Object.entries(uploadedFiles).map(([type, file]) => (
+                <div key={type} className="flex items-center text-sm text-green-700">
+                  <CheckCircle className="w-3 h-3 mr-2" />
+                  <span className="font-medium">{type}:</span>
+                  <span className="ml-1">{file.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+          <h4 className="font-semibold mb-2">عنوان الإرسال:</h4>
+          <p className="text-sm text-muted-foreground">
+            يجب إرسال الوثائق إلى العنوان الإلكتروني التالي: <strong>depot.legal@bnrm.ma</strong>
+          </p>
+        </div>
+
+        <div className="mt-4 p-4 bg-accent/10 rounded-lg">
+          <h4 className="font-semibold mb-2">الشروط وعدد النسخ الواجب إرسالها:</h4>
+          <p className="text-sm text-muted-foreground mb-2">
+            بمجرد نشر العمل، يجب إيداع النسخ لدى الوكالة البيبليوغرافية الوطنية:
+          </p>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• 4 نسخ للكتب المطبوعة</li>
+            <li>• 2 نسخ للكتب الإلكترونية</li>
+          </ul>
+          
+          <div className="mt-3 p-3 bg-background/50 rounded border-l-4 border-primary">
+            <h5 className="font-medium text-sm mb-1">للكتب الإلكترونية:</h5>
+            <ul className="text-xs text-muted-foreground space-y-1">
+              <li>• إيداع نسختين متطابقتين بنفس نوعية الحامل</li>
+              <li>• إيداع كل نسخة في غلاف خاص بها مع إظهار العنوان والأرقام التي تم الحصول عليها</li>
+              <li>• تضمين الملخص بصيغة نصية داخل النسخة المقدمة</li>
+              <li>• ملحوظة: يوصى باستخدام حامل وسائط على شكل بطاقة بشكل أفضل لضمان حفظ المحتوى على المدى الطويل</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {renderPrivacyClauseArabic()}
+    </>
+  );
+
+  const renderPeriodiqueArabicForm = () => (
+    <>
+      {/* التعريف بمدير النشر */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بمدير النشر</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>الاسم النسب</Label>
+            <Input placeholder="الاسم الكامل" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الهاتف</Label>
+            <Input placeholder="رقم الهاتف" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>البريد الإلكتروني</Label>
+            <Input type="email" placeholder="البريد الإلكتروني" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>العنوان</Label>
+            <Textarea placeholder="العنوان الكامل" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الاسم المستعار</Label>
+            <Input placeholder="الاسم المستعار (اختياري)" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>المهنة</Label>
+            <Input placeholder="المهنة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>تاريخ الازدياد</Label>
+            <Input type="date" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>مكان الازدياد</Label>
+            <Input placeholder="مكان الازدياد" />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* ملخص الدورية */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">ملخص الدورية</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>التعريف الدورية</Label>
+            <Input placeholder="تعريف الدورية" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>نوع الإصدار</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر نوع الإصدار" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="printed">مطبوع</SelectItem>
+                <SelectItem value="electronic">إلكتروني</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>عنوان الدورية</Label>
+            <Input placeholder="عنوان الدورية" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>نوع الحامل</Label>
+            <Input placeholder="نوع الحامل" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الموضوع</Label>
+            <Input placeholder="موضوع الدورية" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>العدد</Label>
+            <Input placeholder="رقم العدد" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الدورية</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر الدورية" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="daily">يومية</SelectItem>
+                <SelectItem value="weekly">أسبوعية</SelectItem>
+                <SelectItem value="monthly">شهرية</SelectItem>
+                <SelectItem value="quarterly">فصلية</SelectItem>
+                <SelectItem value="annual">سنوية</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>اللغة</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر اللغة" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="ar">العربية</SelectItem>
+                <SelectItem value="fr">الفرنسية</SelectItem>
+                <SelectItem value="en">الإنجليزية</SelectItem>
+                <SelectItem value="ber">الأمازيغية</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>الطبعة</Label>
+            <Input placeholder="رقم الطبعة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>URL</Label>
+            <Input type="url" placeholder="رابط الموقع الإلكتروني" />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* التعريف بالناشر */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالناشر</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>اسم الناشر</Label>
+            <Input placeholder="اسم الناشر" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>العنوان</Label>
+            <Textarea placeholder="عنوان الناشر" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الهاتف</Label>
+            <Input placeholder="رقم هاتف الناشر" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>البريد الإلكتروني</Label>
+            <Input type="email" placeholder="بريد الناشر الإلكتروني" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>التاريخ المتوقع للإصدار (الشهر / السنة)</Label>
+            <Input type="month" />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* التعريف بالطابع */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالطابع</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>اسم المطبعة</Label>
+            <Input placeholder="اسم المطبعة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>البريد الإلكتروني</Label>
+            <Input type="email" placeholder="بريد المطبعة الإلكتروني" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الهاتف</Label>
+            <Input placeholder="هاتف المطبعة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>العنوان</Label>
+            <Textarea placeholder="عنوان المطبعة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>عدد النسخ المطبوعة</Label>
+            <Input type="number" placeholder="عدد النسخ" />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* الوثائق المطلوب تقديمها */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">الوثائق المطلوب تقديمها</h3>
+        <div className="space-y-4">
+          {renderFileUpload("cover", "إرفاق الغلاف (Format « jpg » moins de 1 MO)", true, "image/jpeg")}
+          {renderFileUpload("summary", "إرفاق الفهرس (Format « PDF » moins de 2 MO)", true, "application/pdf")}
+          {renderFileUpload("cin", "إرسال نسخة من البطاقة الوطنية لمدير النشر", true, "image/jpeg,application/pdf")}
+          {renderFileUpload("court-decision", "قرار محكمة الدرجة الأولى (للدوريات غير الحكومية)", false, "application/pdf")}
+        </div>
+
+        {Object.keys(uploadedFiles).length > 0 && (
+          <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+            <h4 className="font-medium text-green-800 mb-2">الوثائق المرفقة:</h4>
+            <div className="space-y-1">
+              {Object.entries(uploadedFiles).map(([type, file]) => (
+                <div key={type} className="flex items-center text-sm text-green-700">
+                  <CheckCircle className="w-3 h-3 mr-2" />
+                  <span className="font-medium">{type}:</span>
+                  <span className="ml-1">{file.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+          <h4 className="font-semibold mb-2">عنوان الإرسال:</h4>
+          <p className="text-sm text-muted-foreground">
+            يجب إرسال الوثائق إلى العنوان الإلكتروني التالي: <strong>depot.legal@bnrm.ma</strong>
+          </p>
+        </div>
+
+        <div className="mt-4 p-4 bg-accent/10 rounded-lg">
+          <h4 className="font-semibold mb-2">الشروط وعدد النسخ الواجب إرسالها:</h4>
+          <p className="text-sm text-muted-foreground mb-2">
+            بمجرد نشر العمل، يجب إيداع النسخ لدى الوكالة البيبليوغرافية الوطنية:
+          </p>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• 4 نسخ للدوريات المطبوعة</li>
+          </ul>
+          <div className="mt-2 text-xs text-muted-foreground">
+            <p>• للدوريات الإلكترونية، يجب أن يكون رابط الموقع نشطًا ويتضمن مقالات العدد الأول من المنشور</p>
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {renderPrivacyClauseArabic()}
+    </>
+  );
+
+  const renderBDLogicielsArabicForm = () => (
+    <>
+      {/* التعريف بالمؤلف */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالمؤلف</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>نوع المؤلف</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر النوع" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="physique">شخص مادي</SelectItem>
+                <SelectItem value="morale">شخص معنوي (هيئة)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label>اسم المؤلف / اسم الهيئة</Label>
+            <Input placeholder="الاسم الكامل" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>اختصار اسم الهيئة</Label>
+            <Input placeholder="اختصار اسم الهيئة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>نوع المصرح</Label>
+            <Input placeholder="نوع المصرح" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>رقم الهاتف</Label>
+            <Input placeholder="رقم الهاتف" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>البريد الإلكتروني</Label>
+            <Input type="email" placeholder="البريد الإلكتروني" />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label>العنوان</Label>
+            <Textarea placeholder="العنوان الكامل" />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* التعريف بالإصدار */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالإصدار</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2 md:col-span-2">
+            <Label>عنوان الإصدار</Label>
+            <Input placeholder="عنوان الإصدار" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>نوع الإصدار</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر نوع الإصدار" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="software">برمجيات</SelectItem>
+                <SelectItem value="database">قواعد البيانات</SelectItem>
+                <SelectItem value="audiovisual">الوثائق السمعية والبصرية</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>اللغة</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر اللغة" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="ar">العربية</SelectItem>
+                <SelectItem value="fr">الفرنسية</SelectItem>
+                <SelectItem value="en">الإنجليزية</SelectItem>
+                <SelectItem value="ber">الأمازيغية</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>موضوع الإصدار</Label>
+            <Input placeholder="موضوع الإصدار" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>رؤوس للمواضيع</Label>
+            <Input placeholder="رؤوس للمواضيع" />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label>ملخص الإصدار</Label>
+            <Textarea placeholder="ملخص الإصدار" rows={4} />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* التعريف بالناشر */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالناشر</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>اسم الناشر بالعربية والفرنسية</Label>
+            <Input placeholder="اسم الناشر" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>العنوان بالعربية والفرنسية</Label>
+            <Textarea placeholder="عنوان الناشر" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الهاتف</Label>
+            <Input placeholder="رقم هاتف الناشر" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>البريد الإلكتروني</Label>
+            <Input type="email" placeholder="بريد الناشر الإلكتروني" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>التاريخ المتوقع للإصدار (الشهر / السنة)</Label>
+            <Input type="month" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الطبعة</Label>
+            <Input placeholder="رقم الطبعة" />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* التعريف بالموزع */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالموزع</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>اسم الموزع</Label>
+            <Input placeholder="اسم الموزع" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>البريد الإلكتروني</Label>
+            <Input type="email" placeholder="بريد الموزع الإلكتروني" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الهاتف</Label>
+            <Input placeholder="هاتف الموزع" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>العنوان</Label>
+            <Textarea placeholder="عنوان الموزع" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>عدد النسخ المطبوعة</Label>
+            <Input type="number" placeholder="عدد النسخ" />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* الوثائق المطلوب تقديمها */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">الوثائق المطلوب تقديمها</h3>
+        <div className="space-y-4">
+          {renderFileUpload("cover", "إرفاق الغلاف (Format « jpg » moins de 1 MO)", true, "image/jpeg")}
+        </div>
+
+        {Object.keys(uploadedFiles).length > 0 && (
+          <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+            <h4 className="font-medium text-green-800 mb-2">الوثائق المرفقة:</h4>
+            <div className="space-y-1">
+              {Object.entries(uploadedFiles).map(([type, file]) => (
+                <div key={type} className="flex items-center text-sm text-green-700">
+                  <CheckCircle className="w-3 h-3 mr-2" />
+                  <span className="font-medium">{type}:</span>
+                  <span className="ml-1">{file.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+          <h4 className="font-semibold mb-2">عنوان الإرسال:</h4>
+          <p className="text-sm text-muted-foreground">
+            يجب إرسال الوثائق إلى العنوان الإلكتروني التالي: <strong>depot.legal@bnrm.ma</strong>
+          </p>
+        </div>
+
+        <div className="mt-4 p-4 bg-accent/10 rounded-lg">
+          <h4 className="font-semibold mb-2">الشروط وعدد النسخ الواجب إرسالها:</h4>
+          <p className="text-sm text-muted-foreground mb-2">
+            بمجرد نشر العمل، يجب إيداع النسخ لدى الوكالة البيبليوغرافية الوطنية:
+          </p>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• نسختين متطابقتين بنفس نوعية الحامل (مثال: CD، DVD، USB الخ.)</li>
+            <li>• إيداع كل نسخة في غلاف خاص بها مع إظهار العنوان والأرقام التي تم الحصول عليها</li>
+            <li>• تضمين الملخص بصيغة نصية داخل النسخة المقدمة</li>
+          </ul>
+          
+          <div className="mt-3 p-3 bg-background/50 rounded border-l-4 border-primary">
+            <h5 className="font-medium text-sm mb-1">ملحوظة:</h5>
+            <p className="text-xs text-muted-foreground">
+              يوصى باستخدام حامل وسائط على شكل بطاقة بشكل أفضل لضمان حفظ المحتوى على المدى الطويل (USB au format carte)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {renderPrivacyClauseArabic()}
+    </>
+  );
+
+  const renderCollectionsSpecialisesArabicForm = () => (
+    <>
+      {/* التعريف بالمؤلف */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالمؤلف</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>نوع المؤلف</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر النوع" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="physique">شخص مادي</SelectItem>
+                <SelectItem value="morale">شخص معنوي (هيئة)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label>اسم المؤلف / اسم الهيئة</Label>
+            <Input placeholder="الاسم الكامل" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>اختصار اسم الهيئة</Label>
+            <Input placeholder="اختصار اسم الهيئة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>نوع المصرح</Label>
+            <Input placeholder="نوع المصرح" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>رقم الهاتف</Label>
+            <Input placeholder="رقم الهاتف" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>البريد الإلكتروني</Label>
+            <Input type="email" placeholder="البريد الإلكتروني" />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label>العنوان</Label>
+            <Textarea placeholder="العنوان الكامل" />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* التعريف بالإصدار */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالإصدار</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2 md:col-span-2">
+            <Label>عنوان الإصدار</Label>
+            <Input placeholder="عنوان الإصدار" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>نوع الإصدار</Label>
+            <Input placeholder="نوع الإصدار" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>عنوان السلسلة</Label>
+            <Input placeholder="عنوان السلسلة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>اللغة</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر اللغة" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="ar">العربية</SelectItem>
+                <SelectItem value="fr">الفرنسية</SelectItem>
+                <SelectItem value="en">الإنجليزية</SelectItem>
+                <SelectItem value="ber">الأمازيغية</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>الطبعة</Label>
+            <Input placeholder="رقم الطبعة" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>موضوع الإصدار</Label>
+            <Input placeholder="موضوع الإصدار" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>رؤوس للمواضيع</Label>
+            <Input placeholder="رؤوس للمواضيع" />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label>ملخص الإصدار</Label>
+            <Textarea placeholder="ملخص الإصدار" rows={4} />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* التعريف بالناشر */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">التعريف بالناشر</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>اسم الناشر بالعربية والفرنسية</Label>
+            <Input placeholder="اسم الناشر" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>العنوان بالعربية والفرنسية</Label>
+            <Textarea placeholder="عنوان الناشر" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الهاتف</Label>
+            <Input placeholder="رقم هاتف الناشر" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>البريد الإلكتروني</Label>
+            <Input type="email" placeholder="بريد الناشر الإلكتروني" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>التاريخ المتوقع للإصدار (الشهر / السنة)</Label>
+            <Input type="month" />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* الوثائق المطلوب تقديمها */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">الوثائق المطلوب تقديمها</h3>
+        <div className="space-y-4">
+          {renderFileUpload("cover", "إرفاق الغلاف (Format « jpg » moins de 1 MO)", true, "image/jpeg")}
+        </div>
+
+        {Object.keys(uploadedFiles).length > 0 && (
+          <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+            <h4 className="font-medium text-green-800 mb-2">الوثائق المرفقة:</h4>
+            <div className="space-y-1">
+              {Object.entries(uploadedFiles).map(([type, file]) => (
+                <div key={type} className="flex items-center text-sm text-green-700">
+                  <CheckCircle className="w-3 h-3 mr-2" />
+                  <span className="font-medium">{type}:</span>
+                  <span className="ml-1">{file.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+          <h4 className="font-semibold mb-2">عنوان الإرسال:</h4>
+          <p className="text-sm text-muted-foreground">
+            يجب إرسال الوثائق إلى العنوان الإلكتروني التالي: <strong>depot.legal@bnrm.ma</strong>
+          </p>
+        </div>
+
+        <div className="mt-4 p-4 bg-accent/10 rounded-lg">
+          <h4 className="font-semibold mb-2">الشروط وعدد النسخ الواجب إرسالها:</h4>
+          <p className="text-sm text-muted-foreground mb-2">
+            بمجرد نشر العمل، يجب إيداع النسخ لدى الوكالة البيبليوغرافية الوطنية:
+          </p>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• نسختين متطابقتين بنفس نوعية الحامل</li>
+          </ul>
+        </div>
+      </div>
+
+      <Separator />
+
+      {renderPrivacyClauseArabic()}
+    </>
+  );
+
+  const renderPrivacyClauseArabic = () => (
+    <div className="bg-muted/50 p-4 rounded-lg">
+      <h4 className="font-semibold mb-2 flex items-center gap-2">
+        <AlertTriangle className="h-4 w-4" />
+        شرط حماية البيانات الشخصية
+      </h4>
+      <p className="text-sm text-muted-foreground mb-4">
+        تخضع المعلومات التي تم جمعها على موقع www.bnrm.ma للمعالجة المخصصة لإدارة تخصيص أرقام الإيداع القانوني وأرقام ISBN و ISSN. 
+        متلقي البيانات هو خدمة الإيداع القانوني.
+        وفقا للقانون رقم 08-09 الصادر بموجب الظهير الشريف 1-09-15 المؤرخ في 18 فبراير 2009، المتعلق بحماية الأفراد فيما يتعلق بمعالجة البيانات الشخصية، 
+        لك الحق في الوصول إلى المعلومات المتعلقة بك وتصحيحها، والتي يمكنك ممارستها عن طريق الاتصال بـ depot.legal@bnrm.ma.
+        يمكنك أيضا معارضة معالجة البيانات المتعلقة بك، لأسباب مشروعة.
+        تم إخطار CNDP بهذه المعالجة بموجب رقم الاستلام D-90/2023 بتاريخ 01/18/2023.
+      </p>
+      <div className="flex items-center space-x-2">
+        <Checkbox 
+          id="privacy-ar" 
+          checked={acceptedPrivacy}
+          onCheckedChange={(checked) => setAcceptedPrivacy(checked === true)}
+        />
+        <Label htmlFor="privacy-ar" className="text-sm">
+          لقد قرأت وقبلت شرط حماية البيانات الشخصية
+        </Label>
+      </div>
+    </div>
+  );
+
+  const renderFrenchForm = () => (
+    <>
+      {/* Section Auteur/Directeur selon le type */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">
+          {depositType === "periodique" ? "Directeur de la publication" : "Identification de l'auteur"}
+        </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {depositType !== "periodique" && (
                 <div className="space-y-2">
@@ -882,32 +1896,25 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               </Label>
             </div>
           </div>
-        </CardContent>
-        <CardFooter className="flex gap-2">
-          <Button variant="ghost" onClick={onClose}>
-            Annuler
-          </Button>
-          <Button onClick={handleFormSubmit} className="flex-1">
-            Soumettre la déclaration
-          </Button>
-        </CardFooter>
-      </Card>
-    );
-  }
+        </>
+      );
 
   if (currentStep === "confirmation") {
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
           <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500" />
-          <CardTitle>Déclaration soumise avec succès</CardTitle>
+          <CardTitle>{language === 'ar' ? 'تم إرسال التصريح بنجاح' : 'Déclaration soumise avec succès'}</CardTitle>
           <CardDescription>
-            Votre déclaration de dépôt légal a été enregistrée. Vous recevrez une confirmation par email avec le numéro de dépôt légal attribué.
+            {language === 'ar' 
+              ? 'تم تسجيل تصريح الإيداع القانوني الخاص بك. ستتلقى تأكيداً عبر البريد الإلكتروني مع رقم الإيداع القانوني المخصص.'
+              : 'Votre déclaration de dépôt légal a été enregistrée. Vous recevrez une confirmation par email avec le numéro de dépôt légal attribué.'
+            }
           </CardDescription>
         </CardHeader>
         <CardFooter>
           <Button onClick={onClose} className="w-full">
-            Fermer
+            {language === 'ar' ? 'إغلاق' : 'Fermer'}
           </Button>
         </CardFooter>
       </Card>
