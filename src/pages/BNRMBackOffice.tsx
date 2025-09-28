@@ -177,27 +177,151 @@ export default function BNRMBackOffice() {
 
               {/* Document Deposits Tab */}
               <TabsContent value="deposits" className="space-y-4">
+                <div className="grid gap-6 md:grid-cols-2">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Archive className="h-5 w-5" />
+                        <span>Dépôts Physiques</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Réception et traitement des exemplaires papier
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div className="bg-background rounded-lg border p-4">
+                            <h4 className="font-semibold text-sm mb-2">En attente de réception</h4>
+                            <div className="text-2xl font-bold text-orange-600">15</div>
+                            <p className="text-xs text-muted-foreground">Publications attendues</p>
+                          </div>
+                          <div className="bg-background rounded-lg border p-4">
+                            <h4 className="font-semibold text-sm mb-2">Reçus aujourd'hui</h4>
+                            <div className="text-2xl font-bold text-green-600">8</div>
+                            <p className="text-xs text-muted-foreground">Exemplaires reçus</p>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Button variant="outline" className="w-full justify-start">
+                            <FileText className="h-4 w-4 mr-2" />
+                            Registre des entrées
+                          </Button>
+                          <Button variant="outline" className="w-full justify-start">
+                            <Search className="h-4 w-4 mr-2" />
+                            Vérifier conformité
+                          </Button>
+                          <Button variant="outline" className="w-full justify-start">
+                            <Download className="h-4 w-4 mr-2" />
+                            Générer accusé réception
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Database className="h-5 w-5" />
+                        <span>Dépôts Numériques</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Gestion des fichiers et métadonnées numériques
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div className="bg-background rounded-lg border p-4">
+                            <h4 className="font-semibold text-sm mb-2">Fichiers en cours</h4>
+                            <div className="text-2xl font-bold text-blue-600">23</div>
+                            <p className="text-xs text-muted-foreground">En validation technique</p>
+                          </div>
+                          <div className="bg-background rounded-lg border p-4">
+                            <h4 className="font-semibold text-sm mb-2">Archivés</h4>
+                            <div className="text-2xl font-bold text-purple-600">1,247</div>
+                            <p className="text-xs text-muted-foreground">Documents numériques</p>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Button variant="outline" className="w-full justify-start">
+                            <Archive className="h-4 w-4 mr-2" />
+                            Contrôle formats/tailles
+                          </Button>
+                          <Button variant="outline" className="w-full justify-start">
+                            <Shield className="h-4 w-4 mr-2" />
+                            Vérification intégrité
+                          </Button>
+                          <Button variant="outline" className="w-full justify-start">
+                            <Database className="h-4 w-4 mr-2" />
+                            Archivage pérenne
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Archive className="h-5 w-5" />
-                      <span>Suivi des Dépôts de Documents</span>
-                    </CardTitle>
+                    <CardTitle>Suivi des Conformités et Non-Conformités</CardTitle>
                     <CardDescription>
-                      Gestion des exemplaires physiques et numériques déposés
+                      Tableau de bord des contrôles qualité des dépôts
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-center py-12 text-muted-foreground">
-                      <Archive className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <h3 className="text-lg font-semibold mb-2">Module en développement</h3>
-                      <p>Interface de gestion des dépôts physiques et numériques</p>
-                      <p className="text-sm mt-2">
-                        • Vérification de conformité des exemplaires<br/>
-                        • Génération d'accusés de réception<br/>
-                        • Gestion des non-conformités<br/>
-                        • Traçabilité complète des documents
-                      </p>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left p-2">N° Dépôt</th>
+                            <th className="text-left p-2">Publication</th>
+                            <th className="text-left p-2">Type</th>
+                            <th className="text-left p-2">Statut</th>
+                            <th className="text-left p-2">Date contrôle</th>
+                            <th className="text-left p-2">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b">
+                            <td className="p-2">DL-2024-001234</td>
+                            <td className="p-2">Guide du développeur React</td>
+                            <td className="p-2">Livre</td>
+                            <td className="p-2">
+                              <Badge variant="default" className="bg-green-100 text-green-800">Conforme</Badge>
+                            </td>
+                            <td className="p-2">15/03/2024</td>
+                            <td className="p-2">
+                              <Button variant="ghost" size="sm">Voir détails</Button>
+                            </td>
+                          </tr>
+                          <tr className="border-b">
+                            <td className="p-2">DL-2024-001235</td>
+                            <td className="p-2">Magazine Tech Innovation</td>
+                            <td className="p-2">Périodique</td>
+                            <td className="p-2">
+                              <Badge variant="destructive">Non conforme</Badge>
+                            </td>
+                            <td className="p-2">14/03/2024</td>
+                            <td className="p-2">
+                              <Button variant="ghost" size="sm">Corriger</Button>
+                            </td>
+                          </tr>
+                          <tr className="border-b">
+                            <td className="p-2">DL-2024-001236</td>
+                            <td className="p-2">Atlas historique du Maroc</td>
+                            <td className="p-2">Livre</td>
+                            <td className="p-2">
+                              <Badge variant="secondary">En cours</Badge>
+                            </td>
+                            <td className="p-2">13/03/2024</td>
+                            <td className="p-2">
+                              <Button variant="ghost" size="sm">Valider</Button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </CardContent>
                 </Card>
@@ -205,27 +329,145 @@ export default function BNRMBackOffice() {
 
               {/* Workflow Management Tab */}
               <TabsContent value="workflow" className="space-y-4">
+                <div className="grid gap-6 md:grid-cols-2">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Settings className="h-5 w-5" />
+                        <span>Configuration des Processus</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Définition des étapes de validation et responsabilités
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="bg-background rounded-lg border p-4">
+                          <h4 className="font-semibold text-sm mb-2">Workflow Dépôt Légal</h4>
+                          <div className="text-xs text-muted-foreground space-y-1">
+                            <div>1. Réception demande (Agent DL)</div>
+                            <div>2. Vérification documents (Validateur)</div>
+                            <div>3. Attribution numéros (Agent ISBN/ISSN)</div>
+                            <div>4. Contrôle conformité (Agent DL)</div>
+                            <div>5. Archivage final (Conservateur)</div>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Button variant="outline" className="w-full justify-start">
+                            <Settings className="h-4 w-4 mr-2" />
+                            Modifier étapes
+                          </Button>
+                          <Button variant="outline" className="w-full justify-start">
+                            <Users className="h-4 w-4 mr-2" />
+                            Assigner responsables
+                          </Button>
+                          <Button variant="outline" className="w-full justify-start">
+                            <Bell className="h-4 w-4 mr-2" />
+                            Configurer alertes
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <BarChart3 className="h-5 w-5" />
+                        <span>Suivi des Performances</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Délais et indicateurs de performance des workflows
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div className="bg-background rounded-lg border p-4">
+                            <h4 className="font-semibold text-sm mb-2">Délai moyen</h4>
+                            <div className="text-2xl font-bold text-blue-600">2.3j</div>
+                            <p className="text-xs text-muted-foreground">Traitement complet</p>
+                          </div>
+                          <div className="bg-background rounded-lg border p-4">
+                            <h4 className="font-semibold text-sm mb-2">Processus actifs</h4>
+                            <div className="text-2xl font-bold text-orange-600">47</div>
+                            <p className="text-xs text-muted-foreground">En cours</p>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Button variant="outline" className="w-full justify-start">
+                            <BarChart3 className="h-4 w-4 mr-2" />
+                            Tableau de bord
+                          </Button>
+                          <Button variant="outline" className="w-full justify-start">
+                            <Download className="h-4 w-4 mr-2" />
+                            Export performances
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Settings className="h-5 w-5" />
-                      <span>Gestion des Workflows</span>
-                    </CardTitle>
+                    <CardTitle>Instances de Workflow Actives</CardTitle>
                     <CardDescription>
-                      Configuration et suivi des processus métier
+                      Suivi en temps réel des processus en cours
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-center py-12 text-muted-foreground">
-                      <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <h3 className="text-lg font-semibold mb-2">Configuration des processus</h3>
-                      <p>Interface de paramétrage des workflows de validation</p>
-                      <p className="text-sm mt-2">
-                        • Définition des étapes de validation<br/>
-                        • Assignation des responsabilités<br/>
-                        • Gestion des délais et alertes<br/>
-                        • Reporting et tableaux de bord
-                      </p>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left p-2">N° Instance</th>
+                            <th className="text-left p-2">Publication</th>
+                            <th className="text-left p-2">Étape Actuelle</th>
+                            <th className="text-left p-2">Responsable</th>
+                            <th className="text-left p-2">Délai</th>
+                            <th className="text-left p-2">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b">
+                            <td className="p-2">WF-2024-0156</td>
+                            <td className="p-2">Guide pratique React</td>
+                            <td className="p-2">Vérification documents</td>
+                            <td className="p-2">M. Alami</td>
+                            <td className="p-2">
+                              <Badge variant="default" className="bg-green-100 text-green-800">Dans les temps</Badge>
+                            </td>
+                            <td className="p-2">
+                              <Button variant="ghost" size="sm">Voir détails</Button>
+                            </td>
+                          </tr>
+                          <tr className="border-b">
+                            <td className="p-2">WF-2024-0157</td>
+                            <td className="p-2">Revue Architecture</td>
+                            <td className="p-2">Attribution ISSN</td>
+                            <td className="p-2">Mme. Bennani</td>
+                            <td className="p-2">
+                              <Badge variant="destructive">En retard</Badge>
+                            </td>
+                            <td className="p-2">
+                              <Button variant="ghost" size="sm">Relancer</Button>
+                            </td>
+                          </tr>
+                          <tr className="border-b">
+                            <td className="p-2">WF-2024-0158</td>
+                            <td className="p-2">Histoire du Maroc</td>
+                            <td className="p-2">Contrôle conformité</td>
+                            <td className="p-2">M. Hajjami</td>
+                            <td className="p-2">
+                              <Badge variant="secondary">En cours</Badge>
+                            </td>
+                            <td className="p-2">
+                              <Button variant="ghost" size="sm">Suivre</Button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </CardContent>
                 </Card>
