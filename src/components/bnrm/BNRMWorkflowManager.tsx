@@ -8,8 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { 
   Settings, 
   Play, 
@@ -23,7 +28,12 @@ import {
   BarChart3,
   Plus,
   Edit,
-  Trash2
+  Trash2,
+  Users,
+  Bell,
+  Eye,
+  Save,
+  X
 } from "lucide-react";
 
 interface WorkflowStep {
@@ -59,6 +69,33 @@ interface WorkflowInstance {
   metadata: any;
 }
 
+// Validation schemas
+const workflowSchema = z.object({
+  name: z.string().min(3, "Le nom doit contenir au moins 3 caractères"),
+  workflow_type: z.string().min(1, "Le type est requis"),
+  description: z.string().min(10, "La description doit contenir au moins 10 caractères"),
+  is_active: z.boolean().default(true)
+});
+
+const stepSchema = z.object({
+  name: z.string().min(3, "Le nom de l'étape est requis"),
+  description: z.string().min(5, "La description est requise"),
+  role_required: z.string().min(1, "Le rôle est requis"),
+  estimated_duration_hours: z.number().min(0.5, "La durée minimum est 0.5h").max(168, "Maximum 168h"),
+  is_mandatory: z.boolean().default(true),
+  order_index: z.number().min(1, "L'ordre doit être supérieur à 0")
+});
+
+const assignmentSchema = z.object({
+  step_execution_id: z.string().min(1, "ID de l'étape requis"),
+  assigned_to: z.string().min(1, "Utilisateur requis"),
+  comments: z.string().optional()
+});
+
+type WorkflowFormData = z.infer<typeof workflowSchema>;
+type StepFormData = z.infer<typeof stepSchema>;
+type AssignmentFormData = z.infer<typeof assignmentSchema>;
+
 interface StepExecution {
   id: string;
   workflow_instance_id: string;
@@ -81,7 +118,31 @@ export function BNRMWorkflowManager() {
   const [selectedInstance, setSelectedInstance] = useState<WorkflowInstance | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showAlertsDialog, setShowAlertsDialog] = useState(false);
+  const [selectedStepExecution, setSelectedStepExecution] = useState<StepExecution | null>(null);
   const { toast } = useToast();
+
+  // Forms
+  const workflowForm = useForm<WorkflowFormData>({
+    resolver: zodResolver(workflowSchema),
+    defaultValues: {
+      name: "",
+      workflow_type: "legal_deposit",
+      description: "",
+      is_active: true
+    }
+  });
+
+  const assignmentForm = useForm<AssignmentFormData>({
+    resolver: zodResolver(assignmentSchema),
+    defaultValues: {
+      step_execution_id: "",
+      assigned_to: "",
+      comments: ""
+    }
+  });
 
   useEffect(() => {
     loadWorkflowData();
@@ -268,6 +329,147 @@ export function BNRMWorkflowManager() {
     }
   };
 
+  const createWorkflow = async (data: WorkflowFormData) => {
+    try {
+      const workflowData = {
+        name: data.name,
+        workflow_type: data.workflow_type,
+        description: data.description,
+        is_active: data.is_active,
+        steps: [] as any // Will be added later via step management
+      };
+
+      const { error } = await supabase
+        .from('workflows')
+        .insert([workflowData]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "Workflow créé avec succès",
+      });
+
+      setShowCreateDialog(false);
+      workflowForm.reset();
+      loadWorkflowData();
+
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const updateWorkflow = async (workflowId: string, data: Partial<WorkflowFormData>) => {
+    try {
+      const { error } = await supabase
+        .from('workflows')
+        .update(data)
+        .eq('id', workflowId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "Workflow mis à jour avec succès",
+      });
+
+      setShowEditDialog(false);
+      loadWorkflowData();
+
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteWorkflow = async (workflowId: string) => {
+    try {
+      const { error } = await supabase
+        .from('workflows')
+        .delete()
+        .eq('id', workflowId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "Workflow supprimé avec succès",
+      });
+
+      loadWorkflowData();
+
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const assignStepToUser = async (data: AssignmentFormData) => {
+    try {
+      const { error } = await supabase
+        .from('workflow_step_executions')
+        .update({
+          assigned_to: data.assigned_to,
+          comments: data.comments,
+          status: 'active'
+        })
+        .eq('id', data.step_execution_id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "Étape assignée avec succès",
+      });
+
+      setShowAssignDialog(false);
+      assignmentForm.reset();
+      loadWorkflowData();
+
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleWorkflowStatus = async (workflowId: string, isActive: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('workflows')
+        .update({ is_active: !isActive })
+        .eq('id', workflowId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: `Workflow ${!isActive ? 'activé' : 'désactivé'}`,
+      });
+
+      loadWorkflowData();
+
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const completeStep = async (stepExecutionId: string, status: 'completed' | 'rejected', comments?: string) => {
     try {
       // Update step execution
@@ -323,6 +525,7 @@ export function BNRMWorkflowManager() {
         description: `Étape ${status === 'completed' ? 'complétée' : 'rejetée'}`,
       });
 
+      setShowDetailsDialog(false);
       loadWorkflowData();
 
     } catch (error: any) {
@@ -332,6 +535,26 @@ export function BNRMWorkflowManager() {
         variant: "destructive",
       });
     }
+  };
+
+  const openAssignDialog = (stepExecution: StepExecution) => {
+    setSelectedStepExecution(stepExecution);
+    assignmentForm.setValue('step_execution_id', stepExecution.id);
+    setShowAssignDialog(true);
+  };
+
+  const openDetailsDialog = (instance: WorkflowInstance) => {
+    setSelectedInstance(instance);
+    setShowDetailsDialog(true);
+  };
+
+  const openEditDialog = (workflow: WorkflowDefinition) => {
+    setSelectedWorkflow(workflow);
+    workflowForm.setValue('name', workflow.name);
+    workflowForm.setValue('workflow_type', workflow.workflow_type);
+    workflowForm.setValue('description', workflow.description);
+    workflowForm.setValue('is_active', workflow.is_active);
+    setShowEditDialog(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -388,14 +611,103 @@ export function BNRMWorkflowManager() {
                 Nouveau Workflow
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl bg-background">
               <DialogHeader>
                 <DialogTitle>Créer un nouveau workflow</DialogTitle>
                 <DialogDescription>
-                  Définir un nouveau processus de traitement
+                  Définir un nouveau processus de traitement pour le dépôt légal
                 </DialogDescription>
               </DialogHeader>
-              {/* Form content would go here */}
+              <Form {...workflowForm}>
+                <form onSubmit={workflowForm.handleSubmit(createWorkflow)} className="space-y-4">
+                  <FormField
+                    control={workflowForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom du workflow</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Workflow Dépôt Légal Standard" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={workflowForm.control}
+                    name="workflow_type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type de workflow</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-background">
+                              <SelectValue placeholder="Sélectionner le type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-background border z-50">
+                            <SelectItem value="legal_deposit">Dépôt Légal</SelectItem>
+                            <SelectItem value="publication">Publication</SelectItem>
+                            <SelectItem value="validation">Validation</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={workflowForm.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Description détaillée du processus..."
+                            className="min-h-[100px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={workflowForm.control}
+                    name="is_active"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Actif</FormLabel>
+                          <FormDescription>
+                            Le workflow sera disponible pour de nouvelles instances
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="flex justify-end space-x-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)}>
+                      <X className="h-4 w-4 mr-2" />
+                      Annuler
+                    </Button>
+                    <Button type="submit">
+                      <Save className="h-4 w-4 mr-2" />
+                      Créer
+                    </Button>
+                  </div>
+                </form>
+              </Form>
             </DialogContent>
           </Dialog>
         </div>
@@ -479,8 +791,32 @@ export function BNRMWorkflowManager() {
                           <Play className="h-4 w-4 mr-1" />
                           Démarrer
                         </Button>
-                        <Button variant="outline" size="sm">
-                          <Edit className="h-4 w-4" />
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => openEditDialog(workflow)}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => toggleWorkflowStatus(workflow.id, workflow.is_active)}
+                        >
+                          {workflow.is_active ? <Pause className="h-4 w-4 mr-1" /> : <Play className="h-4 w-4 mr-1" />}
+                          {workflow.is_active ? 'Désactiver' : 'Activer'}
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            if (confirm('Êtes-vous sûr de vouloir supprimer ce workflow ?')) {
+                              deleteWorkflow(workflow.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
@@ -534,50 +870,26 @@ export function BNRMWorkflowManager() {
                           <td className="p-2">{getStatusBadge(instance.status)}</td>
                           <td className="p-2">{new Date(instance.started_at).toLocaleDateString()}</td>
                           <td className="p-2">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="ghost" size="sm" onClick={() => setSelectedInstance(instance)}>
-                                  Voir détails
+                            <div className="flex space-x-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => openDetailsDialog(instance)}
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                Détails
+                              </Button>
+                              {activeStep && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => openAssignDialog(activeStep)}
+                                >
+                                  <Users className="h-4 w-4 mr-1" />
+                                  Assigner
                                 </Button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-4xl">
-                                <DialogHeader>
-                                  <DialogTitle>Détails de l'instance</DialogTitle>
-                                  <DialogDescription>
-                                    Suivi détaillé du workflow {workflow?.name}
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                  {currentSteps.map((step) => (
-                                    <div key={step.id} className="border rounded-lg p-4">
-                                      <div className="flex items-center justify-between mb-2">
-                                        <h4 className="font-semibold">{step.step_number}. {step.step_name}</h4>
-                                        {getStatusBadge(step.status)}
-                                      </div>
-                                      {step.status === 'active' && (
-                                        <div className="flex space-x-2 mt-3">
-                                          <Button 
-                                            size="sm" 
-                                            onClick={() => completeStep(step.id, 'completed')}
-                                          >
-                                            <CheckCircle className="h-4 w-4 mr-1" />
-                                            Approuver
-                                          </Button>
-                                          <Button 
-                                            variant="destructive" 
-                                            size="sm"
-                                            onClick={() => completeStep(step.id, 'rejected')}
-                                          >
-                                            <XCircle className="h-4 w-4 mr-1" />
-                                            Rejeter
-                                          </Button>
-                                        </div>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              </DialogContent>
-                            </Dialog>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
@@ -613,6 +925,14 @@ export function BNRMWorkflowManager() {
                     <span className="text-sm">Workflows en retard</span>
                     <span className="font-semibold text-red-600">3</span>
                   </div>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => setShowAlertsDialog(true)}
+                  >
+                    <Bell className="h-4 w-4 mr-2" />
+                    Configurer Alertes
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -644,6 +964,304 @@ export function BNRMWorkflowManager() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Workflow Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-2xl bg-background">
+          <DialogHeader>
+            <DialogTitle>Modifier le workflow</DialogTitle>
+            <DialogDescription>
+              Mettre à jour les paramètres du workflow
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...workflowForm}>
+            <form onSubmit={workflowForm.handleSubmit((data) => {
+              if (selectedWorkflow) {
+                updateWorkflow(selectedWorkflow.id, data);
+              }
+            })} className="space-y-4">
+              <FormField
+                control={workflowForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nom du workflow</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={workflowForm.control}
+                name="workflow_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type de workflow</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-background">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-background border z-50">
+                        <SelectItem value="legal_deposit">Dépôt Légal</SelectItem>
+                        <SelectItem value="publication">Publication</SelectItem>
+                        <SelectItem value="validation">Validation</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={workflowForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea className="min-h-[100px]" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={workflowForm.control}
+                name="is_active"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Actif</FormLabel>
+                      <FormDescription>
+                        Le workflow sera disponible pour de nouvelles instances
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>
+                  Annuler
+                </Button>
+                <Button type="submit">
+                  Sauvegarder
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assignment Dialog */}
+      <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+        <DialogContent className="bg-background">
+          <DialogHeader>
+            <DialogTitle>Assigner une étape</DialogTitle>
+            <DialogDescription>
+              Assigner cette étape à un utilisateur responsable
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...assignmentForm}>
+            <form onSubmit={assignmentForm.handleSubmit(assignStepToUser)} className="space-y-4">
+              <FormField
+                control={assignmentForm.control}
+                name="assigned_to"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Utilisateur responsable</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-background">
+                          <SelectValue placeholder="Sélectionner un utilisateur" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-background border z-50">
+                        <SelectItem value="user1">M. Alami (Agent DL)</SelectItem>
+                        <SelectItem value="user2">Mme. Bennani (Validateur)</SelectItem>
+                        <SelectItem value="user3">M. Hajjami (Agent ISBN)</SelectItem>
+                        <SelectItem value="user4">Mme. Tazi (Conservateur)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={assignmentForm.control}
+                name="comments"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Commentaires (optionnel)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Instructions ou commentaires pour l'assigné..."
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={() => setShowAssignDialog(false)}>
+                  Annuler
+                </Button>
+                <Button type="submit">
+                  Assigner
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Instance Details Dialog */}
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="max-w-4xl bg-background">
+          <DialogHeader>
+            <DialogTitle>Détails de l'instance de workflow</DialogTitle>
+            <DialogDescription>
+              Suivi détaillé et actions sur les étapes du workflow
+            </DialogDescription>
+          </DialogHeader>
+          {selectedInstance && (
+            <div className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <Label className="text-sm font-medium">ID Instance</Label>
+                  <p className="text-sm text-muted-foreground">{selectedInstance.id}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Statut</Label>
+                  <div className="mt-1">{getStatusBadge(selectedInstance.status)}</div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Étapes du workflow</Label>
+                {getInstanceSteps(selectedInstance.id).map((step) => (
+                  <div key={step.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold">{step.step_number}. {step.step_name}</h4>
+                      {getStatusBadge(step.status)}
+                    </div>
+                    {step.assigned_to && (
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Assigné à: {step.assigned_to}
+                      </p>
+                    )}
+                    {step.comments && (
+                      <p className="text-sm bg-muted p-2 rounded">
+                        {step.comments}
+                      </p>
+                    )}
+                    {step.status === 'active' && (
+                      <div className="flex space-x-2 mt-3">
+                        <Button 
+                          size="sm" 
+                          onClick={() => completeStep(step.id, 'completed')}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Approuver
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={() => completeStep(step.id, 'rejected')}
+                        >
+                          <XCircle className="h-4 w-4 mr-1" />
+                          Rejeter
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => openAssignDialog(step)}
+                        >
+                          <Users className="h-4 w-4 mr-1" />
+                          Réassigner
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Alerts Configuration Dialog */}
+      <Dialog open={showAlertsDialog} onOpenChange={setShowAlertsDialog}>
+        <DialogContent className="bg-background">
+          <DialogHeader>
+            <DialogTitle>Configuration des Alertes</DialogTitle>
+            <DialogDescription>
+              Paramétrer les notifications et alertes du système
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-base">Alerte délai dépassé</Label>
+                <p className="text-sm text-muted-foreground">
+                  Notifier quand une étape dépasse le délai prévu
+                </p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-base">Rappel assignation</Label>
+                <p className="text-sm text-muted-foreground">
+                  Rappeler aux utilisateurs leurs tâches en attente
+                </p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-base">Rapport quotidien</Label>
+                <p className="text-sm text-muted-foreground">
+                  Envoyer un résumé quotidien des activités
+                </p>
+              </div>
+              <Switch />
+            </div>
+            
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button variant="outline" onClick={() => setShowAlertsDialog(false)}>
+                Annuler
+              </Button>
+              <Button onClick={() => {
+                toast({
+                  title: "Succès",
+                  description: "Configuration des alertes sauvegardée",
+                });
+                setShowAlertsDialog(false);
+              }}>
+                Sauvegarder
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
