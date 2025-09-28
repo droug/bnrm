@@ -801,6 +801,138 @@ export type Database = {
           },
         ]
       }
+      deposit_activity_log: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          new_status: Database["public"]["Enums"]["deposit_status"] | null
+          old_status: Database["public"]["Enums"]["deposit_status"] | null
+          request_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          new_status?: Database["public"]["Enums"]["deposit_status"] | null
+          old_status?: Database["public"]["Enums"]["deposit_status"] | null
+          request_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          new_status?: Database["public"]["Enums"]["deposit_status"] | null
+          old_status?: Database["public"]["Enums"]["deposit_status"] | null
+          request_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposit_activity_log_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "legal_deposit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deposit_notifications: {
+        Row: {
+          id: string
+          is_read: boolean | null
+          message: string
+          notification_type: string
+          recipient_id: string | null
+          request_id: string | null
+          sent_at: string | null
+          title: string
+        }
+        Insert: {
+          id?: string
+          is_read?: boolean | null
+          message: string
+          notification_type: string
+          recipient_id?: string | null
+          request_id?: string | null
+          sent_at?: string | null
+          title: string
+        }
+        Update: {
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          notification_type?: string
+          recipient_id?: string | null
+          request_id?: string | null
+          sent_at?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposit_notifications_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "legal_deposit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deposit_workflow_steps: {
+        Row: {
+          comments: string | null
+          created_at: string | null
+          gestionnaire_id: string | null
+          id: string
+          processed_at: string | null
+          request_id: string | null
+          status: string | null
+          step_name: string
+          step_number: number
+        }
+        Insert: {
+          comments?: string | null
+          created_at?: string | null
+          gestionnaire_id?: string | null
+          id?: string
+          processed_at?: string | null
+          request_id?: string | null
+          status?: string | null
+          step_name: string
+          step_number: number
+        }
+        Update: {
+          comments?: string | null
+          created_at?: string | null
+          gestionnaire_id?: string | null
+          id?: string
+          processed_at?: string | null
+          request_id?: string | null
+          status?: string | null
+          step_name?: string
+          step_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposit_workflow_steps_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "legal_deposit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       languages: {
         Row: {
           code: string
@@ -833,6 +965,120 @@ export type Database = {
           sort_order?: number | null
         }
         Relationships: []
+      }
+      legal_deposit_requests: {
+        Row: {
+          attribution_date: string | null
+          author_name: string | null
+          collaborator_id: string | null
+          created_at: string | null
+          dl_number: string | null
+          documents_urls: Json | null
+          id: string
+          initiator_id: string
+          isbn: string | null
+          isbn_assigned: string | null
+          ismn: string | null
+          ismn_assigned: string | null
+          issn: string | null
+          issn_assigned: string | null
+          language: string | null
+          metadata: Json | null
+          monograph_type: Database["public"]["Enums"]["monograph_type"]
+          page_count: number | null
+          processing_start_date: string | null
+          publication_date: string | null
+          reception_date: string | null
+          request_number: string
+          status: Database["public"]["Enums"]["deposit_status"] | null
+          submission_date: string | null
+          subtitle: string | null
+          support_type: Database["public"]["Enums"]["support_type"]
+          title: string
+          updated_at: string | null
+          validation_b_date: string | null
+          validation_code: string | null
+        }
+        Insert: {
+          attribution_date?: string | null
+          author_name?: string | null
+          collaborator_id?: string | null
+          created_at?: string | null
+          dl_number?: string | null
+          documents_urls?: Json | null
+          id?: string
+          initiator_id: string
+          isbn?: string | null
+          isbn_assigned?: string | null
+          ismn?: string | null
+          ismn_assigned?: string | null
+          issn?: string | null
+          issn_assigned?: string | null
+          language?: string | null
+          metadata?: Json | null
+          monograph_type: Database["public"]["Enums"]["monograph_type"]
+          page_count?: number | null
+          processing_start_date?: string | null
+          publication_date?: string | null
+          reception_date?: string | null
+          request_number: string
+          status?: Database["public"]["Enums"]["deposit_status"] | null
+          submission_date?: string | null
+          subtitle?: string | null
+          support_type: Database["public"]["Enums"]["support_type"]
+          title: string
+          updated_at?: string | null
+          validation_b_date?: string | null
+          validation_code?: string | null
+        }
+        Update: {
+          attribution_date?: string | null
+          author_name?: string | null
+          collaborator_id?: string | null
+          created_at?: string | null
+          dl_number?: string | null
+          documents_urls?: Json | null
+          id?: string
+          initiator_id?: string
+          isbn?: string | null
+          isbn_assigned?: string | null
+          ismn?: string | null
+          ismn_assigned?: string | null
+          issn?: string | null
+          issn_assigned?: string | null
+          language?: string | null
+          metadata?: Json | null
+          monograph_type?: Database["public"]["Enums"]["monograph_type"]
+          page_count?: number | null
+          processing_start_date?: string | null
+          publication_date?: string | null
+          reception_date?: string | null
+          request_number?: string
+          status?: Database["public"]["Enums"]["deposit_status"] | null
+          submission_date?: string | null
+          subtitle?: string | null
+          support_type?: Database["public"]["Enums"]["support_type"]
+          title?: string
+          updated_at?: string | null
+          validation_b_date?: string | null
+          validation_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_deposit_requests_collaborator_id_fkey"
+            columns: ["collaborator_id"]
+            isOneToOne: false
+            referencedRelation: "professional_registry"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "legal_deposit_requests_initiator_id_fkey"
+            columns: ["initiator_id"]
+            isOneToOne: false
+            referencedRelation: "professional_registry"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       legal_deposits: {
         Row: {
@@ -972,6 +1218,53 @@ export type Database = {
           },
         ]
       }
+      number_ranges: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          current_number: string
+          id: string
+          is_active: boolean | null
+          number_type: string
+          professional_id: string | null
+          range_end: string
+          range_start: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          current_number: string
+          id?: string
+          is_active?: boolean | null
+          number_type: string
+          professional_id?: string | null
+          range_end: string
+          range_start: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          current_number?: string
+          id?: string
+          is_active?: boolean | null
+          number_type?: string
+          professional_id?: string | null
+          range_end?: string
+          range_start?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "number_ranges_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professional_registry"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permissions: {
         Row: {
           category: string
@@ -993,6 +1286,63 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+        }
+        Relationships: []
+      }
+      professional_registry: {
+        Row: {
+          address: string | null
+          city: string | null
+          company_name: string
+          contact_person: string
+          created_at: string | null
+          email: string
+          id: string
+          is_verified: boolean | null
+          last_dl_number: string | null
+          phone: string | null
+          postal_code: string | null
+          professional_type: Database["public"]["Enums"]["professional_type"]
+          registration_number: string | null
+          updated_at: string | null
+          user_id: string | null
+          verification_date: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          company_name: string
+          contact_person: string
+          created_at?: string | null
+          email: string
+          id?: string
+          is_verified?: boolean | null
+          last_dl_number?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          professional_type: Database["public"]["Enums"]["professional_type"]
+          registration_number?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          verification_date?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          company_name?: string
+          contact_person?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          is_verified?: boolean | null
+          last_dl_number?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          professional_type?: Database["public"]["Enums"]["professional_type"]
+          registration_number?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          verification_date?: string | null
         }
         Relationships: []
       }
@@ -1417,6 +1767,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      generate_request_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_validation_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_admin_profile_summary: {
         Args: { user_uuid: string }
         Returns: {
@@ -1491,11 +1849,32 @@ export type Database = {
       access_level: "public" | "restricted" | "confidential"
       content_status: "draft" | "published" | "archived"
       content_type: "news" | "event" | "exhibition" | "page"
+      deposit_status:
+        | "brouillon"
+        | "soumis"
+        | "en_attente_validation_b"
+        | "valide_par_b"
+        | "rejete_par_b"
+        | "en_cours"
+        | "attribue"
+        | "receptionne"
+        | "rejete"
       manuscript_status:
         | "available"
         | "reserved"
         | "maintenance"
         | "digitization"
+      monograph_type:
+        | "livres"
+        | "beaux_livres"
+        | "encyclopedies"
+        | "corans"
+        | "theses"
+        | "ouvrages_scolaires"
+        | "periodiques"
+        | "musique"
+      professional_type: "editeur" | "producteur" | "imprimeur"
+      support_type: "imprime" | "electronique"
       user_role:
         | "admin"
         | "librarian"
@@ -1634,12 +2013,35 @@ export const Constants = {
       access_level: ["public", "restricted", "confidential"],
       content_status: ["draft", "published", "archived"],
       content_type: ["news", "event", "exhibition", "page"],
+      deposit_status: [
+        "brouillon",
+        "soumis",
+        "en_attente_validation_b",
+        "valide_par_b",
+        "rejete_par_b",
+        "en_cours",
+        "attribue",
+        "receptionne",
+        "rejete",
+      ],
       manuscript_status: [
         "available",
         "reserved",
         "maintenance",
         "digitization",
       ],
+      monograph_type: [
+        "livres",
+        "beaux_livres",
+        "encyclopedies",
+        "corans",
+        "theses",
+        "ouvrages_scolaires",
+        "periodiques",
+        "musique",
+      ],
+      professional_type: ["editeur", "producteur", "imprimeur"],
+      support_type: ["imprime", "electronique"],
       user_role: [
         "admin",
         "librarian",
