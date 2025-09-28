@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
-import SignLanguageAvatar from '@/components/SignLanguageAvatar';
+import SimpleAvatar from '@/components/SimpleAvatar';
 import { 
   Send, 
   Mic, 
@@ -333,10 +333,10 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
           </div>
         </div>
 
-        {/* Avatar 3D pour la langue des signes */}
+        {/* Avatar pour la langue des signes */}
         {signLanguageEnabled && (
           <div className="border-b bg-gradient-to-br from-blue-50/50 to-purple-50/50 p-2">
-            <SignLanguageAvatar 
+            <SimpleAvatar 
               isActive={signLanguageEnabled}
               currentText={messages.filter(m => m.sender === 'bot').slice(-1)[0]?.content || ''}
               language={language}

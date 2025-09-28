@@ -302,4 +302,19 @@ Enhanced Moroccan Heritage Design System
     transform: translateZ(0);
     will-change: transform;
   }
+
+  /* Wiggle animation for avatar */
+  @keyframes wiggle {
+    0%, 7% { transform: rotateZ(0deg); }
+    15% { transform: rotateZ(-15deg); }
+    20% { transform: rotateZ(10deg); }
+    25% { transform: rotateZ(-10deg); }
+    30% { transform: rotateZ(6deg); }
+    35% { transform: rotateZ(-4deg); }
+    40%, 100% { transform: rotateZ(0deg); }
+  }
+
+  .animate-wiggle {
+    animation: wiggle 1.5s ease-in-out;
+  }
 }

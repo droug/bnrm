@@ -1,6 +1,6 @@
-import React, { useRef, useMemo, useState, useEffect } from 'react';
+import React, { useRef, useMemo, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Html, OrbitControls, Text, Sphere, Box } from '@react-three/drei';
+import { Html, OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface SignLanguageAvatarProps {
@@ -254,11 +254,28 @@ const SignLanguageAvatar: React.FC<SignLanguageAvatarProps> = ({
 
   return (
     <div className="w-full h-80 bg-gradient-to-br from-blue-500/20 via-purple-500/10 to-pink-500/20 rounded-xl overflow-hidden relative shadow-2xl border border-primary/20">
-      <Canvas
-        camera={{ position: [0, 0, 3.5], fov: 45 }}
-        gl={{ antialias: true, alpha: true }}
-        shadows
-      >
+      <Suspense fallback={
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-blue-500 rounded-full animate-pulse"></div>
+            <p className="text-blue-600 font-medium">Chargement de l'avatar...</p>
+          </div>
+        </div>
+      }>
+        <Canvas
+          camera={{ position: [0, 0, 3.5], fov: 45 }}
+          gl={{ 
+            antialias: true, 
+            alpha: true,
+            preserveDrawingBuffer: true,
+            powerPreference: "high-performance"
+          }}
+          shadows
+          dpr={[1, 2]}
+          onCreated={({ gl }) => {
+            gl.domElement.style.display = 'block';
+          }}
+        >
         {/* Éclairage amélioré */}
         <ambientLight intensity={0.6} />
         <directionalLight 
@@ -326,7 +343,8 @@ const SignLanguageAvatar: React.FC<SignLanguageAvatarProps> = ({
           autoRotate={isActive}
           autoRotateSpeed={0.5}
         />
-      </Canvas>
+        </Canvas>
+      </Suspense>
 
       {/* Indicateur de statut moderne */}
       {isActive && (
