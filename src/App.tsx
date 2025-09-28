@@ -22,6 +22,7 @@ import AdminSettings from "./pages/AdminSettings";
 import LegalDepositPage from "./pages/LegalDepositPage";
 import ArchivingPage from "./pages/ArchivingPage";
 import BNRMBackOffice from "./pages/BNRMBackOffice";
+import SearchResults from "./pages/SearchResults";
 
 const App = () => (
   <TooltipProvider>
@@ -30,6 +31,7 @@ const App = () => (
       <Sonner />
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/search" element={<SearchResults />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<Dashboard />} />

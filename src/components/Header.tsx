@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown, Accessibility } from "lucide-react";
+import SearchBar from "@/components/SearchBar";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
@@ -454,13 +455,12 @@ const Header = () => {
 
           {/* Search and Mobile Menu */}
           <div className="flex items-center space-x-4">
-            <div className="relative hidden sm:block">
-              <Input
-                type="search"
-                placeholder={t('header.search')}
-                className="w-64 pl-10 pr-4 bg-background border-border focus:border-primary"
+            <div className="hidden sm:block w-64">
+              <SearchBar 
+                variant="compact"
+                showSuggestions={true}
+                className="w-full"
               />
-              <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
             </div>
             
             <Button
@@ -476,14 +476,11 @@ const Header = () => {
 
         {/* Mobile Search */}
         <div className="pb-4 sm:hidden">
-          <div className="relative">
-            <Input
-              type="search"
-              placeholder={t('header.searchMobile')}
-              className="w-full pl-10 pr-4 bg-background border-border focus:border-primary"
-            />
-            <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
-          </div>
+          <SearchBar 
+            variant="compact"
+            showSuggestions={true}
+            className="w-full"
+          />
         </div>
       </div>
 
