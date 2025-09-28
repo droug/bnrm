@@ -57,7 +57,7 @@ export default function AdminSettings() {
     },
     {
       icon: BookOpen,
-      title: "Back Office BNRM",
+      title: "Gestion du Dépôt Légal",
       description: "Interface complète de gestion du dépôt légal BNRM",
       href: "/admin/bnrm-backoffice",
       permission: "legal_deposit.manage"
@@ -126,7 +126,10 @@ export default function AdminSettings() {
                     <CardContent>
                       <Button 
                         className="w-full" 
-                        onClick={() => window.location.href = card.href}
+                        onClick={() => {
+                          console.log('Navigating to:', card.href);
+                          window.location.href = card.href;
+                        }}
                       >
                         Accéder
                       </Button>
