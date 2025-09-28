@@ -10,7 +10,12 @@ const corsHeaders = {
 
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
+console.log('=== DEBUGGING OPENAI API KEY ===');
 console.log('OpenAI API Key configured:', OPENAI_API_KEY ? 'Yes' : 'No');
+console.log('API Key length:', OPENAI_API_KEY ? OPENAI_API_KEY.length : 0);
+console.log('API Key starts with sk-:', OPENAI_API_KEY ? OPENAI_API_KEY.startsWith('sk-') : false);
+console.log('API Key value (first 15 chars):', OPENAI_API_KEY ? OPENAI_API_KEY.substring(0, 15) + '...' : 'undefined');
+console.log('===================================');
 
 if (!OPENAI_API_KEY || OPENAI_API_KEY === 'secret') {
   console.error('OPENAI_API_KEY is not set or still using default value');
