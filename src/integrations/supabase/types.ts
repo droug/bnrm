@@ -363,6 +363,158 @@ export type Database = {
           },
         ]
       }
+      chat_conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          language: string
+          title: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          language?: string
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          language?: string
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          conversation_id: string | null
+          created_at: string | null
+          id: string
+          language: string
+          metadata: Json | null
+          sender: string
+        }
+        Insert: {
+          content: string
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          language?: string
+          metadata?: Json | null
+          sender: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          language?: string
+          metadata?: Json | null
+          sender?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chatbot_interactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          interaction_type: string
+          language: string
+          metadata: Json | null
+          query_text: string | null
+          response_text: string | null
+          response_time_ms: number | null
+          satisfaction_rating: number | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          interaction_type: string
+          language?: string
+          metadata?: Json | null
+          query_text?: string | null
+          response_text?: string | null
+          response_time_ms?: number | null
+          satisfaction_rating?: number | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          interaction_type?: string
+          language?: string
+          metadata?: Json | null
+          query_text?: string | null
+          response_text?: string | null
+          response_time_ms?: number | null
+          satisfaction_rating?: number | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      chatbot_knowledge_base: {
+        Row: {
+          category: string
+          content: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          keywords: string[] | null
+          language: string
+          priority: number | null
+          source_type: string | null
+          source_url: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          keywords?: string[] | null
+          language?: string
+          priority?: number | null
+          source_type?: string | null
+          source_url?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          keywords?: string[] | null
+          language?: string
+          priority?: number | null
+          source_type?: string | null
+          source_url?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       collections: {
         Row: {
           created_at: string | null
@@ -1308,6 +1460,20 @@ export type Database = {
       perform_automatic_archiving: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      search_knowledge_base: {
+        Args: {
+          limit_results?: number
+          search_language?: string
+          search_query: string
+        }
+        Returns: {
+          category: string
+          content: string
+          id: string
+          relevance: number
+          title: string
+        }[]
       }
       should_content_be_archived: {
         Args: {
