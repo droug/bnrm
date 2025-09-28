@@ -8,8 +8,10 @@ const corsHeaders = {
 
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
-if (!OPENAI_API_KEY) {
-  console.error('OPENAI_API_KEY is not set');
+console.log('OpenAI API Key configured:', OPENAI_API_KEY ? 'Yes' : 'No');
+
+if (!OPENAI_API_KEY || OPENAI_API_KEY === 'secret') {
+  console.error('OPENAI_API_KEY is not set or still using default value');
 }
 
 serve(async (req) => {
@@ -18,6 +20,21 @@ serve(async (req) => {
   }
 
   try {
+    // Vérifier si la clé API est disponible
+    if (!OPENAI_API_KEY || OPENAI_API_KEY === 'secret') {
+      console.error('OpenAI API key is missing or invalid');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Configuration API manquante',
+          reply: 'Désolé, le service est temporairement indisponible. La clé API OpenAI n\'est pas configurée correctement.' 
+        }),
+        { 
+          status: 200, // Retourner 200 pour éviter l'erreur côté client
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
     const { message, language = 'fr', userId } = await req.json();
 
     if (!message) {
@@ -111,6 +128,8 @@ serve(async (req) => {
 
     const systemPrompt = systemPrompts[language as keyof typeof systemPrompts] || systemPrompts.fr;
 
+    console.log('Making request to OpenAI...');
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -127,6 +146,8 @@ serve(async (req) => {
         temperature: 0.7,
       }),
     });
+
+    console.log('OpenAI response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -154,7 +175,7 @@ serve(async (req) => {
       error: errorMessage,
       reply: 'Désolé, je rencontre un problème technique. Veuillez réessayer.'
     }), {
-      status: 500,
+      status: 200, // Changer à 200 pour éviter l'erreur côté client
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }

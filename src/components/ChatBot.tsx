@@ -489,9 +489,11 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              console.log('Form submitted with message:', inputMessage);
               if (inputMessage.trim()) {
                 sendMessage(inputMessage);
               }
+              return false;
             }}
             className="flex items-center gap-2"
           >
@@ -505,9 +507,19 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     e.stopPropagation();
+                    console.log('Enter pressed with message:', inputMessage);
                     if (inputMessage.trim()) {
                       sendMessage(inputMessage);
                     }
+                    return false;
+                  }
+                }}
+                onKeyPress={(e) => {
+                  // Empêcher tous les événements keypress sur Enter
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
                   }
                 }}
                 className="rounded-full"
