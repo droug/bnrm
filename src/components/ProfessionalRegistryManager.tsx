@@ -95,11 +95,11 @@ export const ProfessionalRegistryManager = () => {
         query = query.or(`company_name.ilike.%${filters.search}%,contact_person.ilike.%${filters.search}%,email.ilike.%${filters.search}%`);
       }
       
-      if (filters.professional_type) {
+      if (filters.professional_type && filters.professional_type !== "all") {
         query = query.eq('professional_type', filters.professional_type as any);
       }
       
-      if (filters.is_verified) {
+      if (filters.is_verified && filters.is_verified !== "all") {
         query = query.eq('is_verified', filters.is_verified === 'true');
       }
       
@@ -302,7 +302,7 @@ export const ProfessionalRegistryManager = () => {
                 <SelectValue placeholder="Type de professionnel" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les types</SelectItem>
+                <SelectItem value="all">Tous les types</SelectItem>
                 <SelectItem value="editeur">Éditeur</SelectItem>
                 <SelectItem value="producteur">Producteur</SelectItem>
                 <SelectItem value="imprimeur">Imprimeur</SelectItem>
@@ -317,7 +317,7 @@ export const ProfessionalRegistryManager = () => {
                 <SelectValue placeholder="Statut de vérification" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous</SelectItem>
+                <SelectItem value="all">Tous</SelectItem>
                 <SelectItem value="true">Vérifiés</SelectItem>
                 <SelectItem value="false">En attente</SelectItem>
               </SelectContent>
@@ -330,7 +330,7 @@ export const ProfessionalRegistryManager = () => {
             />
             
             <Button 
-              onClick={() => setFilters({ search: "", professional_type: "", is_verified: "", city: "" })}
+              onClick={() => setFilters({ search: "", professional_type: "all", is_verified: "all", city: "" })}
               variant="outline"
             >
               Réinitialiser

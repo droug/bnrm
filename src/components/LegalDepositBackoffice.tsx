@@ -120,11 +120,11 @@ export const LegalDepositBackoffice = () => {
         query = query.or(`title.ilike.%${filters.search}%,request_number.ilike.%${filters.search}%,author_name.ilike.%${filters.search}%`);
       }
       
-      if (filters.status) {
+      if (filters.status && filters.status !== "all") {
         query = query.eq('status', filters.status as any);
       }
       
-      if (filters.support_type) {
+      if (filters.support_type && filters.support_type !== "all") {
         query = query.eq('support_type', filters.support_type as any);
       }
       
@@ -340,7 +340,7 @@ export const LegalDepositBackoffice = () => {
                 <SelectValue placeholder="Statut" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les statuts</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
                 {Object.entries(statusConfig).map(([key, config]) => (
                   <SelectItem key={key} value={key}>{config.label}</SelectItem>
                 ))}
@@ -355,7 +355,7 @@ export const LegalDepositBackoffice = () => {
                 <SelectValue placeholder="Type de support" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les supports</SelectItem>
+                <SelectItem value="all">Tous les supports</SelectItem>
                 <SelectItem value="imprime">Imprimé</SelectItem>
                 <SelectItem value="electronique">Électronique</SelectItem>
               </SelectContent>
@@ -376,7 +376,7 @@ export const LegalDepositBackoffice = () => {
             />
             
             <Button 
-              onClick={() => setFilters({ search: "", status: "", professional_type: "", support_type: "", date_from: "", date_to: "" })}
+              onClick={() => setFilters({ search: "", status: "all", professional_type: "", support_type: "all", date_from: "", date_to: "" })}
               variant="outline"
             >
               Réinitialiser
