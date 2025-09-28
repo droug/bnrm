@@ -212,7 +212,7 @@ const Header = () => {
                       <h4 className="text-sm font-medium text-primary mb-3">{t('nav.inscription.access')}</h4>
                       <NavigationMenuLink asChild>
                         <a href="/inscription" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Inscription en ligne / réinscription</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.online.registration')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Parcours "je m'inscris"
                           </p>
@@ -220,7 +220,7 @@ const Header = () => {
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/consulter-bn" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Consulter la Bibliothèque Nationale</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.consult.national.library')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Accès aux collections de référence
                           </p>
@@ -228,7 +228,7 @@ const Header = () => {
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/reserver-ouvrage" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Réserver un ouvrage</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.reserve.book')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Réservation en ligne de documents
                           </p>
@@ -236,7 +236,7 @@ const Header = () => {
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/reserver-espaces" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Réserver nos espaces</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.reserve.spaces')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Réservation d'espaces de travail
                           </p>
@@ -249,7 +249,7 @@ const Header = () => {
                         <a href="/depot-legal" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                           <div className="text-sm font-medium leading-none flex items-center">
                             <FileText className="w-4 h-4 mr-2" />
-                            Dépôt légal
+                            {t('nav.legal.deposit')}
                           </div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Description du service et texte de loi
@@ -260,7 +260,7 @@ const Header = () => {
                         <a href="/demande-reproduction" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                           <div className="text-sm font-medium leading-none flex items-center">
                             <Download className="w-4 h-4 mr-2" />
-                            Demande de reproduction
+                            {t('nav.reproduction.request')}
                           </div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Reproduction de documents
@@ -269,7 +269,7 @@ const Header = () => {
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/demande-restauration" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Demande de restauration</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.restoration.request')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Restauration de documents anciens
                           </p>
@@ -292,27 +292,27 @@ const Header = () => {
                       <h4 className="text-sm font-medium text-primary mb-3">{t('nav.collections')}</h4>
                       <NavigationMenuLink asChild>
                         <a href="/collections-specialisees" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Collections spécialisées</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.specialized.collections')}</div>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/collections-numerisees" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Collections numérisées</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.digitized.collections')}</div>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/collections-offertes" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Collections offertes</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.donated.collections')}</div>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/manuscripts" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Manuscrits</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.manuscripts')}</div>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/monographies" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Monographies</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.monographs')}</div>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>

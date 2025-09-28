@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -61,6 +62,7 @@ const CONTENT_TYPES = {
 
 export default function ArchivingManager() {
   const { user, profile } = useAuth();
+  const { t } = useLanguage();
   const { toast } = useToast();
   
   const [settings, setSettings] = useState<ArchivingSettings[]>([]);
@@ -245,11 +247,11 @@ export default function ArchivingManager() {
         <TabsList>
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
-            Paramètres
+            {t('tabs.settings')}
           </TabsTrigger>
           <TabsTrigger value="logs" className="flex items-center gap-2">
             <History className="h-4 w-4" />
-            Historique
+            {t('tabs.logs')}
           </TabsTrigger>
         </TabsList>
 

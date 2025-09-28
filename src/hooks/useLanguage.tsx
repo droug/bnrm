@@ -43,6 +43,28 @@ const translations = {
     'nav.login': 'Connexion',
     'nav.dashboard': 'Tableau de bord',
     
+    // Additional navigation and menus
+    'nav.legal.deposit': 'Dépôt légal',
+    'nav.reproduction.request': 'Demande de reproduction',
+    'nav.restoration.request': 'Demande de restauration',
+    'nav.online.registration': 'Inscription en ligne / réinscription',
+    'nav.consult.national.library': 'Consulter la Bibliothèque Nationale',
+    'nav.reserve.book': 'Réserver un ouvrage',
+    'nav.reserve.spaces': 'Réserver nos espaces',
+    'nav.specialized.collections': 'Collections spécialisées',
+    'nav.digitized.collections': 'Collections numérisées',
+    'nav.donated.collections': 'Collections offertes',
+    'nav.manuscripts': 'Manuscrits',
+    'nav.monographs': 'Monographies',
+    
+    // Tabs and interface elements
+    'tabs.services': 'Services',
+    'tabs.parameters': 'Paramètres',
+    'tabs.tariffs': 'Tarifs Paramétrables',
+    'tabs.history': 'Historique',
+    'tabs.logs': 'Historique',
+    'tabs.settings': 'Paramètres',
+    
     // Hero
     'hero.title': 'Gardienne du Patrimoine Écrit Marocain',
     'hero.subtitle': 'Découvrez les trésors documentaires du Royaume à travers nos collections de manuscrits anciens, livres rares et ressources numériques d\'exception.',
@@ -244,6 +266,28 @@ const translations = {
     'nav.organization.chart': 'الهيكل التنظيمي',
     'nav.login': 'تسجيل الدخول',
     'nav.dashboard': 'لوحة التحكم',
+    
+    // Additional navigation and menus
+    'nav.legal.deposit': 'الإيداع القانوني',
+    'nav.reproduction.request': 'طلب الاستنساخ',
+    'nav.restoration.request': 'طلب الترميم',
+    'nav.online.registration': 'التسجيل عبر الإنترنت / إعادة التسجيل',
+    'nav.consult.national.library': 'استشارة المكتبة الوطنية',
+    'nav.reserve.book': 'حجز كتاب',
+    'nav.reserve.spaces': 'حجز المساحات',
+    'nav.specialized.collections': 'المجموعات المتخصصة',
+    'nav.digitized.collections': 'المجموعات الرقمية',
+    'nav.donated.collections': 'المجموعات المهداة',
+    'nav.manuscripts': 'المخطوطات',
+    'nav.monographs': 'المونوغرافيات',
+    
+    // Tabs and interface elements
+    'tabs.services': 'الخدمات',
+    'tabs.parameters': 'المعاملات',
+    'tabs.tariffs': 'التعريفات القابلة للتعديل',
+    'tabs.history': 'السجل',
+    'tabs.logs': 'السجل',
+    'tabs.settings': 'الإعدادات',
     
     // Hero
     'hero.title': 'حارسة التراث المكتوب المغربي',
@@ -447,6 +491,28 @@ const translations = {
     'nav.login': 'ⴰⴽⵛⵛⵓⵎ',
     'nav.dashboard': 'ⴰⴼⵍⵍⵉⵙ ⵏ ⵓⵙⴼⵔⵓⴽ',
     
+    // Additional navigation and menus
+    'nav.legal.deposit': 'ⴰⵙⵔⵙ ⴰⵏⴰⵎⵓⵙ',
+    'nav.reproduction.request': 'ⴰⵙⵓⵜⵔ ⵏ ⵓⵙⵏⵓⵍⴼⵓ',
+    'nav.restoration.request': 'ⴰⵙⵓⵜⵔ ⵏ ⵓⵙⵎⴷ',
+    'nav.online.registration': 'ⴰⵙⵎⵓⵍ ⵙ ⵉⵏⵜⴰⵔⵏⵉⵜ / ⴰⵍⵙ ⵓⵙⵎⵓⵍ',
+    'nav.consult.national.library': 'ⴰⵎⵢⴰⵡⴰⴹ ⴰⴽⴷ ⵜⵙⴷⴰⵡⵉⵜ ⵜⴰⵏⴰⵎⵓⵔⵜ',
+    'nav.reserve.book': 'ⴰⴽⵙⵉ ⵓⴷⵍⵉⵙ',
+    'nav.reserve.spaces': 'ⴰⴽⵙⵉ ⵉⴷⵖⴰⵔⵏ',
+    'nav.specialized.collections': 'ⵜⵉⵙⵎⴰⵍⵉⵏ ⵜⵉⴳⵣⵣⵓⵎⵉⵏ',
+    'nav.digitized.collections': 'ⵜⵉⵙⵎⴰⵍⵉⵏ ⵜⵉⵎⵣⵣⵢⵏⵉⵏ',
+    'nav.donated.collections': 'ⵜⵉⵙⵎⴰⵍⵉⵏ ⵜⵓⴼⴽⵉⵏ',
+    'nav.manuscripts': 'ⵉⵔⴰⵜⵏ',
+    'nav.monographs': 'ⵉⵎⵓⵏⵓⴳⵔⴰⴼⵏ',
+    
+    // Tabs and interface elements
+    'tabs.services': 'ⵜⵏⴰⵏⵜⵉⵏ',
+    'tabs.parameters': 'ⵜⵉⵙⵎⴽⵜⴰ',
+    'tabs.tariffs': 'ⵉⵎⵍⴰⵙⵏ ⵉⵜⵜⵓⵙⵏⴼⵍⵏ',
+    'tabs.history': 'ⴰⵎⵣⵔⵓⵢ',
+    'tabs.logs': 'ⴰⵎⵣⵔⵓⵢ',
+    'tabs.settings': 'ⵜⵉⵙⵖⵜⵉⵏ',
+    
     // Hero
     'hero.title': 'ⴰⵎⵙⵙⴰⵔ ⵏ ⵓⵎⵓⵔ ⵉⵜⵜⵓⴳⴰⵏ ⴰⵎⵖⵔⵉⴱⵉ',
     'hero.subtitle': 'ⴰⴼ ⵉⵏⴼⴰⵍⵏ ⵏ ⵜⴳⵍⴷⵉⵜ ⴰⵔ ⵜⵙⵎⴰⵍⵉⵏ ⵏⵏⵖ ⵏ ⵉⵔⴰⵜⵏ ⵉⵣⴰⵢⴽⵓⵏⵏ, ⵉⴷⵍⵉⵙⵏ ⵉⵣⴷⴰⵔⵏ ⴷ ⵜⵅⵣⵉⵏⵜ ⵜⴰⵎⵣⵣⵢⴰⵏⵜ ⵜⴰⵛⵜⵓⴽⵜ.',
@@ -648,6 +714,28 @@ const translations = {
     'nav.organization.chart': 'Organization chart',
     'nav.login': 'Login',
     'nav.dashboard': 'Dashboard',
+    
+    // Additional navigation and menus
+    'nav.legal.deposit': 'Legal Deposit',
+    'nav.reproduction.request': 'Reproduction Request',
+    'nav.restoration.request': 'Restoration Request',
+    'nav.online.registration': 'Online Registration / Re-registration',
+    'nav.consult.national.library': 'Consult National Library',
+    'nav.reserve.book': 'Reserve a Book',
+    'nav.reserve.spaces': 'Reserve Our Spaces',
+    'nav.specialized.collections': 'Specialized Collections',
+    'nav.digitized.collections': 'Digitized Collections',
+    'nav.donated.collections': 'Donated Collections',
+    'nav.manuscripts': 'Manuscripts',
+    'nav.monographs': 'Monographs',
+    
+    // Tabs and interface elements
+    'tabs.services': 'Services',
+    'tabs.parameters': 'Parameters',
+    'tabs.tariffs': 'Configurable Tariffs',
+    'tabs.history': 'History',
+    'tabs.logs': 'Logs',
+    'tabs.settings': 'Settings',
     
     // Hero
     'hero.title': 'Guardian of Moroccan Written Heritage',

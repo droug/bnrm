@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from "@/hooks/useLanguage";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,7 @@ interface TarifHistorique {
 }
 
 export const BNRMManager = () => {
+  const { t } = useLanguage();
   const [services, setServices] = useState<BNRMService[]>([]);
   const [tarifs, setTarifs] = useState<BNRMTarif[]>([]);
   const [parametres, setParametres] = useState<BNRMParametre[]>([]);
@@ -211,10 +213,10 @@ export const BNRMManager = () => {
 
       <Tabs defaultValue="services" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="services">Services</TabsTrigger>
-          <TabsTrigger value="tarifs">Tarifs Paramétrables</TabsTrigger>
-          <TabsTrigger value="parametres">Paramètres</TabsTrigger>
-          <TabsTrigger value="historique">Historique</TabsTrigger>
+          <TabsTrigger value="services">{t('tabs.services')}</TabsTrigger>
+          <TabsTrigger value="tarifs">{t('tabs.tariffs')}</TabsTrigger>
+          <TabsTrigger value="parametres">{t('tabs.parameters')}</TabsTrigger>
+          <TabsTrigger value="historique">{t('tabs.history')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="services" className="space-y-4">
