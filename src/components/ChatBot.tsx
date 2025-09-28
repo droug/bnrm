@@ -311,7 +311,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
     const maxY = window.innerHeight - 750; // hauteur de la fenêtre
     
     setPosition({
-      x: Math.max(0, Math.min(newX, maxX)),
+      x: Math.max(-350, Math.min(newX, maxX)), // Permet de bouger vers la gauche
       y: Math.max(0, Math.min(newY, maxY))
     });
   };
@@ -338,7 +338,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
       ref={chatWindowRef}
       className="fixed shadow-2xl border-2 border-primary/30 bg-background/95 backdrop-blur-lg transition-all duration-300 transform-gpu rounded-lg overflow-hidden"
       style={{
-        left: `${16 + position.x}px`,
+        right: `${16 + position.x}px`,
         top: `${64 + position.y}px`,
         width: window.innerWidth < 640 ? 'calc(100vw - 2rem)' : '384px',
         height: '750px',
@@ -406,17 +406,17 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
           </div>
         </div>
 
-        {/* Avatar pour la langue des signes */}
+        {/* Avatar pour la langue des signes - TOUJOURS VISIBLE */}
         {signLanguageEnabled && (
-          <div className="border-b bg-gradient-to-br from-blue-50/50 to-purple-50/50 p-2">
-            <div className="w-full h-64 bg-gradient-to-br from-blue-500/20 via-purple-500/10 to-pink-500/20 rounded-xl overflow-hidden relative shadow-2xl border border-primary/20 flex items-center justify-center">
-              {/* Avatar simple visible */}
+          <div className="border-b bg-gradient-to-br from-blue-50/50 to-purple-50/50 p-4">
+            <div className="w-full h-48 bg-gradient-to-br from-blue-500/20 via-purple-500/10 to-pink-500/20 rounded-xl overflow-hidden relative shadow-lg border border-primary/20 flex items-center justify-center">
+              {/* Avatar visible */}
               <div className="text-center">
-                <div className="text-6xl mb-2 animate-bounce">🤖</div>
-                <div className="text-lg font-semibold text-blue-600 mb-2">Assistant IA</div>
-                <div className="flex items-center justify-center gap-2 bg-black/20 backdrop-blur-md rounded-full px-3 py-1">
+                <div className="text-5xl mb-3 animate-bounce">🤖</div>
+                <div className="text-lg font-semibold text-blue-600 mb-2">Assistant IA BNRM</div>
+                <div className="flex items-center justify-center gap-2 bg-blue-600/20 backdrop-blur-md rounded-full px-3 py-1">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-white font-semibold">Actif</span>
+                  <span className="text-xs text-blue-800 font-semibold">Langue des signes active</span>
                 </div>
               </div>
             </div>
