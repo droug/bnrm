@@ -290,7 +290,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
   if (!isOpen) return null;
 
   return (
-    <Card className="fixed-chat top-16 right-4 w-96 max-w-[calc(100vw-2rem)] h-[750px] max-h-[calc(100vh-5rem)] shadow-2xl border-2 border-primary/30 bg-background/95 backdrop-blur-lg sm:w-96 w-[95vw] transition-all duration-300">
+    <Card className="fixed-chat top-16 right-4 w-96 max-w-[calc(100vw-2rem)] h-[750px] max-h-[calc(100vh-5rem)] shadow-2xl border-2 border-primary/30 bg-background/95 backdrop-blur-lg sm:w-96 w-[95vw] transition-all duration-300 transform-gpu">
       <CardContent className="p-0 h-full flex flex-col overflow-hidden relative">
         {/* Barre de déplacement */}
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-primary/30 rounded-full mt-2 cursor-move"></div>
@@ -329,7 +329,18 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
             >
               {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </Button>
-            {/* Suppression du bouton de fermeture pour garder la fenêtre ouverte */}
+            {/* Bouton fermer */}
+            {onClose && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="w-8 h-8 p-0 hover:bg-red-100 hover:text-red-600"
+                title="Fermer l'assistant"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         </div>
 
