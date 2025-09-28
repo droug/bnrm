@@ -112,18 +112,14 @@ const Header = () => {
 
         {/* Main navigation - Logo plus grand */}
         <div className="flex items-center justify-between py-8">
-          {/* Logo avec image plus grande */}
-          <Link to="/" className="flex items-center space-x-6 hover:opacity-80 transition-opacity">
-            <div className="w-20 h-20 flex items-center justify-center">
+          {/* Logo seul, plus grand */}
+          <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
+            <div className="w-24 h-24 flex items-center justify-center">
               <img 
                 src={logoImage} 
                 alt="Logo BNRM" 
-                className="h-18 w-auto object-contain"
+                className="h-22 w-auto object-contain"
               />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">BNRM</h1>
-              <p className="text-base text-muted-foreground hidden sm:block">{t('header.title')}</p>
             </div>
           </Link>
 
