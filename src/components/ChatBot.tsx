@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
+import SignLanguageAvatar from '@/components/SignLanguageAvatar';
 import { 
   Send, 
   Mic, 
@@ -18,7 +19,10 @@ import {
   Settings, 
   Loader2,
   Bot,
-  User
+  User,
+  HandHeart,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -44,6 +48,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const [signLanguageEnabled, setSignLanguageEnabled] = useState(false);
+  const [currentBotMessage, setCurrentBotMessage] = useState('');
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -111,6 +117,9 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
       };
 
       setMessages(prev => [...prev, botMessage]);
+
+      // Mettre à jour le message actuel pour l'avatar
+      setCurrentBotMessage(data.reply);
 
       // Text-to-speech if audio is enabled
       if (audioEnabled && data.reply) {
@@ -281,7 +290,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
   if (!isOpen) return null;
 
   return (
-    <Card className="fixed top-20 right-4 w-96 max-w-[calc(100vw-2rem)] h-[600px] max-h-[calc(100vh-6rem)] shadow-2xl border-2 border-primary/20 bg-background z-[9990] sm:w-96 w-[95vw]">
+    <Card className="fixed top-20 right-4 w-96 max-w-[calc(100vw-2rem)] h-[700px] max-h-[calc(100vh-6rem)] shadow-2xl border-2 border-primary/20 bg-background z-[9990] sm:w-96 w-[95vw]">
       <CardContent className="p-0 h-full flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-primary/5">
@@ -292,11 +301,22 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
             <div>
               <h3 className="font-semibold text-sm">Assistant BNRM</h3>
               <Badge variant="secondary" className="text-xs">
-                {isSpeaking ? 'En train de parler...' : isRecording ? 'Écoute...' : 'En ligne'}
+                {isSpeaking ? 'En train de parler...' : 
+                 isRecording ? 'Écoute...' : 
+                 signLanguageEnabled ? 'Langue des signes' : 'En ligne'}
               </Badge>
             </div>
           </div>
           <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSignLanguageEnabled(!signLanguageEnabled)}
+              className={`w-8 h-8 p-0 ${signLanguageEnabled ? 'bg-blue-100 text-blue-600' : ''}`}
+              title="Activer/Désactiver la langue des signes"
+            >
+              {signLanguageEnabled ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -317,6 +337,17 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
             )}
           </div>
         </div>
+
+        {/* Avatar 3D pour la langue des signes */}
+        {signLanguageEnabled && (
+          <div className="border-b bg-gray-50/50 p-2">
+            <SignLanguageAvatar 
+              isActive={signLanguageEnabled && (isSpeaking || currentBotMessage.length > 0)}
+              currentText={currentBotMessage}
+              language={language}
+            />
+          </div>
+        )}
 
         {/* Messages */}
         <ScrollArea className="flex-1 p-4 min-h-0">
