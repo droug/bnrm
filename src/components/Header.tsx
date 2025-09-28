@@ -384,36 +384,36 @@ const Header = () => {
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
                   <Calendar className="w-4 h-4 mr-2" />
-                  Consulter nos actualités
+                  {t('nav.consult.news')}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="grid gap-3 p-6 w-[500px] md:w-[600px] lg:grid-cols-2 bg-card border border-border rounded-lg shadow-moroccan">
                     <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">Actualités</h4>
+                      <h4 className="text-sm font-medium text-primary mb-3">{t('nav.news.section')}</h4>
                       <NavigationMenuLink asChild>
                         <a href="/news" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Actualités et publications</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.news.publications')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Nouvelles acquisitions, actualités du fonds
+                            {t('nav.news.publications.desc')}
                           </p>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/ils-parlent-de-nous" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Ils parlent de nous</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.they.talk.about.us')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Revue de presse et mentions
+                            {t('nav.they.talk.about.us.desc')}
                           </p>
                         </a>
                       </NavigationMenuLink>
                     </div>
                     <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">Culture</h4>
+                      <h4 className="text-sm font-medium text-primary mb-3">{t('nav.culture.section')}</h4>
                       <NavigationMenuLink asChild>
                         <a href="/programmation-culturelle" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Notre programmation culturelle</div>
+                          <div className="text-sm font-medium leading-none">{t('nav.cultural.programming')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Agenda, expositions
+                            {t('nav.cultural.programming.desc')}
                           </p>
                         </a>
                       </NavigationMenuLink>
@@ -426,23 +426,23 @@ const Header = () => {
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 text-foreground hover:text-primary font-medium">
                   <Building className="w-4 h-4 mr-2" />
-                  Collaborer avec nous
+                  {t('nav.collaborate')}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="grid gap-3 p-6 w-[400px] bg-card border border-border rounded-lg shadow-moroccan">
                     <NavigationMenuLink asChild>
                       <a href="/collaborations-nationales" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none">Collaborations nationales</div>
+                        <div className="text-sm font-medium leading-none">{t('nav.national.collaborations')}</div>
                         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Partenariats avec les institutions marocaines
+                          {t('nav.national.collaborations.desc')}
                         </p>
                       </a>
                     </NavigationMenuLink>
                     <NavigationMenuLink asChild>
                       <a href="/collaborations-internationales" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <div className="text-sm font-medium leading-none">Collaborations internationales</div>
+                        <div className="text-sm font-medium leading-none">{t('nav.international.collaborations')}</div>
                         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Échanges et coopération internationale
+                          {t('nav.international.collaborations.desc')}
                         </p>
                       </a>
                     </NavigationMenuLink>

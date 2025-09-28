@@ -65,6 +65,22 @@ const translations = {
     'tabs.logs': 'Historique',
     'tabs.settings': 'Paramètres',
     
+    // News and Culture menus
+    'nav.consult.news': 'Consulter nos actualités',
+    'nav.collaborate': 'Collaborer avec nous',
+    'nav.news.section': 'Actualités',
+    'nav.culture.section': 'Culture',
+    'nav.news.publications': 'Actualités et publications',
+    'nav.news.publications.desc': 'Nouvelles acquisitions, actualités du fonds',
+    'nav.they.talk.about.us': 'Ils parlent de nous',
+    'nav.they.talk.about.us.desc': 'Revue de presse et mentions',
+    'nav.cultural.programming': 'Notre programmation culturelle',
+    'nav.cultural.programming.desc': 'Agenda, expositions',
+    'nav.national.collaborations': 'Collaborations nationales',
+    'nav.national.collaborations.desc': 'Partenariats avec les institutions marocaines',
+    'nav.international.collaborations': 'Collaborations internationales',
+    'nav.international.collaborations.desc': 'Échanges et coopération internationale',
+    
     // Hero
     'hero.title': 'Gardienne du Patrimoine Écrit Marocain',
     'hero.subtitle': 'Découvrez les trésors documentaires du Royaume à travers nos collections de manuscrits anciens, livres rares et ressources numériques d\'exception.',
@@ -288,6 +304,22 @@ const translations = {
     'tabs.history': 'السجل',
     'tabs.logs': 'السجل',
     'tabs.settings': 'الإعدادات',
+    
+    // News and Culture menus
+    'nav.consult.news': 'استشر أخبارنا',
+    'nav.collaborate': 'تعاون معنا',
+    'nav.news.section': 'الأخبار',
+    'nav.culture.section': 'الثقافة',
+    'nav.news.publications': 'الأخبار والمنشورات',
+    'nav.news.publications.desc': 'المقتنيات الجديدة، أخبار المجموعة',
+    'nav.they.talk.about.us': 'يتحدثون عنا',
+    'nav.they.talk.about.us.desc': 'مراجعة الصحافة والإشارات',
+    'nav.cultural.programming': 'برنامجنا الثقافي',
+    'nav.cultural.programming.desc': 'الأجندة، المعارض',
+    'nav.national.collaborations': 'التعاون الوطني',
+    'nav.national.collaborations.desc': 'شراكات مع المؤسسات المغربية',
+    'nav.international.collaborations': 'التعاون الدولي',
+    'nav.international.collaborations.desc': 'التبادلات والتعاون الدولي',
     
     // Hero
     'hero.title': 'حارسة التراث المكتوب المغربي',
@@ -513,6 +545,22 @@ const translations = {
     'tabs.logs': 'ⴰⵎⵣⵔⵓⵢ',
     'tabs.settings': 'ⵜⵉⵙⵖⵜⵉⵏ',
     
+    // News and Culture menus
+    'nav.consult.news': 'ⴰⵏⵏⴰⵢ ⵉⵏⵖⵎⵉⵙⵏ ⵏⵏⵖ',
+    'nav.collaborate': 'ⴰⵎⵓⵏ ⴰⴽⴷⵏⵏⵖ',
+    'nav.news.section': 'ⵉⵏⵖⵎⵉⵙⵏ',
+    'nav.culture.section': 'ⴰⴷⵍⵙⴰⵏ',
+    'nav.news.publications': 'ⵉⵏⵖⵎⵉⵙⵏ ⴷ ⵜⵓⴼⴼⵖⵉⵏ',
+    'nav.news.publications.desc': 'ⴰⵍⵙ ⵓⵙⵎⵓⵏ, ⵉⵏⵖⵎⵉⵙⵏ ⵏ ⵜⵙⵎⴰⵍⵜ',
+    'nav.they.talk.about.us': 'ⴰⵔ ⴰⵖ ⵜⵜⴰⵡⴰⵍⵏ',
+    'nav.they.talk.about.us.desc': 'ⴰⵏⵏⴰⵢ ⵏ ⵜⵏⴱⴹⵜ ⴷ ⵜⵇⵇⵏⵉⵏ',
+    'nav.cultural.programming': 'ⴰⵀⵔⵓⵙ ⵏⵏⵖ ⴰⴷⵍⵙⴰⵏ',
+    'nav.cultural.programming.desc': 'ⴰⵙⵍⴳⵏ, ⵉⵙⵎⴰⵍⵏ',
+    'nav.national.collaborations': 'ⴰⵎⵓⵏ ⴰⵏⴰⵎⵓⵔ',
+    'nav.national.collaborations.desc': 'ⵜⵎⵢⴰⵡⴰⵙⵉⵏ ⴰⴽⴷ ⵜⵙⵙⴽⵍⵉⵡⵉⵏ ⵜⵉⵎⵖⵔⵉⴱⵉⵢⵉⵏ',
+    'nav.international.collaborations': 'ⴰⵎⵓⵏ ⴰⴳⵔⴰⵖⵍⴰⵏ',
+    'nav.international.collaborations.desc': 'ⴰⵎⵓⵏ ⴷ ⵜⵎⵢⴰⵡⴰⵙⵜ ⵜⴰⴳⵔⴰⵖⵍⴰⵏⵜ',
+    
     // Hero
     'hero.title': 'ⴰⵎⵙⵙⴰⵔ ⵏ ⵓⵎⵓⵔ ⵉⵜⵜⵓⴳⴰⵏ ⴰⵎⵖⵔⵉⴱⵉ',
     'hero.subtitle': 'ⴰⴼ ⵉⵏⴼⴰⵍⵏ ⵏ ⵜⴳⵍⴷⵉⵜ ⴰⵔ ⵜⵙⵎⴰⵍⵉⵏ ⵏⵏⵖ ⵏ ⵉⵔⴰⵜⵏ ⵉⵣⴰⵢⴽⵓⵏⵏ, ⵉⴷⵍⵉⵙⵏ ⵉⵣⴷⴰⵔⵏ ⴷ ⵜⵅⵣⵉⵏⵜ ⵜⴰⵎⵣⵣⵢⴰⵏⵜ ⵜⴰⵛⵜⵓⴽⵜ.',
@@ -736,6 +784,22 @@ const translations = {
     'tabs.history': 'History',
     'tabs.logs': 'Logs',
     'tabs.settings': 'Settings',
+    
+    // News and Culture menus
+    'nav.consult.news': 'Consult Our News',
+    'nav.collaborate': 'Collaborate with Us',
+    'nav.news.section': 'News',
+    'nav.culture.section': 'Culture',
+    'nav.news.publications': 'News and Publications',
+    'nav.news.publications.desc': 'New acquisitions, collection news',
+    'nav.they.talk.about.us': 'They Talk About Us',
+    'nav.they.talk.about.us.desc': 'Press review and mentions',
+    'nav.cultural.programming': 'Our Cultural Programming',
+    'nav.cultural.programming.desc': 'Agenda, exhibitions',
+    'nav.national.collaborations': 'National Collaborations',
+    'nav.national.collaborations.desc': 'Partnerships with Moroccan institutions',
+    'nav.international.collaborations': 'International Collaborations',
+    'nav.international.collaborations.desc': 'International exchanges and cooperation',
     
     // Hero
     'hero.title': 'Guardian of Moroccan Written Heritage',
