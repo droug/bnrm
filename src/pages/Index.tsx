@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ChatBotFloatingButton from "@/components/ChatBotFloatingButton";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Crown, Gem } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -323,6 +324,9 @@ const Index = () => {
           </main>
           
           <Footer />
+          
+          {/* Chatbot intelligent flottant */}
+          <ChatBotFloatingButton />
         </div>
       </div>
   );
