@@ -1639,19 +1639,56 @@ export function BNRMWorkflowManager() {
                 />
               </div>
 
-              {/* CPS Compliance Summary */}
+              {/* Workflow Steps Preview */}
               <div className="bg-muted/50 rounded-lg p-4">
-                <h4 className="font-semibold mb-2 flex items-center">
+                <h4 className="font-semibold mb-4 flex items-center">
                   <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
-                  Conformité CPS - Étapes du processus
+                  Aperçu des étapes du workflow
                 </h4>
-                <div className="text-sm space-y-1 text-muted-foreground">
-                  <div>1. Réception et enregistrement initial (Agent DL)</div>
-                  <div>2. Vérification de conformité des documents (Validateur)</div>
-                  <div>3. Attribution des numéros d'identification (Agent ISBN/ISSN)</div>
-                  <div>4. Contrôle qualité final (Agent DL)</div>
-                  <div>5. Archivage définitif et finalisation (Conservateur)</div>
-                </div>
+                {selectedWorkflowForStart && (
+                  <div className="space-y-3">
+                    {selectedWorkflowForStart.steps.map((step, index) => (
+                      <div key={step.id} className="flex items-center space-x-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center">
+                            <span className="text-sm font-medium text-primary">{index + 1}</span>
+                          </div>
+                        </div>
+                        <div className="flex-grow min-w-0">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-medium text-foreground truncate">
+                                {step.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {step.role_required} • {step.estimated_duration_hours}h
+                                {step.is_mandatory && <span className="ml-1 text-destructive">*</span>}
+                              </p>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              {step.is_mandatory && (
+                                <Badge variant="secondary" className="text-xs">
+                                  Obligatoire
+                                </Badge>
+                              )}
+                              <Badge variant="outline" className="text-xs">
+                                {step.role_required}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Total: {selectedWorkflowForStart.steps.length} étapes</span>
+                        <span>
+                          Durée estimée: {selectedWorkflowForStart.steps.reduce((total, step) => total + step.estimated_duration_hours, 0)}h
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end space-x-2 pt-4">
