@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown, Accessibility } from "lucide-react";
+import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown, Accessibility, Bot, MessageCircle } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
+import ChatBot from "@/components/ChatBot";
 import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import logoImage from "@/assets/logo-bnrm.png";
@@ -26,6 +27,7 @@ import {
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isChatBotOpen, setIsChatBotOpen] = useState(false);
   const { language, setLanguage, t, isRTL } = useLanguage();
   const { user, profile } = useAuth();
 
@@ -109,6 +111,24 @@ const Header = () => {
             </DropdownMenu>
             
             <AccessibilityToolkit />
+            
+            {/* Chatbot intelligent */}
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setIsChatBotOpen(!isChatBotOpen)}
+              className={`text-foreground border-primary/30 hover:border-primary bg-background/80 backdrop-blur-sm hover:bg-primary/10 flex items-center gap-2 px-4 py-2 transition-all duration-300 hover:scale-105 ${
+                isChatBotOpen ? 'bg-primary/20 border-primary' : ''
+              }`}
+            >
+              <Bot className="h-5 w-5" />
+              <span className="font-medium hidden sm:inline">
+                Assistant IA
+              </span>
+              {!isChatBotOpen && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              )}
+            </Button>
             
             {user ? (
               <Link to="/dashboard">
@@ -556,6 +576,14 @@ const Header = () => {
             </div>
           </nav>
         </div>
+      )}
+      
+      {/* Chatbot intelligent */}
+      {isChatBotOpen && (
+        <ChatBot 
+          isOpen={isChatBotOpen} 
+          onClose={() => setIsChatBotOpen(false)} 
+        />
       )}
       </header>
     </WatermarkContainer>
