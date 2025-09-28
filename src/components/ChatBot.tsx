@@ -118,8 +118,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
 
       setMessages(prev => [...prev, botMessage]);
 
-      // Mettre à jour le message actuel pour l'avatar
-      setCurrentBotMessage(data.reply);
+  // Mettre à jour le message actuel pour l'avatar
+  setCurrentBotMessage(data.reply);
 
       // Text-to-speech if audio is enabled
       if (audioEnabled && data.reply) {
@@ -342,8 +342,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
         {signLanguageEnabled && (
           <div className="border-b bg-gray-50/50 p-2">
             <SignLanguageAvatar 
-              isActive={signLanguageEnabled && (isSpeaking || currentBotMessage.length > 0)}
-              currentText={currentBotMessage}
+              isActive={signLanguageEnabled}
+              currentText={messages.filter(m => m.sender === 'bot').slice(-1)[0]?.content || ''}
               language={language}
             />
           </div>
