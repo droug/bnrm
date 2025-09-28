@@ -8,12 +8,35 @@ const corsHeaders = {
 
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
+console.log('OpenAI API Key configured:', OPENAI_API_KEY ? 'Yes' : 'No');
+
+if (!OPENAI_API_KEY || OPENAI_API_KEY === 'secret') {
+  console.error('OPENAI_API_KEY is not set or still using default value');
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
+    console.log('OPENAI_API_KEY value:', OPENAI_API_KEY ? `${OPENAI_API_KEY.substring(0, 10)}...` : 'undefined');
+    
+    // Vérifier si la clé API est disponible
+    if (!OPENAI_API_KEY || OPENAI_API_KEY === 'secret') {
+      console.error('OpenAI API key is missing or invalid');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Configuration API manquante',
+          audioContent: null
+        }),
+        { 
+          status: 200, // Retourner 200 pour éviter l'erreur côté client
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
     const { text, voice = 'alloy', language = 'fr' } = await req.json();
 
     if (!text) {
@@ -82,7 +105,7 @@ serve(async (req) => {
         audioContent: null
       }),
       {
-        status: 500,
+        status: 200, // Changer à 200 pour éviter l'erreur côté client
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       },
     );
