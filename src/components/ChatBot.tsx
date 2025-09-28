@@ -290,10 +290,13 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
   if (!isOpen) return null;
 
   return (
-    <Card className="fixed top-20 right-4 w-96 max-w-[calc(100vw-2rem)] h-[700px] max-h-[calc(100vh-6rem)] shadow-2xl border-2 border-primary/20 bg-background z-[9990] sm:w-96 w-[95vw]">
-      <CardContent className="p-0 h-full flex flex-col overflow-hidden">
+    <Card className="fixed top-16 right-4 w-96 max-w-[calc(100vw-2rem)] h-[750px] max-h-[calc(100vh-5rem)] shadow-2xl border-2 border-primary/30 bg-background/95 backdrop-blur-lg z-[9999] sm:w-96 w-[95vw] transition-all duration-300">
+      <CardContent className="p-0 h-full flex flex-col overflow-hidden relative">
+        {/* Barre de déplacement */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-primary/30 rounded-full mt-2 cursor-move"></div>
+        
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b bg-primary/5">
+        <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary/10 to-secondary/10 backdrop-blur-sm">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
               <Bot className="w-4 h-4 text-white" />
@@ -322,25 +325,17 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
               size="sm"
               onClick={() => setAudioEnabled(!audioEnabled)}
               className="w-8 h-8 p-0"
+              title="Activer/Désactiver l'audio"
             >
               {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </Button>
-            {onClose && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                className="w-8 h-8 p-0"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            )}
+            {/* Suppression du bouton de fermeture pour garder la fenêtre ouverte */}
           </div>
         </div>
 
         {/* Avatar 3D pour la langue des signes */}
         {signLanguageEnabled && (
-          <div className="border-b bg-gray-50/50 p-2">
+          <div className="border-b bg-gradient-to-br from-blue-50/50 to-purple-50/50 p-2">
             <SignLanguageAvatar 
               isActive={signLanguageEnabled}
               currentText={messages.filter(m => m.sender === 'bot').slice(-1)[0]?.content || ''}
