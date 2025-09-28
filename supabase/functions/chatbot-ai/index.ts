@@ -1,7 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-// Force redeploy to update environment variables - v2.1
+// Force redeploy to update environment variables - v2.2
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
