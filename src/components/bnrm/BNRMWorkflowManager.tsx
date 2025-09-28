@@ -33,7 +33,10 @@ import {
   Bell,
   Eye,
   Save,
-  X
+  X,
+  Calendar,
+  Hash,
+  Archive
 } from "lucide-react";
 
 interface WorkflowStep {
@@ -92,9 +95,23 @@ const assignmentSchema = z.object({
   comments: z.string().optional()
 });
 
+const startWorkflowSchema = z.object({
+  workflow_id: z.string().min(1, "Workflow requis"),
+  publication_title: z.string().min(3, "Titre de la publication requis"),
+  publisher_name: z.string().min(3, "Nom de l'éditeur requis"),
+  publication_type: z.string().min(1, "Type de publication requis"),
+  submission_date: z.date({ required_error: "Date de soumission requise" }),
+  expected_completion: z.date({ required_error: "Date prévue requise" }),
+  priority: z.enum(["low", "normal", "high", "urgent"]).default("normal"),
+  special_instructions: z.string().optional(),
+  auto_assign: z.boolean().default(true),
+  notify_submitter: z.boolean().default(true)
+});
+
 type WorkflowFormData = z.infer<typeof workflowSchema>;
 type StepFormData = z.infer<typeof stepSchema>;
 type AssignmentFormData = z.infer<typeof assignmentSchema>;
+type StartWorkflowFormData = z.infer<typeof startWorkflowSchema>;
 
 interface StepExecution {
   id: string;
@@ -120,8 +137,10 @@ export function BNRMWorkflowManager() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showStartDialog, setShowStartDialog] = useState(false);
   const [showAlertsDialog, setShowAlertsDialog] = useState(false);
   const [selectedStepExecution, setSelectedStepExecution] = useState<StepExecution | null>(null);
+  const [selectedWorkflowForStart, setSelectedWorkflowForStart] = useState<WorkflowDefinition | null>(null);
   const { toast } = useToast();
 
   // Forms
@@ -141,6 +160,19 @@ export function BNRMWorkflowManager() {
       step_execution_id: "",
       assigned_to: "",
       comments: ""
+    }
+  });
+
+  const startWorkflowForm = useForm<StartWorkflowFormData>({
+    resolver: zodResolver(startWorkflowSchema),
+    defaultValues: {
+      workflow_id: "",
+      publication_title: "",
+      publisher_name: "",
+      publication_type: "book",
+      priority: "normal",
+      auto_assign: true,
+      notify_submitter: true
     }
   });
 
@@ -273,39 +305,75 @@ export function BNRMWorkflowManager() {
     }
   };
 
-  const startWorkflowInstance = async (workflowId: string, contentId: string) => {
+  const startWorkflowInstance = async (data: StartWorkflowFormData) => {
     try {
-      const workflow = workflows.find(w => w.id === workflowId);
-      if (!workflow) return;
+      const workflow = workflows.find(w => w.id === data.workflow_id);
+      if (!workflow) {
+        throw new Error("Workflow non trouvé");
+      }
 
-      // Create workflow instance
+      // Create content record first (simulating legal deposit content)
+      const contentId = `content-${Date.now()}`;
+      
+      // Create workflow instance with comprehensive metadata
+      const instanceMetadata = {
+        workflow_name: workflow.name,
+        publication_details: {
+          title: data.publication_title,
+          publisher: data.publisher_name,
+          type: data.publication_type,
+          submission_date: data.submission_date.toISOString(),
+          expected_completion: data.expected_completion.toISOString()
+        },
+        processing_options: {
+          priority: data.priority,
+          auto_assign: data.auto_assign,
+          notify_submitter: data.notify_submitter,
+          special_instructions: data.special_instructions
+        },
+        cps_compliance: {
+          legal_deposit_number: `DL-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`,
+          submission_timestamp: new Date().toISOString(),
+          regulatory_requirements: ["document_verification", "metadata_validation", "archival_compliance"]
+        }
+      };
+
       const { data: instance, error: instanceError } = await supabase
         .from('workflow_instances')
         .insert([{
-          workflow_id: workflowId,
+          workflow_id: data.workflow_id,
           content_id: contentId,
           status: 'active',
-          current_step: 0,
+          current_step: 1,
           started_by: 'current_user_id', // Replace with actual user ID
-          metadata: { workflow_name: workflow.name }
+          metadata: instanceMetadata
         }])
         .select()
         .single();
 
       if (instanceError) throw instanceError;
 
-      // Create step executions for all workflow steps
-      const stepExecutions = workflow.steps.map(step => ({
-        workflow_instance_id: instance.id,
-        step_number: step.order_index,
-        step_name: step.name,
-        status: step.order_index === 1 ? 'active' : 'pending',
-        metadata: { 
+      // Create step executions for all workflow steps with proper CPS transitions
+      const stepExecutions = workflow.steps.map((step, index) => {
+        const isFirstStep = index === 0;
+        const stepMetadata = {
           role_required: step.role_required,
           estimated_duration_hours: step.estimated_duration_hours,
-          is_mandatory: step.is_mandatory
-        }
-      }));
+          is_mandatory: step.is_mandatory,
+          cps_requirements: getCPSRequirementsForStep(step.name),
+          auto_assignment_rules: data.auto_assign ? getAutoAssignmentRules(step.role_required) : null
+        };
+
+        return {
+          workflow_instance_id: instance.id,
+          step_number: step.order_index,
+          step_name: step.name,
+          status: isFirstStep ? 'active' : 'pending',
+          assigned_to: data.auto_assign && isFirstStep ? getDefaultAssigneeForRole(step.role_required) : null,
+          started_at: isFirstStep ? new Date().toISOString() : null,
+          metadata: stepMetadata
+        };
+      });
 
       const { error: stepsError } = await supabase
         .from('workflow_step_executions')
@@ -313,11 +381,26 @@ export function BNRMWorkflowManager() {
 
       if (stepsError) throw stepsError;
 
-      toast({
-        title: "Succès",
-        description: "Instance de workflow créée et démarrée",
+      // Send notifications if enabled
+      if (data.notify_submitter) {
+        await sendWorkflowNotification(instance.id, 'workflow_started', data.publisher_name);
+      }
+
+      // Log workflow initiation for audit trail
+      await logWorkflowActivity(instance.id, 'workflow_initiated', {
+        initiated_by: 'current_user_id',
+        publication_title: data.publication_title,
+        priority: data.priority,
+        estimated_completion: data.expected_completion
       });
 
+      toast({
+        title: "Workflow démarré avec succès",
+        description: `Instance ${instance.id.slice(0, 8)} créée pour "${data.publication_title}"`,
+      });
+
+      setShowStartDialog(false);
+      startWorkflowForm.reset();
       loadWorkflowData();
 
     } catch (error: any) {
@@ -327,6 +410,79 @@ export function BNRMWorkflowManager() {
         variant: "destructive",
       });
     }
+  };
+
+  // Helper functions for CPS compliance
+  const getCPSRequirementsForStep = (stepName: string) => {
+    const requirements = {
+      "Réception et Enregistrement": [
+        "verify_publisher_credentials",
+        "validate_submission_format",
+        "generate_deposit_number",
+        "record_submission_timestamp"
+      ],
+      "Vérification Documents": [
+        "check_document_completeness",
+        "validate_metadata_accuracy",
+        "verify_legal_compliance",
+        "assess_publication_quality"
+      ],
+      "Attribution Numéros": [
+        "determine_identifier_type",
+        "assign_isbn_issn_number",
+        "update_national_registry",
+        "generate_official_certificate"
+      ],
+      "Contrôle Qualité": [
+        "final_document_review",
+        "compliance_verification",
+        "digital_preservation_check",
+        "metadata_completeness_review"
+      ],
+      "Archivage et Finalisation": [
+        "permanent_archival_storage",
+        "catalog_entry_creation",
+        "access_permissions_setup",
+        "completion_notification"
+      ]
+    };
+    return requirements[stepName] || [];
+  };
+
+  const getAutoAssignmentRules = (role: string) => {
+    const rules = {
+      "agent_dl": ["workload_balance", "expertise_match", "availability_check"],
+      "validateur": ["specialization_match", "quality_rating", "current_capacity"],
+      "agent_isbn": ["identifier_expertise", "publisher_history", "workload_status"],
+      "conservateur": ["archival_expertise", "preservation_knowledge", "final_review_authority"]
+    };
+    return rules[role] || [];
+  };
+
+  const getDefaultAssigneeForRole = (role: string) => {
+    const assignments = {
+      "agent_dl": "user1",
+      "validateur": "user2", 
+      "agent_isbn": "user3",
+      "conservateur": "user4"
+    };
+    return assignments[role] || null;
+  };
+
+  const sendWorkflowNotification = async (instanceId: string, type: string, recipient: string) => {
+    // This would integrate with your notification system
+    console.log(`Notification sent: ${type} for instance ${instanceId} to ${recipient}`);
+  };
+
+  const logWorkflowActivity = async (instanceId: string, action: string, details: any) => {
+    // This would log to your audit system
+    console.log(`Workflow activity logged: ${action} for ${instanceId}`, details);
+  };
+
+  const openStartDialog = (workflow: WorkflowDefinition) => {
+    setSelectedWorkflowForStart(workflow);
+    startWorkflowForm.setValue('workflow_id', workflow.id);
+    setShowStartDialog(true);
   };
 
   const createWorkflow = async (data: WorkflowFormData) => {
@@ -786,7 +942,7 @@ export function BNRMWorkflowManager() {
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => startWorkflowInstance(workflow.id, 'demo-content-id')}
+                          onClick={() => openStartDialog(workflow)}
                         >
                           <Play className="h-4 w-4 mr-1" />
                           Démarrer
@@ -1260,6 +1416,256 @@ export function BNRMWorkflowManager() {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Start Workflow Dialog */}
+      <Dialog open={showStartDialog} onOpenChange={setShowStartDialog}>
+        <DialogContent className="max-w-3xl bg-background">
+          <DialogHeader>
+            <DialogTitle>Démarrer un nouveau workflow</DialogTitle>
+            <DialogDescription>
+              Initier le processus de dépôt légal pour une nouvelle publication
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...startWorkflowForm}>
+            <form onSubmit={startWorkflowForm.handleSubmit(startWorkflowInstance)} className="space-y-6">
+              {/* Publication Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center">
+                  <FileText className="h-5 w-5 mr-2" />
+                  Informations sur la Publication
+                </h3>
+                
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={startWorkflowForm.control}
+                    name="publication_title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Titre de la publication</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Guide pratique du développement web" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={startWorkflowForm.control}
+                    name="publisher_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom de l'éditeur</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Éditions TechMaroc" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={startWorkflowForm.control}
+                  name="publication_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type de publication</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue placeholder="Sélectionner le type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-background border z-50">
+                          <SelectItem value="book">Livre</SelectItem>
+                          <SelectItem value="periodical">Périodique</SelectItem>
+                          <SelectItem value="thesis">Thèse</SelectItem>
+                          <SelectItem value="report">Rapport</SelectItem>
+                          <SelectItem value="multimedia">Multimédia</SelectItem>
+                          <SelectItem value="digital">Publication numérique</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Processing Details */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center">
+                  <Settings className="h-5 w-5 mr-2" />
+                  Paramètres de Traitement
+                </h3>
+                
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={startWorkflowForm.control}
+                    name="submission_date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date de soumission</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date" 
+                            {...field} 
+                            value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                            onChange={(e) => field.onChange(new Date(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={startWorkflowForm.control}
+                    name="expected_completion"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date de finalisation prévue</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date" 
+                            {...field} 
+                            value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                            onChange={(e) => field.onChange(new Date(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={startWorkflowForm.control}
+                  name="priority"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Priorité de traitement</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-background border z-50">
+                          <SelectItem value="low">Basse - Traitement standard (7-10 jours)</SelectItem>
+                          <SelectItem value="normal">Normale - Traitement régulier (3-5 jours)</SelectItem>
+                          <SelectItem value="high">Haute - Traitement prioritaire (1-2 jours)</SelectItem>
+                          <SelectItem value="urgent">Urgente - Traitement immédiat (24h)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Workflow Options */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center">
+                  <Users className="h-5 w-5 mr-2" />
+                  Options de Workflow
+                </h3>
+                
+                <div className="space-y-4">
+                  <FormField
+                    control={startWorkflowForm.control}
+                    name="auto_assign"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Assignation automatique</FormLabel>
+                          <FormDescription>
+                            Assigner automatiquement les étapes aux utilisateurs disponibles selon leurs rôles
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={startWorkflowForm.control}
+                    name="notify_submitter"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Notifier le déposant</FormLabel>
+                          <FormDescription>
+                            Envoyer des notifications automatiques sur l'avancement du traitement
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={startWorkflowForm.control}
+                  name="special_instructions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Instructions spéciales (optionnel)</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Instructions particulières pour le traitement de cette publication..."
+                          className="min-h-[80px]"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Précisions sur les exigences particulières, délais spéciaux, ou considérations techniques
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* CPS Compliance Summary */}
+              <div className="bg-muted/50 rounded-lg p-4">
+                <h4 className="font-semibold mb-2 flex items-center">
+                  <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                  Conformité CPS - Étapes du processus
+                </h4>
+                <div className="text-sm space-y-1 text-muted-foreground">
+                  <div>1. Réception et enregistrement initial (Agent DL)</div>
+                  <div>2. Vérification de conformité des documents (Validateur)</div>
+                  <div>3. Attribution des numéros d'identification (Agent ISBN/ISSN)</div>
+                  <div>4. Contrôle qualité final (Agent DL)</div>
+                  <div>5. Archivage définitif et finalisation (Conservateur)</div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button type="button" variant="outline" onClick={() => setShowStartDialog(false)}>
+                  <X className="h-4 w-4 mr-2" />
+                  Annuler
+                </Button>
+                <Button type="submit">
+                  <Play className="h-4 w-4 mr-2" />
+                  Démarrer le Workflow
+                </Button>
+              </div>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>
