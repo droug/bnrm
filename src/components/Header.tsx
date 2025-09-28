@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
 import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
 import { WatermarkContainer } from "@/components/ui/watermark";
+import logoImage from "@/assets/logo-bnrm.png";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -38,10 +39,10 @@ const Header = () => {
     >
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border shadow-elegant">
       <div className="container mx-auto px-4">
-        {/* Top bar with language and contact */}
-        <div className="flex justify-between items-center py-2 text-sm border-b border-border/50">
+        {/* Top bar with language and contact - Plus grande hauteur */}
+        <div className="flex justify-between items-center py-4 text-sm border-b border-border/50 bg-gradient-to-r from-primary/5 to-secondary/5">
           <div className="flex items-center gap-4">
-            <span className="text-muted-foreground">{t('header.title')}</span>
+            <span className="text-foreground font-medium text-base">{t('header.title')}</span>
           </div>
           <div className="flex items-center gap-4">
             <DropdownMenu>
@@ -109,16 +110,20 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Main navigation */}
-        <div className="flex items-center justify-between py-4">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center shadow-moroccan">
-              <Book className="h-6 w-6 text-primary-foreground" />
+        {/* Main navigation - Plus grande hauteur */}
+        <div className="flex items-center justify-between py-6">
+          {/* Logo avec image */}
+          <Link to="/" className="flex items-center space-x-4 hover:opacity-80 transition-opacity">
+            <div className="w-16 h-16 flex items-center justify-center">
+              <img 
+                src={logoImage} 
+                alt="Logo BNRM" 
+                className="h-14 w-auto object-contain"
+              />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-foreground">BNRM</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">Bibliothèque Nationale</p>
+              <h1 className="text-xl font-bold text-foreground">BNRM</h1>
+              <p className="text-sm text-muted-foreground hidden sm:block">Bibliothèque Nationale</p>
             </div>
           </Link>
 
