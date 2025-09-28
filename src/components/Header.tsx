@@ -40,8 +40,8 @@ const Header = () => {
     >
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b-4 border-primary/30 shadow-2xl">
       <div className="container mx-auto px-4">
-        {/* Bannière agrandie et plus attractive */}
-        <div className="flex justify-between items-center py-8 text-base bg-gradient-to-r from-primary/20 via-secondary/15 to-primary/20 border-b-4 border-primary/40 relative overflow-hidden">
+        {/* Bannière réduite et plus compacte */}
+        <div className="flex justify-between items-center py-3 text-base bg-gradient-to-r from-primary/20 via-secondary/15 to-primary/20 border-b-2 border-primary/30 relative overflow-hidden">
           {/* Effet de fond décoratif */}
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 animate-pulse"></div>
           <div className="absolute top-0 left-1/4 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
@@ -130,16 +130,16 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Navigation principale agrandie */}
-        <div className="flex items-center justify-between py-12 relative">
-          {/* Logo agrandi avec effet hover */}
+        {/* Navigation principale compacte */}
+        <div className="flex items-center justify-between py-4 relative">
+          {/* Logo compact avec effet hover */}
           <Link to="/" className="flex items-center hover:scale-105 transition-all duration-300 group">
-            <div className="w-36 h-36 flex items-center justify-center relative">
+            <div className="w-20 h-20 flex items-center justify-center relative">
               <div className="absolute inset-0 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-all duration-300"></div>
               <img 
                 src={logoImage} 
                 alt="Logo BNRM" 
-                className="h-32 w-auto object-contain relative z-10 drop-shadow-lg"
+                className="h-16 w-auto object-contain relative z-10 drop-shadow-lg"
               />
             </div>
           </Link>

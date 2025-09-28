@@ -7,13 +7,16 @@ import { useLanguage } from "@/hooks/useLanguage";
 const Hero = () => {
   const { t, isRTL } = useLanguage();
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-      {/* Background with overlay */}
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+      {/* Background avec meilleure netteté */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroImage})` }}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105"
+        style={{ 
+          backgroundImage: `url(${heroImage})`,
+          filter: 'contrast(1.1) brightness(1.05) saturate(1.1)'
+        }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/60 to-accent/70"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/50 to-accent/60"></div>
       </div>
 
       {/* Moroccan pattern overlay */}
