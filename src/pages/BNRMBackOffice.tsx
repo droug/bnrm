@@ -151,10 +151,6 @@ export default function BNRMBackOffice() {
                   <Settings className="h-4 w-4" />
                   <span className="hidden lg:inline">Workflow</span>
                 </TabsTrigger>
-                <TabsTrigger value="users" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  <span className="hidden lg:inline">Utilisateurs</span>
-                </TabsTrigger>
                 <TabsTrigger value="reports" className="flex items-center gap-2">
                   <Database className="h-4 w-4" />
                   <span className="hidden lg:inline">Rapports</span>
@@ -333,33 +329,6 @@ export default function BNRMBackOffice() {
                 <BNRMWorkflowManager />
               </TabsContent>
 
-              {/* User Management Tab */}
-              <TabsContent value="users" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Users className="h-5 w-5" />
-                      <span>Gestion des Accès</span>
-                    </CardTitle>
-                    <CardDescription>
-                      Authentification 2FA, rôles et permissions
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-12 text-muted-foreground">
-                      <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <h3 className="text-lg font-semibold mb-2">Système d'authentification</h3>
-                      <p>Gestion avancée des utilisateurs et permissions</p>
-                      <p className="text-sm mt-2">
-                        • Authentification 2FA sécurisée<br/>
-                        • Gestion des rôles (admin, agent DL, validateur)<br/>
-                        • Audit trail complet<br/>
-                        • Profils utilisateurs personnalisés
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
 
               {/* Reports Tab */}
               <TabsContent value="reports" className="space-y-4">
