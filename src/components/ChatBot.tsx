@@ -281,7 +281,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
   if (!isOpen) return null;
 
   return (
-    <Card className="fixed bottom-4 right-4 w-96 h-[600px] shadow-2xl border-2 border-primary/20 bg-background z-50">
+    <Card className="fixed bottom-4 right-4 w-96 h-[600px] shadow-2xl border-2 border-primary/20 bg-background z-[9990]">
       <CardContent className="p-0 h-full flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-primary/5">

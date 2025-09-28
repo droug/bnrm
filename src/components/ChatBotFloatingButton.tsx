@@ -11,22 +11,22 @@ const ChatBotFloatingButton: React.FC = () => {
       {/* Floating Button */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg transition-all duration-300 z-40 ${
+        className={`fixed bottom-6 right-6 w-16 h-16 rounded-full shadow-2xl transition-all duration-300 z-[9999] ${
           isOpen 
-            ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' 
+            ? 'bg-red-500 text-white hover:bg-red-600' 
             : 'bg-primary text-primary-foreground hover:bg-primary/90'
         }`}
         style={{ 
-          boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+          boxShadow: '0 8px 25px rgba(0,0,0,0.25), 0 0 20px rgba(var(--primary), 0.3)',
           transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
         }}
       >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        {isOpen ? <X className="w-7 h-7" /> : <MessageCircle className="w-7 h-7" />}
       </Button>
 
       {/* Pulse Animation when closed */}
       {!isOpen && (
-        <div className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-primary/30 animate-ping z-30"></div>
+        <div className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-primary/20 animate-ping z-[9998]"></div>
       )}
 
       {/* ChatBot Component */}
