@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminSettings() {
+  const navigate = useNavigate();
   const adminCards = [
     {
       icon: Shield,
@@ -81,7 +83,7 @@ export default function AdminSettings() {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => window.history.back()}
+                onClick={() => navigate(-1)}
                 className="flex items-center space-x-2"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -128,7 +130,7 @@ export default function AdminSettings() {
                         className="w-full" 
                         onClick={() => {
                           console.log('Navigating to:', card.href);
-                          window.location.href = card.href;
+                          navigate(card.href);
                         }}
                       >
                         Accéder
