@@ -102,26 +102,32 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
             
-            <AccessibilityToolkit />
+            {/* Outils d'assistance et d'accessibilité */}
+            <div className="flex items-center space-x-3">
+              {/* Toolkit d'accessibilité */}
+              <AccessibilityToolkit />
+              
+              {/* Chatbot intelligent */}
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setIsChatBotOpen(!isChatBotOpen)}
+                className={`text-foreground border-primary/30 hover:border-primary bg-background/80 backdrop-blur-sm hover:bg-primary/10 flex items-center gap-2 px-4 py-2 transition-all duration-300 hover:scale-105 relative ${
+                  isChatBotOpen ? 'bg-primary/20 border-primary' : ''
+                }`}
+                title="Assistant IA - Aide et recherche intelligente"
+              >
+                <Bot className="h-5 w-5" />
+                <span className="font-medium hidden lg:inline">
+                  Assistant IA
+                </span>
+                {!isChatBotOpen && (
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse border border-green-600"></div>
+                )}
+              </Button>
+            </div>
             
-            {/* Chatbot intelligent */}
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => setIsChatBotOpen(!isChatBotOpen)}
-              className={`text-foreground border-primary/30 hover:border-primary bg-background/80 backdrop-blur-sm hover:bg-primary/10 flex items-center gap-2 px-4 py-2 transition-all duration-300 hover:scale-105 ${
-                isChatBotOpen ? 'bg-primary/20 border-primary' : ''
-              }`}
-            >
-              <Bot className="h-5 w-5" />
-              <span className="font-medium hidden sm:inline">
-                Assistant IA
-              </span>
-              {!isChatBotOpen && (
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-              )}
-            </Button>
-            
+            {/* Connexion utilisateur */}
             {user ? (
               <Link to="/dashboard">
                 <Button variant="default" size="lg" className="flex items-center gap-2 px-6 py-2 transition-all duration-300 hover:scale-105 hover:shadow-lg">
@@ -485,16 +491,44 @@ const Header = () => {
             </NavigationMenuList>
           </NavigationMenu>
 
-          {/* Search and Mobile Menu améliorés */}
-          <div className="flex items-center space-x-6">
+          {/* Outils et Actions - Barre de recherche avancée et outils d'accessibilité */}
+          <div className="flex items-center space-x-4">
+            {/* Barre de recherche avancée - toujours visible */}
             <div className="hidden sm:block w-80">
               <SearchBar 
                 variant="compact"
                 showSuggestions={true}
-                className="w-full border-2 border-primary/20 rounded-xl hover:border-primary/40 transition-all duration-300"
+                className="w-full border-2 border-primary/20 rounded-xl hover:border-primary/40 transition-all duration-300 shadow-sm focus-within:shadow-md"
+                placeholder="Recherche avancée dans nos collections..."
               />
             </div>
             
+            {/* Outils d'accessibilité et assistance */}
+            <div className="flex items-center space-x-2">
+              {/* Toolkit d'accessibilité */}
+              <AccessibilityToolkit />
+              
+              {/* Assistant IA / Chatbot */}
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setIsChatBotOpen(!isChatBotOpen)}
+                className={`text-foreground border-2 border-primary/30 hover:border-primary bg-background/80 backdrop-blur-sm hover:bg-primary/10 flex items-center gap-2 px-4 py-2 transition-all duration-300 hover:scale-105 relative ${
+                  isChatBotOpen ? 'bg-primary/20 border-primary' : ''
+                }`}
+                title="Assistant IA - Aide et recherche intelligente"
+              >
+                <Bot className="h-5 w-5" />
+                <span className="font-medium hidden md:inline">
+                  Assistant IA
+                </span>
+                {!isChatBotOpen && (
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse border border-green-600"></div>
+                )}
+              </Button>
+            </div>
+            
+            {/* Menu mobile toggle */}
             <Button
               variant="outline"
               size="lg"
@@ -506,12 +540,13 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Search améliorée */}
+        {/* Barre de recherche mobile - toujours accessible */}
         <div className="pb-6 sm:hidden">
           <SearchBar 
             variant="compact"
             showSuggestions={true}
-            className="w-full border-2 border-primary/20 rounded-xl"
+            className="w-full border-2 border-primary/20 rounded-xl shadow-sm"
+            placeholder="Recherche avancée..."
           />
         </div>
       </div>
@@ -548,6 +583,14 @@ const Header = () => {
                 <Building className="w-5 h-5" />
                 <span className="font-medium">{t('nav.collaborate')}</span>
               </a>
+            </div>
+
+            {/* Outils d'assistance mobile */}
+            <div className="space-y-3 pt-4 border-t border-primary/20">
+              <h4 className="text-base font-semibold text-primary">Outils d'assistance</h4>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Assistant IA et Accessibilité disponibles dans la barre du haut</span>
+              </div>
             </div>
 
             {/* Section contact rapide */}
