@@ -30,13 +30,6 @@ export default function AdminSettings() {
       permission: "requests.manage"
     },
     {
-      icon: Scale,
-      title: "Dépôt légal",
-      description: "Gérer le processus de dépôt légal et les soumissions",
-      href: "/admin/legal-deposit",
-      permission: "legal_deposit.manage"
-    },
-    {
       icon: Archive,
       title: "Archivage",
       description: "Configurer l'archivage automatique du contenu",
