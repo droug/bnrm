@@ -65,7 +65,7 @@ export default function BNRMBackOffice() {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => window.history.back()}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 hover:bg-accent"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Retour</span>
@@ -117,11 +117,19 @@ export default function BNRMBackOffice() {
               </div>
               
               <div className="flex space-x-2">
-                <Button variant="outline">
+                <Button 
+                  variant="outline"
+                  onClick={() => setActiveTab('reports')}
+                  className="hover:bg-accent"
+                >
                   <Download className="w-4 h-4 mr-2" />
                   Rapports
                 </Button>
-                <Button variant="outline">
+                <Button 
+                  variant="outline"
+                  onClick={() => window.open('/', '_blank')}
+                  className="hover:bg-accent"
+                >
                   <Globe className="w-4 h-4 mr-2" />
                   Portail Public
                 </Button>
