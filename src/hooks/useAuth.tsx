@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
@@ -21,7 +21,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any | null>(null);
-  const { toast } = useToast();
 
   useEffect(() => {
     // Set up auth state listener
@@ -86,14 +85,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (error) {
-      toast({
-        title: "Erreur d'inscription",
+      toast.error("Erreur d'inscription", {
         description: error.message,
-        variant: "destructive",
       });
     } else {
-      toast({
-        title: "Inscription réussie",
+      toast.success("Inscription réussie", {
         description: "Veuillez vérifier votre email pour confirmer votre compte.",
       });
     }
@@ -108,14 +104,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (error) {
-      toast({
-        title: "Erreur de connexion",
+      toast.error("Erreur de connexion", {
         description: error.message,
-        variant: "destructive",
       });
     } else {
-      toast({
-        title: "Connexion réussie",
+      toast.success("Connexion réussie", {
         description: "Bienvenue sur le portail BNRM !",
       });
     }
@@ -125,8 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    toast({
-      title: "Déconnexion",
+    toast.success("Déconnexion", {
       description: "Vous avez été déconnecté avec succès.",
     });
   };
@@ -140,14 +132,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .eq('user_id', user.id);
 
     if (error) {
-      toast({
-        title: "Erreur de mise à jour",
+      toast.error("Erreur de mise à jour", {
         description: error.message,
-        variant: "destructive",
       });
     } else {
-      toast({
-        title: "Profil mis à jour",
+      toast.success("Profil mis à jour", {
         description: "Vos informations ont été sauvegardées.",
       });
       // Refresh profile
