@@ -9,6 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
+import digitalLibraryHero from "@/assets/digital-library-hero.jpg";
+import manuscript1 from "@/assets/manuscript-1.jpg";
+import manuscript2 from "@/assets/manuscript-2.jpg";
+import manuscript3 from "@/assets/manuscript-3.jpg";
+import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 
 const DigitalLibrary = () => {
   const { t } = useLanguage();
@@ -20,69 +25,107 @@ const DigitalLibrary = () => {
       title: "Manuscrits",
       icon: BookOpen,
       count: "12,450",
-      description: "Collections de manuscrits précieux",
+      description: "Manuscrits arabes, berbères et hébraïques",
       color: "text-primary",
-      bgColor: "bg-primary/10"
+      bgColor: "bg-primary/10",
+      gradient: "from-primary/20 to-accent/20"
     },
     {
       id: "periodicals",
       title: "Périodiques",
       icon: FileText,
       count: "8,320",
-      description: "Revues et journaux numérisés",
+      description: "Journaux marocains historiques et revues",
       color: "text-accent",
-      bgColor: "bg-accent/10"
+      bgColor: "bg-accent/10",
+      gradient: "from-accent/20 to-highlight/20"
     },
     {
       id: "monographs",
       title: "Monographies",
       icon: Book,
       count: "45,670",
-      description: "Livres et ouvrages complets",
+      description: "Ouvrages sur le patrimoine marocain",
       color: "text-highlight",
-      bgColor: "bg-highlight/10"
+      bgColor: "bg-highlight/10",
+      gradient: "from-highlight/20 to-royal/20"
     },
     {
       id: "special",
       title: "Collections Spécialisées",
       icon: ImageIcon,
       count: "3,240",
-      description: "Lithographies et documents iconographiques",
+      description: "Cartes anciennes, lithographies marocaines",
       color: "text-royal",
-      bgColor: "bg-royal/10"
+      bgColor: "bg-royal/10",
+      gradient: "from-royal/20 to-gold/20"
     },
     {
       id: "audiovisual",
       title: "Documents Audiovisuels",
       icon: Video,
       count: "2,890",
-      description: "Documents sonores et vidéos",
+      description: "Archives sonores et vidéos du Maroc",
       color: "text-gold",
-      bgColor: "bg-gold/10"
+      bgColor: "bg-gold/10",
+      gradient: "from-gold/20 to-primary/20"
     }
   ];
 
   const featuredWorks = [
     {
-      title: "Manuscrit andalou du XIIe siècle",
-      author: "Ibn Rushd (Averroès)",
-      views: "2,345",
+      title: "Al-Kulliyat fi al-Tibb (Le Canon de la Médecine)",
+      author: "Ibn Sina (Avicenne) - Copie marocaine",
+      views: "5,234",
       category: "Manuscrits",
-      image: "/placeholder.svg"
+      image: manuscript1,
+      date: "XVe siècle",
+      description: "Manuscrit médical en arabe classique, calligraphie maghrébie"
     },
     {
-      title: "Journal Al Maghrib - Collection complète",
-      author: "Archives historiques",
-      views: "1,890",
+      title: "Es-Saada (Le Bonheur) - Journal historique",
+      author: "Archives nationales marocaines",
+      views: "3,890",
       category: "Périodiques",
-      image: "/placeholder.svg"
+      image: manuscript2,
+      date: "1904-1920",
+      description: "Premier journal marocain en langue arabe"
     },
     {
-      title: "Histoire du Maroc - Édition rare",
-      author: "Divers auteurs",
-      views: "3,120",
-      category: "Monographies",
-      image: "/placeholder.svg"
+      title: "Al-Muqaddima (Les Prolégomènes)",
+      author: "Ibn Khaldoun",
+      views: "7,120",
+      category: "Manuscrits",
+      image: manuscript3,
+      date: "XIVe siècle",
+      description: "Œuvre fondatrice de sociologie et d'histoire"
+    },
+    {
+      title: "Rihla (Voyages)",
+      author: "Ibn Battuta",
+      views: "4,567",
+      category: "Manuscrits",
+      image: manuscript1,
+      date: "XIVe siècle",
+      description: "Récit des voyages du célèbre explorateur marocain"
+    },
+    {
+      title: "Kitab al-Shifa (Le Livre de la guérison)",
+      author: "Ibn Sina - Édition maghrébine",
+      views: "3,456",
+      category: "Manuscrits",
+      image: manuscript2,
+      date: "XIIe siècle",
+      description: "Encyclopédie philosophique et scientifique"
+    },
+    {
+      title: "L'Indépendance Marocaine",
+      author: "Archives de la résistance",
+      views: "2,890",
+      category: "Périodiques",
+      image: manuscript3,
+      date: "1944-1956",
+      description: "Documents sur le mouvement national"
     }
   ];
 
@@ -99,14 +142,21 @@ const DigitalLibrary = () => {
       
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
-        <section className="relative mb-12 py-16 px-8 bg-gradient-to-r from-primary/20 via-accent/15 to-primary/20 rounded-3xl border-4 border-primary/30 overflow-hidden">
+        <section className="relative mb-12 py-16 px-8 rounded-3xl border-4 border-gold/40 overflow-hidden shadow-2xl">
+          {/* Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${digitalLibraryHero})` }}
+          ></div>
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/85 to-accent/90"></div>
           <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20"></div>
           <div className="relative z-10 text-center">
-            <h1 className="text-5xl font-moroccan font-bold text-foreground mb-4">
-              Bibliothèque Numérique
+            <h1 className="text-5xl font-moroccan font-bold text-white mb-4 drop-shadow-lg">
+              Bibliothèque Numérique du Maroc
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Accédez à notre patrimoine numérisé : manuscrits, périodiques, monographies et collections spécialisées
+            <p className="text-xl text-white/95 mb-8 max-w-3xl mx-auto drop-shadow-md">
+              Découvrez le patrimoine écrit marocain : manuscrits andalous, périodiques historiques, ouvrages rares et collections d'exception
             </p>
             
             {/* Search Bar */}
@@ -140,17 +190,24 @@ const DigitalLibrary = () => {
               const Icon = collection.icon;
               return (
                 <Link key={collection.id} to={`/digital-library/${collection.id}`}>
-                  <Card className="h-full hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 hover:border-primary cursor-pointer">
-                    <CardHeader>
-                      <div className={`w-16 h-16 ${collection.bgColor} rounded-xl flex items-center justify-center mb-4`}>
+                  <Card className="h-full hover:shadow-2xl transition-all duration-300 hover:scale-105 border-3 border-gold/30 hover:border-primary cursor-pointer relative overflow-hidden group">
+                    {/* Moroccan Pattern Background */}
+                    <div 
+                      className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity"
+                      style={{ backgroundImage: `url(${moroccanPatternBg})`, backgroundSize: 'cover' }}
+                    ></div>
+                    <div className={`absolute inset-0 bg-gradient-to-br ${collection.gradient} opacity-60`}></div>
+                    
+                    <CardHeader className="relative z-10">
+                      <div className={`w-16 h-16 ${collection.bgColor} rounded-xl flex items-center justify-center mb-4 shadow-lg border-2 border-gold/20`}>
                         <Icon className={`h-8 w-8 ${collection.color}`} />
                       </div>
-                      <CardTitle className="text-xl font-bold">{collection.title}</CardTitle>
-                      <CardDescription>{collection.description}</CardDescription>
+                      <CardTitle className="text-xl font-moroccan font-bold">{collection.title}</CardTitle>
+                      <CardDescription className="font-elegant">{collection.description}</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="relative z-10">
                       <div className="flex items-center justify-between">
-                        <Badge variant="secondary" className="text-lg px-4 py-1">
+                        <Badge variant="secondary" className="text-base px-4 py-1 bg-white/80 backdrop-blur-sm">
                           {collection.count} documents
                         </Badge>
                         <ArrowRight className="h-5 w-5 text-primary" />
@@ -174,19 +231,29 @@ const DigitalLibrary = () => {
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredWorks.map((work, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredWorks.slice(0, 3).map((work, index) => (
               <Link key={index} to={`/book-reader/${index}`}>
-                <Card className="h-full hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer">
-                  <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-t-lg flex items-center justify-center">
-                    <Book className="h-24 w-24 text-primary/40" />
+                <Card className="h-full hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer border-3 border-gold/30 hover:border-primary group overflow-hidden">
+                  {/* Image */}
+                  <div className="aspect-[3/4] relative overflow-hidden">
+                    <img 
+                      src={work.image} 
+                      alt={work.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <Badge variant="secondary" className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm">
+                      {work.category}
+                    </Badge>
                   </div>
                   <CardHeader>
-                    <Badge variant="secondary" className="w-fit mb-2">{work.category}</Badge>
-                    <CardTitle className="text-lg">{work.title}</CardTitle>
-                    <CardDescription>{work.author}</CardDescription>
+                    <CardTitle className="text-lg font-moroccan leading-tight">{work.title}</CardTitle>
+                    <CardDescription className="font-elegant">{work.author}</CardDescription>
+                    <div className="text-xs text-muted-foreground mt-2">{work.date}</div>
                   </CardHeader>
                   <CardContent>
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{work.description}</p>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Eye className="h-4 w-4" />
                       <span>{work.views} consultations</span>
@@ -217,16 +284,25 @@ const DigitalLibrary = () => {
             </TabsList>
             
             <TabsContent value="recent">
-              <Card>
+              <Card className="border-2 border-gold/20">
                 <CardContent className="p-6">
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground mb-2 font-elegant">
                     Découvrez les derniers documents numérisés et ajoutés à notre bibliothèque numérique.
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                    {[1, 2, 3, 4].map((item) => (
-                      <div key={item} className="aspect-[3/4] bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
-                        <Book className="h-12 w-12 text-primary/40" />
-                      </div>
+                    {featuredWorks.slice(0, 4).map((work, item) => (
+                      <Link key={item} to={`/book-reader/${item}`}>
+                        <div className="aspect-[3/4] rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer shadow-md hover:shadow-xl relative group">
+                          <img 
+                            src={work.image} 
+                            alt={work.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                            <p className="text-white text-xs font-semibold line-clamp-2">{work.title}</p>
+                          </div>
+                        </div>
+                      </Link>
                     ))}
                   </div>
                 </CardContent>
@@ -234,16 +310,29 @@ const DigitalLibrary = () => {
             </TabsContent>
             
             <TabsContent value="popular">
-              <Card>
+              <Card className="border-2 border-gold/20">
                 <CardContent className="p-6">
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground mb-2 font-elegant">
                     Les documents les plus consultés par notre communauté.
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                    {[1, 2, 3, 4].map((item) => (
-                      <div key={item} className="aspect-[3/4] bg-gradient-to-br from-accent/10 to-highlight/10 rounded-lg flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
-                        <BookOpen className="h-12 w-12 text-accent/40" />
-                      </div>
+                    {[...featuredWorks].sort((a, b) => parseInt(b.views.replace(',', '')) - parseInt(a.views.replace(',', ''))).slice(0, 4).map((work, item) => (
+                      <Link key={item} to={`/book-reader/${item}`}>
+                        <div className="aspect-[3/4] rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer shadow-md hover:shadow-xl relative group">
+                          <img 
+                            src={work.image} 
+                            alt={work.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                            <p className="text-white text-xs font-semibold line-clamp-2">{work.title}</p>
+                          </div>
+                          <Badge className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm">
+                            <Eye className="h-3 w-3 mr-1" />
+                            {work.views}
+                          </Badge>
+                        </div>
+                      </Link>
                     ))}
                   </div>
                 </CardContent>
@@ -251,16 +340,25 @@ const DigitalLibrary = () => {
             </TabsContent>
             
             <TabsContent value="recommended">
-              <Card>
+              <Card className="border-2 border-gold/20">
                 <CardContent className="p-6">
-                  <p className="text-muted-foreground">
-                    Sélection personnalisée basée sur vos intérêts.
+                  <p className="text-muted-foreground mb-2 font-elegant">
+                    Sélection personnalisée basée sur les manuscrits andalous et maghrébins.
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                    {[1, 2, 3, 4].map((item) => (
-                      <div key={item} className="aspect-[3/4] bg-gradient-to-br from-highlight/10 to-royal/10 rounded-lg flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
-                        <FileText className="h-12 w-12 text-highlight/40" />
-                      </div>
+                    {featuredWorks.slice(2, 6).map((work, item) => (
+                      <Link key={item} to={`/book-reader/${item + 2}`}>
+                        <div className="aspect-[3/4] rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer shadow-md hover:shadow-xl relative group">
+                          <img 
+                            src={work.image} 
+                            alt={work.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                            <p className="text-white text-xs font-semibold line-clamp-2">{work.title}</p>
+                          </div>
+                        </div>
+                      </Link>
                     ))}
                   </div>
                 </CardContent>
