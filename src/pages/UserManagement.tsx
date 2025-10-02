@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Shield, Users, CheckCircle, XCircle, Clock, Settings, User, Mail, Phone, Building, Calendar, UserCheck, UserX, Edit, ArrowLeft, Home } from "lucide-react";
+import { Shield, Users, CheckCircle, XCircle, Clock, Settings, User, Mail, Phone, Building, Calendar, UserCheck, UserX, Edit, ArrowLeft, Home, Trash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate, Link } from "react-router-dom";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
@@ -232,6 +232,30 @@ export default function UserManagement() {
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour la demande",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteUser = async (userId: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Utilisateur supprimé",
+        description: "L'utilisateur a été supprimé avec succès",
+      });
+
+      fetchData();
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer l'utilisateur",
         variant: "destructive",
       });
     }
@@ -566,6 +590,33 @@ export default function UserManagement() {
                                   </AlertDialogContent>
                                 </AlertDialog>
                               )}
+                              
+                              {/* Bouton Supprimer */}
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button size="sm" variant="destructive">
+                                    <Trash className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Supprimer l'utilisateur</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Êtes-vous sûr de vouloir supprimer définitivement cet utilisateur ? 
+                                      Cette action est irréversible et supprimera toutes les données associées.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => deleteUser(userProfile.id)}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                      Supprimer
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </div>
                           </TableCell>
                         </TableRow>
