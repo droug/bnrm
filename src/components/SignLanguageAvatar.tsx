@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { User, MessageSquare, Brain, Sparkles } from 'lucide-react';
-import avatarImage from '@/assets/chatbot-avatar.png';
+import avatarImage from '@/assets/chatbot-avatar.jpg';
 
 interface SignLanguageAvatarProps {
   isActive: boolean;
