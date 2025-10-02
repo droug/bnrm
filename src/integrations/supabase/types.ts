@@ -1107,6 +1107,62 @@ export type Database = {
           },
         ]
       }
+      faqs: {
+        Row: {
+          answer: string
+          answer_ar: string
+          answer_ber: string | null
+          category_id: string | null
+          created_at: string | null
+          helpful_count: number | null
+          id: string
+          is_published: boolean | null
+          question: string
+          question_ar: string
+          question_ber: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          answer: string
+          answer_ar: string
+          answer_ber?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          is_published?: boolean | null
+          question: string
+          question_ar: string
+          question_ber?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: string
+          answer_ar?: string
+          answer_ber?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          is_published?: boolean | null
+          question?: string
+          question_ar?: string
+          question_ber?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faqs_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "help_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           author: string | null
@@ -1157,6 +1213,137 @@ export type Database = {
             columns: ["manuscript_id"]
             isOneToOne: false
             referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      help_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          description_ar: string | null
+          description_ber: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_ar: string
+          name_ber: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          description_ar?: string | null
+          description_ber?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_ar: string
+          name_ber?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          description_ar?: string | null
+          description_ber?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_ar?: string
+          name_ber?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      help_guides: {
+        Row: {
+          category_id: string | null
+          content: string
+          content_ar: string
+          content_ber: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          description_ar: string | null
+          description_ber: string | null
+          difficulty_level: string | null
+          estimated_time: number | null
+          helpful_count: number | null
+          id: string
+          is_featured: boolean | null
+          is_published: boolean | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string
+          title_ar: string
+          title_ber: string | null
+          updated_at: string | null
+          video_url: string | null
+          view_count: number | null
+        }
+        Insert: {
+          category_id?: string | null
+          content: string
+          content_ar: string
+          content_ber?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          description_ar?: string | null
+          description_ber?: string | null
+          difficulty_level?: string | null
+          estimated_time?: number | null
+          helpful_count?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          title_ar: string
+          title_ber?: string | null
+          updated_at?: string | null
+          video_url?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          category_id?: string | null
+          content?: string
+          content_ar?: string
+          content_ber?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          description_ar?: string | null
+          description_ber?: string | null
+          difficulty_level?: string | null
+          estimated_time?: number | null
+          helpful_count?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          title_ar?: string
+          title_ber?: string | null
+          updated_at?: string | null
+          video_url?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "help_guides_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "help_categories"
             referencedColumns: ["id"]
           },
         ]
@@ -2563,6 +2750,56 @@ export type Database = {
           },
         ]
       }
+      tutorial_steps: {
+        Row: {
+          content: string
+          content_ar: string
+          content_ber: string | null
+          created_at: string | null
+          guide_id: string | null
+          id: string
+          image_url: string | null
+          step_number: number
+          title: string
+          title_ar: string
+          title_ber: string | null
+        }
+        Insert: {
+          content: string
+          content_ar: string
+          content_ber?: string | null
+          created_at?: string | null
+          guide_id?: string | null
+          id?: string
+          image_url?: string | null
+          step_number: number
+          title: string
+          title_ar: string
+          title_ber?: string | null
+        }
+        Update: {
+          content?: string
+          content_ar?: string
+          content_ber?: string | null
+          created_at?: string | null
+          guide_id?: string | null
+          id?: string
+          image_url?: string | null
+          step_number?: number
+          title?: string
+          title_ar?: string
+          title_ber?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tutorial_steps_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "help_guides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_bookmarks: {
         Row: {
           content_id: string | null
@@ -2708,6 +2945,47 @@ export type Database = {
             columns: ["manuscript_id"]
             isOneToOne: false
             referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_tutorial_progress: {
+        Row: {
+          completed: boolean | null
+          completion_date: string | null
+          created_at: string | null
+          guide_id: string | null
+          id: string
+          last_step: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed?: boolean | null
+          completion_date?: string | null
+          created_at?: string | null
+          guide_id?: string | null
+          id?: string
+          last_step?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed?: boolean | null
+          completion_date?: string | null
+          created_at?: string | null
+          guide_id?: string | null
+          id?: string
+          last_step?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_tutorial_progress_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "help_guides"
             referencedColumns: ["id"]
           },
         ]

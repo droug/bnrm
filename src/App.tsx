@@ -30,6 +30,8 @@ import CatalogMetadata from "./pages/CatalogMetadata";
 import ReproductionPage from "./pages/ReproductionPage";
 import ReproductionBackofficePage from "./pages/ReproductionBackofficePage";
 import ReproductionDetailsPage from "./pages/ReproductionDetailsPage";
+import HelpPage from "./pages/HelpPage";
+import PreservationPage from "./pages/PreservationPage";
 
 const App = () => (
   <TooltipProvider>
@@ -69,6 +71,10 @@ const App = () => (
         <Route path="/demande-reproduction" element={<ReproductionPage />} />
         <Route path="/manuscripts" element={<Manuscripts />} />
         <Route path="/my-library-space" element={<MyLibrarySpace />} />
+        <Route path="/help" element={<HelpPage />} />
+        <Route path="/aide" element={<HelpPage />} />
+        <Route path="/admin/preservation" element={<PreservationPage />} />
+
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

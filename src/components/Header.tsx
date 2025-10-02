@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown, Accessibility, Bot, MessageCircle, Shield } from "lucide-react";
+import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown, Accessibility, Bot, MessageCircle, Shield, HelpCircle } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
@@ -263,6 +263,18 @@ const Header = () => {
                           </p>
                         </a>
                       </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link to="/help" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
+                          <div className="text-base font-semibold leading-none flex items-center gap-2">
+                            <HelpCircle className="h-4 w-4" />
+                            {language === 'ar' ? 'مركز المساعدة' : 'Centre d\'Aide'}
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                            {language === 'ar' ? 'أدلة وتوجيهات للاستخدام' : 'Guides et tutoriels d\'utilisation'}
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+
                     </div>
                     <div className="space-y-4">
                       <h4 className="text-lg font-bold text-primary mb-4 border-b border-primary/20 pb-2">{t('nav.history.missions')}</h4>
