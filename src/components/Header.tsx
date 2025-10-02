@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown, Accessibility, Bot, MessageCircle } from "lucide-react";
+import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown, Accessibility, Bot, MessageCircle, Shield } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
@@ -138,14 +138,41 @@ const Header = () => {
                     </span>
                   </Button>
                 </Link>
-                <Link to="/dashboard">
-                  <Button variant="default" size="lg" className="flex items-center gap-2 px-6 py-2 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                    <User className="h-5 w-5" />
-                    <span className="hidden sm:inline font-medium">
-                      {profile?.first_name || 'Dashboard'}
-                    </span>
-                  </Button>
-                </Link>
+                
+                {/* Menu utilisateur avec dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="default" size="lg" className="flex items-center gap-2 px-6 py-2 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                      <User className="h-5 w-5" />
+                      <span className="hidden sm:inline font-medium">
+                        {profile?.first_name || 'Mon Compte'}
+                      </span>
+                      <ChevronDown className="h-4 w-4 ml-1" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 bg-background/95 backdrop-blur-lg border border-primary/20 shadow-2xl z-50">
+                    <DropdownMenuItem asChild className="cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10">
+                      <Link to="/profile" className="flex items-center gap-3">
+                        <User className="h-4 w-4" />
+                        <span>Mon Profil</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10">
+                      <Link to="/dashboard" className="flex items-center gap-3">
+                        <BookOpen className="h-4 w-4" />
+                        <span>Tableau de bord</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    {(profile?.role === 'admin' || profile?.role === 'librarian') && (
+                      <DropdownMenuItem asChild className="cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10">
+                        <Link to="/admin/settings" className="flex items-center gap-3">
+                          <Shield className="h-4 w-4" />
+                          <span>Administration</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ) : (
               <Link to="/auth">
