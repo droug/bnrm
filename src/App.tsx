@@ -25,6 +25,7 @@ import BNRMBackOffice from "./pages/BNRMBackOffice";
 import SearchResults from "./pages/SearchResults";
 import DigitalLibrary from "./pages/DigitalLibrary";
 import BookReader from "./pages/BookReader";
+import MyLibrarySpace from "./pages/MyLibrarySpace";
 
 const App = () => (
   <TooltipProvider>
@@ -56,6 +57,7 @@ const App = () => (
         <Route path="/digital-library" element={<DigitalLibrary />} />
         <Route path="/digital-library/:category" element={<DigitalLibrary />} />
         <Route path="/book-reader/:id" element={<BookReader />} />
+        <Route path="/my-library-space" element={<MyLibrarySpace />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -129,14 +129,24 @@ const Header = () => {
             
             {/* Connexion utilisateur */}
             {user ? (
-              <Link to="/dashboard">
-                <Button variant="default" size="lg" className="flex items-center gap-2 px-6 py-2 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                  <User className="h-5 w-5" />
-                  <span className="hidden sm:inline font-medium">
-                    {profile?.first_name || 'Dashboard'}
-                  </span>
-                </Button>
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link to="/my-library-space">
+                  <Button variant="outline" size="lg" className="flex items-center gap-2 px-4 py-2 transition-all duration-300 hover:scale-105 hover:shadow-lg border-primary/30 hover:border-primary">
+                    <BookOpen className="h-5 w-5" />
+                    <span className="hidden lg:inline font-medium">
+                      Mon Espace
+                    </span>
+                  </Button>
+                </Link>
+                <Link to="/dashboard">
+                  <Button variant="default" size="lg" className="flex items-center gap-2 px-6 py-2 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                    <User className="h-5 w-5" />
+                    <span className="hidden sm:inline font-medium">
+                      {profile?.first_name || 'Dashboard'}
+                    </span>
+                  </Button>
+                </Link>
+              </div>
             ) : (
               <Link to="/auth">
                 <Button size="lg" className="flex items-center gap-2 px-6 py-2 transition-all duration-300 hover:scale-105 hover:shadow-lg bg-primary hover:bg-primary/90">

@@ -3,6 +3,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import manuscriptPage1 from "@/assets/manuscript-page-1.jpg";
 import manuscriptPage2 from "@/assets/manuscript-page-2.jpg";
 import manuscriptPage3 from "@/assets/manuscript-page-3.jpg";
@@ -42,7 +44,9 @@ import {
   Languages,
   Eye,
   EyeOff,
-  MousePointerClick
+  MousePointerClick,
+  Heart,
+  Star
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -71,6 +75,7 @@ const BookReader = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t, setLanguage } = useLanguage();
+  const { user } = useAuth();
   
   // Display states
   const [currentPage, setCurrentPage] = useState(1);
@@ -79,6 +84,12 @@ const BookReader = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "double">("single");
   const [readingMode, setReadingMode] = useState<"book" | "audio">("book");
+  
+  // User interaction states
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
   
   // Security settings (paramétrable)
   const [blockScreenCapture, setBlockScreenCapture] = useState(false);

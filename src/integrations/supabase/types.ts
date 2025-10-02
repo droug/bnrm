@@ -933,6 +933,60 @@ export type Database = {
           },
         ]
       }
+      favorites: {
+        Row: {
+          author: string | null
+          content_id: string | null
+          content_type: string
+          created_at: string
+          id: string
+          manuscript_id: string | null
+          notes: string | null
+          thumbnail_url: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          author?: string | null
+          content_id?: string | null
+          content_type: string
+          created_at?: string
+          id?: string
+          manuscript_id?: string | null
+          notes?: string | null
+          thumbnail_url?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          author?: string | null
+          content_id?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          manuscript_id?: string | null
+          notes?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       languages: {
         Row: {
           code: string
@@ -1409,6 +1463,72 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_history: {
+        Row: {
+          action_type: string
+          author: string | null
+          content_id: string | null
+          content_type: string
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          last_page_read: number | null
+          manuscript_id: string | null
+          reading_progress: number | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          author?: string | null
+          content_id?: string | null
+          content_type: string
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          last_page_read?: number | null
+          manuscript_id?: string | null
+          reading_progress?: number | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          author?: string | null
+          content_id?: string | null
+          content_type?: string
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          last_page_read?: number | null
+          manuscript_id?: string | null
+          reading_progress?: number | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_history_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reading_history_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       role_permissions: {
         Row: {
           created_at: string | null
@@ -1555,6 +1675,51 @@ export type Database = {
           },
         ]
       }
+      user_bookmarks: {
+        Row: {
+          content_id: string | null
+          created_at: string
+          id: string
+          manuscript_id: string | null
+          note: string | null
+          page_number: number
+          user_id: string
+        }
+        Insert: {
+          content_id?: string | null
+          created_at?: string
+          id?: string
+          manuscript_id?: string | null
+          note?: string | null
+          page_number: number
+          user_id: string
+        }
+        Update: {
+          content_id?: string | null
+          created_at?: string
+          id?: string
+          manuscript_id?: string | null
+          note?: string | null
+          page_number?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_bookmarks_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_bookmarks_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_permissions: {
         Row: {
           created_at: string | null
@@ -1595,6 +1760,66 @@ export type Database = {
             columns: ["permission_id"]
             isOneToOne: false
             referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_reviews: {
+        Row: {
+          admin_response: string | null
+          comment: string | null
+          content_id: string | null
+          created_at: string
+          id: string
+          is_reviewed_by_admin: boolean | null
+          manuscript_id: string | null
+          rating: number | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_response?: string | null
+          comment?: string | null
+          content_id?: string | null
+          created_at?: string
+          id?: string
+          is_reviewed_by_admin?: boolean | null
+          manuscript_id?: string | null
+          rating?: number | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_response?: string | null
+          comment?: string | null
+          content_id?: string | null
+          created_at?: string
+          id?: string
+          is_reviewed_by_admin?: boolean | null
+          manuscript_id?: string | null
+          rating?: number | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_reviews_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reviews_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
             referencedColumns: ["id"]
           },
         ]
