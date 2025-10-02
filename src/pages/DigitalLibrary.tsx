@@ -2,7 +2,7 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Search, Book, BookOpen, FileText, Video, Music, Image as ImageIcon, Globe, ArrowRight, TrendingUp, Clock, Eye, Download, Filter, ChevronDown, X, Calendar } from "lucide-react";
+import { Search, Book, BookOpen, FileText, Video, Music, Image as ImageIcon, Globe, ArrowRight, TrendingUp, Clock, Eye, Download, Filter, ChevronDown, X, Calendar, HelpCircle, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -639,6 +639,66 @@ const DigitalLibrary = () => {
               </div>
             </CardContent>
           </Card>
+        </section>
+
+        {/* Help & Support Section */}
+        <section className="mb-12">
+          <div className="bg-gradient-to-r from-primary/10 via-accent/10 to-highlight/10 rounded-2xl p-8 border-2 border-primary/20">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="border-primary/30 hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-3 bg-primary/10 rounded-lg">
+                      <HelpCircle className="h-6 w-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-xl">Besoin d'aide ?</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Accédez à nos guides, tutoriels et FAQ pour utiliser efficacement la bibliothèque numérique
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Link to="/help">
+                    <Button className="w-full gap-2">
+                      <Lightbulb className="h-4 w-4" />
+                      Consulter le centre d'aide
+                      <ArrowRight className="h-4 w-4 ml-auto" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card className="border-accent/30 hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-3 bg-accent/10 rounded-lg">
+                      <BookOpen className="h-6 w-6 text-accent" />
+                    </div>
+                    <CardTitle className="text-xl">Guides rapides</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Des tutoriels étape par étape pour les fonctionnalités principales
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 text-sm">
+                    <Link to="/help" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+                      <ArrowRight className="h-4 w-4" />
+                      Comment rechercher dans les collections
+                    </Link>
+                    <Link to="/help" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+                      <ArrowRight className="h-4 w-4" />
+                      Consulter et télécharger des documents
+                    </Link>
+                    <Link to="/help" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+                      <ArrowRight className="h-4 w-4" />
+                      Utiliser les filtres avancés
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </section>
       </main>
 
