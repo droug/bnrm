@@ -1,22 +1,27 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Crown, Gem } from "lucide-react";
+import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Crown, Gem, Filter, ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import traditionalLibraryBg from "@/assets/traditional-library-bg.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 import LegalDepositDeclaration from "@/components/LegalDepositDeclaration";
 
 const Index = () => {
   const { t } = useLanguage(); // Utiliser le hook au lieu de créer un nouveau provider
+  const navigate = useNavigate();
   const [showLegalDeposit, setShowLegalDeposit] = useState(false);
   const [selectedDepositType, setSelectedDepositType] = useState<"monographie" | "periodique" | "bd_logiciels" | "collections_specialisees" | null>(null);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState<Array<{ type: string; value: string }>>([]);
 
   // Vérifier si le popup d'accueil doit être affiché
   useEffect(() => {
@@ -33,6 +38,43 @@ const Index = () => {
   const handleLegalDepositClick = (type: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees") => {
     setSelectedDepositType(type);
     setShowLegalDeposit(true);
+  };
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('q', searchQuery);
+    activeFilters.forEach(filter => {
+      params.set(filter.type, filter.value);
+    });
+    navigate(`/search?${params.toString()}`);
+  };
+
+  const addFilter = (type: string) => {
+    const value = prompt(`Entrez la valeur pour ${getFilterLabel(type)}:`);
+    if (value && value.trim()) {
+      setActiveFilters(prev => [...prev, { type, value: value.trim() }]);
+    }
+  };
+
+  const removeFilter = (index: number) => {
+    setActiveFilters(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setActiveFilters([]);
+  };
+
+  const getFilterLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      author: "Auteur",
+      publisher: "Éditeur",
+      genre: "Genre",
+      publication_year: "Année de publication",
+      language: "Langue",
+      content_type: "Type de contenu"
+    };
+    return labels[type] || type;
   };
 
   if (showLegalDeposit && selectedDepositType) {
@@ -115,21 +157,96 @@ const Index = () => {
                     <h2 className="text-2xl font-moroccan font-bold text-foreground mb-4">
                       {t('header.search')}
                     </h2>
+                    
+                    {/* Filtres actifs */}
+                    {activeFilters.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-4 justify-center">
+                        {activeFilters.map((filter, index) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="pl-3 pr-2 py-1 text-sm bg-primary/10 text-primary border border-primary/20"
+                          >
+                            <span className="font-semibold">{getFilterLabel(filter.type)}:</span>
+                            <span className="ml-1">{filter.value}</span>
+                            <button
+                              onClick={() => removeFilter(index)}
+                              className="ml-2 hover:text-destructive transition-colors"
+                              aria-label="Supprimer le filtre"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="relative">
+                      {/* Menu des filtres */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-12 px-3 bg-white/95 border-2 border-gold/30 hover:bg-primary/5 hover:border-primary/40"
+                          >
+                            <Filter className="h-4 w-4 mr-2" />
+                            <ChevronDown className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-56">
+                          <DropdownMenuItem onClick={() => addFilter('author')}>
+                            Auteur
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => addFilter('publisher')}>
+                            Éditeur
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => addFilter('genre')}>
+                            Genre
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => addFilter('publication_year')}>
+                            Année de publication
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => addFilter('language')}>
+                            Langue
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => addFilter('content_type')}>
+                            Type de contenu
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
                       <Input
                         type="search"
                         placeholder="Explorez les trésors de la connaissance marocaine..."
-                        className="w-full h-16 text-lg bg-white/98 shadow-zellige border-3 border-gold/30 focus:border-primary pl-6 pr-16 rounded-full font-serif"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                        className="w-full h-16 text-lg bg-white/98 shadow-zellige border-3 border-gold/30 focus:border-primary pl-32 pr-32 rounded-full font-serif"
                       />
+                      
+                      {/* Bouton de suppression */}
+                      {searchQuery && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearSearch}
+                          className="absolute right-20 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full hover:bg-destructive/10 text-destructive"
+                        >
+                          <X className="h-5 w-5" />
+                        </Button>
+                      )}
+
                       <Button 
-                        size="lg" 
+                        size="lg"
+                        onClick={handleSearch}
                         className="absolute right-2 top-2 h-12 w-12 rounded-full bg-gradient-neutral shadow-gold hover:shadow-berber transition-all duration-300 transform hover:scale-105"
                       >
                         <Search className="h-6 w-6" />
                       </Button>
                     </div>
                     <p className="text-muted-foreground mt-4 italic font-elegant">
-                      "Découvrez des siècles de savoir et de patrimoine culturel"
+                      "Découvrez des siècles de savoir et de patrimoine culturel - Utilisez les filtres pour affiner votre recherche"
                     </p>
                   </div>
                 </div>
