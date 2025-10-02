@@ -10,3 +10,6 @@ verify_jwt = false
 
 [functions.auto-archive-content]
 verify_jwt = false
+
+[functions.smart-chatbot]
+verify_jwt = false

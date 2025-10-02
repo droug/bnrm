@@ -6,7 +6,7 @@ import SearchBar from "@/components/SearchBar";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
-import ChatBot from "@/components/ChatBot";
+import SmartChatBot from "@/components/SmartChatBot";
 import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
 // import { WatermarkContainer, Watermark } from "@/components/ui/watermark"; // Removed to fix runtime error
 import logoImage from "@/assets/logo-bnrm.png";
@@ -667,7 +667,7 @@ const Header = () => {
       
       {/* Chatbot intelligent */}
       {isChatBotOpen && (
-        <ChatBot 
+        <SmartChatBot 
           isOpen={isChatBotOpen} 
           onClose={() => setIsChatBotOpen(false)} 
         />
