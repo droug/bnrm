@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Search, Filter, SortAsc, SortDesc, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Filter, SortAsc, SortDesc, Loader2, ChevronLeft, ChevronRight, X, Eye, Calendar } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +26,9 @@ interface SearchResult {
   language: string;
   keywords: string[];
   author: string;
+  publisher?: string;
+  publication_year?: number;
+  genre?: string;
   category?: string;
   tags?: string[];
   url: string;
@@ -31,6 +36,7 @@ interface SearchResult {
   access_level: string;
   is_featured: boolean;
   view_count: number;
+  status: string;
   highlights?: {
     title?: string[];
     content?: string[];
@@ -60,6 +66,9 @@ interface Filters {
   language: string[];
   author: string[];
   category: string[];
+  publisher: string[];
+  genre: string[];
+  publication_year: string;
   is_featured: boolean | null;
 }
 
@@ -72,11 +81,16 @@ export default function SearchResults() {
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null);
+  const [showDetailPanel, setShowDetailPanel] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     content_type: [],
     language: [],
     author: [],
     category: [],
+    publisher: [],
+    genre: [],
+    publication_year: '',
     is_featured: null
   });
 
@@ -99,6 +113,9 @@ export default function SearchResults() {
         content_type: filters.content_type.length > 0 ? filters.content_type.join(',') : '',
         author: filters.author.length > 0 ? filters.author.join(',') : '',
         category: filters.category.length > 0 ? filters.category.join(',') : '',
+        publisher: filters.publisher.length > 0 ? filters.publisher.join(',') : '',
+        genre: filters.genre.length > 0 ? filters.genre.join(',') : '',
+        publication_year: filters.publication_year || '',
         page: currentPage,
         per_page: perPage,
         sort_by: sortBy,
@@ -158,8 +175,16 @@ export default function SearchResults() {
       language: [],
       author: [],
       category: [],
+      publisher: [],
+      genre: [],
+      publication_year: '',
       is_featured: null
     });
+  };
+
+  const handleResultClick = (result: SearchResult) => {
+    setSelectedResult(result);
+    setShowDetailPanel(true);
   };
 
   const formatHighlight = (text: string, highlights?: string[]) => {
@@ -302,36 +327,44 @@ export default function SearchResults() {
                 <Separator />
 
                 {/* Facet filters */}
-                {results?.facet_counts && results.facet_counts.map((facet) => (
-                  <div key={facet.field_name}>
-                    <Label className="font-medium">
-                      {facet.field_name === 'content_type' && (language === 'ar' ? 'نوع المحتوى' : 'Type de contenu')}
-                      {facet.field_name === 'language' && (language === 'ar' ? 'اللغة' : 'Langue')}
-                      {facet.field_name === 'author' && (language === 'ar' ? 'المؤلف' : 'Auteur')}
-                      {facet.field_name === 'category' && (language === 'ar' ? 'الفئة' : 'Catégorie')}
-                    </Label>
-                    <div className="space-y-2 mt-2">
-                      {facet.counts.slice(0, 5).map((count) => (
-                        <div key={count.value} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`${facet.field_name}-${count.value}`}
-                            checked={(filters[facet.field_name as keyof Filters] as string[])?.includes?.(count.value) || false}
-                            onCheckedChange={(checked) => 
-                              handleFilterChange(facet.field_name as keyof Filters, count.value, checked as boolean)
-                            }
-                          />
-                          <Label 
-                            htmlFor={`${facet.field_name}-${count.value}`}
-                            className="text-sm cursor-pointer flex-1"
-                          >
-                            {facet.field_name === 'content_type' ? getContentTypeLabel(count.value) : count.value}
-                            <span className="text-muted-foreground ml-1">({count.count})</span>
-                          </Label>
-                        </div>
-                      ))}
+                {results?.facet_counts && results.facet_counts.map((facet) => {
+                  // Skip internal fields
+                  if (facet.field_name === 'status' || facet.field_name === 'access_level') return null;
+                  
+                  return (
+                    <div key={facet.field_name}>
+                      <Label className="font-medium">
+                        {facet.field_name === 'content_type' && (language === 'ar' ? 'نوع المحتوى' : 'Type de contenu')}
+                        {facet.field_name === 'language' && (language === 'ar' ? 'اللغة' : 'Langue')}
+                        {facet.field_name === 'author' && (language === 'ar' ? 'المؤلف' : 'Auteur')}
+                        {facet.field_name === 'category' && (language === 'ar' ? 'الفئة' : 'Catégorie')}
+                        {facet.field_name === 'publisher' && (language === 'ar' ? 'الناشر' : 'Éditeur')}
+                        {facet.field_name === 'genre' && (language === 'ar' ? 'النوع' : 'Genre')}
+                        {facet.field_name === 'publication_year' && (language === 'ar' ? 'سنة النشر' : 'Année de publication')}
+                      </Label>
+                      <div className="space-y-2 mt-2 max-h-40 overflow-y-auto">
+                        {facet.counts.slice(0, 10).map((count) => (
+                          <div key={count.value} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`${facet.field_name}-${count.value}`}
+                              checked={(filters[facet.field_name as keyof Filters] as string[])?.includes?.(count.value) || false}
+                              onCheckedChange={(checked) => 
+                                handleFilterChange(facet.field_name as keyof Filters, count.value, checked as boolean)
+                              }
+                            />
+                            <Label 
+                              htmlFor={`${facet.field_name}-${count.value}`}
+                              className="text-sm cursor-pointer flex-1"
+                            >
+                              {facet.field_name === 'content_type' ? getContentTypeLabel(count.value) : count.value}
+                              <span className="text-muted-foreground ml-1">({count.count})</span>
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
           </div>
@@ -349,13 +382,16 @@ export default function SearchResults() {
               {/* Results list */}
               <div className="space-y-4 mb-6">
                 {results.hits.map((hit, index) => (
-                  <Card key={hit.document.id} className="hover:shadow-md transition-shadow">
+                  <Card 
+                    key={hit.document.id} 
+                    className="hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => handleResultClick(hit.document)}
+                  >
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
                           <h3 className="text-lg font-semibold mb-2">
-                            <a 
-                              href={hit.document.url}
+                            <span 
                               className="hover:text-primary transition-colors"
                               dangerouslySetInnerHTML={{
                                 __html: formatHighlight(hit.document.title, hit.highlights?.title)
@@ -363,7 +399,7 @@ export default function SearchResults() {
                             />
                           </h3>
                           
-                          <div className="flex items-center gap-2 mb-3">
+                          <div className="flex items-center gap-2 mb-3 flex-wrap">
                             <Badge variant="secondary">
                               {getContentTypeLabel(hit.document.content_type)}
                             </Badge>
@@ -373,10 +409,16 @@ export default function SearchResults() {
                                 {language === 'ar' ? 'مميز' : 'À la une'}
                               </Badge>
                             )}
+                            {hit.document.publication_year && (
+                              <Badge variant="outline" className="gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {hit.document.publication_year}
+                              </Badge>
+                            )}
                           </div>
 
                           <p 
-                            className="text-muted-foreground mb-3"
+                            className="text-muted-foreground mb-3 line-clamp-2"
                             dangerouslySetInnerHTML={{
                               __html: formatHighlight(
                                 hit.document.excerpt || hit.document.content, 
@@ -385,16 +427,21 @@ export default function SearchResults() {
                             }}
                           />
 
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span>{hit.document.author}</span>
-                            <span>
-                              {new Date(hit.document.published_at * 1000).toLocaleDateString(
-                                language === 'ar' ? 'ar-MA' : 'fr-FR'
-                              )}
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                            <span className="flex items-center gap-1">
+                              <span className="font-medium">{language === 'ar' ? 'المؤلف:' : 'Auteur:'}</span>
+                              {hit.document.author}
                             </span>
+                            {hit.document.publisher && (
+                              <span className="flex items-center gap-1">
+                                <span className="font-medium">{language === 'ar' ? 'الناشر:' : 'Éditeur:'}</span>
+                                {hit.document.publisher}
+                              </span>
+                            )}
                             {hit.document.view_count > 0 && (
-                              <span>
-                                {hit.document.view_count} {language === 'ar' ? 'مشاهدة' : 'vues'}
+                              <span className="flex items-center gap-1">
+                                <Eye className="h-3 w-3" />
+                                {hit.document.view_count}
                               </span>
                             )}
                           </div>
@@ -408,7 +455,41 @@ export default function SearchResults() {
                               ))}
                             </div>
                           )}
+
+                          {/* Highlight preview with context */}
+                          {hit.highlights?.content && hit.highlights.content.length > 0 && (
+                            <div className="mt-4 pt-4 border-t">
+                              <p className="text-xs text-muted-foreground mb-2">
+                                {language === 'ar' ? 'مقتطفات مطابقة:' : 'Extraits correspondants:'}
+                              </p>
+                              <div className="space-y-2">
+                                {hit.highlights.content.slice(0, 3).map((snippet, i) => (
+                                  <p 
+                                    key={i}
+                                    className="text-sm text-muted-foreground p-2 bg-muted/30 rounded"
+                                    dangerouslySetInnerHTML={{ 
+                                      __html: snippet.replace(
+                                        /<mark>/g, 
+                                        '<mark class="bg-yellow-200 dark:bg-yellow-500/30 text-foreground font-medium px-1 rounded">'
+                                      )
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
+                        
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleResultClick(hit.document);
+                          }}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -417,7 +498,7 @@ export default function SearchResults() {
 
               {/* Pagination */}
               {results.found > perPage && (
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="text-sm text-muted-foreground">
                     {language === 'ar' 
                       ? `الصفحة ${currentPage} من ${Math.ceil(results.found / perPage)}`
@@ -436,9 +517,35 @@ export default function SearchResults() {
                       {language === 'ar' ? 'السابق' : 'Précédent'}
                     </Button>
                     
-                    <span className="px-3 py-1 text-sm">
-                      {currentPage}
-                    </span>
+                    {/* Page numbers */}
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: Math.min(5, Math.ceil(results.found / perPage)) }, (_, i) => {
+                        const pageNum = i + 1;
+                        const totalPages = Math.ceil(results.found / perPage);
+                        
+                        // Show first page, last page, current page and neighbors
+                        if (
+                          pageNum === 1 || 
+                          pageNum === totalPages ||
+                          (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                        ) {
+                          return (
+                            <Button
+                              key={pageNum}
+                              variant={pageNum === currentPage ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => handlePageChange(pageNum)}
+                              className="w-8 h-8 p-0"
+                            >
+                              {pageNum}
+                            </Button>
+                          );
+                        } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
+                          return <span key={pageNum} className="px-1">...</span>;
+                        }
+                        return null;
+                      })}
+                    </div>
                     
                     <Button
                       variant="outline"
@@ -472,6 +579,152 @@ export default function SearchResults() {
           )}
         </div>
       </div>
+
+      {/* Detail Panel */}
+      <Sheet open={showDetailPanel} onOpenChange={setShowDetailPanel}>
+        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+          <SheetHeader>
+            <SheetTitle className="text-xl">
+              {selectedResult?.title}
+            </SheetTitle>
+          </SheetHeader>
+          
+          {selectedResult && (
+            <ScrollArea className="h-[calc(100vh-100px)] mt-6">
+              <div className="space-y-6 pr-4">
+                {/* Metadata */}
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="secondary">
+                    {getContentTypeLabel(selectedResult.content_type)}
+                  </Badge>
+                  <Badge variant="outline">{selectedResult.language.toUpperCase()}</Badge>
+                  {selectedResult.is_featured && (
+                    <Badge variant="default">
+                      {language === 'ar' ? 'مميز' : 'À la une'}
+                    </Badge>
+                  )}
+                  {selectedResult.publication_year && (
+                    <Badge variant="outline" className="gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {selectedResult.publication_year}
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Author and Publisher */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-semibold">{language === 'ar' ? 'المؤلف:' : 'Auteur:'}</span>
+                    <span>{selectedResult.author}</span>
+                  </div>
+                  {selectedResult.publisher && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-semibold">{language === 'ar' ? 'الناشر:' : 'Éditeur:'}</span>
+                      <span>{selectedResult.publisher}</span>
+                    </div>
+                  )}
+                  {selectedResult.genre && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-semibold">{language === 'ar' ? 'النوع:' : 'Genre:'}</span>
+                      <span>{selectedResult.genre}</span>
+                    </div>
+                  )}
+                  {selectedResult.category && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-semibold">{language === 'ar' ? 'الفئة:' : 'Catégorie:'}</span>
+                      <span>{selectedResult.category}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-semibold">{language === 'ar' ? 'تاريخ النشر:' : 'Date de publication:'}</span>
+                    <span>
+                      {new Date(selectedResult.published_at * 1000).toLocaleDateString(
+                        language === 'ar' ? 'ar-MA' : 'fr-FR',
+                        { year: 'numeric', month: 'long', day: 'numeric' }
+                      )}
+                    </span>
+                  </div>
+                  {selectedResult.view_count > 0 && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Eye className="h-4 w-4" />
+                      <span>{selectedResult.view_count} {language === 'ar' ? 'مشاهدة' : 'vues'}</span>
+                    </div>
+                  )}
+                </div>
+
+                <Separator />
+
+                {/* Excerpt */}
+                {selectedResult.excerpt && (
+                  <div>
+                    <h4 className="font-semibold mb-2">
+                      {language === 'ar' ? 'ملخص' : 'Résumé'}
+                    </h4>
+                    <p className="text-muted-foreground">{selectedResult.excerpt}</p>
+                  </div>
+                )}
+
+                {/* Full content with highlights */}
+                <div>
+                  <h4 className="font-semibold mb-2">
+                    {language === 'ar' ? 'المحتوى الكامل' : 'Contenu complet'}
+                  </h4>
+                  <div 
+                    className="prose prose-sm max-w-none dark:prose-invert"
+                    dangerouslySetInnerHTML={{ 
+                      __html: selectedResult.content.replace(
+                        new RegExp(`(${query})`, 'gi'),
+                        '<mark class="bg-yellow-200 dark:bg-yellow-500/30 text-foreground font-medium px-1 rounded">$1</mark>'
+                      )
+                    }}
+                  />
+                </div>
+
+                {/* Keywords */}
+                {selectedResult.keywords && selectedResult.keywords.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">
+                      {language === 'ar' ? 'الكلمات المفتاحية' : 'Mots-clés'}
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedResult.keywords.map((keyword, i) => (
+                        <Badge key={i} variant="outline">
+                          {keyword}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Tags */}
+                {selectedResult.tags && selectedResult.tags.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">
+                      {language === 'ar' ? 'الوسوم' : 'Tags'}
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedResult.tags.map((tag, i) => (
+                        <Badge key={i} variant="secondary">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action buttons */}
+                <div className="flex gap-2 pt-4">
+                  <Button asChild className="flex-1">
+                    <a href={selectedResult.url}>
+                      {language === 'ar' ? 'عرض المحتوى الكامل' : 'Voir le contenu complet'}
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </ScrollArea>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

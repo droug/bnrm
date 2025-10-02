@@ -23,6 +23,9 @@ interface TypesenseDocument {
   language: string;
   keywords: string[];
   author: string;
+  publisher?: string;
+  publication_year?: number;
+  genre?: string;
   category?: string;
   tags?: string[];
   url: string;
@@ -30,6 +33,7 @@ interface TypesenseDocument {
   access_level: string;
   is_featured: boolean;
   view_count: number;
+  status: string;
 }
 
 const searchSchema = {
@@ -43,13 +47,17 @@ const searchSchema = {
     { name: 'language', type: 'string', facet: true },
     { name: 'keywords', type: 'string[]', facet: true },
     { name: 'author', type: 'string', facet: true },
+    { name: 'publisher', type: 'string', optional: true, facet: true },
+    { name: 'publication_year', type: 'int32', optional: true, facet: true },
+    { name: 'genre', type: 'string', optional: true, facet: true },
     { name: 'category', type: 'string', optional: true, facet: true },
     { name: 'tags', type: 'string[]', optional: true, facet: true },
     { name: 'url', type: 'string', facet: false },
     { name: 'published_at', type: 'int64', facet: false },
     { name: 'access_level', type: 'string', facet: true },
     { name: 'is_featured', type: 'bool', facet: true },
-    { name: 'view_count', type: 'int32', facet: false }
+    { name: 'view_count', type: 'int32', facet: false },
+    { name: 'status', type: 'string', facet: true }
   ],
   default_sorting_field: 'published_at'
 };
@@ -153,6 +161,9 @@ async function indexContent() {
     // Detect language (simple detection based on content)
     const language = detectLanguage(item.content_body || item.title);
 
+    const publishedDate = new Date(item.published_at || item.created_at);
+    const publicationYear = publishedDate.getFullYear();
+
     documents.push({
       id: `content_${item.id}`,
       title: item.title,
@@ -162,12 +173,14 @@ async function indexContent() {
       language,
       keywords,
       author: authorName,
+      publication_year: publicationYear,
       tags: item.tags || [],
       url: `/content/${item.slug}`,
-      published_at: new Date(item.published_at || item.created_at).getTime() / 1000,
+      published_at: publishedDate.getTime() / 1000,
       access_level: 'public',
       is_featured: item.is_featured || false,
-      view_count: item.view_count || 0
+      view_count: item.view_count || 0,
+      status: 'published'
     });
   }
 
@@ -182,6 +195,8 @@ async function indexContent() {
 
       const language = detectLanguage(manuscript.title || manuscript.description);
 
+      const manuscriptDate = new Date(manuscript.created_at);
+      
       documents.push({
         id: `manuscript_${manuscript.id}`,
         title: manuscript.title,
@@ -191,11 +206,13 @@ async function indexContent() {
         language,
         keywords,
         author: manuscript.author || 'Inconnu',
+        publication_year: manuscriptDate.getFullYear(),
         url: `/manuscripts/${manuscript.id}`,
-        published_at: new Date(manuscript.created_at).getTime() / 1000,
+        published_at: manuscriptDate.getTime() / 1000,
         access_level: manuscript.access_level || 'public',
         is_featured: false,
-        view_count: 0
+        view_count: 0,
+        status: manuscript.status || 'available'
       });
     }
   }
@@ -297,11 +314,15 @@ async function searchContent(query: string, options: any = {}) {
     content_type = '',
     author = '',
     category = '',
+    publisher = '',
+    genre = '',
+    publication_year = '',
     access_level = '',
     page = 1,
     per_page = 10,
     sort_by = 'published_at:desc',
-    user_role = 'visitor'
+    user_role = 'visitor',
+    show_hidden = false
   } = options;
 
   console.log(`Searching for: "${query}" with options:`, options);
@@ -309,10 +330,38 @@ async function searchContent(query: string, options: any = {}) {
   // Build filter query
   const filters: string[] = [];
   
-  if (language) filters.push(`language:=${language}`);
-  if (content_type) filters.push(`content_type:=${content_type}`);
-  if (author) filters.push(`author:=${author}`);
-  if (category) filters.push(`category:=${category}`);
+  if (language) {
+    const langs = language.split(',');
+    filters.push(`language:[${langs.join(',')}]`);
+  }
+  if (content_type) {
+    const types = content_type.split(',');
+    filters.push(`content_type:[${types.join(',')}]`);
+  }
+  if (author) {
+    const authors = author.split(',');
+    filters.push(`author:[${authors.join(',')}]`);
+  }
+  if (category) {
+    const categories = category.split(',');
+    filters.push(`category:[${categories.join(',')}]`);
+  }
+  if (publisher) {
+    const publishers = publisher.split(',');
+    filters.push(`publisher:[${publishers.join(',')}]`);
+  }
+  if (genre) {
+    const genres = genre.split(',');
+    filters.push(`genre:[${genres.join(',')}]`);
+  }
+  if (publication_year) {
+    filters.push(`publication_year:=${publication_year}`);
+  }
+  
+  // Hide unpublished/hidden content unless explicitly requested
+  if (!show_hidden) {
+    filters.push('status:published || status:available');
+  }
   
   // Apply access level restrictions based on user role
   if (user_role === 'visitor' || user_role === 'public_user') {
@@ -321,15 +370,17 @@ async function searchContent(query: string, options: any = {}) {
 
   const searchParams: Record<string, string> = {
     q: query || '*',
-    query_by: 'title,content,excerpt,keywords,author',
+    query_by: 'title,content,excerpt,keywords,author,publisher,genre',
     sort_by: sort_by,
     page: page.toString(),
     per_page: Math.min(per_page, 50).toString(),
     highlight_full_fields: 'title,content,excerpt',
-    snippet_threshold: '30',
+    highlight_affix_num_tokens: '8',
+    snippet_threshold: '20',
+    max_candidates: '100',
     num_typos: '2',
     prefix: 'true',
-    facet_by: 'content_type,language,author,category,access_level,is_featured'
+    facet_by: 'content_type,language,author,category,publisher,genre,publication_year,access_level,is_featured,status'
   };
 
   if (filters.length > 0) {
