@@ -3,6 +3,10 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useParams, useNavigate } from "react-router-dom";
+import manuscriptPage1 from "@/assets/manuscript-page-1.jpg";
+import manuscriptPage2 from "@/assets/manuscript-page-2.jpg";
+import manuscriptPage3 from "@/assets/manuscript-page-3.jpg";
+import manuscriptPage4 from "@/assets/manuscript-page-4.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -97,6 +101,19 @@ const BookReader = () => {
   const [emailAddress, setEmailAddress] = useState("");
   
   const totalPages = 245;
+  
+  // Fictional manuscript pages
+  const manuscriptPages = [
+    manuscriptPage1,
+    manuscriptPage2,
+    manuscriptPage3,
+    manuscriptPage4,
+  ];
+  
+  const getCurrentPageImage = (page: number) => {
+    // Cycle through the 4 manuscript images
+    return manuscriptPages[(page - 1) % manuscriptPages.length];
+  };
   
   const bookInfo = {
     title: "Manuscrit andalou du XIIe siècle",
@@ -724,23 +741,17 @@ const BookReader = () => {
                           transition: 'transform 0.3s ease'
                         }}
                       >
-                        <div className="absolute inset-0 p-12 flex items-center justify-center">
-                          <div className="text-center space-y-4">
-                            <FileText className="h-32 w-32 text-muted-foreground/20 mx-auto" />
-                            <p className="text-2xl font-serif text-muted-foreground">
-                              Page {currentPage}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              Contenu océrisé disponible
-                            </p>
-                            {bookmarks.includes(currentPage) && (
-                              <Badge className="mt-4">
-                                <Bookmark className="h-3 w-3 mr-1 fill-current" />
-                                Marqué
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
+                        <img 
+                          src={getCurrentPageImage(currentPage)}
+                          alt={`Page ${currentPage}`}
+                          className="w-full h-full object-contain"
+                        />
+                        {bookmarks.includes(currentPage) && (
+                          <Badge className="absolute top-4 right-4 bg-primary/90">
+                            <Bookmark className="h-3 w-3 mr-1 fill-current" />
+                            Marqué
+                          </Badge>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -757,23 +768,17 @@ const BookReader = () => {
                             transition: 'transform 0.3s ease'
                           }}
                         >
-                          <div className="absolute inset-0 p-12 flex items-center justify-center">
-                            <div className="text-center space-y-4">
-                              <FileText className="h-32 w-32 text-muted-foreground/20 mx-auto" />
-                              <p className="text-2xl font-serif text-muted-foreground">
-                                Page {currentPage + 1}
-                              </p>
-                              <p className="text-sm text-muted-foreground">
-                                Contenu océrisé disponible
-                              </p>
-                              {bookmarks.includes(currentPage + 1) && (
-                                <Badge className="mt-4">
-                                  <Bookmark className="h-3 w-3 mr-1 fill-current" />
-                                  Marqué
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
+                          <img 
+                            src={getCurrentPageImage(currentPage + 1)}
+                            alt={`Page ${currentPage + 1}`}
+                            className="w-full h-full object-contain"
+                          />
+                          {bookmarks.includes(currentPage + 1) && (
+                            <Badge className="absolute top-4 right-4 bg-primary/90">
+                              <Bookmark className="h-3 w-3 mr-1 fill-current" />
+                              Marqué
+                            </Badge>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
