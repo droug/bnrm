@@ -27,6 +27,8 @@ import DigitalLibrary from "./pages/DigitalLibrary";
 import BookReader from "./pages/BookReader";
 import MyLibrarySpace from "./pages/MyLibrarySpace";
 import CatalogMetadata from "./pages/CatalogMetadata";
+import ReproductionPage from "./pages/ReproductionPage";
+import ReproductionBackofficePage from "./pages/ReproductionBackofficePage";
 
 const App = () => (
   <TooltipProvider>
@@ -56,9 +58,13 @@ const App = () => (
         <Route path="/admin/settings" element={<AdminSettings />} />
         <Route path="/admin/bnrm-backoffice" element={<BNRMBackOffice />} />
         <Route path="/admin/catalog-metadata" element={<CatalogMetadata />} />
+        <Route path="/admin/reproduction" element={<ReproductionBackofficePage />} />
         <Route path="/digital-library" element={<DigitalLibrary />} />
         <Route path="/digital-library/:category" element={<DigitalLibrary />} />
         <Route path="/book-reader/:id" element={<BookReader />} />
+        <Route path="/reproduction" element={<ReproductionPage />} />
+        <Route path="/reproduction/:action" element={<ReproductionPage />} />
+        <Route path="/manuscripts" element={<Manuscripts />} />
         <Route path="/my-library-space" element={<MyLibrarySpace />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />

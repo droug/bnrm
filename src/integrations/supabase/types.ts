@@ -1793,6 +1793,313 @@ export type Database = {
           },
         ]
       }
+      reproduction_items: {
+        Row: {
+          color_mode: string | null
+          content_id: string | null
+          created_at: string | null
+          formats: Database["public"]["Enums"]["reproduction_format"][]
+          id: string
+          manuscript_id: string | null
+          output_files: Json | null
+          pages_specification: string | null
+          quantity: number | null
+          reference: string | null
+          request_id: string
+          resolution_dpi: number | null
+          title: string
+          total_price: number | null
+          unit_price: number | null
+        }
+        Insert: {
+          color_mode?: string | null
+          content_id?: string | null
+          created_at?: string | null
+          formats?: Database["public"]["Enums"]["reproduction_format"][]
+          id?: string
+          manuscript_id?: string | null
+          output_files?: Json | null
+          pages_specification?: string | null
+          quantity?: number | null
+          reference?: string | null
+          request_id: string
+          resolution_dpi?: number | null
+          title: string
+          total_price?: number | null
+          unit_price?: number | null
+        }
+        Update: {
+          color_mode?: string | null
+          content_id?: string | null
+          created_at?: string | null
+          formats?: Database["public"]["Enums"]["reproduction_format"][]
+          id?: string
+          manuscript_id?: string | null
+          output_files?: Json | null
+          pages_specification?: string | null
+          quantity?: number | null
+          reference?: string | null
+          request_id?: string
+          resolution_dpi?: number | null
+          title?: string
+          total_price?: number | null
+          unit_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reproduction_items_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reproduction_items_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reproduction_items_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "reproduction_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reproduction_notifications: {
+        Row: {
+          id: string
+          is_read: boolean | null
+          message: string
+          notification_type: string
+          recipient_id: string
+          request_id: string
+          sent_at: string | null
+          title: string
+        }
+        Insert: {
+          id?: string
+          is_read?: boolean | null
+          message: string
+          notification_type: string
+          recipient_id: string
+          request_id: string
+          sent_at?: string | null
+          title: string
+        }
+        Update: {
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          notification_type?: string
+          recipient_id?: string
+          request_id?: string
+          sent_at?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reproduction_notifications_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "reproduction_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reproduction_payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          paid_at: string | null
+          payment_details: Json | null
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: string | null
+          request_id: string
+          transaction_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_details?: Json | null
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status?: string | null
+          request_id: string
+          transaction_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_details?: Json | null
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          payment_status?: string | null
+          request_id?: string
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reproduction_payments_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "reproduction_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reproduction_requests: {
+        Row: {
+          available_at: string | null
+          created_at: string | null
+          download_count: number | null
+          expires_at: string | null
+          id: string
+          internal_notes: string | null
+          manager_validated_at: string | null
+          manager_validation_notes: string | null
+          manager_validator_id: string | null
+          metadata: Json | null
+          paid_at: string | null
+          payment_amount: number | null
+          payment_method: Database["public"]["Enums"]["payment_method"] | null
+          payment_status: string | null
+          processed_by: string | null
+          processing_completed_at: string | null
+          processing_started_at: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
+          reproduction_modality: Database["public"]["Enums"]["reproduction_modality"]
+          request_number: string
+          service_validated_at: string | null
+          service_validation_notes: string | null
+          service_validator_id: string | null
+          status: Database["public"]["Enums"]["reproduction_status"]
+          submitted_at: string | null
+          supporting_documents: Json | null
+          updated_at: string | null
+          user_id: string
+          user_notes: string | null
+        }
+        Insert: {
+          available_at?: string | null
+          created_at?: string | null
+          download_count?: number | null
+          expires_at?: string | null
+          id?: string
+          internal_notes?: string | null
+          manager_validated_at?: string | null
+          manager_validation_notes?: string | null
+          manager_validator_id?: string | null
+          metadata?: Json | null
+          paid_at?: string | null
+          payment_amount?: number | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          payment_status?: string | null
+          processed_by?: string | null
+          processing_completed_at?: string | null
+          processing_started_at?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          reproduction_modality: Database["public"]["Enums"]["reproduction_modality"]
+          request_number: string
+          service_validated_at?: string | null
+          service_validation_notes?: string | null
+          service_validator_id?: string | null
+          status?: Database["public"]["Enums"]["reproduction_status"]
+          submitted_at?: string | null
+          supporting_documents?: Json | null
+          updated_at?: string | null
+          user_id: string
+          user_notes?: string | null
+        }
+        Update: {
+          available_at?: string | null
+          created_at?: string | null
+          download_count?: number | null
+          expires_at?: string | null
+          id?: string
+          internal_notes?: string | null
+          manager_validated_at?: string | null
+          manager_validation_notes?: string | null
+          manager_validator_id?: string | null
+          metadata?: Json | null
+          paid_at?: string | null
+          payment_amount?: number | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          payment_status?: string | null
+          processed_by?: string | null
+          processing_completed_at?: string | null
+          processing_started_at?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          reproduction_modality?: Database["public"]["Enums"]["reproduction_modality"]
+          request_number?: string
+          service_validated_at?: string | null
+          service_validation_notes?: string | null
+          service_validator_id?: string | null
+          status?: Database["public"]["Enums"]["reproduction_status"]
+          submitted_at?: string | null
+          supporting_documents?: Json | null
+          updated_at?: string | null
+          user_id?: string
+          user_notes?: string | null
+        }
+        Relationships: []
+      }
+      reproduction_workflow_steps: {
+        Row: {
+          comments: string | null
+          created_at: string | null
+          id: string
+          request_id: string
+          status: string | null
+          step_name: string
+          step_number: number
+          validated_at: string | null
+          validator_id: string | null
+        }
+        Insert: {
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          request_id: string
+          status?: string | null
+          step_name: string
+          step_number: number
+          validated_at?: string | null
+          validator_id?: string | null
+        }
+        Update: {
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          request_id?: string
+          status?: string | null
+          step_name?: string
+          step_number?: number
+          validated_at?: string | null
+          validator_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reproduction_workflow_steps_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "reproduction_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       role_permissions: {
         Row: {
           created_at: string | null
@@ -2348,6 +2655,10 @@ export type Database = {
         Args: { user_agent_str: string }
         Returns: string
       }
+      calculate_reproduction_total: {
+        Args: { request_uuid: string }
+        Returns: number
+      }
       cleanup_old_activity_logs: {
         Args: Record<PropertyKey, never>
         Returns: number
@@ -2357,6 +2668,10 @@ export type Database = {
         Returns: string
       }
       generate_deposit_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_reproduction_request_number: {
         Args: Record<PropertyKey, never>
         Returns: string
       }
@@ -2466,7 +2781,28 @@ export type Database = {
         | "ouvrages_scolaires"
         | "periodiques"
         | "musique"
+      payment_method: "carte_bancaire" | "virement" | "especes" | "cheque"
       professional_type: "editeur" | "producteur" | "imprimeur"
+      reproduction_format: "pdf" | "jpeg" | "tiff" | "png"
+      reproduction_modality:
+        | "papier"
+        | "numerique_mail"
+        | "numerique_espace"
+        | "support_physique"
+      reproduction_status:
+        | "brouillon"
+        | "soumise"
+        | "en_validation_service"
+        | "validee_service"
+        | "en_validation_responsable"
+        | "approuvee"
+        | "refusee"
+        | "en_attente_paiement"
+        | "paiement_recu"
+        | "en_traitement"
+        | "terminee"
+        | "disponible"
+        | "expiree"
       support_type: "imprime" | "electronique"
       user_role:
         | "admin"
@@ -2633,7 +2969,30 @@ export const Constants = {
         "periodiques",
         "musique",
       ],
+      payment_method: ["carte_bancaire", "virement", "especes", "cheque"],
       professional_type: ["editeur", "producteur", "imprimeur"],
+      reproduction_format: ["pdf", "jpeg", "tiff", "png"],
+      reproduction_modality: [
+        "papier",
+        "numerique_mail",
+        "numerique_espace",
+        "support_physique",
+      ],
+      reproduction_status: [
+        "brouillon",
+        "soumise",
+        "en_validation_service",
+        "validee_service",
+        "en_validation_responsable",
+        "approuvee",
+        "refusee",
+        "en_attente_paiement",
+        "paiement_recu",
+        "en_traitement",
+        "terminee",
+        "disponible",
+        "expiree",
+      ],
       support_type: ["imprime", "electronique"],
       user_role: [
         "admin",
