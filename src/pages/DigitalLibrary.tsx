@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import digitalLibraryHero from "@/assets/digital-library-hero.jpg";
 import manuscript1 from "@/assets/manuscript-1.jpg";
 import manuscript2 from "@/assets/manuscript-2.jpg";
@@ -17,7 +17,15 @@ import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 
 const DigitalLibrary = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   const collections = [
     {
@@ -161,21 +169,26 @@ const DigitalLibrary = () => {
             
             {/* Search Bar */}
             <div className="max-w-3xl mx-auto">
-              <div className="relative">
+              <form onSubmit={handleSearch} className="relative">
                 <Input
                   type="search"
-                  placeholder="Rechercher dans les collections..."
+                  placeholder="Rechercher dans les collections (auteur, titre, éditeur, année...)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
                   className="w-full h-16 text-lg bg-white/98 shadow-lg border-3 border-gold/30 focus:border-primary pl-6 pr-16 rounded-full"
                 />
                 <Button 
+                  type="submit"
                   size="lg" 
                   className="absolute right-2 top-2 h-12 w-12 rounded-full"
                 >
                   <Search className="h-6 w-6" />
                 </Button>
-              </div>
+              </form>
+              <p className="text-white/80 text-sm mt-3 text-center">
+                Recherche avancée avec filtres : auteur, éditeur, année de publication, genre, langue
+              </p>
             </div>
           </div>
         </section>
