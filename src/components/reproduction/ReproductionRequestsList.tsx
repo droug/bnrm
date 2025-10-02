@@ -190,12 +190,15 @@ export function ReproductionRequestsList() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => navigate(`/reproduction/${request.id}`)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/reproduction/details/${request.id}`);
+                    }}
                   >
                     <Eye className="h-4 w-4 mr-2" />
-                    {language === "ar" ? "عرض" : "Voir détails"}
+                    {language === "ar" ? "عرض التفاصيل" : "Voir détails"}
                   </Button>
-                  {request.status === "disponible" && (
+                  {request.status === "terminee" && (
                     <Button size="sm" variant="default">
                       <Download className="h-4 w-4 mr-2" />
                       {language === "ar" ? "تحميل" : "Télécharger"}

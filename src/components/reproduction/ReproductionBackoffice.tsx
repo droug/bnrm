@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Clock, FileText, DollarSign } from "lucide-react";
+import { CheckCircle, XCircle, Clock, FileText, DollarSign, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr, arDZ } from "date-fns/locale";
 import {
@@ -37,6 +38,7 @@ interface ReproductionRequest {
 export function ReproductionBackoffice() {
   const { user, profile } = useAuth();
   const { language } = useLanguage();
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<ReproductionRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<ReproductionRequest | null>(null);
   const [validationNotes, setValidationNotes] = useState("");
@@ -236,6 +238,14 @@ export function ReproductionBackoffice() {
                     </div>
                   )}
                   <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/reproduction/details/${request.id}`)}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      {language === "ar" ? "عرض التفاصيل" : "Voir détails"}
+                    </Button>
                     <Button
                       variant="default"
                       onClick={() => openValidationDialog(request, "approve")}

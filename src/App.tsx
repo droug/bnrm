@@ -29,6 +29,7 @@ import MyLibrarySpace from "./pages/MyLibrarySpace";
 import CatalogMetadata from "./pages/CatalogMetadata";
 import ReproductionPage from "./pages/ReproductionPage";
 import ReproductionBackofficePage from "./pages/ReproductionBackofficePage";
+import ReproductionDetailsPage from "./pages/ReproductionDetailsPage";
 
 const App = () => (
   <TooltipProvider>
@@ -64,6 +65,7 @@ const App = () => (
         <Route path="/book-reader/:id" element={<BookReader />} />
         <Route path="/reproduction" element={<ReproductionPage />} />
         <Route path="/reproduction/:action" element={<ReproductionPage />} />
+        <Route path="/reproduction/details/:id" element={<ReproductionDetailsPage />} />
         <Route path="/demande-reproduction" element={<ReproductionPage />} />
         <Route path="/manuscripts" element={<Manuscripts />} />
         <Route path="/my-library-space" element={<MyLibrarySpace />} />
