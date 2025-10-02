@@ -1607,6 +1607,219 @@ export type Database = {
         }
         Relationships: []
       }
+      preservation_actions: {
+        Row: {
+          action_type: string
+          backup_location: string | null
+          checksum_after: string | null
+          checksum_before: string | null
+          completed_at: string | null
+          content_id: string | null
+          created_at: string | null
+          error_message: string | null
+          file_path: string | null
+          id: string
+          manuscript_id: string | null
+          metadata: Json | null
+          performed_by: string | null
+          scheduled_date: string | null
+          source_format: string | null
+          started_at: string | null
+          status: string | null
+          target_format: string | null
+        }
+        Insert: {
+          action_type: string
+          backup_location?: string | null
+          checksum_after?: string | null
+          checksum_before?: string | null
+          completed_at?: string | null
+          content_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          file_path?: string | null
+          id?: string
+          manuscript_id?: string | null
+          metadata?: Json | null
+          performed_by?: string | null
+          scheduled_date?: string | null
+          source_format?: string | null
+          started_at?: string | null
+          status?: string | null
+          target_format?: string | null
+        }
+        Update: {
+          action_type?: string
+          backup_location?: string | null
+          checksum_after?: string | null
+          checksum_before?: string | null
+          completed_at?: string | null
+          content_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          file_path?: string | null
+          id?: string
+          manuscript_id?: string | null
+          metadata?: Json | null
+          performed_by?: string | null
+          scheduled_date?: string | null
+          source_format?: string | null
+          started_at?: string | null
+          status?: string | null
+          target_format?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "preservation_actions_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preservation_actions_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      preservation_backups: {
+        Row: {
+          backup_location: string
+          backup_size_mb: number | null
+          backup_type: string
+          checksum: string
+          created_at: string | null
+          created_by: string | null
+          encryption_method: string | null
+          expiry_date: string | null
+          id: string
+          is_verified: boolean | null
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string
+          retention_period_days: number | null
+          verification_date: string | null
+        }
+        Insert: {
+          backup_location: string
+          backup_size_mb?: number | null
+          backup_type: string
+          checksum: string
+          created_at?: string | null
+          created_by?: string | null
+          encryption_method?: string | null
+          expiry_date?: string | null
+          id?: string
+          is_verified?: boolean | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type: string
+          retention_period_days?: number | null
+          verification_date?: string | null
+        }
+        Update: {
+          backup_location?: string
+          backup_size_mb?: number | null
+          backup_type?: string
+          checksum?: string
+          created_at?: string | null
+          created_by?: string | null
+          encryption_method?: string | null
+          expiry_date?: string | null
+          id?: string
+          is_verified?: boolean | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string
+          retention_period_days?: number | null
+          verification_date?: string | null
+        }
+        Relationships: []
+      }
+      preservation_formats: {
+        Row: {
+          created_at: string | null
+          file_extension: string
+          format_name: string
+          format_stability: string | null
+          id: string
+          is_preservation_format: boolean | null
+          migration_priority: number | null
+          mime_type: string
+          recommended_alternative: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_extension: string
+          format_name: string
+          format_stability?: string | null
+          id?: string
+          is_preservation_format?: boolean | null
+          migration_priority?: number | null
+          mime_type: string
+          recommended_alternative?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          file_extension?: string
+          format_name?: string
+          format_stability?: string | null
+          id?: string
+          is_preservation_format?: boolean | null
+          migration_priority?: number | null
+          mime_type?: string
+          recommended_alternative?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      preservation_schedules: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          created_by: string | null
+          frequency: string
+          id: string
+          is_active: boolean | null
+          last_run: string | null
+          next_run: string | null
+          resource_filter: Json | null
+          schedule_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          created_by?: string | null
+          frequency: string
+          id?: string
+          is_active?: boolean | null
+          last_run?: string | null
+          next_run?: string | null
+          resource_filter?: Json | null
+          schedule_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          last_run?: string | null
+          next_run?: string | null
+          resource_filter?: Json | null
+          schedule_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       professional_registry: {
         Row: {
           address: string | null
@@ -2655,6 +2868,10 @@ export type Database = {
         Args: { user_agent_str: string }
         Returns: string
       }
+      calculate_checksum: {
+        Args: { content_data: string }
+        Returns: string
+      }
       calculate_reproduction_total: {
         Args: { request_uuid: string }
         Returns: number
@@ -2750,6 +2967,10 @@ export type Database = {
       }
       user_has_permission: {
         Args: { permission_name: string; user_uuid: string }
+        Returns: boolean
+      }
+      verify_backup_integrity: {
+        Args: { backup_id: string }
         Returns: boolean
       }
     }
