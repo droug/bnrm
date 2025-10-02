@@ -273,12 +273,12 @@ const Header = () => {
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/consulter-bn" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <Link to="/digital-library" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                           <div className="text-sm font-medium leading-none">{t('nav.consult.national.library')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Accès aux collections de référence
+                            Accès à la Bibliothèque Numérique
                           </p>
-                        </a>
+                        </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/reserver-ouvrage" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">

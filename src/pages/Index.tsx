@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WelcomePopup from "@/components/WelcomePopup";
@@ -182,26 +183,28 @@ const Index = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Carte Patrimoine avec motifs zellige */}
-                  <Card className="relative overflow-hidden group border-3 border-accent/30 shadow-elegant hover:shadow-zellige transition-all duration-700">
-                    <div className="absolute inset-0 bg-pattern-filigrane opacity-20 group-hover:opacity-35 transition-opacity duration-700"></div>
-                    <div className="absolute inset-0 bg-pattern-mosaique-geometric opacity-15 group-hover:opacity-25 transition-opacity duration-700"></div>
-                    <div className="absolute inset-0 bg-gradient-accent opacity-80"></div>
-                    <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
-                      <div className="relative">
-                        <div className="w-20 h-20 bg-gradient-neutral rounded-3xl flex items-center justify-center mb-4 shadow-mosaique transform group-hover:scale-110 transition-all duration-500 border-2 border-white/20">
-                          <Book className="h-10 w-10 text-white" />
+                   {/* Carte Patrimoine avec motifs zellige */}
+                  <Link to="/digital-library">
+                    <Card className="relative overflow-hidden group border-3 border-accent/30 shadow-elegant hover:shadow-zellige transition-all duration-700 cursor-pointer">
+                      <div className="absolute inset-0 bg-pattern-filigrane opacity-20 group-hover:opacity-35 transition-opacity duration-700"></div>
+                      <div className="absolute inset-0 bg-pattern-mosaique-geometric opacity-15 group-hover:opacity-25 transition-opacity duration-700"></div>
+                      <div className="absolute inset-0 bg-gradient-accent opacity-80"></div>
+                      <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
+                        <div className="relative">
+                          <div className="w-20 h-20 bg-gradient-neutral rounded-3xl flex items-center justify-center mb-4 shadow-mosaique transform group-hover:scale-110 transition-all duration-500 border-2 border-white/20">
+                            <Book className="h-10 w-10 text-white" />
+                          </div>
+                          <Star className="absolute -top-2 -right-2 h-6 w-6 text-gold fill-gold/70 animate-pulse" />
                         </div>
-                        <Star className="absolute -top-2 -right-2 h-6 w-6 text-gold fill-gold/70 animate-pulse" />
-                      </div>
-                      <h3 className="text-xl font-moroccan font-bold text-white">
-                        {t('nav.explore')}
-                      </h3>
-                      <p className="text-white/95 font-elegant">
-                        Collections manuscrites, fonds documentaires et trésors numériques
-                      </p>
-                    </CardContent>
-                  </Card>
+                        <h3 className="text-xl font-moroccan font-bold text-white">
+                          Bibliothèque Numérique
+                        </h3>
+                        <p className="text-white/95 font-elegant">
+                          Collections manuscrites, fonds documentaires et trésors numériques
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
 
                   {/* Carte Services avec mosaïques traditionnelles */}
                   <Card className="relative overflow-hidden group border-3 border-highlight/30 shadow-berber hover:shadow-mosaique transition-all duration-700">

@@ -23,6 +23,8 @@ import LegalDepositPage from "./pages/LegalDepositPage";
 import ArchivingPage from "./pages/ArchivingPage";
 import BNRMBackOffice from "./pages/BNRMBackOffice";
 import SearchResults from "./pages/SearchResults";
+import DigitalLibrary from "./pages/DigitalLibrary";
+import BookReader from "./pages/BookReader";
 
 const App = () => (
   <TooltipProvider>
@@ -51,6 +53,9 @@ const App = () => (
         <Route path="/admin/archiving" element={<ArchivingPage />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
         <Route path="/admin/bnrm-backoffice" element={<BNRMBackOffice />} />
+        <Route path="/digital-library" element={<DigitalLibrary />} />
+        <Route path="/digital-library/:category" element={<DigitalLibrary />} />
+        <Route path="/book-reader/:id" element={<BookReader />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
