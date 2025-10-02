@@ -5,7 +5,7 @@ import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, C
 import SearchBar from "@/components/SearchBar";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import SmartChatBot from "@/components/SmartChatBot";
 import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
 // import { WatermarkContainer, Watermark } from "@/components/ui/watermark"; // Removed to fix runtime error
@@ -30,6 +30,8 @@ const Header = () => {
   const [isChatBotOpen, setIsChatBotOpen] = useState(false);
   const { language, setLanguage, t, isRTL } = useLanguage();
   const { user, profile } = useAuth();
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b-4 border-primary/30 shadow-2xl">
@@ -189,17 +191,19 @@ const Header = () => {
         <div className="flex items-center justify-between py-4 relative">
           {/* Bouton Retour + Logo BNRM */}
           <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => window.history.back()}
-              className="flex items-center space-x-2 hover:bg-accent transition-all duration-300"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span className="hidden sm:inline">Retour</span>
-            </Button>
+            {!isHomePage && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => window.history.back()}
+                className="flex items-center space-x-2 hover:bg-accent transition-all duration-300"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="hidden sm:inline">Retour</span>
+              </Button>
+            )}
             
             {/* Logo compact avec effet hover */}
             <Link to="/" className="flex items-center hover:scale-105 transition-all duration-300 group">
