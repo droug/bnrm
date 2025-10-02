@@ -331,6 +331,180 @@ export type Database = {
         }
         Relationships: []
       }
+      catalog_metadata: {
+        Row: {
+          access_rights: string | null
+          cdu_classification: string | null
+          co_authors: string[] | null
+          color_mode: string | null
+          conservation_notes: string | null
+          content_id: string | null
+          content_notes: string | null
+          copyright_status: string | null
+          created_at: string | null
+          created_by: string | null
+          custom_fields: Json | null
+          dewey_classification: string | null
+          digital_format: string | null
+          edition: string | null
+          editors: string[] | null
+          file_size_mb: number | null
+          format_size: string | null
+          general_notes: string | null
+          geographic_coverage: string[] | null
+          id: string
+          illustrations_type: string | null
+          illustrators: string[] | null
+          import_date: string | null
+          isbn: string | null
+          issn: string | null
+          keywords: string[] | null
+          last_sync_date: string | null
+          main_author: string | null
+          manuscript_id: string | null
+          missing_pages_reason: string | null
+          original_title: string | null
+          page_count: number | null
+          physical_description: string | null
+          publication_place: string | null
+          publication_year: number | null
+          publisher: string | null
+          resolution_dpi: number | null
+          series_title: string | null
+          source_record_id: string | null
+          source_sigb: string | null
+          subjects: string[] | null
+          subtitle: string | null
+          time_period: string | null
+          translated_title: string | null
+          translators: string[] | null
+          udc_classification: string | null
+          updated_at: string | null
+          updated_by: string | null
+          usage_restrictions: string | null
+          volume_number: string | null
+        }
+        Insert: {
+          access_rights?: string | null
+          cdu_classification?: string | null
+          co_authors?: string[] | null
+          color_mode?: string | null
+          conservation_notes?: string | null
+          content_id?: string | null
+          content_notes?: string | null
+          copyright_status?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_fields?: Json | null
+          dewey_classification?: string | null
+          digital_format?: string | null
+          edition?: string | null
+          editors?: string[] | null
+          file_size_mb?: number | null
+          format_size?: string | null
+          general_notes?: string | null
+          geographic_coverage?: string[] | null
+          id?: string
+          illustrations_type?: string | null
+          illustrators?: string[] | null
+          import_date?: string | null
+          isbn?: string | null
+          issn?: string | null
+          keywords?: string[] | null
+          last_sync_date?: string | null
+          main_author?: string | null
+          manuscript_id?: string | null
+          missing_pages_reason?: string | null
+          original_title?: string | null
+          page_count?: number | null
+          physical_description?: string | null
+          publication_place?: string | null
+          publication_year?: number | null
+          publisher?: string | null
+          resolution_dpi?: number | null
+          series_title?: string | null
+          source_record_id?: string | null
+          source_sigb?: string | null
+          subjects?: string[] | null
+          subtitle?: string | null
+          time_period?: string | null
+          translated_title?: string | null
+          translators?: string[] | null
+          udc_classification?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          usage_restrictions?: string | null
+          volume_number?: string | null
+        }
+        Update: {
+          access_rights?: string | null
+          cdu_classification?: string | null
+          co_authors?: string[] | null
+          color_mode?: string | null
+          conservation_notes?: string | null
+          content_id?: string | null
+          content_notes?: string | null
+          copyright_status?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_fields?: Json | null
+          dewey_classification?: string | null
+          digital_format?: string | null
+          edition?: string | null
+          editors?: string[] | null
+          file_size_mb?: number | null
+          format_size?: string | null
+          general_notes?: string | null
+          geographic_coverage?: string[] | null
+          id?: string
+          illustrations_type?: string | null
+          illustrators?: string[] | null
+          import_date?: string | null
+          isbn?: string | null
+          issn?: string | null
+          keywords?: string[] | null
+          last_sync_date?: string | null
+          main_author?: string | null
+          manuscript_id?: string | null
+          missing_pages_reason?: string | null
+          original_title?: string | null
+          page_count?: number | null
+          physical_description?: string | null
+          publication_place?: string | null
+          publication_year?: number | null
+          publisher?: string | null
+          resolution_dpi?: number | null
+          series_title?: string | null
+          source_record_id?: string | null
+          source_sigb?: string | null
+          subjects?: string[] | null
+          subtitle?: string | null
+          time_period?: string | null
+          translated_title?: string | null
+          translators?: string[] | null
+          udc_classification?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          usage_restrictions?: string | null
+          volume_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalog_metadata_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catalog_metadata_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string | null
@@ -1272,6 +1446,96 @@ export type Database = {
           },
         ]
       }
+      metadata_exports: {
+        Row: {
+          created_at: string | null
+          download_count: number | null
+          expires_at: string | null
+          export_date: string | null
+          export_filters: Json | null
+          export_format: string
+          export_status: string | null
+          exported_by: string | null
+          file_path: string | null
+          file_size_mb: number | null
+          id: string
+          records_count: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          download_count?: number | null
+          expires_at?: string | null
+          export_date?: string | null
+          export_filters?: Json | null
+          export_format: string
+          export_status?: string | null
+          exported_by?: string | null
+          file_path?: string | null
+          file_size_mb?: number | null
+          id?: string
+          records_count?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          download_count?: number | null
+          expires_at?: string | null
+          export_date?: string | null
+          export_filters?: Json | null
+          export_format?: string
+          export_status?: string | null
+          exported_by?: string | null
+          file_path?: string | null
+          file_size_mb?: number | null
+          id?: string
+          records_count?: number | null
+        }
+        Relationships: []
+      }
+      metadata_import_history: {
+        Row: {
+          created_at: string | null
+          error_log: Json | null
+          id: string
+          import_date: string | null
+          import_parameters: Json | null
+          import_status: string | null
+          import_type: string
+          imported_by: string | null
+          records_failed: number | null
+          records_imported: number | null
+          records_updated: number | null
+          source_system: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_log?: Json | null
+          id?: string
+          import_date?: string | null
+          import_parameters?: Json | null
+          import_status?: string | null
+          import_type: string
+          imported_by?: string | null
+          records_failed?: number | null
+          records_imported?: number | null
+          records_updated?: number | null
+          source_system: string
+        }
+        Update: {
+          created_at?: string | null
+          error_log?: Json | null
+          id?: string
+          import_date?: string | null
+          import_parameters?: Json | null
+          import_status?: string | null
+          import_type?: string
+          imported_by?: string | null
+          records_failed?: number | null
+          records_imported?: number | null
+          records_updated?: number | null
+          source_system?: string
+        }
+        Relationships: []
+      }
       number_ranges: {
         Row: {
           created_at: string | null
@@ -1557,6 +1821,110 @@ export type Database = {
             columns: ["permission_id"]
             isOneToOne: false
             referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sigb_configuration: {
+        Row: {
+          api_endpoint: string | null
+          api_version: string | null
+          authentication_type: string | null
+          configuration_params: Json | null
+          configured_by: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_date: string | null
+          next_sync_date: string | null
+          sync_enabled: boolean | null
+          sync_frequency: string | null
+          system_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          api_endpoint?: string | null
+          api_version?: string | null
+          authentication_type?: string | null
+          configuration_params?: Json | null
+          configured_by?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_date?: string | null
+          next_sync_date?: string | null
+          sync_enabled?: boolean | null
+          sync_frequency?: string | null
+          system_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          api_endpoint?: string | null
+          api_version?: string | null
+          authentication_type?: string | null
+          configuration_params?: Json | null
+          configured_by?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_date?: string | null
+          next_sync_date?: string | null
+          sync_enabled?: boolean | null
+          sync_frequency?: string | null
+          system_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      sigb_sync_logs: {
+        Row: {
+          config_id: string | null
+          created_at: string | null
+          error_details: Json | null
+          id: string
+          records_created: number | null
+          records_failed: number | null
+          records_processed: number | null
+          records_updated: number | null
+          sync_duration_seconds: number | null
+          sync_end: string | null
+          sync_start: string | null
+          sync_status: string | null
+        }
+        Insert: {
+          config_id?: string | null
+          created_at?: string | null
+          error_details?: Json | null
+          id?: string
+          records_created?: number | null
+          records_failed?: number | null
+          records_processed?: number | null
+          records_updated?: number | null
+          sync_duration_seconds?: number | null
+          sync_end?: string | null
+          sync_start?: string | null
+          sync_status?: string | null
+        }
+        Update: {
+          config_id?: string | null
+          created_at?: string | null
+          error_details?: Json | null
+          id?: string
+          records_created?: number | null
+          records_failed?: number | null
+          records_processed?: number | null
+          records_updated?: number | null
+          sync_duration_seconds?: number | null
+          sync_end?: string | null
+          sync_start?: string | null
+          sync_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sigb_sync_logs_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "sigb_configuration"
             referencedColumns: ["id"]
           },
         ]
