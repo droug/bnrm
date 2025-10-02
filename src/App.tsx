@@ -26,6 +26,7 @@ import SearchResults from "./pages/SearchResults";
 import DigitalLibrary from "./pages/DigitalLibrary";
 import BookReader from "./pages/BookReader";
 import MyLibrarySpace from "./pages/MyLibrarySpace";
+import CatalogMetadata from "./pages/CatalogMetadata";
 
 const App = () => (
   <TooltipProvider>
@@ -54,6 +55,7 @@ const App = () => (
         <Route path="/admin/archiving" element={<ArchivingPage />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
         <Route path="/admin/bnrm-backoffice" element={<BNRMBackOffice />} />
+        <Route path="/admin/catalog-metadata" element={<CatalogMetadata />} />
         <Route path="/digital-library" element={<DigitalLibrary />} />
         <Route path="/digital-library/:category" element={<DigitalLibrary />} />
         <Route path="/book-reader/:id" element={<BookReader />} />

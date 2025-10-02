@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -64,6 +64,13 @@ export default function AdminSettings() {
       description: "Interface complète de gestion du dépôt légal BNRM",
       href: "/admin/bnrm-backoffice",
       permission: "legal_deposit.manage"
+    },
+    {
+      icon: Database,
+      title: "Catalogue en Ligne - Métadonnées",
+      description: "Gérer les métadonnées du catalogue, imports SIGB et exports",
+      href: "/admin/catalog-metadata",
+      permission: "content.manage"
     }
   ];
 
