@@ -63,6 +63,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "access_requests_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "access_requests_manuscript_id_fkey"
             columns: ["manuscript_id"]
             isOneToOne: false
@@ -74,6 +81,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "access_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -118,6 +132,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -720,6 +741,13 @@ export type Database = {
             columns: ["curator_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collections_curator_id_fkey"
+            columns: ["curator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1631,6 +1659,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "manuscripts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       metadata_exports: {
@@ -2061,6 +2096,39 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
           verification_date?: string | null
+        }
+        Relationships: []
+      }
+      profile_pii_access_log: {
+        Row: {
+          access_reason: string | null
+          accessed_by: string
+          accessed_fields: string[]
+          accessed_profile_id: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+        }
+        Insert: {
+          access_reason?: string | null
+          accessed_by: string
+          accessed_fields: string[]
+          accessed_profile_id: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+        }
+        Update: {
+          access_reason?: string | null
+          accessed_by?: string
+          accessed_fields?: string[]
+          accessed_profile_id?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
         }
         Relationships: []
       }
@@ -3135,7 +3203,54 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      profiles_public: {
+        Row: {
+          created_at: string | null
+          first_name: string | null
+          id: string | null
+          institution: string | null
+          is_approved: boolean | null
+          last_name: string | null
+          research_field: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          subscription_end_date: string | null
+          subscription_start_date: string | null
+          subscription_type: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string | null
+          institution?: string | null
+          is_approved?: boolean | null
+          last_name?: string | null
+          research_field?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          subscription_type?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string | null
+          institution?: string | null
+          is_approved?: boolean | null
+          last_name?: string | null
+          research_field?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          subscription_type?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       anonymize_ip: {
@@ -3194,6 +3309,21 @@ export type Database = {
       get_profile_permissions: {
         Args: { user_uuid: string }
         Returns: Json
+      }
+      get_profile_with_contact: {
+        Args: { access_reason?: string; profile_user_id: string }
+        Returns: {
+          first_name: string
+          id: string
+          institution: string
+          is_approved: boolean
+          last_name: string
+          partner_organization: string
+          phone: string
+          research_field: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }[]
       }
       get_user_permissions: {
         Args: { user_uuid: string }
