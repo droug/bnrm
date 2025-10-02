@@ -67,6 +67,17 @@ export function PermissionsManager() {
     { value: 'visitor', label: 'Visiteur' }
   ];
 
+  const categoryLabels: Record<string, string> = {
+    collections: 'Collections',
+    content: 'Contenu',
+    legal_deposit: 'Dépôt Légal',
+    manuscripts: 'Manuscrits',
+    requests: 'Demandes',
+    subscriptions: 'Abonnements',
+    system: 'Système',
+    users: 'Utilisateurs'
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -251,14 +262,14 @@ export function PermissionsManager() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <User className="h-5 w-5" />
+                <Shield className="h-5 w-5" />
                 <span>Permissions par Rôle</span>
               </CardTitle>
               <CardDescription>
-                Gérez les permissions attribuées à chaque rôle système
+                Gérez les permissions attribuées à chaque rôle système par catégorie
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div>
                 <Label htmlFor="role-select">Sélectionner un rôle</Label>
                 <Select value={selectedRole} onValueChange={setSelectedRole}>
@@ -277,44 +288,60 @@ export function PermissionsManager() {
 
               <Separator />
 
-              <div className="space-y-6">
-                {Object.entries(getPermissionsByCategory()).map(([category, categoryPermissions]) => (
-                  <div key={category} className="space-y-3">
-                    <h3 className="text-lg font-semibold capitalize">{category}</h3>
-                    <div className="grid gap-3">
-                      {categoryPermissions.map((permission) => {
-                        const rolePermission = getRolePermissions(selectedRole).find(
-                          rp => rp.permission_id === permission.id
-                        );
-                        
-                        return (
-                          <div key={permission.id} className="flex items-center justify-between p-3 border rounded-lg">
-                            <div className="space-y-1">
-                              <div className="flex items-center space-x-2">
-                                <span className="font-medium">{permission.name}</span>
-                                <Badge variant="outline" className="text-xs">
-                                  {permission.category}
-                                </Badge>
+              {/* Category Tabs for Permissions */}
+              <Tabs defaultValue="collections" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+                  <TabsTrigger value="collections">Collections</TabsTrigger>
+                  <TabsTrigger value="content">Contenu</TabsTrigger>
+                  <TabsTrigger value="legal_deposit">Dépôt Légal</TabsTrigger>
+                  <TabsTrigger value="manuscripts">Manuscrits</TabsTrigger>
+                  <TabsTrigger value="requests">Demandes</TabsTrigger>
+                  <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
+                  <TabsTrigger value="system">Système</TabsTrigger>
+                  <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+                </TabsList>
+
+                {['collections', 'content', 'legal_deposit', 'manuscripts', 'requests', 'subscriptions', 'system', 'users'].map((category) => (
+                  <TabsContent key={category} value={category} className="mt-6">
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold">{categoryLabels[category]}</h3>
+                      <div className="grid gap-3">
+                        {permissions
+                          .filter(p => p.category === category)
+                          .map((permission) => {
+                            const rolePermission = getRolePermissions(selectedRole).find(
+                              rp => rp.permission_id === permission.id
+                            );
+                            
+                            return (
+                              <div key={permission.id} className="flex items-center justify-between p-4 border rounded-lg bg-card hover:shadow-sm transition-shadow">
+                                <div className="space-y-1 flex-1">
+                                  <div className="flex items-center space-x-2">
+                                    <span className="font-medium">{permission.name}</span>
+                                    <Badge variant="outline" className="text-xs">
+                                      {categoryLabels[permission.category]}
+                                    </Badge>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">
+                                    {permission.description}
+                                  </p>
+                                </div>
+                                <Switch
+                                  checked={rolePermission?.granted || false}
+                                  onCheckedChange={(checked) => {
+                                    if (rolePermission) {
+                                      updateRolePermission(rolePermission.id, checked);
+                                    }
+                                  }}
+                                />
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                {permission.description}
-                              </p>
-                            </div>
-                            <Switch
-                              checked={rolePermission?.granted || false}
-                              onCheckedChange={(checked) => {
-                                if (rolePermission) {
-                                  updateRolePermission(rolePermission.id, checked);
-                                }
-                              }}
-                            />
-                          </div>
-                        );
-                      })}
+                            );
+                          })}
+                      </div>
                     </div>
-                  </div>
+                  </TabsContent>
                 ))}
-              </div>
+              </Tabs>
             </CardContent>
           </Card>
         </TabsContent>
@@ -374,7 +401,7 @@ export function PermissionsManager() {
                           <SelectContent>
                             {permissions.map((permission) => (
                               <SelectItem key={permission.id} value={permission.id}>
-                                {permission.name} ({permission.category})
+                                {permission.name} ({categoryLabels[permission.category]})
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -441,7 +468,7 @@ export function PermissionsManager() {
                       <div className="text-sm">
                         <span className="font-medium">{userPermission.permission.name}</span>
                         <span className="text-muted-foreground ml-2">
-                          ({userPermission.permission.category})
+                          ({categoryLabels[userPermission.permission.category]})
                         </span>
                       </div>
                       {userPermission.reason && (
@@ -459,12 +486,6 @@ export function PermissionsManager() {
                     </Button>
                   </div>
                 ))}
-
-                {userPermissions.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Aucune permission utilisateur spécifique configurée
-                  </div>
-                )}
               </div>
             </CardContent>
           </Card>
@@ -476,19 +497,22 @@ export function PermissionsManager() {
             <Card>
               <CardHeader>
                 <CardTitle>Statistiques des Permissions</CardTitle>
+                <CardDescription>Aperçu général du système de permissions</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex justify-between">
-                  <span>Total des permissions:</span>
-                  <Badge>{permissions.length}</Badge>
+                <div className="flex items-center justify-between p-3 border rounded">
+                  <span className="font-medium">Total des permissions</span>
+                  <Badge variant="secondary">{permissions.length}</Badge>
                 </div>
-                <div className="flex justify-between">
-                  <span>Permissions utilisateur actives:</span>
-                  <Badge>{userPermissions.filter(up => up.granted).length}</Badge>
+                <div className="flex items-center justify-between p-3 border rounded">
+                  <span className="font-medium">Permissions utilisateur actives</span>
+                  <Badge variant="secondary">
+                    {userPermissions.filter(up => !up.expires_at || new Date(up.expires_at) > new Date()).length}
+                  </Badge>
                 </div>
-                <div className="flex justify-between">
-                  <span>Catégories de permissions:</span>
-                  <Badge>{Object.keys(getPermissionsByCategory()).length}</Badge>
+                <div className="flex items-center justify-between p-3 border rounded">
+                  <span className="font-medium">Rôles système</span>
+                  <Badge variant="secondary">{roles.length}</Badge>
                 </div>
               </CardContent>
             </Card>
@@ -496,12 +520,13 @@ export function PermissionsManager() {
             <Card>
               <CardHeader>
                 <CardTitle>Permissions par Catégorie</CardTitle>
+                <CardDescription>Répartition des permissions</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {Object.entries(getPermissionsByCategory()).map(([category, categoryPermissions]) => (
-                  <div key={category} className="flex justify-between items-center">
-                    <span className="capitalize font-medium">{category}</span>
-                    <Badge variant="outline">{categoryPermissions.length}</Badge>
+                {Object.entries(getPermissionsByCategory()).map(([category, perms]) => (
+                  <div key={category} className="flex items-center justify-between p-3 border rounded">
+                    <span className="font-medium capitalize">{categoryLabels[category]}</span>
+                    <Badge>{perms.length}</Badge>
                   </div>
                 ))}
               </CardContent>

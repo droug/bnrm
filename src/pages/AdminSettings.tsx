@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -12,8 +12,15 @@ export default function AdminSettings() {
     {
       icon: Shield,
       title: "Gestion des Droits et Permissions",
-      description: "Gérer les rôles utilisateurs et les permissions d'accès",
+      description: "Gérer les rôles et les permissions d'accès au système",
       href: "/settings",
+      permission: "users.permissions"
+    },
+    {
+      icon: Users,
+      title: "Gestion des Utilisateurs",
+      description: "Administrer les comptes utilisateurs, rôles et approbations",
+      href: "/admin/users",
       permission: "users.manage"
     },
     {
