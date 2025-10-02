@@ -34,272 +34,173 @@ const Header = () => {
   const isHomePage = location.pathname === "/";
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b-4 border-primary/30 shadow-2xl">
+    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b-2 border-primary/20 shadow-lg">
       <div className="container mx-auto px-4">
-        {/* Bannière réduite et plus compacte */}
-        <div className="flex justify-between items-center py-3 text-base bg-gradient-to-r from-primary/20 via-secondary/15 to-primary/20 border-b-2 border-primary/30 relative overflow-hidden">
-          {/* Effet de fond décoratif */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 animate-pulse"></div>
-          <div className="absolute top-0 left-1/4 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-24 h-24 bg-secondary/10 rounded-full blur-2xl"></div>
+        {/* Bannière ultra-compacte */}
+        <div className="flex justify-between items-center py-2 border-b border-primary/20">
+          {/* Logo + Titre compact */}
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <img src={logoImage} alt="Logo BNRM" className="h-10 w-auto" />
+            <span className="font-bold text-sm hidden lg:inline">
+              {t('header.title')}
+            </span>
+          </Link>
           
-          <div className="flex items-center gap-6 relative z-10">
-            <div className="flex flex-col">
-              <span className="text-foreground font-bold text-2xl tracking-wide mb-1 animate-fade-in">
-                {t('header.title')}
-              </span>
-              <span className="text-muted-foreground text-sm italic">
-                Bibliothèque Nationale du Royaume du Maroc
-              </span>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-6 relative z-10">
+          {/* Actions compactes */}
+          <div className="flex items-center gap-2">
+            {/* Langue - icône seulement sur mobile */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="text-foreground border-primary/30 hover:border-primary bg-background/80 backdrop-blur-sm hover:bg-primary/10 flex items-center gap-2 px-4 py-2 transition-all duration-300 hover:scale-105"
-                >
-                  <Globe className="h-5 w-5" />
-                  <span className="font-medium">
-                    {language === 'ar' && 'العربية'}
-                    {language === 'ber' && 'ⵜⴰⵎⴰⵣⵉⵖⵜ'}
-                    {language === 'fr' && 'Français'}
-                    {language === 'en' && 'English'}
+                <Button variant="ghost" size="sm" className="gap-1 px-2">
+                  <Globe className="h-4 w-4" />
+                  <span className="hidden sm:inline text-xs">
+                    {language === 'ar' && 'ع'}
+                    {language === 'ber' && 'ⵣ'}
+                    {language === 'fr' && 'FR'}
+                    {language === 'en' && 'EN'}
                   </span>
-                  <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-background/95 backdrop-blur-lg border border-primary/20 shadow-2xl min-w-[180px] z-50">
-                <DropdownMenuItem 
-                  onClick={() => setLanguage('ar')}
-                  className={`cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10 ${language === 'ar' ? 'bg-primary/20 text-primary font-medium' : ''}`}
-                >
-                  <span className="mr-3">🇲🇦</span>
-                  العربية
+              <DropdownMenuContent className="bg-background border border-primary/20 z-50">
+                <DropdownMenuItem onClick={() => setLanguage('ar')} className="cursor-pointer text-sm">
+                  🇲🇦 العربية
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setLanguage('ber')}
-                  className={`cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10 ${language === 'ber' ? 'bg-primary/20 text-primary font-medium' : ''}`}
-                >
-                  <span className="mr-3">ⵣ</span>
-                  ⵜⴰⵎⴰⵣⵉⵖⵜ
+                <DropdownMenuItem onClick={() => setLanguage('ber')} className="cursor-pointer text-sm">
+                  ⵣ ⵜⴰⵎⴰⵣⵉⵖⵜ
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setLanguage('fr')}
-                  className={`cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10 ${language === 'fr' ? 'bg-primary/20 text-primary font-medium' : ''}`}
-                >
-                  <span className="mr-3">🇫🇷</span>
-                  Français
+                <DropdownMenuItem onClick={() => setLanguage('fr')} className="cursor-pointer text-sm">
+                  🇫🇷 Français
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setLanguage('en')}
-                  className={`cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10 ${language === 'en' ? 'bg-primary/20 text-primary font-medium' : ''}`}
-                >
-                  <span className="mr-3">🇺🇸</span>
-                  English
+                <DropdownMenuItem onClick={() => setLanguage('en')} className="cursor-pointer text-sm">
+                  🇺🇸 English
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             
-            {/* Outils d'assistance et d'accessibilité */}
-            <div className="flex items-center space-x-3">
-              {/* Toolkit d'accessibilité */}
-              <AccessibilityToolkit />
-              
-              {/* Chatbot intelligent */}
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => setIsChatBotOpen(!isChatBotOpen)}
-                className={`text-foreground border-primary/30 hover:border-primary bg-background/80 backdrop-blur-sm hover:bg-primary/10 flex items-center gap-2 px-4 py-2 transition-all duration-300 hover:scale-105 relative ${
-                  isChatBotOpen ? 'bg-primary/20 border-primary' : ''
-                }`}
-                title="Assistant IA - Aide et recherche intelligente"
-              >
-                <Bot className="h-5 w-5" />
-                <span className="font-medium hidden lg:inline">
-                  Assistant IA
-                </span>
-                {!isChatBotOpen && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse border border-green-600"></div>
-                )}
-              </Button>
-            </div>
+            {/* Accessibilité - icône seulement */}
+            <AccessibilityToolkit />
             
-            {/* Connexion utilisateur */}
+            {/* Chatbot - icône seulement */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsChatBotOpen(!isChatBotOpen)}
+              className={`px-2 relative ${isChatBotOpen ? 'bg-primary/10' : ''}`}
+              title="Assistant IA"
+            >
+              <Bot className="h-4 w-4" />
+              {!isChatBotOpen && (
+                <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full"></div>
+              )}
+            </Button>
+            
+            {/* Utilisateur */}
             {user ? (
-              <div className="flex items-center gap-3">
-                <Link to="/my-library-space">
-                  <Button variant="outline" size="lg" className="flex items-center gap-2 px-4 py-2 transition-all duration-300 hover:scale-105 hover:shadow-lg border-primary/30 hover:border-primary">
-                    <BookOpen className="h-5 w-5" />
-                    <span className="hidden lg:inline font-medium">
-                      Mon Espace
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-1 px-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden md:inline text-xs max-w-[80px] truncate">
+                      {profile?.first_name || 'Compte'}
                     </span>
                   </Button>
-                </Link>
-                
-                {/* Menu utilisateur avec dropdown */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="default" size="lg" className="flex items-center gap-2 px-6 py-2 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                      <User className="h-5 w-5" />
-                      <span className="hidden sm:inline font-medium">
-                        {profile?.first_name || 'Mon Compte'}
-                      </span>
-                      <ChevronDown className="h-4 w-4 ml-1" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-background/95 backdrop-blur-lg border border-primary/20 shadow-2xl z-50">
-                    <DropdownMenuItem asChild className="cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10">
-                      <Link to="/profile" className="flex items-center gap-3">
-                        <User className="h-4 w-4" />
-                        <span>Mon Profil</span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-background border border-primary/20 z-50">
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/my-library-space" className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4" />
+                      Mon Espace
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/profile" className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Mon Profil
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/dashboard" className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4" />
+                      Tableau de bord
+                    </Link>
+                  </DropdownMenuItem>
+                  {(profile?.role === 'admin' || profile?.role === 'librarian') && (
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link to="/admin/settings" className="flex items-center gap-2">
+                        <Shield className="h-4 w-4" />
+                        Administration
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10">
-                      <Link to="/dashboard" className="flex items-center gap-3">
-                        <BookOpen className="h-4 w-4" />
-                        <span>Tableau de bord</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    {(profile?.role === 'admin' || profile?.role === 'librarian') && (
-                      <DropdownMenuItem asChild className="cursor-pointer p-3 text-base transition-all duration-200 hover:bg-primary/10">
-                        <Link to="/admin/settings" className="flex items-center gap-3">
-                          <Shield className="h-4 w-4" />
-                          <span>Administration</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Link to="/auth">
-                <Button size="lg" className="flex items-center gap-2 px-6 py-2 transition-all duration-300 hover:scale-105 hover:shadow-lg bg-primary hover:bg-primary/90">
-                  <LogIn className="h-5 w-5" />
-                  <span className="font-medium">{t('nav.login')}</span>
+                <Button size="sm" className="gap-1 px-3">
+                  <LogIn className="h-4 w-4" />
+                  <span className="hidden sm:inline text-xs">{t('nav.login')}</span>
                 </Button>
               </Link>
             )}
           </div>
         </div>
 
-        {/* Navigation principale compacte */}
-        <div className="flex items-center justify-between py-4 relative">
-          {/* Bouton Retour + Logo BNRM */}
-          <div className="flex items-center gap-4">
-            {!isHomePage && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => window.history.back()}
-                className="flex items-center space-x-2 hover:bg-accent transition-all duration-300"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                <span className="hidden sm:inline">Retour</span>
-              </Button>
-            )}
-            
-            {/* Logo compact avec effet hover */}
-            <Link to="/" className="flex items-center hover:scale-105 transition-all duration-300 group">
-              <div className="w-20 h-20 flex items-center justify-center relative">
-                <div className="absolute inset-0 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-all duration-300"></div>
-                <img 
-                  src={logoImage} 
-                  alt="Logo BNRM" 
-                  className="h-16 w-auto object-contain relative z-10 drop-shadow-lg"
-                />
-              </div>
-            </Link>
-          </div>
+        {/* Navigation principale ultra-compacte */}
+        <div className="flex items-center justify-between py-2">
+          {/* Retour (si pas homepage) */}
+          {!isHomePage && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => window.history.back()}
+              className="px-2"
+              title="Retour"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </Button>
+          )}
 
-          {/* Navigation Desktop agrandie et améliorée */}
-          <NavigationMenu className="hidden md:flex">
-            <NavigationMenuList className="space-x-8">
-              {/* Découvrir la Bibliothèque */}
+          {/* Navigation Desktop compacte avec icônes */}
+          <NavigationMenu className="hidden md:flex flex-1 justify-center">
+            <NavigationMenuList className="space-x-1">
+              {/* Découvrir */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground hover:text-primary font-semibold text-lg px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-primary/20">
-                  <BookOpen className="w-5 h-5 mr-3" />
-                  {t('nav.discover')}
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-sm px-3 py-2" title={t('nav.discover')}>
+                  <BookOpen className="w-4 h-4 mr-1" />
+                  <span className="hidden lg:inline">{t('nav.discover')}</span>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="grid gap-4 p-8 w-[700px] md:w-[800px] lg:grid-cols-2 bg-background/95 backdrop-blur-lg border-2 border-primary/20 rounded-2xl shadow-2xl">
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-bold text-primary mb-4 border-b border-primary/20 pb-2">{t('nav.practical.info')}</h4>
+                <NavigationMenuContent className="z-50">
+                  <div className="grid gap-2 p-4 w-[500px] lg:grid-cols-2 bg-background border border-primary/20 shadow-xl">
+                    <div className="space-y-1">
+                      <h4 className="text-xs font-bold text-primary mb-1 pb-1">{t('nav.practical.info')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/informations-pratiques" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
-                          <div className="text-base font-semibold leading-none">{t('nav.schedules.access')}</div>
-                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                            Heures d'ouverture et plan d'accès
-                          </p>
+                        <a href="/informations-pratiques" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          {t('nav.schedules.access')}
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/services-tarifs" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
-                          <div className="text-base font-semibold leading-none">{t('nav.services.catalog')}</div>
-                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                            Services proposés et grilles tarifaires
-                          </p>
+                        <a href="/services-tarifs" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          {t('nav.services.catalog')}
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/visites-virtuelles" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
-                          <div className="text-base font-semibold leading-none">{t('nav.virtual.tours')}</div>
-                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                            Découverte virtuelle de nos espaces
-                          </p>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/donateurs" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
-                          <div className="text-base font-semibold leading-none">{t('nav.donors')}</div>
-                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                            Recherche par donateur/œuvre
-                          </p>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link to="/help" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
-                          <div className="text-base font-semibold leading-none flex items-center gap-2">
-                            <HelpCircle className="h-4 w-4" />
-                            {language === 'ar' ? 'مركز المساعدة' : 'Centre d\'Aide'}
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                            {language === 'ar' ? 'أدلة وتوجيهات للاستخدام' : 'Guides et tutoriels d\'utilisation'}
-                          </p>
+                        <Link to="/help" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          {language === 'ar' ? 'مركز المساعدة' : 'Centre d\'Aide'}
                         </Link>
                       </NavigationMenuLink>
-
                     </div>
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-bold text-primary mb-4 border-b border-primary/20 pb-2">{t('nav.history.missions')}</h4>
+                    <div className="space-y-1">
+                      <h4 className="text-xs font-bold text-primary mb-1 pb-1">{t('nav.history.missions')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/histoire" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
-                          <div className="text-base font-semibold leading-none">{t('nav.library.history')}</div>
-                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                            Missions et valeurs prônées
-                          </p>
+                        <a href="/histoire" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          {t('nav.library.history')}
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/mot-direction" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
-                          <div className="text-base font-semibold leading-none">{t('nav.management.message')}</div>
-                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                            Message de notre directeur
-                          </p>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/organigramme" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
-                          <div className="text-base font-semibold leading-none">{t('nav.organization.chart')}</div>
-                          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                            Structure organisationnelle
-                          </p>
+                        <a href="/mot-direction" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          {t('nav.management.message')}
                         </a>
                       </NavigationMenuLink>
                     </div>
@@ -307,179 +208,71 @@ const Header = () => {
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
-              {/* Accéder à nos services */}
+              {/* Services */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground hover:text-primary font-semibold text-lg px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-primary/20">
-                  <Users className="w-5 h-5 mr-3" />
-                  {t('nav.services')}
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-sm px-3 py-2" title={t('nav.services')}>
+                  <Users className="w-4 h-4 mr-1" />
+                  <span className="hidden lg:inline">{t('nav.services')}</span>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="grid gap-4 p-8 w-[700px] md:w-[800px] lg:grid-cols-2 bg-background/95 backdrop-blur-lg border-2 border-primary/20 rounded-2xl shadow-2xl">
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">{t('nav.inscription.access')}</h4>
+                <NavigationMenuContent className="z-50">
+                  <div className="grid gap-2 p-4 w-[400px] bg-background border border-primary/20 shadow-xl">
+                    <div className="space-y-1">
                       <NavigationMenuLink asChild>
-                        <a href="/inscription" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.online.registration')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Parcours "je m'inscris"
-                          </p>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link to="/digital-library" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.consult.national.library')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Accès à la Bibliothèque Numérique
-                          </p>
+                        <Link to="/digital-library" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          {t('nav.consult.national.library')}
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/reserver-ouvrage" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.reserve.book')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Réservation en ligne de documents
-                          </p>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/reserver-espaces" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.reserve.spaces')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Réservation d'espaces de travail
-                          </p>
-                        </a>
-                      </NavigationMenuLink>
-                    </div>
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">Services spécialisés</h4>
-                      <NavigationMenuLink asChild>
-                        <Link to="/depot-legal" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none flex items-center">
-                            <FileText className="w-4 h-4 mr-2" />
-                            {t('nav.legal.deposit')}
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Description du service et texte de loi
-                          </p>
+                        <Link to="/legal-deposit" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          {t('nav.legal.deposit')}
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/demande-reproduction" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none flex items-center">
-                            <Download className="w-4 h-4 mr-2" />
-                            {t('nav.reproduction.request')}
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Reproduction de documents
-                          </p>
+                        <Link to="/demande-reproduction" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          {t('nav.reproduction.request')}
                         </Link>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/demande-restauration" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.restoration.request')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Restauration de documents anciens
-                          </p>
-                        </a>
                       </NavigationMenuLink>
                     </div>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
-              {/* Explorer le patrimoine */}
+              {/* Explorer */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground hover:text-primary font-semibold text-lg px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-primary/20">
-                  <Book className="w-5 h-5 mr-3" />
-                  {t('nav.explore')}
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-sm px-3 py-2" title={t('nav.explore')}>
+                  <Book className="w-4 h-4 mr-1" />
+                  <span className="hidden lg:inline">{t('nav.explore')}</span>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="grid gap-4 p-8 w-[800px] md:w-[1000px] lg:grid-cols-3 bg-background/95 backdrop-blur-lg border-2 border-primary/20 rounded-2xl shadow-2xl">
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-bold text-primary mb-4 border-b border-primary/20 pb-2">{t('nav.collections')}</h4>
+                <NavigationMenuContent className="z-50">
+                  <div className="grid gap-2 p-4 w-[450px] lg:grid-cols-2 bg-background border border-primary/20 shadow-xl">
+                    <div className="space-y-1">
+                      <h4 className="text-xs font-bold text-primary mb-1">{t('nav.collections')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/collections-specialisees" className="block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:scale-102 border border-transparent hover:border-primary/20">
-                          <div className="text-base font-semibold leading-none">{t('nav.specialized.collections')}</div>
+                        <a href="/manuscripts" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          {t('nav.manuscripts')}
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/collections-numerisees" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.digitized.collections')}</div>
+                        <a href="/collections-numerisees" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          {t('nav.digitized.collections')}
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/collections-offertes" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.donated.collections')}</div>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/manuscripts" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.manuscripts')}</div>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/monographies" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.monographs')}</div>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/periodiques" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Périodiques</div>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/audiovisuels" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Audiovisuels et multimédias</div>
-                        </a>
+                        <Link to="/news" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          {t('nav.news.events')}
+                        </Link>
                       </NavigationMenuLink>
                     </div>
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">Catalogues</h4>
+                    <div className="space-y-1">
+                      <h4 className="text-xs font-bold text-primary mb-1">Ressources</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/catalogue-general" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Catalogue général en ligne</div>
+                        <a href="/catalogue-general" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          Catalogue général
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/archives-manuscrits" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Archives et manuscrits</div>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/autres-catalogues" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Autres catalogues et bases</div>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/catalogue-numerise" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Catalogue numérisé</div>
-                        </a>
-                      </NavigationMenuLink>
-                    </div>
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">Ressources</h4>
-                      <NavigationMenuLink asChild>
-                        <a href="/galerie-medias" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Galerie des médias</div>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/lire-ecouter-voir" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Lire écouter et voir</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Bibliographies, rapports, trésors
-                          </p>
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/chercher-document" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none flex items-center">
-                            <Search className="w-4 h-4 mr-2" />
-                            Chercher un document
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Recherche avancée
-                          </p>
+                        <a href="/bibliographies" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                          Bibliographies
                         </a>
                       </NavigationMenuLink>
                     </div>
