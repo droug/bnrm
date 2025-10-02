@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import SignLanguageAvatar from '@/components/SignLanguageAvatar';
 import { 
   Send, 
   Mic, 
@@ -22,7 +23,9 @@ import {
   UserCircle,
   Building2,
   Download,
-  Settings
+  Settings,
+  MessageCircle,
+  Accessibility
 } from 'lucide-react';
 import {
   Select,
@@ -60,6 +63,8 @@ const SmartChatBot: React.FC<SmartChatBotProps> = ({ onClose, isOpen = true }) =
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [showSignLanguage, setShowSignLanguage] = useState(false);
+  const [currentBotMessage, setCurrentBotMessage] = useState('');
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -206,6 +211,7 @@ Amek zemreɣ ad k-ɛiwneɣ ass-a?`
       };
 
       setMessages(prev => [...prev, botMessage]);
+      setCurrentBotMessage(data.reply);
 
       // Text-to-speech if audio is enabled
       if (audioEnabled && data.reply) {
@@ -419,7 +425,7 @@ Amek zemreɣ ad k-ɛiwneɣ ass-a?`
     }
   }, [isDragging, dragStart]);
 
-  if (!isOpen) return null;
+  // Toujours visible - pas de condition isOpen
 
   const getRequestTypeIcon = (type: string) => {
     switch (type) {
@@ -433,18 +439,35 @@ Amek zemreɣ ad k-ɛiwneɣ ass-a?`
   };
 
   return (
-    <div
-      className="fixed shadow-2xl border-2 border-primary/30 bg-background/95 backdrop-blur-lg transition-all duration-300 transform-gpu rounded-lg overflow-hidden"
-      style={{
-        right: `${16 + position.x}px`,
-        top: `${64 + position.y}px`,
-        width: window.innerWidth < 640 ? 'calc(100vw - 2rem)' : '450px',
-        height: '750px',
-        maxHeight: 'calc(100vh - 5rem)',
-        zIndex: 99999,
-        cursor: isDragging ? 'grabbing' : 'default'
-      }}
-    >
+    <>
+      {/* Bouton flottant quand le chatbot est réduit */}
+      {!isOpen && (
+        <Button
+          onClick={() => onClose && onClose()}
+          className="fixed bottom-6 right-6 w-16 h-16 rounded-full shadow-2xl bg-gradient-to-br from-primary to-secondary hover:scale-110 transition-all duration-300 z-[99998] border-4 border-white/20"
+          title="Ouvrir l'assistant intelligent"
+        >
+          <MessageCircle className="w-8 h-8 text-white" />
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full animate-pulse border-2 border-white"></div>
+        </Button>
+      )}
+
+      {/* Fenêtre du chatbot */}
+      <div
+        className={`fixed shadow-2xl border-2 border-primary/30 bg-background/95 backdrop-blur-lg transition-all duration-300 transform-gpu rounded-lg overflow-hidden ${
+          isOpen ? 'translate-x-0 opacity-100' : 'translate-x-[120%] opacity-0'
+        }`}
+        style={{
+          right: `${16 + position.x}px`,
+          top: `${64 + position.y}px`,
+          width: window.innerWidth < 640 ? 'calc(100vw - 2rem)' : '500px',
+          height: showSignLanguage ? '950px' : '750px',
+          maxHeight: 'calc(100vh - 5rem)',
+          zIndex: 99999,
+          cursor: isDragging ? 'grabbing' : 'default',
+          pointerEvents: isOpen ? 'auto' : 'none'
+        }}
+      >
       <div className="p-0 h-full flex flex-col overflow-hidden relative">
         {/* Drag handle */}
         <div 
@@ -474,6 +497,15 @@ Amek zemreɣ ad k-ɛiwneɣ ass-a?`
             <Button
               variant="ghost"
               size="sm"
+              onClick={() => setShowSignLanguage(!showSignLanguage)}
+              className={`w-8 h-8 p-0 ${showSignLanguage ? 'bg-primary/20 text-primary' : ''}`}
+              title={language === 'ar' ? "لغة الإشارة" : "Langue des signes"}
+            >
+              <Accessibility className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setAudioEnabled(!audioEnabled)}
               className="w-8 h-8 p-0"
               title={language === 'ar' ? "تشغيل/إيقاف الصوت" : "Activer/Désactiver l'audio"}
@@ -493,6 +525,17 @@ Amek zemreɣ ad k-ɛiwneɣ ass-a?`
             )}
           </div>
         </div>
+
+        {/* Avatar langue des signes */}
+        {showSignLanguage && (
+          <div className="p-3 border-b">
+            <SignLanguageAvatar 
+              isActive={isLoading || isSpeaking}
+              currentText={currentBotMessage}
+              language={language}
+            />
+          </div>
+        )}
 
         {/* Request type selector */}
         <div className="p-3 border-b bg-muted/30">
@@ -614,7 +657,8 @@ Amek zemreɣ ad k-ɛiwneɣ ass-a?`
           </form>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
