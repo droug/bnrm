@@ -2,13 +2,21 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Search, Book, BookOpen, FileText, Video, Music, Image as ImageIcon, Globe, ArrowRight, TrendingUp, Clock, Eye, Download } from "lucide-react";
+import { Search, Book, BookOpen, FileText, Video, Music, Image as ImageIcon, Globe, ArrowRight, TrendingUp, Clock, Eye, Download, Filter, ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 import digitalLibraryHero from "@/assets/digital-library-hero.jpg";
 import manuscript1 from "@/assets/manuscript-1.jpg";
 import manuscript2 from "@/assets/manuscript-2.jpg";
@@ -19,12 +27,52 @@ const DigitalLibrary = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState<{type: string, value: string}[]>([]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const searchParams = new URLSearchParams();
+    
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      searchParams.append('q', searchQuery.trim());
+    } else if (activeFilters.length > 0) {
+      searchParams.append('q', '*');
+    } else {
+      return;
     }
+    
+    activeFilters.forEach(filter => {
+      searchParams.append(filter.type, filter.value);
+    });
+    
+    navigate(`/search?${searchParams.toString()}`);
+  };
+
+  const addFilter = (type: string, value: string) => {
+    const newFilters = activeFilters.filter(f => f.type !== type);
+    setActiveFilters([...newFilters, { type, value }]);
+  };
+
+  const removeFilter = (type: string) => {
+    setActiveFilters(activeFilters.filter(f => f.type !== type));
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setActiveFilters([]);
+  };
+
+  const getFilterLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      'author': 'Auteur',
+      'publisher': 'Éditeur',
+      'genre': 'Genre',
+      'publication_year': 'Année',
+      'language': 'Langue',
+      'content_type': 'Type'
+    };
+    return labels[type] || type;
   };
 
   const collections = [
@@ -167,27 +215,157 @@ const DigitalLibrary = () => {
               Découvrez le patrimoine écrit marocain : manuscrits andalous, périodiques historiques, ouvrages rares et collections d'exception
             </p>
             
-            {/* Search Bar */}
-            <div className="max-w-3xl mx-auto">
-              <form onSubmit={handleSearch} className="relative">
-                <Input
-                  type="search"
-                  placeholder="Rechercher dans les collections (auteur, titre, éditeur, année...)..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-                  className="w-full h-16 text-lg bg-white/98 shadow-lg border-3 border-gold/30 focus:border-primary pl-6 pr-16 rounded-full"
-                />
-                <Button 
-                  type="submit"
-                  size="lg" 
-                  className="absolute right-2 top-2 h-12 w-12 rounded-full"
-                >
-                  <Search className="h-6 w-6" />
-                </Button>
+            {/* Advanced Search Bar with Filters */}
+            <div className="max-w-4xl mx-auto space-y-3">
+              {/* Filter badges */}
+              {activeFilters.length > 0 && (
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {activeFilters.map((filter) => (
+                    <Badge 
+                      key={filter.type} 
+                      variant="secondary" 
+                      className="gap-1.5 bg-white/20 text-white border border-white/30 backdrop-blur-sm hover:bg-white/30 transition-colors px-3 py-1.5"
+                    >
+                      <span className="text-sm font-medium">
+                        {getFilterLabel(filter.type)}: {filter.value}
+                      </span>
+                      <button
+                        onClick={() => removeFilter(filter.type)}
+                        className="ml-1 hover:bg-white/20 rounded-full p-0.5 transition-colors"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </Badge>
+                  ))}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearSearch}
+                    className="h-7 px-2 text-white/90 hover:text-white hover:bg-white/20"
+                  >
+                    <X className="h-3.5 w-3.5 mr-1" />
+                    Tout effacer
+                  </Button>
+                </div>
+              )}
+
+              <form onSubmit={handleSearch} className="flex items-center gap-2">
+                {/* Filters Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="lg"
+                      className="h-16 px-4 gap-2 bg-white/95 hover:bg-white border-3 border-gold/30 shadow-lg shrink-0"
+                    >
+                      <Filter className="h-5 w-5" />
+                      <span className="hidden sm:inline">Filtres</span>
+                      <ChevronDown className="h-4 w-4" />
+                      {activeFilters.length > 0 && (
+                        <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                          {activeFilters.length}
+                        </Badge>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-64 bg-background border-border z-50 shadow-xl">
+                    <DropdownMenuLabel className="text-base">Filtrer par critère</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem onClick={() => {
+                      const value = prompt("Nom de l'auteur:");
+                      if (value?.trim()) addFilter('author', value.trim());
+                    }} className="cursor-pointer">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      <span>Auteur</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem onClick={() => {
+                      const value = prompt("Nom de l'éditeur:");
+                      if (value?.trim()) addFilter('publisher', value.trim());
+                    }} className="cursor-pointer">
+                      <Book className="h-4 w-4 mr-2" />
+                      <span>Éditeur</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem onClick={() => {
+                      const value = prompt("Genre (ex: Roman, Poésie, Histoire...):");
+                      if (value?.trim()) addFilter('genre', value.trim());
+                    }} className="cursor-pointer">
+                      <FileText className="h-4 w-4 mr-2" />
+                      <span>Genre</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem onClick={() => {
+                      const value = prompt("Année de publication (ex: 2024):");
+                      if (value?.trim()) addFilter('publication_year', value.trim());
+                    }} className="cursor-pointer">
+                      <Clock className="h-4 w-4 mr-2" />
+                      <span>Année de publication</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem onClick={() => {
+                      const value = prompt("Code langue (ar/fr/en/ber):");
+                      if (value?.trim()) addFilter('language', value.trim().toLowerCase());
+                    }} className="cursor-pointer">
+                      <Globe className="h-4 w-4 mr-2" />
+                      <span>Langue</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem onClick={() => {
+                      const options = ['manuscript', 'book', 'periodical', 'article'];
+                      const value = prompt(`Type de contenu (${options.join(', ')}):`);
+                      if (value?.trim() && options.includes(value.trim().toLowerCase())) {
+                        addFilter('content_type', value.trim().toLowerCase());
+                      }
+                    }} className="cursor-pointer">
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                      <span>Type de contenu</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* Search Input */}
+                <div className="relative flex-1">
+                  <Input
+                    type="search"
+                    placeholder="Rechercher dans les collections (titre, auteur, mots-clés...)..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full h-16 text-lg bg-white/98 shadow-lg border-3 border-gold/30 focus:border-primary pl-6 pr-28 rounded-full"
+                  />
+                  
+                  {/* Clear button */}
+                  {searchQuery && (
+                    <Button
+                      type="button"
+                      onClick={() => setSearchQuery("")}
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-16 top-1/2 -translate-y-1/2 h-10 w-10 p-0 hover:bg-destructive/10 rounded-full"
+                      title="Effacer"
+                    >
+                      <X className="h-5 w-5 text-destructive" />
+                    </Button>
+                  )}
+                  
+                  {/* Search button */}
+                  <Button 
+                    type="submit"
+                    size="lg" 
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full shadow-md"
+                    disabled={!searchQuery.trim() && activeFilters.length === 0}
+                  >
+                    <Search className="h-6 w-6" />
+                  </Button>
+                </div>
               </form>
-              <p className="text-white/80 text-sm mt-3 text-center">
-                Recherche avancée avec filtres : auteur, éditeur, année de publication, genre, langue
+              
+              <p className="text-white/90 text-sm text-center font-medium">
+                💡 Utilisez les filtres pour affiner votre recherche par auteur, éditeur, année, genre ou langue
               </p>
             </div>
           </div>
