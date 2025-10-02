@@ -337,7 +337,7 @@ const Header = () => {
                     <div className="space-y-3">
                       <h4 className="text-sm font-medium text-primary mb-3">Services spécialisés</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/depot-legal" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <Link to="/depot-legal" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                           <div className="text-sm font-medium leading-none flex items-center">
                             <FileText className="w-4 h-4 mr-2" />
                             {t('nav.legal.deposit')}
@@ -345,7 +345,7 @@ const Header = () => {
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Description du service et texte de loi
                           </p>
-                        </a>
+                        </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <Link to="/demande-reproduction" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
