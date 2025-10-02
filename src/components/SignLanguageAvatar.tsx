@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { User, MessageSquare, Brain, Sparkles } from 'lucide-react';
+import avatarImage from '@/assets/chatbot-avatar.png';
 
 interface SignLanguageAvatarProps {
   isActive: boolean;
@@ -88,26 +89,40 @@ const SignLanguageAvatar: React.FC<SignLanguageAvatarProps> = ({
 
       {/* Avatar Container */}
       <div className="p-6 flex flex-col items-center justify-center min-h-[200px]">
-        {/* Animated Avatar Circle */}
+        {/* Animated Avatar with Image */}
         <div className="relative mb-4">
           {/* Outer ring animation */}
           <div className={`absolute inset-0 rounded-full bg-gradient-to-r from-primary to-secondary opacity-20 ${
             isActive ? 'animate-ping' : ''
-          }`} style={{ width: '120px', height: '120px' }} />
+          }`} style={{ width: '140px', height: '140px', left: '-10px', top: '-10px' }} />
           
-          {/* Main avatar circle */}
+          {/* Main avatar circle with photo */}
           <div 
             key={animationKey}
-            className={`relative w-28 h-28 rounded-full bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center text-white shadow-2xl ${
+            className={`relative w-28 h-28 rounded-full overflow-hidden shadow-2xl border-4 border-primary/30 ${
               isActive ? 'animate-pulse' : ''
             }`}
             style={{
               animation: isActive ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none'
             }}
           >
-            {/* Gesture icon */}
-            <div className="transform transition-all duration-500 scale-110">
-              {getGestureIcon()}
+            {/* Avatar Image */}
+            <img 
+              src={avatarImage} 
+              alt="Chatbot Avatar" 
+              className="w-full h-full object-cover"
+            />
+            
+            {/* Overlay gradient for speech effect */}
+            {isActive && (
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent animate-pulse" />
+            )}
+
+            {/* Gesture icon overlay */}
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 backdrop-blur-[1px]">
+              <div className="transform transition-all duration-500 text-white drop-shadow-lg">
+                {getGestureIcon()}
+              </div>
             </div>
 
             {/* Speaking indicator */}
