@@ -2,13 +2,14 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Search, Book, BookOpen, FileText, Video, Music, Image as ImageIcon, Globe, ArrowRight, TrendingUp, Clock, Eye, Download, Filter, ChevronDown, X } from "lucide-react";
+import { Search, Book, BookOpen, FileText, Video, Music, Image as ImageIcon, Globe, ArrowRight, TrendingUp, Clock, Eye, Download, Filter, ChevronDown, X, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useNavigate } from "react-router-dom";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,11 +70,31 @@ const DigitalLibrary = () => {
       'publisher': 'Éditeur',
       'genre': 'Genre',
       'publication_year': 'Année',
+      'publication_month': 'Mois',
       'language': 'Langue',
       'content_type': 'Type'
     };
     return labels[type] || type;
   };
+
+  // Generate years for dropdown (from 1900 to current year)
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1899 }, (_, i) => currentYear - i);
+  
+  const months = [
+    { value: '01', label: 'Janvier' },
+    { value: '02', label: 'Février' },
+    { value: '03', label: 'Mars' },
+    { value: '04', label: 'Avril' },
+    { value: '05', label: 'Mai' },
+    { value: '06', label: 'Juin' },
+    { value: '07', label: 'Juillet' },
+    { value: '08', label: 'Août' },
+    { value: '09', label: 'Septembre' },
+    { value: '10', label: 'Octobre' },
+    { value: '11', label: 'Novembre' },
+    { value: '12', label: 'Décembre' }
+  ];
 
   const collections = [
     {
@@ -297,13 +318,44 @@ const DigitalLibrary = () => {
                       <span>Genre</span>
                     </DropdownMenuItem>
                     
-                    <DropdownMenuItem onClick={() => {
-                      const value = prompt("Année de publication (ex: 2024):");
-                      if (value?.trim()) addFilter('publication_year', value.trim());
-                    }} className="cursor-pointer">
-                      <Clock className="h-4 w-4 mr-2" />
-                      <span>Année de publication</span>
-                    </DropdownMenuItem>
+                    <DropdownMenuLabel className="text-sm">Période de publication</DropdownMenuLabel>
+                    
+                    <div className="px-2 py-2 space-y-2">
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-muted-foreground">Année</label>
+                        <Select onValueChange={(value) => addFilter('publication_year', value)}>
+                          <SelectTrigger className="w-full h-9">
+                            <SelectValue placeholder="Sélectionner une année" />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-60">
+                            {years.map((year) => (
+                              <SelectItem key={year} value={year.toString()}>
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-muted-foreground">Mois</label>
+                        <Select 
+                          onValueChange={(value) => addFilter('publication_month', value)}
+                          disabled={!activeFilters.some(f => f.type === 'publication_year')}
+                        >
+                          <SelectTrigger className="w-full h-9">
+                            <SelectValue placeholder="Sélectionner un mois" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {months.map((month) => (
+                              <SelectItem key={month.value} value={month.value}>
+                                {month.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                     
                     <DropdownMenuSeparator />
                     

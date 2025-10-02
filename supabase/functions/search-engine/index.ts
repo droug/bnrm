@@ -317,6 +317,7 @@ async function searchContent(query: string, options: any = {}) {
     publisher = '',
     genre = '',
     publication_year = '',
+    publication_month = '',
     access_level = '',
     page = 1,
     per_page = 10,
@@ -356,6 +357,9 @@ async function searchContent(query: string, options: any = {}) {
   }
   if (publication_year) {
     filters.push(`publication_year:=${publication_year}`);
+  }
+  if (publication_month && publication_year) {
+    filters.push(`publication_month:=${publication_month}`);
   }
   
   // Hide unpublished/hidden content unless explicitly requested

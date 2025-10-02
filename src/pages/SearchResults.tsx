@@ -69,6 +69,7 @@ interface Filters {
   publisher: string[];
   genre: string[];
   publication_year: string;
+  publication_month: string;
   is_featured: boolean | null;
 }
 
@@ -91,8 +92,28 @@ export default function SearchResults() {
     publisher: [],
     genre: [],
     publication_year: '',
+    publication_month: '',
     is_featured: null
   });
+
+  // Generate years for dropdown (from 1900 to current year)
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1899 }, (_, i) => currentYear - i);
+  
+  const months = [
+    { value: '01', label: language === 'ar' ? 'يناير' : 'Janvier' },
+    { value: '02', label: language === 'ar' ? 'فبراير' : 'Février' },
+    { value: '03', label: language === 'ar' ? 'مارس' : 'Mars' },
+    { value: '04', label: language === 'ar' ? 'أبريل' : 'Avril' },
+    { value: '05', label: language === 'ar' ? 'مايو' : 'Mai' },
+    { value: '06', label: language === 'ar' ? 'يونيو' : 'Juin' },
+    { value: '07', label: language === 'ar' ? 'يوليو' : 'Juillet' },
+    { value: '08', label: language === 'ar' ? 'أغسطس' : 'Août' },
+    { value: '09', label: language === 'ar' ? 'سبتمبر' : 'Septembre' },
+    { value: '10', label: language === 'ar' ? 'أكتوبر' : 'Octobre' },
+    { value: '11', label: language === 'ar' ? 'نوفمبر' : 'Novembre' },
+    { value: '12', label: language === 'ar' ? 'ديسمبر' : 'Décembre' }
+  ];
 
   const query = searchParams.get('q') || '';
   const currentPage = parseInt(searchParams.get('page') || '1');
@@ -116,6 +137,7 @@ export default function SearchResults() {
         publisher: filters.publisher.length > 0 ? filters.publisher.join(',') : '',
         genre: filters.genre.length > 0 ? filters.genre.join(',') : '',
         publication_year: filters.publication_year || '',
+        publication_month: filters.publication_month || '',
         page: currentPage,
         per_page: perPage,
         sort_by: sortBy,
@@ -178,6 +200,7 @@ export default function SearchResults() {
       publisher: [],
       genre: [],
       publication_year: '',
+      publication_month: '',
       is_featured: null
     });
   };
@@ -322,6 +345,67 @@ export default function SearchResults() {
                       </SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <Separator />
+
+                {/* Date Filters */}
+                <div className="space-y-3">
+                  <Label className="font-medium flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    {language === 'ar' ? 'فترة النشر' : 'Période de publication'}
+                  </Label>
+                  
+                  {/* Year Filter */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">
+                      {language === 'ar' ? 'السنة' : 'Année'}
+                    </Label>
+                    <Select 
+                      value={filters.publication_year} 
+                      onValueChange={(value) => setFilters(prev => ({ ...prev, publication_year: value, publication_month: value ? prev.publication_month : '' }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={language === 'ar' ? 'اختر سنة' : 'Sélectionner une année'} />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60">
+                        <SelectItem value="">
+                          {language === 'ar' ? 'كل السنوات' : 'Toutes les années'}
+                        </SelectItem>
+                        {years.map((year) => (
+                          <SelectItem key={year} value={year.toString()}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Month Filter */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">
+                      {language === 'ar' ? 'الشهر' : 'Mois'}
+                    </Label>
+                    <Select 
+                      value={filters.publication_month}
+                      onValueChange={(value) => setFilters(prev => ({ ...prev, publication_month: value }))}
+                      disabled={!filters.publication_year}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={language === 'ar' ? 'اختر شهراً' : 'Sélectionner un mois'} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">
+                          {language === 'ar' ? 'كل الأشهر' : 'Tous les mois'}
+                        </SelectItem>
+                        {months.map((month) => (
+                          <SelectItem key={month.value} value={month.value}>
+                            {month.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <Separator />
