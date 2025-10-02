@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,63 +12,74 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { resourceId, resourceType, sourceFormat, targetFormat } = await req.json();
+    const { sourceFormat, targetFormat, resourceType, resourceId } = await req.json();
 
-    // Créer l'action de migration
-    const { data: action, error: actionError } = await supabaseClient
+    console.log('Starting format migration:', { sourceFormat, targetFormat, resourceType });
+
+    // Créer une action de migration
+    const { data: action, error: actionError } = await supabase
       .from('preservation_actions')
       .insert({
-        content_id: resourceType === 'content' ? resourceId : null,
-        manuscript_id: resourceType === 'manuscript' ? resourceId : null,
         action_type: 'format_migration',
         status: 'in_progress',
         source_format: sourceFormat,
         target_format: targetFormat,
+        performed_by: (await supabase.auth.getUser()).data.user?.id,
         started_at: new Date().toISOString(),
+        metadata: {
+          resource_type: resourceType,
+          resource_id: resourceId
+        }
       })
       .select()
       .single();
 
     if (actionError) throw actionError;
 
-    // Simuler la migration (à remplacer par la vraie logique)
-    console.log(`Migration de ${sourceFormat} vers ${targetFormat} pour ${resourceType} ${resourceId}`);
-    
-    // Mettre à jour le statut après migration
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulation
+    // Simuler la migration (dans un vrai système, effectuer la conversion ici)
+    console.log('Performing migration simulation...');
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
-    const { error: updateError } = await supabaseClient
+    // Mettre à jour l'action comme terminée
+    const { error: updateError } = await supabase
       .from('preservation_actions')
       .update({
         status: 'completed',
         completed_at: new Date().toISOString(),
+        checksum_after: crypto.randomUUID() // Simulé
       })
       .eq('id', action.id);
 
     if (updateError) throw updateError;
 
+    console.log('Migration completed successfully');
+
     return new Response(
       JSON.stringify({ 
         success: true,
-        action,
-        message: `Migration de ${sourceFormat} vers ${targetFormat} réussie` 
+        action: action,
+        message: `Migration de ${sourceFormat} vers ${targetFormat} réussie`
       }),
-      {
+      { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200
       }
     );
+
   } catch (error) {
-    console.error('Migration error:', error);
+    console.error('Error in format migration:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
+      JSON.stringify({ 
+        error: error.message,
+        details: 'Erreur lors de la migration de format'
+      }),
+      { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500
       }
     );
   }

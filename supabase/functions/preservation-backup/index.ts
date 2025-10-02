@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,64 +12,87 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { resourceType, resourceId, backupType } = await req.json();
+    const { resourceType, backupType, resourceId } = await req.json();
 
-    // Génération du checksum
-    const checksum = crypto.randomUUID(); // Simplification pour l'exemple
+    console.log('Creating backup:', { resourceType, backupType, resourceId });
+
+    // Simuler la création d'une sauvegarde
+    const checksum = crypto.randomUUID(); // Dans un vrai système, calculer le checksum réel
+    const backupLocation = `backups/${resourceType}/${new Date().toISOString()}/backup.tar.gz`;
     
-    // Créer l'enregistrement de sauvegarde
-    const { data: backup, error } = await supabaseClient
+    const now = new Date();
+    const expiryDate = new Date(now);
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1); // 1 an de rétention
+
+    const { data: backup, error: backupError } = await supabase
       .from('preservation_backups')
       .insert({
         resource_type: resourceType,
         resource_id: resourceId,
-        backup_type: backupType || 'full',
-        backup_location: `/backups/${resourceType}/${resourceId}/${Date.now()}`,
+        backup_type: backupType,
+        backup_location: backupLocation,
         checksum: checksum,
-        backup_size_mb: Math.random() * 100, // Calcul réel nécessaire
+        backup_size_mb: Math.random() * 100, // Simulé
         retention_period_days: 365,
-        expiry_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+        expiry_date: expiryDate.toISOString(),
+        created_by: (await supabase.auth.getUser()).data.user?.id,
+        metadata: {
+          created_at: now.toISOString(),
+          backup_method: 'automated'
+        }
       })
       .select()
       .single();
 
-    if (error) throw error;
+    if (backupError) throw backupError;
 
-    // Enregistrer l'action de préservation
-    await supabaseClient
+    // Créer une action de préservation
+    const { error: actionError } = await supabase
       .from('preservation_actions')
       .insert({
-        content_id: resourceType === 'content' ? resourceId : null,
-        manuscript_id: resourceType === 'manuscript' ? resourceId : null,
         action_type: 'backup',
         status: 'completed',
-        backup_location: backup.backup_location,
+        performed_by: (await supabase.auth.getUser()).data.user?.id,
+        backup_location: backupLocation,
         checksum_after: checksum,
+        started_at: now.toISOString(),
         completed_at: new Date().toISOString(),
+        metadata: {
+          backup_id: backup.id,
+          backup_type: backupType
+        }
       });
+
+    if (actionError) throw actionError;
+
+    console.log('Backup created successfully:', backup.id);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        backup,
-        message: 'Sauvegarde créée avec succès' 
+        backup: backup,
+        message: 'Sauvegarde créée avec succès'
       }),
-      {
+      { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200
       }
     );
+
   } catch (error) {
-    console.error('Backup error:', error);
+    console.error('Error creating backup:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
+      JSON.stringify({ 
+        error: error.message,
+        details: 'Erreur lors de la création de la sauvegarde'
+      }),
+      { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500
       }
     );
   }

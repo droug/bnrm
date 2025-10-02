@@ -1,11 +1,11 @@
 import React from 'react';
-import PreservationManager from '@/components/PreservationManager';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import PreservationManager from '@/components/PreservationManager';
 
-const PreservationPage = () => {
+const PreservationPage: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1">
         <PreservationManager />

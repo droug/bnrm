@@ -1,22 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { useToast } from '@/hooks/use-toast';
+import { Shield, Database, RefreshCw, FileCheck, Calendar, Download, Upload, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  Database, 
-  HardDrive, 
-  RefreshCw, 
-  CheckCircle, 
-  AlertTriangle, 
-  FileText,
-  Calendar,
-  Archive,
-  Shield
-} from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import {
   Table,
   TableBody,
@@ -24,225 +14,326 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+interface PreservationFormat {
+  id: string;
+  format_name: string;
+  file_extension: string;
+  format_stability: string;
+  is_preservation_format: boolean;
+}
+
+interface PreservationAction {
+  id: string;
+  action_type: string;
+  status: string;
+  source_format?: string;
+  target_format?: string;
+  created_at: string;
+  completed_at?: string;
+}
+
+interface PreservationBackup {
+  id: string;
+  resource_type: string;
+  backup_type: string;
+  backup_size_mb?: number;
+  is_verified: boolean;
+  created_at: string;
+  expiry_date?: string;
+}
 
 const PreservationManager: React.FC = () => {
+  const [formats, setFormats] = useState<PreservationFormat[]>([]);
+  const [actions, setActions] = useState<PreservationAction[]>([]);
+  const [backups, setBackups] = useState<PreservationBackup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedResourceType, setSelectedResourceType] = useState<'content' | 'manuscript'>('content');
+  const [selectedBackupType, setSelectedBackupType] = useState<'full' | 'incremental'>('full');
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('overview');
-  const [isProcessing, setIsProcessing] = useState(false);
+  const { user } = useAuth();
 
-  const handleBackup = async () => {
-    setIsProcessing(true);
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('preservation-backup', {
+      const [formatsRes, actionsRes, backupsRes] = await Promise.all([
+        supabase.from('preservation_formats').select('*').order('format_name'),
+        supabase.from('preservation_actions').select('*').order('created_at', { ascending: false }).limit(50),
+        supabase.from('preservation_backups').select('*').order('created_at', { ascending: false }).limit(50)
+      ]);
+
+      if (formatsRes.error) throw formatsRes.error;
+      if (actionsRes.error) throw actionsRes.error;
+      if (backupsRes.error) throw backupsRes.error;
+
+      setFormats(formatsRes.data || []);
+      setActions(actionsRes.data || []);
+      setBackups(backupsRes.data || []);
+    } catch (error) {
+      console.error('Erreur chargement données:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les données de préservation",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createBackup = async () => {
+    try {
+      const { error } = await supabase.functions.invoke('preservation-backup', {
         body: {
-          resourceType: 'database',
-          backupType: 'full'
+          resourceType: selectedResourceType,
+          backupType: selectedBackupType
         }
       });
 
       if (error) throw error;
 
       toast({
-        title: "Sauvegarde créée",
-        description: "La sauvegarde complète a été effectuée avec succès.",
+        title: "Sauvegarde lancée",
+        description: "La sauvegarde est en cours de traitement"
       });
+      
+      loadData();
     } catch (error) {
-      console.error('Backup error:', error);
+      console.error('Erreur création sauvegarde:', error);
       toast({
-        variant: "destructive",
         title: "Erreur",
-        description: "Impossible de créer la sauvegarde.",
+        description: "Impossible de créer la sauvegarde",
+        variant: "destructive"
       });
-    } finally {
-      setIsProcessing(false);
     }
   };
 
-  const handleFormatMigration = async () => {
-    setIsProcessing(true);
+  const migrateFormat = async (sourceFormat: string, targetFormat: string) => {
     try {
+      const { error } = await supabase.functions.invoke('format-migration', {
+        body: {
+          sourceFormat,
+          targetFormat,
+          resourceType: selectedResourceType
+        }
+      });
+
+      if (error) throw error;
+
       toast({
-        title: "Migration de formats",
-        description: "La migration des formats obsolètes a démarré...",
+        title: "Migration lancée",
+        description: `Migration de ${sourceFormat} vers ${targetFormat} en cours`
       });
       
-      // Logique de migration ici
-      
+      loadData();
     } catch (error) {
-      console.error('Migration error:', error);
-    } finally {
-      setIsProcessing(false);
+      console.error('Erreur migration format:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de lancer la migration",
+        variant: "destructive"
+      });
     }
   };
+
+  const verifyBackup = async (backupId: string) => {
+    try {
+      const { error } = await supabase.rpc('verify_backup_integrity', { backup_id: backupId });
+
+      if (error) throw error;
+
+      toast({
+        title: "Vérification réussie",
+        description: "L'intégrité de la sauvegarde a été vérifiée"
+      });
+      
+      loadData();
+    } catch (error) {
+      console.error('Erreur vérification:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de vérifier la sauvegarde",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getStabilityBadge = (stability: string) => {
+    const variants = {
+      stable: 'default',
+      at_risk: 'secondary',
+      obsolete: 'destructive'
+    };
+    return <Badge variant={variants[stability as keyof typeof variants] as any}>{stability}</Badge>;
+  };
+
+  const getStatusBadge = (status: string) => {
+    const variants = {
+      pending: 'secondary',
+      in_progress: 'default',
+      completed: 'default',
+      failed: 'destructive'
+    };
+    return <Badge variant={variants[status as keyof typeof variants] as any}>{status}</Badge>;
+  };
+
+  if (loading) {
+    return <div className="flex items-center justify-center p-8">Chargement...</div>;
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Préservation & Conservation</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <Shield className="h-8 w-8 text-primary" />
+            Préservation et Conservation
+          </h1>
+          <p className="text-muted-foreground mt-2">
             Gestion de la pérennité des ressources numériques
           </p>
         </div>
-        <Button onClick={handleBackup} disabled={isProcessing}>
-          <HardDrive className="mr-2 h-4 w-4" />
-          {isProcessing ? 'Sauvegarde en cours...' : 'Nouvelle Sauvegarde'}
-        </Button>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              Créer une sauvegarde
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Nouvelle sauvegarde</DialogTitle>
+              <DialogDescription>
+                Créer une sauvegarde pour protéger vos données
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Type de ressource</Label>
+                <Select value={selectedResourceType} onValueChange={(v: any) => setSelectedResourceType(v)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="content">Contenu</SelectItem>
+                    <SelectItem value="manuscript">Manuscrits</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Type de sauvegarde</Label>
+                <Select value={selectedBackupType} onValueChange={(v: any) => setSelectedBackupType(v)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full">Complète</SelectItem>
+                    <SelectItem value="incremental">Incrémentale</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button onClick={createBackup} className="w-full">
+                Créer la sauvegarde
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Sauvegardes Totales
-            </CardTitle>
-            <Database className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2,547</div>
-            <p className="text-xs text-muted-foreground">
-              +12% ce mois
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Migrations en Cours
-            </CardTitle>
-            <RefreshCw className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">
-              15 formats obsolètes
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Intégrité Vérifiée
-            </CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">98.7%</div>
-            <p className="text-xs text-muted-foreground">
-              Des ressources
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Formats À Risque
-            </CardTitle>
-            <AlertTriangle className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">147</div>
-            <p className="text-xs text-muted-foreground">
-              Nécessitent migration
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs defaultValue="formats" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="overview">
-            <Archive className="mr-2 h-4 w-4" />
-            Vue d'ensemble
-          </TabsTrigger>
-          <TabsTrigger value="backups">
-            <HardDrive className="mr-2 h-4 w-4" />
-            Sauvegardes
-          </TabsTrigger>
-          <TabsTrigger value="formats">
-            <FileText className="mr-2 h-4 w-4" />
+          <TabsTrigger value="formats" className="flex items-center gap-2">
+            <FileCheck className="h-4 w-4" />
             Formats
           </TabsTrigger>
-          <TabsTrigger value="schedules">
-            <Calendar className="mr-2 h-4 w-4" />
-            Planification
+          <TabsTrigger value="actions" className="flex items-center gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Actions
+          </TabsTrigger>
+          <TabsTrigger value="backups" className="flex items-center gap-2">
+            <Database className="h-4 w-4" />
+            Sauvegardes
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="formats" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>État de la Préservation</CardTitle>
-              <CardDescription>
-                Vue globale des actions de préservation en cours
-              </CardDescription>
+              <CardTitle>Formats de préservation</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Sauvegarde Complète</span>
-                  <span className="text-sm text-muted-foreground">75%</span>
-                </div>
-                <Progress value={75} />
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Migration de Formats</span>
-                  <span className="text-sm text-muted-foreground">45%</span>
-                </div>
-                <Progress value={45} />
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Vérification Checksum</span>
-                  <span className="text-sm text-muted-foreground">92%</span>
-                </div>
-                <Progress value={92} />
-              </div>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Format</TableHead>
+                    <TableHead>Extension</TableHead>
+                    <TableHead>Stabilité</TableHead>
+                    <TableHead>Préservation</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {formats.map((format) => (
+                    <TableRow key={format.id}>
+                      <TableCell className="font-medium">{format.format_name}</TableCell>
+                      <TableCell>{format.file_extension}</TableCell>
+                      <TableCell>{getStabilityBadge(format.format_stability)}</TableCell>
+                      <TableCell>
+                        {format.is_preservation_format ? (
+                          <Badge variant="default">Recommandé</Badge>
+                        ) : (
+                          <Badge variant="outline">Standard</Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
+        </TabsContent>
 
+        <TabsContent value="actions" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Actions Récentes</CardTitle>
+              <CardTitle>Actions de préservation</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Type</TableHead>
-                    <TableHead>Ressource</TableHead>
+                    <TableHead>Format source</TableHead>
+                    <TableHead>Format cible</TableHead>
                     <TableHead>Statut</TableHead>
                     <TableHead>Date</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
-                    <TableCell>
-                      <Badge variant="outline">Sauvegarde</Badge>
-                    </TableCell>
-                    <TableCell>Manuscrit MS-2024-001</TableCell>
-                    <TableCell>
-                      <Badge variant="default">Complété</Badge>
-                    </TableCell>
-                    <TableCell>2024-01-15</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <Badge variant="outline">Migration</Badge>
-                    </TableCell>
-                    <TableCell>Document DL-2024-123</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">En cours</Badge>
-                    </TableCell>
-                    <TableCell>2024-01-14</TableCell>
-                  </TableRow>
+                  {actions.map((action) => (
+                    <TableRow key={action.id}>
+                      <TableCell className="font-medium">{action.action_type}</TableCell>
+                      <TableCell>{action.source_format || '-'}</TableCell>
+                      <TableCell>{action.target_format || '-'}</TableCell>
+                      <TableCell>{getStatusBadge(action.status)}</TableCell>
+                      <TableCell>{new Date(action.created_at).toLocaleDateString()}</TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </CardContent>
@@ -252,144 +343,51 @@ const PreservationManager: React.FC = () => {
         <TabsContent value="backups" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Gestion des Sauvegardes</CardTitle>
-              <CardDescription>
-                Liste des sauvegardes et leur état de vérification
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <Shield className="h-8 w-8 text-primary" />
-                    <div>
-                      <p className="font-medium">Sauvegarde Complète - Janvier 2024</p>
-                      <p className="text-sm text-muted-foreground">2.3 GB • SHA256 vérifié</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="default">Vérifiée</Badge>
-                    <Button variant="outline" size="sm">Restaurer</Button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <Shield className="h-8 w-8 text-primary" />
-                    <div>
-                      <p className="font-medium">Sauvegarde Incrémentale - 15/01/2024</p>
-                      <p className="text-sm text-muted-foreground">845 MB • En vérification</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="secondary">En cours</Badge>
-                    <Button variant="outline" size="sm" disabled>Restaurer</Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="formats" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Formats de Préservation</CardTitle>
-              <CardDescription>
-                Gestion des formats stables et migration des formats obsolètes
-              </CardDescription>
+              <CardTitle>Sauvegardes</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Format</TableHead>
-                    <TableHead>Extension</TableHead>
-                    <TableHead>Stabilité</TableHead>
-                    <TableHead>Action</TableHead>
+                    <TableHead>Type ressource</TableHead>
+                    <TableHead>Type sauvegarde</TableHead>
+                    <TableHead>Taille</TableHead>
+                    <TableHead>Vérifié</TableHead>
+                    <TableHead>Date création</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium">PDF/A-2</TableCell>
-                    <TableCell>.pdf</TableCell>
-                    <TableCell>
-                      <Badge variant="default">Stable</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">Recommandé</Badge>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">TIFF</TableCell>
-                    <TableCell>.tiff</TableCell>
-                    <TableCell>
-                      <Badge variant="default">Stable</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">Recommandé</Badge>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">DOC</TableCell>
-                    <TableCell>.doc</TableCell>
-                    <TableCell>
-                      <Badge variant="destructive">Obsolète</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="outline" size="sm" onClick={handleFormatMigration}>
-                        Migrer vers PDF/A
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                  {backups.map((backup) => (
+                    <TableRow key={backup.id}>
+                      <TableCell className="font-medium">{backup.resource_type}</TableCell>
+                      <TableCell>{backup.backup_type}</TableCell>
+                      <TableCell>
+                        {backup.backup_size_mb ? `${backup.backup_size_mb.toFixed(2)} MB` : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {backup.is_verified ? (
+                          <Badge variant="default">Vérifié</Badge>
+                        ) : (
+                          <Badge variant="secondary">Non vérifié</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>{new Date(backup.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {!backup.is_verified && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => verifyBackup(backup.id)}
+                          >
+                            Vérifier
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="schedules" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tâches Planifiées</CardTitle>
-              <CardDescription>
-                Configuration des tâches automatiques de préservation
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <Calendar className="h-8 w-8 text-primary" />
-                    <div>
-                      <p className="font-medium">Sauvegarde Quotidienne</p>
-                      <p className="text-sm text-muted-foreground">
-                        Tous les jours à 02:00 • Dernière: 15/01/2024
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="default">Active</Badge>
-                    <Button variant="outline" size="sm">Modifier</Button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <RefreshCw className="h-8 w-8 text-primary" />
-                    <div>
-                      <p className="font-medium">Vérification Checksum</p>
-                      <p className="text-sm text-muted-foreground">
-                        Hebdomadaire • Prochaine: 22/01/2024
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="default">Active</Badge>
-                    <Button variant="outline" size="sm">Modifier</Button>
-                  </div>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>

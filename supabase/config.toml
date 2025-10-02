@@ -13,3 +13,9 @@ verify_jwt = false
 
 [functions.smart-chatbot]
 verify_jwt = false
+
+[functions.preservation-backup]
+verify_jwt = false
+
+[functions.format-migration]
+verify_jwt = false
