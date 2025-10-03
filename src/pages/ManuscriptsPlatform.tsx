@@ -20,6 +20,10 @@ import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
 import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
 import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
+import manuscriptArabic from "@/assets/manuscript-arabic.jpg";
+import manuscriptBerber from "@/assets/manuscript-berber.jpg";
+import manuscriptLatin from "@/assets/manuscript-latin.jpg";
+import manuscriptFrench from "@/assets/manuscript-french.jpg";
 
 interface Manuscript {
   id: string;
@@ -384,20 +388,24 @@ export default function ManuscriptsPlatform() {
                   !canAccessManuscript(manuscript) ? 'opacity-60' : ''
                 }`}
               >
-                {manuscript.thumbnail_url && (
-                  <div className="aspect-video overflow-hidden relative bg-gradient-mosaique">
-                    <img
-                      src={manuscript.thumbnail_url}
-                      alt={manuscript.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    {!canAccessManuscript(manuscript) && (
-                      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                        <Lock className="h-12 w-12 text-white drop-shadow-lg" />
-                      </div>
+                <div className="aspect-video overflow-hidden relative bg-gradient-mosaique">
+                  <img
+                    src={manuscript.thumbnail_url || (
+                      manuscript.language === 'arabe' ? manuscriptArabic :
+                      manuscript.language === 'berbère' ? manuscriptBerber :
+                      manuscript.language === 'latin' ? manuscriptLatin :
+                      manuscript.language === 'français' ? manuscriptFrench :
+                      manuscriptArabic
                     )}
-                  </div>
-                )}
+                    alt={manuscript.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  {!canAccessManuscript(manuscript) && (
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                      <Lock className="h-12 w-12 text-white drop-shadow-lg" />
+                    </div>
+                  )}
+                </div>
                 
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start gap-2">
