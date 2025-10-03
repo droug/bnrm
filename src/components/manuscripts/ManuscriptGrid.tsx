@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Download, Calendar, User, MapPin, Lock } from "lucide-react";
+import { Eye, Download, Calendar, User, MapPin, Lock, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import manuscrit1 from "@/assets/manuscrit-1.jpg";
 import manuscrit2 from "@/assets/manuscrit-2.png";
@@ -160,26 +160,37 @@ export function ManuscriptGrid({
               </Badge>
             </div>
 
-            <div className="flex gap-2 pt-2">
+            <div className="flex flex-col gap-2 pt-2">
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  className="flex-1"
+                  disabled={!canAccessManuscript(manuscript)}
+                  onClick={() => {
+                    if (canAccessManuscript(manuscript)) {
+                      navigate(`/manuscrit/${manuscript.permalink || manuscript.id}`);
+                    }
+                  }}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Consulter
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  disabled={!canAccessManuscript(manuscript)}
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
               <Button 
                 size="sm" 
-                className="flex-1"
-                disabled={!canAccessManuscript(manuscript)}
-                onClick={() => {
-                  if (canAccessManuscript(manuscript)) {
-                    navigate(`/manuscrit/${manuscript.permalink || manuscript.id}`);
-                  }
-                }}
+                variant="secondary"
+                className="w-full"
+                onClick={() => navigate(`/reproduction/new?manuscriptId=${manuscript.id}&manuscriptTitle=${encodeURIComponent(manuscript.title)}`)}
               >
-                <Eye className="h-4 w-4 mr-2" />
-                Consulter
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline"
-                disabled={!canAccessManuscript(manuscript)}
-              >
-                <Download className="h-4 w-4" />
+                <FileText className="h-4 w-4 mr-2" />
+                Demande de reproduction
               </Button>
             </div>
           </div>
