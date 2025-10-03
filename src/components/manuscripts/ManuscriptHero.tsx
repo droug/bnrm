@@ -1,16 +1,15 @@
 import { Crown, Star, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Link } from "react-router-dom";
+import manuscriptBanner from "@/assets/manuscript-banner.jpg";
 
 interface ManuscriptHeroProps {
-  backgroundImage: string;
   userAccessLevel: string;
   isAuthenticated: boolean;
   searchBar: React.ReactNode;
 }
 
 export function ManuscriptHero({ 
-  backgroundImage, 
   userAccessLevel, 
   isAuthenticated,
   searchBar 
@@ -19,9 +18,9 @@ export function ManuscriptHero({
     <section className="relative mb-12 py-20 px-8 rounded-3xl border-4 border-gold/40 overflow-hidden shadow-2xl">
       <div 
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
+        style={{ backgroundImage: `url(${manuscriptBanner})` }}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-royal/90 via-primary/85 to-accent/90" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/60 to-royal/80" />
       <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20" />
       <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-15" />
       

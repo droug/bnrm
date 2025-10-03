@@ -83,6 +83,7 @@ export function PartnerManuscriptSubmissionForm({ onSuccess }: { onSuccess?: () 
           dimensions: data.dimensions || null,
           inventory_number: data.inventory_number || null,
           page_count: data.page_count || null,
+          submitted_by: user.id,
         }]);
 
       if (error) throw error;

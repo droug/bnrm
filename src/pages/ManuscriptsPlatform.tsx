@@ -21,7 +21,7 @@ import { AdvancedSearchPanel } from "@/components/manuscripts/AdvancedSearchPane
 import { SearchResultsPanel } from "@/components/manuscripts/SearchResultsPanel";
 import { SearchPagination } from "@/components/manuscripts/SearchPagination";
 import { ManuscriptSearchBar } from "@/components/manuscripts/ManuscriptSearchBar";
-import manuscriptHero from "@/assets/manuscript-page-1.jpg";
+import manuscriptBanner from "@/assets/manuscript-banner.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
 import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
@@ -209,10 +209,10 @@ export default function ManuscriptsPlatform() {
             {/* Background Image */}
             <div 
               className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${manuscriptHero})` }}
+              style={{ backgroundImage: `url(${manuscriptBanner})` }}
             ></div>
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-royal/90 via-primary/85 to-accent/90"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/60 to-royal/80"></div>
             <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20"></div>
             <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-15"></div>
             

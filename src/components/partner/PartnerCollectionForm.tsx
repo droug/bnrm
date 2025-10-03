@@ -55,6 +55,7 @@ export function PartnerCollectionForm({ onSuccess }: { onSuccess?: () => void })
           contact_phone: data.contact_phone || null,
           description: data.description || null,
           website_url: data.website_url || null,
+          created_by: user.id,
         }]);
 
       if (error) throw error;
