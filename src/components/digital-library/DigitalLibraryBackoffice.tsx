@@ -176,25 +176,29 @@ export default function DigitalLibraryBackoffice() {
       icon: Library,
       title: "Gestion des documents numérisés",
       description: "Ajout/suppression de documents, gestion des permissions et visibilité",
-      count: documents?.length || 0
+      count: documents?.length || 0,
+      action: () => navigate('/admin/digital-library/documents')
     },
     {
       icon: Ban,
       title: "Restrictions de téléchargement",
       description: "Restreindre l'accès pour des utilisateurs spécifiques en cas d'abus",
-      count: restrictions?.length || 0
+      count: restrictions?.length || 0,
+      action: () => navigate('/admin/digital-library/restrictions')
     },
     {
       icon: Calendar,
       title: "Suivi des droits d'auteur",
       description: "Documents avec accès limité et alertes d'expiration",
-      count: expiringDocs?.length || 0
+      count: expiringDocs?.length || 0,
+      action: () => navigate('/admin/digital-library/copyright')
     },
     {
       icon: Upload,
       title: "Import en masse",
       description: "Importer plusieurs documents avec métadonnées (CSV/Excel)",
-      count: null
+      count: null,
+      action: () => navigate('/admin/digital-library/bulk-import')
     }
   ];
 
@@ -210,7 +214,11 @@ export default function DigitalLibraryBackoffice() {
       {/* Cards Menu */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
         {menuCards.map((card) => (
-          <Card key={card.title} className="hover:shadow-lg transition-all duration-200">
+          <Card 
+            key={card.title} 
+            className="hover:shadow-lg transition-all duration-200 cursor-pointer"
+            onClick={card.action}
+          >
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="p-3 rounded-lg bg-primary/10">

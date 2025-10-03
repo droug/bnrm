@@ -33,6 +33,8 @@ import ReproductionDetailsPage from "./pages/ReproductionDetailsPage";
 import HelpPage from "./pages/HelpPage";
 import PreservationPage from "./pages/PreservationPage";
 import DigitalLibraryBackoffice from "./pages/DigitalLibraryBackoffice";
+import DigitalLibraryDocuments from "./pages/DigitalLibraryDocuments";
+
 
 const App = () => (
   <TooltipProvider>
@@ -76,6 +78,7 @@ const App = () => (
         <Route path="/aide" element={<HelpPage />} />
         <Route path="/admin/preservation" element={<PreservationPage />} />
         <Route path="/admin/digital-library" element={<DigitalLibraryBackoffice />} />
+        <Route path="/admin/digital-library/documents" element={<DigitalLibraryDocuments />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
