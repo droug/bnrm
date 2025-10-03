@@ -168,7 +168,7 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
             />
           </div>
 
-          <div className="relative">
+          <div className="relative z-10">
             <Label htmlFor="status" className="text-sm font-medium">
               Statut
             </Label>
@@ -179,7 +179,7 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
               <SelectTrigger className="mt-1" id="status">
                 <SelectValue placeholder="Tous les statuts" />
               </SelectTrigger>
-              <SelectContent position="popper" sideOffset={5}>
+              <SelectContent position="item-aligned">
                 <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="available">Disponible</SelectItem>
                 <SelectItem value="digitization">En numérisation</SelectItem>
