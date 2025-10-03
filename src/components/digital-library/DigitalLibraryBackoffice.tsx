@@ -174,27 +174,27 @@ export default function DigitalLibraryBackoffice() {
   const menuCards = [
     {
       icon: Library,
-      title: "Gestion des Documents",
-      description: "Gérer les documents numérisés et leurs permissions",
-      action: () => navigate('/admin/digital-library/documents')
+      title: "Gestion des documents numérisés",
+      description: "Ajout/suppression de documents, gestion des permissions et visibilité",
+      count: documents?.length || 0
     },
     {
       icon: Ban,
-      title: "Restrictions d'accès",
-      description: "Gérer les utilisateurs avec restrictions de téléchargement",
-      action: () => navigate('/admin/digital-library/restrictions')
+      title: "Restrictions de téléchargement",
+      description: "Restreindre l'accès pour des utilisateurs spécifiques en cas d'abus",
+      count: restrictions?.length || 0
     },
     {
       icon: Calendar,
-      title: "Alertes Droits d'auteur",
-      description: "Suivre les documents dont les droits arrivent à expiration",
-      action: () => navigate('/admin/digital-library/copyright')
+      title: "Suivi des droits d'auteur",
+      description: "Documents avec accès limité et alertes d'expiration",
+      count: expiringDocs?.length || 0
     },
     {
       icon: Upload,
       title: "Import en masse",
-      description: "Importer plusieurs documents avec leurs métadonnées",
-      action: () => navigate('/admin/digital-library/bulk-import')
+      description: "Importer plusieurs documents avec métadonnées (CSV/Excel)",
+      count: null
     }
   ];
 
@@ -208,67 +208,50 @@ export default function DigitalLibraryBackoffice() {
       </div>
 
       {/* Cards Menu */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
         {menuCards.map((card) => (
-          <Card key={card.title} className="hover:shadow-lg transition-all duration-200 cursor-pointer group">
+          <Card key={card.title} className="hover:shadow-lg transition-all duration-200">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-3">
-                <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                  <card.icon className="h-6 w-6 text-primary" />
+              <div className="flex items-center justify-between">
+                <div className="p-3 rounded-lg bg-primary/10">
+                  <card.icon className="h-8 w-8 text-primary" />
                 </div>
-              </CardTitle>
-              <CardDescription className="text-base font-semibold mt-2">
-                {card.title}
+                {card.count !== null && (
+                  <Badge variant="secondary" className="text-lg px-3 py-1">
+                    {card.count}
+                  </Badge>
+                )}
+              </div>
+              <CardTitle className="text-xl mt-4">{card.title}</CardTitle>
+              <CardDescription className="text-sm mt-2">
+                {card.description}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">{card.description}</p>
-              <Button 
-                className="w-full" 
-                onClick={card.action}
-              >
-                Accéder
-              </Button>
-            </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Documents
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{documents?.length || 0}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Restrictions Actives
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{restrictions?.length || 0}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Alertes Droits d'auteur
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-destructive">{expiringDocs?.length || 0}</div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Actions Rapides</CardTitle>
+          <CardDescription>Accès direct aux fonctionnalités principales</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-3">
+          <Button onClick={() => setShowAddDialog(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Ajouter un document
+          </Button>
+          <Button variant="outline">
+            <Upload className="h-4 w-4 mr-2" />
+            Import CSV/Excel
+          </Button>
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Exporter la liste
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Recent Documents Preview */}
       <Card>
