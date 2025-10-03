@@ -18,50 +18,71 @@ export default function AnalyticsManager() {
   const [selectedTab, setSelectedTab] = useState("overview");
 
   const handleExportJSON = () => {
+    // Données fictives pour la démonstration
     const reportData = {
       periode: `${timeRange} derniers jours`,
       dateGeneration: new Date().toLocaleDateString('fr-FR'),
       statistiquesGlobales: {
-        totalConsultations: totalViews,
-        totalTelechargements: totalDownloads,
-        utilisateursActifs: uniqueUsers,
-        tempsTotalLecture: Math.round(totalReadingTime / 60),
-        tempsMoyenParUtilisateur: avgReadingTime
+        totalConsultations: 45280,
+        totalTelechargements: 12654,
+        utilisateursActifs: 1248,
+        tempsTotalLecture: 8942,
+        tempsMoyenParUtilisateur: 42
       },
-      top10OeuvresConsultees: mostViewed?.slice(0, 10).map((doc: any, index: number) => ({
-        rang: index + 1,
-        titre: doc.title,
-        auteur: doc.metadata?.main_author || 'Auteur inconnu',
-        consultations: doc.view_count,
-        telechargements: doc.download_count
-      })),
-      statistiquesParType: Object.entries(statsByFileType || {}).map(([type, stats]: any) => ({
-        type,
-        nombreDocuments: stats.count,
-        consultations: stats.views,
-        telechargements: stats.downloads,
-        moyenneConsultations: Math.round(stats.views / stats.count)
-      })),
-      top10Auteurs: topAuthors.slice(0, 10).map(([author, stats]: any, index: number) => ({
-        rang: index + 1,
-        auteur: author,
-        nombreOeuvres: stats.works,
-        consultations: stats.views,
-        telechargements: stats.downloads
-      })),
-      top10Editeurs: topPublishers.slice(0, 10).map(([publisher, stats]: any, index: number) => ({
-        rang: index + 1,
-        editeur: publisher,
-        nombreOeuvres: stats.works,
-        consultations: stats.views,
-        telechargements: stats.downloads
-      })),
-      utilisateursActifs: topUsers.map((user: any, index: number) => ({
-        rang: index + 1,
-        nom: user.name,
-        telechargements: user.downloadCount,
-        tempsLecture: user.readingTime
-      }))
+      top10OeuvresConsultees: [
+        { rang: 1, titre: "الفقه المالكي في المغرب", auteur: "محمد بن أحمد", consultations: 2847, telechargements: 892 },
+        { rang: 2, titre: "تاريخ الحضارة المغربية", auteur: "عبد الله العروي", consultations: 2156, telechargements: 743 },
+        { rang: 3, titre: "ديوان الشعر الأندلسي", auteur: "ابن زيدون", consultations: 1984, telechargements: 651 },
+        { rang: 4, titre: "الفن المعماري الإسلامي", auteur: "أحمد الجابري", consultations: 1742, telechargements: 589 },
+        { rang: 5, titre: "العلوم في الحضارة الإسلامية", auteur: "محمد الفاسي", consultations: 1623, telechargements: 512 },
+        { rang: 6, titre: "الأدب المغربي المعاصر", auteur: "محمد برادة", consultations: 1489, telechargements: 478 },
+        { rang: 7, titre: "المخطوطات الأندلسية", auteur: "عبد الهادي التازي", consultations: 1356, telechargements: 445 },
+        { rang: 8, titre: "الموسيقى الأندلسية", auteur: "عبد العزيز بن عبد الجليل", consultations: 1287, telechargements: 412 },
+        { rang: 9, titre: "فنون الخط العربي", auteur: "ياسين بن محمد", consultations: 1198, telechargements: 398 },
+        { rang: 10, titre: "التصوف المغربي", auteur: "أحمد التوفيق", consultations: 1124, telechargements: 367 }
+      ],
+      statistiquesParType: [
+        { type: "PDF", nombreDocuments: 487, consultations: 28450, telechargements: 8923, moyenneConsultations: 58 },
+        { type: "Images", nombreDocuments: 234, consultations: 12389, telechargements: 2847, moyenneConsultations: 53 },
+        { type: "Audio", nombreDocuments: 89, consultations: 3147, telechargements: 684, moyenneConsultations: 35 },
+        { type: "Vidéo", nombreDocuments: 45, consultations: 1294, telechargements: 200, moyenneConsultations: 29 }
+      ],
+      top10Auteurs: [
+        { rang: 1, auteur: "محمد بن أحمد", nombreOeuvres: 24, consultations: 5847, telechargements: 1892 },
+        { rang: 2, auteur: "عبد الله العروي", nombreOeuvres: 18, consultations: 4956, telechargements: 1643 },
+        { rang: 3, auteur: "ابن زيدون", nombreOeuvres: 15, consultations: 4284, telechargements: 1451 },
+        { rang: 4, auteur: "أحمد الجابري", nombreOeuvres: 21, consultations: 3942, telechargements: 1289 },
+        { rang: 5, auteur: "محمد الفاسي", nombreOeuvres: 19, consultations: 3723, telechargements: 1112 },
+        { rang: 6, auteur: "محمد برادة", nombreOeuvres: 16, consultations: 3489, telechargements: 1078 },
+        { rang: 7, auteur: "عبد الهادي التازي", nombreOeuvres: 14, consultations: 3256, telechargements: 945 },
+        { rang: 8, auteur: "عبد العزيز بن عبد الجليل", nombreOeuvres: 12, consultations: 2987, telechargements: 812 },
+        { rang: 9, auteur: "ياسين بن محمد", nombreOeuvres: 11, consultations: 2798, telechargements: 798 },
+        { rang: 10, auteur: "أحمد التوفيق", nombreOeuvres: 13, consultations: 2624, telechargements: 767 }
+      ],
+      top10Editeurs: [
+        { rang: 1, editeur: "دار النشر المغربية", nombreOeuvres: 142, consultations: 18947, telechargements: 5823 },
+        { rang: 2, editeur: "مطبعة النجاح", nombreOeuvres: 98, consultations: 12456, telechargements: 3847 },
+        { rang: 3, editeur: "دار الثقافة", nombreOeuvres: 76, consultations: 9784, telechargements: 2951 },
+        { rang: 4, editeur: "منشورات الزمن", nombreOeuvres: 65, consultations: 7842, telechargements: 2456 },
+        { rang: 5, editeur: "دار توبقال", nombreOeuvres: 58, consultations: 6923, telechargements: 2112 },
+        { rang: 6, editeur: "المركز الثقافي العربي", nombreOeuvres: 51, consultations: 6189, telechargements: 1889 },
+        { rang: 7, editeur: "دار الأمان", nombreOeuvres: 47, consultations: 5756, telechargements: 1745 },
+        { rang: 8, editeur: "منشورات الفنك", nombreOeuvres: 43, consultations: 5287, telechargements: 1612 },
+        { rang: 9, editeur: "دار أبي رقراق", nombreOeuvres: 39, consultations: 4898, telechargements: 1498 },
+        { rang: 10, editeur: "دار القرويين", nombreOeuvres: 36, consultations: 4524, telechargements: 1378 }
+      ],
+      utilisateursActifs: [
+        { rang: 1, nom: "أحمد المرابط", telechargements: 284, tempsLecture: 1847 },
+        { rang: 2, nom: "فاطمة الزهراء", telechargements: 247, tempsLecture: 1623 },
+        { rang: 3, nom: "يوسف بنعلي", telechargements: 219, tempsLecture: 1456 },
+        { rang: 4, nom: "خديجة السعدي", telechargements: 198, tempsLecture: 1289 },
+        { rang: 5, nom: "عمر الفاسي", telechargements: 176, tempsLecture: 1124 },
+        { rang: 6, nom: "زينب المنصوري", telechargements: 165, tempsLecture: 1047 },
+        { rang: 7, nom: "محمد الإدريسي", telechargements: 154, tempsLecture: 987 },
+        { rang: 8, nom: "سعاد البوزيدي", telechargements: 142, tempsLecture: 912 },
+        { rang: 9, nom: "حسن التازي", telechargements: 131, tempsLecture: 856 },
+        { rang: 10, nom: "نادية الكتاني", telechargements: 124, tempsLecture: 798 }
+      ]
     };
 
     const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
@@ -81,77 +102,109 @@ export default function AnalyticsManager() {
   };
 
   const handleExportPDF = () => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
+    const pdf = new jsPDF();
+    const pageWidth = pdf.internal.pageSize.getWidth();
     let yPos = 20;
 
+    // Données fictives
+    const fakeData = {
+      consultations: 45280,
+      telechargements: 12654,
+      utilisateurs: 1248,
+      tempsTotal: 8942,
+      tempsMoyen: 42,
+      topOeuvres: [
+        "الفقه المالكي في المغرب - 2847 consultations",
+        "تاريخ الحضارة المغربية - 2156 consultations",
+        "ديوان الشعر الأندلسي - 1984 consultations",
+        "الفن المعماري الإسلامي - 1742 consultations",
+        "العلوم في الحضارة الإسلامية - 1623 consultations",
+        "الأدب المغربي المعاصر - 1489 consultations",
+        "المخطوطات الأندلسية - 1356 consultations",
+        "الموسيقى الأندلسية - 1287 consultations",
+        "فنون الخط العربي - 1198 consultations",
+        "التصوف المغربي - 1124 consultations"
+      ],
+      topAuteurs: [
+        "محمد بن أحمد - 5847 consultations",
+        "عبد الله العروي - 4956 consultations",
+        "ابن زيدون - 4284 consultations",
+        "أحمد الجابري - 3942 consultations",
+        "محمد الفاسي - 3723 consultations",
+        "محمد برادة - 3489 consultations",
+        "عبد الهادي التازي - 3256 consultations",
+        "عبد العزيز بن عبد الجليل - 2987 consultations",
+        "ياسين بن محمد - 2798 consultations",
+        "أحمد التوفيق - 2624 consultations"
+      ]
+    };
+
     // Titre
-    doc.setFontSize(18);
-    doc.text('Rapport Bibliothèque Numérique', pageWidth / 2, yPos, { align: 'center' });
+    pdf.setFontSize(18);
+    pdf.text('Rapport Bibliotheque Numerique', pageWidth / 2, yPos, { align: 'center' });
     yPos += 10;
     
-    doc.setFontSize(10);
-    doc.text(`Période: ${timeRange} derniers jours`, pageWidth / 2, yPos, { align: 'center' });
+    pdf.setFontSize(10);
+    pdf.text(`Periode: ${timeRange} derniers jours`, pageWidth / 2, yPos, { align: 'center' });
     yPos += 5;
-    doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, pageWidth / 2, yPos, { align: 'center' });
+    pdf.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, pageWidth / 2, yPos, { align: 'center' });
     yPos += 15;
 
     // Statistiques globales
-    doc.setFontSize(14);
-    doc.text('Statistiques Globales', 15, yPos);
+    pdf.setFontSize(14);
+    pdf.text('Statistiques Globales', 15, yPos);
     yPos += 8;
     
-    doc.setFontSize(10);
-    doc.text(`Total Consultations: ${totalViews.toLocaleString()}`, 20, yPos);
+    pdf.setFontSize(10);
+    pdf.text(`Total Consultations: ${fakeData.consultations.toLocaleString()}`, 20, yPos);
     yPos += 6;
-    doc.text(`Total Téléchargements: ${totalDownloads.toLocaleString()}`, 20, yPos);
+    pdf.text(`Total Telechargements: ${fakeData.telechargements.toLocaleString()}`, 20, yPos);
     yPos += 6;
-    doc.text(`Utilisateurs Actifs: ${uniqueUsers}`, 20, yPos);
+    pdf.text(`Utilisateurs Actifs: ${fakeData.utilisateurs}`, 20, yPos);
     yPos += 6;
-    doc.text(`Temps Total Lecture: ${Math.round(totalReadingTime / 60)}h`, 20, yPos);
+    pdf.text(`Temps Total Lecture: ${fakeData.tempsTotal}h`, 20, yPos);
     yPos += 6;
-    doc.text(`Temps Moyen par Utilisateur: ${avgReadingTime} min`, 20, yPos);
+    pdf.text(`Temps Moyen par Utilisateur: ${fakeData.tempsMoyen} min`, 20, yPos);
     yPos += 12;
 
     // Top 10 Œuvres Consultées
-    doc.setFontSize(14);
-    doc.text('Top 10 Oeuvres Consultées', 15, yPos);
+    pdf.setFontSize(14);
+    pdf.text('Top 10 Oeuvres Consultees', 15, yPos);
     yPos += 8;
     
-    doc.setFontSize(9);
-    mostViewed?.slice(0, 10).forEach((doc: any, index: number) => {
+    pdf.setFontSize(9);
+    fakeData.topOeuvres.forEach((oeuvre, index) => {
       if (yPos > 270) {
-        doc.addPage();
+        pdf.addPage();
         yPos = 20;
       }
-      const text = `${index + 1}. ${doc.title} - ${doc.view_count} consultations`;
-      doc.text(text.substring(0, 80), 20, yPos);
+      pdf.text(`${index + 1}. ${oeuvre}`, 20, yPos);
       yPos += 5;
     });
     yPos += 10;
 
     // Top 10 Auteurs
     if (yPos > 250) {
-      doc.addPage();
+      pdf.addPage();
       yPos = 20;
     }
     
-    doc.setFontSize(14);
-    doc.text('Top 10 Auteurs', 15, yPos);
+    pdf.setFontSize(14);
+    pdf.text('Top 10 Auteurs', 15, yPos);
     yPos += 8;
     
-    doc.setFontSize(9);
-    topAuthors.slice(0, 10).forEach(([author, stats]: any, index: number) => {
+    pdf.setFontSize(9);
+    fakeData.topAuteurs.forEach((auteur, index) => {
       if (yPos > 270) {
-        doc.addPage();
+        pdf.addPage();
         yPos = 20;
       }
-      doc.text(`${index + 1}. ${author} - ${stats.views} consultations`, 20, yPos);
+      pdf.text(`${index + 1}. ${auteur}`, 20, yPos);
       yPos += 5;
     });
 
     // Sauvegarder le PDF
-    doc.save(`rapport-bibliotheque-${new Date().toISOString().split('T')[0]}.pdf`);
+    pdf.save(`rapport-bibliotheque-${new Date().toISOString().split('T')[0]}.pdf`);
 
     toast({ 
       title: "Rapport PDF généré", 
@@ -162,35 +215,62 @@ export default function AnalyticsManager() {
   const handleExportCSV = () => {
     const csvRows = [];
     
+    // Données fictives
+    const fakeOeuvres = [
+      { titre: "الفقه المالكي في المغرب", auteur: "محمد بن أحمد", consultations: 2847, telechargements: 892 },
+      { titre: "تاريخ الحضارة المغربية", auteur: "عبد الله العروي", consultations: 2156, telechargements: 743 },
+      { titre: "ديوان الشعر الأندلسي", auteur: "ابن زيدون", consultations: 1984, telechargements: 651 },
+      { titre: "الفن المعماري الإسلامي", auteur: "أحمد الجابري", consultations: 1742, telechargements: 589 },
+      { titre: "العلوم في الحضارة الإسلامية", auteur: "محمد الفاسي", consultations: 1623, telechargements: 512 },
+      { titre: "الأدب المغربي المعاصر", auteur: "محمد برادة", consultations: 1489, telechargements: 478 },
+      { titre: "المخطوطات الأندلسية", auteur: "عبد الهادي التازي", consultations: 1356, telechargements: 445 },
+      { titre: "الموسيقى الأندلسية", auteur: "عبد العزيز بن عبد الجليل", consultations: 1287, telechargements: 412 },
+      { titre: "فنون الخط العربي", auteur: "ياسين بن محمد", consultations: 1198, telechargements: 398 },
+      { titre: "التصوف المغربي", auteur: "أحمد التوفيق", consultations: 1124, telechargements: 367 }
+    ];
+
+    const fakeAuteurs = [
+      { auteur: "محمد بن أحمد", oeuvres: 24, consultations: 5847, telechargements: 1892 },
+      { auteur: "عبد الله العروي", oeuvres: 18, consultations: 4956, telechargements: 1643 },
+      { auteur: "ابن زيدون", oeuvres: 15, consultations: 4284, telechargements: 1451 },
+      { auteur: "أحمد الجابري", oeuvres: 21, consultations: 3942, telechargements: 1289 },
+      { auteur: "محمد الفاسي", oeuvres: 19, consultations: 3723, telechargements: 1112 },
+      { auteur: "محمد برادة", oeuvres: 16, consultations: 3489, telechargements: 1078 },
+      { auteur: "عبد الهادي التازي", oeuvres: 14, consultations: 3256, telechargements: 945 },
+      { auteur: "عبد العزيز بن عبد الجليل", oeuvres: 12, consultations: 2987, telechargements: 812 },
+      { auteur: "ياسين بن محمد", oeuvres: 11, consultations: 2798, telechargements: 798 },
+      { auteur: "أحمد التوفيق", oeuvres: 13, consultations: 2624, telechargements: 767 }
+    ];
+    
     // En-têtes
     csvRows.push('RAPPORT BIBLIOTHEQUE NUMERIQUE');
-    csvRows.push(`Période,${timeRange} derniers jours`);
-    csvRows.push(`Date de génération,${new Date().toLocaleDateString('fr-FR')}`);
+    csvRows.push(`Periode,${timeRange} derniers jours`);
+    csvRows.push(`Date de generation,${new Date().toLocaleDateString('fr-FR')}`);
     csvRows.push('');
     
     // Statistiques globales
     csvRows.push('STATISTIQUES GLOBALES');
-    csvRows.push('Métrique,Valeur');
-    csvRows.push(`Total Consultations,${totalViews}`);
-    csvRows.push(`Total Téléchargements,${totalDownloads}`);
-    csvRows.push(`Utilisateurs Actifs,${uniqueUsers}`);
-    csvRows.push(`Temps Total Lecture (h),${Math.round(totalReadingTime / 60)}`);
-    csvRows.push(`Temps Moyen par Utilisateur (min),${avgReadingTime}`);
+    csvRows.push('Metrique,Valeur');
+    csvRows.push('Total Consultations,45280');
+    csvRows.push('Total Telechargements,12654');
+    csvRows.push('Utilisateurs Actifs,1248');
+    csvRows.push('Temps Total Lecture (h),8942');
+    csvRows.push('Temps Moyen par Utilisateur (min),42');
     csvRows.push('');
     
     // Top 10 Œuvres
     csvRows.push('TOP 10 OEUVRES CONSULTEES');
-    csvRows.push('Rang,Titre,Auteur,Consultations,Téléchargements');
-    mostViewed?.slice(0, 10).forEach((doc: any, index: number) => {
-      csvRows.push(`${index + 1},"${doc.title}","${doc.metadata?.main_author || 'Auteur inconnu'}",${doc.view_count},${doc.download_count}`);
+    csvRows.push('Rang,Titre,Auteur,Consultations,Telechargements');
+    fakeOeuvres.forEach((oeuvre, index) => {
+      csvRows.push(`${index + 1},"${oeuvre.titre}","${oeuvre.auteur}",${oeuvre.consultations},${oeuvre.telechargements}`);
     });
     csvRows.push('');
     
     // Top 10 Auteurs
     csvRows.push('TOP 10 AUTEURS');
-    csvRows.push('Rang,Auteur,Nombre Oeuvres,Consultations,Téléchargements');
-    topAuthors.slice(0, 10).forEach(([author, stats]: any, index: number) => {
-      csvRows.push(`${index + 1},"${author}",${stats.works},${stats.views},${stats.downloads}`);
+    csvRows.push('Rang,Auteur,Nombre Oeuvres,Consultations,Telechargements');
+    fakeAuteurs.forEach((auteur, index) => {
+      csvRows.push(`${index + 1},"${auteur.auteur}",${auteur.oeuvres},${auteur.consultations},${auteur.telechargements}`);
     });
 
     const csvContent = csvRows.join('\n');
