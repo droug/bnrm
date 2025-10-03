@@ -283,7 +283,7 @@ const DigitalLibrary = () => {
                       type="button"
                       variant="secondary"
                       size="lg"
-                      className="h-16 px-4 gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-3 border-white/30 shadow-lg shrink-0 text-white"
+                      className="h-16 px-4 gap-2 bg-white/95 hover:bg-white border-3 border-gold/30 shadow-lg shrink-0"
                     >
                       <Filter className="h-5 w-5" />
                       <span className="hidden sm:inline">Filtres</span>
