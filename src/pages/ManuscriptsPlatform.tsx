@@ -384,17 +384,6 @@ export default function ManuscriptsPlatform() {
                   !canAccessManuscript(manuscript) ? 'opacity-60' : ''
                 }`}
               >
-                {/* Zellige pattern background for the card */}
-                <div 
-                  className="absolute inset-0 opacity-8 group-hover:opacity-12 transition-opacity bg-cover bg-center pointer-events-none"
-                  style={{ 
-                    backgroundImage: `url(${
-                      manuscript.language === 'Arabe' ? zelligePattern1 :
-                      manuscript.language === 'Berbère' ? zelligePattern3 :
-                      zelligePattern2
-                    })` 
-                  }}
-                ></div>
                 {manuscript.thumbnail_url && (
                   <div className="aspect-video overflow-hidden relative bg-gradient-mosaique">
                     <img
