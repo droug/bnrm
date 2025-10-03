@@ -151,9 +151,9 @@ export default function AnalyticsManager() {
 
   const totalDownloads = downloadLogs?.length || 0;
   const totalViews = contentStats?.reduce((sum: number, c: any) => sum + c.view_count, 0) || 0;
-  const uniqueUsers = new Set(downloadLogs?.map((log: any) => log.user_id).filter(Boolean)).size;
-  const totalReadingTime = Object.values(userActivityStats || {}).reduce((sum: number, u: any) => sum + u.readingTime, 0);
-  const avgReadingTime = uniqueUsers > 0 ? Math.round(totalReadingTime / uniqueUsers) : 0;
+  const uniqueUsers: number = new Set(downloadLogs?.map((log: any) => log.user_id).filter(Boolean)).size;
+  const totalReadingTime: number = (Object.values(userActivityStats || {}).reduce((sum: number, u: any) => sum + u.readingTime, 0) as number) || 0;
+  const avgReadingTime: number = uniqueUsers > 0 ? Math.round(totalReadingTime / uniqueUsers) : 0;
 
   return (
     <div className="space-y-6">
