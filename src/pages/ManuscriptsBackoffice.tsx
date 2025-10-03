@@ -6,11 +6,12 @@ import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BookOpen, Users, FileText, BarChart3, Settings, Shield, Archive, Database } from "lucide-react";
+import { BookOpen, Users, FileText, BarChart3, Settings, Shield, Archive, Database, FileSearch } from "lucide-react";
 import { ManuscriptsManager } from "@/components/manuscripts/ManuscriptsManager";
 import { ManuscriptsAnalytics } from "@/components/manuscripts/ManuscriptsAnalytics";
 import { ManuscriptsSettings } from "@/components/manuscripts/ManuscriptsSettings";
 import { ManuscriptsAccessControl } from "@/components/manuscripts/ManuscriptsAccessControl";
+import { MetadataImportManager } from "@/components/manuscripts/MetadataImportManager";
 
 export default function ManuscriptsBackoffice() {
   const { user, loading, profile } = useAuth();
@@ -44,10 +45,15 @@ export default function ManuscriptsBackoffice() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 gap-2 bg-card/50 p-2 h-auto">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 gap-2 bg-card/50 p-2 h-auto">
             <TabsTrigger value="manuscripts" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               <span className="hidden sm:inline">Manuscrits</span>
+            </TabsTrigger>
+            
+            <TabsTrigger value="metadata" className="flex items-center gap-2">
+              <FileSearch className="h-4 w-4" />
+              <span className="hidden sm:inline">Métadonnées</span>
             </TabsTrigger>
             
             <TabsTrigger value="access" className="flex items-center gap-2">
@@ -74,6 +80,10 @@ export default function ManuscriptsBackoffice() {
           <ScrollArea className="h-[calc(100vh-280px)] mt-6">
             <TabsContent value="manuscripts" className="space-y-4">
               <ManuscriptsManager />
+            </TabsContent>
+
+            <TabsContent value="metadata" className="space-y-4">
+              <MetadataImportManager />
             </TabsContent>
 
             <TabsContent value="access" className="space-y-4">
