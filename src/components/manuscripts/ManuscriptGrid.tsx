@@ -51,12 +51,12 @@ export function ManuscriptGrid({
   getStatusLabel,
   getAccessLabel,
 }: ManuscriptGridProps) {
-  // Photos réelles de manuscrits fournies par l'utilisateur
+  // Toutes les 10 photos réelles de manuscrits fournies par l'utilisateur
   const realManuscriptImages = {
-    'Arabe': [manuscrit1, manuscrit2, manuscrit3, manuscrit6, manuscrit7, manuscrit8, manuscrit9, manuscrit10],
-    'Berbère': [manuscrit11, manuscrit12, manuscrit1, manuscrit3],
-    'Latin': [manuscrit6, manuscrit7, manuscrit8, manuscrit9],
-    'Français': [manuscrit10, manuscrit11, manuscrit12, manuscrit1],
+    'Arabe': [manuscrit1, manuscrit3, manuscrit6, manuscrit8, manuscrit9],
+    'Berbère': [manuscrit2, manuscrit7, manuscrit11],
+    'Latin': [manuscrit10, manuscrit12],
+    'Français': [manuscrit1, manuscrit2, manuscrit3, manuscrit6, manuscrit7, manuscrit8, manuscrit9, manuscrit10, manuscrit11, manuscrit12],
   };
 
   const getDefaultImage = (manuscript: Manuscript) => {
