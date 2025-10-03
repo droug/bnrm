@@ -1,7 +1,8 @@
-import { Crown, Star, AlertCircle } from "lucide-react";
+import { Star, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Link } from "react-router-dom";
 import manuscriptBanner from "@/assets/manuscript-banner.jpg";
+import emblemeMaroc from "@/assets/embleme-maroc.png";
 
 interface ManuscriptHeroProps {
   userAccessLevel: string;
@@ -26,11 +27,11 @@ export function ManuscriptHero({
       
       <div className="relative z-10 text-center">
         <div className="flex items-center justify-center space-x-4 mb-6">
-          <Crown className="h-10 w-10 text-gold animate-pulse drop-shadow-lg" />
+          <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-16 w-16 object-contain drop-shadow-lg" />
           <h1 className="text-5xl font-moroccan font-bold text-white drop-shadow-2xl">
             Plateforme des Manuscrits Numérisés
           </h1>
-          <Crown className="h-10 w-10 text-gold animate-pulse drop-shadow-lg" />
+          <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-16 w-16 object-contain drop-shadow-lg" />
         </div>
         <p className="text-xl text-white/95 mb-6 max-w-3xl mx-auto drop-shadow-md font-elegant">
           Découvrez les trésors manuscrits de la BNRM et des institutions partenaires marocaines
