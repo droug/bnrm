@@ -2,6 +2,13 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Download, Calendar, User, MapPin, Lock } from "lucide-react";
+import manuscriptPage1 from "@/assets/manuscript-page-1.jpg";
+import manuscriptPage2 from "@/assets/manuscript-page-2.jpg";
+import manuscriptPage3 from "@/assets/manuscript-page-3.jpg";
+import manuscriptPage4 from "@/assets/manuscript-page-4.jpg";
+import manuscript1 from "@/assets/manuscript-1.jpg";
+import manuscript2 from "@/assets/manuscript-2.jpg";
+import manuscript3 from "@/assets/manuscript-3.jpg";
 
 interface Manuscript {
   id: string;
@@ -41,6 +48,22 @@ export function ManuscriptGrid({
   getStatusLabel,
   getAccessLabel,
 }: ManuscriptGridProps) {
+  // Photos réelles de manuscrits par langue
+  const realManuscriptImages = {
+    'Arabe': [manuscriptPage1, manuscriptPage2, manuscriptPage3, manuscriptPage4, manuscript1],
+    'Berbère': [manuscript2, manuscript3],
+    'Latin': [manuscriptPage3, manuscriptPage4],
+    'Français': [manuscript1, manuscriptPage1],
+  };
+
+  const getDefaultImage = (manuscript: Manuscript) => {
+    if (manuscript.thumbnail_url) return manuscript.thumbnail_url;
+    
+    const images = realManuscriptImages[manuscript.language as keyof typeof realManuscriptImages] || realManuscriptImages['Arabe'];
+    const index = parseInt(manuscript.id.slice(-2), 16) % images.length;
+    return images[index] || getManuscriptImage(manuscript.language, manuscript.id);
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
       {manuscripts.map((manuscript) => (
@@ -52,7 +75,7 @@ export function ManuscriptGrid({
         >
           <div className="aspect-video overflow-hidden relative bg-gradient-mosaique">
             <img
-              src={manuscript.thumbnail_url || getManuscriptImage(manuscript.language, manuscript.id)}
+              src={getDefaultImage(manuscript)}
               alt={manuscript.title}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
