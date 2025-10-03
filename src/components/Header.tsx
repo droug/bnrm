@@ -32,6 +32,11 @@ const Header = () => {
   const { user, profile } = useAuth();
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  
+  // Vérifier si on est sur une des plateformes spéciales
+  const isDigitalLibrary = location.pathname.startsWith("/digital-library");
+  const isManuscriptsPlatform = location.pathname === "/plateforme-manuscrits" || location.pathname === "/manuscripts-platform";
+  const hideNavigation = isDigitalLibrary || isManuscriptsPlatform;
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b-2 border-primary/20 shadow-lg">
@@ -145,22 +150,23 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Navigation principale ultra-compacte */}
-        <div className="flex items-center justify-between py-2">
-          {/* Retour (si pas homepage) */}
-          {!isHomePage && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => window.history.back()}
-              className="px-2"
-              title="Retour"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </Button>
-          )}
+        {/* Navigation principale ultra-compacte - cachée sur certaines plateformes */}
+        {!hideNavigation && (
+          <div className="flex items-center justify-between py-2">
+            {/* Retour (si pas homepage) */}
+            {!isHomePage && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => window.history.back()}
+                className="px-2"
+                title="Retour"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </Button>
+            )}
 
           {/* Navigation Desktop compacte avec icônes */}
           <NavigationMenu className="hidden md:flex flex-1 justify-center">
@@ -412,20 +418,23 @@ const Header = () => {
             </Button>
           </div>
         </div>
+        )}
 
         {/* Barre de recherche mobile - toujours accessible */}
-        <div className="pb-6 sm:hidden">
-          <SearchBar 
-            variant="compact"
-            showSuggestions={true}
-            className="w-full border-2 border-primary/20 rounded-xl shadow-sm"
-            placeholder="Recherche avancée..."
-          />
-        </div>
+        {!hideNavigation && (
+          <div className="pb-6 sm:hidden">
+            <SearchBar 
+              variant="compact"
+              showSuggestions={true}
+              className="w-full border-2 border-primary/20 rounded-xl shadow-sm"
+              placeholder="Recherche avancée..."
+            />
+          </div>
+        )}
       </div>
 
       {/* Menu Mobile Navigation amélioré */}
-      {isMenuOpen && (
+      {!hideNavigation && isMenuOpen && (
         <div className="md:hidden bg-background/98 backdrop-blur-lg border-t-4 border-primary/30 shadow-2xl animate-slide-in-right">
           <nav className="container mx-auto px-6 py-8 space-y-6">
             {/* Liens principaux avec icônes */}
