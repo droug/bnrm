@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import traditionalLibraryBg from "@/assets/traditional-library-bg.jpg";
+import bnrmBuildingNight from "@/assets/bnrm-building-night.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 import LegalDepositDeclaration from "@/components/LegalDepositDeclaration";
 
@@ -112,10 +112,10 @@ const Index = () => {
           
           {/* Bannière avec mosaïques et arrière-plan bibliothèque */}
           <section className="relative py-12 border-b-4 border-gold/30 overflow-hidden">
-            {/* Image de fond bibliothèque traditionnelle */}
+            {/* Image de fond - Bâtiment BNRM de nuit */}
             <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-25"
-              style={{ backgroundImage: `url(${traditionalLibraryBg})` }}
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+              style={{ backgroundImage: `url(${bnrmBuildingNight})` }}
             ></div>
             {/* Overlay avec mosaïques zellige */}
             <div className="absolute inset-0 bg-gradient-zellige-main opacity-85"></div>
