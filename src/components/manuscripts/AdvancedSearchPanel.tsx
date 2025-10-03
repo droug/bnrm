@@ -168,7 +168,7 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
             />
           </div>
 
-          <div>
+          <div className="relative">
             <Label htmlFor="status" className="text-sm font-medium">
               Statut
             </Label>
@@ -176,10 +176,10 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
               value={filters.status || 'all'}
               onValueChange={(value) => setFilters({ ...filters, status: value === 'all' ? undefined : value })}
             >
-              <SelectTrigger className="mt-1">
+              <SelectTrigger className="mt-1" id="status">
                 <SelectValue placeholder="Tous les statuts" />
               </SelectTrigger>
-              <SelectContent className="z-[100] bg-popover">
+              <SelectContent position="popper" sideOffset={5}>
                 <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="available">Disponible</SelectItem>
                 <SelectItem value="digitization">En numérisation</SelectItem>
