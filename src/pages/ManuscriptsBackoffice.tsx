@@ -37,7 +37,7 @@ export default function ManuscriptsBackoffice() {
         <div className="mb-8">
           <h1 className="text-4xl font-moroccan font-bold text-foreground mb-2 flex items-center gap-3">
             <BookOpen className="h-10 w-10 text-gold" />
-            Back-Office Manuscrits Numérisés
+            Gestion Manuscrits Numérisés
           </h1>
           <p className="text-muted-foreground text-lg">
             Gestion complète de la plateforme des manuscrits numérisés
