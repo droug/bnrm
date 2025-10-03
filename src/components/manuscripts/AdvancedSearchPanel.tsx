@@ -179,7 +179,7 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
               <SelectTrigger className="mt-1">
                 <SelectValue placeholder="Tous les statuts" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[100] bg-popover">
                 <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="available">Disponible</SelectItem>
                 <SelectItem value="digitization">En numérisation</SelectItem>
