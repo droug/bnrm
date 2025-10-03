@@ -57,13 +57,23 @@ export function ManuscriptGrid({
   };
 
   const getDefaultImage = (manuscript: Manuscript) => {
-    if (manuscript.thumbnail_url) return manuscript.thumbnail_url;
+    console.log('🖼️ Getting image for manuscript:', manuscript.title, 'Language:', manuscript.language, 'Thumbnail:', manuscript.thumbnail_url);
+    
+    if (manuscript.thumbnail_url) {
+      console.log('✅ Using thumbnail_url:', manuscript.thumbnail_url);
+      return manuscript.thumbnail_url;
+    }
     
     // Normaliser la langue pour correspondre aux clés
-    const languageKey = manuscript.language.charAt(0).toUpperCase() + manuscript.language.slice(1).toLowerCase();
+    const languageKey = manuscript.language?.charAt(0).toUpperCase() + manuscript.language?.slice(1).toLowerCase();
+    console.log('🔑 Language key:', languageKey);
+    
     const images = realManuscriptImages[languageKey as keyof typeof realManuscriptImages] || realManuscriptImages['Arabe'];
     const index = parseInt(manuscript.id.slice(-2), 16) % images.length;
-    return images[index] || getManuscriptImage(manuscript.language, manuscript.id);
+    const selectedImage = images[index] || getManuscriptImage(manuscript.language, manuscript.id);
+    
+    console.log('📸 Selected image:', selectedImage);
+    return selectedImage;
   };
 
   return (
