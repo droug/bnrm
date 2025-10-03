@@ -13,9 +13,14 @@ import Footer from "@/components/Footer";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { ProtectedWatermark } from "@/components/ui/protected-watermark";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ManuscriptGrid } from "@/components/manuscripts/ManuscriptGrid";
+import { useManuscriptSearch, SearchFilters } from "@/hooks/useManuscriptSearch";
+import { AdvancedSearchPanel } from "@/components/manuscripts/AdvancedSearchPanel";
+import { SearchResultsPanel } from "@/components/manuscripts/SearchResultsPanel";
+import { SearchPagination } from "@/components/manuscripts/SearchPagination";
+import { ManuscriptSearchBar } from "@/components/manuscripts/ManuscriptSearchBar";
 import manuscriptHero from "@/assets/manuscript-page-1.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
@@ -56,14 +61,23 @@ interface Manuscript {
 export default function ManuscriptsPlatform() {
   const { user, loading, profile } = useAuth();
   const { toast } = useToast();
-  const [manuscripts, setManuscripts] = useState<Manuscript[]>([]);
-  const [filteredManuscripts, setFilteredManuscripts] = useState<Manuscript[]>([]);
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterLanguage, setFilterLanguage] = useState("all");
-  const [filterPeriod, setFilterPeriod] = useState("all");
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [filterInstitution, setFilterInstitution] = useState("all");
-  const [isLoading, setIsLoading] = useState(true);
+  const [filters, setFilters] = useState<SearchFilters>({});
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  
+  const { 
+    results, 
+    loading: searchLoading, 
+    totalResults, 
+    page, 
+    perPage, 
+    facets,
+    search, 
+    setPage, 
+    setPerPage,
+    highlightText 
+  } = useManuscriptSearch();
 
   // Fonction pour sélectionner une image variée selon la langue
   const getManuscriptImage = (language: string, id: string) => {
@@ -87,85 +101,16 @@ export default function ManuscriptsPlatform() {
   };
 
   useEffect(() => {
-    fetchManuscripts();
+    // Effectuer la recherche initiale
+    search(searchQuery, filters);
   }, []);
 
-  useEffect(() => {
-    filterManuscripts();
-  }, [manuscripts, searchQuery, filterLanguage, filterPeriod, filterStatus, filterInstitution]);
-
-  const fetchManuscripts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('manuscripts')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setManuscripts(data || []);
-    } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les manuscrits",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSearch = () => {
+    search(searchQuery, filters, 1);
   };
 
-  const filterManuscripts = () => {
-    let filtered = manuscripts;
-
-    // Filtre basé sur le niveau d'accès et le rôle de l'utilisateur
-    filtered = filtered.filter(manuscript => {
-      // Public: accessible à tous
-      if (manuscript.access_level === 'public') return true;
-      
-      // Restreint: seulement pour les utilisateurs authentifiés avec rôle approprié
-      if (manuscript.access_level === 'restricted') {
-        return user && (
-          profile?.role === 'subscriber' || 
-          profile?.role === 'researcher' || 
-          profile?.role === 'partner' ||
-          profile?.role === 'librarian' ||
-          profile?.role === 'admin'
-        );
-      }
-      
-      // Confidentiel: seulement pour admin et librarian
-      if (manuscript.access_level === 'confidential') {
-        return profile?.role === 'admin' || profile?.role === 'librarian';
-      }
-      
-      return false;
-    });
-
-    if (searchQuery) {
-      filtered = filtered.filter(manuscript =>
-        manuscript.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        manuscript.author?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        manuscript.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    if (filterLanguage !== "all") {
-      filtered = filtered.filter(manuscript => manuscript.language === filterLanguage);
-    }
-
-    if (filterPeriod !== "all") {
-      filtered = filtered.filter(manuscript => manuscript.period === filterPeriod);
-    }
-
-    if (filterStatus !== "all") {
-      filtered = filtered.filter(manuscript => manuscript.status === filterStatus);
-    }
-
-    if (filterInstitution !== "all") {
-      filtered = filtered.filter(manuscript => manuscript.institution === filterInstitution);
-    }
-
-    setFilteredManuscripts(filtered);
+  const handleResultClick = (result: any) => {
+    navigate(`/lecteur-manuscrit/${result.id}`);
   };
 
   const canAccessManuscript = (manuscript: Manuscript) => {
@@ -234,7 +179,7 @@ export default function ManuscriptsPlatform() {
     return 'Accès public';
   };
 
-  if (loading || isLoading) {
+  if (loading || searchLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-subtle">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -306,96 +251,23 @@ export default function ManuscriptsPlatform() {
               </div>
 
               {/* Barre de recherche */}
-              <div className="max-w-4xl mx-auto">
-                <div className="relative">
-                  <Input
-                    type="search"
-                    placeholder="Rechercher par titre, auteur ou description..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-16 text-lg bg-white/98 shadow-lg border-3 border-gold/30 focus:border-white pl-6 pr-28 rounded-full"
-                  />
-                  
-                  {searchQuery && (
-                    <Button
-                      onClick={() => setSearchQuery("")}
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-16 top-1/2 -translate-y-1/2 h-10 w-10 p-0 hover:bg-destructive/10 rounded-full"
-                    >
-                      <X className="h-5 w-5 text-destructive" />
-                    </Button>
-                  )}
-                  
-                  <Button 
-                    size="lg" 
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full shadow-md bg-gradient-neutral"
-                  >
-                    <Search className="h-6 w-6" />
-                  </Button>
-                </div>
-                <p className="text-white/90 text-sm text-center font-medium mt-4">
-                  💡 Utilisez les filtres ci-dessous pour affiner votre recherche
-                </p>
-              </div>
+              <ManuscriptSearchBar 
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+              />
               
               <div className="w-48 h-2 bg-gradient-berber mx-auto rounded-full shadow-gold mt-6"></div>
             </div>
           </section>
 
-          {/* Filtres */}
+          {/* Filtres avancés */}
           <section className="mb-8">
-            <div className="flex flex-col md:flex-row gap-4 flex-wrap">
-              <Select value={filterInstitution} onValueChange={setFilterInstitution}>
-                <SelectTrigger className="w-full md:w-56 h-12 border-2 border-gold/20">
-                  <SelectValue placeholder="Institution" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Toutes les institutions</SelectItem>
-                  <SelectItem value="BNRM">BNRM</SelectItem>
-                  <SelectItem value="Bibliothèque Al Quaraouiyine">Al Quaraouiyine</SelectItem>
-                  <SelectItem value="Archives Royales">Archives Royales</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={filterLanguage} onValueChange={setFilterLanguage}>
-                <SelectTrigger className="w-full md:w-48 h-12 border-2 border-gold/20">
-                  <SelectValue placeholder="Langue" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Toutes les langues</SelectItem>
-                  <SelectItem value="arabe">Arabe</SelectItem>
-                  <SelectItem value="français">Français</SelectItem>
-                  <SelectItem value="berbère">Berbère</SelectItem>
-                  <SelectItem value="latin">Latin</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={filterPeriod} onValueChange={setFilterPeriod}>
-                <SelectTrigger className="w-full md:w-48 h-12 border-2 border-gold/20">
-                  <SelectValue placeholder="Période" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Toutes les périodes</SelectItem>
-                  <SelectItem value="médiéval">Médiéval</SelectItem>
-                  <SelectItem value="moderne">Moderne</SelectItem>
-                  <SelectItem value="contemporain">Contemporain</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-full md:w-48 h-12 border-2 border-gold/20">
-                  <SelectValue placeholder="Statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="available">Disponible</SelectItem>
-                  <SelectItem value="digitization">Numérisation</SelectItem>
-                  <SelectItem value="reserved">Réservé</SelectItem>
-                  <SelectItem value="maintenance">Maintenance</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <AdvancedSearchPanel
+              filters={filters}
+              setFilters={setFilters}
+              onSearch={handleSearch}
+              facets={facets}
+            />
           </section>
 
           {/* Résultats */}
@@ -405,13 +277,13 @@ export default function ManuscriptsPlatform() {
               Manuscrits Disponibles
             </h2>
             <p className="text-muted-foreground text-lg mb-4">
-              {filteredManuscripts.length} manuscrit(s) accessible(s) trouvé(s)
+              {totalResults} manuscrit(s) trouvé(s)
             </p>
           </section>
 
           {/* Grille des manuscrits */}
           <ManuscriptGrid
-            manuscripts={filteredManuscripts}
+            manuscripts={results as any}
             canAccessManuscript={canAccessManuscript}
             getManuscriptImage={getManuscriptImage}
             getStatusColor={getStatusColor as any}
@@ -420,26 +292,42 @@ export default function ManuscriptsPlatform() {
             getAccessLabel={getAccessLabel}
           />
 
-          {filteredManuscripts.length === 0 && !isLoading && (
+          {/* Pagination */}
+          {totalResults > 0 && (
+            <SearchPagination
+              currentPage={page}
+              totalResults={totalResults}
+              perPage={perPage}
+              onPageChange={(newPage) => {
+                setPage(newPage);
+                search(searchQuery, filters, newPage);
+              }}
+              onPerPageChange={(newPerPage) => {
+                setPerPage(newPerPage);
+                search(searchQuery, filters, 1);
+              }}
+            />
+          )}
+
+          {/* Panneau de résultats */}
+          {results.length > 0 && (
+            <SearchResultsPanel
+              results={results}
+              searchQuery={searchQuery}
+              onResultClick={handleResultClick}
+              highlightText={highlightText}
+            />
+          )}
+
+          {results.length === 0 && !searchLoading && searchQuery && (
             <div className="text-center py-16 relative">
               <div className="absolute inset-0 bg-pattern-zellige-complex opacity-10 rounded-3xl"></div>
               <div className="relative z-10">
                 <BookOpen className="h-16 w-16 text-gold mx-auto mb-6 animate-pulse" />
-                <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">Aucun manuscrit accessible trouvé</h3>
+                <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">Aucun manuscrit trouvé</h3>
                 <p className="text-muted-foreground text-lg mb-6 max-w-md mx-auto">
-                  {!user 
-                    ? "Connectez-vous pour accéder à plus de manuscrits précieux"
-                    : "Essayez de modifier vos critères de recherche ou de filtrage."
-                  }
+                  Essayez de modifier vos critères de recherche ou de filtrage.
                 </p>
-                {!user && (
-                  <Link to="/auth">
-                    <Button className="bg-gradient-neutral shadow-gold hover:shadow-moroccan transition-all duration-300">
-                      <Lock className="h-4 w-4 mr-2" />
-                      Se connecter
-                    </Button>
-                  </Link>
-                )}
               </div>
             </div>
           )}
