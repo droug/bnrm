@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -78,6 +78,13 @@ export default function AdminSettings() {
       description: "Gérer les demandes de reproduction de documents - Validation et workflow",
       href: "/admin/reproduction",
       permission: "requests.manage"
+    },
+    {
+      icon: Library,
+      title: "Bibliothèque Numérique",
+      description: "Gestion des documents numérisés, permissions et restrictions d'accès",
+      href: "/admin/digital-library",
+      permission: "content.manage"
     }
   ];
 
