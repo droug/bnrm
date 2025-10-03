@@ -12,6 +12,8 @@ import { ManuscriptsAnalytics } from "@/components/manuscripts/ManuscriptsAnalyt
 import { ManuscriptsSettings } from "@/components/manuscripts/ManuscriptsSettings";
 import { ManuscriptsAccessControl } from "@/components/manuscripts/ManuscriptsAccessControl";
 import { MetadataImportManager } from "@/components/manuscripts/MetadataImportManager";
+import { PartnerCollectionsApproval } from "@/components/manuscripts/PartnerCollectionsApproval";
+import { PartnerManuscriptSubmissions } from "@/components/manuscripts/PartnerManuscriptSubmissions";
 
 export default function ManuscriptsBackoffice() {
   const { user, loading, profile } = useAuth();
@@ -45,7 +47,7 @@ export default function ManuscriptsBackoffice() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 gap-2 bg-card/50 p-2 h-auto">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-7 gap-2 bg-card/50 p-2 h-auto">
             <TabsTrigger value="manuscripts" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               <span className="hidden sm:inline">Manuscrits</span>
@@ -56,9 +58,14 @@ export default function ManuscriptsBackoffice() {
               <span className="hidden sm:inline">Métadonnées</span>
             </TabsTrigger>
             
+            <TabsTrigger value="partners" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">Partenaires</span>
+            </TabsTrigger>
+            
             <TabsTrigger value="access" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              <span className="hidden sm:inline">Contrôle d'Accès</span>
+              <span className="hidden sm:inline">Accès</span>
             </TabsTrigger>
             
             <TabsTrigger value="analytics" className="flex items-center gap-2">
@@ -84,6 +91,13 @@ export default function ManuscriptsBackoffice() {
 
             <TabsContent value="metadata" className="space-y-4">
               <MetadataImportManager />
+            </TabsContent>
+
+            <TabsContent value="partners" className="space-y-4">
+              <PartnerCollectionsApproval />
+              <div className="mt-6">
+                <PartnerManuscriptSubmissions />
+              </div>
             </TabsContent>
 
             <TabsContent value="access" className="space-y-4">

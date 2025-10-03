@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Search, Eye, Download, Calendar, User, MapPin } from "lucide-react";
+import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Building2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import { WatermarkContainer } from "@/components/ui/watermark";
@@ -31,7 +31,7 @@ interface Manuscript {
 }
 
 export default function Manuscripts() {
-  const { user, loading } = useAuth();
+  const { user, loading, profile } = useAuth();
   const { toast } = useToast();
   const [manuscripts, setManuscripts] = useState<Manuscript[]>([]);
   const [filteredManuscripts, setFilteredManuscripts] = useState<Manuscript[]>([]);
@@ -159,13 +159,25 @@ export default function Manuscripts() {
       
       <main className="container py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-            <BookOpen className="h-8 w-8 text-primary" />
-            Collection de Manuscrits
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Explorez notre riche collection de manuscrits historiques
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                <BookOpen className="h-8 w-8 text-primary" />
+                Collection de Manuscrits
+              </h1>
+              <p className="text-muted-foreground mt-2">
+                Explorez notre riche collection de manuscrits historiques
+              </p>
+            </div>
+            {profile?.role === 'partner' && (
+              <Button asChild>
+                <a href="/partner-dashboard">
+                  <Building2 className="h-4 w-4 mr-2" />
+                  Espace Partenaire
+                </a>
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Filtres et recherche */}
