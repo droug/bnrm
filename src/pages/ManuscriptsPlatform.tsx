@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Lock, AlertCircle, Star, Sparkles, Crown, Filter, ChevronDown, X } from "lucide-react";
+import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Lock, AlertCircle, Star, Sparkles, Filter, ChevronDown, X } from "lucide-react";
+import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -218,11 +219,11 @@ export default function ManuscriptsPlatform() {
             
             <div className="relative z-10 text-center">
               <div className="flex items-center justify-center space-x-4 mb-6">
-                <Crown className="h-10 w-10 text-gold animate-pulse drop-shadow-lg" />
+                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-10 w-10 object-contain drop-shadow-lg" />
                 <h1 className="text-5xl font-moroccan font-bold text-white drop-shadow-2xl">
                   Plateforme des Manuscrits Numérisés
                 </h1>
-                <Crown className="h-10 w-10 text-gold animate-pulse drop-shadow-lg" />
+                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-10 w-10 object-contain drop-shadow-lg" />
               </div>
               <p className="text-xl text-white/95 mb-6 max-w-3xl mx-auto drop-shadow-md font-elegant">
                 Découvrez les trésors manuscrits de la BNRM et des institutions partenaires marocaines

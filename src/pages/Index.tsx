@@ -4,7 +4,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Crown, Gem, Filter, ChevronDown, X } from "lucide-react";
+import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Gem, Filter, ChevronDown, X } from "lucide-react";
+import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -128,11 +129,11 @@ const Index = () => {
             
             <div className="container mx-auto px-4 text-center relative z-10">
               <div className="flex items-center justify-center space-x-4 mb-8">
-                <Crown className="h-12 w-12 md:h-14 md:w-14 text-gold animate-pulse drop-shadow-2xl" />
+                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-12 w-12 md:h-14 md:w-14 object-contain drop-shadow-2xl" />
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-moroccan font-bold text-white drop-shadow-2xl">
                   {t('header.title')}
                 </h1>
-                <Crown className="h-12 w-12 md:h-14 md:w-14 text-gold animate-pulse drop-shadow-2xl" />
+                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-12 w-12 md:h-14 md:w-14 object-contain drop-shadow-2xl" />
               </div>
               <p className="text-2xl md:text-3xl text-white font-elegant italic mb-6 drop-shadow-2xl">
                 "Gardienne du patrimoine millénaire marocain"
