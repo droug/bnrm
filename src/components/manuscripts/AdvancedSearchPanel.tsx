@@ -91,8 +91,8 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
       </div>
 
       {showFilters && (
-        <Card className="mt-4">
-          <CardContent className="pt-6 space-y-4">
+        <Card className="mt-4 overflow-visible">
+          <CardContent className="pt-6 space-y-4 overflow-visible">
         {/* Filtres de base */}
         <div className="space-y-3">
           <div>
@@ -168,7 +168,7 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
             />
           </div>
 
-          <div className="relative z-10">
+          <div>
             <Label htmlFor="status" className="text-sm font-medium">
               Statut
             </Label>
@@ -179,7 +179,7 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
               <SelectTrigger className="mt-1" id="status">
                 <SelectValue placeholder="Tous les statuts" />
               </SelectTrigger>
-              <SelectContent position="item-aligned">
+              <SelectContent>
                 <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="available">Disponible</SelectItem>
                 <SelectItem value="digitization">En numérisation</SelectItem>
