@@ -88,14 +88,6 @@ export default function AdminSettings() {
       href: "/admin/reproduction",
       permission: "requests.manage",
       gradient: "from-red-500 to-red-600"
-    },
-    {
-      icon: BookOpenCheck,
-      title: "Bibliothèque Numérique",
-      description: "Gestion des documents numérisés, permissions et restrictions d'accès",
-      href: "/admin/digital-library",
-      permission: "content.manage",
-      gradient: "from-violet-500 to-violet-600"
     }
   ];
 
