@@ -120,7 +120,54 @@ const MyManuscriptsSpace = () => {
         .limit(20);
 
       if (error) throw error;
-      setReadingHistory(data || []);
+      
+      // Add mock data if empty
+      if (!data || data.length === 0) {
+        const mockData: ReadingHistory[] = [
+          {
+            id: '1',
+            manuscript_id: '1',
+            action_type: 'read',
+            page_number: 45,
+            created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+            manuscript: {
+              title: 'Kitab al-Shifa (Le Livre de la Guérison)',
+              author: 'Ibn Sina (Avicenne)',
+              thumbnail_url: '',
+              permalink: 'kitab-al-shifa'
+            }
+          },
+          {
+            id: '2',
+            manuscript_id: '2',
+            action_type: 'download',
+            page_number: null,
+            created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+            manuscript: {
+              title: 'Muqaddimah (Introduction à l\'Histoire universelle)',
+              author: 'Ibn Khaldoun',
+              thumbnail_url: '',
+              permalink: 'muqaddimah'
+            }
+          },
+          {
+            id: '3',
+            manuscript_id: '3',
+            action_type: 'read',
+            page_number: 12,
+            created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+            manuscript: {
+              title: 'Rihla (Le Voyage)',
+              author: 'Ibn Battuta',
+              thumbnail_url: '',
+              permalink: 'rihla'
+            }
+          }
+        ];
+        setReadingHistory(mockData);
+      } else {
+        setReadingHistory(data);
+      }
     } catch (error: any) {
       console.error("Erreur lors du chargement de l'historique:", error);
     }
@@ -135,7 +182,45 @@ const MyManuscriptsSpace = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setFavorites(data || []);
+      
+      // Add mock data if empty
+      if (!data || data.length === 0) {
+        const mockData: Favorite[] = [
+          {
+            id: '1',
+            manuscript_id: '1',
+            title: 'Al-Qanun fi al-Tibb (Canon de la Médecine)',
+            author: 'Ibn Sina (Avicenne)',
+            thumbnail_url: null,
+            created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+            content_type: 'manuscript',
+            notes: 'Référence importante pour mes recherches sur la médecine médiévale'
+          },
+          {
+            id: '2',
+            manuscript_id: '2',
+            title: 'Kitab al-Hayawan (Le Livre des Animaux)',
+            author: 'Al-Jahiz',
+            thumbnail_url: null,
+            created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+            content_type: 'manuscript',
+            notes: null
+          },
+          {
+            id: '3',
+            manuscript_id: '3',
+            title: 'Diwan de Poésie Andalouse',
+            author: 'Ibn Zaydun',
+            thumbnail_url: null,
+            created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+            content_type: 'manuscript',
+            notes: 'Belle collection de poèmes, à relire'
+          }
+        ];
+        setFavorites(mockData);
+      } else {
+        setFavorites(data);
+      }
     } catch (error: any) {
       console.error("Erreur lors du chargement des favoris:", error);
     }
@@ -152,7 +237,39 @@ const MyManuscriptsSpace = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setBookmarks(data || []);
+      
+      // Add mock data if empty
+      if (!data || data.length === 0) {
+        const mockData: Bookmark[] = [
+          {
+            id: '1',
+            manuscript_id: '1',
+            page_number: 78,
+            note: 'Chapitre intéressant sur les plantes médicinales',
+            created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+            manuscript: {
+              title: 'Kitab al-Nabat (Le Livre des Plantes)',
+              author: 'Al-Dinawari',
+              permalink: 'kitab-al-nabat'
+            }
+          },
+          {
+            id: '2',
+            manuscript_id: '2',
+            page_number: 134,
+            note: null,
+            created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+            manuscript: {
+              title: 'Al-Kitab al-Mukhtar fi Kashf al-Asrar',
+              author: 'Al-Razi',
+              permalink: 'kashf-al-asrar'
+            }
+          }
+        ];
+        setBookmarks(mockData);
+      } else {
+        setBookmarks(data);
+      }
     } catch (error: any) {
       console.error("Erreur lors du chargement des marque-pages:", error);
     }
@@ -169,7 +286,54 @@ const MyManuscriptsSpace = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setReviews(data || []);
+      
+      // Add mock data if empty
+      if (!data || data.length === 0) {
+        const mockData: Review[] = [
+          {
+            id: '1',
+            manuscript_id: '1',
+            rating: 5,
+            comment: 'Excellente numérisation, qualité d\'image exceptionnelle. Merci à la BNRM pour ce travail remarquable.',
+            status: 'approved',
+            created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            manuscript: {
+              title: 'Al-Jami\' li-Mufradat al-Adwiya wa-l-Aghdhiya',
+              author: 'Ibn al-Baytar'
+            }
+          },
+          {
+            id: '2',
+            manuscript_id: '2',
+            rating: 4,
+            comment: 'Très bon document, mais quelques pages mériteraient une meilleure résolution.',
+            status: 'pending',
+            created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+            manuscript: {
+              title: 'Kitab al-Manazir (Livre de l\'Optique)',
+              author: 'Ibn al-Haytham'
+            }
+          },
+          {
+            id: '3',
+            manuscript_id: '3',
+            rating: 5,
+            comment: 'Document précieux parfaitement préservé. Interface de lecture très intuitive.',
+            status: 'approved',
+            created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+            manuscript: {
+              title: 'Kitab Surat al-Ard (Livre de la Configuration de la Terre)',
+              author: 'Al-Khwarizmi'
+            }
+          }
+        ];
+        setReviews(mockData);
+      } else {
+        setReviews(data);
+      }
     } catch (error: any) {
       console.error("Erreur lors du chargement des évaluations:", error);
     }
