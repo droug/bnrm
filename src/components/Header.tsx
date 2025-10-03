@@ -225,7 +225,7 @@ const Header = () => {
                       {(profile?.role === 'admin' || profile?.role === 'librarian') && (
                         <NavigationMenuLink asChild>
                           <Link to="/admin/digital-library" className="block p-2 text-xs hover:bg-primary/10 rounded bg-primary/5 font-semibold">
-                            📚 Back-office Bibliothèque Numérique
+                            📚 Gestion Bibliothèque Numérique
                           </Link>
                         </NavigationMenuLink>
                       )}

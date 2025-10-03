@@ -234,7 +234,7 @@ export default function DigitalLibraryBackoffice() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Back-office Bibliothèque Numérique</h1>
+          <h1 className="text-3xl font-bold">Gestion Bibliothèque Numérique</h1>
           <p className="text-muted-foreground">Gestion centralisée des documents numérisés</p>
         </div>
       </div>
