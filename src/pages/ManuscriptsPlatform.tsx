@@ -265,22 +265,6 @@ export default function ManuscriptsPlatform() {
                   <Star key={i} className="h-5 w-5 text-gold fill-gold animate-pulse drop-shadow-lg" style={{ animationDelay: `${i * 0.15}s` }} />
                 ))}
               </div>
-              
-              {/* Indicateur de niveau d'accès */}
-              <div className="max-w-2xl mx-auto mb-8">
-                <Alert className="border-white/30 bg-white/10 backdrop-blur-md">
-                  <AlertCircle className="h-4 w-4 text-white" />
-                  <AlertTitle className="text-white font-semibold">Votre niveau d'accès</AlertTitle>
-                  <AlertDescription className="text-white/95">
-                    {getUserAccessLevel()}
-                    {!user && (
-                      <span className="ml-2">
-                        - <Link to="/auth" className="underline text-gold hover:text-gold/80">Connectez-vous</Link> pour accéder à plus de contenu
-                      </span>
-                    )}
-                  </AlertDescription>
-                </Alert>
-              </div>
 
               {/* Barre de recherche */}
               <ManuscriptSearchBar 
