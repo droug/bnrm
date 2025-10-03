@@ -1,275 +1,193 @@
 import { useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Search, X, Filter, Calendar, BookOpen, User, MapPin, Tag } from "lucide-react";
+import { Search, X, Filter, ChevronDown, ChevronUp } from "lucide-react";
+import { SearchFilters } from "@/hooks/useManuscriptSearch";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface AdvancedSearchPanelProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSearch: (filters: SearchFilters) => void;
+  filters: SearchFilters;
+  setFilters: (filters: SearchFilters) => void;
+  onSearch: () => void;
+  facets?: Record<string, Record<string, number>>;
 }
 
-export interface SearchFilters {
-  query: string;
-  author: string;
-  title: string;
-  subject: string[];
-  genre: string;
-  language: string;
-  yearFrom: string;
-  yearTo: string;
-  period: string;
-  cote: string;
-  source: string;
-  status: string;
-}
+export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: AdvancedSearchPanelProps) {
+  const [isOpen, setIsOpen] = useState(false);
 
-export function AdvancedSearchPanel({ isOpen, onClose, onSearch }: AdvancedSearchPanelProps) {
-  const [filters, setFilters] = useState<SearchFilters>({
-    query: "",
-    author: "",
-    title: "",
-    subject: [],
-    genre: "",
-    language: "",
-    yearFrom: "",
-    yearTo: "",
-    period: "",
-    cote: "",
-    source: "",
-    status: ""
-  });
-
-  const handleFilterChange = (key: keyof SearchFilters, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+  const clearFilters = () => {
+    setFilters({});
+    onSearch();
   };
 
-  const handleSearch = () => {
-    onSearch(filters);
-  };
+  const hasActiveFilters = Object.keys(filters).length > 0;
 
-  const handleReset = () => {
-    const emptyFilters: SearchFilters = {
-      query: "",
-      author: "",
-      title: "",
-      subject: [],
-      genre: "",
-      language: "",
-      yearFrom: "",
-      yearTo: "",
-      period: "",
-      cote: "",
-      source: "",
-      status: ""
-    };
-    setFilters(emptyFilters);
-    onSearch(emptyFilters);
-  };
+  const renderFacet = (title: string, facetKey: string, filterKey: keyof SearchFilters) => {
+    if (!facets || !facets[facetKey]) return null;
 
-  const activeFiltersCount = Object.values(filters).filter(v => 
-    Array.isArray(v) ? v.length > 0 : Boolean(v)
-  ).length;
+    const facetData = facets[facetKey];
+    const entries = Object.entries(facetData).filter(([key]) => key);
+    
+    if (entries.length === 0) return null;
+
+    return (
+      <div className="space-y-2">
+        <Label className="text-sm font-semibold">{title}</Label>
+        <div className="space-y-1">
+          {entries.slice(0, 10).map(([value, count]) => (
+            <button
+              key={value}
+              onClick={() => {
+                setFilters({ ...filters, [filterKey]: value });
+                onSearch();
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors ${
+                filters[filterKey] === value ? 'bg-accent font-medium' : ''
+              }`}
+            >
+              <span className="truncate">{value}</span>
+              <Badge variant="secondary" className="ml-2 shrink-0">
+                {count}
+              </Badge>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-full sm:max-w-lg">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
+    <Card className="sticky top-4">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <Filter className="h-5 w-5" />
-            Recherche Avancée
-          </SheetTitle>
-          <SheetDescription>
-            Affinez votre recherche avec plusieurs critères
-          </SheetDescription>
-        </SheetHeader>
+            Filtres de recherche
+            {hasActiveFilters && (
+              <Badge variant="secondary">{Object.keys(filters).length}</Badge>
+            )}
+          </CardTitle>
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="h-8"
+            >
+              <X className="h-4 w-4 mr-1" />
+              Effacer
+            </Button>
+          )}
+        </div>
+      </CardHeader>
 
-        <ScrollArea className="h-[calc(100vh-180px)] mt-6 pr-4">
-          <div className="space-y-6">
-            {/* Recherche plein texte */}
-            <div className="space-y-2">
-              <Label htmlFor="query" className="flex items-center gap-2">
-                <Search className="h-4 w-4" />
-                Recherche plein texte
-              </Label>
-              <Input
-                id="query"
-                placeholder="Mots-clés dans tout le contenu..."
-                value={filters.query}
-                onChange={(e) => handleFilterChange('query', e.target.value)}
-              />
-            </div>
-
-            <Separator />
-
-            {/* Titre */}
-            <div className="space-y-2">
-              <Label htmlFor="title" className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
-                Titre
-              </Label>
-              <Input
-                id="title"
-                placeholder="Titre du manuscrit..."
-                value={filters.title}
-                onChange={(e) => handleFilterChange('title', e.target.value)}
-              />
-            </div>
-
-            {/* Auteur */}
-            <div className="space-y-2">
-              <Label htmlFor="author" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Auteur
-              </Label>
-              <Input
-                id="author"
-                placeholder="Nom de l'auteur..."
-                value={filters.author}
-                onChange={(e) => handleFilterChange('author', e.target.value)}
-              />
-            </div>
-
-            {/* Langue */}
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Langue
-              </Label>
-              <Select value={filters.language} onValueChange={(v) => handleFilterChange('language', v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner une langue" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Toutes les langues</SelectItem>
-                  <SelectItem value="arabe">Arabe</SelectItem>
-                  <SelectItem value="français">Français</SelectItem>
-                  <SelectItem value="berbère">Berbère</SelectItem>
-                  <SelectItem value="latin">Latin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Genre */}
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Tag className="h-4 w-4" />
-                Genre
-              </Label>
-              <Select value={filters.genre} onValueChange={(v) => handleFilterChange('genre', v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un genre" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Tous les genres</SelectItem>
-                  <SelectItem value="littérature">Littérature</SelectItem>
-                  <SelectItem value="poésie">Poésie</SelectItem>
-                  <SelectItem value="science">Science</SelectItem>
-                  <SelectItem value="religion">Religion</SelectItem>
-                  <SelectItem value="philosophie">Philosophie</SelectItem>
-                  <SelectItem value="histoire">Histoire</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Période */}
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                Période historique
-              </Label>
-              <Select value={filters.period} onValueChange={(v) => handleFilterChange('period', v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner une période" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Toutes les périodes</SelectItem>
-                  <SelectItem value="médiéval">Médiéval</SelectItem>
-                  <SelectItem value="moderne">Moderne</SelectItem>
-                  <SelectItem value="contemporain">Contemporain</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Année de publication */}
-            <div className="space-y-2">
-              <Label>Année de publication</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="number"
-                  placeholder="De"
-                  value={filters.yearFrom}
-                  onChange={(e) => handleFilterChange('yearFrom', e.target.value)}
-                />
-                <Input
-                  type="number"
-                  placeholder="À"
-                  value={filters.yearTo}
-                  onChange={(e) => handleFilterChange('yearTo', e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Cote */}
-            <div className="space-y-2">
-              <Label htmlFor="cote">Cote</Label>
-              <Input
-                id="cote"
-                placeholder="Cote du manuscrit..."
-                value={filters.cote}
-                onChange={(e) => handleFilterChange('cote', e.target.value)}
-              />
-            </div>
-
-            {/* Source */}
-            <div className="space-y-2">
-              <Label htmlFor="source">Source</Label>
-              <Input
-                id="source"
-                placeholder="Source du manuscrit..."
-                value={filters.source}
-                onChange={(e) => handleFilterChange('source', e.target.value)}
-              />
-            </div>
-
-            {/* Statut */}
-            <div className="space-y-2">
-              <Label>Statut</Label>
-              <Select value={filters.status} onValueChange={(v) => handleFilterChange('status', v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Tous les statuts</SelectItem>
-                  <SelectItem value="available">Disponible</SelectItem>
-                  <SelectItem value="digitization">Numérisation</SelectItem>
-                  <SelectItem value="reserved">Réservé</SelectItem>
-                  <SelectItem value="maintenance">Maintenance</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+      <CardContent className="space-y-4">
+        {/* Filtres de base */}
+        <div className="space-y-3">
+          <div>
+            <Label htmlFor="author" className="text-sm font-medium">
+              Auteur
+            </Label>
+            <Input
+              id="author"
+              placeholder="Nom de l'auteur..."
+              value={filters.author || ''}
+              onChange={(e) => setFilters({ ...filters, author: e.target.value })}
+              className="mt-1"
+            />
           </div>
-        </ScrollArea>
 
-        <div className="absolute bottom-0 left-0 right-0 p-6 bg-background border-t">
-          <div className="flex gap-2">
-            <Button onClick={handleReset} variant="outline" className="flex-1">
-              <X className="h-4 w-4 mr-2" />
-              Réinitialiser
-            </Button>
-            <Button onClick={handleSearch} className="flex-1">
-              <Search className="h-4 w-4 mr-2" />
-              Rechercher {activeFiltersCount > 0 && `(${activeFiltersCount})`}
-            </Button>
+          <div>
+            <Label htmlFor="cote" className="text-sm font-medium">
+              Cote
+            </Label>
+            <Input
+              id="cote"
+              placeholder="Numéro de cote..."
+              value={filters.cote || ''}
+              onChange={(e) => setFilters({ ...filters, cote: e.target.value })}
+              className="mt-1"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="year" className="text-sm font-medium">
+              Année de publication
+            </Label>
+            <Input
+              id="year"
+              type="number"
+              placeholder="AAAA"
+              value={filters.publicationYear || ''}
+              onChange={(e) => setFilters({ ...filters, publicationYear: parseInt(e.target.value) || undefined })}
+              className="mt-1"
+            />
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+
+        {/* Filtres à facettes */}
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+          <CollapsibleTrigger asChild>
+            <Button variant="outline" className="w-full justify-between">
+              <span>Filtres par catégorie</span>
+              {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </CollapsibleTrigger>
+          
+          <CollapsibleContent className="space-y-4 mt-4">
+            {renderFacet('Langue', 'languages', 'language')}
+            {renderFacet('Période', 'periods', 'period')}
+            {renderFacet('Genre', 'genres', 'genre')}
+            {renderFacet('Auteurs', 'authors', 'author')}
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Filtres additionnels */}
+        <div className="space-y-3">
+          <div>
+            <Label htmlFor="source" className="text-sm font-medium">
+              Source
+            </Label>
+            <Input
+              id="source"
+              placeholder="Source du manuscrit..."
+              value={filters.source || ''}
+              onChange={(e) => setFilters({ ...filters, source: e.target.value })}
+              className="mt-1"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="status" className="text-sm font-medium">
+              Statut
+            </Label>
+            <Select
+              value={filters.status || 'all'}
+              onValueChange={(value) => setFilters({ ...filters, status: value === 'all' ? undefined : value })}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Tous les statuts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="available">Disponible</SelectItem>
+                <SelectItem value="digitization">En numérisation</SelectItem>
+                <SelectItem value="reserved">Réservé</SelectItem>
+                <SelectItem value="maintenance">Maintenance</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <Button onClick={onSearch} className="w-full">
+          <Search className="h-4 w-4 mr-2" />
+          Appliquer les filtres
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
