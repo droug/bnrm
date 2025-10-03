@@ -59,7 +59,9 @@ export function ManuscriptGrid({
   const getDefaultImage = (manuscript: Manuscript) => {
     if (manuscript.thumbnail_url) return manuscript.thumbnail_url;
     
-    const images = realManuscriptImages[manuscript.language as keyof typeof realManuscriptImages] || realManuscriptImages['Arabe'];
+    // Normaliser la langue pour correspondre aux clés
+    const languageKey = manuscript.language.charAt(0).toUpperCase() + manuscript.language.slice(1).toLowerCase();
+    const images = realManuscriptImages[languageKey as keyof typeof realManuscriptImages] || realManuscriptImages['Arabe'];
     const index = parseInt(manuscript.id.slice(-2), 16) % images.length;
     return images[index] || getManuscriptImage(manuscript.language, manuscript.id);
   };
