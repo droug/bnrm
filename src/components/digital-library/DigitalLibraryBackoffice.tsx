@@ -180,6 +180,13 @@ export default function DigitalLibraryBackoffice() {
       action: () => navigate('/admin/digital-library/documents')
     },
     {
+      icon: Shield,
+      title: "Gestion des comptes utilisateurs",
+      description: "Création de comptes, gestion des droits d'accès et modification des profils",
+      count: null,
+      action: () => navigate('/admin/digital-library/users')
+    },
+    {
       icon: Ban,
       title: "Restrictions de téléchargement",
       description: "Restreindre l'accès pour des utilisateurs spécifiques en cas d'abus",

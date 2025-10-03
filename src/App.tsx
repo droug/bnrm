@@ -34,6 +34,7 @@ import HelpPage from "./pages/HelpPage";
 import PreservationPage from "./pages/PreservationPage";
 import DigitalLibraryBackoffice from "./pages/DigitalLibraryBackoffice";
 import DigitalLibraryDocuments from "./pages/DigitalLibraryDocuments";
+import DigitalLibraryUsers from "./pages/DigitalLibraryUsers";
 
 
 const App = () => (
@@ -77,8 +78,9 @@ const App = () => (
         <Route path="/help" element={<HelpPage />} />
         <Route path="/aide" element={<HelpPage />} />
         <Route path="/admin/preservation" element={<PreservationPage />} />
-        <Route path="/admin/digital-library" element={<DigitalLibraryBackoffice />} />
-        <Route path="/admin/digital-library/documents" element={<DigitalLibraryDocuments />} />
+          <Route path="/admin/digital-library" element={<DigitalLibraryBackoffice />} />
+          <Route path="/admin/digital-library/documents" element={<DigitalLibraryDocuments />} />
+          <Route path="/admin/digital-library/users" element={<DigitalLibraryUsers />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
