@@ -1241,6 +1241,80 @@ export type Database = {
           },
         ]
       }
+      exhibition_resources: {
+        Row: {
+          added_at: string | null
+          content_id: string | null
+          display_order: number | null
+          exhibition_id: string | null
+          id: string
+        }
+        Insert: {
+          added_at?: string | null
+          content_id?: string | null
+          display_order?: number | null
+          exhibition_id?: string | null
+          id?: string
+        }
+        Update: {
+          added_at?: string | null
+          content_id?: string | null
+          display_order?: number | null
+          exhibition_id?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exhibition_resources_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exhibition_resources_exhibition_id_fkey"
+            columns: ["exhibition_id"]
+            isOneToOne: false
+            referencedRelation: "virtual_exhibitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exhibition_visits: {
+        Row: {
+          exhibition_id: string | null
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+          user_id: string | null
+          visited_at: string | null
+        }
+        Insert: {
+          exhibition_id?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+          visited_at?: string | null
+        }
+        Update: {
+          exhibition_id?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+          visited_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exhibition_visits_exhibition_id_fkey"
+            columns: ["exhibition_id"]
+            isOneToOne: false
+            referencedRelation: "virtual_exhibitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       faqs: {
         Row: {
           answer: string
@@ -3164,6 +3238,45 @@ export type Database = {
           },
         ]
       }
+      virtual_exhibitions: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          end_date: string
+          id: string
+          is_active: boolean | null
+          start_date: string
+          title: string
+          updated_at: string | null
+          visitor_count: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date: string
+          id?: string
+          is_active?: boolean | null
+          start_date: string
+          title: string
+          updated_at?: string | null
+          visitor_count?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date?: string
+          id?: string
+          is_active?: boolean | null
+          start_date?: string
+          title?: string
+          updated_at?: string | null
+          visitor_count?: number | null
+        }
+        Relationships: []
+      }
       workflow_instances: {
         Row: {
           completed_at: string | null
@@ -3442,6 +3555,10 @@ export type Database = {
       get_user_role: {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["user_role"]
+      }
+      increment_exhibition_visitors: {
+        Args: { exhibition_uuid: string }
+        Returns: undefined
       }
       insert_activity_log: {
         Args: {
