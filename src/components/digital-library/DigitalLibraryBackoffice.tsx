@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Upload, Trash2, Eye, EyeOff, Download, Share2, Mail, AlertCircle, FileText, Library, Ban, Shield, Calendar, BarChart3, Image } from "lucide-react";
+import { Plus, Upload, Trash2, Eye, EyeOff, Download, Share2, Mail, AlertCircle, FileText, Library, Ban, Shield, Calendar, BarChart3, Image, Copy } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 
@@ -199,6 +199,13 @@ export default function DigitalLibraryBackoffice() {
       description: "Statistiques, tendances et documents les plus populaires",
       count: null,
       action: () => navigate('/admin/digital-library/analytics')
+    },
+    {
+      icon: Copy,
+      title: "Gestion des demandes de reproduction",
+      description: "Enregistrement, suivi et validation des demandes de reproduction",
+      count: null,
+      action: () => navigate('/admin/digital-library/reproduction')
     },
     {
       icon: Ban,

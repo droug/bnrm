@@ -37,6 +37,7 @@ import DigitalLibraryDocuments from "./pages/DigitalLibraryDocuments";
 import DigitalLibraryUsers from "./pages/DigitalLibraryUsers";
 import DigitalLibraryAnalytics from "./pages/DigitalLibraryAnalytics";
 import DigitalLibraryExhibitions from "./pages/DigitalLibraryExhibitions";
+import DigitalLibraryReproduction from "./pages/DigitalLibraryReproduction";
 
 
 const App = () => (
@@ -85,6 +86,7 @@ const App = () => (
           <Route path="/admin/digital-library/users" element={<DigitalLibraryUsers />} />
           <Route path="/admin/digital-library/analytics" element={<DigitalLibraryAnalytics />} />
           <Route path="/admin/digital-library/exhibitions" element={<DigitalLibraryExhibitions />} />
+          <Route path="/admin/digital-library/reproduction" element={<DigitalLibraryReproduction />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
