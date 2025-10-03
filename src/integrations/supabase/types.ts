@@ -2272,6 +2272,197 @@ export type Database = {
           },
         ]
       }
+      partner_collections: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          contact_email: string
+          contact_person: string
+          contact_phone: string | null
+          created_at: string | null
+          created_by: string
+          description: string | null
+          id: string
+          institution_code: string
+          institution_name: string
+          is_approved: boolean | null
+          logo_url: string | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          contact_email: string
+          contact_person: string
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          id?: string
+          institution_code: string
+          institution_name: string
+          is_approved?: boolean | null
+          logo_url?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          contact_email?: string
+          contact_person?: string
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          id?: string
+          institution_code?: string
+          institution_name?: string
+          is_approved?: boolean | null
+          logo_url?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      partner_manuscript_submissions: {
+        Row: {
+          approved_at: string | null
+          author: string | null
+          collection_id: string | null
+          condition_notes: string | null
+          created_at: string | null
+          description: string | null
+          digital_files: Json | null
+          dimensions: string | null
+          id: string
+          inventory_number: string | null
+          language: string
+          manuscript_id: string | null
+          material: string | null
+          metadata: Json | null
+          page_count: number | null
+          period: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          revision_notes: string | null
+          submission_status: string | null
+          submitted_by: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          author?: string | null
+          collection_id?: string | null
+          condition_notes?: string | null
+          created_at?: string | null
+          description?: string | null
+          digital_files?: Json | null
+          dimensions?: string | null
+          id?: string
+          inventory_number?: string | null
+          language: string
+          manuscript_id?: string | null
+          material?: string | null
+          metadata?: Json | null
+          page_count?: number | null
+          period?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          revision_notes?: string | null
+          submission_status?: string | null
+          submitted_by: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          author?: string | null
+          collection_id?: string | null
+          condition_notes?: string | null
+          created_at?: string | null
+          description?: string | null
+          digital_files?: Json | null
+          dimensions?: string | null
+          id?: string
+          inventory_number?: string | null
+          language?: string
+          manuscript_id?: string | null
+          material?: string | null
+          metadata?: Json | null
+          page_count?: number | null
+          period?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          revision_notes?: string | null
+          submission_status?: string | null
+          submitted_by?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_manuscript_submissions_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "partner_collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_manuscript_submissions_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_submission_history: {
+        Row: {
+          action: string
+          comments: string | null
+          created_at: string | null
+          id: string
+          new_status: string | null
+          old_status: string | null
+          performed_by: string | null
+          submission_id: string | null
+        }
+        Insert: {
+          action: string
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          new_status?: string | null
+          old_status?: string | null
+          performed_by?: string | null
+          submission_id?: string | null
+        }
+        Update: {
+          action?: string
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          new_status?: string | null
+          old_status?: string | null
+          performed_by?: string | null
+          submission_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_submission_history_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "partner_manuscript_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permissions: {
         Row: {
           category: string
