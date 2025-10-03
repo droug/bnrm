@@ -757,18 +757,27 @@ export type Database = {
           author_id: string
           content_body: string
           content_type: Database["public"]["Enums"]["content_type"]
+          copyright_derogation: boolean | null
+          copyright_expires_at: string | null
           created_at: string | null
+          download_enabled: boolean | null
+          email_share_enabled: boolean | null
           end_date: string | null
           excerpt: string | null
           featured_image_url: string | null
+          file_size_mb: number | null
+          file_type: string | null
+          file_url: string | null
           id: string
           is_featured: boolean | null
+          is_visible: boolean | null
           location: string | null
           meta_description: string | null
           meta_title: string | null
           published_at: string | null
           seo_keywords: string[] | null
           slug: string
+          social_share_enabled: boolean | null
           start_date: string | null
           status: Database["public"]["Enums"]["content_status"] | null
           tags: string[] | null
@@ -780,18 +789,27 @@ export type Database = {
           author_id: string
           content_body: string
           content_type: Database["public"]["Enums"]["content_type"]
+          copyright_derogation?: boolean | null
+          copyright_expires_at?: string | null
           created_at?: string | null
+          download_enabled?: boolean | null
+          email_share_enabled?: boolean | null
           end_date?: string | null
           excerpt?: string | null
           featured_image_url?: string | null
+          file_size_mb?: number | null
+          file_type?: string | null
+          file_url?: string | null
           id?: string
           is_featured?: boolean | null
+          is_visible?: boolean | null
           location?: string | null
           meta_description?: string | null
           meta_title?: string | null
           published_at?: string | null
           seo_keywords?: string[] | null
           slug: string
+          social_share_enabled?: boolean | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["content_status"] | null
           tags?: string[] | null
@@ -803,18 +821,27 @@ export type Database = {
           author_id?: string
           content_body?: string
           content_type?: Database["public"]["Enums"]["content_type"]
+          copyright_derogation?: boolean | null
+          copyright_expires_at?: string | null
           created_at?: string | null
+          download_enabled?: boolean | null
+          email_share_enabled?: boolean | null
           end_date?: string | null
           excerpt?: string | null
           featured_image_url?: string | null
+          file_size_mb?: number | null
+          file_type?: string | null
+          file_url?: string | null
           id?: string
           is_featured?: boolean | null
+          is_visible?: boolean | null
           location?: string | null
           meta_description?: string | null
           meta_title?: string | null
           published_at?: string | null
           seo_keywords?: string[] | null
           slug?: string
+          social_share_enabled?: boolean | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["content_status"] | null
           tags?: string[] | null
@@ -1131,6 +1158,85 @@ export type Database = {
             columns: ["request_id"]
             isOneToOne: false
             referencedRelation: "legal_deposit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      download_logs: {
+        Row: {
+          content_id: string
+          downloaded_at: string | null
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          content_id: string
+          downloaded_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          content_id?: string
+          downloaded_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "download_logs_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      download_restrictions: {
+        Row: {
+          content_id: string | null
+          created_at: string | null
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          reason: string | null
+          restricted_at: string | null
+          restriction_type: string
+          user_id: string
+        }
+        Insert: {
+          content_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          reason?: string | null
+          restricted_at?: string | null
+          restriction_type: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          reason?: string | null
+          restricted_at?: string | null
+          restriction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "download_restrictions_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
             referencedColumns: ["id"]
           },
         ]
@@ -3268,6 +3374,10 @@ export type Database = {
       calculate_reproduction_total: {
         Args: { request_uuid: string }
         Returns: number
+      }
+      can_user_download: {
+        Args: { p_content_id: string; p_user_id: string }
+        Returns: boolean
       }
       cleanup_old_activity_logs: {
         Args: Record<PropertyKey, never>
