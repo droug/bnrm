@@ -6,11 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Building2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Building2, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { ProtectedWatermark } from "@/components/ui/protected-watermark";
+import { PartnerCollectionForm } from "@/components/partner/PartnerCollectionForm";
 
 interface Manuscript {
   id: string;
@@ -40,6 +42,7 @@ export default function Manuscripts() {
   const [filterPeriod, setFilterPeriod] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
+  const [partnerDialogOpen, setPartnerDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchManuscripts();
@@ -169,14 +172,32 @@ export default function Manuscripts() {
                 Explorez notre riche collection de manuscrits historiques
               </p>
             </div>
-            {profile?.role === 'partner' && (
-              <Button asChild>
-                <a href="/partner-dashboard">
-                  <Building2 className="h-4 w-4 mr-2" />
-                  Espace Partenaire
-                </a>
-              </Button>
-            )}
+            <div className="flex gap-2">
+              {user && (
+                <Dialog open={partnerDialogOpen} onOpenChange={setPartnerDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline">
+                      <Users className="h-4 w-4 mr-2" />
+                      Devenir Partenaire
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Demande de Partenariat BNRM</DialogTitle>
+                    </DialogHeader>
+                    <PartnerCollectionForm onSuccess={() => setPartnerDialogOpen(false)} />
+                  </DialogContent>
+                </Dialog>
+              )}
+              {profile?.role === 'partner' && (
+                <Button asChild>
+                  <a href="/partner-dashboard">
+                    <Building2 className="h-4 w-4 mr-2" />
+                    Espace Partenaire
+                  </a>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
