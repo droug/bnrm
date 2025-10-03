@@ -295,7 +295,7 @@ const DigitalLibrary = () => {
                       )}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-64 bg-background border-border z-50 shadow-xl">
+                  <DropdownMenuContent align="start" className="w-64 bg-white/10 backdrop-blur-md border-white/30 z-50 shadow-xl text-white">
                     <DropdownMenuLabel className="text-base">Filtrer par critère</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     
