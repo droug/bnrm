@@ -82,54 +82,100 @@ export function ReproductionRequestForm() {
     setIsSubmitting(true);
 
     try {
-      // Create the request
-      const { data: request, error: requestError } = await supabase
-        .from("reproduction_requests")
-        .insert([{
-          reproduction_modality: modality,
-          status: "soumise",
-          submitted_at: new Date().toISOString(),
-          user_notes: userNotes,
-          supporting_documents: supportingDocs.map(f => ({ name: f.name, size: f.size })),
-        }] as any)
-        .select()
-        .single();
+      // Pour chaque item, vérifier l'institution et router la demande
+      for (const item of items) {
+        if (item.manuscript_id) {
+          // Appeler l'edge function pour router la demande
+          const { data: routingResult, error: routingError } = await supabase.functions.invoke(
+            'route-reproduction-request',
+            {
+              body: {
+                manuscript_id: item.manuscript_id,
+                user_id: user.id,
+                request_type: modality,
+                format: item.formats[0],
+                pages: item.pages_specification,
+                quantity: item.quantity,
+                notes: userNotes,
+              }
+            }
+          );
 
-      if (requestError) throw requestError;
+          if (routingError) {
+            console.error('Erreur routage:', routingError);
+            throw routingError;
+          }
 
-      // Add items
-      const itemsToInsert = items.map(item => ({
-        request_id: request.id,
-        title: item.title,
-        reference: item.reference || null,
-        content_id: item.content_id || null,
-        manuscript_id: item.manuscript_id || null,
-        formats: item.formats as any,
-        pages_specification: item.pages_specification || null,
-        color_mode: item.color_mode,
-        resolution_dpi: item.resolution_dpi,
-        quantity: item.quantity,
-      }));
+          console.log('Résultat routage:', routingResult);
 
-      const { error: itemsError } = await supabase
-        .from("reproduction_items")
-        .insert(itemsToInsert as any);
+          // Si la demande nécessite une redirection vers une institution partenaire
+          if (!routingResult.request_created && routingResult.redirect_url) {
+            toast.info(
+              language === "ar"
+                ? `سيتم معالجة طلبك من قبل ${routingResult.target_service}`
+                : routingResult.message
+            );
+            
+            // Redirection après un court délai
+            setTimeout(() => {
+              if (routingResult.redirect_url.startsWith('http')) {
+                window.location.href = routingResult.redirect_url;
+              } else {
+                navigate(routingResult.redirect_url);
+              }
+            }, 2000);
+            
+            setIsSubmitting(false);
+            return;
+          }
 
-      if (itemsError) throw itemsError;
+          // Si la demande a été créée dans le système BNRM
+          if (routingResult.request_created) {
+            toast.success(
+              language === "ar"
+                ? `تم إرسال الطلب بنجاح إلى ${routingResult.target_service}`
+                : routingResult.message
+            );
+          }
+        } else {
+          // Pour les contenus non-manuscrits, utiliser le flux normal
+          const { data: request, error: requestError } = await supabase
+            .from("reproduction_requests")
+            .insert([{
+              reproduction_modality: modality,
+              status: "soumise",
+              submitted_at: new Date().toISOString(),
+              user_notes: userNotes,
+              supporting_documents: supportingDocs.map(f => ({ name: f.name, size: f.size })),
+            }] as any)
+            .select()
+            .single();
 
-      // Create workflow steps
-      const workflowSteps = [
-        { request_id: request.id, step_name: "Validation service", step_number: 1, status: "en_attente" },
-        { request_id: request.id, step_name: "Validation responsable", step_number: 2, status: "en_attente" },
-      ];
+          if (requestError) throw requestError;
 
-      await supabase.from("reproduction_workflow_steps").insert(workflowSteps);
+          const { error: itemsError } = await supabase
+            .from("reproduction_items")
+            .insert([{
+              request_id: request.id,
+              title: item.title,
+              reference: item.reference || null,
+              content_id: item.content_id || null,
+              formats: item.formats as any,
+              pages_specification: item.pages_specification || null,
+              color_mode: item.color_mode,
+              resolution_dpi: item.resolution_dpi,
+              quantity: item.quantity,
+            }] as any);
 
-      toast.success(
-        language === "ar"
-          ? `تم إرسال الطلب بنجاح. رقم الطلب: ${request.request_number}`
-          : `Demande soumise avec succès. Numéro: ${request.request_number}`
-      );
+          if (itemsError) throw itemsError;
+
+          toast.success(
+            language === "ar"
+              ? `تم إرسال الطلب بنجاح. رقم الطلب: ${request.request_number}`
+              : `Demande soumise avec succès. Numéro: ${request.request_number}`
+          );
+        }
+      }
 
       navigate("/my-library");
     } catch (error: any) {
