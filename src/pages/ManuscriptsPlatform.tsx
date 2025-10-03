@@ -15,6 +15,7 @@ import { ProtectedWatermark } from "@/components/ui/protected-watermark";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Link } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ManuscriptGrid } from "@/components/manuscripts/ManuscriptGrid";
 import manuscriptHero from "@/assets/manuscript-page-1.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
@@ -409,107 +410,15 @@ export default function ManuscriptsPlatform() {
           </section>
 
           {/* Grille des manuscrits */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
-            {filteredManuscripts.map((manuscript) => (
-              <Card 
-                key={manuscript.id} 
-                className={`overflow-hidden hover:shadow-moroccan transition-all duration-500 bg-card/50 backdrop-blur border-2 border-gold/20 hover:border-gold/40 group relative ${
-                  !canAccessManuscript(manuscript) ? 'opacity-60' : ''
-                }`}
-              >
-                <div className="aspect-video overflow-hidden relative bg-gradient-mosaique">
-                  <img
-                    src={manuscript.thumbnail_url || getManuscriptImage(manuscript.language, manuscript.id)}
-                    alt={manuscript.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  {!canAccessManuscript(manuscript) && (
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                      <Lock className="h-12 w-12 text-white drop-shadow-lg" />
-                    </div>
-                  )}
-                </div>
-                
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start gap-2">
-                    <CardTitle className="text-lg leading-tight">{manuscript.title}</CardTitle>
-                    <div className="flex gap-1 flex-wrap">
-                      <Badge variant={getStatusColor(manuscript.status)} className="text-xs">
-                        {getStatusLabel(manuscript.status)}
-                      </Badge>
-                      <Badge variant={getAccessLevelColor(manuscript.access_level)} className="text-xs">
-                        {getAccessLabel(manuscript.access_level)}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  {manuscript.author && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <User className="h-3 w-3" />
-                      {manuscript.author}
-                    </div>
-                  )}
-
-                  {manuscript.institution && (
-                    <div className="flex items-center gap-2 text-xs text-primary font-medium">
-                      <MapPin className="h-3 w-3" />
-                      {manuscript.institution}
-                    </div>
-                  )}
-                </CardHeader>
-
-                <CardContent className="space-y-3">
-                  {manuscript.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {manuscript.description}
-                    </p>
-                  )}
-
-                  <div className="space-y-2 text-xs text-muted-foreground">
-                    {manuscript.language && (
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-3 w-3" />
-                        Langue: {manuscript.language}
-                      </div>
-                    )}
-                    
-                    {manuscript.period && (
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-3 w-3" />
-                        Période: {manuscript.period}
-                      </div>
-                    )}
-                    
-                    {manuscript.inventory_number && (
-                      <div>N° inventaire: {manuscript.inventory_number}</div>
-                    )}
-                  </div>
-
-                  <div className="flex gap-2 pt-2">
-                    {canAccessManuscript(manuscript) ? (
-                      <>
-                        <Button size="sm" variant="outline" className="flex-1">
-                          <Eye className="h-3 w-3 mr-1" />
-                          Consulter
-                        </Button>
-                        
-                        {manuscript.digital_copy_url && (
-                          <Button size="sm" variant="outline">
-                            <Download className="h-3 w-3" />
-                          </Button>
-                        )}
-                      </>
-                    ) : (
-                      <Button size="sm" variant="outline" className="flex-1" disabled>
-                        <Lock className="h-3 w-3 mr-1" />
-                        Accès restreint
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <ManuscriptGrid
+            manuscripts={filteredManuscripts}
+            canAccessManuscript={canAccessManuscript}
+            getManuscriptImage={getManuscriptImage}
+            getStatusColor={getStatusColor as any}
+            getAccessLevelColor={getAccessLevelColor as any}
+            getStatusLabel={getStatusLabel}
+            getAccessLabel={getAccessLabel}
+          />
 
           {filteredManuscripts.length === 0 && !isLoading && (
             <div className="text-center py-16 relative">
