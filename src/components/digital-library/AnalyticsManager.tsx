@@ -1,5 +1,6 @@
 import { useState } from "react";
 import jsPDF from "jspdf";
+import logoImage from "@/assets/logo-bnrm.png";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -104,9 +105,20 @@ export default function AnalyticsManager() {
   const handleExportPDF = () => {
     const pdf = new jsPDF();
     const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
     let yPos = 20;
 
-    // Données fictives
+    // Couleurs du design system (Zellige Marocain)
+    const colors = {
+      primary: [59, 85, 135],      // Bleu Zellige
+      accent: [69, 113, 102],       // Vert Olive
+      gold: [172, 145, 107],        // Or Ancien
+      text: [51, 43, 38],           // Texte principal
+      textLight: [102, 92, 84],     // Texte secondaire
+      background: [247, 244, 240]   // Fond
+    };
+
+    // Données fictives en français (pour éviter les problèmes d'encodage)
     const fakeData = {
       consultations: 45280,
       telechargements: 12654,
@@ -114,94 +126,216 @@ export default function AnalyticsManager() {
       tempsTotal: 8942,
       tempsMoyen: 42,
       topOeuvres: [
-        "الفقه المالكي في المغرب - 2847 consultations",
-        "تاريخ الحضارة المغربية - 2156 consultations",
-        "ديوان الشعر الأندلسي - 1984 consultations",
-        "الفن المعماري الإسلامي - 1742 consultations",
-        "العلوم في الحضارة الإسلامية - 1623 consultations",
-        "الأدب المغربي المعاصر - 1489 consultations",
-        "المخطوطات الأندلسية - 1356 consultations",
-        "الموسيقى الأندلسية - 1287 consultations",
-        "فنون الخط العربي - 1198 consultations",
-        "التصوف المغربي - 1124 consultations"
+        { titre: "Le Fiqh Malikite au Maroc", auteur: "Mohamed Ben Ahmed", vues: 2847 },
+        { titre: "Histoire de la Civilisation Marocaine", auteur: "Abdellah Laroui", vues: 2156 },
+        { titre: "Recueil de Poésie Andalouse", auteur: "Ibn Zaydoun", vues: 1984 },
+        { titre: "Architecture Islamique", auteur: "Ahmed Al-Jabri", vues: 1742 },
+        { titre: "Sciences dans la Civilisation Islamique", auteur: "Mohamed Al-Fassi", vues: 1623 },
+        { titre: "Littérature Marocaine Contemporaine", auteur: "Mohamed Berrada", vues: 1489 },
+        { titre: "Manuscrits Andalous", auteur: "Abdelhai Tazi", vues: 1356 },
+        { titre: "Musique Andalouse", auteur: "Abdelaziz Ben Abdeljalil", vues: 1287 },
+        { titre: "Arts de la Calligraphie Arabe", auteur: "Yassine Ben Mohamed", vues: 1198 },
+        { titre: "Soufisme Marocain", auteur: "Ahmed Toufiq", vues: 1124 }
       ],
       topAuteurs: [
-        "محمد بن أحمد - 5847 consultations",
-        "عبد الله العروي - 4956 consultations",
-        "ابن زيدون - 4284 consultations",
-        "أحمد الجابري - 3942 consultations",
-        "محمد الفاسي - 3723 consultations",
-        "محمد برادة - 3489 consultations",
-        "عبد الهادي التازي - 3256 consultations",
-        "عبد العزيز بن عبد الجليل - 2987 consultations",
-        "ياسين بن محمد - 2798 consultations",
-        "أحمد التوفيق - 2624 consultations"
+        { nom: "Mohamed Ben Ahmed", oeuvres: 24, vues: 5847 },
+        { nom: "Abdellah Laroui", oeuvres: 18, vues: 4956 },
+        { nom: "Ibn Zaydoun", oeuvres: 15, vues: 4284 },
+        { nom: "Ahmed Al-Jabri", oeuvres: 21, vues: 3942 },
+        { nom: "Mohamed Al-Fassi", oeuvres: 19, vues: 3723 },
+        { nom: "Mohamed Berrada", oeuvres: 16, vues: 3489 },
+        { nom: "Abdelhai Tazi", oeuvres: 14, vues: 3256 },
+        { nom: "Abdelaziz Ben Abdeljalil", oeuvres: 12, vues: 2987 },
+        { nom: "Yassine Ben Mohamed", oeuvres: 11, vues: 2798 },
+        { nom: "Ahmed Toufiq", oeuvres: 13, vues: 2624 }
       ]
     };
 
-    // Titre
-    pdf.setFontSize(18);
-    pdf.text('Rapport Bibliotheque Numerique', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 10;
+    // Fonction pour ajouter le header avec logo
+    const addHeader = (isFirstPage = false) => {
+      // Fond coloré pour l'en-tête
+      pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.rect(0, 0, pageWidth, 35, 'F');
+      
+      // Logo (si première page)
+      if (isFirstPage) {
+        const img = new Image();
+        img.src = logoImage;
+        try {
+          pdf.addImage(img, 'PNG', 15, 8, 25, 20);
+        } catch (e) {
+          console.log('Logo non chargé');
+        }
+      }
+      
+      // Titre
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(isFirstPage ? 20 : 14);
+      pdf.text(isFirstPage ? 'Bibliothèque Nationale du Royaume du Maroc' : 'BNRM - Rapport Statistiques', isFirstPage ? 45 : 15, 18);
+      
+      if (isFirstPage) {
+        pdf.setFontSize(12);
+        pdf.text('Rapport Statistiques et Analyses', 45, 26);
+      }
+      
+      return 45;
+    };
+
+    // Fonction pour ajouter le footer
+    const addFooter = (pageNum: number) => {
+      pdf.setFillColor(colors.background[0], colors.background[1], colors.background[2]);
+      pdf.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+      
+      pdf.setTextColor(colors.textLight[0], colors.textLight[1], colors.textLight[2]);
+      pdf.setFontSize(9);
+      pdf.text(`Page ${pageNum}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
+      pdf.text(`Généré le ${new Date().toLocaleDateString('fr-FR')}`, pageWidth - 15, pageHeight - 8, { align: 'right' });
+    };
+
+    // Page 1 - En-tête et informations générales
+    yPos = addHeader(true);
     
-    pdf.setFontSize(10);
-    pdf.text(`Periode: ${timeRange} derniers jours`, pageWidth / 2, yPos, { align: 'center' });
-    yPos += 5;
-    pdf.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, pageWidth / 2, yPos, { align: 'center' });
+    // Période
+    pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+    pdf.setFontSize(11);
+    pdf.text(`Période d'analyse : ${timeRange} derniers jours`, 15, yPos);
     yPos += 15;
 
-    // Statistiques globales
+    // Section Statistiques Globales avec encadré coloré
+    pdf.setFillColor(colors.accent[0], colors.accent[1], colors.accent[2]);
+    pdf.roundedRect(15, yPos - 5, pageWidth - 30, 55, 3, 3, 'F');
+    
+    pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(14);
-    pdf.text('Statistiques Globales', 15, yPos);
-    yPos += 8;
+    pdf.text('Statistiques Globales', 20, yPos + 3);
     
     pdf.setFontSize(10);
-    pdf.text(`Total Consultations: ${fakeData.consultations.toLocaleString()}`, 20, yPos);
-    yPos += 6;
-    pdf.text(`Total Telechargements: ${fakeData.telechargements.toLocaleString()}`, 20, yPos);
-    yPos += 6;
-    pdf.text(`Utilisateurs Actifs: ${fakeData.utilisateurs}`, 20, yPos);
-    yPos += 6;
-    pdf.text(`Temps Total Lecture: ${fakeData.tempsTotal}h`, 20, yPos);
-    yPos += 6;
-    pdf.text(`Temps Moyen par Utilisateur: ${fakeData.tempsMoyen} min`, 20, yPos);
+    pdf.setTextColor(255, 255, 255);
     yPos += 12;
-
-    // Top 10 Œuvres Consultées
+    
+    // Statistiques en colonnes
+    const statY = yPos;
+    pdf.text(`Consultations`, 20, statY);
+    pdf.setFontSize(16);
+    pdf.text(`${fakeData.consultations.toLocaleString()}`, 20, statY + 7);
+    
+    pdf.setFontSize(10);
+    pdf.text(`Téléchargements`, 75, statY);
+    pdf.setFontSize(16);
+    pdf.text(`${fakeData.telechargements.toLocaleString()}`, 75, statY + 7);
+    
+    pdf.setFontSize(10);
+    pdf.text(`Utilisateurs actifs`, 130, statY);
+    pdf.setFontSize(16);
+    pdf.text(`${fakeData.utilisateurs}`, 130, statY + 7);
+    
+    yPos += 20;
+    
+    pdf.setFontSize(10);
+    pdf.text(`Temps total de lecture`, 20, yPos);
     pdf.setFontSize(14);
-    pdf.text('Top 10 Oeuvres Consultees', 15, yPos);
-    yPos += 8;
+    pdf.text(`${fakeData.tempsTotal}h`, 20, yPos + 7);
+    
+    pdf.setFontSize(10);
+    pdf.text(`Temps moyen / utilisateur`, 75, yPos);
+    pdf.setFontSize(14);
+    pdf.text(`${fakeData.tempsMoyen} min`, 75, yPos + 7);
+    
+    yPos += 25;
+
+    // Top 10 Œuvres les plus consultées
+    pdf.setFillColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+    pdf.roundedRect(15, yPos, pageWidth - 30, 10, 2, 2, 'F');
+    pdf.setTextColor(colors.text[0], colors.text[1], colors.text[2]);
+    pdf.setFontSize(13);
+    pdf.text('Top 10 des Oeuvres les Plus Consultées', 20, yPos + 7);
+    yPos += 15;
     
     pdf.setFontSize(9);
+    pdf.setTextColor(colors.textLight[0], colors.textLight[1], colors.textLight[2]);
+    
     fakeData.topOeuvres.forEach((oeuvre, index) => {
-      if (yPos > 270) {
+      if (yPos > pageHeight - 30) {
+        addFooter(1);
         pdf.addPage();
-        yPos = 20;
+        yPos = addHeader(false);
+        yPos += 10;
       }
-      pdf.text(`${index + 1}. ${oeuvre}`, 20, yPos);
-      yPos += 5;
+      
+      // Ligne alternée
+      if (index % 2 === 0) {
+        pdf.setFillColor(colors.background[0], colors.background[1], colors.background[2]);
+        pdf.rect(15, yPos - 4, pageWidth - 30, 8, 'F');
+      }
+      
+      pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.setFontSize(10);
+      pdf.text(`${index + 1}.`, 18, yPos);
+      
+      pdf.setTextColor(colors.text[0], colors.text[1], colors.text[2]);
+      pdf.text(oeuvre.titre.substring(0, 50), 25, yPos);
+      
+      pdf.setTextColor(colors.textLight[0], colors.textLight[1], colors.textLight[2]);
+      pdf.setFontSize(9);
+      pdf.text(oeuvre.auteur, 25, yPos + 4);
+      
+      pdf.setTextColor(colors.accent[0], colors.accent[1], colors.accent[2]);
+      pdf.setFontSize(10);
+      pdf.text(`${oeuvre.vues} vues`, pageWidth - 35, yPos, { align: 'right' });
+      
+      yPos += 10;
     });
-    yPos += 10;
+
+    // Nouvelle page pour les auteurs
+    if (yPos > pageHeight - 80) {
+      addFooter(1);
+      pdf.addPage();
+      yPos = addHeader(false);
+      yPos += 10;
+    } else {
+      yPos += 10;
+    }
 
     // Top 10 Auteurs
-    if (yPos > 250) {
-      pdf.addPage();
-      yPos = 20;
-    }
-    
-    pdf.setFontSize(14);
-    pdf.text('Top 10 Auteurs', 15, yPos);
-    yPos += 8;
-    
-    pdf.setFontSize(9);
+    pdf.setFillColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+    pdf.roundedRect(15, yPos, pageWidth - 30, 10, 2, 2, 'F');
+    pdf.setTextColor(colors.text[0], colors.text[1], colors.text[2]);
+    pdf.setFontSize(13);
+    pdf.text('Top 10 des Auteurs les Plus Consultés', 20, yPos + 7);
+    yPos += 15;
+
     fakeData.topAuteurs.forEach((auteur, index) => {
-      if (yPos > 270) {
+      if (yPos > pageHeight - 30) {
+        addFooter(2);
         pdf.addPage();
-        yPos = 20;
+        yPos = addHeader(false);
+        yPos += 10;
       }
-      pdf.text(`${index + 1}. ${auteur}`, 20, yPos);
-      yPos += 5;
+      
+      if (index % 2 === 0) {
+        pdf.setFillColor(colors.background[0], colors.background[1], colors.background[2]);
+        pdf.rect(15, yPos - 4, pageWidth - 30, 8, 'F');
+      }
+      
+      pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.setFontSize(10);
+      pdf.text(`${index + 1}.`, 18, yPos);
+      
+      pdf.setTextColor(colors.text[0], colors.text[1], colors.text[2]);
+      pdf.text(auteur.nom, 25, yPos);
+      
+      pdf.setTextColor(colors.textLight[0], colors.textLight[1], colors.textLight[2]);
+      pdf.setFontSize(9);
+      pdf.text(`${auteur.oeuvres} oeuvres`, 25, yPos + 4);
+      
+      pdf.setTextColor(colors.accent[0], colors.accent[1], colors.accent[2]);
+      pdf.setFontSize(10);
+      pdf.text(`${auteur.vues} vues`, pageWidth - 35, yPos, { align: 'right' });
+      
+      yPos += 10;
     });
+
+    addFooter(2);
 
     // Sauvegarder le PDF
     pdf.save(`rapport-bibliotheque-${new Date().toISOString().split('T')[0]}.pdf`);
