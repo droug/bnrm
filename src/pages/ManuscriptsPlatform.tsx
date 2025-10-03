@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Lock, AlertCircle, Star, Sparkles, Filter, ChevronDown, X } from "lucide-react";
+import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Lock, AlertCircle, Star, Sparkles, Filter, ChevronDown, X, Users, Building2 } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
@@ -15,6 +15,8 @@ import { WatermarkContainer } from "@/components/ui/watermark";
 import { ProtectedWatermark } from "@/components/ui/protected-watermark";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Link, useNavigate } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { PartnerCollectionForm } from "@/components/partner/PartnerCollectionForm";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ManuscriptGrid } from "@/components/manuscripts/ManuscriptGrid";
 import { useManuscriptSearch, SearchFilters } from "@/hooks/useManuscriptSearch";
@@ -66,6 +68,7 @@ export default function ManuscriptsPlatform() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<SearchFilters>({});
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [partnerDialogOpen, setPartnerDialogOpen] = useState(false);
   
   const { 
     results, 
@@ -228,6 +231,34 @@ export default function ManuscriptsPlatform() {
               <p className="text-xl text-white/95 mb-6 max-w-3xl mx-auto drop-shadow-md font-elegant">
                 Découvrez les trésors manuscrits de la BNRM et des institutions partenaires marocaines
               </p>
+              
+              {/* Boutons d'action */}
+              <div className="flex justify-center gap-3 mb-6">
+                {user && (
+                  <Dialog open={partnerDialogOpen} onOpenChange={setPartnerDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="lg" className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg">
+                        <Users className="h-5 w-5 mr-2" />
+                        Devenir Partenaire
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Demande de Partenariat BNRM</DialogTitle>
+                      </DialogHeader>
+                      <PartnerCollectionForm onSuccess={() => setPartnerDialogOpen(false)} />
+                    </DialogContent>
+                  </Dialog>
+                )}
+                {profile?.role === 'partner' && (
+                  <Button size="lg" asChild className="bg-gold hover:bg-gold/90 text-white shadow-lg">
+                    <Link to="/partner-dashboard">
+                      <Building2 className="h-5 w-5 mr-2" />
+                      Espace Partenaire
+                    </Link>
+                  </Button>
+                )}
+              </div>
               
               <div className="flex justify-center space-x-2 mb-6">
                 {[...Array(7)].map((_, i) => (
