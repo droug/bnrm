@@ -2,13 +2,16 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Download, Calendar, User, MapPin, Lock } from "lucide-react";
-import manuscriptPage1 from "@/assets/manuscript-page-1.jpg";
-import manuscriptPage2 from "@/assets/manuscript-page-2.jpg";
-import manuscriptPage3 from "@/assets/manuscript-page-3.jpg";
-import manuscriptPage4 from "@/assets/manuscript-page-4.jpg";
-import manuscript1 from "@/assets/manuscript-1.jpg";
-import manuscript2 from "@/assets/manuscript-2.jpg";
-import manuscript3 from "@/assets/manuscript-3.jpg";
+import manuscrit1 from "@/assets/manuscrit-1.jpg";
+import manuscrit2 from "@/assets/manuscrit-2.png";
+import manuscrit3 from "@/assets/manuscrit-3.jpg";
+import manuscrit6 from "@/assets/manuscrit-6.jpg";
+import manuscrit7 from "@/assets/manuscrit-7.jpg";
+import manuscrit8 from "@/assets/manuscrit-8.jpg";
+import manuscrit9 from "@/assets/manuscrit-9.jpg";
+import manuscrit10 from "@/assets/manuscrit-10.jpg";
+import manuscrit11 from "@/assets/manuscrit-11.jpg";
+import manuscrit12 from "@/assets/manuscrit-12.png";
 
 interface Manuscript {
   id: string;
@@ -50,10 +53,10 @@ export function ManuscriptGrid({
 }: ManuscriptGridProps) {
   // Photos réelles de manuscrits fournies par l'utilisateur
   const realManuscriptImages = {
-    'Arabe': [manuscriptPage1, manuscriptPage2, manuscriptPage3, manuscriptPage4, manuscript1, manuscript2, manuscript3],
-    'Berbère': [manuscript2, manuscript3, manuscriptPage1],
-    'Latin': [manuscript3, manuscriptPage4, manuscriptPage2],
-    'Français': [manuscript1, manuscriptPage1, manuscriptPage3],
+    'Arabe': [manuscrit1, manuscrit2, manuscrit3, manuscrit6, manuscrit7, manuscrit8, manuscrit9, manuscrit10],
+    'Berbère': [manuscrit11, manuscrit12, manuscrit1, manuscrit3],
+    'Latin': [manuscrit6, manuscrit7, manuscrit8, manuscrit9],
+    'Français': [manuscrit10, manuscrit11, manuscrit12, manuscrit1],
   };
 
   const getDefaultImage = (manuscript: Manuscript) => {
