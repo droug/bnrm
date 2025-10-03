@@ -219,20 +219,20 @@ const DigitalLibrary = () => {
       
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
-        <section className="relative mb-12 py-16 px-8 rounded-3xl border-4 border-gold/40 overflow-hidden shadow-2xl">
+        <section className="relative mb-12 py-24 md:py-32 px-8 rounded-3xl border-4 border-gold/40 overflow-hidden shadow-2xl">
           {/* Background Image */}
           <div 
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 bg-cover bg-center opacity-70"
             style={{ backgroundImage: `url(${digitalLibraryHero})` }}
           ></div>
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/85 to-accent/90"></div>
-          <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20"></div>
+          {/* Overlay - réduit pour plus de visibilité */}
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/50 via-primary/40 to-accent/50"></div>
+          <div className="absolute inset-0 bg-pattern-zellige-complex opacity-10"></div>
           <div className="relative z-10 text-center">
-            <h1 className="text-5xl font-moroccan font-bold text-white mb-4 drop-shadow-lg">
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-moroccan font-bold text-white mb-6 drop-shadow-2xl">
               Bibliothèque Numérique du Maroc
             </h1>
-            <p className="text-xl text-white/95 mb-8 max-w-3xl mx-auto drop-shadow-md">
+            <p className="text-2xl md:text-3xl text-white mb-10 max-w-4xl mx-auto drop-shadow-2xl font-elegant">
               Découvrez le patrimoine écrit marocain : manuscrits andalous, périodiques historiques, ouvrages rares et collections d'exception
             </p>
             
