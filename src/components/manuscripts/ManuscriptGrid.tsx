@@ -59,14 +59,26 @@ export function ManuscriptGrid({
   const getDefaultImage = (manuscript: Manuscript) => {
     console.log('🖼️ Getting image for manuscript:', manuscript.title, 'Language:', manuscript.language, 'Thumbnail:', manuscript.thumbnail_url);
     
-    if (manuscript.thumbnail_url) {
+    if (manuscript.thumbnail_url && !manuscript.thumbnail_url.includes('placeholder')) {
       console.log('✅ Using thumbnail_url:', manuscript.thumbnail_url);
       return manuscript.thumbnail_url;
     }
     
-    // Normaliser la langue pour correspondre aux clés
-    const languageKey = manuscript.language?.charAt(0).toUpperCase() + manuscript.language?.slice(1).toLowerCase();
-    console.log('🔑 Language key:', languageKey);
+    // Mapper les codes de langue vers les noms complets
+    const languageMap: { [key: string]: string } = {
+      'ar': 'Arabe',
+      'fr': 'Français',
+      'ber': 'Berbère',
+      'la': 'Latin',
+      'arabe': 'Arabe',
+      'français': 'Français',
+      'berbère': 'Berbère',
+      'latin': 'Latin'
+    };
+    
+    const normalizedLang = manuscript.language?.toLowerCase() || 'ar';
+    const languageKey = languageMap[normalizedLang] || 'Arabe';
+    console.log('🔑 Language:', manuscript.language, '→ Key:', languageKey);
     
     const images = realManuscriptImages[languageKey as keyof typeof realManuscriptImages] || realManuscriptImages['Arabe'];
     const index = parseInt(manuscript.id.slice(-2), 16) % images.length;
