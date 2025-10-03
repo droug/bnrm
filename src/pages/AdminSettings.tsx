@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -10,81 +10,92 @@ export default function AdminSettings() {
   const navigate = useNavigate();
   const adminCards = [
     {
-      icon: Shield,
+      icon: ShieldCheck,
       title: "Gestion des Droits et Permissions",
       description: "Gérer les rôles et les permissions d'accès au système",
       href: "/settings",
-      permission: "users.permissions"
+      permission: "users.permissions",
+      gradient: "from-indigo-500 to-indigo-600"
     },
     {
-      icon: Users,
+      icon: UserCog,
       title: "Gestion des Utilisateurs",
       description: "Administrer les comptes utilisateurs, rôles et approbations",
       href: "/admin/users",
-      permission: "users.manage"
+      permission: "users.manage",
+      gradient: "from-purple-500 to-purple-600"
     },
     {
-      icon: FileText,
+      icon: Newspaper,
       title: "Gestion de contenu",
       description: "Créer et modérer les actualités, événements et expositions",
       href: "/admin/content",
-      permission: "content.manage"
+      permission: "content.manage",
+      gradient: "from-blue-500 to-blue-600"
     },
     {
-      icon: Clock,
+      icon: ClockAlert,
       title: "Demandes en attente",
       description: "Traiter les demandes d'accès aux manuscrits",
       href: "/admin/access-requests",
-      permission: "requests.manage"
+      permission: "requests.manage",
+      gradient: "from-orange-500 to-amber-600"
     },
     {
-      icon: Archive,
+      icon: ArchiveRestore,
       title: "Archivage",
       description: "Configurer l'archivage automatique du contenu",
       href: "/admin/archiving",
-      permission: "content.archive"
+      permission: "content.archive",
+      gradient: "from-slate-500 to-slate-600"
     },
     {
-      icon: Edit,
+      icon: PenSquare,
       title: "Éditeur WYSIWYG",
       description: "Éditeur visuel pour créer et modifier du contenu",
       href: "/admin/wysiwyg",
-      permission: "content.manage"
+      permission: "content.manage",
+      gradient: "from-pink-500 to-rose-600"
     },
     {
-      icon: DollarSign,
+      icon: Coins,
       title: "Gestion des Tarifs BNRM",
       description: "Gérer les tarifs et services de la Bibliothèque Nationale",
       href: "/admin/bnrm-tariffs",
-      permission: "content.manage"
+      permission: "content.manage",
+      gradient: "from-yellow-500 to-yellow-600"
     },
     {
-      icon: BookOpen,
+      icon: BookMarked,
       title: "Gestion du Dépôt Légal",
       description: "Interface complète de gestion du dépôt légal BNRM",
       href: "/admin/bnrm-backoffice",
-      permission: "legal_deposit.manage"
+      permission: "legal_deposit.manage",
+      gradient: "from-emerald-500 to-emerald-600"
     },
     {
-      icon: Database,
+      icon: DatabaseZap,
       title: "Catalogue en Ligne - Métadonnées",
       description: "Gérer les métadonnées du catalogue, imports SIGB et exports",
       href: "/admin/catalog-metadata",
-      permission: "content.manage"
+      permission: "content.manage",
+      gradient: "from-cyan-500 to-teal-600"
     },
     {
-      icon: Copy,
+      icon: FileImage,
       title: "Demandes de Reproduction",
       description: "Gérer les demandes de reproduction de documents - Validation et workflow",
       href: "/admin/reproduction",
-      permission: "requests.manage"
+      permission: "requests.manage",
+      gradient: "from-red-500 to-red-600"
     },
     {
-      icon: Library,
+      icon: BookOpenCheck,
       title: "Bibliothèque Numérique",
       description: "Gestion des documents numérisés, permissions et restrictions d'accès",
       href: "/admin/digital-library",
-      permission: "content.manage"
+      permission: "content.manage",
+      gradient: "from-violet-500 to-violet-600"
     }
   ];
 
@@ -120,21 +131,22 @@ export default function AdminSettings() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {adminCards.map((card) => (
                 <PermissionGuard key={card.title} permission={card.permission}>
-                  <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer group">
-                    <CardHeader>
+                  <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/40">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                    <CardHeader className="relative">
                       <CardTitle className="flex items-center space-x-3">
-                        <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                          <card.icon className="h-6 w-6 text-primary" />
+                        <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                          <card.icon className="h-6 w-6 text-white" />
                         </div>
-                        <span className="text-lg">{card.title}</span>
+                        <span className="text-lg group-hover:text-primary transition-colors">{card.title}</span>
                       </CardTitle>
-                      <CardDescription className="text-base">
+                      <CardDescription className="text-base leading-relaxed mt-2">
                         {card.description}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="relative">
                       <Button 
-                        className="w-full" 
+                        className="w-full group-hover:scale-105 transition-transform" 
                         onClick={() => {
                           console.log('Navigating to:', card.href);
                           navigate(card.href);

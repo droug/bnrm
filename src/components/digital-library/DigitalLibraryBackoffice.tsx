@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Upload, Trash2, Eye, EyeOff, Download, Share2, Mail, AlertCircle, FileText, Library, Ban, Shield, Calendar, BarChart3, Image, Copy } from "lucide-react";
+import { Plus, Upload, Trash2, Eye, EyeOff, Download, Share2, Mail, AlertCircle, FileText, Library, Ban, Shield, Calendar, BarChart3, Image, Copy, BookOpen, Users, Sparkles, FileImage, ShieldCheck, CalendarClock, UploadCloud } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 
@@ -173,60 +173,68 @@ export default function DigitalLibraryBackoffice() {
 
   const menuCards = [
     {
-      icon: Library,
+      icon: BookOpen,
       title: "Gestion des documents numérisés",
       description: "Ajout/suppression de documents, gestion des permissions et visibilité",
       count: documents?.length || 0,
-      action: () => navigate('/admin/digital-library/documents')
+      action: () => navigate('/admin/digital-library/documents'),
+      gradient: "from-blue-500 to-blue-600"
     },
     {
-      icon: Shield,
+      icon: Users,
       title: "Gestion des comptes utilisateurs",
       description: "Création de comptes, gestion des droits d'accès et modification des profils",
       count: null,
-      action: () => navigate('/admin/digital-library/users')
+      action: () => navigate('/admin/digital-library/users'),
+      gradient: "from-purple-500 to-purple-600"
     },
     {
-      icon: Image,
+      icon: Sparkles,
       title: "Gestion des expositions virtuelles",
       description: "Créer et gérer les expositions virtuelles avec suivi des visiteurs",
       count: null,
-      action: () => navigate('/admin/digital-library/exhibitions')
+      action: () => navigate('/admin/digital-library/exhibitions'),
+      gradient: "from-pink-500 to-rose-600"
     },
     {
       icon: BarChart3,
       title: "Statistiques et Rapports",
       description: "Statistiques détaillées et export de rapports d'utilisation",
       count: null,
-      action: () => navigate('/admin/digital-library/analytics')
+      action: () => navigate('/admin/digital-library/analytics'),
+      gradient: "from-green-500 to-emerald-600"
     },
     {
-      icon: Copy,
+      icon: FileImage,
       title: "Gestion des demandes de reproduction",
       description: "Enregistrement, suivi et validation des demandes de reproduction",
       count: null,
-      action: () => navigate('/admin/digital-library/reproduction')
+      action: () => navigate('/admin/digital-library/reproduction'),
+      gradient: "from-orange-500 to-amber-600"
     },
     {
-      icon: Ban,
+      icon: ShieldCheck,
       title: "Restrictions de téléchargement",
       description: "Restreindre l'accès pour des utilisateurs spécifiques en cas d'abus",
       count: restrictions?.length || 0,
-      action: () => navigate('/admin/digital-library/restrictions')
+      action: () => navigate('/admin/digital-library/restrictions'),
+      gradient: "from-red-500 to-red-600"
     },
     {
-      icon: Calendar,
+      icon: CalendarClock,
       title: "Suivi des droits d'auteur",
       description: "Documents avec accès limité et alertes d'expiration",
       count: expiringDocs?.length || 0,
-      action: () => navigate('/admin/digital-library/copyright')
+      action: () => navigate('/admin/digital-library/copyright'),
+      gradient: "from-indigo-500 to-indigo-600"
     },
     {
-      icon: Upload,
+      icon: UploadCloud,
       title: "Import en masse",
       description: "Importer plusieurs documents avec métadonnées (CSV/Excel)",
       count: null,
-      action: () => navigate('/admin/digital-library/bulk-import')
+      action: () => navigate('/admin/digital-library/bulk-import'),
+      gradient: "from-cyan-500 to-teal-600"
     }
   ];
 
@@ -244,22 +252,28 @@ export default function DigitalLibraryBackoffice() {
         {menuCards.map((card) => (
           <Card 
             key={card.title} 
-            className="hover:shadow-lg transition-all duration-200 cursor-pointer"
+            className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/40"
             onClick={card.action}
           >
-            <CardHeader>
+            <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+            <CardHeader className="relative">
               <div className="flex items-center justify-between">
-                <div className="p-3 rounded-lg bg-primary/10">
-                  <card.icon className="h-8 w-8 text-primary" />
+                <div className={`p-4 rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <card.icon className="h-7 w-7 text-white" />
                 </div>
                 {card.count !== null && (
-                  <Badge variant="secondary" className="text-lg px-3 py-1">
+                  <Badge 
+                    variant="secondary" 
+                    className="text-lg px-4 py-1.5 bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20"
+                  >
                     {card.count}
                   </Badge>
                 )}
               </div>
-              <CardTitle className="text-xl mt-4">{card.title}</CardTitle>
-              <CardDescription className="text-sm mt-2">
+              <CardTitle className="text-xl mt-4 group-hover:text-primary transition-colors">
+                {card.title}
+              </CardTitle>
+              <CardDescription className="text-sm mt-2 leading-relaxed">
                 {card.description}
               </CardDescription>
             </CardHeader>
