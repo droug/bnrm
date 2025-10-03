@@ -1933,22 +1933,31 @@ export type Database = {
           category_id: string | null
           collection_id: string | null
           condition_notes: string | null
+          cote: string | null
           created_at: string | null
           created_by: string | null
           description: string | null
           digital_copy_url: string | null
           dimensions: string | null
           file_url: string | null
+          full_text_content: string | null
+          genre: string | null
           has_ocr: boolean | null
+          historical_period: string | null
           id: string
           inventory_number: string | null
+          is_visible: boolean | null
           language: string | null
           material: string | null
           page_count: number | null
           pages_data: Json | null
           period: string | null
           permalink: string | null
+          publication_year: number | null
+          search_keywords: string[] | null
+          source: string | null
           status: Database["public"]["Enums"]["manuscript_status"] | null
+          subject: string[] | null
           thumbnail_url: string | null
           title: string
           updated_at: string | null
@@ -1964,22 +1973,31 @@ export type Database = {
           category_id?: string | null
           collection_id?: string | null
           condition_notes?: string | null
+          cote?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           digital_copy_url?: string | null
           dimensions?: string | null
           file_url?: string | null
+          full_text_content?: string | null
+          genre?: string | null
           has_ocr?: boolean | null
+          historical_period?: string | null
           id?: string
           inventory_number?: string | null
+          is_visible?: boolean | null
           language?: string | null
           material?: string | null
           page_count?: number | null
           pages_data?: Json | null
           period?: string | null
           permalink?: string | null
+          publication_year?: number | null
+          search_keywords?: string[] | null
+          source?: string | null
           status?: Database["public"]["Enums"]["manuscript_status"] | null
+          subject?: string[] | null
           thumbnail_url?: string | null
           title: string
           updated_at?: string | null
@@ -1995,22 +2013,31 @@ export type Database = {
           category_id?: string | null
           collection_id?: string | null
           condition_notes?: string | null
+          cote?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           digital_copy_url?: string | null
           dimensions?: string | null
           file_url?: string | null
+          full_text_content?: string | null
+          genre?: string | null
           has_ocr?: boolean | null
+          historical_period?: string | null
           id?: string
           inventory_number?: string | null
+          is_visible?: boolean | null
           language?: string | null
           material?: string | null
           page_count?: number | null
           pages_data?: Json | null
           period?: string | null
           permalink?: string | null
+          publication_year?: number | null
+          search_keywords?: string[] | null
+          source?: string | null
           status?: Database["public"]["Enums"]["manuscript_status"] | null
+          subject?: string[] | null
           thumbnail_url?: string | null
           title?: string
           updated_at?: string | null
@@ -2978,6 +3005,78 @@ export type Database = {
           },
         ]
       }
+      search_logs: {
+        Row: {
+          created_at: string | null
+          filters: Json | null
+          id: string
+          query: string
+          results_count: number | null
+          search_duration_ms: number | null
+          selected_result_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          filters?: Json | null
+          id?: string
+          query: string
+          results_count?: number | null
+          search_duration_ms?: number | null
+          selected_result_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          filters?: Json | null
+          id?: string
+          query?: string
+          results_count?: number | null
+          search_duration_ms?: number | null
+          selected_result_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      search_settings: {
+        Row: {
+          created_at: string | null
+          enable_faceted_search: boolean | null
+          enable_fulltext_search: boolean | null
+          enable_realtime_indexing: boolean | null
+          highlight_color: string | null
+          id: string
+          max_results: number | null
+          results_per_page: number
+          snippet_length: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          enable_faceted_search?: boolean | null
+          enable_fulltext_search?: boolean | null
+          enable_realtime_indexing?: boolean | null
+          highlight_color?: string | null
+          id?: string
+          max_results?: number | null
+          results_per_page?: number
+          snippet_length?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          enable_faceted_search?: boolean | null
+          enable_fulltext_search?: boolean | null
+          enable_realtime_indexing?: boolean | null
+          highlight_color?: string | null
+          id?: string
+          max_results?: number | null
+          results_per_page?: number
+          snippet_length?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       sigb_configuration: {
         Row: {
           api_endpoint: string | null
@@ -3773,6 +3872,26 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      gtrgm_compress: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_decompress: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_in: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_options: {
+        Args: { "": unknown }
+        Returns: undefined
+      }
+      gtrgm_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
       increment_exhibition_visitors: {
         Args: { exhibition_uuid: string }
         Returns: undefined
@@ -3792,6 +3911,15 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: boolean
       }
+      log_search: {
+        Args: {
+          p_filters?: Json
+          p_query: string
+          p_results_count?: number
+          p_search_duration_ms?: number
+        }
+        Returns: string
+      }
       perform_automatic_archiving: {
         Args: Record<PropertyKey, never>
         Returns: Json
@@ -3810,12 +3938,24 @@ export type Database = {
           title: string
         }[]
       }
+      set_limit: {
+        Args: { "": number }
+        Returns: number
+      }
       should_content_be_archived: {
         Args: {
           content_row: Record<string, unknown>
           settings_row: Record<string, unknown>
         }
         Returns: boolean
+      }
+      show_limit: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      show_trgm: {
+        Args: { "": string }
+        Returns: string[]
       }
       user_has_permission: {
         Args: { permission_name: string; user_uuid: string }
