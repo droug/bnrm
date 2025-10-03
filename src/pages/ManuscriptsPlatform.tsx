@@ -6,13 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Lock, AlertCircle } from "lucide-react";
+import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Lock, AlertCircle, Star, Sparkles, Crown, Filter, ChevronDown, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { ProtectedWatermark } from "@/components/ui/protected-watermark";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Link } from "react-router-dom";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import manuscriptHero from "@/assets/manuscript-page-1.jpg";
+import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 
 interface Manuscript {
   id: string;
@@ -210,54 +214,103 @@ export default function ManuscriptsPlatform() {
         opacity: 0.03
       }}
     >
-      <div className="min-h-screen bg-gradient-subtle relative">
+      <div className="min-h-screen bg-background relative">
         <ProtectedWatermark 
           userRole={profile?.role || "visitor"}
           isProtected={true}
         />
         <Header />
         
-        <main className="container py-8">
-          {/* En-tête de la plateforme */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground flex items-center gap-3 mb-3">
-              <BookOpen className="h-10 w-10 text-primary" />
-              Plateforme des Manuscrits Numérisés
-            </h1>
-            <p className="text-muted-foreground text-lg mb-4">
-              Consultez les manuscrits de la BNRM et des institutions partenaires marocaines
-            </p>
+        <main className="container mx-auto px-4 py-8">
+          {/* Hero Section */}
+          <section className="relative mb-12 py-20 px-8 rounded-3xl border-4 border-gold/40 overflow-hidden shadow-2xl">
+            {/* Background Image */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${manuscriptHero})` }}
+            ></div>
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-royal/90 via-primary/85 to-accent/90"></div>
+            <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20"></div>
+            <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-15"></div>
             
-            {/* Indicateur de niveau d'accès */}
-            <Alert className="mb-6 border-primary/30 bg-primary/5">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Votre niveau d'accès</AlertTitle>
-              <AlertDescription>
-                {getUserAccessLevel()}
-                {!user && (
-                  <span className="ml-2">
-                    - <Link to="/auth" className="underline text-primary">Connectez-vous</Link> pour accéder à plus de contenu
-                  </span>
-                )}
-              </AlertDescription>
-            </Alert>
-          </div>
-
-          {/* Filtres et recherche */}
-          <div className="mb-8 space-y-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Rechercher par titre, auteur ou description..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
+            <div className="relative z-10 text-center">
+              <div className="flex items-center justify-center space-x-4 mb-6">
+                <Crown className="h-10 w-10 text-gold animate-pulse drop-shadow-lg" />
+                <h1 className="text-5xl font-moroccan font-bold text-white drop-shadow-2xl">
+                  Plateforme des Manuscrits Numérisés
+                </h1>
+                <Crown className="h-10 w-10 text-gold animate-pulse drop-shadow-lg" />
+              </div>
+              <p className="text-xl text-white/95 mb-6 max-w-3xl mx-auto drop-shadow-md font-elegant">
+                Découvrez les trésors manuscrits de la BNRM et des institutions partenaires marocaines
+              </p>
+              
+              <div className="flex justify-center space-x-2 mb-6">
+                {[...Array(7)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 text-gold fill-gold animate-pulse drop-shadow-lg" style={{ animationDelay: `${i * 0.15}s` }} />
+                ))}
               </div>
               
+              {/* Indicateur de niveau d'accès */}
+              <div className="max-w-2xl mx-auto mb-8">
+                <Alert className="border-white/30 bg-white/10 backdrop-blur-md">
+                  <AlertCircle className="h-4 w-4 text-white" />
+                  <AlertTitle className="text-white font-semibold">Votre niveau d'accès</AlertTitle>
+                  <AlertDescription className="text-white/95">
+                    {getUserAccessLevel()}
+                    {!user && (
+                      <span className="ml-2">
+                        - <Link to="/auth" className="underline text-gold hover:text-gold/80">Connectez-vous</Link> pour accéder à plus de contenu
+                      </span>
+                    )}
+                  </AlertDescription>
+                </Alert>
+              </div>
+
+              {/* Barre de recherche */}
+              <div className="max-w-4xl mx-auto">
+                <div className="relative">
+                  <Input
+                    type="search"
+                    placeholder="Rechercher par titre, auteur ou description..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full h-16 text-lg bg-white/98 shadow-lg border-3 border-gold/30 focus:border-white pl-6 pr-28 rounded-full"
+                  />
+                  
+                  {searchQuery && (
+                    <Button
+                      onClick={() => setSearchQuery("")}
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-16 top-1/2 -translate-y-1/2 h-10 w-10 p-0 hover:bg-destructive/10 rounded-full"
+                    >
+                      <X className="h-5 w-5 text-destructive" />
+                    </Button>
+                  )}
+                  
+                  <Button 
+                    size="lg" 
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full shadow-md bg-gradient-neutral"
+                  >
+                    <Search className="h-6 w-6" />
+                  </Button>
+                </div>
+                <p className="text-white/90 text-sm text-center font-medium mt-4">
+                  💡 Utilisez les filtres ci-dessous pour affiner votre recherche
+                </p>
+              </div>
+              
+              <div className="w-48 h-2 bg-gradient-berber mx-auto rounded-full shadow-gold mt-6"></div>
+            </div>
+          </section>
+
+          {/* Filtres */}
+          <section className="mb-8">
+            <div className="flex flex-col md:flex-row gap-4 flex-wrap">
               <Select value={filterInstitution} onValueChange={setFilterInstitution}>
-                <SelectTrigger className="w-full md:w-56">
+                <SelectTrigger className="w-full md:w-56 h-12 border-2 border-gold/20">
                   <SelectValue placeholder="Institution" />
                 </SelectTrigger>
                 <SelectContent>
@@ -269,7 +322,7 @@ export default function ManuscriptsPlatform() {
               </Select>
 
               <Select value={filterLanguage} onValueChange={setFilterLanguage}>
-                <SelectTrigger className="w-full md:w-48">
+                <SelectTrigger className="w-full md:w-48 h-12 border-2 border-gold/20">
                   <SelectValue placeholder="Langue" />
                 </SelectTrigger>
                 <SelectContent>
@@ -282,7 +335,7 @@ export default function ManuscriptsPlatform() {
               </Select>
 
               <Select value={filterPeriod} onValueChange={setFilterPeriod}>
-                <SelectTrigger className="w-full md:w-48">
+                <SelectTrigger className="w-full md:w-48 h-12 border-2 border-gold/20">
                   <SelectValue placeholder="Période" />
                 </SelectTrigger>
                 <SelectContent>
@@ -294,7 +347,7 @@ export default function ManuscriptsPlatform() {
               </Select>
 
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-full md:w-48">
+                <SelectTrigger className="w-full md:w-48 h-12 border-2 border-gold/20">
                   <SelectValue placeholder="Statut" />
                 </SelectTrigger>
                 <SelectContent>
@@ -306,34 +359,39 @@ export default function ManuscriptsPlatform() {
                 </SelectContent>
               </Select>
             </div>
-          </div>
+          </section>
 
           {/* Résultats */}
-          <div className="mb-4">
-            <p className="text-muted-foreground">
+          <section className="mb-6">
+            <h2 className="text-3xl font-moroccan font-bold text-foreground mb-2 flex items-center gap-3">
+              <Sparkles className="h-8 w-8 text-gold" />
+              Manuscrits Disponibles
+            </h2>
+            <p className="text-muted-foreground text-lg mb-4">
               {filteredManuscripts.length} manuscrit(s) accessible(s) trouvé(s)
             </p>
-          </div>
+          </section>
 
           {/* Grille des manuscrits */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
             {filteredManuscripts.map((manuscript) => (
               <Card 
                 key={manuscript.id} 
-                className={`overflow-hidden hover:shadow-moroccan transition-all duration-300 bg-card/50 backdrop-blur ${
+                className={`overflow-hidden hover:shadow-moroccan transition-all duration-500 bg-card/50 backdrop-blur border-2 border-gold/20 hover:border-gold/40 group ${
                   !canAccessManuscript(manuscript) ? 'opacity-60' : ''
                 }`}
               >
                 {manuscript.thumbnail_url && (
-                  <div className="aspect-video overflow-hidden relative">
+                  <div className="aspect-video overflow-hidden relative bg-gradient-mosaique">
+                    <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20"></div>
                     <img
                       src={manuscript.thumbnail_url}
                       alt={manuscript.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     {!canAccessManuscript(manuscript) && (
-                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                        <Lock className="h-12 w-12 text-white" />
+                      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                        <Lock className="h-12 w-12 text-white drop-shadow-lg" />
                       </div>
                     )}
                   </div>
@@ -421,23 +479,31 @@ export default function ManuscriptsPlatform() {
           </div>
 
           {filteredManuscripts.length === 0 && !isLoading && (
-            <div className="text-center py-12">
-              <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-2">Aucun manuscrit accessible trouvé</h3>
-              <p className="text-muted-foreground">
-                {!user 
-                  ? "Connectez-vous pour accéder à plus de manuscrits"
-                  : "Essayez de modifier vos critères de recherche ou de filtrage."
-                }
-              </p>
-              {!user && (
-                <Link to="/auth">
-                  <Button className="mt-4">Se connecter</Button>
-                </Link>
-              )}
+            <div className="text-center py-16 relative">
+              <div className="absolute inset-0 bg-pattern-zellige-complex opacity-10 rounded-3xl"></div>
+              <div className="relative z-10">
+                <BookOpen className="h-16 w-16 text-gold mx-auto mb-6 animate-pulse" />
+                <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">Aucun manuscrit accessible trouvé</h3>
+                <p className="text-muted-foreground text-lg mb-6 max-w-md mx-auto">
+                  {!user 
+                    ? "Connectez-vous pour accéder à plus de manuscrits précieux"
+                    : "Essayez de modifier vos critères de recherche ou de filtrage."
+                  }
+                </p>
+                {!user && (
+                  <Link to="/auth">
+                    <Button className="bg-gradient-neutral shadow-gold hover:shadow-moroccan transition-all duration-300">
+                      <Lock className="h-4 w-4 mr-2" />
+                      Se connecter
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </div>
           )}
         </main>
+        
+        <Footer />
       </div>
     </WatermarkContainer>
   );
