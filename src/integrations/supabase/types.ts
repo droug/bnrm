@@ -1753,10 +1753,92 @@ export type Database = {
           },
         ]
       }
+      manuscript_bookmarks: {
+        Row: {
+          created_at: string | null
+          id: string
+          manuscript_id: string
+          note: string | null
+          page_number: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          manuscript_id: string
+          note?: string | null
+          page_number: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          manuscript_id?: string
+          note?: string | null
+          page_number?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manuscript_bookmarks_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manuscript_viewer_settings: {
+        Row: {
+          allow_download_default: boolean | null
+          allow_email_share_default: boolean | null
+          allow_print_default: boolean | null
+          block_right_click_default: boolean | null
+          block_screenshot_default: boolean | null
+          created_at: string | null
+          default_view_mode: string | null
+          id: string
+          max_zoom: number | null
+          min_zoom: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          allow_download_default?: boolean | null
+          allow_email_share_default?: boolean | null
+          allow_print_default?: boolean | null
+          block_right_click_default?: boolean | null
+          block_screenshot_default?: boolean | null
+          created_at?: string | null
+          default_view_mode?: string | null
+          id?: string
+          max_zoom?: number | null
+          min_zoom?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          allow_download_default?: boolean | null
+          allow_email_share_default?: boolean | null
+          allow_print_default?: boolean | null
+          block_right_click_default?: boolean | null
+          block_screenshot_default?: boolean | null
+          created_at?: string | null
+          default_view_mode?: string | null
+          id?: string
+          max_zoom?: number | null
+          min_zoom?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       manuscripts: {
         Row: {
           access_level: Database["public"]["Enums"]["access_level"] | null
+          allow_download: boolean | null
+          allow_email_share: boolean | null
+          allow_print: boolean | null
           author: string | null
+          block_right_click: boolean | null
+          block_screenshot: boolean | null
           category_id: string | null
           collection_id: string | null
           condition_notes: string | null
@@ -1765,11 +1847,16 @@ export type Database = {
           description: string | null
           digital_copy_url: string | null
           dimensions: string | null
+          file_url: string | null
+          has_ocr: boolean | null
           id: string
           inventory_number: string | null
           language: string | null
           material: string | null
+          page_count: number | null
+          pages_data: Json | null
           period: string | null
+          permalink: string | null
           status: Database["public"]["Enums"]["manuscript_status"] | null
           thumbnail_url: string | null
           title: string
@@ -1777,7 +1864,12 @@ export type Database = {
         }
         Insert: {
           access_level?: Database["public"]["Enums"]["access_level"] | null
+          allow_download?: boolean | null
+          allow_email_share?: boolean | null
+          allow_print?: boolean | null
           author?: string | null
+          block_right_click?: boolean | null
+          block_screenshot?: boolean | null
           category_id?: string | null
           collection_id?: string | null
           condition_notes?: string | null
@@ -1786,11 +1878,16 @@ export type Database = {
           description?: string | null
           digital_copy_url?: string | null
           dimensions?: string | null
+          file_url?: string | null
+          has_ocr?: boolean | null
           id?: string
           inventory_number?: string | null
           language?: string | null
           material?: string | null
+          page_count?: number | null
+          pages_data?: Json | null
           period?: string | null
+          permalink?: string | null
           status?: Database["public"]["Enums"]["manuscript_status"] | null
           thumbnail_url?: string | null
           title: string
@@ -1798,7 +1895,12 @@ export type Database = {
         }
         Update: {
           access_level?: Database["public"]["Enums"]["access_level"] | null
+          allow_download?: boolean | null
+          allow_email_share?: boolean | null
+          allow_print?: boolean | null
           author?: string | null
+          block_right_click?: boolean | null
+          block_screenshot?: boolean | null
           category_id?: string | null
           collection_id?: string | null
           condition_notes?: string | null
@@ -1807,11 +1909,16 @@ export type Database = {
           description?: string | null
           digital_copy_url?: string | null
           dimensions?: string | null
+          file_url?: string | null
+          has_ocr?: boolean | null
           id?: string
           inventory_number?: string | null
           language?: string | null
           material?: string | null
+          page_count?: number | null
+          pages_data?: Json | null
           period?: string | null
+          permalink?: string | null
           status?: Database["public"]["Enums"]["manuscript_status"] | null
           thumbnail_url?: string | null
           title?: string

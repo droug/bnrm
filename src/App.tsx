@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Manuscripts from "./pages/Manuscripts";
 import ManuscriptsPlatform from "./pages/ManuscriptsPlatform";
 import ManuscriptsBackoffice from "./pages/ManuscriptsBackoffice";
+import ManuscriptReader from "./pages/ManuscriptReader";
 import AccessRequest from "./pages/AccessRequest";
 import Profile from "./pages/Profile";
 import UserManagement from "./pages/UserManagement";
@@ -58,6 +59,8 @@ const App = () => (
         <Route path="/manuscripts-platform" element={<ManuscriptsPlatform />} />
         <Route path="/plateforme-manuscrits" element={<ManuscriptsPlatform />} />
         <Route path="/admin/manuscripts-backoffice" element={<ManuscriptsBackoffice />} />
+        <Route path="/manuscrit/:id" element={<ManuscriptReader />} />
+        <Route path="/manuscript/:id" element={<ManuscriptReader />} />
         <Route path="/access-request" element={<AccessRequest />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin/users" element={<UserManagement />} />

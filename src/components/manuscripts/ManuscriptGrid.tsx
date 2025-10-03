@@ -29,6 +29,7 @@ interface Manuscript {
   access_level: 'public' | 'restricted' | 'confidential';
   status: 'available' | 'digitization' | 'reserved' | 'maintenance';
   institution?: string;
+  permalink?: string;
   created_at: string;
 }
 
@@ -162,6 +163,11 @@ export function ManuscriptGrid({
                 size="sm" 
                 className="flex-1"
                 disabled={!canAccessManuscript(manuscript)}
+                onClick={() => {
+                  if (canAccessManuscript(manuscript)) {
+                    window.location.href = `/manuscrit/${manuscript.permalink || manuscript.id}`;
+                  }
+                }}
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Consulter
