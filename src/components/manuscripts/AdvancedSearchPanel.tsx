@@ -18,6 +18,7 @@ interface AdvancedSearchPanelProps {
 
 export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: AdvancedSearchPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const clearFilters = () => {
     setFilters({});
@@ -61,31 +62,37 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
   };
 
   return (
-    <Card className="sticky top-4">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Filter className="h-5 w-5" />
-            Filtres de recherche
-            {hasActiveFilters && (
-              <Badge variant="secondary">{Object.keys(filters).length}</Badge>
-            )}
-          </CardTitle>
+    <div className="w-full">
+      <div className="flex items-center gap-3">
+        <Button
+          onClick={() => setShowFilters(!showFilters)}
+          variant="outline"
+          className="h-10"
+        >
+          <Filter className="h-4 w-4 mr-2" />
+          Filtres avancés
           {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearFilters}
-              className="h-8"
-            >
-              <X className="h-4 w-4 mr-1" />
-              Effacer
-            </Button>
+            <Badge variant="secondary" className="ml-2">{Object.keys(filters).length}</Badge>
           )}
-        </div>
-      </CardHeader>
+          {showFilters ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />}
+        </Button>
+        
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="h-10"
+          >
+            <X className="h-4 w-4 mr-1" />
+            Effacer les filtres
+          </Button>
+        )}
+      </div>
 
-      <CardContent className="space-y-4">
+      {showFilters && (
+        <Card className="mt-4">
+          <CardContent className="pt-6 space-y-4">
         {/* Filtres de base */}
         <div className="space-y-3">
           <div>
@@ -183,11 +190,13 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
           </div>
         </div>
 
-        <Button onClick={onSearch} className="w-full">
-          <Search className="h-4 w-4 mr-2" />
-          Appliquer les filtres
-        </Button>
-      </CardContent>
-    </Card>
+            <Button onClick={onSearch} className="w-full">
+              <Search className="h-4 w-4 mr-2" />
+              Appliquer les filtres
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }

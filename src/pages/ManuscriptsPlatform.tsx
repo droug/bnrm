@@ -260,14 +260,16 @@ export default function ManuscriptsPlatform() {
             </div>
           </section>
 
-          {/* Filtres avancés */}
-          <section className="mb-8">
-            <AdvancedSearchPanel
-              filters={filters}
-              setFilters={setFilters}
-              onSearch={handleSearch}
-              facets={facets}
-            />
+          {/* Filtres avancés - Version compacte */}
+          <section className="mb-6">
+            <div className="flex gap-3 items-center justify-between">
+              <AdvancedSearchPanel
+                filters={filters}
+                setFilters={setFilters}
+                onSearch={handleSearch}
+                facets={facets}
+              />
+            </div>
           </section>
 
           {/* Résultats */}
@@ -309,15 +311,6 @@ export default function ManuscriptsPlatform() {
             />
           )}
 
-          {/* Panneau de résultats */}
-          {results.length > 0 && (
-            <SearchResultsPanel
-              results={results}
-              searchQuery={searchQuery}
-              onResultClick={handleResultClick}
-              highlightText={highlightText}
-            />
-          )}
 
           {results.length === 0 && !searchLoading && searchQuery && (
             <div className="text-center py-16 relative">
