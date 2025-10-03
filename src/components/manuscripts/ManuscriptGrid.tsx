@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Download, Calendar, User, MapPin, Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import manuscrit1 from "@/assets/manuscrit-1.jpg";
 import manuscrit2 from "@/assets/manuscrit-2.png";
 import manuscrit3 from "@/assets/manuscrit-3.jpg";
@@ -52,6 +53,7 @@ export function ManuscriptGrid({
   getStatusLabel,
   getAccessLabel,
 }: ManuscriptGridProps) {
+  const navigate = useNavigate();
   // Toutes les 10 photos réelles de manuscrits fournies par l'utilisateur
   const realManuscriptImages = {
     'Arabe': [manuscrit1, manuscrit3, manuscrit6, manuscrit8, manuscrit9],
@@ -165,7 +167,7 @@ export function ManuscriptGrid({
                 disabled={!canAccessManuscript(manuscript)}
                 onClick={() => {
                   if (canAccessManuscript(manuscript)) {
-                    window.location.href = `/manuscrit/${manuscript.permalink || manuscript.id}`;
+                    navigate(`/manuscrit/${manuscript.permalink || manuscript.id}`);
                   }
                 }}
               >
