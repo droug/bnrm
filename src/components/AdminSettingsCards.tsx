@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, Edit } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, Edit, Library } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -55,6 +55,13 @@ export function AdminSettingsCards() {
       title: t('admin.bnrm.tariffs.title'),
       description: t('admin.bnrm.tariffs.description'),
       href: "/admin/bnrm-tariffs",
+      permission: "content.manage"
+    },
+    {
+      icon: Library,
+      title: "Bibliothèque Numérique",
+      description: "Gestion des documents numérisés et leurs permissions",
+      href: "/admin/digital-library",
       permission: "content.manage"
     }
   ];
