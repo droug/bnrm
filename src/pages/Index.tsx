@@ -12,6 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import bnrmBuildingNight from "@/assets/bnrm-building-night.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
+import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
+import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
+import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
+import zelligePattern5 from "@/assets/zellige-pattern-5.jpg";
+import zelligePattern6 from "@/assets/zellige-pattern-6.jpg";
 import LegalDepositDeclaration from "@/components/LegalDepositDeclaration";
 
 const Index = () => {
@@ -257,10 +262,10 @@ const Index = () => {
                   {/* Carte Découvrir avec mosaïques zellige */}
                   <Card className="md:col-span-1 relative overflow-hidden group border-3 border-gold/40 shadow-mosaique hover:shadow-moroccan transition-all duration-700">
                     <div 
-                      className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-40 transition-opacity duration-700"
-                      style={{ backgroundImage: `url(${moroccanPatternBg})` }}
+                      className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-700"
+                      style={{ backgroundImage: `url(${zelligePattern1})` }}
                     ></div>
-                    <div className="absolute inset-0 bg-gradient-neutral opacity-90"></div>
+                    <div className="absolute inset-0 bg-gradient-neutral opacity-85"></div>
                     <CardContent className="p-10 min-h-[350px] flex flex-col justify-center items-center text-center space-y-6 relative z-10">
                       <div className="relative">
                         <div className="w-24 h-24 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-6 shadow-mosaique transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border-2 border-gold/20">
@@ -285,10 +290,10 @@ const Index = () => {
                   {/* Carte Actualités avec mosaïques subtiles */}
                   <Card className="relative overflow-hidden group border-3 border-primary/30 shadow-zellige hover:shadow-mosaique transition-all duration-700">
                     <div 
-                      className="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-35 transition-opacity duration-700"
-                      style={{ backgroundImage: `url(${moroccanPatternBg})` }}
+                      className="absolute inset-0 bg-cover bg-center opacity-15 group-hover:opacity-25 transition-opacity duration-700"
+                      style={{ backgroundImage: `url(${zelligePattern3})` }}
                     ></div>
-                    <div className="absolute inset-0 bg-gradient-primary opacity-80"></div>
+                    <div className="absolute inset-0 bg-gradient-primary opacity-75"></div>
                     <CardContent className="p-10 min-h-[350px] flex flex-col justify-center items-center text-center space-y-6 relative z-10">
                       <div className="relative">
                         <div className="w-24 h-24 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-6 shadow-zellige transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 border-2 border-white/20">
@@ -308,8 +313,10 @@ const Index = () => {
                    {/* Carte Patrimoine avec motifs zellige */}
                   <Link to="/digital-library">
                     <Card className="relative overflow-hidden group border-3 border-accent/30 shadow-elegant hover:shadow-zellige transition-all duration-700 cursor-pointer">
-                      <div className="absolute inset-0 bg-pattern-filigrane opacity-20 group-hover:opacity-35 transition-opacity duration-700"></div>
-                      <div className="absolute inset-0 bg-pattern-mosaique-geometric opacity-15 group-hover:opacity-25 transition-opacity duration-700"></div>
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-700"
+                        style={{ backgroundImage: `url(${zelligePattern5})` }}
+                      ></div>
                       <div className="absolute inset-0 bg-gradient-accent opacity-80"></div>
                       <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
                         <div className="relative">
@@ -331,8 +338,10 @@ const Index = () => {
                   {/* Carte Plateforme Manuscrits */}
                   <Link to="/plateforme-manuscrits">
                     <Card className="relative overflow-hidden group border-3 border-gold/40 shadow-moroccan hover:shadow-zellige transition-all duration-700 cursor-pointer">
-                      <div className="absolute inset-0 bg-pattern-zellige-complex opacity-25 group-hover:opacity-40 transition-opacity duration-700"></div>
-                      <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-20 group-hover:opacity-30 transition-opacity duration-700"></div>
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-35 transition-opacity duration-700"
+                        style={{ backgroundImage: `url(${zelligePattern2})` }}
+                      ></div>
                       <div className="absolute inset-0 bg-gradient-primary opacity-85"></div>
                       <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
                         <div className="relative">
@@ -353,8 +362,10 @@ const Index = () => {
 
                   {/* Carte Services avec mosaïques traditionnelles */}
                   <Card className="relative overflow-hidden group border-3 border-highlight/30 shadow-berber hover:shadow-mosaique transition-all duration-700">
-                    <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20 group-hover:opacity-35 transition-opacity duration-700"></div>
-                    <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-15 group-hover:opacity-25 transition-opacity duration-700"></div>
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-700"
+                      style={{ backgroundImage: `url(${zelligePattern6})` }}
+                    ></div>
                     <div className="absolute inset-0 bg-gradient-neutral opacity-85"></div>
                     <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
                       <div className="relative">

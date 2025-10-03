@@ -17,6 +17,9 @@ import { Link } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import manuscriptHero from "@/assets/manuscript-page-1.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
+import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
+import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
+import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
 
 interface Manuscript {
   id: string;
@@ -377,13 +380,23 @@ export default function ManuscriptsPlatform() {
             {filteredManuscripts.map((manuscript) => (
               <Card 
                 key={manuscript.id} 
-                className={`overflow-hidden hover:shadow-moroccan transition-all duration-500 bg-card/50 backdrop-blur border-2 border-gold/20 hover:border-gold/40 group ${
+                className={`overflow-hidden hover:shadow-moroccan transition-all duration-500 bg-card/50 backdrop-blur border-2 border-gold/20 hover:border-gold/40 group relative ${
                   !canAccessManuscript(manuscript) ? 'opacity-60' : ''
                 }`}
               >
+                {/* Zellige pattern background for the card */}
+                <div 
+                  className="absolute inset-0 opacity-8 group-hover:opacity-12 transition-opacity bg-cover bg-center pointer-events-none"
+                  style={{ 
+                    backgroundImage: `url(${
+                      manuscript.language === 'Arabe' ? zelligePattern1 :
+                      manuscript.language === 'Berbère' ? zelligePattern3 :
+                      zelligePattern2
+                    })` 
+                  }}
+                ></div>
                 {manuscript.thumbnail_url && (
                   <div className="aspect-video overflow-hidden relative bg-gradient-mosaique">
-                    <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20"></div>
                     <img
                       src={manuscript.thumbnail_url}
                       alt={manuscript.title}

@@ -23,6 +23,11 @@ import manuscript1 from "@/assets/manuscript-1.jpg";
 import manuscript2 from "@/assets/manuscript-2.jpg";
 import manuscript3 from "@/assets/manuscript-3.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
+import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
+import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
+import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
+import zelligePattern5 from "@/assets/zellige-pattern-5.jpg";
+import zelligePattern6 from "@/assets/zellige-pattern-6.jpg";
 
 const DigitalLibrary = () => {
   const { t } = useLanguage();
@@ -434,12 +439,20 @@ const DigitalLibrary = () => {
               return (
                 <Link key={collection.id} to={`/digital-library/${collection.id}`}>
                   <Card className="h-full hover:shadow-2xl transition-all duration-300 hover:scale-105 border-3 border-gold/30 hover:border-primary cursor-pointer relative overflow-hidden group">
-                    {/* Moroccan Pattern Background */}
+                    {/* Zellige Pattern Background */}
                     <div 
-                      className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity"
-                      style={{ backgroundImage: `url(${moroccanPatternBg})`, backgroundSize: 'cover' }}
+                      className="absolute inset-0 opacity-15 group-hover:opacity-25 transition-opacity bg-cover bg-center"
+                      style={{ 
+                        backgroundImage: `url(${
+                          collection.id === 'manuscripts' ? zelligePattern1 :
+                          collection.id === 'periodicals' ? zelligePattern3 :
+                          collection.id === 'monographs' ? zelligePattern2 :
+                          collection.id === 'special' ? zelligePattern5 :
+                          zelligePattern6
+                        })` 
+                      }}
                     ></div>
-                    <div className={`absolute inset-0 bg-gradient-to-br ${collection.gradient} opacity-60`}></div>
+                    <div className={`absolute inset-0 bg-gradient-to-br ${collection.gradient} opacity-70`}></div>
                     
                     <CardHeader className="relative z-10">
                       <div className={`w-16 h-16 ${collection.bgColor} rounded-xl flex items-center justify-center mb-4 shadow-lg border-2 border-gold/20`}>

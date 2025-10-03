@@ -12,6 +12,10 @@ import {
   Eye
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
+import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
+import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
+import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
+import zelligePattern5 from "@/assets/zellige-pattern-5.jpg";
 
 const Collections = () => {
   const { t } = useLanguage();
@@ -87,9 +91,13 @@ const Collections = () => {
           <h3 className="text-2xl font-bold text-foreground mb-8 text-center">Manuscrits à la Une</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {featuredManuscripts.map((manuscript, index) => (
-              <Card key={index} className="bg-card bg-pattern-moroccan-stars border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 group animate-slide-in relative overflow-hidden"
+              <Card key={index} className="bg-card border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 group animate-slide-in relative overflow-hidden"
                     style={{ animationDelay: `${index * 0.1}s` }}>
-                <CardContent className="p-6">
+                <div 
+                  className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity bg-cover bg-center"
+                  style={{ backgroundImage: `url(${[zelligePattern1, zelligePattern3, zelligePattern2][index]})` }}
+                ></div>
+                <CardContent className="p-6 relative z-10">
                   <div className="w-16 h-16 bg-gradient-accent rounded-lg flex items-center justify-center mb-4 group-hover:animate-glow">
                     <Scroll className="h-8 w-8 text-accent-foreground" />
                   </div>
@@ -114,9 +122,13 @@ const Collections = () => {
         {/* Collections grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {collections.map((collection, index) => (
-            <Card key={index} className={`bg-card bg-pattern-geometric border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 group animate-fade-in relative overflow-hidden ${collection.featured ? 'md:col-span-2 lg:col-span-1' : ''}`}
+            <Card key={index} className={`bg-card border-border shadow-elegant hover:shadow-moroccan transition-all duration-300 group animate-fade-in relative overflow-hidden ${collection.featured ? 'md:col-span-2 lg:col-span-1' : ''}`}
                   style={{ animationDelay: `${(index + 3) * 0.1}s` }}>
-              <CardContent className="p-8">
+              <div 
+                className="absolute inset-0 opacity-12 group-hover:opacity-20 transition-opacity bg-cover bg-center"
+                style={{ backgroundImage: `url(${[zelligePattern1, zelligePattern2, zelligePattern5, zelligePattern3][index]})` }}
+              ></div>
+              <CardContent className="p-8 relative z-10">
                 <div className={`w-16 h-16 ${collection.color} rounded-lg flex items-center justify-center mb-6 group-hover:animate-glow`}>
                   <div className="text-white">{collection.icon}</div>
                 </div>
