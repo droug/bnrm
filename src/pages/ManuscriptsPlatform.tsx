@@ -21,9 +21,17 @@ import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
 import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
 import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
 import manuscriptArabic from "@/assets/manuscript-arabic.jpg";
+import manuscriptArabic2 from "@/assets/manuscript-arabic-2.jpg";
+import manuscriptArabic3 from "@/assets/manuscript-arabic-3.jpg";
 import manuscriptBerber from "@/assets/manuscript-berber.jpg";
+import manuscriptBerber2 from "@/assets/manuscript-berber-2.jpg";
+import manuscriptBerber3 from "@/assets/manuscript-berber-3.jpg";
 import manuscriptLatin from "@/assets/manuscript-latin.jpg";
+import manuscriptLatin2 from "@/assets/manuscript-latin-2.jpg";
+import manuscriptLatin3 from "@/assets/manuscript-latin-3.jpg";
 import manuscriptFrench from "@/assets/manuscript-french.jpg";
+import manuscriptFrench2 from "@/assets/manuscript-french-2.jpg";
+import manuscriptFrench3 from "@/assets/manuscript-french-3.jpg";
 
 interface Manuscript {
   id: string;
@@ -55,6 +63,27 @@ export default function ManuscriptsPlatform() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterInstitution, setFilterInstitution] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
+
+  // Fonction pour sélectionner une image variée selon la langue
+  const getManuscriptImage = (language: string, id: string) => {
+    const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    
+    if (language === 'arabe') {
+      const images = [manuscriptArabic, manuscriptArabic2, manuscriptArabic3];
+      return images[hash % images.length];
+    } else if (language === 'berbère') {
+      const images = [manuscriptBerber, manuscriptBerber2, manuscriptBerber3];
+      return images[hash % images.length];
+    } else if (language === 'latin') {
+      const images = [manuscriptLatin, manuscriptLatin2, manuscriptLatin3];
+      return images[hash % images.length];
+    } else if (language === 'français') {
+      const images = [manuscriptFrench, manuscriptFrench2, manuscriptFrench3];
+      return images[hash % images.length];
+    }
+    
+    return manuscriptArabic;
+  };
 
   useEffect(() => {
     fetchManuscripts();
@@ -390,13 +419,7 @@ export default function ManuscriptsPlatform() {
               >
                 <div className="aspect-video overflow-hidden relative bg-gradient-mosaique">
                   <img
-                    src={manuscript.thumbnail_url || (
-                      manuscript.language === 'arabe' ? manuscriptArabic :
-                      manuscript.language === 'berbère' ? manuscriptBerber :
-                      manuscript.language === 'latin' ? manuscriptLatin :
-                      manuscript.language === 'français' ? manuscriptFrench :
-                      manuscriptArabic
-                    )}
+                    src={manuscript.thumbnail_url || getManuscriptImage(manuscript.language, manuscript.id)}
                     alt={manuscript.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
