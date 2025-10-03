@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { X, BookOpen, Calendar, Users, FileText, Crown, Star, Sparkles, Gift } from "lucide-react";
+import { X, BookOpen, Calendar, Users, FileText, Star, Sparkles, Gift } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
+import emblemeMaroc from "@/assets/embleme-maroc.png";
 
 interface WelcomePopupProps {
   isOpen: boolean;
@@ -70,11 +71,11 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
             <DialogHeader>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <Crown className="h-8 w-8 text-gold animate-pulse" />
+                  <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-10 w-10 object-contain drop-shadow-lg" />
                   <DialogTitle className="text-2xl font-moroccan font-bold text-white">
                     Bienvenue à la BNRM
                   </DialogTitle>
-                  <Crown className="h-8 w-8 text-gold animate-pulse" />
+                  <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-10 w-10 object-contain drop-shadow-lg" />
                 </div>
                 <Button
                   variant="ghost"
