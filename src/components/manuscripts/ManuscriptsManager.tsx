@@ -10,7 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Edit, Trash2, Search, Download, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Download, Eye, Shield, MousePointerClick, Camera } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 
 interface Manuscript {
   id: string;
@@ -48,6 +50,12 @@ export function ManuscriptsManager() {
     status: 'available' | 'digitization' | 'reserved' | 'maintenance';
     institution: string;
     thumbnail_url: string;
+    page_count: number;
+    block_right_click: boolean;
+    block_screenshot: boolean;
+    allow_download: boolean;
+    allow_print: boolean;
+    allow_email_share: boolean;
   }>({
     title: "",
     author: "",
@@ -59,7 +67,13 @@ export function ManuscriptsManager() {
     access_level: "public",
     status: "available",
     institution: "BNRM",
-    thumbnail_url: ""
+    thumbnail_url: "",
+    page_count: 0,
+    block_right_click: false,
+    block_screenshot: false,
+    allow_download: true,
+    allow_print: true,
+    allow_email_share: true,
   });
 
   useEffect(() => {
@@ -166,7 +180,13 @@ export function ManuscriptsManager() {
       access_level: manuscript.access_level as 'public' | 'restricted' | 'confidential',
       status: manuscript.status as 'available' | 'digitization' | 'reserved' | 'maintenance',
       institution: manuscript.institution || "BNRM",
-      thumbnail_url: manuscript.thumbnail_url || ""
+      thumbnail_url: manuscript.thumbnail_url || "",
+      page_count: (manuscript as any).page_count || 0,
+      block_right_click: (manuscript as any).block_right_click || false,
+      block_screenshot: (manuscript as any).block_screenshot || false,
+      allow_download: (manuscript as any).allow_download !== false,
+      allow_print: (manuscript as any).allow_print !== false,
+      allow_email_share: (manuscript as any).allow_email_share !== false,
     });
     setIsDialogOpen(true);
   };
@@ -184,7 +204,13 @@ export function ManuscriptsManager() {
       access_level: "public",
       status: "available",
       institution: "BNRM",
-      thumbnail_url: ""
+      thumbnail_url: "",
+      page_count: 0,
+      block_right_click: false,
+      block_screenshot: false,
+      allow_download: true,
+      allow_print: true,
+      allow_email_share: true,
     });
   };
 
@@ -325,6 +351,17 @@ export function ManuscriptsManager() {
                       onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
                     />
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="page_count">Nombre de pages</Label>
+                    <Input
+                      id="page_count"
+                      type="number"
+                      value={formData.page_count}
+                      onChange={(e) => setFormData({ ...formData, page_count: parseInt(e.target.value) || 0 })}
+                      min={0}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -345,6 +382,117 @@ export function ManuscriptsManager() {
                     onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })}
                     placeholder="https://..."
                   />
+                </div>
+
+                <Separator className="my-6" />
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Shield className="h-5 w-5 text-primary" />
+                    <h3 className="text-sm font-semibold">Paramètres de Sécurité et Consultation</h3>
+                  </div>
+
+                  <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="block_right_click" className="flex items-center gap-2">
+                          <MousePointerClick className="h-4 w-4" />
+                          Bloquer le clic droit
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Empêche les utilisateurs de faire un clic droit sur ce manuscrit
+                        </p>
+                      </div>
+                      <Switch
+                        id="block_right_click"
+                        checked={formData.block_right_click}
+                        onCheckedChange={(checked) => 
+                          setFormData({ ...formData, block_right_click: checked })
+                        }
+                      />
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="block_screenshot" className="flex items-center gap-2">
+                          <Camera className="h-4 w-4" />
+                          Bloquer les captures d'écran
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Tente d'empêcher les captures d'écran (PrintScreen, etc.)
+                        </p>
+                      </div>
+                      <Switch
+                        id="block_screenshot"
+                        checked={formData.block_screenshot}
+                        onCheckedChange={(checked) => 
+                          setFormData({ ...formData, block_screenshot: checked })
+                        }
+                      />
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="allow_download">
+                          Autoriser le téléchargement
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Les utilisateurs autorisés peuvent télécharger ce manuscrit
+                        </p>
+                      </div>
+                      <Switch
+                        id="allow_download"
+                        checked={formData.allow_download}
+                        onCheckedChange={(checked) => 
+                          setFormData({ ...formData, allow_download: checked })
+                        }
+                      />
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="allow_print">
+                          Autoriser l'impression
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Les utilisateurs peuvent imprimer ce manuscrit
+                        </p>
+                      </div>
+                      <Switch
+                        id="allow_print"
+                        checked={formData.allow_print}
+                        onCheckedChange={(checked) => 
+                          setFormData({ ...formData, allow_print: checked })
+                        }
+                      />
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="allow_email_share">
+                          Autoriser le partage par email
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Les utilisateurs peuvent envoyer ce manuscrit par email
+                        </p>
+                      </div>
+                      <Switch
+                        id="allow_email_share"
+                        checked={formData.allow_email_share}
+                        onCheckedChange={(checked) => 
+                          setFormData({ ...formData, allow_email_share: checked })
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <DialogFooter>
