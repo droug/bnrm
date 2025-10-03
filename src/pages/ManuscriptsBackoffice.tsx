@@ -47,44 +47,69 @@ export default function ManuscriptsBackoffice() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-7 gap-2 bg-card/50 p-2 h-auto">
-            <TabsTrigger value="manuscripts" className="flex items-center gap-2">
-              <Database className="h-4 w-4" />
-              <span className="hidden sm:inline">Manuscrits</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="metadata" className="flex items-center gap-2">
-              <FileSearch className="h-4 w-4" />
-              <span className="hidden sm:inline">Métadonnées</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="partners" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Partenaires</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="access" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              <span className="hidden sm:inline">Accès</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Statistiques</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">Paramètres</span>
-            </TabsTrigger>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-gold/5 to-primary/5 rounded-xl"></div>
+            <TabsList className="relative grid w-full grid-cols-2 lg:grid-cols-7 gap-3 bg-transparent p-3 h-auto">
+              <TabsTrigger 
+                value="manuscripts" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105 transition-all duration-300 bg-white/80 backdrop-blur-sm border border-primary/20 hover:border-primary/40 hover:bg-primary/5"
+              >
+                <Database className="h-4 w-4" />
+                <span className="hidden sm:inline font-medium">Manuscrits</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="metadata" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105 transition-all duration-300 bg-white/80 backdrop-blur-sm border border-primary/20 hover:border-primary/40 hover:bg-primary/5"
+              >
+                <FileSearch className="h-4 w-4" />
+                <span className="hidden sm:inline font-medium">Métadonnées</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="partners" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-br data-[state=active]:from-gold data-[state=active]:to-gold/80 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105 transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gold/20 hover:border-gold/40 hover:bg-gold/5"
+              >
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline font-medium">Partenaires</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="access" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105 transition-all duration-300 bg-white/80 backdrop-blur-sm border border-primary/20 hover:border-primary/40 hover:bg-primary/5"
+              >
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline font-medium">Accès</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="analytics" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105 transition-all duration-300 bg-white/80 backdrop-blur-sm border border-primary/20 hover:border-primary/40 hover:bg-primary/5"
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden sm:inline font-medium">Statistiques</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="settings" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105 transition-all duration-300 bg-white/80 backdrop-blur-sm border border-primary/20 hover:border-primary/40 hover:bg-primary/5"
+              >
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline font-medium">Paramètres</span>
+              </TabsTrigger>
 
-            <TabsTrigger value="collections" className="flex items-center gap-2">
-              <Archive className="h-4 w-4" />
-              <span className="hidden sm:inline">Collections</span>
-            </TabsTrigger>
-          </TabsList>
+              <TabsTrigger 
+                value="collections" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105 transition-all duration-300 bg-white/80 backdrop-blur-sm border border-primary/20 hover:border-primary/40 hover:bg-primary/5"
+              >
+                <Archive className="h-4 w-4" />
+                <span className="hidden sm:inline font-medium">Collections</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          <ScrollArea className="h-[calc(100vh-280px)] mt-6">
+          <ScrollArea className="h-[calc(100vh-280px)] mt-8">
+            <div className="animate-fade-in">{/* Animation wrapper */}
             <TabsContent value="manuscripts" className="space-y-4">
               <ManuscriptsManager />
             </TabsContent>
@@ -128,6 +153,7 @@ export default function ManuscriptsBackoffice() {
                 </CardContent>
               </Card>
             </TabsContent>
+            </div>{/* Fermeture animation wrapper */}
           </ScrollArea>
         </Tabs>
       </main>
