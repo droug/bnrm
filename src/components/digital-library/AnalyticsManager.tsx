@@ -6,11 +6,79 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, Download, TrendingUp, Users, Clock, Search, AlertCircle, User, Building } from "lucide-react";
+import { Eye, Download, TrendingUp, Users, Clock, Search, AlertCircle, User, Building, FileDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AnalyticsManager() {
+  const { toast } = useToast();
   const [timeRange, setTimeRange] = useState<string>("30");
   const [selectedTab, setSelectedTab] = useState("overview");
+
+  const handleExportReport = () => {
+    // Génération de données fictives pour le rapport
+    const reportData = {
+      periode: `${timeRange} derniers jours`,
+      dateGeneration: new Date().toLocaleDateString('fr-FR'),
+      statistiquesGlobales: {
+        totalConsultations: totalViews,
+        totalTelechargements: totalDownloads,
+        utilisateursActifs: uniqueUsers,
+        tempsTotalLecture: Math.round(totalReadingTime / 60),
+        tempsMoyenParUtilisateur: avgReadingTime
+      },
+      top10OeuvresConsultees: mostViewed?.slice(0, 10).map((doc: any, index: number) => ({
+        rang: index + 1,
+        titre: doc.title,
+        auteur: doc.metadata?.main_author || 'Auteur inconnu',
+        consultations: doc.view_count,
+        telechargements: doc.download_count
+      })),
+      statistiquesParType: Object.entries(statsByFileType || {}).map(([type, stats]: any) => ({
+        type,
+        nombreDocuments: stats.count,
+        consultations: stats.views,
+        telechargements: stats.downloads,
+        moyenneConsultations: Math.round(stats.views / stats.count)
+      })),
+      top10Auteurs: topAuthors.slice(0, 10).map(([author, stats]: any, index: number) => ({
+        rang: index + 1,
+        auteur: author,
+        nombreOeuvres: stats.works,
+        consultations: stats.views,
+        telechargements: stats.downloads
+      })),
+      top10Editeurs: topPublishers.slice(0, 10).map(([publisher, stats]: any, index: number) => ({
+        rang: index + 1,
+        editeur: publisher,
+        nombreOeuvres: stats.works,
+        consultations: stats.views,
+        telechargements: stats.downloads
+      })),
+      utilisateursActifs: topUsers.map((user: any, index: number) => ({
+        rang: index + 1,
+        nom: user.name,
+        telechargements: user.downloadCount,
+        tempsLecture: user.readingTime
+      }))
+    };
+
+    // Créer un blob et télécharger le fichier JSON
+    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rapport-bibliotheque-numerique-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({ 
+      title: "Rapport généré", 
+      description: "Le rapport a été téléchargé avec succès" 
+    });
+  };
 
   // Fetch download logs
   const { data: downloadLogs, isLoading: logsLoading } = useQuery({
@@ -162,17 +230,23 @@ export default function AnalyticsManager() {
           <h2 className="text-2xl font-bold">Statistiques et Rapports</h2>
           <p className="text-muted-foreground">Analyse détaillée de l'utilisation de la Bibliothèque Numérique</p>
         </div>
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7">7 derniers jours</SelectItem>
-            <SelectItem value="30">30 derniers jours</SelectItem>
-            <SelectItem value="90">90 derniers jours</SelectItem>
-            <SelectItem value="365">Année</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-3">
+          <Button onClick={handleExportReport} variant="outline">
+            <FileDown className="h-4 w-4 mr-2" />
+            Exporter le rapport
+          </Button>
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7">7 derniers jours</SelectItem>
+              <SelectItem value="30">30 derniers jours</SelectItem>
+              <SelectItem value="90">90 derniers jours</SelectItem>
+              <SelectItem value="365">Année</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">

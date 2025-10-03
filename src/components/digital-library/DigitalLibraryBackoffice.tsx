@@ -195,8 +195,8 @@ export default function DigitalLibraryBackoffice() {
     },
     {
       icon: BarChart3,
-      title: "Suivi des consultations / téléchargements",
-      description: "Statistiques, tendances et documents les plus populaires",
+      title: "Statistiques et Rapports",
+      description: "Statistiques détaillées et export de rapports d'utilisation",
       count: null,
       action: () => navigate('/admin/digital-library/analytics')
     },
