@@ -111,34 +111,34 @@ const Index = () => {
           <Header />
           
           {/* Bannière avec mosaïques et arrière-plan bibliothèque */}
-          <section className="relative py-12 border-b-4 border-gold/30 overflow-hidden">
+          <section className="relative py-20 md:py-28 border-b-4 border-gold/30 overflow-hidden">
             {/* Image de fond - Bâtiment BNRM de nuit */}
             <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-70"
               style={{ backgroundImage: `url(${bnrmBuildingNight})` }}
             ></div>
-            {/* Overlay avec mosaïques zellige */}
-            <div className="absolute inset-0 bg-gradient-zellige-main opacity-85"></div>
-            <div className="absolute inset-0 bg-pattern-zellige-tiles opacity-30"></div>
+            {/* Overlay avec mosaïques zellige - réduit pour plus de visibilité */}
+            <div className="absolute inset-0 bg-gradient-zellige-main opacity-50"></div>
+            <div className="absolute inset-0 bg-pattern-zellige-tiles opacity-15"></div>
             
             <div className="container mx-auto px-4 text-center relative z-10">
-              <div className="flex items-center justify-center space-x-4 mb-6">
-                <Crown className="h-10 w-10 text-gold animate-pulse drop-shadow-lg" />
-                <h1 className="text-4xl md:text-5xl font-moroccan font-bold text-white drop-shadow-2xl">
+              <div className="flex items-center justify-center space-x-4 mb-8">
+                <Crown className="h-12 w-12 md:h-14 md:w-14 text-gold animate-pulse drop-shadow-2xl" />
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-moroccan font-bold text-white drop-shadow-2xl">
                   {t('header.title')}
                 </h1>
-                <Crown className="h-10 w-10 text-gold animate-pulse drop-shadow-lg" />
+                <Crown className="h-12 w-12 md:h-14 md:w-14 text-gold animate-pulse drop-shadow-2xl" />
               </div>
-              <p className="text-xl text-white/95 font-elegant italic mb-4 drop-shadow-lg">
+              <p className="text-2xl md:text-3xl text-white font-elegant italic mb-6 drop-shadow-2xl">
                 "Gardienne du patrimoine millénaire marocain"
               </p>
-              <div className="flex justify-center space-x-2 mb-4">
+              <div className="flex justify-center space-x-3 mb-6">
                 {[...Array(7)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 text-gold fill-gold animate-pulse drop-shadow-lg" style={{ animationDelay: `${i * 0.15}s` }} />
+                  <Star key={i} className="h-6 w-6 md:h-7 md:w-7 text-gold fill-gold animate-pulse drop-shadow-2xl" style={{ animationDelay: `${i * 0.15}s` }} />
                 ))}
               </div>
               {/* Motif décoratif zellige */}
-              <div className="w-48 h-2 bg-gradient-berber mx-auto rounded-full shadow-gold"></div>
+              <div className="w-64 h-3 bg-gradient-berber mx-auto rounded-full shadow-gold"></div>
             </div>
           </section>
           
