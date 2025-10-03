@@ -51,6 +51,30 @@ const Header = () => {
             </span>
           </Link>
           
+          {/* Bouton de gestion pour les plateformes spéciales (admin/librarian uniquement) */}
+          {(profile?.role === 'admin' || profile?.role === 'librarian') && (
+            <>
+              {isManuscriptsPlatform && (
+                <Link to="/admin/manuscripts-backoffice">
+                  <Button variant="outline" size="sm" className="gap-2 border-gold/40 hover:border-gold hover:bg-gold/10">
+                    <Shield className="h-4 w-4" />
+                    <span className="hidden sm:inline">Gestion Manuscrits Numérisés</span>
+                    <span className="sm:hidden">Gestion</span>
+                  </Button>
+                </Link>
+              )}
+              {isDigitalLibrary && (
+                <Link to="/admin/digital-library">
+                  <Button variant="outline" size="sm" className="gap-2 border-gold/40 hover:border-gold hover:bg-gold/10">
+                    <Shield className="h-4 w-4" />
+                    <span className="hidden sm:inline">Gestion Bibliothèque Numérique</span>
+                    <span className="sm:hidden">Gestion</span>
+                  </Button>
+                </Link>
+              )}
+            </>
+          )}
+
           {/* Actions compactes */}
           <div className="flex items-center gap-2">
             {/* Langue - icône seulement sur mobile */}
