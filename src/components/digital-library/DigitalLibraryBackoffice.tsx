@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Upload, Trash2, Eye, EyeOff, Download, Share2, Mail, AlertCircle, FileText, Library, Ban, Shield, Calendar } from "lucide-react";
+import { Plus, Upload, Trash2, Eye, EyeOff, Download, Share2, Mail, AlertCircle, FileText, Library, Ban, Shield, Calendar, BarChart3 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 
@@ -185,6 +185,13 @@ export default function DigitalLibraryBackoffice() {
       description: "Création de comptes, gestion des droits d'accès et modification des profils",
       count: null,
       action: () => navigate('/admin/digital-library/users')
+    },
+    {
+      icon: BarChart3,
+      title: "Suivi des consultations / téléchargements",
+      description: "Statistiques, tendances et documents les plus populaires",
+      count: null,
+      action: () => navigate('/admin/digital-library/analytics')
     },
     {
       icon: Ban,
