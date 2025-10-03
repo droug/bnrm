@@ -8,6 +8,7 @@ import Auth from "./pages/Auth";
 import SignupPage from "./pages/SignupPage";
 import Dashboard from "./pages/Dashboard";
 import Manuscripts from "./pages/Manuscripts";
+import ManuscriptsPlatform from "./pages/ManuscriptsPlatform";
 import AccessRequest from "./pages/AccessRequest";
 import Profile from "./pages/Profile";
 import UserManagement from "./pages/UserManagement";
@@ -52,6 +53,8 @@ const App = () => (
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/manuscripts" element={<Manuscripts />} />
+        <Route path="/manuscripts-platform" element={<ManuscriptsPlatform />} />
+        <Route path="/plateforme-manuscrits" element={<ManuscriptsPlatform />} />
         <Route path="/access-request" element={<AccessRequest />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin/users" element={<UserManagement />} />

@@ -255,6 +255,11 @@ const Header = () => {
                     <div className="space-y-1">
                       <h4 className="text-xs font-bold text-primary mb-1">{t('nav.collections')}</h4>
                       <NavigationMenuLink asChild>
+                        <Link to="/plateforme-manuscrits" className="block p-2 text-xs hover:bg-primary/10 rounded bg-accent/50 font-semibold">
+                          📜 Plateforme Manuscrits (BNRM & Partenaires)
+                        </Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
                         <a href="/manuscripts" className="block p-2 text-xs hover:bg-primary/10 rounded">
                           {t('nav.manuscripts')}
                         </a>

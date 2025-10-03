@@ -328,6 +328,29 @@ const Index = () => {
                     </Card>
                   </Link>
 
+                  {/* Carte Plateforme Manuscrits */}
+                  <Link to="/plateforme-manuscrits">
+                    <Card className="relative overflow-hidden group border-3 border-gold/40 shadow-moroccan hover:shadow-zellige transition-all duration-700 cursor-pointer">
+                      <div className="absolute inset-0 bg-pattern-zellige-complex opacity-25 group-hover:opacity-40 transition-opacity duration-700"></div>
+                      <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-20 group-hover:opacity-30 transition-opacity duration-700"></div>
+                      <div className="absolute inset-0 bg-gradient-primary opacity-85"></div>
+                      <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
+                        <div className="relative">
+                          <div className="w-20 h-20 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-4 shadow-zellige transform group-hover:scale-110 transition-all duration-500 border-2 border-gold/30">
+                            <BookOpen className="h-10 w-10 text-white" />
+                          </div>
+                          <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-bounce" />
+                        </div>
+                        <h3 className="text-xl font-moroccan font-bold text-white">
+                          Plateforme Manuscrits
+                        </h3>
+                        <p className="text-white/95 font-elegant">
+                          Manuscrits BNRM & institutions partenaires marocaines
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+
                   {/* Carte Services avec mosaïques traditionnelles */}
                   <Card className="relative overflow-hidden group border-3 border-highlight/30 shadow-berber hover:shadow-mosaique transition-all duration-700">
                     <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20 group-hover:opacity-35 transition-opacity duration-700"></div>
