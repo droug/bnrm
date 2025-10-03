@@ -48,12 +48,12 @@ export function ManuscriptGrid({
   getStatusLabel,
   getAccessLabel,
 }: ManuscriptGridProps) {
-  // Photos réelles de manuscrits par langue
+  // Photos réelles de manuscrits fournies par l'utilisateur
   const realManuscriptImages = {
-    'Arabe': [manuscriptPage1, manuscriptPage2, manuscriptPage3, manuscriptPage4, manuscript1],
-    'Berbère': [manuscript2, manuscript3],
-    'Latin': [manuscriptPage3, manuscriptPage4],
-    'Français': [manuscript1, manuscriptPage1],
+    'Arabe': [manuscriptPage1, manuscriptPage2, manuscriptPage3, manuscriptPage4, manuscript1, manuscript2, manuscript3],
+    'Berbère': [manuscript2, manuscript3, manuscriptPage1],
+    'Latin': [manuscript3, manuscriptPage4, manuscriptPage2],
+    'Français': [manuscript1, manuscriptPage1, manuscriptPage3],
   };
 
   const getDefaultImage = (manuscript: Manuscript) => {
