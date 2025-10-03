@@ -1,4 +1,5 @@
 import { useState } from "react";
+import jsPDF from "jspdf";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,14 +10,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, Download, TrendingUp, Users, Clock, Search, AlertCircle, User, Building, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function AnalyticsManager() {
   const { toast } = useToast();
   const [timeRange, setTimeRange] = useState<string>("30");
   const [selectedTab, setSelectedTab] = useState("overview");
 
-  const handleExportReport = () => {
-    // Génération de données fictives pour le rapport
+  const handleExportJSON = () => {
     const reportData = {
       periode: `${timeRange} derniers jours`,
       dateGeneration: new Date().toLocaleDateString('fr-FR'),
@@ -63,19 +64,148 @@ export default function AnalyticsManager() {
       }))
     };
 
-    // Créer un blob et télécharger le fichier JSON
     const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `rapport-bibliotheque-numerique-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `rapport-bibliotheque-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
     toast({ 
-      title: "Rapport généré", 
+      title: "Rapport JSON généré", 
+      description: "Le rapport a été téléchargé avec succès" 
+    });
+  };
+
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let yPos = 20;
+
+    // Titre
+    doc.setFontSize(18);
+    doc.text('Rapport Bibliothèque Numérique', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 10;
+    
+    doc.setFontSize(10);
+    doc.text(`Période: ${timeRange} derniers jours`, pageWidth / 2, yPos, { align: 'center' });
+    yPos += 5;
+    doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, pageWidth / 2, yPos, { align: 'center' });
+    yPos += 15;
+
+    // Statistiques globales
+    doc.setFontSize(14);
+    doc.text('Statistiques Globales', 15, yPos);
+    yPos += 8;
+    
+    doc.setFontSize(10);
+    doc.text(`Total Consultations: ${totalViews.toLocaleString()}`, 20, yPos);
+    yPos += 6;
+    doc.text(`Total Téléchargements: ${totalDownloads.toLocaleString()}`, 20, yPos);
+    yPos += 6;
+    doc.text(`Utilisateurs Actifs: ${uniqueUsers}`, 20, yPos);
+    yPos += 6;
+    doc.text(`Temps Total Lecture: ${Math.round(totalReadingTime / 60)}h`, 20, yPos);
+    yPos += 6;
+    doc.text(`Temps Moyen par Utilisateur: ${avgReadingTime} min`, 20, yPos);
+    yPos += 12;
+
+    // Top 10 Œuvres Consultées
+    doc.setFontSize(14);
+    doc.text('Top 10 Oeuvres Consultées', 15, yPos);
+    yPos += 8;
+    
+    doc.setFontSize(9);
+    mostViewed?.slice(0, 10).forEach((doc: any, index: number) => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 20;
+      }
+      const text = `${index + 1}. ${doc.title} - ${doc.view_count} consultations`;
+      doc.text(text.substring(0, 80), 20, yPos);
+      yPos += 5;
+    });
+    yPos += 10;
+
+    // Top 10 Auteurs
+    if (yPos > 250) {
+      doc.addPage();
+      yPos = 20;
+    }
+    
+    doc.setFontSize(14);
+    doc.text('Top 10 Auteurs', 15, yPos);
+    yPos += 8;
+    
+    doc.setFontSize(9);
+    topAuthors.slice(0, 10).forEach(([author, stats]: any, index: number) => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 20;
+      }
+      doc.text(`${index + 1}. ${author} - ${stats.views} consultations`, 20, yPos);
+      yPos += 5;
+    });
+
+    // Sauvegarder le PDF
+    doc.save(`rapport-bibliotheque-${new Date().toISOString().split('T')[0]}.pdf`);
+
+    toast({ 
+      title: "Rapport PDF généré", 
+      description: "Le rapport a été téléchargé avec succès" 
+    });
+  };
+
+  const handleExportCSV = () => {
+    const csvRows = [];
+    
+    // En-têtes
+    csvRows.push('RAPPORT BIBLIOTHEQUE NUMERIQUE');
+    csvRows.push(`Période,${timeRange} derniers jours`);
+    csvRows.push(`Date de génération,${new Date().toLocaleDateString('fr-FR')}`);
+    csvRows.push('');
+    
+    // Statistiques globales
+    csvRows.push('STATISTIQUES GLOBALES');
+    csvRows.push('Métrique,Valeur');
+    csvRows.push(`Total Consultations,${totalViews}`);
+    csvRows.push(`Total Téléchargements,${totalDownloads}`);
+    csvRows.push(`Utilisateurs Actifs,${uniqueUsers}`);
+    csvRows.push(`Temps Total Lecture (h),${Math.round(totalReadingTime / 60)}`);
+    csvRows.push(`Temps Moyen par Utilisateur (min),${avgReadingTime}`);
+    csvRows.push('');
+    
+    // Top 10 Œuvres
+    csvRows.push('TOP 10 OEUVRES CONSULTEES');
+    csvRows.push('Rang,Titre,Auteur,Consultations,Téléchargements');
+    mostViewed?.slice(0, 10).forEach((doc: any, index: number) => {
+      csvRows.push(`${index + 1},"${doc.title}","${doc.metadata?.main_author || 'Auteur inconnu'}",${doc.view_count},${doc.download_count}`);
+    });
+    csvRows.push('');
+    
+    // Top 10 Auteurs
+    csvRows.push('TOP 10 AUTEURS');
+    csvRows.push('Rang,Auteur,Nombre Oeuvres,Consultations,Téléchargements');
+    topAuthors.slice(0, 10).forEach(([author, stats]: any, index: number) => {
+      csvRows.push(`${index + 1},"${author}",${stats.works},${stats.views},${stats.downloads}`);
+    });
+
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rapport-bibliotheque-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({ 
+      title: "Rapport CSV généré", 
       description: "Le rapport a été téléchargé avec succès" 
     });
   };
@@ -231,10 +361,28 @@ export default function AnalyticsManager() {
           <p className="text-muted-foreground">Analyse détaillée de l'utilisation de la Bibliothèque Numérique</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button onClick={handleExportReport} variant="outline">
-            <FileDown className="h-4 w-4 mr-2" />
-            Exporter le rapport
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <FileDown className="h-4 w-4 mr-2" />
+                Exporter le rapport
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleExportPDF}>
+                <FileDown className="h-4 w-4 mr-2" />
+                Exporter en PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportCSV}>
+                <FileDown className="h-4 w-4 mr-2" />
+                Exporter en CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportJSON}>
+                <FileDown className="h-4 w-4 mr-2" />
+                Exporter en JSON
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue />
