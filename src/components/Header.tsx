@@ -222,6 +222,13 @@ const Header = () => {
                           {t('nav.consult.national.library')}
                         </Link>
                       </NavigationMenuLink>
+                      {(profile?.role === 'admin' || profile?.role === 'librarian') && (
+                        <NavigationMenuLink asChild>
+                          <Link to="/admin/digital-library" className="block p-2 text-xs hover:bg-primary/10 rounded bg-primary/5 font-semibold">
+                            📚 Back-office Bibliothèque Numérique
+                          </Link>
+                        </NavigationMenuLink>
+                      )}
                       <NavigationMenuLink asChild>
                         <Link to="/legal-deposit" className="block p-2 text-xs hover:bg-primary/10 rounded">
                           {t('nav.legal.deposit')}
