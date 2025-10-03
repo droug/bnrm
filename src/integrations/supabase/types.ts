@@ -1788,6 +1788,53 @@ export type Database = {
           },
         ]
       }
+      manuscript_pages: {
+        Row: {
+          created_at: string | null
+          id: string
+          image_url: string | null
+          manuscript_id: string
+          ocr_text: string | null
+          page_number: number
+          paragraphs: Json | null
+          translations: Json | null
+          updated_at: string | null
+          word_coordinates: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          manuscript_id: string
+          ocr_text?: string | null
+          page_number: number
+          paragraphs?: Json | null
+          translations?: Json | null
+          updated_at?: string | null
+          word_coordinates?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          manuscript_id?: string
+          ocr_text?: string | null
+          page_number?: number
+          paragraphs?: Json | null
+          translations?: Json | null
+          updated_at?: string | null
+          word_coordinates?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manuscript_pages_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       manuscript_reading_history: {
         Row: {
           action_type: string
@@ -1949,7 +1996,10 @@ export type Database = {
           is_visible: boolean | null
           language: string | null
           material: string | null
+          ocr_pages: Json | null
+          ocr_text: string | null
           page_count: number | null
+          page_structure: Json | null
           pages_data: Json | null
           period: string | null
           permalink: string | null
@@ -1960,7 +2010,9 @@ export type Database = {
           subject: string[] | null
           thumbnail_url: string | null
           title: string
+          translations: Json | null
           updated_at: string | null
+          versions: Json | null
         }
         Insert: {
           access_level?: Database["public"]["Enums"]["access_level"] | null
@@ -1989,7 +2041,10 @@ export type Database = {
           is_visible?: boolean | null
           language?: string | null
           material?: string | null
+          ocr_pages?: Json | null
+          ocr_text?: string | null
           page_count?: number | null
+          page_structure?: Json | null
           pages_data?: Json | null
           period?: string | null
           permalink?: string | null
@@ -2000,7 +2055,9 @@ export type Database = {
           subject?: string[] | null
           thumbnail_url?: string | null
           title: string
+          translations?: Json | null
           updated_at?: string | null
+          versions?: Json | null
         }
         Update: {
           access_level?: Database["public"]["Enums"]["access_level"] | null
@@ -2029,7 +2086,10 @@ export type Database = {
           is_visible?: boolean | null
           language?: string | null
           material?: string | null
+          ocr_pages?: Json | null
+          ocr_text?: string | null
           page_count?: number | null
+          page_structure?: Json | null
           pages_data?: Json | null
           period?: string | null
           permalink?: string | null
@@ -2040,7 +2100,9 @@ export type Database = {
           subject?: string[] | null
           thumbnail_url?: string | null
           title?: string
+          translations?: Json | null
           updated_at?: string | null
+          versions?: Json | null
         }
         Relationships: [
           {
@@ -3936,6 +3998,18 @@ export type Database = {
           id: string
           relevance: number
           title: string
+        }[]
+      }
+      search_manuscript_pages: {
+        Args: {
+          p_context_words?: number
+          p_manuscript_id: string
+          p_query: string
+        }
+        Returns: {
+          matches: Json
+          page_id: string
+          page_number: number
         }[]
       }
       set_limit: {
