@@ -11,6 +11,7 @@ import Manuscripts from "./pages/Manuscripts";
 import ManuscriptsPlatform from "./pages/ManuscriptsPlatform";
 import ManuscriptsBackoffice from "./pages/ManuscriptsBackoffice";
 import ManuscriptReader from "./pages/ManuscriptReader";
+import MyManuscriptsSpace from "./pages/MyManuscriptsSpace";
 import AccessRequest from "./pages/AccessRequest";
 import Profile from "./pages/Profile";
 import UserManagement from "./pages/UserManagement";
@@ -61,6 +62,7 @@ const App = () => (
         <Route path="/admin/manuscripts-backoffice" element={<ManuscriptsBackoffice />} />
         <Route path="/manuscrit/:id" element={<ManuscriptReader />} />
         <Route path="/manuscript/:id" element={<ManuscriptReader />} />
+        <Route path="/mon-espace-manuscrits" element={<MyManuscriptsSpace />} />
         <Route path="/access-request" element={<AccessRequest />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin/users" element={<UserManagement />} />

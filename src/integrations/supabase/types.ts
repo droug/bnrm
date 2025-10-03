@@ -1788,6 +1788,97 @@ export type Database = {
           },
         ]
       }
+      manuscript_reading_history: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          manuscript_id: string
+          metadata: Json | null
+          page_number: number | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          manuscript_id: string
+          metadata?: Json | null
+          page_number?: number | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          manuscript_id?: string
+          metadata?: Json | null
+          page_number?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manuscript_reading_history_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manuscript_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          id: string
+          is_public: boolean | null
+          manuscript_id: string
+          rating: number
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          is_public?: boolean | null
+          manuscript_id: string
+          rating: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          is_public?: boolean | null
+          manuscript_id?: string
+          rating?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manuscript_reviews_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       manuscript_viewer_settings: {
         Row: {
           allow_download_default: boolean | null
@@ -3529,6 +3620,25 @@ export type Database = {
       }
     }
     Views: {
+      manuscript_reading_stats: {
+        Row: {
+          download_count: number | null
+          last_page: number | null
+          last_read_at: string | null
+          manuscript_id: string | null
+          read_count: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manuscript_reading_history_manuscript_id_fkey"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles_public: {
         Row: {
           created_at: string | null

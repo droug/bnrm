@@ -75,6 +75,16 @@ const Header = () => {
             </>
           )}
 
+          {/* Mon Espace pour la plateforme des manuscrits */}
+          {isManuscriptsPlatform && user && (
+            <Link to="/mon-espace-manuscrits">
+              <Button variant="outline" size="sm" className="gap-2">
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline">Mon Espace</span>
+              </Button>
+            </Link>
+          )}
+
           {/* Actions compactes */}
           <div className="flex items-center gap-2">
             {/* Langue - icône seulement sur mobile */}
