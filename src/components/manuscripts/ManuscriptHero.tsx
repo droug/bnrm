@@ -20,7 +20,7 @@ export function ManuscriptHero({
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${manuscriptBanner})` }}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/60 to-royal/80" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/30 to-royal/50" />
       <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20" />
       <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-15" />
       
