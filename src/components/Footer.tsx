@@ -60,7 +60,7 @@ const Footer = () => {
 
   return (
     <footer className={isKitabPage 
-      ? "bg-[hsl(var(--kitab-primary))] text-white" 
+      ? "bg-muted/30 text-foreground border-t" 
       : "bg-primary text-primary-foreground"
     }>
       {/* Main footer content */}
@@ -69,8 +69,11 @@ const Footer = () => {
           {/* Organization info */}
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center">
-                <Book className="h-6 w-6 text-accent-foreground" />
+              <div className={isKitabPage 
+                ? "w-12 h-12 bg-[hsl(var(--kitab-accent))]/10 rounded-full flex items-center justify-center"
+                : "w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center"
+              }>
+                <Book className={isKitabPage ? "h-6 w-6 text-[hsl(var(--kitab-accent))]" : "h-6 w-6 text-accent-foreground"} />
               </div>
               <div>
                 <h3 className="text-xl font-bold">{isKitabPage ? "Kitab" : "BNRM"}</h3>
@@ -91,7 +94,10 @@ const Footer = () => {
                   key={index}
                   variant="ghost" 
                   size="sm" 
-                  className="opacity-70 hover:opacity-100 hover:bg-white/10 p-2"
+                  className={isKitabPage 
+                    ? "opacity-70 hover:opacity-100 hover:bg-muted p-2"
+                    : "opacity-70 hover:opacity-100 hover:bg-white/10 p-2"
+                  }
                   aria-label={social.label}
                 >
                   {social.icon}
@@ -175,7 +181,10 @@ const Footer = () => {
               <Input 
                 type="email" 
                 placeholder="Votre email"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:border-white/40"
+                className={isKitabPage
+                  ? "bg-background border-input"
+                  : "bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:border-white/40"
+                }
               />
               <Button 
                 className={isKitabPage 
@@ -192,7 +201,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <Separator className="bg-white/20 mb-8" />
+        <Separator className={isKitabPage ? "bg-border mb-8" : "bg-white/20 mb-8"} />
 
         {/* Bottom section */}
         <div className="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
