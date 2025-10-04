@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Users, BarChart3, Settings, Shield, Eye, Image } from "lucide-react";
-import { ManuscriptsManager } from "@/components/manuscripts/ManuscriptsManager";
+import DocumentsManagerManuscripts from "@/components/manuscripts/DocumentsManagerManuscripts";
 import { ManuscriptsSettings } from "@/components/manuscripts/ManuscriptsSettings";
 import { ManuscriptsAccessControl } from "@/components/manuscripts/ManuscriptsAccessControl";
 import { ManuscriptsAnalytics } from "@/components/manuscripts/ManuscriptsAnalytics";
@@ -74,7 +74,7 @@ export default function ManuscriptsBackoffice() {
           </TabsContent>
 
           <TabsContent value="documents">
-            <ManuscriptsManager />
+            <DocumentsManagerManuscripts />
           </TabsContent>
 
           <TabsContent value="users">
