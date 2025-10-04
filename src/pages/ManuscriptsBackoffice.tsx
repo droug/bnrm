@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BookOpen, Users, FileText, BarChart3, Settings, Shield, Archive, Database, FileSearch } from "lucide-react";
+import { BookOpen, Users, FileText, BarChart3, Settings, Shield, Archive, Database, FileSearch, LayoutDashboard, GitBranch } from "lucide-react";
 import { ManuscriptsManager } from "@/components/manuscripts/ManuscriptsManager";
 import { ManuscriptsAnalytics } from "@/components/manuscripts/ManuscriptsAnalytics";
 import { ManuscriptsSettings } from "@/components/manuscripts/ManuscriptsSettings";
@@ -14,10 +14,13 @@ import { ManuscriptsAccessControl } from "@/components/manuscripts/ManuscriptsAc
 import { MetadataImportManager } from "@/components/manuscripts/MetadataImportManager";
 import { PartnerCollectionsApproval } from "@/components/manuscripts/PartnerCollectionsApproval";
 import { PartnerManuscriptSubmissions } from "@/components/manuscripts/PartnerManuscriptSubmissions";
+import { ManuscriptsDashboard } from "@/components/manuscripts/ManuscriptsDashboard";
+import { ManuscriptsWorkflow } from "@/components/manuscripts/ManuscriptsWorkflow";
+import { ManuscriptsReports } from "@/components/manuscripts/ManuscriptsReports";
 
 export default function ManuscriptsBackoffice() {
   const { user, loading, profile } = useAuth();
-  const [activeTab, setActiveTab] = useState("manuscripts");
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   if (loading) {
     return (
@@ -49,7 +52,15 @@ export default function ManuscriptsBackoffice() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-gold/5 to-primary/5 rounded-xl"></div>
-            <TabsList className="relative grid w-full grid-cols-2 lg:grid-cols-7 gap-3 bg-transparent p-3 h-auto">
+            <TabsList className="relative grid w-full grid-cols-2 lg:grid-cols-9 gap-2 bg-transparent p-3 h-auto">
+              <TabsTrigger 
+                value="dashboard" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105 transition-all duration-300 bg-white/80 backdrop-blur-sm border border-primary/20 hover:border-primary/40 hover:bg-primary/5"
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                <span className="hidden sm:inline font-medium">Dashboard</span>
+              </TabsTrigger>
+              
               <TabsTrigger 
                 value="manuscripts" 
                 className="flex items-center gap-2 data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105 transition-all duration-300 bg-white/80 backdrop-blur-sm border border-primary/20 hover:border-primary/40 hover:bg-primary/5"
@@ -105,11 +116,31 @@ export default function ManuscriptsBackoffice() {
                 <Archive className="h-4 w-4" />
                 <span className="hidden sm:inline font-medium">Collections</span>
               </TabsTrigger>
+
+              <TabsTrigger 
+                value="workflow" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-br data-[state=active]:from-gold data-[state=active]:to-gold/80 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105 transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gold/20 hover:border-gold/40 hover:bg-gold/5"
+              >
+                <GitBranch className="h-4 w-4" />
+                <span className="hidden sm:inline font-medium">Workflow</span>
+              </TabsTrigger>
+
+              <TabsTrigger 
+                value="reports" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105 transition-all duration-300 bg-white/80 backdrop-blur-sm border border-primary/20 hover:border-primary/40 hover:bg-primary/5"
+              >
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline font-medium">Rapports</span>
+              </TabsTrigger>
             </TabsList>
           </div>
 
           <ScrollArea className="h-[calc(100vh-280px)] mt-8">
             <div className="animate-fade-in">{/* Animation wrapper */}
+            <TabsContent value="dashboard" className="space-y-4">
+              <ManuscriptsDashboard />
+            </TabsContent>
+
             <TabsContent value="manuscripts" className="space-y-4">
               <ManuscriptsManager />
             </TabsContent>
@@ -152,6 +183,14 @@ export default function ManuscriptsBackoffice() {
                   <p className="text-muted-foreground">Module de gestion des collections à venir...</p>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="workflow" className="space-y-4">
+              <ManuscriptsWorkflow />
+            </TabsContent>
+
+            <TabsContent value="reports" className="space-y-4">
+              <ManuscriptsReports />
             </TabsContent>
             </div>{/* Fermeture animation wrapper */}
           </ScrollArea>
