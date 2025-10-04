@@ -236,9 +236,6 @@ const Footer = () => {
             <p className="text-sm opacity-80">
               © {currentYear} {isKitabPage ? "Kitab - BNRM" : t('header.title')}. {t('footer.rights')}
             </p>
-            <p className="text-xs opacity-60 mt-2 flex items-center justify-center gap-1">
-              Fait avec <Heart className="h-3 w-3 fill-current" /> pour la culture et le patrimoine marocain
-            </p>
           </div>
         </div>
       </div>
