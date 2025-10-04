@@ -116,8 +116,8 @@ const Index = () => {
         <div className="relative z-10">
           <Header />
           
-          {/* Bannière moderne inspirée d'AUI avec image claire */}
-          <section className="relative h-[70vh] overflow-hidden">
+          {/* Bannière moderne avec header intégré */}
+          <section className="relative h-screen overflow-hidden -mt-[140px]">
             {/* Image de fond - Bâtiment BNRM de nuit - claire à 100% */}
             <div 
               className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -128,11 +128,11 @@ const Index = () => {
             ></div>
             
             {/* Gradient overlay subtil pour améliorer la lisibilité */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60"></div>
             
-            {/* Contenu centré */}
-            <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
-              <div className="max-w-4xl mx-auto">
+            {/* Contenu en haut */}
+            <div className="relative z-10 h-full flex flex-col pt-[180px] px-4">
+              <div className="max-w-4xl mx-auto text-center">
                 <div className="flex items-center justify-center space-x-4 mb-6">
                   <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-2xl" />
                   <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white drop-shadow-2xl">

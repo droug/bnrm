@@ -50,10 +50,10 @@ const Header = () => {
   const showBackButton = !isHomePage && !isDigitalLibraryHome && !isManuscriptsPlatformHome;
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b-2 border-primary/20 shadow-lg">
-      <div className="container mx-auto px-4">
+    <header className={`sticky top-0 z-50 border-b-2 shadow-lg ${isHomePage ? 'bg-transparent border-transparent' : 'bg-background/95 backdrop-blur-lg border-primary/20'}`}>
+      <div className={`container mx-auto px-4 ${isHomePage ? 'text-white' : ''}`}>
         {/* Bannière ultra-compacte */}
-        <div className="flex justify-between items-center py-2 border-b border-primary/20">
+        <div className={`flex justify-between items-center py-2 ${isHomePage ? 'border-b border-white/20' : 'border-b border-primary/20'}`}>
           {/* Logo + Titre compact */}
           <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <img src={logoImage} alt="Logo BNRM" className="h-10 w-auto" />
@@ -67,7 +67,7 @@ const Header = () => {
             <>
               {isManuscriptsPlatform && (
                 <Link to="/admin/manuscripts-backoffice">
-                  <Button variant="outline" size="sm" className="gap-2 border-gold/40 hover:border-gold hover:bg-gold/10">
+                  <Button variant="outline" size="sm" className={`gap-2 ${isHomePage ? 'border-white/40 text-white hover:bg-white/20' : 'border-gold/40 hover:border-gold hover:bg-gold/10'}`}>
                     <Shield className="h-4 w-4" />
                     <span className="hidden sm:inline">Gestion Manuscrits Numérisés</span>
                     <span className="sm:hidden">Gestion</span>
@@ -76,7 +76,7 @@ const Header = () => {
               )}
               {isDigitalLibrary && (
                 <Link to="/admin/digital-library">
-                  <Button variant="outline" size="sm" className="gap-2 border-gold/40 hover:border-gold hover:bg-gold/10">
+                  <Button variant="outline" size="sm" className={`gap-2 ${isHomePage ? 'border-white/40 text-white hover:bg-white/20' : 'border-gold/40 hover:border-gold hover:bg-gold/10'}`}>
                     <Shield className="h-4 w-4" />
                     <span className="hidden sm:inline">Gestion Bibliothèque Numérique</span>
                     <span className="sm:hidden">Gestion</span>
@@ -89,7 +89,7 @@ const Header = () => {
           {/* Mon Espace pour la plateforme des manuscrits */}
           {isManuscriptsPlatform && user && (
             <Link to="/mon-espace-manuscrits">
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className={`gap-2 ${isHomePage ? 'border-white/40 text-white hover:bg-white/20' : ''}`}>
                 <User className="h-4 w-4" />
                 <span className="hidden sm:inline">Mon Espace</span>
               </Button>
@@ -101,7 +101,7 @@ const Header = () => {
             {/* Navigation Portails */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
+                <Button variant="outline" size="sm" className={`gap-2 ${isHomePage ? 'border-white/40 text-white hover:bg-white/20' : ''}`}>
                   <Building className="h-4 w-4" />
                   <span className="hidden md:inline">Portails</span>
                   <ChevronDown className="h-3 w-3" />
@@ -138,7 +138,7 @@ const Header = () => {
             {/* Langue - icône seulement sur mobile */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1 px-2">
+                <Button variant="ghost" size="sm" className={`gap-1 px-2 ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
                   <Globe className="h-4 w-4" />
                   <span className="hidden sm:inline text-xs">
                     {language === 'ar' && 'ع'}
@@ -172,7 +172,7 @@ const Header = () => {
               variant="ghost"
               size="sm"
               onClick={() => setIsChatBotOpen(!isChatBotOpen)}
-              className={`px-2 relative ${isChatBotOpen ? 'bg-primary/10' : ''}`}
+              className={`px-2 relative ${isChatBotOpen ? 'bg-primary/10' : ''} ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}
               title="Assistant IA"
             >
               <Bot className="h-4 w-4" />
@@ -185,7 +185,7 @@ const Header = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-1 px-2">
+                  <Button variant="ghost" size="sm" className={`gap-1 px-2 ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
                     <User className="h-4 w-4" />
                     <span className="hidden md:inline text-xs max-w-[80px] truncate">
                       {profile?.first_name || 'Compte'}
@@ -223,7 +223,7 @@ const Header = () => {
               </DropdownMenu>
             ) : (
               <Link to="/auth">
-                <Button size="sm" className="gap-1 px-3">
+                <Button size="sm" className={`gap-1 px-3 ${isHomePage ? 'bg-white text-primary hover:bg-white/90' : ''}`}>
                   <LogIn className="h-4 w-4" />
                   <span className="hidden sm:inline text-xs">{t('nav.login')}</span>
                 </Button>
