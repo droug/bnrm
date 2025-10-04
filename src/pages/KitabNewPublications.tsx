@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import KitabHeader from "@/components/KitabHeader";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,12 @@ import { useState } from "react";
 
 export default function KitabNewPublications() {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   const handleSearch = () => {
-    // TODO: Implement search functionality
-    console.log("Searching for:", searchQuery);
+    if (searchQuery.trim()) {
+      navigate(`/search-results?q=${encodeURIComponent(searchQuery)}&source=kitab`);
+    }
   };
 
   return (
