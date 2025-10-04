@@ -25,3 +25,6 @@ verify_jwt = true
 
 [functions.verify-payment]
 verify_jwt = false
+
+[functions.subscribe-newsletter]
+verify_jwt = false

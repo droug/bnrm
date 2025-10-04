@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -11,18 +12,50 @@ import {
   Youtube, 
   Instagram,
   Book,
-  Heart
+  Heart,
+  Loader2
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { t } = useLanguage();
   const location = useLocation();
+  const [email, setEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
   
   // Check if we're on a Kitab page
   const isKitabPage = location.pathname.startsWith('/kitab');
+
+  const handleNewsletterSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !email.includes("@")) {
+      toast.error("Veuillez entrer une adresse email valide");
+      return;
+    }
+
+    setIsSubscribing(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('subscribe-newsletter', {
+        body: { email }
+      });
+
+      if (error) throw error;
+
+      toast.success(data.message || "Merci pour votre abonnement !");
+      setEmail("");
+    } catch (error) {
+      console.error("Newsletter subscription error:", error);
+      toast.error("Erreur lors de l'abonnement. Veuillez réessayer.");
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   const quickLinks = [
     { title: t('header.catalog'), href: "#catalogue" },
@@ -217,24 +250,36 @@ const Footer = () => {
             <p className="text-sm opacity-80 mb-4 leading-relaxed">
               Restez informé de nos actualités et nouvelles acquisitions.
             </p>
-            <div className="space-y-3">
+            <form onSubmit={handleNewsletterSubscribe} className="space-y-3">
               <Input 
                 type="email" 
                 placeholder="Votre email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isSubscribing}
                 className={isKitabPage
                   ? "bg-background border-input text-sm"
                   : "bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:border-white/40 text-sm"
                 }
               />
               <Button 
+                type="submit"
+                disabled={isSubscribing}
                 className={isKitabPage 
                   ? "w-full bg-[hsl(var(--kitab-accent))] hover:bg-[hsl(var(--kitab-accent))]/90 text-white font-medium text-sm" 
                   : "w-full bg-accent hover:bg-accent/90 text-accent-foreground font-medium text-sm"
                 }
               >
-                S'abonner
+                {isSubscribing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Abonnement...
+                  </>
+                ) : (
+                  "S'abonner"
+                )}
               </Button>
-            </div>
+            </form>
             <p className="text-xs opacity-60 mt-3 leading-relaxed">
               En vous abonnant, vous acceptez de recevoir nos communications.
             </p>
