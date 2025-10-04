@@ -458,8 +458,9 @@ Amek zemreɣ ad k-ɛiwneɣ ass-a?`
           isOpen ? 'translate-x-0 opacity-100' : 'translate-x-[120%] opacity-0'
         }`}
         style={{
-          right: `${16 + position.x}px`,
-          top: `${64 + position.y}px`,
+          left: '50%',
+          top: '80px',
+          transform: 'translateX(-50%)',
           width: window.innerWidth < 640 ? 'calc(100vw - 2rem)' : '500px',
           height: showSignLanguage ? '950px' : '750px',
           maxHeight: 'calc(100vh - 5rem)',
@@ -468,7 +469,7 @@ Amek zemreɣ ad k-ɛiwneɣ ass-a?`
           pointerEvents: isOpen ? 'auto' : 'none'
         }}
       >
-      <div className="p-0 h-full flex flex-col overflow-hidden relative">
+      <div className="p-0 h-full flex flex-col overflow-hidden relative" style={{ scrollBehavior: 'auto' }}>
         {/* Drag handle */}
         <div 
           className="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-primary/30 rounded-full mt-2 cursor-grab active:cursor-grabbing z-10"
@@ -560,8 +561,8 @@ Amek zemreɣ ad k-ɛiwneɣ ass-a?`
         </div>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 p-4 min-h-0">
-          <div className="space-y-4">
+        <ScrollArea className="flex-1 p-4 min-h-0" style={{ overflowX: 'hidden' }}>
+          <div className="space-y-4 w-full">
             {messages.map((message) => (
               <div
                 key={message.id}
