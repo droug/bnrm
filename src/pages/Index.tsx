@@ -152,28 +152,28 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Boutons d'action latéraux colorés (style AUI) */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 z-20 space-y-2">
+            {/* Boutons d'action en bas de la bannière avec couleurs douces */}
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-wrap gap-4 justify-center px-4">
               <Link to="/digital-library">
-                <Button className="rounded-l-lg rounded-r-none py-6 px-6 bg-amber-500 hover:bg-amber-600 text-white shadow-lg">
+                <Button className="py-6 px-8 bg-slate-100/90 hover:bg-slate-200/90 text-slate-700 shadow-lg backdrop-blur-sm">
                   <BookOpen className="h-5 w-5 mr-2" />
                   Explorer
                 </Button>
               </Link>
               <Link to="/manuscripts-platform">
-                <Button className="rounded-l-lg rounded-r-none py-6 px-6 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg">
+                <Button className="py-6 px-8 bg-blue-50/90 hover:bg-blue-100/90 text-blue-700 shadow-lg backdrop-blur-sm">
                   <Book className="h-5 w-5 mr-2" />
                   Manuscrits
                 </Button>
               </Link>
               <Link to="/access-request">
-                <Button className="rounded-l-lg rounded-r-none py-6 px-6 bg-orange-600 hover:bg-orange-700 text-white shadow-lg">
+                <Button className="py-6 px-8 bg-amber-50/90 hover:bg-amber-100/90 text-amber-700 shadow-lg backdrop-blur-sm">
                   <Download className="h-5 w-5 mr-2" />
                   Accès
                 </Button>
               </Link>
               <Link to="/help">
-                <Button className="rounded-l-lg rounded-r-none py-6 px-6 bg-purple-600 hover:bg-purple-700 text-white shadow-lg">
+                <Button className="py-6 px-8 bg-purple-50/90 hover:bg-purple-100/90 text-purple-700 shadow-lg backdrop-blur-sm">
                   <Users className="h-5 w-5 mr-2" />
                   Aide
                 </Button>
