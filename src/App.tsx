@@ -72,6 +72,8 @@ import KitabRepertoireImprimeurs from "./pages/KitabRepertoireImprimeurs";
 import KitabRepertoireDistributeurs from "./pages/KitabRepertoireDistributeurs";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCanceled from "./pages/PaymentCanceled";
+import Wallet from "./pages/Wallet";
+import PaymentServices from "./pages/PaymentServices";
 
 
 const App = () => (
@@ -162,7 +164,12 @@ const App = () => (
           <Route path="/kitab/repertoire-imprimeurs" element={<KitabRepertoireImprimeurs />} />
           <Route path="/kitab/repertoire-distributeurs" element={<KitabRepertoireDistributeurs />} />
           
-          {/* Payment Routes */}
+          {/* Payment & Wallet Routes */}
+          <Route path="/payment-services" element={<PaymentServices />} />
+          <Route path="/services-paiement" element={<PaymentServices />} />
+          <Route path="/wallet" element={<Wallet />} />
+          <Route path="/portefeuille" element={<Wallet />} />
+          <Route path="/e-wallet" element={<Wallet />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-canceled" element={<PaymentCanceled />} />
 

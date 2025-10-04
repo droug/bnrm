@@ -51,6 +51,13 @@ const Footer = () => {
     { title: "Chatbot d'assistance", href: "#chatbot" }
   ];
 
+  const paymentLinks = [
+    { title: "e-Wallet BNRM", href: "/wallet" },
+    { title: "Services BNRM", href: "/bnrm" },
+    { title: "Reproduction", href: "/reproduction" },
+    { title: "Dépôt légal", href: "/admin/legal-deposit" }
+  ];
+
   const socialLinks = [
     { icon: <Facebook className="h-5 w-5" />, href: "#facebook", label: "Facebook" },
     { icon: <Twitter className="h-5 w-5" />, href: "#twitter", label: "Twitter" },
@@ -65,7 +72,7 @@ const Footer = () => {
     }>
       <div className="container mx-auto px-4 py-16">
         {/* Section principale - Informations et liens */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12">
           
           {/* Col 1: À propos */}
           <div className="lg:col-span-1 space-y-6">
@@ -149,7 +156,27 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Col 4: Contact */}
+          {/* Col 4: Paiements & Services */}
+          <div>
+            <h4 className="text-lg font-semibold mb-6 flex items-center">
+              <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-accent'}`}></span>
+              Paiements
+            </h4>
+            <ul className="space-y-3">
+              {paymentLinks.map((link, index) => (
+                <li key={index}>
+                  <a 
+                    href={link.href} 
+                    className="text-sm opacity-80 hover:opacity-100 hover:translate-x-1 transition-all inline-block"
+                  >
+                    {link.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 5: Contact */}
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
               <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-accent'}`}></span>
@@ -181,7 +208,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Col 5: Newsletter */}
+          {/* Col 6: Newsletter */}
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
               <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-accent'}`}></span>
