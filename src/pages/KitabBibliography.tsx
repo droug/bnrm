@@ -35,7 +35,7 @@ export default function KitabBibliography() {
       <KitabHeader />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden h-[400px] flex items-center justify-center">
+      <section className="relative overflow-hidden h-[400px]">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img 
@@ -48,22 +48,24 @@ export default function KitabBibliography() {
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--kitab-primary))]/70 via-[hsl(var(--kitab-primary-dark))]/60 to-[hsl(var(--kitab-secondary))]/70"></div>
         
-        <div className="container mx-auto px-4 relative z-10">
-          <Link to="/kitab" className="absolute top-8 left-4">
-            <Button variant="ghost" className="text-white hover:text-white/80">
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Retour au Portail Kitab
-            </Button>
-          </Link>
-          
-          <div className="max-w-4xl mx-auto text-center">
-            <BookMarked className="w-16 h-16 text-white mx-auto mb-6" />
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-              Bibliographie Nationale
-            </h1>
-            <p className="text-xl text-white/90 leading-relaxed">
-              Recherche avancée par support et par année
-            </p>
+        <div className="container mx-auto px-4 relative z-10 h-full flex items-center">
+          <div className="w-full">
+            <Link to="/kitab">
+              <Button variant="ghost" className="text-white hover:text-white/80 mb-6">
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Retour au Portail Kitab
+              </Button>
+            </Link>
+            
+            <div className="max-w-4xl mx-auto text-center">
+              <BookMarked className="w-16 h-16 text-white mx-auto mb-6" />
+              <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+                Bibliographie Nationale
+              </h1>
+              <p className="text-xl text-white/90 leading-relaxed">
+                Recherche avancée par support et par année
+              </p>
+            </div>
           </div>
         </div>
       </section>
