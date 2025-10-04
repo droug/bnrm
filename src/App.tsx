@@ -10,6 +10,14 @@ import Dashboard from "./pages/Dashboard";
 import Manuscripts from "./pages/Manuscripts";
 import ManuscriptsPlatform from "./pages/ManuscriptsPlatform";
 import ManuscriptsBackoffice from "./pages/ManuscriptsBackoffice";
+import ManuscriptsBackofficeDashboard from "./pages/ManuscriptsBackofficeDashboard";
+import ManuscriptsBackofficeDocuments from "./pages/ManuscriptsBackofficeDocuments";
+import ManuscriptsBackofficeUsers from "./pages/ManuscriptsBackofficeUsers";
+import ManuscriptsBackofficeAnalytics from "./pages/ManuscriptsBackofficeAnalytics";
+import ManuscriptsBackofficeExhibitions from "./pages/ManuscriptsBackofficeExhibitions";
+import ManuscriptsBackofficeReports from "./pages/ManuscriptsBackofficeReports";
+import ManuscriptsBackofficeAccess from "./pages/ManuscriptsBackofficeAccess";
+import ManuscriptsBackofficeSettings from "./pages/ManuscriptsBackofficeSettings";
 import ManuscriptReader from "./pages/ManuscriptReader";
 import MyManuscriptsSpace from "./pages/MyManuscriptsSpace";
 import ManuscriptsHelp from "./pages/ManuscriptsHelp";
@@ -63,6 +71,14 @@ const App = () => (
         <Route path="/manuscripts/help" element={<ManuscriptsHelp />} />
         <Route path="/aide-manuscrits" element={<ManuscriptsHelp />} />
         <Route path="/admin/manuscripts-backoffice" element={<ManuscriptsBackoffice />} />
+        <Route path="/admin/manuscripts-backoffice/dashboard" element={<ManuscriptsBackofficeDashboard />} />
+        <Route path="/admin/manuscripts-backoffice/documents" element={<ManuscriptsBackofficeDocuments />} />
+        <Route path="/admin/manuscripts-backoffice/users" element={<ManuscriptsBackofficeUsers />} />
+        <Route path="/admin/manuscripts-backoffice/analytics" element={<ManuscriptsBackofficeAnalytics />} />
+        <Route path="/admin/manuscripts-backoffice/exhibitions" element={<ManuscriptsBackofficeExhibitions />} />
+        <Route path="/admin/manuscripts-backoffice/reports" element={<ManuscriptsBackofficeReports />} />
+        <Route path="/admin/manuscripts-backoffice/access" element={<ManuscriptsBackofficeAccess />} />
+        <Route path="/admin/manuscripts-backoffice/settings" element={<ManuscriptsBackofficeSettings />} />
         <Route path="/manuscrit/:id" element={<ManuscriptReader />} />
         <Route path="/manuscript/:id" element={<ManuscriptReader />} />
         <Route path="/mon-espace-manuscrits" element={<MyManuscriptsSpace />} />
