@@ -52,6 +52,13 @@ import DigitalLibraryAnalytics from "./pages/DigitalLibraryAnalytics";
 import DigitalLibraryExhibitions from "./pages/DigitalLibraryExhibitions";
 import DigitalLibraryReproduction from "./pages/DigitalLibraryReproduction";
 import AccessPolicies from "./pages/AccessPolicies";
+import CBMPortal from "./pages/CBMPortal";
+import CBMObjectifs from "./pages/CBMObjectifs";
+import CBMPlanActions from "./pages/CBMPlanActions";
+import CBMOrganesGestion from "./pages/CBMOrganesGestion";
+import CBMAdhesion from "./pages/CBMAdhesion";
+import CBMRecherche from "./pages/CBMRecherche";
+import CBMAccesRapide from "./pages/CBMAccesRapide";
 
 
 const App = () => (
@@ -119,6 +126,15 @@ const App = () => (
           <Route path="/admin/digital-library/reproduction" element={<DigitalLibraryReproduction />} />
           <Route path="/access-policies" element={<AccessPolicies />} />
           <Route path="/politiques-acces" element={<AccessPolicies />} />
+          
+          {/* CBM Portal Routes */}
+          <Route path="/cbm" element={<CBMPortal />} />
+          <Route path="/cbm/objectifs" element={<CBMObjectifs />} />
+          <Route path="/cbm/plan-actions" element={<CBMPlanActions />} />
+          <Route path="/cbm/organes-gestion" element={<CBMOrganesGestion />} />
+          <Route path="/cbm/adhesion" element={<CBMAdhesion />} />
+          <Route path="/cbm/recherche" element={<CBMRecherche />} />
+          <Route path="/cbm/acces-rapide" element={<CBMAccesRapide />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />

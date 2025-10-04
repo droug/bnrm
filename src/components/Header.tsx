@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown, Accessibility, Bot, MessageCircle, Shield, HelpCircle } from "lucide-react";
+import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown, Accessibility, Bot, MessageCircle, Shield, HelpCircle, Network } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
@@ -97,6 +97,43 @@ const Header = () => {
 
           {/* Actions compactes */}
           <div className="flex items-center gap-2">
+            {/* Navigation Portails */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Building className="h-4 w-4" />
+                  <span className="hidden md:inline">Portails</span>
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuItem asChild>
+                  <Link to="/" className="cursor-pointer">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Portail Principal
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/digital-library" className="cursor-pointer">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Bibliothèque Numérique
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/plateforme-manuscrits" className="cursor-pointer">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Manuscrits Numérisés
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/cbm" className="cursor-pointer">
+                    <Network className="h-4 w-4 mr-2" />
+                    Portail CBM
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {/* Langue - icône seulement sur mobile */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

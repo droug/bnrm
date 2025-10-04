@@ -58,6 +58,39 @@ Enhanced Moroccan Heritage Design System
     --royal: 280 25% 60%;
     --royal-foreground: 44 15% 98%;
 
+    /* === CBM Portal Specific Colors === */
+    /* Palette distinctive pour le Catalogue des Bibliothèques Marocaines */
+    --cbm-primary: 210 85% 45%; /* Bleu bibliothèque */
+    --cbm-primary-foreground: 0 0% 100%;
+    --cbm-primary-light: 210 75% 55%;
+    --cbm-primary-dark: 210 90% 35%;
+    
+    --cbm-secondary: 160 70% 40%; /* Vert émeraude réseau */
+    --cbm-secondary-foreground: 0 0% 100%;
+    --cbm-secondary-light: 160 60% 50%;
+    
+    --cbm-accent: 180 65% 50%; /* Turquoise interactif */
+    --cbm-accent-foreground: 0 0% 100%;
+    --cbm-accent-glow: 180 55% 60%;
+    
+    --cbm-neutral: 210 15% 30%; /* Gris ardoise */
+    --cbm-neutral-foreground: 0 0% 100%;
+    --cbm-neutral-light: 210 10% 85%;
+    
+    /* Gradients CBM */
+    --gradient-cbm: linear-gradient(135deg, hsl(var(--cbm-primary)), hsl(var(--cbm-secondary)), hsl(var(--cbm-accent)));
+    --gradient-cbm-subtle: linear-gradient(180deg, hsl(var(--cbm-primary) / 0.05), hsl(var(--cbm-secondary) / 0.05));
+    
+    /* Patterns CBM - Hexagones et réseaux */
+    --pattern-cbm-network: 
+      repeating-linear-gradient(60deg, hsl(var(--cbm-primary) / 0.06) 0px, hsl(var(--cbm-primary) / 0.06) 1px, transparent 1px, transparent 40px),
+      repeating-linear-gradient(120deg, hsl(var(--cbm-secondary) / 0.05) 0px, hsl(var(--cbm-secondary) / 0.05) 1px, transparent 1px, transparent 40px),
+      repeating-linear-gradient(0deg, hsl(var(--cbm-accent) / 0.04) 0px, hsl(var(--cbm-accent) / 0.04) 1px, transparent 1px, transparent 40px);
+    
+    /* Ombres CBM */
+    --shadow-cbm: 0 4px 20px -4px hsl(var(--cbm-primary) / 0.2), 0 2px 8px -2px hsl(var(--cbm-secondary) / 0.1);
+    --shadow-cbm-strong: 0 8px 32px -8px hsl(var(--cbm-primary) / 0.3), 0 4px 12px -2px hsl(var(--cbm-accent) / 0.15);
+
     --destructive: 0 50% 60%;
     --destructive-foreground: 44 15% 98%;
 
