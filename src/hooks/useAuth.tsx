@@ -37,7 +37,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .select('*')
               .eq('user_id', session.user.id)
               .single();
-            setProfile(profileData);
+            
+            // Fetch user role from user_roles table
+            const { data: roleData } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', session.user.id)
+              .order('granted_at', { ascending: false })
+              .limit(1)
+              .single();
+            
+            // Combine profile with role
+            setProfile({
+              ...profileData,
+              role: roleData?.role || 'visitor'
+            });
           }, 0);
         } else {
           setProfile(null);
@@ -62,7 +76,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .eq('user_id', session.user.id)
           .single();
         console.log("AuthProvider - Profile query result:", { profileData, error });
-        setProfile(profileData);
+        
+        // Fetch user role from user_roles table
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .order('granted_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        // Combine profile with role
+        setProfile({
+          ...profileData,
+          role: roleData?.role || 'visitor'
+        });
       } else {
         console.log("AuthProvider - No session, setting profile to null");
         setProfile(null);
@@ -145,7 +173,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .select('*')
         .eq('user_id', user.id)
         .single();
-      setProfile(updatedProfile);
+      
+      // Fetch user role
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .order('granted_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      // Combine profile with role
+      setProfile({
+        ...updatedProfile,
+        role: roleData?.role || 'visitor'
+      });
     }
 
     return { error };

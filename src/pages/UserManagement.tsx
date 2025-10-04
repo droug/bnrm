@@ -129,13 +129,32 @@ export default function UserManagement() {
   const fetchData = async () => {
     try {
       // Fetch all users - RLS will ensure only admins can see this data
-      const { data: usersData, error: usersError } = await supabase
+      const { data: profilesData, error: usersError } = await supabase
         .from('profiles')
-        .select('id, user_id, first_name, last_name, phone, institution, research_field, role, is_approved, created_at, updated_at, subscription_type, partner_organization, research_specialization, access_level_details, profile_preferences')
+        .select('id, user_id, first_name, last_name, phone, institution, research_field, is_approved, created_at, updated_at, subscription_type, partner_organization, research_specialization, access_level_details, profile_preferences')
         .order('created_at', { ascending: false });
 
       if (usersError) throw usersError;
-      setUsers(usersData || []);
+      
+      // Fetch roles for each user
+      const usersWithRoles = await Promise.all(
+        (profilesData || []).map(async (profile) => {
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', profile.user_id)
+            .order('granted_at', { ascending: false })
+            .limit(1)
+            .single();
+          
+          return {
+            ...profile,
+            role: roleData?.role || 'visitor'
+          };
+        })
+      );
+      
+      setUsers(usersWithRoles || []);
 
       // Fetch pending access requests
       const { data: requestsData, error: requestsError } = await supabase

@@ -3,10 +3,11 @@ import { canAccessContent, canDownload, canRequestReproduction, hasAdvancedSearc
 
 /**
  * Hook personnalisé pour gérer les permissions d'accès
+ * Note: Le rôle est maintenant récupéré depuis la table user_roles pour plus de sécurité
  */
 export function useAccessControl() {
   const { profile } = useAuth();
-  const userRole = (profile?.role as UserRole) || null;
+  const userRole = (profile?.role as UserRole) || 'visitor';
 
   /**
    * Vérifie si l'utilisateur peut accéder à un contenu

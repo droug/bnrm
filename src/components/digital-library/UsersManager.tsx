@@ -52,13 +52,33 @@ export default function UsersManager() {
   const { data: users, isLoading } = useQuery({
     queryKey: ['bn-users'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch profiles
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
-      return data as Profile[];
+      if (profilesError) throw profilesError;
+      
+      // Fetch roles for each user
+      const usersWithRoles = await Promise.all(
+        (profilesData || []).map(async (profile) => {
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', profile.user_id)
+            .order('granted_at', { ascending: false })
+            .limit(1)
+            .single();
+          
+          return {
+            ...profile,
+            role: roleData?.role || 'visitor'
+          };
+        })
+      );
+      
+      return usersWithRoles as Profile[];
     }
   });
 

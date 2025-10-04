@@ -3028,7 +3028,6 @@ export type Database = {
           profile_preferences: Json | null
           research_field: string | null
           research_specialization: string[] | null
-          role: Database["public"]["Enums"]["user_role"] | null
           subscription_end_date: string | null
           subscription_start_date: string | null
           subscription_type: string | null
@@ -3048,7 +3047,6 @@ export type Database = {
           profile_preferences?: Json | null
           research_field?: string | null
           research_specialization?: string[] | null
-          role?: Database["public"]["Enums"]["user_role"] | null
           subscription_end_date?: string | null
           subscription_start_date?: string | null
           subscription_type?: string | null
@@ -3068,7 +3066,6 @@ export type Database = {
           profile_preferences?: Json | null
           research_field?: string | null
           research_specialization?: string[] | null
-          role?: Database["public"]["Enums"]["user_role"] | null
           subscription_end_date?: string | null
           subscription_start_date?: string | null
           subscription_type?: string | null
@@ -3971,6 +3968,33 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          expires_at: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_tutorial_progress: {
         Row: {
           completed: boolean | null
@@ -4314,9 +4338,6 @@ export type Database = {
           last_name: string | null
           research_field: string | null
           role: Database["public"]["Enums"]["user_role"] | null
-          subscription_end_date: string | null
-          subscription_start_date: string | null
-          subscription_type: string | null
           updated_at: string | null
           user_id: string | null
         }
@@ -4328,10 +4349,7 @@ export type Database = {
           is_approved?: boolean | null
           last_name?: string | null
           research_field?: string | null
-          role?: Database["public"]["Enums"]["user_role"] | null
-          subscription_end_date?: string | null
-          subscription_start_date?: string | null
-          subscription_type?: string | null
+          role?: never
           updated_at?: string | null
           user_id?: string | null
         }
@@ -4343,10 +4361,7 @@ export type Database = {
           is_approved?: boolean | null
           last_name?: string | null
           research_field?: string | null
-          role?: Database["public"]["Enums"]["user_role"] | null
-          subscription_end_date?: string | null
-          subscription_start_date?: string | null
-          subscription_type?: string | null
+          role?: never
           updated_at?: string | null
           user_id?: string | null
         }
@@ -4438,6 +4453,10 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: Json
       }
+      get_user_primary_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
       get_user_role: {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["user_role"]
@@ -4465,6 +4484,13 @@ export type Database = {
       has_manuscript_role: {
         Args: {
           _role: Database["public"]["Enums"]["manuscript_platform_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["user_role"]
           _user_id: string
         }
         Returns: boolean
