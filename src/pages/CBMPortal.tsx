@@ -14,28 +14,28 @@ export default function CBMPortal() {
       description: "Découvrez les missions et objectifs du Catalogue des Bibliothèques Marocaines",
       icon: Target,
       path: "/cbm/objectifs",
-      color: "bg-blue-600"
+      gradient: "from-primary/90 to-primary"
     },
     {
       title: "Adhésion au Réseau",
       description: "Rejoignez le réseau CBM - Formulaire et conditions d'adhésion",
       icon: UserPlus,
       path: "/cbm/adhesion",
-      color: "bg-green-600"
+      gradient: "from-accent/90 to-accent"
     },
     {
       title: "Recherche Documentaire",
       description: "Accédez au catalogue unifié des bibliothèques marocaines",
       icon: Database,
       path: "/cbm/recherche",
-      color: "bg-purple-600"
+      gradient: "from-secondary/90 to-secondary"
     },
     {
       title: "Plan d'Actions",
       description: "Étapes d'intégration et feuille de route du réseau CBM",
       icon: Network,
       path: "/cbm/plan-actions",
-      color: "bg-orange-600"
+      gradient: "from-primary/80 to-primary/90"
     }
   ];
 
@@ -59,7 +59,7 @@ export default function CBMPortal() {
       <Header />
       
       {/* Hero Banner - NYPL Style */}
-      <section className="relative overflow-hidden bg-primary h-[500px]">
+      <section className="relative overflow-hidden bg-primary h-[650px]">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img 
@@ -122,14 +122,15 @@ export default function CBMPortal() {
               const IconComponent = item.icon;
               return (
                 <Link key={item.path} to={item.path}>
-                  <Card className="group h-full hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden border">
-                    {/* Icon Header */}
-                    <div className={`${item.color} h-32 flex items-center justify-center`}>
-                      <IconComponent className="w-16 h-16 text-white" />
+                  <Card className="group h-full hover:shadow-xl transition-all duration-500 cursor-pointer overflow-hidden border-0 shadow-md">
+                    {/* Icon Header with Gradient */}
+                    <div className={`bg-gradient-to-br ${item.gradient} h-40 flex items-center justify-center relative`}>
+                      <div className="absolute inset-0 bg-pattern-zellige-complex opacity-10"></div>
+                      <IconComponent className="w-20 h-20 text-white relative z-10 group-hover:scale-110 transition-transform duration-300" strokeWidth={1.5} />
                     </div>
                     
-                    <CardHeader>
-                      <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors">
+                    <CardHeader className="p-6">
+                      <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors mb-2">
                         {item.title}
                       </CardTitle>
                       <CardDescription className="text-sm leading-relaxed">
@@ -154,20 +155,20 @@ export default function CBMPortal() {
               const IconComponent = item.icon;
               return (
                 <Link key={item.path} to={item.path}>
-                  <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border h-full">
-                    <CardHeader className="flex flex-row items-start gap-4 p-6">
-                      <div className="bg-primary/10 p-3 rounded-lg">
-                        <IconComponent className="w-8 h-8 text-primary" />
+                  <Card className="group hover:shadow-xl transition-all duration-500 cursor-pointer border-0 shadow-md h-full bg-card/50 backdrop-blur-sm">
+                    <CardHeader className="flex flex-row items-start gap-4 p-8">
+                      <div className="bg-gradient-to-br from-primary/20 to-primary/10 p-4 rounded-xl group-hover:scale-105 transition-transform duration-300">
+                        <IconComponent className="w-8 h-8 text-primary" strokeWidth={1.5} />
                       </div>
                       <div className="flex-1">
-                        <CardTitle className="text-xl mb-2 group-hover:text-primary transition-colors">
+                        <CardTitle className="text-xl mb-3 group-hover:text-primary transition-colors font-semibold">
                           {item.title}
                         </CardTitle>
-                        <CardDescription className="text-sm">
+                        <CardDescription className="text-sm leading-relaxed">
                           {item.description}
                         </CardDescription>
                       </div>
-                      <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-2 transition-all duration-300" />
                     </CardHeader>
                   </Card>
                 </Link>
