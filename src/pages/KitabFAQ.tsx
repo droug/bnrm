@@ -68,7 +68,7 @@ export default function KitabFAQ() {
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--kitab-accent))]/70 via-[hsl(var(--kitab-secondary))]/70 to-[hsl(var(--kitab-primary))]/70"></div>
         
-        <div className="container mx-auto px-4 relative z-10 h-full flex items-center">
+        <div className="container mx-auto px-4 relative z-10 h-full flex items-start pt-16">
           <div className="w-full">
             <Link to="/kitab">
               <Button variant="ghost" className="text-white hover:text-white/80 mb-6">
