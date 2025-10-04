@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Gem, Filter, ChevronDown, X } from "lucide-react";
+import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Gem, Filter, ChevronDown, X, Network } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -356,6 +356,35 @@ const Index = () => {
                         </h3>
                         <p className="text-white/95 font-elegant">
                           Manuscrits BNRM & institutions partenaires marocaines
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+
+                  {/* Carte Portail CBM */}
+                  <Link to="/cbm">
+                    <Card className="relative overflow-hidden group border-3 border-cbm-primary/40 shadow-cbm hover:shadow-cbm-strong transition-all duration-700 cursor-pointer">
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center opacity-15 group-hover:opacity-25 transition-opacity duration-700"
+                        style={{ backgroundImage: `url(${zelligePattern6})` }}
+                      ></div>
+                      <div 
+                        className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity"
+                        style={{ backgroundImage: 'var(--pattern-cbm-network)' }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-cbm-primary via-cbm-secondary to-cbm-accent opacity-85"></div>
+                      <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
+                        <div className="relative">
+                          <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center mb-4 shadow-cbm transform group-hover:scale-110 transition-all duration-500 border-2 border-white/30">
+                            <Network className="h-10 w-10 text-white" />
+                          </div>
+                          <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-white animate-pulse" />
+                        </div>
+                        <h3 className="text-xl font-moroccan font-bold text-white">
+                          Portail CBM
+                        </h3>
+                        <p className="text-white/95 font-elegant">
+                          Catalogue des Bibliothèques Marocaines - Réseau National
                         </p>
                       </CardContent>
                     </Card>
