@@ -61,7 +61,7 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique">
         {/* Header with Moroccan design */}
         <div className="relative overflow-hidden bg-gradient-zellige-main p-6 text-white">
           <div className="absolute inset-0 bg-pattern-zellige-complex opacity-30"></div>
