@@ -294,55 +294,59 @@ const Index = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   
                   {/* Carte Découvrir avec mosaïques zellige */}
-                  <Card className="md:col-span-1 relative overflow-hidden group border-3 border-gold/40 shadow-mosaique hover:shadow-moroccan transition-all duration-700">
-                    <div 
-                      className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-700"
-                      style={{ backgroundImage: `url(${zelligePattern1})` }}
-                    ></div>
-                    <div className="absolute inset-0 bg-gradient-neutral opacity-85"></div>
-                    <CardContent className="p-10 min-h-[350px] flex flex-col justify-center items-center text-center space-y-6 relative z-10">
-                      <div className="relative">
-                        <div className="w-24 h-24 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-6 shadow-mosaique transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border-2 border-gold/20">
-                          <BookOpen className="h-12 w-12 text-primary" />
+                  <Link to="/digital-library">
+                    <Card className="md:col-span-1 relative overflow-hidden group border-3 border-gold/40 shadow-mosaique hover:shadow-moroccan transition-all duration-700 cursor-pointer">
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-700"
+                        style={{ backgroundImage: `url(${zelligePattern1})` }}
+                      ></div>
+                      <div className="absolute inset-0 bg-gradient-neutral opacity-85"></div>
+                      <CardContent className="p-10 min-h-[350px] flex flex-col justify-center items-center text-center space-y-6 relative z-10">
+                        <div className="relative">
+                          <div className="w-24 h-24 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-6 shadow-mosaique transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border-2 border-gold/20">
+                            <BookOpen className="h-12 w-12 text-primary" />
+                          </div>
+                          <Sparkles className="absolute -top-3 -right-3 h-8 w-8 text-gold animate-pulse" />
                         </div>
-                        <Sparkles className="absolute -top-3 -right-3 h-8 w-8 text-gold animate-pulse" />
-                      </div>
-                      <h3 className="text-2xl font-moroccan font-bold text-foreground">
-                        {t('nav.discover')}
-                      </h3>
-                      <p className="text-muted-foreground font-elegant text-lg">
-                        Explorez l'histoire, les missions et les services de notre institution millénaire
-                      </p>
-                      <div className="flex space-x-2">
-                        {[...Array(5)].map((_, i) => (
-                          <div key={i} className="w-3 h-3 bg-gold/60 rounded-full animate-pulse border border-gold/30" style={{ animationDelay: `${i * 0.2}s` }}></div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
+                        <h3 className="text-2xl font-moroccan font-bold text-foreground">
+                          {t('nav.discover')}
+                        </h3>
+                        <p className="text-muted-foreground font-elegant text-lg">
+                          Explorez l'histoire, les missions et les services de notre institution millénaire
+                        </p>
+                        <div className="flex space-x-2">
+                          {[...Array(5)].map((_, i) => (
+                            <div key={i} className="w-3 h-3 bg-gold/60 rounded-full animate-pulse border border-gold/30" style={{ animationDelay: `${i * 0.2}s` }}></div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
 
                   {/* Carte Actualités avec mosaïques subtiles */}
-                  <Card className="relative overflow-hidden group border-3 border-primary/30 shadow-zellige hover:shadow-mosaique transition-all duration-700">
-                    <div 
-                      className="absolute inset-0 bg-cover bg-center opacity-15 group-hover:opacity-25 transition-opacity duration-700"
-                      style={{ backgroundImage: `url(${zelligePattern3})` }}
-                    ></div>
-                    <div className="absolute inset-0 bg-gradient-primary opacity-75"></div>
-                    <CardContent className="p-10 min-h-[350px] flex flex-col justify-center items-center text-center space-y-6 relative z-10">
-                      <div className="relative">
-                        <div className="w-24 h-24 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-6 shadow-zellige transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 border-2 border-white/20">
-                          <Calendar className="h-12 w-12 text-white" />
+                  <Link to="/news">
+                    <Card className="relative overflow-hidden group border-3 border-primary/30 shadow-zellige hover:shadow-mosaique transition-all duration-700 cursor-pointer">
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center opacity-15 group-hover:opacity-25 transition-opacity duration-700"
+                        style={{ backgroundImage: `url(${zelligePattern3})` }}
+                      ></div>
+                      <div className="absolute inset-0 bg-gradient-primary opacity-75"></div>
+                      <CardContent className="p-10 min-h-[350px] flex flex-col justify-center items-center text-center space-y-6 relative z-10">
+                        <div className="relative">
+                          <div className="w-24 h-24 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-6 shadow-zellige transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 border-2 border-white/20">
+                            <Calendar className="h-12 w-12 text-white" />
+                          </div>
+                          <Gem className="absolute -top-3 -right-3 h-8 w-8 text-gold animate-bounce" />
                         </div>
-                        <Gem className="absolute -top-3 -right-3 h-8 w-8 text-gold animate-bounce" />
-                      </div>
-                      <h3 className="text-2xl font-moroccan font-bold text-white">
-                        Actualités & Publications
-                      </h3>
-                      <p className="text-white/95 font-elegant text-lg">
-                        Découvrez les dernières nouvelles, événements et publications de la BNRM
-                      </p>
-                    </CardContent>
-                  </Card>
+                        <h3 className="text-2xl font-moroccan font-bold text-white">
+                          Actualités & Publications
+                        </h3>
+                        <p className="text-white/95 font-elegant text-lg">
+                          Découvrez les dernières nouvelles, événements et publications de la BNRM
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
 
                    {/* Carte Patrimoine avec motifs zellige */}
                   <Link to="/digital-library">
@@ -453,27 +457,29 @@ const Index = () => {
                   </Link>
 
                   {/* Carte Services avec mosaïques traditionnelles */}
-                  <Card className="relative overflow-hidden group border-3 border-highlight/30 shadow-berber hover:shadow-mosaique transition-all duration-700">
-                    <div 
-                      className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-700"
-                      style={{ backgroundImage: `url(${zelligePattern6})` }}
-                    ></div>
-                    <div className="absolute inset-0 bg-gradient-neutral opacity-85"></div>
-                    <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
-                      <div className="relative">
-                        <div className="w-20 h-20 bg-highlight/70 rounded-3xl flex items-center justify-center mb-4 shadow-zellige transform group-hover:scale-110 transition-all duration-500 border-2 border-highlight/30">
-                          <Users className="h-10 w-10 text-white" />
+                  <Link to="/payment-services">
+                    <Card className="relative overflow-hidden group border-3 border-highlight/30 shadow-berber hover:shadow-mosaique transition-all duration-700 cursor-pointer">
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-700"
+                        style={{ backgroundImage: `url(${zelligePattern6})` }}
+                      ></div>
+                      <div className="absolute inset-0 bg-gradient-neutral opacity-85"></div>
+                      <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
+                        <div className="relative">
+                          <div className="w-20 h-20 bg-highlight/70 rounded-3xl flex items-center justify-center mb-4 shadow-zellige transform group-hover:scale-110 transition-all duration-500 border-2 border-highlight/30">
+                            <Users className="h-10 w-10 text-white" />
+                          </div>
+                          <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-pulse" />
                         </div>
-                        <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-pulse" />
-                      </div>
-                      <h3 className="text-xl font-moroccan font-bold text-foreground">
-                        {t('nav.services')}
-                      </h3>
-                      <p className="text-muted-foreground font-elegant">
-                        Inscription, réservation, dépôt légal et services numériques
-                      </p>
-                    </CardContent>
-                  </Card>
+                        <h3 className="text-xl font-moroccan font-bold text-foreground">
+                          {t('nav.services')}
+                        </h3>
+                        <p className="text-muted-foreground font-elegant">
+                          Inscription, réservation, dépôt légal et services numériques
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 </div>
 
                 {/* Services rapides avec mosaïques zellige raffinées */}
@@ -531,11 +537,11 @@ const Index = () => {
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                       {[
-                        { icon: FileText, label: "Dépôt légal", color: "text-primary", bg: "bg-primary/10", border: "border-primary/25" },
-                        { icon: BookOpen, label: "Réserver un ouvrage", color: "text-accent", bg: "bg-accent/10", border: "border-accent/25" },
-                        { icon: Download, label: "Reproduction", color: "text-highlight", bg: "bg-highlight/10", border: "border-highlight/25" },
+                        { icon: FileText, label: "Dépôt légal", color: "text-primary", bg: "bg-primary/10", border: "border-primary/25", href: "/legal-deposit" },
+                        { icon: BookOpen, label: "Réserver un ouvrage", color: "text-accent", bg: "bg-accent/10", border: "border-accent/25", href: "/digital-library" },
+                        { icon: Download, label: "Reproduction", color: "text-highlight", bg: "bg-highlight/10", border: "border-highlight/25", href: "/reproduction" },
                         { icon: Users, label: "Inscription", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25", href: "/signup" },
-                        { icon: Calendar, label: "Événements", color: "text-gold", bg: "bg-gold/10", border: "border-gold/25" }
+                        { icon: Calendar, label: "Événements", color: "text-gold", bg: "bg-gold/10", border: "border-gold/25", href: "/news" }
                        ].map((service, index) => (
                          <div 
                            key={index} 
@@ -556,38 +562,42 @@ const Index = () => {
               <div className="xl:col-span-1 space-y-6">
                 
                 {/* Mon espace avec mosaïques raffinées */}
-                <Card className="relative overflow-hidden group border-3 border-primary/25 shadow-mosaique hover:shadow-zellige transition-all duration-500">
-                  <div className="absolute inset-0 bg-pattern-filigrane opacity-15 group-hover:opacity-25 transition-opacity duration-500"></div>
-                  <div className="absolute inset-0 bg-pattern-zellige-tiles opacity-10 group-hover:opacity-20 transition-opacity duration-500"></div>
-                  <div className="absolute inset-0 bg-gradient-mosaique opacity-90"></div>
-                  <CardContent className="p-5 text-center relative z-10">
-                    <div className="w-16 h-16 bg-gradient-neutral rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-mosaique transform group-hover:scale-110 transition-transform duration-300 border-2 border-primary/20">
-                      <Users className="h-8 w-8 text-primary" />
-                    </div>
-                    <h4 className="font-moroccan font-bold text-foreground mb-3">Mon Espace</h4>
-                    <Button size="sm" className="w-full bg-gradient-primary shadow-gold hover:shadow-mosaique font-serif">
-                      Connexion
-                    </Button>
-                  </CardContent>
-                </Card>
+                <Link to="/auth">
+                  <Card className="relative overflow-hidden group border-3 border-primary/25 shadow-mosaique hover:shadow-zellige transition-all duration-500 cursor-pointer">
+                    <div className="absolute inset-0 bg-pattern-filigrane opacity-15 group-hover:opacity-25 transition-opacity duration-500"></div>
+                    <div className="absolute inset-0 bg-pattern-zellige-tiles opacity-10 group-hover:opacity-20 transition-opacity duration-500"></div>
+                    <div className="absolute inset-0 bg-gradient-mosaique opacity-90"></div>
+                    <CardContent className="p-5 text-center relative z-10">
+                      <div className="w-16 h-16 bg-gradient-neutral rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-mosaique transform group-hover:scale-110 transition-transform duration-300 border-2 border-primary/20">
+                        <Users className="h-8 w-8 text-primary" />
+                      </div>
+                      <h4 className="font-moroccan font-bold text-foreground mb-3">Mon Espace</h4>
+                      <Button size="sm" className="w-full bg-gradient-primary shadow-gold hover:shadow-mosaique font-serif">
+                        Connexion
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Link>
 
                 {/* Cartes sidebar avec différentes mosaïques */}
                 {[
-                  { title: "Aide & Support", subtitle: "FAQ, règlements, contacts", icon: MousePointer, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-moroccan-stars", border: "border-accent/25", shadow: "shadow-elegant hover:shadow-zellige" },
-                  { title: "Services numériques", subtitle: "Catalogue, reproduction", icon: Download, gradient: "bg-gradient-neutral", pattern: "bg-pattern-filigrane", border: "border-gold/25", shadow: "shadow-gold hover:shadow-mosaique" },
-                  { title: "Langues", subtitle: "", icon: Globe, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-highlight/25", shadow: "shadow-berber hover:shadow-gold" },
-                  { title: "Accessibilité", subtitle: "Options d'accessibilité", icon: Accessibility, gradient: "bg-gradient-neutral", pattern: "bg-pattern-moroccan-stars", border: "border-royal/25", shadow: "shadow-royal hover:shadow-mosaique" },
-                  { title: "Partager", subtitle: "", icon: Share2, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-filigrane", border: "border-primary/25", shadow: "shadow-mosaique hover:shadow-zellige" }
+                  { title: "Aide & Support", subtitle: "FAQ, règlements, contacts", icon: MousePointer, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-moroccan-stars", border: "border-accent/25", shadow: "shadow-elegant hover:shadow-zellige", href: "/help" },
+                  { title: "Services numériques", subtitle: "Catalogue, reproduction", icon: Download, gradient: "bg-gradient-neutral", pattern: "bg-pattern-filigrane", border: "border-gold/25", shadow: "shadow-gold hover:shadow-mosaique", href: "/payment-services" },
+                  { title: "Langues", subtitle: "", icon: Globe, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-highlight/25", shadow: "shadow-berber hover:shadow-gold", href: "#" },
+                  { title: "Accessibilité", subtitle: "Options d'accessibilité", icon: Accessibility, gradient: "bg-gradient-neutral", pattern: "bg-pattern-moroccan-stars", border: "border-royal/25", shadow: "shadow-royal hover:shadow-mosaique", href: "#" },
+                  { title: "Partager", subtitle: "", icon: Share2, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-filigrane", border: "border-primary/25", shadow: "shadow-mosaique hover:shadow-zellige", href: "#" }
                 ].map((item, index) => (
-                  <Card key={index} className={`relative overflow-hidden group border-3 ${item.border} ${item.shadow} transition-all duration-500`}>
-                    <div className={`absolute inset-0 ${item.pattern} opacity-15 group-hover:opacity-25 transition-opacity duration-500`}></div>
-                    <div className={`absolute inset-0 ${item.gradient} opacity-85`}></div>
-                    <CardContent className="p-4 text-center relative z-10">
-                      <item.icon className="h-6 w-6 text-foreground mx-auto mb-2" />
-                      <h4 className="font-moroccan text-sm font-bold text-foreground">{item.title}</h4>
-                      {item.subtitle && <p className="text-xs text-muted-foreground mt-1">{item.subtitle}</p>}
-                    </CardContent>
-                  </Card>
+                  <Link key={index} to={item.href}>
+                    <Card className={`relative overflow-hidden group border-3 ${item.border} ${item.shadow} transition-all duration-500 cursor-pointer`}>
+                      <div className={`absolute inset-0 ${item.pattern} opacity-15 group-hover:opacity-25 transition-opacity duration-500`}></div>
+                      <div className={`absolute inset-0 ${item.gradient} opacity-85`}></div>
+                      <CardContent className="p-4 text-center relative z-10">
+                        <item.icon className="h-6 w-6 text-foreground mx-auto mb-2" />
+                        <h4 className="font-moroccan text-sm font-bold text-foreground">{item.title}</h4>
+                        {item.subtitle && <p className="text-xs text-muted-foreground mt-1">{item.subtitle}</p>}
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             </div>
