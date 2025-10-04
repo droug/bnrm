@@ -98,7 +98,7 @@ export default function CBMPortal() {
                 </Button>
               </Link>
               <Link to="/cbm/adhesion">
-                <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10">
+                <Button size="lg" className="bg-white hover:bg-white/90 shadow-lg" style={{ color: 'hsl(var(--cbm-primary))' }}>
                   <UserPlus className="w-5 h-5 mr-2" />
                   Adhérer au Réseau
                 </Button>
