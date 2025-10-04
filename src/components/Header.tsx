@@ -43,7 +43,8 @@ const Header = () => {
   const isManuscriptsPlatform = location.pathname === "/plateforme-manuscrits" || location.pathname === "/manuscripts-platform";
   const isManuscriptsHelp = location.pathname === "/manuscripts/help" || location.pathname === "/aide-manuscrits";
   const isBackoffice = location.pathname.startsWith("/admin/manuscripts-backoffice") || location.pathname.startsWith("/admin/digital-library");
-  const hideNavigation = isDigitalLibrary || isManuscriptsPlatform || isManuscriptsHelp || isBackoffice;
+  const isCBMPortal = location.pathname.startsWith("/cbm");
+  const hideNavigation = isDigitalLibrary || isManuscriptsPlatform || isManuscriptsHelp || isBackoffice || isCBMPortal;
   
   // Afficher le bouton retour sur toutes les pages SAUF les pages d'accueil principales
   const showBackButton = !isHomePage && !isDigitalLibraryHome && !isManuscriptsPlatformHome;
