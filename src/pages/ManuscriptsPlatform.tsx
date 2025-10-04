@@ -237,8 +237,12 @@ export default function ManuscriptsPlatform() {
               </p>
               
               {/* Boutons d'action */}
-              <div className="flex justify-center gap-3 mb-6">
-                <Button size="lg" asChild className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg">
+              <div className="flex flex-wrap justify-center gap-3 mb-6">
+                <Button 
+                  size="lg" 
+                  asChild 
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all border-2 border-white/40"
+                >
                   <Link to="/manuscripts/help">
                     <HelpCircle className="h-5 w-5 mr-2" />
                     Centre d'Aide
