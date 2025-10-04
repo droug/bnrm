@@ -125,19 +125,31 @@ export default function KitabPortal() {
               const IconComponent = feature.icon;
               return (
                 <Link key={feature.path} to={feature.path}>
-                  <Card className="group h-full hover:shadow-[var(--shadow-kitab-strong)] transition-all duration-500 cursor-pointer overflow-hidden border-0 shadow-[var(--shadow-kitab)]">
-                    {/* Icon Header with Gradient */}
-                    <div className={`bg-gradient-to-br ${feature.gradient} h-40 flex items-center justify-center relative`}>
+                  <Card className="group h-full hover:shadow-[var(--shadow-kitab-strong)] transition-all duration-500 cursor-pointer overflow-hidden border-2 border-[hsl(var(--kitab-primary))]/10 hover:border-[hsl(var(--kitab-primary))]/30 shadow-[var(--shadow-kitab)] bg-white">
+                    {/* Icon Header with Gradient and animated background */}
+                    <div className={`bg-gradient-to-br ${feature.gradient} h-48 flex items-center justify-center relative overflow-hidden`}>
                       <div 
-                        className="absolute inset-0 opacity-15"
+                        className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-500"
                         style={{ backgroundImage: 'var(--pattern-kitab-books)' }}
                       ></div>
-                      <IconComponent className="w-20 h-20 text-white relative z-10 group-hover:scale-110 transition-transform duration-300" strokeWidth={1.5} />
+                      
+                      {/* Glow effect */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      
+                      {/* Icon with enhanced styling */}
+                      <div className="relative z-10 bg-white/20 backdrop-blur-sm rounded-3xl p-6 group-hover:bg-white/30 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg">
+                        <IconComponent className="w-16 h-16 text-white drop-shadow-lg" strokeWidth={1.5} />
+                      </div>
+                      
+                      {/* Sparkle effects */}
+                      <div className="absolute top-4 right-4 w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
+                      <div className="absolute bottom-6 left-6 w-3 h-3 bg-white/40 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
                     </div>
                     
-                    <CardHeader className="p-6">
-                      <CardTitle className="text-lg font-semibold group-hover:text-[hsl(var(--kitab-primary))] transition-colors mb-2">
+                    <CardHeader className="p-6 bg-gradient-to-b from-transparent to-[hsl(var(--kitab-neutral-light))]/10">
+                      <CardTitle className="text-lg font-bold group-hover:text-[hsl(var(--kitab-primary))] transition-colors mb-2 flex items-center gap-2">
                         {feature.title}
+                        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
                       </CardTitle>
                       <CardDescription className="text-sm leading-relaxed">
                         {feature.description}
@@ -161,20 +173,29 @@ export default function KitabPortal() {
               const IconComponent = item.icon;
               return (
                 <Link key={item.path} to={item.path}>
-                  <Card className="group hover:shadow-[var(--shadow-kitab-strong)] transition-all duration-500 cursor-pointer border-0 shadow-[var(--shadow-kitab)] bg-gradient-to-r from-white to-[hsl(var(--kitab-neutral-light))]/30">
-                    <CardHeader className="flex flex-row items-start gap-4 p-8">
-                      <div className="bg-gradient-to-br from-[hsl(var(--kitab-primary))]/20 to-[hsl(var(--kitab-accent))]/10 p-4 rounded-xl group-hover:scale-105 transition-transform duration-300">
-                        <IconComponent className="w-8 h-8 text-[hsl(var(--kitab-primary))]" strokeWidth={1.5} />
+                  <Card className="group hover:shadow-[var(--shadow-kitab-strong)] transition-all duration-500 cursor-pointer border-2 border-[hsl(var(--kitab-primary))]/10 hover:border-[hsl(var(--kitab-primary))]/30 shadow-[var(--shadow-kitab)] bg-gradient-to-r from-white via-white to-[hsl(var(--kitab-neutral-light))]/20 overflow-hidden">
+                    <CardHeader className="flex flex-row items-start gap-6 p-8 relative">
+                      {/* Background decoration */}
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[hsl(var(--kitab-primary))]/5 to-transparent rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                      
+                      {/* Enhanced icon container */}
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-[hsl(var(--kitab-primary))]/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                        <div className="relative bg-gradient-to-br from-[hsl(var(--kitab-primary))]/20 via-[hsl(var(--kitab-accent))]/15 to-[hsl(var(--kitab-secondary))]/10 p-5 rounded-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg border border-[hsl(var(--kitab-primary))]/20">
+                          <IconComponent className="w-10 h-10 text-[hsl(var(--kitab-primary))] drop-shadow-sm" strokeWidth={1.5} />
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-xl mb-3 group-hover:text-[hsl(var(--kitab-primary))] transition-colors font-semibold">
+                      
+                      <div className="flex-1 relative z-10">
+                        <CardTitle className="text-xl mb-3 group-hover:text-[hsl(var(--kitab-primary))] transition-colors font-bold flex items-center gap-2">
                           {item.title}
+                          <Sparkles className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[hsl(var(--kitab-accent))]" />
                         </CardTitle>
-                        <CardDescription className="text-sm leading-relaxed">
+                        <CardDescription className="text-base leading-relaxed">
                           {item.description}
                         </CardDescription>
                       </div>
-                      <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-[hsl(var(--kitab-primary))] group-hover:translate-x-2 transition-all duration-300" />
+                      <ArrowRight className="w-6 h-6 text-muted-foreground group-hover:text-[hsl(var(--kitab-primary))] group-hover:translate-x-2 transition-all duration-300 flex-shrink-0 relative z-10" />
                     </CardHeader>
                   </Card>
                 </Link>
@@ -221,21 +242,35 @@ export default function KitabPortal() {
 
         {/* Call to Action */}
         <section>
-          <div className="bg-gradient-to-r from-[hsl(var(--kitab-neutral-light))] to-white rounded-2xl p-12 text-center shadow-[var(--shadow-kitab)]">
-            <Library className="w-16 h-16 mx-auto mb-6 text-[hsl(var(--kitab-primary))]" />
-            <h3 className="text-3xl font-bold text-foreground mb-4">
-              Rejoignez l'Écosystème Kitab
-            </h3>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              Éditeurs, auteurs, libraires : participez à la promotion de l'industrie nationale du livre. 
-              Contactez-nous pour intégrer vos publications dans Kitab.
-            </p>
-            <Link to="/kitab/faq">
-              <Button size="lg" className="bg-[hsl(var(--kitab-primary))] hover:bg-[hsl(var(--kitab-primary-dark))] text-white h-12 px-8 shadow-[var(--shadow-kitab)]">
-                <Mail className="w-5 h-5 mr-2" />
-                Nous Contacter
-              </Button>
-            </Link>
+          <div className="relative bg-gradient-to-r from-[hsl(var(--kitab-neutral-light))] via-white to-[hsl(var(--kitab-neutral-light))] rounded-2xl p-12 text-center shadow-[var(--shadow-kitab)] border-2 border-[hsl(var(--kitab-primary))]/10 overflow-hidden">
+            {/* Background decorations */}
+            <div className="absolute top-0 left-0 w-48 h-48 bg-gradient-to-br from-[hsl(var(--kitab-primary))]/10 to-transparent rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-0 w-48 h-48 bg-gradient-to-tl from-[hsl(var(--kitab-accent))]/10 to-transparent rounded-full blur-3xl"></div>
+            
+            <div className="relative z-10">
+              {/* Enhanced icon */}
+              <div className="inline-block relative mb-6">
+                <div className="absolute inset-0 bg-[hsl(var(--kitab-primary))]/20 rounded-full blur-2xl animate-pulse"></div>
+                <div className="relative bg-gradient-to-br from-[hsl(var(--kitab-primary))]/20 to-[hsl(var(--kitab-accent))]/10 p-6 rounded-full">
+                  <Library className="w-16 h-16 text-[hsl(var(--kitab-primary))] drop-shadow-lg" />
+                </div>
+              </div>
+              
+              <h3 className="text-3xl font-bold text-foreground mb-4">
+                Rejoignez l'Écosystème Kitab
+              </h3>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+                Éditeurs, auteurs, libraires : participez à la promotion de l'industrie nationale du livre. 
+                Contactez-nous pour intégrer vos publications dans Kitab.
+              </p>
+              <Link to="/kitab/faq">
+                <Button size="lg" className="bg-[hsl(var(--kitab-primary))] hover:bg-[hsl(var(--kitab-primary-dark))] text-white h-12 px-8 shadow-[var(--shadow-kitab)] group">
+                  <Mail className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  Nous Contacter
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </section>
       </main>
