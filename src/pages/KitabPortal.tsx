@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Header from "@/components/Header";
+import KitabHeader from "@/components/KitabHeader";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,7 +49,7 @@ export default function KitabPortal() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <KitabHeader />
       
       {/* Hero Section - Kitab Style */}
       <section className="relative overflow-hidden h-[600px]">

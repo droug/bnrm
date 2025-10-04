@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Header from "@/components/Header";
+import KitabHeader from "@/components/KitabHeader";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,7 +40,7 @@ export default function KitabAbout() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <KitabHeader />
       
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(var(--kitab-primary))] to-[hsl(var(--kitab-secondary))] py-20">
