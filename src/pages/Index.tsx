@@ -301,22 +301,22 @@ const Index = () => {
                         style={{ backgroundImage: `url(${zelligePattern1})` }}
                       ></div>
                       <div className="absolute inset-0 bg-gradient-neutral opacity-85"></div>
-                      <CardContent className="p-10 min-h-[350px] flex flex-col justify-center items-center text-center space-y-6 relative z-10">
+                      <CardContent className="p-8 h-[280px] flex flex-col justify-center items-center text-center space-y-4 relative z-10">
                         <div className="relative">
-                          <div className="w-24 h-24 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-6 shadow-mosaique transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border-2 border-gold/20">
-                            <BookOpen className="h-12 w-12 text-primary" />
+                          <div className="w-20 h-20 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-4 shadow-mosaique transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border-2 border-gold/20">
+                            <BookOpen className="h-10 w-10 text-primary" />
                           </div>
-                          <Sparkles className="absolute -top-3 -right-3 h-8 w-8 text-gold animate-pulse" />
+                          <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-pulse" />
                         </div>
-                        <h3 className="text-2xl font-moroccan font-bold text-foreground">
+                        <h3 className="text-xl font-moroccan font-bold text-foreground">
                           {t('nav.discover')}
                         </h3>
-                        <p className="text-muted-foreground font-elegant text-lg">
+                        <p className="text-muted-foreground font-elegant text-sm">
                           Explorez l'histoire, les missions et les services de notre institution millénaire
                         </p>
                         <div className="flex space-x-2">
                           {[...Array(5)].map((_, i) => (
-                            <div key={i} className="w-3 h-3 bg-gold/60 rounded-full animate-pulse border border-gold/30" style={{ animationDelay: `${i * 0.2}s` }}></div>
+                            <div key={i} className="w-2 h-2 bg-gold/60 rounded-full animate-pulse border border-gold/30" style={{ animationDelay: `${i * 0.2}s` }}></div>
                           ))}
                         </div>
                       </CardContent>
@@ -331,17 +331,17 @@ const Index = () => {
                         style={{ backgroundImage: `url(${zelligePattern3})` }}
                       ></div>
                       <div className="absolute inset-0 bg-gradient-primary opacity-75"></div>
-                      <CardContent className="p-10 min-h-[350px] flex flex-col justify-center items-center text-center space-y-6 relative z-10">
+                      <CardContent className="p-8 h-[280px] flex flex-col justify-center items-center text-center space-y-4 relative z-10">
                         <div className="relative">
-                          <div className="w-24 h-24 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-6 shadow-zellige transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 border-2 border-white/20">
-                            <Calendar className="h-12 w-12 text-white" />
+                          <div className="w-20 h-20 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-4 shadow-zellige transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 border-2 border-white/20">
+                            <Calendar className="h-10 w-10 text-white" />
                           </div>
-                          <Gem className="absolute -top-3 -right-3 h-8 w-8 text-gold animate-bounce" />
+                          <Gem className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-bounce" />
                         </div>
-                        <h3 className="text-2xl font-moroccan font-bold text-white">
+                        <h3 className="text-xl font-moroccan font-bold text-white">
                           Actualités & Publications
                         </h3>
-                        <p className="text-white/95 font-elegant text-lg">
+                        <p className="text-white/95 font-elegant text-sm">
                           Découvrez les dernières nouvelles, événements et publications de la BNRM
                         </p>
                       </CardContent>
@@ -356,7 +356,7 @@ const Index = () => {
                         style={{ backgroundImage: `url(${zelligePattern5})` }}
                       ></div>
                       <div className="absolute inset-0 bg-gradient-accent opacity-80"></div>
-                      <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
+                      <CardContent className="p-8 h-[280px] flex flex-col justify-center items-center text-center space-y-4 relative z-10">
                         <div className="relative">
                           <div className="w-20 h-20 bg-gradient-neutral rounded-3xl flex items-center justify-center mb-4 shadow-mosaique transform group-hover:scale-110 transition-all duration-500 border-2 border-white/20">
                             <Book className="h-10 w-10 text-white" />
@@ -366,7 +366,7 @@ const Index = () => {
                         <h3 className="text-xl font-moroccan font-bold text-white">
                           Bibliothèque Numérique
                         </h3>
-                        <p className="text-white/95 font-elegant">
+                        <p className="text-white/95 font-elegant text-sm">
                           Collections manuscrites, fonds documentaires et trésors numériques
                         </p>
                       </CardContent>
@@ -381,7 +381,7 @@ const Index = () => {
                         style={{ backgroundImage: `url(${zelligePattern2})` }}
                       ></div>
                       <div className="absolute inset-0 bg-gradient-primary opacity-85"></div>
-                      <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
+                      <CardContent className="p-8 h-[280px] flex flex-col justify-center items-center text-center space-y-4 relative z-10">
                         <div className="relative">
                           <div className="w-20 h-20 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-4 shadow-zellige transform group-hover:scale-110 transition-all duration-500 border-2 border-gold/30">
                             <BookOpen className="h-10 w-10 text-white" />
@@ -391,7 +391,7 @@ const Index = () => {
                         <h3 className="text-xl font-moroccan font-bold text-white">
                           Plateforme Manuscrits
                         </h3>
-                        <p className="text-white/95 font-elegant">
+                        <p className="text-white/95 font-elegant text-sm">
                           Manuscrits BNRM & institutions partenaires marocaines
                         </p>
                       </CardContent>
@@ -410,7 +410,7 @@ const Index = () => {
                         style={{ backgroundImage: 'var(--pattern-cbm-network)' }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-br from-cbm-primary/20 via-cbm-secondary/15 to-cbm-accent/20"></div>
-                      <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
+                      <CardContent className="p-8 h-[280px] flex flex-col justify-center items-center text-center space-y-4 relative z-10">
                         <div className="relative">
                           <div className="w-20 h-20 bg-gradient-to-br from-cbm-primary to-cbm-secondary rounded-3xl flex items-center justify-center mb-4 shadow-cbm transform group-hover:scale-110 transition-all duration-500 border-2 border-cbm-primary/30">
                             <Network className="h-10 w-10 text-foreground" />
@@ -420,7 +420,7 @@ const Index = () => {
                         <h3 className="text-xl font-moroccan font-bold text-foreground">
                           Portail CBM
                         </h3>
-                        <p className="text-foreground/80 font-elegant">
+                        <p className="text-foreground/80 font-elegant text-sm">
                           Catalogue des Bibliothèques Marocaines - Réseau National
                         </p>
                       </CardContent>
@@ -439,7 +439,7 @@ const Index = () => {
                         style={{ backgroundImage: 'var(--pattern-kitab-books)' }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-br from-coral/40 to-royal/30 opacity-80"></div>
-                      <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
+                      <CardContent className="p-8 h-[280px] flex flex-col justify-center items-center text-center space-y-4 relative z-10">
                         <div className="relative">
                           <div className="w-20 h-20 bg-coral/70 rounded-3xl flex items-center justify-center mb-4 shadow-mosaique transform group-hover:scale-110 transition-all duration-500 border-2 border-coral/30">
                             <Book className="h-10 w-10 text-white" />
@@ -449,7 +449,7 @@ const Index = () => {
                         <h3 className="text-xl font-moroccan font-bold text-foreground">
                           Plateforme Kitab
                         </h3>
-                        <p className="text-muted-foreground font-elegant">
+                        <p className="text-muted-foreground font-elegant text-sm">
                           Bibliothèque Numérique de l'Édition Marocaine
                         </p>
                       </CardContent>
@@ -464,7 +464,7 @@ const Index = () => {
                         style={{ backgroundImage: `url(${zelligePattern6})` }}
                       ></div>
                       <div className="absolute inset-0 bg-gradient-neutral opacity-85"></div>
-                      <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
+                      <CardContent className="p-8 h-[280px] flex flex-col justify-center items-center text-center space-y-4 relative z-10">
                         <div className="relative">
                           <div className="w-20 h-20 bg-highlight/70 rounded-3xl flex items-center justify-center mb-4 shadow-zellige transform group-hover:scale-110 transition-all duration-500 border-2 border-highlight/30">
                             <Users className="h-10 w-10 text-white" />
@@ -474,7 +474,7 @@ const Index = () => {
                         <h3 className="text-xl font-moroccan font-bold text-foreground">
                           {t('nav.services')}
                         </h3>
-                        <p className="text-muted-foreground font-elegant">
+                        <p className="text-muted-foreground font-elegant text-sm">
                           Inscription, réservation, dépôt légal et services numériques
                         </p>
                       </CardContent>
