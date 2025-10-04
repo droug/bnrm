@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,7 +28,8 @@ import {
   Eye,
   EyeOff,
   MousePointerClick,
-  Search
+  Search,
+  HelpCircle
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -397,6 +398,13 @@ export function ManuscriptViewer() {
 
             {/* Right: Actions and language selector */}
             <div className="flex items-center gap-2">
+              {/* Help Button */}
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/manuscripts/help">
+                  <HelpCircle className="h-4 w-4" />
+                </Link>
+              </Button>
+              
               {/* Language Selector */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Lock, AlertCircle, Star, Sparkles, Filter, ChevronDown, X, Users, Building2 } from "lucide-react";
+import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Lock, AlertCircle, Star, Sparkles, Filter, ChevronDown, X, Users, Building2, HelpCircle } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
@@ -238,6 +238,13 @@ export default function ManuscriptsPlatform() {
               
               {/* Boutons d'action */}
               <div className="flex justify-center gap-3 mb-6">
+                <Button size="lg" asChild className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg">
+                  <Link to="/manuscripts/help">
+                    <HelpCircle className="h-5 w-5 mr-2" />
+                    Centre d'Aide
+                  </Link>
+                </Button>
+                
                 {user && (
                   <Dialog open={partnerDialogOpen} onOpenChange={setPartnerDialogOpen}>
                     <DialogTrigger asChild>

@@ -12,6 +12,7 @@ import ManuscriptsPlatform from "./pages/ManuscriptsPlatform";
 import ManuscriptsBackoffice from "./pages/ManuscriptsBackoffice";
 import ManuscriptReader from "./pages/ManuscriptReader";
 import MyManuscriptsSpace from "./pages/MyManuscriptsSpace";
+import ManuscriptsHelp from "./pages/ManuscriptsHelp";
 import AccessRequest from "./pages/AccessRequest";
 import Profile from "./pages/Profile";
 import UserManagement from "./pages/UserManagement";
@@ -59,6 +60,8 @@ const App = () => (
         <Route path="/manuscripts" element={<Manuscripts />} />
         <Route path="/manuscripts-platform" element={<ManuscriptsPlatform />} />
         <Route path="/plateforme-manuscrits" element={<ManuscriptsPlatform />} />
+        <Route path="/manuscripts/help" element={<ManuscriptsHelp />} />
+        <Route path="/aide-manuscrits" element={<ManuscriptsHelp />} />
         <Route path="/admin/manuscripts-backoffice" element={<ManuscriptsBackoffice />} />
         <Route path="/manuscrit/:id" element={<ManuscriptReader />} />
         <Route path="/manuscript/:id" element={<ManuscriptReader />} />
