@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Network, Target, Users, UserPlus, Database, BookOpen, ArrowRight, Library, FileText, GraduationCap } from "lucide-react";
-import manuscriptImage from "@/assets/manuscript-banner.jpg";
+import cbmHeroBanner from "@/assets/cbm-hero-banner.jpg";
 
 export default function CBMPortal() {
   const spotlightItems = [
@@ -63,7 +63,7 @@ export default function CBMPortal() {
         {/* Background Image */}
         <div className="absolute inset-0">
           <img 
-            src={manuscriptImage} 
+            src={cbmHeroBanner} 
             alt="Bibliothèque" 
             className="w-full h-full object-cover opacity-30"
           />
