@@ -11,6 +11,8 @@ import { Download, FileText, BarChart3, Calendar as CalendarIcon, Filter } from 
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import jsPDF from "jspdf";
 
 export function ManuscriptsReports() {
   const [reportType, setReportType] = useState("monthly");
@@ -32,9 +34,111 @@ export function ManuscriptsReports() {
     }
   });
 
-  const generateReport = (format: string) => {
-    console.log(`Generating ${reportType} report in ${format} format`);
-    // This would trigger actual report generation
+  const generatePDFReport = () => {
+    const doc = new jsPDF();
+    
+    // En-tête du rapport
+    doc.setFontSize(20);
+    doc.text("Rapport - Manuscrits Numérisés", 20, 20);
+    doc.setFontSize(12);
+    doc.text(`Date: ${format(new Date(), "PPP", { locale: fr })}`, 20, 30);
+    doc.text(`Type: ${reportTypes.find(r => r.id === reportType)?.title || reportType}`, 20, 37);
+    
+    // Filtres appliqués
+    doc.setFontSize(10);
+    doc.text("Filtres appliqués:", 20, 50);
+    let yPos = 57;
+    
+    if (dateFrom) {
+      doc.text(`Période du: ${format(dateFrom, "PPP", { locale: fr })}`, 20, yPos);
+      yPos += 7;
+    }
+    if (dateTo) {
+      doc.text(`au: ${format(dateTo, "PPP", { locale: fr })}`, 20, yPos);
+      yPos += 7;
+    }
+    if (filterLanguage !== "all") {
+      doc.text(`Langue: ${filterLanguage}`, 20, yPos);
+      yPos += 7;
+    }
+    if (filterPeriod !== "all") {
+      doc.text(`Période: ${filterPeriod}`, 20, yPos);
+      yPos += 7;
+    }
+    
+    yPos += 10;
+    
+    // Statistiques
+    doc.setFontSize(14);
+    doc.text("Statistiques", 20, yPos);
+    yPos += 10;
+    
+    doc.setFontSize(10);
+    doc.text(`Total des manuscrits: ${manuscripts?.length || 0}`, 20, yPos);
+    yPos += 7;
+    doc.text(`Langues différentes: ${new Set(manuscripts?.map(m => m.language)).size || 0}`, 20, yPos);
+    yPos += 7;
+    doc.text(`Périodes historiques: ${new Set(manuscripts?.map(m => m.period).filter(Boolean)).size || 0}`, 20, yPos);
+    yPos += 7;
+    
+    // Liste des manuscrits (échantillon)
+    yPos += 10;
+    doc.setFontSize(14);
+    doc.text("Échantillon de manuscrits", 20, yPos);
+    yPos += 10;
+    
+    doc.setFontSize(9);
+    manuscripts?.slice(0, 10).forEach((manuscript, index) => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 20;
+      }
+      doc.text(`${index + 1}. ${manuscript.title || "Sans titre"}`, 20, yPos);
+      yPos += 5;
+      doc.text(`   Langue: ${manuscript.language || "N/A"} | Période: ${manuscript.period || "N/A"}`, 20, yPos);
+      yPos += 8;
+    });
+    
+    doc.save(`rapport-manuscrits-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+    toast.success("Rapport PDF généré avec succès");
+  };
+
+  const generateExcelReport = () => {
+    // Générer un CSV (compatible Excel)
+    const headers = ["ID", "Titre", "Auteur", "Langue", "Période", "Date de création"];
+    const rows = manuscripts?.map(m => [
+      m.id,
+      m.title || "Sans titre",
+      m.author || "N/A",
+      m.language || "N/A",
+      m.period || "N/A",
+      format(new Date(m.created_at), "PPP", { locale: fr })
+    ]) || [];
+    
+    let csvContent = headers.join(",") + "\n";
+    rows.forEach(row => {
+      csvContent += row.map(cell => `"${cell}"`).join(",") + "\n";
+    });
+    
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `rapport-manuscrits-${format(new Date(), "yyyy-MM-dd")}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success("Rapport Excel généré avec succès");
+  };
+
+  const generateReport = (formatType: string) => {
+    if (formatType === 'pdf') {
+      generatePDFReport();
+    } else if (formatType === 'excel') {
+      generateExcelReport();
+    }
   };
 
   const reportTypes = [
