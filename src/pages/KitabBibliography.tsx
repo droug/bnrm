@@ -35,7 +35,7 @@ export default function KitabBibliography() {
       <KitabHeader />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden h-[400px]">
+      <section className="relative overflow-hidden h-[400px] flex items-center justify-center">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img 
@@ -48,9 +48,9 @@ export default function KitabBibliography() {
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--kitab-primary))]/70 via-[hsl(var(--kitab-primary-dark))]/60 to-[hsl(var(--kitab-secondary))]/70"></div>
         
-        <div className="container mx-auto px-4 relative z-10 h-full flex flex-col justify-center">
-          <Link to="/kitab">
-            <Button variant="ghost" className="text-white hover:text-white/80 mb-6">
+        <div className="container mx-auto px-4 relative z-10">
+          <Link to="/kitab" className="absolute top-8 left-4">
+            <Button variant="ghost" className="text-white hover:text-white/80">
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour au Portail Kitab
             </Button>
