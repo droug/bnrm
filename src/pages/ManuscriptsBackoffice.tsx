@@ -12,7 +12,7 @@ import { ManuscriptsAnalytics } from "@/components/manuscripts/ManuscriptsAnalyt
 import { ManuscriptsReports } from "@/components/manuscripts/ManuscriptsReports";
 import { ManuscriptsDashboard } from "@/components/manuscripts/ManuscriptsDashboard";
 import ExhibitionsManager from "@/components/digital-library/ExhibitionsManager";
-import UsersManager from "@/components/digital-library/UsersManager";
+import { ManuscriptsUsersManager } from "@/components/manuscripts/ManuscriptsUsersManager";
 
 export default function ManuscriptsBackoffice() {
   const { user, profile } = useAuth();
@@ -78,7 +78,7 @@ export default function ManuscriptsBackoffice() {
           </TabsContent>
 
           <TabsContent value="users">
-            <UsersManager />
+            <ManuscriptsUsersManager />
           </TabsContent>
 
           <TabsContent value="analytics">

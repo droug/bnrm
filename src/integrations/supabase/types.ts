@@ -1835,6 +1835,36 @@ export type Database = {
           },
         ]
       }
+      manuscript_platform_users: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          role: Database["public"]["Enums"]["manuscript_platform_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          role?: Database["public"]["Enums"]["manuscript_platform_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          role?: Database["public"]["Enums"]["manuscript_platform_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       manuscript_reading_history: {
         Row: {
           action_type: string
@@ -4145,6 +4175,13 @@ export type Database = {
         Args: { "": unknown }
         Returns: unknown
       }
+      has_manuscript_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["manuscript_platform_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       increment_exhibition_visitors: {
         Args: { exhibition_uuid: string }
         Returns: undefined
@@ -4162,6 +4199,10 @@ export type Database = {
       }
       is_admin_or_librarian: {
         Args: { user_uuid: string }
+        Returns: boolean
+      }
+      is_manuscript_admin: {
+        Args: { _user_id: string }
         Returns: boolean
       }
       log_search: {
@@ -4245,6 +4286,7 @@ export type Database = {
         | "attribue"
         | "receptionne"
         | "rejete"
+      manuscript_platform_role: "viewer" | "contributor" | "editor" | "admin"
       manuscript_status:
         | "available"
         | "reserved"
@@ -4431,6 +4473,7 @@ export const Constants = {
         "receptionne",
         "rejete",
       ],
+      manuscript_platform_role: ["viewer", "contributor", "editor", "admin"],
       manuscript_status: [
         "available",
         "reserved",
