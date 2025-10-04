@@ -70,6 +70,8 @@ import KitabRepertoireEditeurs from "./pages/KitabRepertoireEditeurs";
 import KitabRepertoireAuteurs from "./pages/KitabRepertoireAuteurs";
 import KitabRepertoireImprimeurs from "./pages/KitabRepertoireImprimeurs";
 import KitabRepertoireDistributeurs from "./pages/KitabRepertoireDistributeurs";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCanceled from "./pages/PaymentCanceled";
 
 
 const App = () => (
@@ -159,6 +161,10 @@ const App = () => (
           <Route path="/kitab/repertoire-auteurs" element={<KitabRepertoireAuteurs />} />
           <Route path="/kitab/repertoire-imprimeurs" element={<KitabRepertoireImprimeurs />} />
           <Route path="/kitab/repertoire-distributeurs" element={<KitabRepertoireDistributeurs />} />
+          
+          {/* Payment Routes */}
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-canceled" element={<PaymentCanceled />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />

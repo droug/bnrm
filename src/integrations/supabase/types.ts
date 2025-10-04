@@ -352,6 +352,36 @@ export type Database = {
         }
         Relationships: []
       }
+      bnrm_wallets: {
+        Row: {
+          balance: number
+          created_at: string | null
+          currency: string
+          id: string
+          is_active: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string | null
+          currency?: string
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string | null
+          currency?: string
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       catalog_metadata: {
         Row: {
           access_rights: string | null
@@ -1425,6 +1455,44 @@ export type Database = {
           },
         ]
       }
+      fraud_detection_logs: {
+        Row: {
+          action_taken: string | null
+          created_at: string | null
+          fraud_indicators: Json | null
+          id: string
+          risk_score: number | null
+          transaction_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_taken?: string | null
+          created_at?: string | null
+          fraud_indicators?: Json | null
+          id?: string
+          risk_score?: number | null
+          transaction_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_taken?: string | null
+          created_at?: string | null
+          fraud_indicators?: Json | null
+          id?: string
+          risk_score?: number | null
+          transaction_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fraud_detection_logs_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "payment_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       help_categories: {
         Row: {
           created_at: string | null
@@ -2489,6 +2557,99 @@ export type Database = {
             columns: ["submission_id"]
             isOneToOne: false
             referencedRelation: "partner_manuscript_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_transactions: {
+        Row: {
+          amount: number
+          cmi_reference: string | null
+          completed_at: string | null
+          created_at: string | null
+          currency: string
+          error_message: string | null
+          fraud_score: number | null
+          id: string
+          ip_address: unknown | null
+          is_3d_secure: boolean | null
+          legal_deposit_id: string | null
+          metadata: Json | null
+          payment_method: string
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          processed_at: string | null
+          reproduction_request_id: string | null
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
+          transaction_number: string
+          transaction_type: Database["public"]["Enums"]["transaction_type"]
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          cmi_reference?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          currency?: string
+          error_message?: string | null
+          fraud_score?: number | null
+          id?: string
+          ip_address?: unknown | null
+          is_3d_secure?: boolean | null
+          legal_deposit_id?: string | null
+          metadata?: Json | null
+          payment_method: string
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          processed_at?: string | null
+          reproduction_request_id?: string | null
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          transaction_number: string
+          transaction_type: Database["public"]["Enums"]["transaction_type"]
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          cmi_reference?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          currency?: string
+          error_message?: string | null
+          fraud_score?: number | null
+          id?: string
+          ip_address?: unknown | null
+          is_3d_secure?: boolean | null
+          legal_deposit_id?: string | null
+          metadata?: Json | null
+          payment_method?: string
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          processed_at?: string | null
+          reproduction_request_id?: string | null
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          transaction_number?: string
+          transaction_type?: Database["public"]["Enums"]["transaction_type"]
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_legal_deposit_id_fkey"
+            columns: ["legal_deposit_id"]
+            isOneToOne: false
+            referencedRelation: "legal_deposits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_reproduction_request_id_fkey"
+            columns: ["reproduction_request_id"]
+            isOneToOne: false
+            referencedRelation: "reproduction_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -3857,6 +4018,95 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_recharges: {
+        Row: {
+          amount: number
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          status: Database["public"]["Enums"]["payment_status"]
+          transaction_id: string | null
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["payment_status"]
+          transaction_id?: string | null
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["payment_status"]
+          transaction_id?: string | null
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_recharges_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "payment_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_recharges_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "bnrm_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          created_at: string | null
+          description: string | null
+          id: string
+          reference_id: string | null
+          transaction_type: string
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          transaction_type: string
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          balance_before?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          transaction_type?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "bnrm_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workflow_instances: {
         Row: {
           completed_at: string | null
@@ -4111,6 +4361,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      generate_transaction_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       generate_validation_code: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -4263,6 +4517,16 @@ export type Database = {
         Args: { "": string }
         Returns: string[]
       }
+      update_wallet_balance: {
+        Args: {
+          p_amount: number
+          p_description?: string
+          p_reference_id?: string
+          p_transaction_type: string
+          p_wallet_id: string
+        }
+        Returns: string
+      }
       user_has_permission: {
         Args: { permission_name: string; user_uuid: string }
         Returns: boolean
@@ -4302,6 +4566,13 @@ export type Database = {
         | "periodiques"
         | "musique"
       payment_method: "carte_bancaire" | "virement" | "especes" | "cheque"
+      payment_status:
+        | "pending"
+        | "processing"
+        | "completed"
+        | "failed"
+        | "refunded"
+        | "cancelled"
       professional_type: "editeur" | "producteur" | "imprimeur"
       reproduction_format: "pdf" | "jpeg" | "tiff" | "png"
       reproduction_modality:
@@ -4324,6 +4595,12 @@ export type Database = {
         | "disponible"
         | "expiree"
       support_type: "imprime" | "electronique"
+      transaction_type:
+        | "reproduction"
+        | "subscription"
+        | "legal_deposit"
+        | "service_bnrm"
+        | "recharge_wallet"
       user_role:
         | "admin"
         | "librarian"
@@ -4491,6 +4768,14 @@ export const Constants = {
         "musique",
       ],
       payment_method: ["carte_bancaire", "virement", "especes", "cheque"],
+      payment_status: [
+        "pending",
+        "processing",
+        "completed",
+        "failed",
+        "refunded",
+        "cancelled",
+      ],
       professional_type: ["editeur", "producteur", "imprimeur"],
       reproduction_format: ["pdf", "jpeg", "tiff", "png"],
       reproduction_modality: [
@@ -4515,6 +4800,13 @@ export const Constants = {
         "expiree",
       ],
       support_type: ["imprime", "electronique"],
+      transaction_type: [
+        "reproduction",
+        "subscription",
+        "legal_deposit",
+        "service_bnrm",
+        "recharge_wallet",
+      ],
       user_role: [
         "admin",
         "librarian",
