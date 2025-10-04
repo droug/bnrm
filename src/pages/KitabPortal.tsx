@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookText, Lightbulb, Sparkles, BookMarked, Library, Mail, ArrowRight, FileText, Clock } from "lucide-react";
+import kitabBanner from "@/assets/kitab-banner.jpg";
 
 export default function KitabPortal() {
   const mainFeatures = [
@@ -53,14 +54,17 @@ export default function KitabPortal() {
       
       {/* Hero Section - Kitab Style */}
       <section className="relative overflow-hidden h-[600px]">
-        {/* Background Pattern */}
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: 'var(--pattern-kitab-books)' }}
-        />
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img 
+            src={kitabBanner} 
+            alt="Kitab Banner" 
+            className="w-full h-full object-cover"
+          />
+        </div>
         
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--kitab-primary))]/70 via-[hsl(var(--kitab-secondary))]/60 to-[hsl(var(--kitab-accent))]/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--kitab-primary))]/50 via-[hsl(var(--kitab-secondary))]/40 to-[hsl(var(--kitab-accent))]/30"></div>
         
         <div className="container mx-auto px-4 h-full relative z-10">
           <div className="flex flex-col justify-center h-full max-w-4xl mx-auto text-center">

@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
 import SmartChatBot from "@/components/SmartChatBot";
 import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
-import logoImage from "@/assets/logo-bnrm.png";
+import logoImage from "@/assets/logo-kitab.png";
 
 const KitabHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,12 +21,8 @@ const KitabHeader = () => {
         {/* Top Bar */}
         <div className="flex justify-between items-center py-2 border-b border-[hsl(var(--kitab-primary))]/20">
           {/* Logo + Titre */}
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src={logoImage} alt="Logo BNRM" className="h-10 w-auto" />
-            <div className="hidden lg:flex flex-col">
-              <span className="font-bold text-xs text-muted-foreground">BNRM</span>
-              <span className="font-bold text-sm text-[hsl(var(--kitab-primary))]">Plateforme Kitab</span>
-            </div>
+          <Link to="/kitab" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <img src={logoImage} alt="Logo Kitab" className="h-12 w-auto" />
           </Link>
 
           {/* Actions */}
