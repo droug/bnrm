@@ -56,7 +56,7 @@ export default function CBMPortal() {
       <Header />
       
       {/* Hero Banner - Design Moderne Marocain */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-cbm-primary via-cbm-secondary to-cbm-accent">
+      <section className="relative overflow-hidden" style={{ backgroundColor: 'hsl(var(--cbm-primary))' }}>
         {/* Pattern background subtil */}
         <div 
           className="absolute inset-0 opacity-10"
@@ -66,17 +66,17 @@ export default function CBMPortal() {
         <div className="container mx-auto px-4 py-24 md:py-32 relative">
           <div className="max-w-4xl mx-auto text-center text-white">
             {/* Icon Badge */}
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl mb-6 shadow-cbm-strong">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-6 shadow-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
               <Network className="w-10 h-10 text-white" />
             </div>
             
             {/* Title */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-white">
               Portail CBM
             </h1>
             
             {/* Subtitle */}
-            <p className="text-2xl md:text-3xl mb-4 font-light opacity-95">
+            <p className="text-2xl md:text-3xl mb-4 font-light text-white opacity-95">
               Catalogue des Bibliothèques Marocaines
             </p>
             
@@ -84,7 +84,7 @@ export default function CBMPortal() {
             <div className="w-32 h-1 bg-white/40 mx-auto mb-8 rounded-full" />
             
             {/* Description */}
-            <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 opacity-90 leading-relaxed">
+            <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white opacity-90 leading-relaxed">
               Réseau national de coopération et de partage des ressources documentaires 
               entre bibliothèques marocaines
             </p>
@@ -92,7 +92,7 @@ export default function CBMPortal() {
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4 justify-center">
               <Link to="/cbm/recherche">
-                <Button size="lg" className="bg-white text-cbm-primary hover:bg-white/90 shadow-lg">
+                <Button size="lg" className="bg-white hover:bg-white/90 shadow-lg" style={{ color: 'hsl(var(--cbm-primary))' }}>
                   <Database className="w-5 h-5 mr-2" />
                   Rechercher dans le Catalogue
                 </Button>
@@ -132,13 +132,20 @@ export default function CBMPortal() {
             const IconComponent = card.icon;
             return (
               <Link key={card.path} to={card.path}>
-                <Card className="group h-full hover:shadow-cbm-strong transition-all duration-300 cursor-pointer border hover:border-cbm-accent/60 bg-white overflow-hidden">
+                <Card className="group h-full hover:shadow-cbm-strong transition-all duration-300 cursor-pointer border hover:border-cbm-accent/60 bg-white overflow-hidden" style={{ borderColor: 'hsl(var(--cbm-neutral-light))' }}>
                   <div className="relative">
                     {/* Gradient header */}
-                    <div className={`h-2 bg-gradient-to-r ${card.gradient}`} />
+                    <div className="h-2" style={{ 
+                      background: `linear-gradient(to right, hsl(var(--cbm-primary)), hsl(var(--cbm-secondary)))`
+                    }} />
                     
                     <CardHeader className="relative pb-4">
-                      <div className={`inline-flex h-14 w-14 rounded-xl bg-gradient-to-br ${card.gradient} items-center justify-center mb-4 shadow-cbm group-hover:scale-110 transition-transform duration-300`}>
+                      <div 
+                        className="inline-flex h-14 w-14 rounded-xl items-center justify-center mb-4 shadow-cbm group-hover:scale-110 transition-transform duration-300"
+                        style={{ 
+                          background: `linear-gradient(to bottom right, hsl(var(--cbm-primary)), hsl(var(--cbm-secondary)))`
+                        }}
+                      >
                         <IconComponent className="h-7 w-7 text-white" />
                       </div>
                       <CardTitle className="text-xl text-foreground group-hover:text-cbm-primary transition-colors">
@@ -149,7 +156,7 @@ export default function CBMPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <div className="flex items-center text-cbm-primary group-hover:translate-x-2 transition-transform duration-300">
+                      <div className="flex items-center group-hover:translate-x-2 transition-transform duration-300" style={{ color: 'hsl(var(--cbm-primary))' }}>
                         <span className="text-sm font-medium">Découvrir</span>
                         <ArrowRight className="h-4 w-4 ml-2" />
                       </div>
@@ -162,26 +169,29 @@ export default function CBMPortal() {
         </div>
 
         {/* Quick Stats Section - Style Moderne */}
-        <div className="bg-gradient-to-br from-cbm-primary/5 via-cbm-secondary/5 to-cbm-accent/5 rounded-2xl p-8 md:p-12 border border-cbm-primary/10">
+        <div className="rounded-2xl p-8 md:p-12 border" style={{ 
+          background: 'linear-gradient(to bottom right, hsl(var(--cbm-primary) / 0.05), hsl(var(--cbm-secondary) / 0.05))',
+          borderColor: 'hsl(var(--cbm-primary) / 0.1)'
+        }}>
           <div className="text-center mb-8">
             <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
-              <Sparkles className="h-6 w-6 text-cbm-accent" />
+              <Sparkles className="h-6 w-6" style={{ color: 'hsl(var(--cbm-accent))' }} />
               Le Réseau CBM en Chiffres
             </h3>
             <p className="text-muted-foreground">Impact et portée du catalogue national</p>
           </div>
           
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm border border-cbm-primary/20 hover:shadow-cbm transition-shadow">
-              <div className="text-4xl md:text-5xl font-bold text-cbm-primary mb-2">150+</div>
+            <div className="text-center p-6 bg-white rounded-xl shadow-sm border hover:shadow-cbm transition-shadow" style={{ borderColor: 'hsl(var(--cbm-primary) / 0.2)' }}>
+              <div className="text-4xl md:text-5xl font-bold mb-2" style={{ color: 'hsl(var(--cbm-primary))' }}>150+</div>
               <div className="text-sm text-muted-foreground font-medium">Bibliothèques membres</div>
             </div>
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm border border-cbm-secondary/20 hover:shadow-cbm transition-shadow">
-              <div className="text-4xl md:text-5xl font-bold text-cbm-secondary mb-2">2M+</div>
+            <div className="text-center p-6 bg-white rounded-xl shadow-sm border hover:shadow-cbm transition-shadow" style={{ borderColor: 'hsl(var(--cbm-secondary) / 0.2)' }}>
+              <div className="text-4xl md:text-5xl font-bold mb-2" style={{ color: 'hsl(var(--cbm-secondary))' }}>2M+</div>
               <div className="text-sm text-muted-foreground font-medium">Documents catalogués</div>
             </div>
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm border border-cbm-accent/20 hover:shadow-cbm transition-shadow">
-              <div className="text-4xl md:text-5xl font-bold text-cbm-accent mb-2">24/7</div>
+            <div className="text-center p-6 bg-white rounded-xl shadow-sm border hover:shadow-cbm transition-shadow" style={{ borderColor: 'hsl(var(--cbm-accent) / 0.2)' }}>
+              <div className="text-4xl md:text-5xl font-bold mb-2" style={{ color: 'hsl(var(--cbm-accent))' }}>24/7</div>
               <div className="text-sm text-muted-foreground font-medium">Accès aux ressources</div>
             </div>
           </div>
