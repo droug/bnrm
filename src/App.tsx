@@ -66,6 +66,10 @@ import KitabUpcoming from "./pages/KitabUpcoming";
 import KitabNewPublications from "./pages/KitabNewPublications";
 import KitabBibliography from "./pages/KitabBibliography";
 import KitabFAQ from "./pages/KitabFAQ";
+import KitabRepertoireEditeurs from "./pages/KitabRepertoireEditeurs";
+import KitabRepertoireAuteurs from "./pages/KitabRepertoireAuteurs";
+import KitabRepertoireImprimeurs from "./pages/KitabRepertoireImprimeurs";
+import KitabRepertoireDistributeurs from "./pages/KitabRepertoireDistributeurs";
 
 
 const App = () => (
@@ -151,6 +155,10 @@ const App = () => (
           <Route path="/kitab/new-publications" element={<KitabNewPublications />} />
           <Route path="/kitab/bibliography" element={<KitabBibliography />} />
           <Route path="/kitab/faq" element={<KitabFAQ />} />
+          <Route path="/kitab/repertoire-editeurs" element={<KitabRepertoireEditeurs />} />
+          <Route path="/kitab/repertoire-auteurs" element={<KitabRepertoireAuteurs />} />
+          <Route path="/kitab/repertoire-imprimeurs" element={<KitabRepertoireImprimeurs />} />
+          <Route path="/kitab/repertoire-distributeurs" element={<KitabRepertoireDistributeurs />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />

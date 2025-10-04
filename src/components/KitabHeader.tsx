@@ -1,11 +1,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Globe, User, LogIn, Accessibility, Bot } from "lucide-react";
+import { Menu, X, Globe, User, LogIn, Accessibility, Bot, ChevronDown } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
 import SmartChatBot from "@/components/SmartChatBot";
 import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import logoImage from "@/assets/logo-kitab.png";
 
 const KitabHeader = () => {
@@ -108,6 +114,39 @@ const KitabHeader = () => {
               À Paraître
             </Button>
           </Link>
+          
+          {/* Menu Répertoires */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="hover:text-[hsl(var(--kitab-primary))] hover:bg-[hsl(var(--kitab-primary))]/10 gap-1">
+                Répertoires
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56 bg-background border-[hsl(var(--kitab-primary))]/20">
+              <DropdownMenuItem asChild>
+                <Link to="/kitab/repertoire-editeurs" className="w-full cursor-pointer">
+                  Répertoire des éditeurs
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/kitab/repertoire-auteurs" className="w-full cursor-pointer">
+                  Répertoire des auteurs
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/kitab/repertoire-imprimeurs" className="w-full cursor-pointer">
+                  Répertoire des imprimeurs
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/kitab/repertoire-distributeurs" className="w-full cursor-pointer">
+                  Répertoire des distributeurs
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
           <Link to="/kitab/faq">
             <Button variant="ghost" size="sm" className="hover:text-[hsl(var(--kitab-primary))] hover:bg-[hsl(var(--kitab-primary))]/10">
               Contact
@@ -149,12 +188,37 @@ const KitabHeader = () => {
                 À Paraître
               </Button>
             </Link>
+            
+            {/* Répertoires Mobile */}
+            <div className="border-t border-[hsl(var(--kitab-primary))]/20 my-2" />
+            <div className="text-xs font-semibold text-muted-foreground px-3 py-2">Répertoires</div>
+            <Link to="/kitab/repertoire-editeurs" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" size="sm" className="w-full justify-start pl-6">
+                Répertoire des éditeurs
+              </Button>
+            </Link>
+            <Link to="/kitab/repertoire-auteurs" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" size="sm" className="w-full justify-start pl-6">
+                Répertoire des auteurs
+              </Button>
+            </Link>
+            <Link to="/kitab/repertoire-imprimeurs" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" size="sm" className="w-full justify-start pl-6">
+                Répertoire des imprimeurs
+              </Button>
+            </Link>
+            <Link to="/kitab/repertoire-distributeurs" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" size="sm" className="w-full justify-start pl-6">
+                Répertoire des distributeurs
+              </Button>
+            </Link>
+            
+            <div className="border-t border-[hsl(var(--kitab-primary))]/20 my-2" />
             <Link to="/kitab/faq" onClick={() => setIsMenuOpen(false)}>
               <Button variant="ghost" size="sm" className="w-full justify-start">
                 Contact
               </Button>
             </Link>
-            <div className="border-t border-[hsl(var(--kitab-primary))]/20 my-2" />
             <Link to="/" onClick={() => setIsMenuOpen(false)}>
               <Button variant="outline" size="sm" className="w-full justify-start border-[hsl(var(--kitab-primary))]/40">
                 Retour BNRM
