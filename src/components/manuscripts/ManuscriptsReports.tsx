@@ -47,6 +47,40 @@ export function ManuscriptsReports() {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     
+    // Fonction pour nettoyer le texte et gérer les caractères arabes
+    const cleanText = (text: string): string => {
+      if (!text) return "";
+      
+      // Détecter les caractères arabes (plage Unicode 0600-06FF)
+      const hasArabic = /[\u0600-\u06FF]/.test(text);
+      
+      if (hasArabic) {
+        // Pour les caractères arabes, retourner une translittération ou indication
+        return "[Texte en arabe - voir version numérique]";
+      }
+      
+      // Nettoyer les caractères spéciaux et problématiques
+      return text
+        .replace(/[^\x00-\x7F]/g, (char) => {
+          // Conserver les caractères accentués français courants
+          const accents: Record<string, string> = {
+            'à': 'a', 'â': 'a', 'ä': 'a', 'á': 'a',
+            'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
+            'î': 'i', 'ï': 'i', 'í': 'i',
+            'ô': 'o', 'ö': 'o', 'ó': 'o',
+            'ù': 'u', 'û': 'u', 'ü': 'u', 'ú': 'u',
+            'ç': 'c', 'ñ': 'n',
+            'À': 'A', 'Â': 'A', 'Ä': 'A', 'Á': 'A',
+            'É': 'E', 'È': 'E', 'Ê': 'E', 'Ë': 'E',
+            'Î': 'I', 'Ï': 'I', 'Í': 'I',
+            'Ô': 'O', 'Ö': 'O', 'Ó': 'O',
+            'Ù': 'U', 'Û': 'U', 'Ü': 'U', 'Ú': 'U',
+            'Ç': 'C', 'Ñ': 'N'
+          };
+          return accents[char] || char;
+        });
+    };
+    
     // Fonction pour ajouter l'en-tête professionnel sur chaque page
     const addHeader = () => {
       // Logo en haut
@@ -60,13 +94,6 @@ export function ManuscriptsReports() {
       doc.line(15, 45, pageWidth - 15, 45);
     };
     
-    // Fonction pour gérer le texte avec support UTF-8 complet
-    const addText = (text: string, x: number, y: number, options?: any) => {
-      // Convertir le texte pour assurer l'encodage UTF-8
-      const encodedText = decodeURIComponent(encodeURIComponent(text));
-      doc.text(encodedText, x, y, options);
-    };
-    
     // Ajouter l'en-tête de la première page
     addHeader();
     
@@ -76,18 +103,18 @@ export function ManuscriptsReports() {
     doc.setFontSize(18);
     doc.setTextColor(41, 128, 185);
     doc.setFont('helvetica', 'bold');
-    addText("RAPPORT STATISTIQUE", pageWidth / 2, yPos, { align: 'center' });
+    doc.text("RAPPORT STATISTIQUE", pageWidth / 2, yPos, { align: 'center' });
     yPos += 8;
-    addText("MANUSCRITS NUMÉRISÉS", pageWidth / 2, yPos, { align: 'center' });
+    doc.text("MANUSCRITS NUMERISES", pageWidth / 2, yPos, { align: 'center' });
     yPos += 15;
     
     // Informations du rapport
     doc.setFontSize(11);
     doc.setTextColor(60, 60, 60);
     doc.setFont('helvetica', 'normal');
-    addText(`Date de génération: ${format(new Date(), "PPP", { locale: fr })}`, 20, yPos);
+    doc.text(`Date de generation: ${format(new Date(), "dd/MM/yyyy")}`, 20, yPos);
     yPos += 7;
-    addText(`Type de rapport: ${reportTypes.find(r => r.id === reportType)?.title || reportType}`, 20, yPos);
+    doc.text(`Type de rapport: ${reportTypes.find(r => r.id === reportType)?.title || reportType}`, 20, yPos);
     yPos += 12;
     
     // Section Filtres appliqués
@@ -100,7 +127,7 @@ export function ManuscriptsReports() {
       doc.setFontSize(12);
       doc.setTextColor(41, 128, 185);
       doc.setFont('helvetica', 'bold');
-      addText("Filtres appliqués:", 20, yPos);
+      doc.text("Filtres appliques:", 20, yPos);
       yPos += 8;
       
       doc.setFontSize(10);
@@ -108,30 +135,30 @@ export function ManuscriptsReports() {
       doc.setFont('helvetica', 'normal');
       
       if (dateFrom) {
-        addText(`• Période du: ${format(dateFrom, "PPP", { locale: fr })}`, 25, yPos);
+        doc.text(`- Periode du: ${format(dateFrom, "dd/MM/yyyy")}`, 25, yPos);
         yPos += 7;
       }
       if (dateTo) {
-        addText(`• au: ${format(dateTo, "PPP", { locale: fr })}`, 25, yPos);
+        doc.text(`- au: ${format(dateTo, "dd/MM/yyyy")}`, 25, yPos);
         yPos += 7;
       }
       if (filterLanguage !== "all") {
         const langMap: Record<string, string> = {
           "arabic": "Arabe",
-          "french": "Français",
+          "french": "Francais",
           "berber": "Amazigh",
           "latin": "Latin"
         };
-        addText(`• Langue: ${langMap[filterLanguage] || filterLanguage}`, 25, yPos);
+        doc.text(`- Langue: ${langMap[filterLanguage] || filterLanguage}`, 25, yPos);
         yPos += 7;
       }
       if (filterPeriod !== "all") {
         const periodMap: Record<string, string> = {
-          "medieval": "Médiévale",
+          "medieval": "Medievale",
           "modern": "Moderne",
           "contemporary": "Contemporaine"
         };
-        addText(`• Période: ${periodMap[filterPeriod] || filterPeriod}`, 25, yPos);
+        doc.text(`- Periode: ${periodMap[filterPeriod] || filterPeriod}`, 25, yPos);
         yPos += 7;
       }
       yPos += 8;
@@ -141,14 +168,14 @@ export function ManuscriptsReports() {
     doc.setFontSize(14);
     doc.setTextColor(41, 128, 185);
     doc.setFont('helvetica', 'bold');
-    addText("STATISTIQUES PRINCIPALES", 20, yPos);
+    doc.text("STATISTIQUES PRINCIPALES", 20, yPos);
     yPos += 10;
     
     // Boîtes de statistiques
     const stats = [
       { label: "Total des manuscrits", value: manuscripts?.length || 0 },
-      { label: "Langues différentes", value: new Set(manuscripts?.map(m => m.language)).size || 0 },
-      { label: "Périodes historiques", value: new Set(manuscripts?.map(m => m.period).filter(Boolean)).size || 0 },
+      { label: "Langues differentes", value: new Set(manuscripts?.map(m => m.language)).size || 0 },
+      { label: "Periodes historiques", value: new Set(manuscripts?.map(m => m.period).filter(Boolean)).size || 0 },
       { label: "Nouveaux ce mois", value: manuscripts?.filter(m => {
         const created = new Date(m.created_at);
         const now = new Date();
@@ -169,13 +196,13 @@ export function ManuscriptsReports() {
       doc.setFontSize(16);
       doc.setTextColor(41, 128, 185);
       doc.setFont('helvetica', 'bold');
-      addText(String(stat.value), boxX + 42.5, boxY + 8, { align: 'center' });
+      doc.text(String(stat.value), boxX + 42.5, boxY + 8, { align: 'center' });
       
       // Label
       doc.setFontSize(9);
       doc.setTextColor(100, 100, 100);
       doc.setFont('helvetica', 'normal');
-      addText(stat.label, boxX + 42.5, boxY + 16, { align: 'center' });
+      doc.text(stat.label, boxX + 42.5, boxY + 16, { align: 'center' });
     });
     
     yPos += 60;
@@ -185,12 +212,20 @@ export function ManuscriptsReports() {
       doc.setFontSize(14);
       doc.setTextColor(41, 128, 185);
       doc.setFont('helvetica', 'bold');
-      addText("LISTE DES MANUSCRITS", 20, yPos);
+      doc.text("LISTE DES MANUSCRITS", 20, yPos);
       yPos += 10;
       
       doc.setFontSize(9);
       doc.setTextColor(60, 60, 60);
       doc.setFont('helvetica', 'normal');
+      
+      // Note pour les textes arabes
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text("Note: Les titres en arabe sont indiques par [Texte en arabe]", 20, yPos);
+      yPos += 8;
+      doc.setFontSize(9);
+      doc.setTextColor(60, 60, 60);
       
       manuscripts.slice(0, 20).forEach((manuscript, index) => {
         // Nouvelle page si nécessaire
@@ -206,17 +241,21 @@ export function ManuscriptsReports() {
           doc.rect(15, yPos - 4, pageWidth - 30, 12, 'F');
         }
         
-        // Titre avec encodage UTF-8 correct
+        // Titre nettoyé
         doc.setFont('helvetica', 'bold');
-        const title = manuscript.title || "Sans titre";
-        addText(`${index + 1}. ${title}`, 20, yPos);
+        const title = cleanText(manuscript.title || "Sans titre");
+        const titleText = `${index + 1}. ${title}`;
+        doc.text(titleText, 20, yPos);
         yPos += 5;
         
-        // Détails
+        // Détails nettoyés
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(100, 100, 100);
-        const details = `    Auteur: ${manuscript.author || "N/A"} | Langue: ${manuscript.language || "N/A"} | Période: ${manuscript.period || "N/A"}`;
-        addText(details, 20, yPos);
+        const author = cleanText(manuscript.author || "N/A");
+        const language = manuscript.language || "N/A";
+        const period = cleanText(manuscript.period || "N/A");
+        const details = `    Auteur: ${author} | Langue: ${language} | Periode: ${period}`;
+        doc.text(details, 20, yPos);
         yPos += 8;
         
         doc.setTextColor(60, 60, 60);
@@ -229,8 +268,8 @@ export function ManuscriptsReports() {
       doc.setPage(i);
       doc.setFontSize(9);
       doc.setTextColor(150, 150, 150);
-      addText(
-        `Page ${i} / ${totalPages} - Généré le ${format(new Date(), "PPP", { locale: fr })}`,
+      doc.text(
+        `Page ${i} / ${totalPages} - Genere le ${format(new Date(), "dd/MM/yyyy")}`,
         pageWidth / 2,
         pageHeight - 10,
         { align: 'center' }
@@ -238,7 +277,7 @@ export function ManuscriptsReports() {
     }
     
     doc.save(`rapport-manuscrits-${format(new Date(), "yyyy-MM-dd")}.pdf`);
-    toast.success("Rapport PDF généré avec succès");
+    toast.success("Rapport PDF genere avec succes");
   };
 
   const generateExcelReport = () => {
