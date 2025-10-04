@@ -65,7 +65,7 @@ export default function CBMPortal() {
           <img 
             src={cbmHeroBanner} 
             alt="Bibliothèque" 
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover opacity-100"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/95 to-primary/80" />
         </div>
