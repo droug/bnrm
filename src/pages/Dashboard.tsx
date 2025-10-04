@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, FileText, Clock, Library, LogOut, Settings, Cog } from "lucide-react";
+import { BookOpen, Users, FileText, Clock, Library, LogOut, Settings, Cog, ArrowLeft } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { UserProfileDialog } from "@/components/UserProfileDialog";
+import logoBnrm from "@/assets/logo-bnrm.png";
 
 export default function Dashboard() {
   const { user, profile, signOut, loading } = useAuth();
@@ -86,8 +87,14 @@ export default function Dashboard() {
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center space-x-4">
+            <Link to="/">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Retour
+              </Button>
+            </Link>
             <div className="flex items-center space-x-2">
-              <BookOpen className="h-6 w-6 text-primary" />
+              <img src={logoBnrm} alt="Logo BNRM" className="h-8 w-auto object-contain" />
               <span className="text-xl font-bold">Portail BNRM</span>
             </div>
           </div>
