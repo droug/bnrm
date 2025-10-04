@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import { Routes, Route } from "react-router-dom";
+import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import SignupPage from "./pages/SignupPage";
@@ -70,6 +71,7 @@ import KitabFAQ from "./pages/KitabFAQ";
 const App = () => (
   <TooltipProvider>
     <LanguageProvider>
+      <ScrollToTop />
       <Toaster />
       <Sonner />
       <Routes>
