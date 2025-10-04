@@ -4,288 +4,226 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Network, Target, Users, UserPlus, Database, BookOpen, ArrowRight, Sparkles, TrendingUp, Award, Globe, BookMarked, Zap, CheckCircle2 } from "lucide-react";
+import { Network, Target, Users, UserPlus, Database, BookOpen, ArrowRight, Library, FileText, GraduationCap } from "lucide-react";
+import manuscriptImage from "@/assets/manuscript-banner.jpg";
 
 export default function CBMPortal() {
-  const menuCards = [
+  const spotlightItems = [
     {
       title: "Objectifs du Réseau CBM",
       description: "Découvrez les missions et objectifs du Catalogue des Bibliothèques Marocaines",
       icon: Target,
       path: "/cbm/objectifs",
-      color: "from-violet-600 to-purple-600",
-      badge: "Essentiel"
-    },
-    {
-      title: "Plan d'Actions",
-      description: "Étapes d'intégration et feuille de route du réseau",
-      icon: Network,
-      path: "/cbm/plan-actions",
-      color: "from-blue-600 to-cyan-600",
-      badge: "Stratégie"
-    },
-    {
-      title: "Organes de Gestion",
-      description: "Bureau CBM, Comité Actif et structure organisationnelle",
-      icon: Users,
-      path: "/cbm/organes-gestion",
-      color: "from-emerald-600 to-teal-600",
-      badge: "Gouvernance"
+      color: "bg-blue-600"
     },
     {
       title: "Adhésion au Réseau",
-      description: "Rejoignez le réseau CBM - Formulaire et conditions",
+      description: "Rejoignez le réseau CBM - Formulaire et conditions d'adhésion",
       icon: UserPlus,
       path: "/cbm/adhesion",
-      color: "from-orange-600 to-amber-600",
-      badge: "Rejoindre"
+      color: "bg-green-600"
     },
     {
       title: "Recherche Documentaire",
-      description: "Accédez aux ressources des bibliothèques membres",
+      description: "Accédez au catalogue unifié des bibliothèques marocaines",
       icon: Database,
       path: "/cbm/recherche",
-      color: "from-pink-600 to-rose-600",
-      badge: "Catalogue"
+      color: "bg-purple-600"
     },
     {
-      title: "Accès Rapide",
-      description: "Charte, règlements, formations et connectivité",
-      icon: BookOpen,
-      path: "/cbm/acces-rapide",
-      color: "from-indigo-600 to-blue-600",
-      badge: "Ressources"
+      title: "Plan d'Actions",
+      description: "Étapes d'intégration et feuille de route du réseau CBM",
+      icon: Network,
+      path: "/cbm/plan-actions",
+      color: "bg-orange-600"
     }
   ];
 
-  const stats = [
-    { label: "Bibliothèques Membres", value: "150+", icon: BookMarked },
-    { label: "Documents Catalogués", value: "2M+", icon: Database },
-    { label: "Utilisateurs Actifs", value: "50K+", icon: Users },
-    { label: "Taux de Satisfaction", value: "98%", icon: Award }
-  ];
-
-  const features = [
-    "Recherche unifiée dans toutes les bibliothèques",
-    "Partage de ressources documentaires",
-    "Formations et accompagnement technique",
-    "Connectivité et interopérabilité",
-    "Standards internationaux (UNIMARC, Z39.50)",
-    "Support et assistance continue"
+  const quickLinks = [
+    {
+      title: "Organes de Gestion",
+      description: "Bureau CBM et structure organisationnelle",
+      icon: Users,
+      path: "/cbm/organes-gestion"
+    },
+    {
+      title: "Accès Rapide",
+      description: "Charte, règlements et formations",
+      icon: BookOpen,
+      path: "/cbm/acces-rapide"
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Hero Banner - Design Premium Ultra-Moderne */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-violet-900 via-purple-900 to-indigo-900">
-        {/* Animated Background Patterns */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-violet-500 rounded-full filter blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-indigo-500 rounded-full filter blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      {/* Hero Banner - NYPL Style */}
+      <section className="relative overflow-hidden bg-primary h-[500px]">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img 
+            src={manuscriptImage} 
+            alt="Bibliothèque" 
+            className="w-full h-full object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 to-primary/80" />
         </div>
         
-        {/* Grid Pattern Overlay */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-10"></div>
-        
-        <div className="container mx-auto px-4 py-20 md:py-32 relative">
-          <div className="max-w-5xl mx-auto text-center">
-            {/* Floating Badge */}
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8 animate-fade-in">
-              <Sparkles className="w-5 h-5 text-yellow-300" />
-              <span className="text-white font-medium">Réseau National de Coopération</span>
-              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black border-0">
-                Nouveau
-              </Badge>
-            </div>
+        <div className="container mx-auto px-4 h-full relative z-10">
+          <div className="flex flex-col justify-center h-full max-w-2xl">
+            {/* Badge */}
+            <Badge className="w-fit mb-6 bg-accent text-accent-foreground border-0 px-4 py-2 text-sm font-medium">
+              RÉSEAU NATIONAL
+            </Badge>
             
-            {/* Main Title with Gradient */}
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
-                Portail CBM
-              </span>
+            {/* Main Title */}
+            <h1 className="text-5xl md:text-6xl font-bold text-primary-foreground mb-6 leading-tight">
+              Catalogue des Bibliothèques Marocaines
             </h1>
             
-            {/* Subtitle */}
-            <p className="text-3xl md:text-4xl mb-6 font-light text-blue-100">
-              Catalogue des Bibliothèques Marocaines
-            </p>
-            
-            {/* Decorative Divider */}
-            <div className="flex items-center justify-center gap-3 mb-10">
-              <div className="h-px w-20 bg-gradient-to-r from-transparent to-white/50"></div>
-              <Network className="w-8 h-8 text-purple-300" />
-              <div className="h-px w-20 bg-gradient-to-l from-transparent to-white/50"></div>
-            </div>
-            
             {/* Description */}
-            <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-12 text-blue-100/90 leading-relaxed font-light">
-              Connectez-vous au plus grand réseau de partage de ressources documentaires 
-              entre bibliothèques marocaines. Innovation, collaboration et excellence.
+            <p className="text-xl text-primary-foreground/90 mb-8 leading-relaxed">
+              Connectez-vous au réseau national de partage de ressources documentaires 
+              entre bibliothèques marocaines.
             </p>
             
-            {/* CTA Buttons - Modern Style */}
-            <div className="flex flex-wrap gap-6 justify-center mb-16">
+            {/* CTA Button */}
+            <div>
               <Link to="/cbm/recherche">
-                <Button size="lg" className="h-14 px-8 text-lg bg-white hover:bg-blue-50 text-violet-900 shadow-2xl hover:shadow-violet-500/50 transition-all duration-300 hover:scale-105 rounded-xl group">
-                  <Database className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform" />
+                <Button size="lg" className="bg-background text-foreground hover:bg-background/90 h-12 px-8">
+                  <Database className="w-5 h-5 mr-2" />
                   Rechercher dans le Catalogue
-                  <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
-              <Link to="/cbm/adhesion">
-                <Button size="lg" className="h-14 px-8 text-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 rounded-xl border-2 border-white/20">
-                  <UserPlus className="w-6 h-6 mr-3" />
-                  Adhérer au Réseau
-                  <Zap className="w-5 h-5 ml-3" />
-                </Button>
-              </Link>
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-              {stats.map((stat, index) => {
-                const IconComponent = stat.icon;
-                return (
-                  <div 
-                    key={index} 
-                    className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105"
-                  >
-                    <IconComponent className="w-8 h-8 text-purple-300 mb-3 mx-auto" />
-                    <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                    <div className="text-sm text-blue-200">{stat.label}</div>
-                  </div>
-                );
-              })}
             </div>
           </div>
-        </div>
-        
-        {/* Modern Wave Decoration */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-16 md:h-24">
-            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="rgb(248, 250, 252)"/>
-          </svg>
         </div>
       </section>
       
-      <main className="container mx-auto px-4 py-20">
-        {/* Section Title with Animation */}
-        <div className="text-center mb-16 animate-fade-in">
-          <Badge className="mb-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 px-4 py-2 text-sm">
-            Explorer le Réseau
-          </Badge>
-          <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-6 bg-gradient-to-r from-violet-900 via-purple-900 to-indigo-900 bg-clip-text text-transparent">
-            Accédez à Tous les Services
+      <main className="container mx-auto px-4 py-16">
+        {/* Spotlight Section - NYPL Style */}
+        <section className="mb-16">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-foreground border-l-4 border-primary pl-4">
+              À la Une
+            </h2>
+            <Link to="/cbm/recherche">
+              <Button variant="outline" className="gap-2">
+                Voir Plus
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {spotlightItems.map((item, index) => {
+              const IconComponent = item.icon;
+              return (
+                <Link key={item.path} to={item.path}>
+                  <Card className="group h-full hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden border">
+                    {/* Icon Header */}
+                    <div className={`${item.color} h-32 flex items-center justify-center`}>
+                      <IconComponent className="w-16 h-16 text-white" />
+                    </div>
+                    
+                    <CardHeader>
+                      <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors">
+                        {item.title}
+                      </CardTitle>
+                      <CardDescription className="text-sm leading-relaxed">
+                        {item.description}
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Quick Links Section */}
+        <section className="mb-16">
+          <h2 className="text-3xl font-bold text-foreground border-l-4 border-primary pl-4 mb-8">
+            Liens Rapides
           </h2>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto font-light">
-            Découvrez l'ensemble des fonctionnalités et ressources du Portail CBM
-          </p>
-        </div>
 
-        {/* Menu Cards Grid - Premium Design */}
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-20">
-          {menuCards.map((card, index) => {
-            const IconComponent = card.icon;
-            return (
-              <Link key={card.path} to={card.path}>
-                <Card 
-                  className="group h-full hover:shadow-2xl transition-all duration-500 cursor-pointer border-0 bg-white overflow-hidden hover:-translate-y-2"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  {/* Gradient Top Border */}
-                  <div className={`h-1.5 bg-gradient-to-r ${card.color}`} />
-                  
-                  <CardHeader className="relative pb-6 pt-8">
-                    {/* Badge */}
-                    <Badge className={`absolute top-4 right-4 bg-gradient-to-r ${card.color} text-white border-0 shadow-lg`}>
-                      {card.badge}
-                    </Badge>
-                    
-                    {/* Icon with Gradient Background */}
-                    <div className="relative mb-6">
-                      <div 
-                        className={`inline-flex h-20 w-20 rounded-2xl items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 bg-gradient-to-br ${card.color}`}
-                      >
-                        <IconComponent className="h-10 w-10 text-white" />
+          <div className="grid gap-6 md:grid-cols-2">
+            {quickLinks.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <Link key={item.path} to={item.path}>
+                  <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border h-full">
+                    <CardHeader className="flex flex-row items-start gap-4 p-6">
+                      <div className="bg-primary/10 p-3 rounded-lg">
+                        <IconComponent className="w-8 h-8 text-primary" />
                       </div>
-                      <div className={`absolute -inset-1 bg-gradient-to-r ${card.color} rounded-2xl blur opacity-25 group-hover:opacity-75 transition-opacity`}></div>
-                    </div>
-                    
-                    <CardTitle className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-violet-600 group-hover:to-purple-600 transition-all">
-                      {card.title}
-                    </CardTitle>
-                    <CardDescription className="text-base text-slate-600 leading-relaxed">
-                      {card.description}
-                    </CardDescription>
-                  </CardHeader>
-                  
-                  <CardContent className="pt-0 pb-8">
-                    <div className="flex items-center text-violet-600 font-semibold group-hover:translate-x-2 transition-transform">
-                      <span>Découvrir</span>
-                      <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Features Section */}
-        <div className="bg-gradient-to-br from-violet-900 via-purple-900 to-indigo-900 rounded-3xl p-12 md:p-16 mb-20 relative overflow-hidden">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full filter blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-300 rounded-full filter blur-3xl"></div>
+                      <div className="flex-1">
+                        <CardTitle className="text-xl mb-2 group-hover:text-primary transition-colors">
+                          {item.title}
+                        </CardTitle>
+                        <CardDescription className="text-sm">
+                          {item.description}
+                        </CardDescription>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                    </CardHeader>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
-          
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <Sparkles className="h-6 w-6 text-yellow-300" />
-              </div>
-              <h3 className="text-4xl font-bold text-white">
-                Pourquoi Choisir CBM ?
-              </h3>
-            </div>
+        </section>
+
+        {/* Stats Section */}
+        <section className="mb-16">
+          <div className="bg-primary text-primary-foreground rounded-lg p-12">
+            <h2 className="text-3xl font-bold mb-2 text-center">Le Réseau CBM en Chiffres</h2>
+            <p className="text-center text-primary-foreground/90 mb-10">
+              Un réseau en constante croissance au service de la recherche et du savoir
+            </p>
             
-            <div className="grid md:grid-cols-2 gap-6">
-              {features.map((feature, index) => (
-                <div 
-                  key={index} 
-                  className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-5 hover:bg-white/15 transition-all group"
-                >
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <CheckCircle2 className="h-5 w-5 text-white" />
-                  </div>
-                  <p className="text-white text-lg font-medium">{feature}</p>
-                </div>
-              ))}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div className="text-center">
+                <div className="text-4xl font-bold mb-2">150+</div>
+                <div className="text-sm text-primary-foreground/80">Bibliothèques Membres</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold mb-2">2M+</div>
+                <div className="text-sm text-primary-foreground/80">Documents Catalogués</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold mb-2">50K+</div>
+                <div className="text-sm text-primary-foreground/80">Utilisateurs Actifs</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold mb-2">98%</div>
+                <div className="text-sm text-primary-foreground/80">Satisfaction</div>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Call to Action Final */}
-        <div className="text-center bg-gradient-to-r from-slate-100 to-blue-100 rounded-3xl p-12 md:p-16">
-          <Globe className="w-16 h-16 mx-auto mb-6 text-violet-600" />
-          <h3 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-            Prêt à Rejoindre le Réseau ?
-          </h3>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-10 font-light">
-            Rejoignez plus de 150 bibliothèques marocaines et participez à la révolution 
-            du partage des connaissances.
-          </p>
-          <Link to="/cbm/adhesion">
-            <Button size="lg" className="h-16 px-10 text-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-2xl hover:shadow-violet-500/50 transition-all duration-300 hover:scale-105 rounded-xl">
-              <UserPlus className="w-6 h-6 mr-3" />
-              Commencer Maintenant
-              <TrendingUp className="w-6 h-6 ml-3" />
-            </Button>
-          </Link>
-        </div>
+        {/* Call to Action */}
+        <section>
+          <div className="bg-muted rounded-lg p-12 text-center">
+            <Library className="w-16 h-16 mx-auto mb-6 text-primary" />
+            <h3 className="text-3xl font-bold text-foreground mb-4">
+              Rejoignez le Réseau CBM
+            </h3>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+              Devenez membre du réseau et bénéficiez d'un accès privilégié aux ressources 
+              documentaires de toutes les bibliothèques marocaines participantes.
+            </p>
+            <Link to="/cbm/adhesion">
+              <Button size="lg" className="h-12 px-8">
+                <UserPlus className="w-5 h-5 mr-2" />
+                Adhérer Maintenant
+              </Button>
+            </Link>
+          </div>
+        </section>
       </main>
       
       <Footer />
