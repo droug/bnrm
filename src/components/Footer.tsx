@@ -59,10 +59,18 @@ const Footer = () => {
   ];
 
   return (
-    <footer className={isKitabPage 
-      ? "bg-gradient-to-br from-orange-50 via-orange-50/80 to-rose-50 text-foreground border-t border-orange-100" 
-      : "bg-primary text-primary-foreground"
-    }>
+    <footer 
+      className={isKitabPage 
+        ? "bg-gradient-to-br from-orange-50 via-orange-50/80 to-rose-50 text-foreground border-t border-orange-100 relative" 
+        : "bg-primary text-primary-foreground"
+      }
+      style={isKitabPage ? {
+        backgroundImage: `linear-gradient(to bottom right, rgba(255, 247, 237, 0.95), rgba(255, 241, 242, 0.95)), url(/src/assets/zellige-pattern-1.jpg)`,
+        backgroundSize: '300px 300px, 150px 150px',
+        backgroundPosition: 'center, center',
+        backgroundRepeat: 'no-repeat, repeat'
+      } : undefined}
+    >
       {/* Main footer content */}
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
