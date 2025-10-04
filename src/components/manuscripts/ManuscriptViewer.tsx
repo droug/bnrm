@@ -144,7 +144,7 @@ export function ManuscriptViewer() {
     try {
       const { data, error } = await supabase
         .from('manuscripts')
-        .select('*')
+        .select('id, title, author, description, language, period, material, dimensions, page_count, thumbnail_url, digital_copy_url, access_level, status, has_ocr, block_right_click, block_screenshot, allow_download, allow_print, allow_email_share, created_at, permalink, condition_notes, inventory_number, genre, cote, source, historical_period')
         .or(`id.eq.${id},permalink.eq.${id}`)
         .single();
 

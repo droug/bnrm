@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Download, Calendar, User, MapPin, Lock, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { LazyImage } from "./LazyImage";
 import manuscrit1 from "@/assets/manuscrit-1.jpg";
 import manuscrit2 from "@/assets/manuscrit-2.png";
 import manuscrit3 from "@/assets/manuscrit-3.jpg";
@@ -104,10 +105,11 @@ export function ManuscriptGrid({
           }`}
         >
           <div className="aspect-video overflow-hidden relative bg-gradient-mosaique">
-            <img
+            <LazyImage
               src={getDefaultImage(manuscript)}
               alt={manuscript.title}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              thumbnail={manuscript.thumbnail_url}
             />
             {!canAccessManuscript(manuscript) && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">

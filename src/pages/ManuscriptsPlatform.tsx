@@ -105,9 +105,13 @@ export default function ManuscriptsPlatform() {
   };
 
   useEffect(() => {
-    // Effectuer la recherche initiale
-    search(searchQuery, filters);
-  }, []);
+    // Effectuer la recherche initiale avec debounce
+    const timer = setTimeout(() => {
+      search(searchQuery, filters);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [searchQuery, filters]);
 
   const handleSearch = () => {
     search(searchQuery, filters, 1);

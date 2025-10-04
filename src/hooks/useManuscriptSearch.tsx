@@ -23,7 +23,6 @@ export interface SearchResult {
   language: string;
   period: string;
   genre: string;
-  subject: string[];
   publication_year: number;
   cote: string;
   source: string;
@@ -31,6 +30,9 @@ export interface SearchResult {
   status: string;
   access_level: string;
   permalink: string;
+  material: string;
+  dimensions: string;
+  created_at: string;
   highlights?: {
     title?: string[];
     description?: string[];
@@ -45,16 +47,30 @@ export function useManuscriptSearch() {
   const [totalResults, setTotalResults] = useState(0);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
+  const [cache, setCache] = useState<Map<string, { data: SearchResult[], timestamp: number, count: number }>>(new Map());
+  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes de cache
   const [facets, setFacets] = useState<Record<string, any>>({});
 
   const search = async (query: string, filters: SearchFilters = {}, pageNum: number = 1) => {
+    // Créer une clé de cache unique
+    const cacheKey = JSON.stringify({ query, filters, pageNum });
+    
+    // Vérifier le cache
+    const cached = cache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      setResults(cached.data);
+      setTotalResults(cached.count);
+      setPage(pageNum);
+      return;
+    }
+    
     setLoading(true);
     const startTime = performance.now();
 
     try {
       let queryBuilder = supabase
         .from('manuscripts')
-        .select('*', { count: 'exact' })
+        .select('id, title, author, description, thumbnail_url, language, period, genre, publication_year, cote, source, historical_period, status, access_level, permalink, material, dimensions, created_at', { count: 'exact' })
         .eq('is_visible', true);
 
       // Recherche plein texte si une requête est fournie
@@ -109,21 +125,36 @@ export function useManuscriptSearch() {
 
       if (error) throw error;
 
-      setResults(data || []);
+      const searchResults = data || [];
+      setResults(searchResults);
       setTotalResults(count || 0);
       setPage(pageNum);
-
-      // Enregistrer la recherche dans les logs
-      const searchDuration = Math.round(performance.now() - startTime);
-      await supabase.rpc('log_search', {
-        p_query: query || '',
-        p_filters: filters as any,
-        p_results_count: count || 0,
-        p_search_duration_ms: searchDuration
+      
+      // Mettre en cache les résultats
+      setCache(prev => {
+        const newCache = new Map(prev);
+        newCache.set(cacheKey, { data: searchResults, timestamp: Date.now(), count: count || 0 });
+        // Limiter la taille du cache à 30 entrées
+        if (newCache.size > 30) {
+          const firstKey = newCache.keys().next().value;
+          newCache.delete(firstKey);
+        }
+        return newCache;
       });
 
-      // Récupérer les facettes pour affichage
-      await fetchFacets();
+      // Enregistrer la recherche dans les logs (en arrière-plan)
+      const searchDuration = Math.round(performance.now() - startTime);
+      setTimeout(() => {
+        supabase.rpc('log_search', {
+          p_query: query || '',
+          p_filters: filters as any,
+          p_results_count: count || 0,
+          p_search_duration_ms: searchDuration
+        });
+      }, 0);
+
+      // Récupérer les facettes pour affichage (en arrière-plan)
+      fetchFacets();
 
     } catch (error) {
       console.error('Erreur de recherche:', error);

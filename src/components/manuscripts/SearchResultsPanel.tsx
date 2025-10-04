@@ -166,15 +166,13 @@ export function SearchResultsPanel({ results, searchQuery, onResultClick, highli
                     )}
                   </div>
 
-                  {selectedResult.subject && selectedResult.subject.length > 0 && (
+                  {selectedResult.material && (
                     <div>
-                      <h4 className="text-xs font-semibold text-muted-foreground mb-2">Sujets</h4>
+                      <h4 className="text-xs font-semibold text-muted-foreground mb-2">Matériau</h4>
                       <div className="flex flex-wrap gap-2">
-                        {selectedResult.subject.map((subj, index) => (
-                          <Badge key={index} variant="secondary">
-                            {subj}
-                          </Badge>
-                        ))}
+                        <Badge variant="secondary">
+                          {selectedResult.material}
+                        </Badge>
                       </div>
                     </div>
                   )}
