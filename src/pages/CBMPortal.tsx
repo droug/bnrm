@@ -67,7 +67,6 @@ export default function CBMPortal() {
             alt="Bibliothèque" 
             className="w-full h-full object-cover opacity-100"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 to-primary/80" />
         </div>
         
         <div className="container mx-auto px-4 h-full relative z-10">
