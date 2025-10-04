@@ -36,8 +36,9 @@ const Header = () => {
   // Vérifier si on est sur une des plateformes spéciales
   const isDigitalLibrary = location.pathname.startsWith("/digital-library");
   const isManuscriptsPlatform = location.pathname === "/plateforme-manuscrits" || location.pathname === "/manuscripts-platform";
+  const isManuscriptsHelp = location.pathname === "/manuscripts/help" || location.pathname === "/aide-manuscrits";
   const isBackoffice = location.pathname.startsWith("/admin/manuscripts-backoffice") || location.pathname.startsWith("/admin/digital-library");
-  const hideNavigation = isDigitalLibrary || isManuscriptsPlatform || isBackoffice;
+  const hideNavigation = isDigitalLibrary || isManuscriptsPlatform || isManuscriptsHelp || isBackoffice;
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b-2 border-primary/20 shadow-lg">
