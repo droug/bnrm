@@ -59,51 +59,53 @@ export default function KitabPortal() {
           <img 
             src={kitabBanner} 
             alt="Kitab Banner" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center"
           />
         </div>
         
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--kitab-primary))]/50 via-[hsl(var(--kitab-secondary))]/40 to-[hsl(var(--kitab-accent))]/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--kitab-primary))]/60 via-[hsl(var(--kitab-secondary))]/50 to-[hsl(var(--kitab-accent))]/40"></div>
         
-        <div className="container mx-auto px-4 h-full relative z-10">
-          <div className="flex flex-col justify-center h-full max-w-4xl mx-auto text-center">
-            {/* Badge */}
-            <Badge className="w-fit mx-auto mb-6 bg-[hsl(var(--kitab-accent))] text-white border-0 px-6 py-2 text-sm font-medium">
-              PLATEFORME NATIONALE
-            </Badge>
-            
-            {/* Main Title */}
-            <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
-              Kitab
-            </h1>
-            
-            {/* Subtitle */}
-            <p className="text-2xl text-white/95 mb-4 font-semibold">
-              Plateforme Digitale de l'Édition au Maroc
-            </p>
-            
-            {/* Description */}
-            <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-3xl mx-auto">
-              Bibliothèque bibliographique numérique gratuite dédiée aux publications nationales. 
-              Découvrez, explorez et promouvez l'industrie marocaine du livre.
-            </p>
-            
-            {/* CTA Button */}
-            <div className="flex gap-4 justify-center">
-              <Link to="/kitab/new-publications">
-                <Button size="lg" className="bg-white text-[hsl(var(--kitab-primary))] hover:bg-white/90 h-14 px-8 text-lg shadow-[var(--shadow-kitab-strong)]">
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Nouvelles Parutions
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
-              <Link to="/kitab/bibliography">
-                <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 h-14 px-8 text-lg">
-                  <BookMarked className="w-5 h-5 mr-2" />
-                  Bibliographie Nationale
-                </Button>
-              </Link>
+        <div className="relative z-10 flex items-center justify-center h-full">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+              {/* Badge */}
+              <Badge className="mb-6 bg-[hsl(var(--kitab-accent))] text-white border-0 px-6 py-2 text-sm font-medium">
+                PLATEFORME NATIONALE
+              </Badge>
+              
+              {/* Main Title */}
+              <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                Kitab
+              </h1>
+              
+              {/* Subtitle */}
+              <p className="text-2xl text-white/95 mb-4 font-semibold">
+                Plateforme Digitale de l'Édition au Maroc
+              </p>
+              
+              {/* Description */}
+              <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-3xl mx-auto">
+                Bibliothèque bibliographique numérique gratuite dédiée aux publications nationales. 
+                Découvrez, explorez et promouvez l'industrie marocaine du livre.
+              </p>
+              
+              {/* CTA Button */}
+              <div className="flex flex-wrap gap-4 justify-center">
+                <Link to="/kitab/new-publications">
+                  <Button size="lg" className="bg-white text-[hsl(var(--kitab-primary))] hover:bg-white/90 h-14 px-8 text-lg shadow-[var(--shadow-kitab-strong)]">
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    Nouvelles Parutions
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+                <Link to="/kitab/bibliography">
+                  <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 h-14 px-8 text-lg">
+                    <BookMarked className="w-5 h-5 mr-2" />
+                    Bibliographie Nationale
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
