@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Target, Users, TrendingUp, Database, ArrowLeft, CheckCircle2 } from "lucide-react";
+import mosaicBanner from "@/assets/kitab-banner-mosaic-purple.jpg";
 
 export default function KitabAbout() {
   const objectives = [
@@ -43,13 +44,20 @@ export default function KitabAbout() {
       <KitabHeader />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(var(--kitab-primary))] to-[hsl(var(--kitab-secondary))] py-20">
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: 'var(--pattern-kitab-books)' }}
-        />
+      <section className="relative overflow-hidden h-[400px]">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img 
+            src={mosaicBanner} 
+            alt="Mosaïque Marocaine" 
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
         
-        <div className="container mx-auto px-4 relative z-10">
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--kitab-primary))]/70 to-[hsl(var(--kitab-secondary))]/70"></div>
+        
+        <div className="container mx-auto px-4 relative z-10 h-full flex flex-col justify-center">
           <Link to="/kitab">
             <Button variant="ghost" className="text-white hover:text-white/80 mb-6">
               <ArrowLeft className="w-5 h-5 mr-2" />
