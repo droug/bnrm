@@ -112,6 +112,11 @@ Plateforme numérique complète pour la gestion de la bibliothèque nationale, i
 - Visualisation des manuscrits
 - Téléchargement (selon permissions)
 
+**Interface de gestion** (Admin/Bibliothécaire uniquement):
+- Accessible depuis la page de la bibliothèque numérique via un bouton dédié
+- Non incluse dans le menu principal du portail BNRM
+- Route: `/admin/digital-library`
+
 ---
 
 ### 3. **Module Manuscrits**
@@ -816,4 +821,4 @@ Reconnaissance vocale
 
 **Document généré le**: 2 octobre 2025  
 **Version du portail**: 1.0  
-**Dernière mise à jour**: Implémentation sécurité PII
+**Dernière mise à jour**: 4 octobre 2025 - Retrait menu "Gestion Bibliothèque Numérique" du Header principal
