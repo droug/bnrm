@@ -5,7 +5,7 @@ import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, C
 import SearchBar from "@/components/SearchBar";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import SmartChatBot from "@/components/SmartChatBot";
 import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
 // import { WatermarkContainer, Watermark } from "@/components/ui/watermark"; // Removed to fix runtime error
@@ -31,7 +31,12 @@ const Header = () => {
   const { language, setLanguage, t, isRTL } = useLanguage();
   const { user, profile } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const isHomePage = location.pathname === "/";
+  
+  // Pages d'accueil principales (pas de bouton retour)
+  const isDigitalLibraryHome = location.pathname === "/digital-library";
+  const isManuscriptsPlatformHome = location.pathname === "/plateforme-manuscrits" || location.pathname === "/manuscripts-platform";
   
   // Vérifier si on est sur une des plateformes spéciales
   const isDigitalLibrary = location.pathname.startsWith("/digital-library");
@@ -39,6 +44,9 @@ const Header = () => {
   const isManuscriptsHelp = location.pathname === "/manuscripts/help" || location.pathname === "/aide-manuscrits";
   const isBackoffice = location.pathname.startsWith("/admin/manuscripts-backoffice") || location.pathname.startsWith("/admin/digital-library");
   const hideNavigation = isDigitalLibrary || isManuscriptsPlatform || isManuscriptsHelp || isBackoffice;
+  
+  // Afficher le bouton retour sur toutes les pages SAUF les pages d'accueil principales
+  const showBackButton = !isHomePage && !isDigitalLibraryHome && !isManuscriptsPlatformHome;
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b-2 border-primary/20 shadow-lg">
@@ -186,23 +194,28 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Navigation principale ultra-compacte - cachée sur certaines plateformes */}
-        {!hideNavigation && (
-          <div className="flex items-center justify-between py-2">
-            {/* Retour (si pas homepage) */}
-            {!isHomePage && (
+        {/* Bouton Retour - affiché sur toutes les pages sauf les pages d'accueil principales */}
+        {showBackButton && (
+          <div className="border-b py-2">
+            <div className="container mx-auto px-4">
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => window.history.back()}
-                className="px-2"
-                title="Retour"
+                onClick={() => navigate(-1)}
+                className="gap-2 hover:bg-accent transition-all duration-300"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
+                <span>Retour</span>
               </Button>
-            )}
+            </div>
+          </div>
+        )}
+
+        {/* Navigation principale ultra-compacte - cachée sur certaines plateformes */}
+        {!hideNavigation && (
+          <div className="flex items-center justify-between py-2">
 
           {/* Navigation Desktop compacte avec icônes */}
           <NavigationMenu className="hidden md:flex flex-1 justify-center">
