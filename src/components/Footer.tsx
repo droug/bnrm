@@ -60,7 +60,7 @@ const Footer = () => {
 
   return (
     <footer className={isKitabPage 
-      ? "bg-orange-50 text-foreground border-t border-orange-100" 
+      ? "bg-gradient-to-br from-orange-50 via-orange-50/80 to-rose-50 text-foreground border-t border-orange-100" 
       : "bg-primary text-primary-foreground"
     }>
       {/* Main footer content */}
