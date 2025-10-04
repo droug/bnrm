@@ -27,43 +27,45 @@ export default function ManuscriptsBackoffice() {
       <Header />
       <main className="container mx-auto py-8 px-4">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Gestion Manuscrits Numérisés</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-4xl md:text-5xl font-moroccan font-bold mb-3 bg-gradient-to-r from-primary via-accent to-highlight bg-clip-text text-transparent">
+            Gestion Manuscrits Numérisés
+          </h1>
+          <p className="text-muted-foreground text-lg">
             Gestion complète des manuscrits numérisés avec suivi et analyses
           </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 bg-gradient-to-r from-card/50 to-secondary/30 p-2 rounded-2xl border border-border shadow-moroccan">
+            <TabsTrigger value="dashboard" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-elegant rounded-xl transition-all">
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Dashboard</span>
             </TabsTrigger>
-            <TabsTrigger value="documents" className="flex items-center gap-2">
+            <TabsTrigger value="documents" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-elegant rounded-xl transition-all">
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Documents</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
+            <TabsTrigger value="users" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-elegant rounded-xl transition-all">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Utilisateurs</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <TabsTrigger value="analytics" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-elegant rounded-xl transition-all">
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Statistiques</span>
             </TabsTrigger>
-            <TabsTrigger value="exhibitions" className="flex items-center gap-2">
+            <TabsTrigger value="exhibitions" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-elegant rounded-xl transition-all">
               <Image className="h-4 w-4" />
               <span className="hidden sm:inline">Expositions</span>
             </TabsTrigger>
-            <TabsTrigger value="reports" className="flex items-center gap-2">
+            <TabsTrigger value="reports" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-elegant rounded-xl transition-all">
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Rapports</span>
             </TabsTrigger>
-            <TabsTrigger value="access" className="flex items-center gap-2">
+            <TabsTrigger value="access" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-elegant rounded-xl transition-all">
               <Shield className="h-4 w-4" />
               <span className="hidden sm:inline">Accès</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
+            <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-elegant rounded-xl transition-all">
               <Settings className="h-4 w-4" />
               <span className="hidden sm:inline">Paramètres</span>
             </TabsTrigger>
