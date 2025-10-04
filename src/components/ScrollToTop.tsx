@@ -5,12 +5,19 @@ export default function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Force scroll to top immediately
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    // Multiple attempts to ensure scroll works
+    const scrollToTop = () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
     
-    // Also try to scroll the document
-    document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    document.body.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    // Immediate scroll
+    scrollToTop();
+    
+    // Delayed scroll to ensure DOM is ready
+    setTimeout(scrollToTop, 0);
+    setTimeout(scrollToTop, 100);
   }, [pathname]);
 
   return null;
