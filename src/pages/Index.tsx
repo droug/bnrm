@@ -376,7 +376,7 @@ const Index = () => {
                       <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
                         <div className="relative">
                           <div className="w-20 h-20 bg-gradient-to-br from-cbm-primary to-cbm-secondary rounded-3xl flex items-center justify-center mb-4 shadow-cbm transform group-hover:scale-110 transition-all duration-500 border-2 border-cbm-primary/30">
-                            <Network className="h-10 w-10 text-white" />
+                            <Network className="h-10 w-10 text-foreground" />
                           </div>
                           <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-cbm-primary animate-pulse" />
                         </div>
