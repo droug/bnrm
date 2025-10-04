@@ -91,6 +91,39 @@ Enhanced Moroccan Heritage Design System
     --shadow-cbm: 0 4px 20px -4px hsl(var(--cbm-primary) / 0.2), 0 2px 8px -2px hsl(var(--cbm-secondary) / 0.1);
     --shadow-cbm-strong: 0 8px 32px -8px hsl(var(--cbm-primary) / 0.3), 0 4px 12px -2px hsl(var(--cbm-accent) / 0.15);
 
+    /* === Kitab Platform Specific Colors === */
+    /* Palette distinctive pour la plateforme éditoriale Kitab */
+    --kitab-primary: 25 85% 50%; /* Orange éditorial */
+    --kitab-primary-foreground: 0 0% 100%;
+    --kitab-primary-light: 25 75% 60%;
+    --kitab-primary-dark: 25 90% 40%;
+    
+    --kitab-secondary: 280 70% 50%; /* Violet créatif */
+    --kitab-secondary-foreground: 0 0% 100%;
+    --kitab-secondary-light: 280 60% 60%;
+    
+    --kitab-accent: 340 80% 55%; /* Rose vif */
+    --kitab-accent-foreground: 0 0% 100%;
+    --kitab-accent-glow: 340 70% 65%;
+    
+    --kitab-neutral: 30 10% 30%; /* Brun neutre */
+    --kitab-neutral-foreground: 0 0% 100%;
+    --kitab-neutral-light: 30 8% 90%;
+    
+    /* Gradients Kitab */
+    --gradient-kitab: linear-gradient(135deg, hsl(var(--kitab-primary)), hsl(var(--kitab-secondary)), hsl(var(--kitab-accent)));
+    --gradient-kitab-subtle: linear-gradient(180deg, hsl(var(--kitab-primary) / 0.05), hsl(var(--kitab-accent) / 0.05));
+    
+    /* Patterns Kitab - Livres et publications */
+    --pattern-kitab-books: 
+      repeating-linear-gradient(45deg, hsl(var(--kitab-primary) / 0.05) 0px, hsl(var(--kitab-primary) / 0.05) 10px, transparent 10px, transparent 20px),
+      repeating-linear-gradient(-45deg, hsl(var(--kitab-secondary) / 0.04) 0px, hsl(var(--kitab-secondary) / 0.04) 10px, transparent 10px, transparent 20px),
+      repeating-linear-gradient(90deg, hsl(var(--kitab-accent) / 0.03) 0px, hsl(var(--kitab-accent) / 0.03) 1px, transparent 1px, transparent 30px);
+    
+    /* Ombres Kitab */
+    --shadow-kitab: 0 4px 20px -4px hsl(var(--kitab-primary) / 0.25), 0 2px 8px -2px hsl(var(--kitab-accent) / 0.15);
+    --shadow-kitab-strong: 0 8px 32px -8px hsl(var(--kitab-primary) / 0.35), 0 4px 12px -2px hsl(var(--kitab-secondary) / 0.2);
+
     --destructive: 0 50% 60%;
     --destructive-foreground: 44 15% 98%;
 

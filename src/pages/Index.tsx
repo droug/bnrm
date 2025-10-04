@@ -423,6 +423,35 @@ const Index = () => {
                     </Card>
                   </Link>
 
+                  {/* Carte Kitab - Plateforme Éditoriale */}
+                  <Link to="/kitab">
+                    <Card className="relative overflow-hidden group border-3 border-coral/30 shadow-zellige hover:shadow-moroccan transition-all duration-700 cursor-pointer">
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center opacity-15 group-hover:opacity-25 transition-opacity duration-700"
+                        style={{ backgroundImage: `url(${zelligePattern2})` }}
+                      ></div>
+                      <div 
+                        className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity"
+                        style={{ backgroundImage: 'var(--pattern-kitab-books)' }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-coral/40 to-royal/30 opacity-80"></div>
+                      <CardContent className="p-8 min-h-[250px] flex flex-col justify-center items-center text-center space-y-5 relative z-10">
+                        <div className="relative">
+                          <div className="w-20 h-20 bg-coral/70 rounded-3xl flex items-center justify-center mb-4 shadow-mosaique transform group-hover:scale-110 transition-all duration-500 border-2 border-coral/30">
+                            <Book className="h-10 w-10 text-white" />
+                          </div>
+                          <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-pulse" />
+                        </div>
+                        <h3 className="text-xl font-moroccan font-bold text-foreground">
+                          Plateforme Kitab
+                        </h3>
+                        <p className="text-muted-foreground font-elegant">
+                          Bibliothèque Numérique de l'Édition Marocaine
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+
                   {/* Carte Services avec mosaïques traditionnelles */}
                   <Card className="relative overflow-hidden group border-3 border-highlight/30 shadow-berber hover:shadow-mosaique transition-all duration-700">
                     <div 

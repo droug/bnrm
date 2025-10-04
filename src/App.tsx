@@ -59,6 +59,12 @@ import CBMOrganesGestion from "./pages/CBMOrganesGestion";
 import CBMAdhesion from "./pages/CBMAdhesion";
 import CBMRecherche from "./pages/CBMRecherche";
 import CBMAccesRapide from "./pages/CBMAccesRapide";
+import KitabPortal from "./pages/KitabPortal";
+import KitabAbout from "./pages/KitabAbout";
+import KitabUpcoming from "./pages/KitabUpcoming";
+import KitabNewPublications from "./pages/KitabNewPublications";
+import KitabBibliography from "./pages/KitabBibliography";
+import KitabFAQ from "./pages/KitabFAQ";
 
 
 const App = () => (
@@ -135,6 +141,14 @@ const App = () => (
           <Route path="/cbm/adhesion" element={<CBMAdhesion />} />
           <Route path="/cbm/recherche" element={<CBMRecherche />} />
           <Route path="/cbm/acces-rapide" element={<CBMAccesRapide />} />
+
+          {/* Kitab Platform Routes */}
+          <Route path="/kitab" element={<KitabPortal />} />
+          <Route path="/kitab/about" element={<KitabAbout />} />
+          <Route path="/kitab/upcoming" element={<KitabUpcoming />} />
+          <Route path="/kitab/new-publications" element={<KitabNewPublications />} />
+          <Route path="/kitab/bibliography" element={<KitabBibliography />} />
+          <Route path="/kitab/faq" element={<KitabFAQ />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
