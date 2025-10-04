@@ -17,9 +17,10 @@ const KitabHeader = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b-2 shadow-lg bg-background/95 backdrop-blur-lg border-[hsl(var(--kitab-primary))]/20">
-      <div className="container mx-auto px-4">
-        {/* Top Bar */}
-        <div className="flex justify-between items-center py-2 border-b border-[hsl(var(--kitab-primary))]/20">
+      <div className="w-full">
+        <div className="container mx-auto px-4">
+          {/* Top Bar */}
+          <div className="flex justify-between items-center py-2 border-b border-[hsl(var(--kitab-primary))]/20">
           {/* Logo + Titre */}
           <Link to="/kitab" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <img src={logoImage} alt="Logo Kitab" className="h-12 w-auto" />
@@ -81,8 +82,8 @@ const KitabHeader = () => {
           </div>
         </div>
 
-        {/* Navigation Desktop */}
-        <nav className="hidden md:flex items-center justify-center gap-1 py-2">
+          {/* Navigation Desktop */}
+          <nav className="hidden md:flex items-center justify-center gap-1 py-2">
           <Link to="/kitab">
             <Button variant="ghost" size="sm" className="hover:text-[hsl(var(--kitab-primary))] hover:bg-[hsl(var(--kitab-primary))]/10">
               Accueil Kitab
@@ -121,9 +122,9 @@ const KitabHeader = () => {
           </Link>
         </nav>
 
-        {/* Navigation Mobile */}
-        {isMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-[hsl(var(--kitab-primary))]/20 space-y-2">
+          {/* Navigation Mobile */}
+          {isMenuOpen && (
+            <nav className="md:hidden py-4 border-t border-[hsl(var(--kitab-primary))]/20 space-y-2">
             <Link to="/kitab" onClick={() => setIsMenuOpen(false)}>
               <Button variant="ghost" size="sm" className="w-full justify-start">
                 Accueil Kitab
@@ -160,8 +161,9 @@ const KitabHeader = () => {
                 Retour BNRM
               </Button>
             </Link>
-          </nav>
-        )}
+            </nav>
+          )}
+        </div>
       </div>
 
       {/* ChatBot */}
