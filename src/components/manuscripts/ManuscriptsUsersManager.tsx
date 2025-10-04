@@ -193,7 +193,13 @@ export function ManuscriptsUsersManager() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Utilisateurs de la Plateforme Manuscrits</h2>
-          <p className="text-muted-foreground">Gestion des accès à la plateforme des manuscrits numérisés</p>
+          <p className="text-muted-foreground">
+            Gérez les utilisateurs inscrits sur la plateforme des manuscrits numérisés
+          </p>
+          <p className="text-sm text-amber-600 mt-2 flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Note: Seuls les utilisateurs ajoutés à cette plateforme peuvent être modifiés ou supprimés ici
+          </p>
         </div>
       </div>
 
@@ -234,21 +240,29 @@ export function ManuscriptsUsersManager() {
       {/* Actions */}
       <Card>
         <CardHeader>
-          <CardTitle>Actions Rapides</CardTitle>
+          <CardTitle>Ajouter un Utilisateur Authentifié</CardTitle>
+          <CardDescription>
+            Sélectionnez un utilisateur déjà authentifié au portail pour lui donner accès à la plateforme manuscrits
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Button onClick={() => setShowAddDialog(true)}>
             <UserPlus className="h-4 w-4 mr-2" />
-            Ajouter un utilisateur
+            Inscrire un utilisateur du portail
           </Button>
+          <div className="text-sm text-muted-foreground flex-1 flex items-center">
+            Les utilisateurs du portail doivent être ajoutés ici pour accéder à la plateforme manuscrits
+          </div>
         </CardContent>
       </Card>
 
       {/* Filters and Search */}
       <Card>
         <CardHeader>
-          <CardTitle>Liste des Utilisateurs</CardTitle>
-          <CardDescription>Les utilisateurs authentifiés au portail peuvent accéder à la plateforme</CardDescription>
+          <CardTitle>Utilisateurs Inscrits sur la Plateforme</CardTitle>
+          <CardDescription>
+            Liste des utilisateurs ayant accès à la plateforme manuscrits - Seuls ces utilisateurs peuvent être modifiés ou retirés
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4 mb-6">
@@ -320,6 +334,7 @@ export function ManuscriptsUsersManager() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setEditingUser(user)}
+                          title="Modifier l'utilisateur de la plateforme"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -327,8 +342,9 @@ export function ManuscriptsUsersManager() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setDeletingUserId(user.id)}
+                          title="Retirer l'utilisateur de la plateforme"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
                     </TableCell>
@@ -344,9 +360,10 @@ export function ManuscriptsUsersManager() {
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Ajouter un Utilisateur</DialogTitle>
+            <DialogTitle>Inscrire un Utilisateur du Portail</DialogTitle>
             <DialogDescription>
-              Sélectionnez un utilisateur déjà authentifié au portail pour lui donner accès à la plateforme des manuscrits
+              Sélectionnez un utilisateur déjà authentifié au portail principal pour lui donner accès à la plateforme des manuscrits numérisés.
+              Une fois inscrit, vous pourrez modifier son rôle ou le retirer de cette plateforme.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmitAdd)} className="space-y-4">
@@ -465,9 +482,12 @@ export function ManuscriptsUsersManager() {
       <AlertDialog open={!!deletingUserId} onOpenChange={() => setDeletingUserId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Retirer l'utilisateur ?</AlertDialogTitle>
+            <AlertDialogTitle>Retirer cet utilisateur de la plateforme ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Cet utilisateur ne pourra plus accéder à la plateforme des manuscrits. Il pourra toujours accéder au portail principal.
+              Cet utilisateur ne pourra plus accéder à la plateforme des manuscrits numérisés.
+              <br /><br />
+              <strong>Important:</strong> Il conservera son compte sur le portail principal et pourra y accéder normalement.
+              Cette action retire uniquement l'accès à la plateforme manuscrits.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
