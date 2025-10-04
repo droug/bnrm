@@ -71,31 +71,33 @@ export default function CBMPortal() {
         
         <div className="container mx-auto px-4 h-full relative z-10">
           <div className="flex flex-col justify-center h-full max-w-2xl">
-            {/* Badge */}
-            <Badge className="w-fit mb-6 bg-accent text-accent-foreground border-0 px-4 py-2 text-sm font-medium">
-              RÉSEAU NATIONAL
-            </Badge>
-            
-            {/* Main Title */}
-            <h1 className="text-5xl md:text-6xl font-bold text-primary-foreground mb-6 leading-tight">
-              Catalogue des Bibliothèques Marocaines
-            </h1>
-            
-            {/* Description */}
-            <p className="text-xl text-primary-foreground/90 mb-8 leading-relaxed">
-              Connectez-vous au réseau national de partage de ressources documentaires 
-              entre bibliothèques marocaines.
-            </p>
-            
-            {/* CTA Button */}
-            <div>
-              <Link to="/cbm/recherche">
-                <Button size="lg" className="bg-background text-foreground hover:bg-background/90 h-12 px-8">
-                  <Database className="w-5 h-5 mr-2" />
-                  Rechercher dans le Catalogue
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
+            <div className="bg-background/95 backdrop-blur-sm p-8 rounded-lg shadow-xl">
+              {/* Badge */}
+              <Badge className="w-fit mb-6 bg-accent text-accent-foreground border-0 px-4 py-2 text-sm font-medium">
+                RÉSEAU NATIONAL
+              </Badge>
+              
+              {/* Main Title */}
+              <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+                Catalogue des Bibliothèques Marocaines
+              </h1>
+              
+              {/* Description */}
+              <p className="text-xl text-foreground mb-8 leading-relaxed">
+                Connectez-vous au réseau national de partage de ressources documentaires 
+                entre bibliothèques marocaines.
+              </p>
+              
+              {/* CTA Button */}
+              <div>
+                <Link to="/cbm/recherche">
+                  <Button size="lg" className="h-12 px-8">
+                    <Database className="w-5 h-5 mr-2" />
+                    Rechercher dans le Catalogue
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
