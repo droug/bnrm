@@ -116,35 +116,68 @@ const Index = () => {
         <div className="relative z-10">
           <Header />
           
-          {/* Bannière avec mosaïques et arrière-plan bibliothèque */}
-          <section className="relative py-20 md:py-28 border-b-4 border-gold/30 overflow-hidden">
-            {/* Image de fond - Bâtiment BNRM de nuit */}
+          {/* Bannière moderne inspirée d'AUI avec image claire */}
+          <section className="relative h-[70vh] overflow-hidden">
+            {/* Image de fond - Bâtiment BNRM de nuit - claire à 100% */}
             <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-70"
-              style={{ backgroundImage: `url(${bnrmBuildingNight})` }}
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{ 
+                backgroundImage: `url(${bnrmBuildingNight})`,
+                filter: 'brightness(1.2) contrast(1.1)'
+              }}
             ></div>
-            {/* Overlay avec mosaïques zellige - réduit pour plus de visibilité */}
-            <div className="absolute inset-0 bg-gradient-zellige-main opacity-50"></div>
-            <div className="absolute inset-0 bg-pattern-zellige-tiles opacity-15"></div>
             
-            <div className="container mx-auto px-4 text-center relative z-10">
-              <div className="flex items-center justify-center space-x-4 mb-8">
-                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-12 w-12 md:h-14 md:w-14 object-contain drop-shadow-2xl" />
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-moroccan font-bold text-white drop-shadow-2xl">
-                  {t('header.title')}
-                </h1>
-                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-12 w-12 md:h-14 md:w-14 object-contain drop-shadow-2xl" />
+            {/* Gradient overlay subtil pour améliorer la lisibilité */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50"></div>
+            
+            {/* Contenu centré */}
+            <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-center justify-center space-x-4 mb-6">
+                  <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-2xl" />
+                  <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white drop-shadow-2xl">
+                    {t('header.title')}
+                  </h1>
+                  <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-2xl" />
+                </div>
+                
+                <p className="text-2xl md:text-3xl text-white/95 font-light mb-8 drop-shadow-lg">
+                  Gardienne du patrimoine millénaire marocain
+                </p>
+                
+                <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed drop-shadow-lg mb-8">
+                  La Bibliothèque Nationale du Royaume du Maroc forme les futurs citoyens du Maroc et du monde entier 
+                  en préservant et en partageant le patrimoine culturel et intellectuel marocain
+                </p>
               </div>
-              <p className="text-2xl md:text-3xl text-white font-elegant italic mb-6 drop-shadow-2xl">
-                "Gardienne du patrimoine millénaire marocain"
-              </p>
-              <div className="flex justify-center space-x-3 mb-6">
-                {[...Array(7)].map((_, i) => (
-                  <Star key={i} className="h-6 w-6 md:h-7 md:w-7 text-gold fill-gold animate-pulse drop-shadow-2xl" style={{ animationDelay: `${i * 0.15}s` }} />
-                ))}
-              </div>
-              {/* Motif décoratif zellige */}
-              <div className="w-64 h-3 bg-gradient-berber mx-auto rounded-full shadow-gold"></div>
+            </div>
+
+            {/* Boutons d'action latéraux colorés (style AUI) */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 z-20 space-y-2">
+              <Link to="/digital-library">
+                <Button className="rounded-l-lg rounded-r-none py-6 px-6 bg-amber-500 hover:bg-amber-600 text-white shadow-lg">
+                  <BookOpen className="h-5 w-5 mr-2" />
+                  Explorer
+                </Button>
+              </Link>
+              <Link to="/manuscripts-platform">
+                <Button className="rounded-l-lg rounded-r-none py-6 px-6 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg">
+                  <Book className="h-5 w-5 mr-2" />
+                  Manuscrits
+                </Button>
+              </Link>
+              <Link to="/access-request">
+                <Button className="rounded-l-lg rounded-r-none py-6 px-6 bg-orange-600 hover:bg-orange-700 text-white shadow-lg">
+                  <Download className="h-5 w-5 mr-2" />
+                  Accès
+                </Button>
+              </Link>
+              <Link to="/help">
+                <Button className="rounded-l-lg rounded-r-none py-6 px-6 bg-purple-600 hover:bg-purple-700 text-white shadow-lg">
+                  <Users className="h-5 w-5 mr-2" />
+                  Aide
+                </Button>
+              </Link>
             </div>
           </section>
           
