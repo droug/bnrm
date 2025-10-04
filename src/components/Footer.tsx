@@ -14,10 +14,15 @@ import {
   Heart
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useLocation } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { t } = useLanguage();
+  const location = useLocation();
+  
+  // Check if we're on a Kitab page
+  const isKitabPage = location.pathname.startsWith('/kitab');
 
   const quickLinks = [
     { title: t('header.catalog'), href: "#catalogue" },
@@ -54,7 +59,10 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-primary text-primary-foreground">
+    <footer className={isKitabPage 
+      ? "bg-[hsl(var(--kitab-primary))] text-white" 
+      : "bg-primary text-primary-foreground"
+    }>
       {/* Main footer content */}
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
@@ -65,13 +73,17 @@ const Footer = () => {
                 <Book className="h-6 w-6 text-accent-foreground" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">BNRM</h3>
-                <p className="text-sm text-primary-foreground/80">Bibliothèque Nationale</p>
+                <h3 className="text-xl font-bold">{isKitabPage ? "Kitab" : "BNRM"}</h3>
+                <p className="text-sm opacity-80">
+                  {isKitabPage ? "Plateforme Nationale de l'Édition" : "Bibliothèque Nationale"}
+                </p>
               </div>
             </div>
-            <p className="text-primary-foreground/90 mb-6 leading-relaxed">
-              La Bibliothèque Nationale du Royaume du Maroc, gardienne du patrimoine écrit 
-              et promotrice du savoir au service de tous.
+            <p className="opacity-90 mb-6 leading-relaxed">
+              {isKitabPage 
+                ? "Kitab, la plateforme digitale dédiée à l'édition marocaine et à la promotion de l'industrie nationale du livre."
+                : "La Bibliothèque Nationale du Royaume du Maroc, gardienne du patrimoine écrit et promotrice du savoir au service de tous."
+              }
             </p>
             <div className="flex space-x-4">
               {socialLinks.map((social, index) => (
@@ -79,7 +91,7 @@ const Footer = () => {
                   key={index}
                   variant="ghost" 
                   size="sm" 
-                  className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-white/10 p-2"
+                  className="opacity-70 hover:opacity-100 hover:bg-white/10 p-2"
                   aria-label={social.label}
                 >
                   {social.icon}
@@ -96,7 +108,7 @@ const Footer = () => {
                 <li key={index}>
                   <a 
                     href={link.href} 
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                    className="opacity-80 hover:opacity-100 transition-colors"
                   >
                     {link.title}
                   </a>
@@ -113,7 +125,7 @@ const Footer = () => {
                 <li key={index}>
                   <a 
                     href={link.href} 
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                    className="opacity-80 hover:opacity-100 transition-colors"
                   >
                     {link.title}
                   </a>
@@ -127,22 +139,24 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-6">{t('footer.contact')}</h4>
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
-                <MapPin className="h-5 w-5 mt-0.5 text-accent" />
-                <div className="text-primary-foreground/80">
+                <MapPin className={`h-5 w-5 mt-0.5 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-accent'}`} />
+                <div className="opacity-80">
                   <p>{t('footer.location')}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-accent" />
-                <span className="text-primary-foreground/80">{t('footer.phone')}: +212 537 27 16 33</span>
+                <Phone className={`h-5 w-5 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-accent'}`} />
+                <span className="opacity-80">{t('footer.phone')}: +212 537 27 16 33</span>
               </div>
               <div className="flex items-center space-x-3">
-                <Mail className="h-5 w-5 text-accent" />
-                <span className="text-primary-foreground/80">{t('footer.email')}: contact@bnrm.ma</span>
+                <Mail className={`h-5 w-5 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-accent'}`} />
+                <span className="opacity-80">
+                  {t('footer.email')}: {isKitabPage ? 'kitab@bnrm.ma' : 'contact@bnrm.ma'}
+                </span>
               </div>
               <div className="flex items-start space-x-3">
-                <Clock className="h-5 w-5 mt-0.5 text-accent" />
-                <div className="text-primary-foreground/80">
+                <Clock className={`h-5 w-5 mt-0.5 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-accent'}`} />
+                <div className="opacity-80">
                   <p>{t('footer.monday')}</p>
                   <p>{t('footer.saturday')}</p>
                   <p>{t('footer.sunday')}</p>
@@ -154,22 +168,25 @@ const Footer = () => {
           {/* Newsletter */}
           <div>
             <h4 className="text-lg font-semibold mb-6">Nous suivre</h4>
-            <p className="text-primary-foreground/80 mb-4">
+            <p className="opacity-80 mb-4">
               Newsletter - Restez informé de nos actualités et nouvelles acquisitions.
             </p>
             <div className="space-y-3">
               <Input 
                 type="email" 
                 placeholder="Votre email"
-                className="bg-white/10 border-white/20 text-primary-foreground placeholder:text-primary-foreground/60 focus:border-accent"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:border-white/40"
               />
               <Button 
-                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-medium"
+                className={isKitabPage 
+                  ? "w-full bg-[hsl(var(--kitab-accent))] hover:bg-[hsl(var(--kitab-accent))]/90 text-white font-medium" 
+                  : "w-full bg-accent hover:bg-accent/90 text-accent-foreground font-medium"
+                }
               >
                 S'abonner
               </Button>
             </div>
-            <p className="text-xs text-primary-foreground/60 mt-3">
+            <p className="text-xs opacity-60 mt-3">
               En vous abonnant, vous acceptez de recevoir nos communications.
             </p>
           </div>
@@ -181,8 +198,8 @@ const Footer = () => {
         <div className="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
           {/* Copyright */}
           <div className="text-center lg:text-left">
-            <p className="text-primary-foreground/80">
-              © {currentYear} {t('header.title')}. {t('footer.rights')}
+            <p className="opacity-80">
+              © {currentYear} {isKitabPage ? "Kitab - BNRM" : t('header.title')}. {t('footer.rights')}
             </p>
           </div>
 
@@ -192,7 +209,7 @@ const Footer = () => {
               <a 
                 key={index}
                 href={link.href}
-                className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                className="text-sm opacity-70 hover:opacity-100 transition-colors"
               >
                 {link.title}
               </a>
