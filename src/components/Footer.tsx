@@ -199,13 +199,6 @@ const Footer = () => {
             ))}
           </div>
         </div>
-
-        {/* Kingdom attribution */}
-        <div className="text-center mt-8 pt-8 border-t border-white/20">
-          <p className="text-primary-foreground/60 flex items-center justify-center gap-2">
-            Fait avec <Heart className="h-4 w-4 text-highlight fill-current" /> pour le Royaume du Maroc
-          </p>
-        </div>
       </div>
     </footer>
   );
