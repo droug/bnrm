@@ -99,13 +99,13 @@ export default function ServicesCatalog() {
     }
   };
 
-  // Séparer les services d'abonnement et les services ponctuels
+  // Séparer les services d'abonnement (Inscription) et les services ponctuels (autres)
   const subscriptionServices = services.filter((service) => 
-    service.categorie === "Abonnement" || service.nom_service.toLowerCase().includes("abonnement")
+    service.categorie === "Inscription"
   );
 
   const oneTimeServices = services.filter((service) => 
-    service.categorie !== "Abonnement" && !service.nom_service.toLowerCase().includes("abonnement")
+    service.categorie !== "Inscription"
   );
 
   const filteredSubscriptionServices = subscriptionServices.filter((service) => {
