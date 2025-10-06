@@ -200,7 +200,7 @@ export default function ServicesCatalog() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredServices.map((service) => (
-                  <Card key={service.id_service} className="hover:shadow-lg transition-shadow">
+                  <Card key={service.id_service} className="hover:shadow-lg transition-shadow flex flex-col h-full">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
@@ -212,25 +212,27 @@ export default function ServicesCatalog() {
                         {service.categorie}
                       </Badge>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      {service.description && (
-                        <CardDescription className="text-sm">
-                          {service.description}
-                        </CardDescription>
-                      )}
-                      {service.public_cible && (
-                        <div className="text-sm">
-                          <span className="font-semibold">Public cible : </span>
-                          {service.public_cible}
-                        </div>
-                      )}
-                      {service.reference_legale && (
-                        <div className="text-xs text-muted-foreground">
-                          Référence légale : {service.reference_legale}
-                        </div>
-                      )}
+                    <CardContent className="space-y-4 flex flex-col flex-1">
+                      <div className="flex-1 space-y-3">
+                        {service.description && (
+                          <CardDescription className="text-sm">
+                            {service.description}
+                          </CardDescription>
+                        )}
+                        {service.public_cible && (
+                          <div className="text-sm">
+                            <span className="font-semibold">Public cible : </span>
+                            {service.public_cible}
+                          </div>
+                        )}
+                        {service.reference_legale && (
+                          <div className="text-xs text-muted-foreground">
+                            Référence légale : {service.reference_legale}
+                          </div>
+                        )}
+                      </div>
                       <Button 
-                        className="w-full"
+                        className="w-full mt-auto"
                         onClick={() => {
                           setSelectedServiceForRegistration(service);
                           setSelectedTariffForRegistration(null);
@@ -271,7 +273,7 @@ export default function ServicesCatalog() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredTariffs.map((tariff) => (
-                  <Card key={tariff.id_tarif} className="hover:shadow-lg transition-shadow">
+                  <Card key={tariff.id_tarif} className="hover:shadow-lg transition-shadow flex flex-col h-full">
                     <CardHeader>
                       <CardTitle className="text-lg">
                         {tariff.bnrm_services?.nom_service || "Service non spécifié"}
@@ -282,25 +284,27 @@ export default function ServicesCatalog() {
                         </Badge>
                       )}
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-primary">
-                          {tariff.montant} {tariff.devise}
-                        </span>
+                    <CardContent className="space-y-4 flex flex-col flex-1">
+                      <div className="flex-1 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl font-bold text-primary">
+                            {tariff.montant} {tariff.devise}
+                          </span>
+                        </div>
+                        {tariff.condition_tarif && (
+                          <div className="text-sm">
+                            <span className="font-semibold">Conditions : </span>
+                            {tariff.condition_tarif}
+                          </div>
+                        )}
+                        {tariff.periode_validite && (
+                          <div className="text-xs text-muted-foreground">
+                            Période de validité : {tariff.periode_validite}
+                          </div>
+                        )}
                       </div>
-                      {tariff.condition_tarif && (
-                        <div className="text-sm">
-                          <span className="font-semibold">Conditions : </span>
-                          {tariff.condition_tarif}
-                        </div>
-                      )}
-                      {tariff.periode_validite && (
-                        <div className="text-xs text-muted-foreground">
-                          Période de validité : {tariff.periode_validite}
-                        </div>
-                      )}
                       <Button 
-                        className="w-full"
+                        className="w-full mt-auto"
                         onClick={() => {
                           const service = services.find(s => s.id_service === tariff.id_service);
                           if (service) {
