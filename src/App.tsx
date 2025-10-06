@@ -27,6 +27,7 @@ import Profile from "./pages/Profile";
 import UserManagement from "./pages/UserManagement";
 import ContentManagement from "./pages/ContentManagement";
 import News from "./pages/News";
+import PracticalInfo from "./pages/PracticalInfo";
 import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import WysiwygPage from "./pages/WysiwygPage";
@@ -112,7 +113,8 @@ const App = () => (
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin/users" element={<UserManagement />} />
         <Route path="/admin/content" element={<ContentManagement />} />
-        <Route path="/news" element={<News />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/practical-info" element={<PracticalInfo />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/wysiwyg" element={<WysiwygPage />} />
             <Route path="/admin/bnrm-tariffs" element={<BNRMTariffsPage />} />
