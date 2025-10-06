@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import InteractiveMap from "@/components/InteractiveMap";
 import {
   Clock,
   MapPin,
@@ -363,21 +364,28 @@ const PracticalInfo = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-video bg-accent/20 rounded-lg mb-4 overflow-hidden">
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3307.4347267956943!2d-6.8395!3d33.9808!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xda76ce7f9462dd1%3A0x7856d8d8d8d8d8d8!2sBiblioth%C3%A8que%20Nationale%20du%20Royaume%20du%20Maroc!5e0!3m2!1sfr!2sma!4v1234567890"
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    ></iframe>
+                  <div className="h-[400px] rounded-lg mb-4 overflow-hidden">
+                    <InteractiveMap
+                      center={[-6.8395, 33.9808]}
+                      zoom={15}
+                      markerTitle="Bibliothèque Nationale du Royaume du Maroc"
+                      markerDescription="Avenue Al Atlas, Hay Ryad, Rabat"
+                    />
                   </div>
                   <div className="space-y-2 text-sm">
                     <p className="font-semibold">Bibliothèque Nationale du Royaume du Maroc</p>
                     <p className="text-muted-foreground">Avenue Al Atlas, Hay Ryad</p>
                     <p className="text-muted-foreground">Rabat, Maroc</p>
+                    <Button variant="outline" size="sm" className="w-full mt-3" asChild>
+                      <a 
+                        href="https://www.google.com/maps/dir/?api=1&destination=33.9808,-6.8395" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
+                        <MapPin className="mr-2 h-4 w-4" />
+                        Obtenir l'itinéraire
+                      </a>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
