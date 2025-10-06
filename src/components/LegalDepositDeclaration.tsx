@@ -1384,15 +1384,15 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     
     if (type === "editor") {
       setEditorData(credentials);
+      toast.success("Éditeur authentifié avec succès");
+      // Si l'utilisateur est un éditeur, passer à l'authentification de l'imprimeur
+      if (userType === "editor") {
+        setCurrentStep("printer_auth");
+      }
     } else {
       setPrinterData(credentials);
-    }
-    
-    toast.success(`${type === "editor" ? "Éditeur" : "Imprimeur"} authentifié avec succès`);
-    
-    if (userType === "editor") {
-      setCurrentStep("printer_auth");
-    } else {
+      toast.success("Imprimeur authentifié avec succès");
+      // Après l'authentification de l'imprimeur, passer au formulaire
       setCurrentStep("form_filling");
     }
   };
