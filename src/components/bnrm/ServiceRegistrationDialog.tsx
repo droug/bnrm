@@ -90,24 +90,27 @@ export function ServiceRegistrationDialog({
     setIsLoading(true);
 
     try {
-      // Vérifier si l'utilisateur est déjà inscrit
-      const { data: existingRegistration, error: checkError } = await supabase
-        .from("service_registrations")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("service_id", service.id_service)
-        .maybeSingle();
+      // Pour les services d'abonnement uniquement, vérifier si l'utilisateur est déjà inscrit
+      if (!isPageBasedService && !isFreeService) {
+        const { data: existingRegistration, error: checkError } = await supabase
+          .from("service_registrations")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("service_id", service.id_service)
+          .eq("is_paid", true)
+          .maybeSingle();
 
-      if (checkError) throw checkError;
+        if (checkError) throw checkError;
 
-      if (existingRegistration) {
-        toast({
-          title: "Déjà inscrit",
-          description: "Vous êtes déjà inscrit à ce service",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
+        if (existingRegistration) {
+          toast({
+            title: "Déjà inscrit",
+            description: "Vous avez déjà un abonnement actif pour ce service",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
       }
 
       const registrationData = {
@@ -121,6 +124,7 @@ export function ServiceRegistrationDialog({
           address: formData.address,
           institution: formData.institution,
           additionalInfo: formData.additionalInfo,
+          ...(isPageBasedService && { pageCount }),
         },
       };
 
