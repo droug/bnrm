@@ -162,8 +162,8 @@ export function PaymentDialog({
   const hasInsufficientFunds = walletBalance < totalAmount;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+    <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
+      <DialogContent className="max-w-md sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Paiement de l'abonnement</DialogTitle>
           <DialogDescription>
