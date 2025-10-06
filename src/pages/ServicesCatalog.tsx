@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, FileText, Printer, Users, BookOpen, DollarSign } from "lucide-react";
+import { Search, FileText, Printer, Users, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
@@ -276,7 +276,6 @@ export default function ServicesCatalog() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="flex items-center gap-2">
-                        <DollarSign className="h-5 w-5 text-primary" />
                         <span className="text-2xl font-bold text-primary">
                           {tariff.montant} {tariff.devise}
                         </span>
