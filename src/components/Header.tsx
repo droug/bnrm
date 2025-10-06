@@ -277,17 +277,17 @@ const Header = () => {
                     <div className="space-y-1">
                       <h4 className="text-xs font-bold text-primary mb-1 pb-1">{t('nav.practical.info')}</h4>
                       <NavigationMenuLink asChild>
-                        <Link to="/practical-info" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <Link to="/practical-info" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.schedules.access')}
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/services-tarifs" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <a href="/services-tarifs" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.services.catalog')}
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/help" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <Link to="/help" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {language === 'ar' ? 'مركز المساعدة' : 'Centre d\'Aide'}
                         </Link>
                       </NavigationMenuLink>
@@ -295,12 +295,12 @@ const Header = () => {
                     <div className="space-y-1">
                       <h4 className="text-xs font-bold text-primary mb-1 pb-1">{t('nav.history.missions')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/histoire" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <a href="/histoire" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.library.history')}
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/mot-direction" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <a href="/mot-direction" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.management.message')}
                         </a>
                       </NavigationMenuLink>
@@ -319,17 +319,17 @@ const Header = () => {
                   <div className="grid gap-2 p-4 w-[400px] bg-background border border-primary/20 shadow-xl">
                     <div className="space-y-1">
                       <NavigationMenuLink asChild>
-                        <Link to="/digital-library" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <Link to="/digital-library" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.consult.national.library')}
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/legal-deposit" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <Link to="/legal-deposit" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.legal.deposit')}
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/demande-reproduction" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <Link to="/demande-reproduction" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.reproduction.request')}
                         </Link>
                       </NavigationMenuLink>
@@ -349,22 +349,22 @@ const Header = () => {
                     <div className="space-y-1">
                       <h4 className="text-xs font-bold text-primary mb-1">{t('nav.collections')}</h4>
                       <NavigationMenuLink asChild>
-                        <Link to="/plateforme-manuscrits" className="block p-2 text-xs hover:bg-primary/10 rounded bg-accent/50 font-semibold">
+                        <Link to="/plateforme-manuscrits" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded bg-accent/50 font-semibold">
                           📜 Plateforme Manuscrits (BNRM & Partenaires)
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/manuscripts" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <a href="/manuscripts" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.manuscripts')}
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/collections-numerisees" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <a href="/collections-numerisees" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.digitized.collections')}
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/news" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <Link to="/news" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.news.events')}
                         </Link>
                       </NavigationMenuLink>
@@ -372,12 +372,12 @@ const Header = () => {
                     <div className="space-y-1">
                       <h4 className="text-xs font-bold text-primary mb-1">Ressources</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/catalogue-general" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <a href="/catalogue-general" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           Catalogue général
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/bibliographies" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <a href="/bibliographies" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           Bibliographies
                         </a>
                       </NavigationMenuLink>
