@@ -218,7 +218,7 @@ export default function ServicesCatalog() {
                   const serviceTariffs = getTariffsForService(service.id_service);
                   
                   return (
-                    <Card key={service.id_service} className="hover:shadow-lg transition-shadow flex flex-col h-full">
+                    <Card key={service.id_service} className="hover:shadow-lg transition-shadow flex flex-col">
                       <CardHeader>
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-2">
@@ -230,8 +230,8 @@ export default function ServicesCatalog() {
                           {service.categorie}
                         </Badge>
                       </CardHeader>
-                      <CardContent className="space-y-4 flex flex-col flex-1">
-                        <div className="flex-1 space-y-3">
+                      <CardContent className="flex flex-col flex-1">
+                        <div className="flex-1 space-y-3 mb-4">
                           {service.description && (
                             <CardDescription className="text-sm">
                               {service.description}
@@ -275,7 +275,7 @@ export default function ServicesCatalog() {
                           )}
                         </div>
                         <Button 
-                          className="w-full mt-auto"
+                          className="w-full"
                           onClick={() => {
                             setSelectedServiceForRegistration(service);
                             setSelectedTariffForRegistration(null); // Ne pas présélectionner
@@ -321,7 +321,7 @@ export default function ServicesCatalog() {
                   const firstTariff = serviceTariffs[0];
                   
                   return (
-                    <Card key={service.id_service} className="hover:shadow-lg transition-shadow flex flex-col h-full">
+                    <Card key={service.id_service} className="hover:shadow-lg transition-shadow flex flex-col">
                       <CardHeader>
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-2">
@@ -333,8 +333,8 @@ export default function ServicesCatalog() {
                           {service.categorie}
                         </Badge>
                       </CardHeader>
-                      <CardContent className="space-y-4 flex flex-col flex-1">
-                        <div className="flex-1 space-y-3">
+                      <CardContent className="flex flex-col flex-1">
+                        <div className="flex-1 space-y-3 mb-4">
                           {service.description && (
                             <CardDescription className="text-sm">
                               {service.description}
@@ -370,7 +370,7 @@ export default function ServicesCatalog() {
                           )}
                         </div>
                         <Button 
-                          className="w-full mt-auto"
+                          className="w-full"
                           onClick={() => {
                             setSelectedServiceForRegistration(service);
                             setSelectedTariffForRegistration(firstTariff || null);
