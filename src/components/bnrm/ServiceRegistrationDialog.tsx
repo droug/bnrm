@@ -469,13 +469,18 @@ export function ServiceRegistrationDialog({
             {isReproductionService && (
               <div className="grid gap-2">
                 <Label>Document à reproduire *</Label>
-                <Popover open={searchOpen} onOpenChange={setSearchOpen}>
+                <Popover open={searchOpen} onOpenChange={setSearchOpen} modal={true}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       role="combobox"
+                      type="button"
                       aria-expanded={searchOpen}
                       className="justify-between w-full"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSearchOpen(!searchOpen);
+                      }}
                     >
                       {selectedManuscript ? (
                         <span className="truncate">
@@ -487,14 +492,21 @@ export function ServiceRegistrationDialog({
                       <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[400px] p-0">
-                    <Command>
+                  <PopoverContent 
+                    className="w-[400px] p-0" 
+                    align="start"
+                    side="bottom"
+                    avoidCollisions={true}
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                  >
+                    <Command shouldFilter={false}>
                       <CommandInput 
                         placeholder="Rechercher par titre, cote, auteur..." 
                         value={searchQuery}
                         onValueChange={setSearchQuery}
+                        onFocus={(e) => e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' })}
                       />
-                      <CommandList>
+                      <CommandList className="max-h-[200px]">
                         <CommandEmpty>Aucun document trouvé.</CommandEmpty>
                         <CommandGroup>
                           {manuscripts
