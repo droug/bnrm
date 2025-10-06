@@ -99,18 +99,33 @@ export default function ServicesCatalog() {
     }
   };
 
-  const filteredServices = services.filter((service) => {
+  // Séparer les services d'abonnement et les services ponctuels
+  const subscriptionServices = services.filter((service) => 
+    service.categorie === "Abonnement" || service.nom_service.toLowerCase().includes("abonnement")
+  );
+
+  const oneTimeServices = services.filter((service) => 
+    service.categorie !== "Abonnement" && !service.nom_service.toLowerCase().includes("abonnement")
+  );
+
+  const filteredSubscriptionServices = subscriptionServices.filter((service) => {
     const matchesSearch = service.nom_service.toLowerCase().includes(searchTerm.toLowerCase()) ||
       service.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || service.categorie === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const filteredTariffs = tariffs.filter((tariff) => {
-    const matchesSearch = tariff.bnrm_services?.nom_service.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesService = selectedService === "all" || tariff.id_service === selectedService;
-    return matchesSearch && matchesService;
+  const filteredOneTimeServices = oneTimeServices.filter((service) => {
+    const matchesSearch = service.nom_service.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || service.categorie === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
+
+  // Obtenir les tarifs pour un service spécifique
+  const getTariffsForService = (serviceId: string) => {
+    return tariffs.filter(t => t.id_service === serviceId);
+  };
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
@@ -173,14 +188,114 @@ export default function ServicesCatalog() {
             </div>
           </div>
 
-          {/* Tabs for Services and Tariffs */}
-          <Tabs defaultValue="services" className="w-full">
+          {/* Tabs for Subscriptions and One-Time Services */}
+          <Tabs defaultValue="abonnements" className="w-full">
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-              <TabsTrigger value="services">Services</TabsTrigger>
-              <TabsTrigger value="tarifs">Tarifs</TabsTrigger>
+              <TabsTrigger value="abonnements">Abonnements</TabsTrigger>
+              <TabsTrigger value="services">Services Ponctuels</TabsTrigger>
             </TabsList>
 
-            {/* Services Tab */}
+            {/* Subscriptions Tab */}
+            <TabsContent value="abonnements" className="space-y-6 mt-6">
+              <div className="flex gap-4 items-center">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Catégorie" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les catégories</SelectItem>
+                    <SelectItem value="Dépôt légal">Dépôt légal</SelectItem>
+                    <SelectItem value="Reproduction">Reproduction</SelectItem>
+                    <SelectItem value="Recherche">Recherche</SelectItem>
+                    <SelectItem value="Numérisation">Numérisation</SelectItem>
+                    <SelectItem value="Formation">Formation</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredSubscriptionServices.map((service) => {
+                  const serviceTariffs = getTariffsForService(service.id_service);
+                  
+                  return (
+                    <Card key={service.id_service} className="hover:shadow-lg transition-shadow flex flex-col h-full">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-2">
+                            {getCategoryIcon(service.categorie)}
+                            <CardTitle className="text-lg">{service.nom_service}</CardTitle>
+                          </div>
+                        </div>
+                        <Badge className={getCategoryColor(service.categorie)}>
+                          {service.categorie}
+                        </Badge>
+                      </CardHeader>
+                      <CardContent className="space-y-4 flex flex-col flex-1">
+                        <div className="flex-1 space-y-3">
+                          {service.description && (
+                            <CardDescription className="text-sm">
+                              {service.description}
+                            </CardDescription>
+                          )}
+                          {service.public_cible && (
+                            <div className="text-sm">
+                              <span className="font-semibold">Public cible : </span>
+                              {service.public_cible}
+                            </div>
+                          )}
+                          
+                          {/* Afficher les tarifs associés */}
+                          {serviceTariffs.length > 0 && (
+                            <div className="space-y-2 pt-2 border-t">
+                              <div className="font-semibold text-sm">Tarifs disponibles :</div>
+                              {serviceTariffs.map((tariff) => (
+                                <div key={tariff.id_tarif} className="flex items-center justify-between bg-muted p-2 rounded">
+                                  <div className="text-sm">
+                                    <div className="font-medium">{tariff.condition_tarif}</div>
+                                    {tariff.periode_validite && (
+                                      <div className="text-xs text-muted-foreground">
+                                        Validité: {tariff.periode_validite}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="text-lg font-bold text-primary">
+                                    {tariff.montant} {tariff.devise}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {service.reference_legale && (
+                            <div className="text-xs text-muted-foreground">
+                              Référence légale : {service.reference_legale}
+                            </div>
+                          )}
+                        </div>
+                        <Button 
+                          className="w-full mt-auto"
+                          onClick={() => {
+                            setSelectedServiceForRegistration(service);
+                            setSelectedTariffForRegistration(serviceTariffs[0] || null);
+                            setRegistrationDialogOpen(true);
+                          }}
+                        >
+                          Inscription
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {filteredSubscriptionServices.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  Aucun abonnement trouvé.
+                </div>
+              )}
+            </TabsContent>
+
+            {/* One-Time Services Tab */}
             <TabsContent value="services" className="space-y-6 mt-6">
               <div className="flex gap-4 items-center">
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -199,131 +314,78 @@ export default function ServicesCatalog() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredServices.map((service) => (
-                  <Card key={service.id_service} className="hover:shadow-lg transition-shadow flex flex-col h-full">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-2">
-                          {getCategoryIcon(service.categorie)}
-                          <CardTitle className="text-lg">{service.nom_service}</CardTitle>
+                {filteredOneTimeServices.map((service) => {
+                  const serviceTariffs = getTariffsForService(service.id_service);
+                  const firstTariff = serviceTariffs[0];
+                  
+                  return (
+                    <Card key={service.id_service} className="hover:shadow-lg transition-shadow flex flex-col h-full">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-2">
+                            {getCategoryIcon(service.categorie)}
+                            <CardTitle className="text-lg">{service.nom_service}</CardTitle>
+                          </div>
                         </div>
-                      </div>
-                      <Badge className={getCategoryColor(service.categorie)}>
-                        {service.categorie}
-                      </Badge>
-                    </CardHeader>
-                    <CardContent className="space-y-4 flex flex-col flex-1">
-                      <div className="flex-1 space-y-3">
-                        {service.description && (
-                          <CardDescription className="text-sm">
-                            {service.description}
-                          </CardDescription>
-                        )}
-                        {service.public_cible && (
-                          <div className="text-sm">
-                            <span className="font-semibold">Public cible : </span>
-                            {service.public_cible}
-                          </div>
-                        )}
-                        {service.reference_legale && (
-                          <div className="text-xs text-muted-foreground">
-                            Référence légale : {service.reference_legale}
-                          </div>
-                        )}
-                      </div>
-                      <Button 
-                        className="w-full mt-auto"
-                        onClick={() => {
-                          setSelectedServiceForRegistration(service);
-                          setSelectedTariffForRegistration(null);
-                          setRegistrationDialogOpen(true);
-                        }}
-                      >
-                        Inscription
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              {filteredServices.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground">
-                  Aucun service trouvé.
-                </div>
-              )}
-            </TabsContent>
-
-            {/* Tariffs Tab */}
-            <TabsContent value="tarifs" className="space-y-6 mt-6">
-              <div className="flex gap-4 items-center">
-                <Select value={selectedService} onValueChange={setSelectedService}>
-                  <SelectTrigger className="w-[250px]">
-                    <SelectValue placeholder="Filtrer par service" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tous les services</SelectItem>
-                    {services.map((service) => (
-                      <SelectItem key={service.id_service} value={service.id_service}>
-                        {service.nom_service}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredTariffs.map((tariff) => (
-                  <Card key={tariff.id_tarif} className="hover:shadow-lg transition-shadow flex flex-col h-full">
-                    <CardHeader>
-                      <CardTitle className="text-lg">
-                        {tariff.bnrm_services?.nom_service || "Service non spécifié"}
-                      </CardTitle>
-                      {tariff.bnrm_services?.categorie && (
-                        <Badge className={getCategoryColor(tariff.bnrm_services.categorie)}>
-                          {tariff.bnrm_services.categorie}
+                        <Badge className={getCategoryColor(service.categorie)}>
+                          {service.categorie}
                         </Badge>
-                      )}
-                    </CardHeader>
-                    <CardContent className="space-y-4 flex flex-col flex-1">
-                      <div className="flex-1 space-y-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xl font-bold text-primary">
-                            {tariff.montant} {tariff.devise}
-                          </span>
+                      </CardHeader>
+                      <CardContent className="space-y-4 flex flex-col flex-1">
+                        <div className="flex-1 space-y-3">
+                          {service.description && (
+                            <CardDescription className="text-sm">
+                              {service.description}
+                            </CardDescription>
+                          )}
+                          {service.public_cible && (
+                            <div className="text-sm">
+                              <span className="font-semibold">Public cible : </span>
+                              {service.public_cible}
+                            </div>
+                          )}
+                          
+                          {/* Afficher le tarif si disponible */}
+                          {firstTariff && (
+                            <div className="pt-2 border-t">
+                              <div className="flex items-center gap-2">
+                                <span className="text-2xl font-bold text-primary">
+                                  {firstTariff.montant} {firstTariff.devise}
+                                </span>
+                              </div>
+                              {firstTariff.condition_tarif && (
+                                <div className="text-sm text-muted-foreground">
+                                  {firstTariff.condition_tarif}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          {service.reference_legale && (
+                            <div className="text-xs text-muted-foreground">
+                              Référence légale : {service.reference_legale}
+                            </div>
+                          )}
                         </div>
-                        {tariff.condition_tarif && (
-                          <div className="text-sm">
-                            <span className="font-semibold">Conditions : </span>
-                            {tariff.condition_tarif}
-                          </div>
-                        )}
-                        {tariff.periode_validite && (
-                          <div className="text-xs text-muted-foreground">
-                            Période de validité : {tariff.periode_validite}
-                          </div>
-                        )}
-                      </div>
-                      <Button 
-                        className="w-full mt-auto"
-                        onClick={() => {
-                          const service = services.find(s => s.id_service === tariff.id_service);
-                          if (service) {
+                        <Button 
+                          className="w-full mt-auto"
+                          onClick={() => {
                             setSelectedServiceForRegistration(service);
-                            setSelectedTariffForRegistration(tariff);
+                            setSelectedTariffForRegistration(firstTariff || null);
                             setRegistrationDialogOpen(true);
-                          }
-                        }}
-                      >
-                        Inscription
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
+                          }}
+                        >
+                          Réservation
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
 
-              {filteredTariffs.length === 0 && (
+              {filteredOneTimeServices.length === 0 && (
                 <div className="text-center py-12 text-muted-foreground">
-                  Aucun tarif trouvé.
+                  Aucun service ponctuel trouvé.
                 </div>
               )}
             </TabsContent>
