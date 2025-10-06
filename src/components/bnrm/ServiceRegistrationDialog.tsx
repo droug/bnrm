@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,21 +8,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Loader2, Search } from "lucide-react";
+import { Loader2, Search, X } from "lucide-react";
 import { PaymentDialog } from "./PaymentDialog";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface BNRMService {
   id_service: string;
@@ -75,10 +63,11 @@ export function ServiceRegistrationDialog({
   });
   
   // Pour les reproductions
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [showManuscriptList, setShowManuscriptList] = useState(false);
   const [manuscripts, setManuscripts] = useState<any[]>([]);
   const [selectedManuscript, setSelectedManuscript] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const manuscriptListRef = useRef<HTMLDivElement>(null);
   
   // Services facturés au nombre de pages et nécessitant sélection de document
   const pageBasedServices = [
@@ -133,6 +122,18 @@ export function ServiceRegistrationDialog({
     
     loadManuscripts();
   }, [open, isReproductionService]);
+
+  // Fermer la liste au clic à l'extérieur
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (manuscriptListRef.current && !manuscriptListRef.current.contains(event.target as Node)) {
+        setShowManuscriptList(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (profile) {
@@ -469,77 +470,83 @@ export function ServiceRegistrationDialog({
             {isReproductionService && (
               <div className="grid gap-2">
                 <Label>Document à reproduire *</Label>
-                <Popover open={searchOpen} onOpenChange={setSearchOpen} modal={true}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      type="button"
-                      aria-expanded={searchOpen}
-                      className="justify-between w-full"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setSearchOpen(!searchOpen);
+                <div className="relative">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Rechercher par titre, cote, auteur..."
+                      value={selectedManuscript ? `${selectedManuscript.title} - ${selectedManuscript.cote || selectedManuscript.inventory_number}` : searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setShowManuscriptList(true);
+                        if (selectedManuscript) setSelectedManuscript(null);
                       }}
+                      onFocus={() => setShowManuscriptList(true)}
+                      className="pl-9 pr-9"
+                    />
+                    {selectedManuscript && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedManuscript(null);
+                          setSearchQuery("");
+                        }}
+                        className="absolute right-3 top-3 h-4 w-4 text-muted-foreground hover:text-foreground"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                  
+                  {showManuscriptList && !selectedManuscript && (
+                    <div 
+                      ref={manuscriptListRef}
+                      className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-[200px] overflow-auto"
                     >
-                      {selectedManuscript ? (
-                        <span className="truncate">
-                          {selectedManuscript.title} - {selectedManuscript.cote || selectedManuscript.inventory_number}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground">Rechercher un document...</span>
+                      {manuscripts
+                        .filter(m => 
+                          searchQuery === "" ||
+                          m.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          m.author?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          m.cote?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          m.inventory_number?.toLowerCase().includes(searchQuery.toLowerCase())
+                        )
+                        .slice(0, 10)
+                        .map((manuscript) => (
+                          <button
+                            key={manuscript.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedManuscript(manuscript);
+                              setSearchQuery("");
+                              setShowManuscriptList(false);
+                            }}
+                            className="w-full text-left px-4 py-2 hover:bg-muted focus:bg-muted focus:outline-none"
+                          >
+                            <div className="flex flex-col">
+                              <span className="font-medium text-sm">{manuscript.title}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {manuscript.author && `${manuscript.author} - `}
+                                {manuscript.cote || manuscript.inventory_number}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      {manuscripts.filter(m => 
+                        searchQuery === "" ||
+                        m.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        m.author?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        m.cote?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        m.inventory_number?.toLowerCase().includes(searchQuery.toLowerCase())
+                      ).length === 0 && (
+                        <div className="px-4 py-2 text-sm text-muted-foreground">
+                          Aucun document trouvé.
+                        </div>
                       )}
-                      <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent 
-                    className="w-[400px] p-0" 
-                    align="start"
-                    side="bottom"
-                    avoidCollisions={true}
-                    onOpenAutoFocus={(e) => e.preventDefault()}
-                  >
-                    <Command shouldFilter={false}>
-                      <CommandInput 
-                        placeholder="Rechercher par titre, cote, auteur..." 
-                        value={searchQuery}
-                        onValueChange={setSearchQuery}
-                        onFocus={(e) => e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' })}
-                      />
-                      <CommandList className="max-h-[200px]">
-                        <CommandEmpty>Aucun document trouvé.</CommandEmpty>
-                        <CommandGroup>
-                          {manuscripts
-                            .filter(m => 
-                              m.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              m.author?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              m.cote?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              m.inventory_number?.toLowerCase().includes(searchQuery.toLowerCase())
-                            )
-                            .slice(0, 10)
-                            .map((manuscript) => (
-                              <CommandItem
-                                key={manuscript.id}
-                                value={manuscript.id}
-                                onSelect={() => {
-                                  setSelectedManuscript(manuscript);
-                                  setSearchOpen(false);
-                                }}
-                              >
-                                <div className="flex flex-col">
-                                  <span className="font-medium">{manuscript.title}</span>
-                                  <span className="text-sm text-muted-foreground">
-                                    {manuscript.author && `${manuscript.author} - `}
-                                    {manuscript.cote || manuscript.inventory_number}
-                                  </span>
-                                </div>
-                              </CommandItem>
-                            ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
