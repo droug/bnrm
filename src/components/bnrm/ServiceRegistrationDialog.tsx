@@ -42,6 +42,8 @@ export function ServiceRegistrationDialog({
   const { user, profile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [subscriptionType, setSubscriptionType] = useState<"monthly" | "annual">("monthly");
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+  const [registrationId, setRegistrationId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     phone: "",
     address: "",
@@ -116,6 +118,8 @@ export function ServiceRegistrationDialog({
 
       if (regError) throw regError;
 
+      setRegistrationId(registration.id);
+
       // Si le service est payant, créer un abonnement
       if (!isFreeService && tariff) {
         const startDate = new Date();
@@ -140,23 +144,49 @@ export function ServiceRegistrationDialog({
 
         if (subError) throw subError;
 
-        toast({
-          title: "Inscription enregistrée",
-          description: "Votre inscription a été enregistrée. Vous recevrez des notifications pour effectuer le paiement.",
-        });
+        // Afficher les options de paiement
+        setShowPaymentOptions(true);
       } else {
         toast({
           title: "Inscription réussie",
           description: "Vous êtes maintenant inscrit à ce service gratuit",
         });
+        onOpenChange(false);
       }
-
-      onOpenChange(false);
     } catch (error: any) {
       console.error("Erreur lors de l'inscription:", error);
       toast({
         title: "Erreur",
         description: error.message || "Une erreur est survenue lors de l'inscription",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePayLater = () => {
+    toast({
+      title: "Paiement différé",
+      description: "Vous recevrez des notifications pour effectuer le paiement.",
+    });
+    onOpenChange(false);
+  };
+
+  const handlePayNow = async () => {
+    setIsLoading(true);
+    try {
+      // TODO: Intégrer avec le système de paiement (portefeuille)
+      toast({
+        title: "Redirection vers le paiement",
+        description: "Vous allez être redirigé vers l'interface de paiement...",
+      });
+      // Ici on pourrait rediriger vers la page de paiement du portefeuille
+      // ou ouvrir un dialogue de paiement
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue",
         variant: "destructive",
       });
     } finally {
@@ -186,15 +216,72 @@ export function ServiceRegistrationDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Inscription au service : {service.nom_service}</DialogTitle>
+          <DialogTitle>
+            {showPaymentOptions ? "Options de paiement" : `Inscription au service : ${service.nom_service}`}
+          </DialogTitle>
           <DialogDescription>
-            {isFreeService 
-              ? "Complétez le formulaire pour vous inscrire à ce service gratuit"
-              : "Complétez le formulaire et choisissez votre type d'abonnement"}
+            {showPaymentOptions 
+              ? "Choisissez votre mode de paiement"
+              : isFreeService 
+                ? "Complétez le formulaire pour vous inscrire à ce service gratuit"
+                : "Complétez le formulaire et choisissez votre type d'abonnement"}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {showPaymentOptions ? (
+          <div className="space-y-6">
+            <div className="bg-muted/50 p-6 rounded-lg space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold">Montant à payer:</span>
+                <span className="text-2xl font-bold text-primary">
+                  {tariff && (subscriptionType === "monthly" 
+                    ? `${tariff.montant} ${tariff.devise} / mois`
+                    : `${tariff.montant * 12} ${tariff.devise} / an`)}
+                </span>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Type d'abonnement: {subscriptionType === "monthly" ? "Mensuel" : "Annuel"}
+              </div>
+            </div>
+
+            <div className="grid gap-4">
+              <Button 
+                onClick={handlePayNow}
+                disabled={isLoading}
+                size="lg"
+                className="w-full"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Traitement en cours...
+                  </>
+                ) : (
+                  "Payer maintenant"
+                )}
+              </Button>
+
+              <Button 
+                onClick={handlePayLater}
+                disabled={isLoading}
+                variant="outline"
+                size="lg"
+                className="w-full"
+              >
+                Payer plus tard
+              </Button>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+              <p className="text-sm text-blue-900 dark:text-blue-100">
+                <strong>Paiement différé :</strong> Si vous choisissez de payer plus tard, 
+                vous recevrez des notifications de rappel selon les paramètres définis par l'administration. 
+                Votre abonnement sera activé dès réception du paiement.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div className="grid gap-2">
               <Label htmlFor="phone">Téléphone *</Label>
@@ -287,6 +374,7 @@ export function ServiceRegistrationDialog({
             </Button>
           </div>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );
