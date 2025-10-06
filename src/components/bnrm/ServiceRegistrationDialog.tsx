@@ -8,8 +8,21 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Loader2 } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import { PaymentDialog } from "./PaymentDialog";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface BNRMService {
   id_service: string;
@@ -52,13 +65,22 @@ export function ServiceRegistrationDialog({
   const [availableTariffs, setAvailableTariffs] = useState<BNRMTariff[]>([]);
   const [selectedTariff, setSelectedTariff] = useState<BNRMTariff | null>(null);
   const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
     phone: "",
     address: "",
     institution: "",
     additionalInfo: "",
   });
-
-  // Services facturés au nombre de pages
+  
+  // Pour les reproductions
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [manuscripts, setManuscripts] = useState<any[]>([]);
+  const [selectedManuscript, setSelectedManuscript] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Services facturés au nombre de pages et nécessitant sélection de document
   const pageBasedServices = [
     "Impression papier NB",
     "Numérisation documents rares",
@@ -66,6 +88,7 @@ export function ServiceRegistrationDialog({
   ];
   
   const isPageBasedService = pageBasedServices.includes(service.nom_service);
+  const isReproductionService = service.categorie === "Reproduction";
 
   
   // Charger les tarifs disponibles pour ce service
@@ -92,15 +115,42 @@ export function ServiceRegistrationDialog({
     }
   }, [open, service.id_service, tariff]);
 
+  
+  // Charger les manuscrits pour recherche (services de reproduction)
+  useEffect(() => {
+    const loadManuscripts = async () => {
+      if (!isReproductionService || !open) return;
+      
+      const { data, error } = await supabase
+        .from("manuscripts")
+        .select("id, title, author, cote, inventory_number")
+        .limit(50);
+      
+      if (!error && data) {
+        setManuscripts(data);
+      }
+    };
+    
+    loadManuscripts();
+  }, [open, isReproductionService]);
+
   useEffect(() => {
     if (profile) {
       setFormData(prev => ({
         ...prev,
+        firstName: profile.first_name || "",
+        lastName: profile.last_name || "",
+        email: user?.email || "",
         phone: profile.phone || "",
         institution: profile.institution || "",
       }));
+    } else if (user?.email) {
+      setFormData(prev => ({
+        ...prev,
+        email: user.email || "",
+      }));
     }
-  }, [profile]);
+  }, [profile, user]);
 
   const isFreeService = !selectedTariff;
 
@@ -165,11 +215,19 @@ export function ServiceRegistrationDialog({
         status: isFreeService ? "active" : "pending",
         is_paid: isFreeService,
         registration_data: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
           phone: formData.phone,
           address: formData.address,
           institution: formData.institution,
           additionalInfo: formData.additionalInfo,
           ...(isPageBasedService && { pageCount }),
+          ...(selectedManuscript && { 
+            manuscriptId: selectedManuscript.id,
+            manuscriptTitle: selectedManuscript.title,
+            manuscriptCote: selectedManuscript.cote
+          }),
         },
       };
 
@@ -291,9 +349,9 @@ export function ServiceRegistrationDialog({
           <DialogDescription>
             {showPaymentOptions 
               ? "Choisissez votre mode de paiement"
-              : isFreeService 
-                ? "Complétez le formulaire pour vous inscrire à ce service gratuit"
-                : "Complétez le formulaire et choisissez votre type d'abonnement"}
+              : user 
+                ? "Vérifiez vos informations et complétez le formulaire"
+                : "Veuillez vous connecter ou créer un compte pour continuer"}
           </DialogDescription>
         </DialogHeader>
 
@@ -356,16 +414,122 @@ export function ServiceRegistrationDialog({
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Téléphone *</Label>
-              <Input
-                id="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                required
-              />
+            {/* Informations personnelles */}
+            <div className="bg-muted/30 p-4 rounded-lg space-y-4">
+              <h3 className="font-semibold text-sm">Informations personnelles</h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="firstName">Prénom *</Label>
+                  <Input
+                    id="firstName"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    required
+                    disabled={!!profile?.first_name}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="lastName">Nom *</Label>
+                  <Input
+                    id="lastName"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    required
+                    disabled={!!profile?.last_name}
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                  disabled={!!user?.email}
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Téléphone *</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  required
+                />
+              </div>
             </div>
+
+            {/* Sélection de document pour reproduction */}
+            {isReproductionService && (
+              <div className="grid gap-2">
+                <Label>Document à reproduire *</Label>
+                <Popover open={searchOpen} onOpenChange={setSearchOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={searchOpen}
+                      className="justify-between w-full"
+                    >
+                      {selectedManuscript ? (
+                        <span className="truncate">
+                          {selectedManuscript.title} - {selectedManuscript.cote || selectedManuscript.inventory_number}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">Rechercher un document...</span>
+                      )}
+                      <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px] p-0">
+                    <Command>
+                      <CommandInput 
+                        placeholder="Rechercher par titre, cote, auteur..." 
+                        value={searchQuery}
+                        onValueChange={setSearchQuery}
+                      />
+                      <CommandList>
+                        <CommandEmpty>Aucun document trouvé.</CommandEmpty>
+                        <CommandGroup>
+                          {manuscripts
+                            .filter(m => 
+                              m.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              m.author?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              m.cote?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              m.inventory_number?.toLowerCase().includes(searchQuery.toLowerCase())
+                            )
+                            .slice(0, 10)
+                            .map((manuscript) => (
+                              <CommandItem
+                                key={manuscript.id}
+                                value={manuscript.id}
+                                onSelect={() => {
+                                  setSelectedManuscript(manuscript);
+                                  setSearchOpen(false);
+                                }}
+                              >
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{manuscript.title}</span>
+                                  <span className="text-sm text-muted-foreground">
+                                    {manuscript.author && `${manuscript.author} - `}
+                                    {manuscript.cote || manuscript.inventory_number}
+                                  </span>
+                                </div>
+                              </CommandItem>
+                            ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
 
             <div className="grid gap-2">
               <Label htmlFor="address">Adresse</Label>
