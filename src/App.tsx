@@ -52,6 +52,9 @@ import DigitalLibraryUsers from "./pages/DigitalLibraryUsers";
 import DigitalLibraryAnalytics from "./pages/DigitalLibraryAnalytics";
 import DigitalLibraryExhibitions from "./pages/DigitalLibraryExhibitions";
 import DigitalLibraryReproduction from "./pages/DigitalLibraryReproduction";
+import DigitalLibraryRestrictions from "./pages/DigitalLibraryRestrictions";
+import DigitalLibraryCopyright from "./pages/DigitalLibraryCopyright";
+import DigitalLibraryBulkImport from "./pages/DigitalLibraryBulkImport";
 import AccessPolicies from "./pages/AccessPolicies";
 import CBMPortal from "./pages/CBMPortal";
 import CBMObjectifs from "./pages/CBMObjectifs";
@@ -140,6 +143,9 @@ const App = () => (
           <Route path="/admin/digital-library/analytics" element={<DigitalLibraryAnalytics />} />
           <Route path="/admin/digital-library/exhibitions" element={<DigitalLibraryExhibitions />} />
           <Route path="/admin/digital-library/reproduction" element={<DigitalLibraryReproduction />} />
+          <Route path="/admin/digital-library/restrictions" element={<DigitalLibraryRestrictions />} />
+          <Route path="/admin/digital-library/copyright" element={<DigitalLibraryCopyright />} />
+          <Route path="/admin/digital-library/bulk-import" element={<DigitalLibraryBulkImport />} />
           <Route path="/access-policies" element={<AccessPolicies />} />
           <Route path="/politiques-acces" element={<AccessPolicies />} />
           
