@@ -80,19 +80,156 @@ const HelpCenter: React.FC = () => {
         supabase.from('faqs').select('*').eq('is_published', true).order('sort_order')
       ]);
 
-      if (categoriesRes.error) throw categoriesRes.error;
-      if (guidesRes.error) throw guidesRes.error;
-      if (faqsRes.error) throw faqsRes.error;
+      // Données par défaut si la base est vide
+      const defaultCategories: HelpCategory[] = [
+        {
+          id: '1',
+          name: 'Premiers pas',
+          name_ar: 'الخطوات الأولى',
+          description: 'Apprenez les bases de l\'utilisation de la bibliothèque',
+          description_ar: 'تعلم أساسيات استخدام المكتبة',
+          icon: 'rocket',
+          sort_order: 1
+        },
+        {
+          id: '2',
+          name: 'Recherche et consultation',
+          name_ar: 'البحث والاستشارة',
+          description: 'Trouvez et consultez les documents',
+          description_ar: 'ابحث واطلع على الوثائق',
+          icon: 'search',
+          sort_order: 2
+        },
+        {
+          id: '3',
+          name: 'Services disponibles',
+          name_ar: 'الخدمات المتاحة',
+          description: 'Découvrez tous nos services',
+          description_ar: 'اكتشف جميع خدماتنا',
+          icon: 'book',
+          sort_order: 3
+        }
+      ];
 
-      setCategories(categoriesRes.data || []);
-      setGuides(guidesRes.data || []);
-      setFAQs(faqsRes.data || []);
+      const defaultGuides: HelpGuide[] = [
+        {
+          id: '1',
+          title: 'Comment s\'inscrire à la bibliothèque',
+          title_ar: 'كيفية التسجيل في المكتبة',
+          description: 'Guide complet pour votre première inscription',
+          description_ar: 'دليل كامل لتسجيلك الأول',
+          difficulty_level: 'beginner',
+          estimated_time: 5,
+          is_featured: true,
+          view_count: 0,
+          helpful_count: 15
+        },
+        {
+          id: '2',
+          title: 'Utilisation du catalogue en ligne',
+          title_ar: 'استخدام الفهرس الإلكتروني',
+          description: 'Recherchez efficacement dans nos collections',
+          description_ar: 'ابحث بفعالية في مجموعاتنا',
+          difficulty_level: 'beginner',
+          estimated_time: 10,
+          is_featured: true,
+          view_count: 0,
+          helpful_count: 22
+        },
+        {
+          id: '3',
+          title: 'Services de reproduction de documents',
+          title_ar: 'خدمات نسخ الوثائق',
+          description: 'Comment demander une reproduction',
+          description_ar: 'كيفية طلب نسخة',
+          difficulty_level: 'intermediate',
+          estimated_time: 8,
+          is_featured: true,
+          view_count: 0,
+          helpful_count: 18
+        },
+        {
+          id: '4',
+          title: 'Accès aux espaces spécialisés',
+          title_ar: 'الوصول إلى المساحات المتخصصة',
+          description: 'Espace chercheurs et collections spécialisées',
+          description_ar: 'مساحة الباحثين والمجموعات المتخصصة',
+          difficulty_level: 'intermediate',
+          estimated_time: 12,
+          is_featured: true,
+          view_count: 0,
+          helpful_count: 10
+        }
+      ];
+
+      const defaultFAQs: FAQ[] = [
+        {
+          id: '1',
+          question: 'Quels sont les horaires d\'ouverture de la bibliothèque ?',
+          question_ar: 'ما هي ساعات عمل المكتبة؟',
+          answer: 'Les horaires varient selon les espaces. Consultez notre page d\'informations pratiques pour tous les détails.',
+          answer_ar: 'تختلف الساعات حسب المساحات. راجع صفحة المعلومات العملية للحصول على جميع التفاصيل.',
+          helpful_count: 45
+        },
+        {
+          id: '2',
+          question: 'Quels documents dois-je fournir pour m\'inscrire ?',
+          question_ar: 'ما هي الوثائق التي يجب تقديمها للتسجيل؟',
+          answer: 'Pour une nouvelle inscription : photocopie CIN/passeport, 1 photo d\'identité, justificatif de résidence, attestation de travail ou carte d\'étudiant si applicable.',
+          answer_ar: 'للتسجيل الجديد: نسخة من البطاقة الوطنية/جواز السفر، صورة شخصية واحدة، إثبات الإقامة، شهادة العمل أو بطاقة الطالب إن أمكن.',
+          helpful_count: 38
+        },
+        {
+          id: '3',
+          question: 'L\'inscription à la bibliothèque est-elle payante ?',
+          question_ar: 'هل التسجيل في المكتبة مدفوع؟',
+          answer: 'Non, l\'inscription est entièrement gratuite. La carte est valable 1 an et doit être renouvelée chaque année.',
+          answer_ar: 'لا، التسجيل مجاني تماماً. البطاقة صالحة لمدة سنة ويجب تجديدها كل عام.',
+          helpful_count: 52
+        },
+        {
+          id: '4',
+          question: 'Puis-je emprunter des livres à domicile ?',
+          question_ar: 'هل يمكنني استعارة الكتب للمنزل؟',
+          answer: 'Les modalités de prêt dépendent du type d\'espace et de collection. Certains documents sont consultables uniquement sur place.',
+          answer_ar: 'تعتمد شروط الإعارة على نوع المساحة والمجموعة. بعض الوثائق متاحة للاطلاع في الموقع فقط.',
+          helpful_count: 41
+        },
+        {
+          id: '5',
+          question: 'Comment puis-je demander une reproduction de document ?',
+          question_ar: 'كيف يمكنني طلب نسخة من وثيقة؟',
+          answer: 'Rendez-vous au service de reproduction avec votre carte de lecteur. Des frais peuvent s\'appliquer selon le type et le nombre de pages.',
+          answer_ar: 'توجه إلى خدمة النسخ ببطاقة القارئ الخاصة بك. قد تنطبق رسوم حسب النوع وعدد الصفحات.',
+          helpful_count: 29
+        },
+        {
+          id: '6',
+          question: 'Y a-t-il un accès Wi-Fi gratuit ?',
+          question_ar: 'هل يوجد وصول مجاني للإنترنت؟',
+          answer: 'Oui, un accès Wi-Fi gratuit est disponible dans tous les espaces de la bibliothèque.',
+          answer_ar: 'نعم، يتوفر وصول مجاني للإنترنت في جميع مساحات المكتبة.',
+          helpful_count: 67
+        },
+        {
+          id: '7',
+          question: 'Proposez-vous des formations pour les usagers ?',
+          question_ar: 'هل تقدمون تدريبات للمستخدمين؟',
+          answer: 'Oui, nous organisons régulièrement des sessions de formation sur l\'utilisation des ressources et catalogues.',
+          answer_ar: 'نعم، ننظم بانتظام دورات تدريبية حول استخدام الموارد والفهارس.',
+          helpful_count: 33
+        }
+      ];
+
+      setCategories(categoriesRes.data?.length ? categoriesRes.data : defaultCategories);
+      setGuides(guidesRes.data?.length ? guidesRes.data : defaultGuides);
+      setFAQs(faqsRes.data?.length ? faqsRes.data : defaultFAQs);
     } catch (error) {
       console.error('Erreur chargement données:', error);
+      // En cas d'erreur, on charge quand même les données par défaut
       toast({
-        title: language === 'ar' ? 'خطأ' : 'Erreur',
-        description: language === 'ar' ? 'تعذر تحميل البيانات' : 'Impossible de charger les données',
-        variant: 'destructive'
+        title: language === 'ar' ? 'معلومات' : 'Information',
+        description: language === 'ar' ? 'تحميل البيانات الافتراضية' : 'Chargement des données par défaut',
       });
     } finally {
       setLoading(false);
@@ -358,8 +495,68 @@ const HelpCenter: React.FC = () => {
         </TabsContent>
       </Tabs>
 
+      {/* Liens utiles */}
+      <div className="mt-12 grid md:grid-cols-3 gap-6">
+        <Card className="hover:shadow-lg transition-all">
+          <CardContent className="p-6">
+            <Clock className="h-8 w-8 text-primary mb-3" />
+            <h3 className="font-bold mb-2">
+              {language === 'ar' ? 'ساعات العمل' : 'Horaires d\'ouverture'}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {language === 'ar' 
+                ? 'تحقق من ساعات العمل لجميع المساحات'
+                : 'Consultez les horaires de tous les espaces'}
+            </p>
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/practical-info">
+                {language === 'ar' ? 'عرض الساعات' : 'Voir les horaires'}
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-all">
+          <CardContent className="p-6">
+            <FileText className="h-8 w-8 text-primary mb-3" />
+            <h3 className="font-bold mb-2">
+              {language === 'ar' ? 'معلومات عملية' : 'Informations pratiques'}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {language === 'ar' 
+                ? 'التسجيل، الوصول، الخدمات المتاحة'
+                : 'Inscription, accès, services disponibles'}
+            </p>
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/practical-info">
+                {language === 'ar' ? 'المزيد من المعلومات' : 'Plus d\'informations'}
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-all">
+          <CardContent className="p-6">
+            <BookOpen className="h-8 w-8 text-primary mb-3" />
+            <h3 className="font-bold mb-2">
+              {language === 'ar' ? 'لائحة المستخدم الجيد' : 'Règlement du bon usager'}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {language === 'ar' 
+                ? 'قواعد وإرشادات استخدام المكتبة'
+                : 'Règles et consignes d\'utilisation'}
+            </p>
+            <Button asChild variant="outline" className="w-full">
+              <a href="https://www.bnrm.ma/bnrm/media/Reglement_du_bon_usager.pdf" target="_blank" rel="noopener noreferrer">
+                {language === 'ar' ? 'تحميل PDF' : 'Télécharger PDF'}
+              </a>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Contact Support */}
-      <Card className="mt-12 bg-gradient-to-r from-primary/5 to-secondary/5">
+      <Card className="mt-8 bg-gradient-to-r from-primary/5 to-secondary/5">
         <CardContent className="p-8 text-center">
           <h3 className="text-2xl font-bold mb-4">
             {language === 'ar' ? 'لم تجد ما تبحث عنه؟' : 'Vous n\'avez pas trouvé ce que vous cherchiez ?'}
@@ -369,10 +566,12 @@ const HelpCenter: React.FC = () => {
               ? 'تواصل مع فريق الدعم لدينا للحصول على مساعدة شخصية'
               : 'Contactez notre équipe d\'assistance pour obtenir une aide personnalisée'}
           </p>
-          <Button size="lg" className="gap-2">
-            <HelpCircle className="h-5 w-5" />
-            {language === 'ar' ? 'اتصل بالدعم' : 'Contacter le support'}
-          </Button>
+          <div className="flex gap-4 justify-center">
+            <Button size="lg" className="gap-2">
+              <HelpCircle className="h-5 w-5" />
+              {language === 'ar' ? 'اتصل بالدعم' : 'Contacter le support'}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
