@@ -46,12 +46,22 @@ export function ServiceRegistrationDialog({
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [registrationId, setRegistrationId] = useState<string | null>(null);
+  const [pageCount, setPageCount] = useState<number>(1);
   const [formData, setFormData] = useState({
     phone: "",
     address: "",
     institution: "",
     additionalInfo: "",
   });
+
+  // Services facturés au nombre de pages
+  const pageBasedServices = [
+    "Impression papier NB",
+    "Numérisation documents rares",
+    "Impression papier couleur"
+  ];
+  
+  const isPageBasedService = pageBasedServices.includes(service.nom_service);
 
   useEffect(() => {
     if (profile) {
@@ -124,29 +134,32 @@ export function ServiceRegistrationDialog({
 
       setRegistrationId(registration.id);
 
-      // Si le service est payant, créer un abonnement
+      // Si le service est payant
       if (!isFreeService && tariff) {
-        const startDate = new Date();
-        const endDate = subscriptionType === "monthly" 
-          ? new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000)
-          : new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000);
+        // Pour les services facturés au nombre de pages, pas besoin de créer un abonnement
+        if (!isPageBasedService) {
+          const startDate = new Date();
+          const endDate = subscriptionType === "monthly" 
+            ? new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000)
+            : new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000);
 
-        const { error: subError } = await supabase
-          .from("service_subscriptions")
-          .insert({
-            user_id: user.id,
-            service_id: service.id_service,
-            tariff_id: tariff.id_tarif,
-            subscription_type: subscriptionType,
-            status: "pending_payment",
-            start_date: startDate.toISOString(),
-            end_date: endDate.toISOString(),
-            amount: tariff.montant,
-            currency: tariff.devise,
-            payment_status: "pending",
-          });
+          const { error: subError } = await supabase
+            .from("service_subscriptions")
+            .insert({
+              user_id: user.id,
+              service_id: service.id_service,
+              tariff_id: tariff.id_tarif,
+              subscription_type: subscriptionType,
+              status: "pending_payment",
+              start_date: startDate.toISOString(),
+              end_date: endDate.toISOString(),
+              amount: tariff.montant,
+              currency: tariff.devise,
+              payment_status: "pending",
+            });
 
-        if (subError) throw subError;
+          if (subError) throw subError;
+        }
 
         // Afficher les options de paiement
         setShowPaymentOptions(true);
@@ -227,13 +240,17 @@ export function ServiceRegistrationDialog({
               <div className="flex justify-between items-center">
                 <span className="font-semibold">Montant à payer:</span>
                 <span className="text-2xl font-bold text-primary">
-                  {tariff && (subscriptionType === "monthly" 
-                    ? `${tariff.montant} ${tariff.devise} / mois`
-                    : `${tariff.montant * 12} ${tariff.devise} / an`)}
+                  {tariff && (isPageBasedService
+                    ? `${tariff.montant * pageCount} ${tariff.devise}`
+                    : subscriptionType === "monthly" 
+                      ? `${tariff.montant} ${tariff.devise} / mois`
+                      : `${tariff.montant * 12} ${tariff.devise} / an`)}
                 </span>
               </div>
               <div className="text-sm text-muted-foreground">
-                Type d'abonnement: {subscriptionType === "monthly" ? "Mensuel" : "Annuel"}
+                {isPageBasedService 
+                  ? `${pageCount} page(s) × ${tariff.montant} ${tariff.devise} = ${tariff.montant * pageCount} ${tariff.devise}`
+                  : `Type d'abonnement: ${subscriptionType === "monthly" ? "Mensuel" : "Annuel"}`}
               </div>
             </div>
 
@@ -319,35 +336,63 @@ export function ServiceRegistrationDialog({
 
           {!isFreeService && tariff && (
             <div className="space-y-4 border-t pt-4">
-              <Label>Type d'abonnement</Label>
-              <RadioGroup value={subscriptionType} onValueChange={(value: any) => setSubscriptionType(value)}>
-                <div className="flex items-center space-x-2 p-4 border rounded-lg">
-                  <RadioGroupItem value="monthly" id="monthly" />
-                  <Label htmlFor="monthly" className="flex-1 cursor-pointer">
-                    <div className="font-semibold">Abonnement mensuel</div>
-                    <div className="text-sm text-muted-foreground">
-                      {tariff.montant} {tariff.devise} / mois
+              {isPageBasedService ? (
+                <>
+                  <Label htmlFor="pageCount">Nombre de pages *</Label>
+                  <Input
+                    id="pageCount"
+                    type="number"
+                    min="1"
+                    value={pageCount}
+                    onChange={(e) => setPageCount(Math.max(1, parseInt(e.target.value) || 1))}
+                    required
+                  />
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Prix unitaire:</span>
+                      <span className="text-sm">{tariff.montant} {tariff.devise} / page</span>
                     </div>
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 p-4 border rounded-lg">
-                  <RadioGroupItem value="annual" id="annual" />
-                  <Label htmlFor="annual" className="flex-1 cursor-pointer">
-                    <div className="font-semibold">Abonnement annuel</div>
-                    <div className="text-sm text-muted-foreground">
-                      {tariff.montant * 12} {tariff.devise} / an (économisez 2 mois)
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="font-semibold">Total:</span>
+                      <span className="text-lg font-bold text-primary">
+                        {tariff.montant * pageCount} {tariff.devise}
+                      </span>
                     </div>
-                  </Label>
-                </div>
-              </RadioGroup>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Label>Type d'abonnement</Label>
+                  <RadioGroup value={subscriptionType} onValueChange={(value: any) => setSubscriptionType(value)}>
+                    <div className="flex items-center space-x-2 p-4 border rounded-lg">
+                      <RadioGroupItem value="monthly" id="monthly" />
+                      <Label htmlFor="monthly" className="flex-1 cursor-pointer">
+                        <div className="font-semibold">Abonnement mensuel</div>
+                        <div className="text-sm text-muted-foreground">
+                          {tariff.montant} {tariff.devise} / mois
+                        </div>
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 p-4 border rounded-lg">
+                      <RadioGroupItem value="annual" id="annual" />
+                      <Label htmlFor="annual" className="flex-1 cursor-pointer">
+                        <div className="font-semibold">Abonnement annuel</div>
+                        <div className="text-sm text-muted-foreground">
+                          {tariff.montant * 12} {tariff.devise} / an (économisez 2 mois)
+                        </div>
+                      </Label>
+                    </div>
+                  </RadioGroup>
 
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                <p className="text-sm text-blue-900 dark:text-blue-100">
-                  <strong>Note :</strong> Vous pouvez payer maintenant ou plus tard. 
-                  Vous recevrez des notifications pour effectuer le paiement. 
-                  L'abonnement peut être annulé à tout moment, mais restera actif jusqu'à la fin de la période en cours.
-                </p>
-              </div>
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                    <p className="text-sm text-blue-900 dark:text-blue-100">
+                      <strong>Note :</strong> Vous pouvez payer maintenant ou plus tard. 
+                      Vous recevrez des notifications pour effectuer le paiement. 
+                      L'abonnement peut être annulé à tout moment, mais restera actif jusqu'à la fin de la période en cours.
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -375,7 +420,7 @@ export function ServiceRegistrationDialog({
         <PaymentDialog
           open={showPaymentDialog}
           onOpenChange={setShowPaymentDialog}
-          amount={tariff.montant}
+          amount={isPageBasedService ? tariff.montant * pageCount : tariff.montant}
           currency={tariff.devise}
           subscriptionType={subscriptionType}
           serviceName={service.nom_service}
