@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
+import { PaymentDialog } from "./PaymentDialog";
 
 interface BNRMService {
   id_service: string;
@@ -43,6 +44,7 @@ export function ServiceRegistrationDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [subscriptionType, setSubscriptionType] = useState<"monthly" | "annual">("monthly");
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [registrationId, setRegistrationId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     phone: "",
@@ -173,25 +175,14 @@ export function ServiceRegistrationDialog({
     onOpenChange(false);
   };
 
-  const handlePayNow = async () => {
-    setIsLoading(true);
-    try {
-      // TODO: Intégrer avec le système de paiement (portefeuille)
-      toast({
-        title: "Redirection vers le paiement",
-        description: "Vous allez être redirigé vers l'interface de paiement...",
-      });
-      // Ici on pourrait rediriger vers la page de paiement du portefeuille
-      // ou ouvrir un dialogue de paiement
-    } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: error.message || "Une erreur est survenue",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handlePayNow = () => {
+    setShowPaymentDialog(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentOptions(false);
+    setShowPaymentDialog(false);
+    onOpenChange(false);
   };
 
   if (!user) {
@@ -376,6 +367,21 @@ export function ServiceRegistrationDialog({
         </form>
         )}
       </DialogContent>
+
+      {/* Dialogue de paiement */}
+      {tariff && (
+        <PaymentDialog
+          open={showPaymentDialog}
+          onOpenChange={setShowPaymentDialog}
+          amount={tariff.montant}
+          currency={tariff.devise}
+          subscriptionType={subscriptionType}
+          serviceName={service.nom_service}
+          serviceId={service.id_service}
+          tariffId={tariff.id_tarif}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
+      )}
     </Dialog>
   );
 }
