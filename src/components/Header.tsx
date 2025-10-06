@@ -397,7 +397,7 @@ const Header = () => {
                     <div className="space-y-3">
                       <h4 className="text-sm font-medium text-primary mb-3">{t('nav.news.section')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/news" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <a href="/news" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
                           <div className="text-sm font-medium leading-none">{t('nav.news.publications')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             {t('nav.news.publications.desc')}
@@ -405,7 +405,7 @@ const Header = () => {
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/ils-parlent-de-nous" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <a href="/ils-parlent-de-nous" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
                           <div className="text-sm font-medium leading-none">{t('nav.they.talk.about.us')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             {t('nav.they.talk.about.us.desc')}
@@ -416,7 +416,7 @@ const Header = () => {
                     <div className="space-y-3">
                       <h4 className="text-sm font-medium text-primary mb-3">{t('nav.culture.section')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/programmation-culturelle" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <a href="/programmation-culturelle" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
                           <div className="text-sm font-medium leading-none">{t('nav.cultural.programming')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             {t('nav.cultural.programming.desc')}
@@ -437,7 +437,7 @@ const Header = () => {
                 <NavigationMenuContent>
                   <div className="grid gap-4 p-8 w-[500px] bg-background/95 backdrop-blur-lg border-2 border-primary/20 rounded-2xl shadow-2xl">
                     <NavigationMenuLink asChild>
-                      <a href="/collaborations-nationales" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                      <a href="/collaborations-nationales" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
                         <div className="text-sm font-medium leading-none">{t('nav.national.collaborations')}</div>
                         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                           {t('nav.national.collaborations.desc')}
@@ -445,7 +445,7 @@ const Header = () => {
                       </a>
                     </NavigationMenuLink>
                     <NavigationMenuLink asChild>
-                      <a href="/collaborations-internationales" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                      <a href="/collaborations-internationales" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
                         <div className="text-sm font-medium leading-none">{t('nav.international.collaborations')}</div>
                         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                           {t('nav.international.collaborations.desc')}
