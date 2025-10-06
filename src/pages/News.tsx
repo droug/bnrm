@@ -73,20 +73,58 @@ const News = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <section className="bg-gradient-hero py-20 text-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center animate-fade-in">
-            <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6 shadow-gold border border-white/20">
-              <MessageSquare className="h-8 w-8 text-white" />
+      {/* Hero Banner */}
+      <section className="relative h-[500px] overflow-hidden">
+        {/* Background Image with Overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1920&h=500&fit=crop')"
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/85 to-royal/90"></div>
+          <div className="absolute inset-0 bg-pattern-zellige opacity-5"></div>
+        </div>
+
+        {/* Content */}
+        <div className="relative h-full container mx-auto px-4 flex items-center">
+          <div className="max-w-3xl animate-fade-in">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center shadow-gold border border-white/20">
+                <MessageSquare className="h-6 w-6 text-white" />
+              </div>
+              <Badge className="bg-gold/20 text-white border-gold/30 backdrop-blur-sm">
+                Actualités BNRM
+              </Badge>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Actualités</h1>
-            <div className="w-24 h-1 bg-gradient-accent mx-auto mb-6 rounded-full"></div>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Suivez les dernières nouvelles et événements de la Bibliothèque Nationale du Royaume du Maroc
+            
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white leading-tight">
+              Actualités &<br />
+              <span className="text-gold">Événements</span>
+            </h1>
+            
+            <div className="w-32 h-1.5 bg-gradient-accent mb-8 rounded-full shadow-glow"></div>
+            
+            <p className="text-xl md:text-2xl text-white/95 leading-relaxed mb-8 font-light">
+              Suivez les dernières nouvelles, événements culturels et coopérations internationales de la Bibliothèque Nationale du Royaume du Maroc
             </p>
+
+            <div className="flex flex-wrap gap-4">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-elegant group">
+                Explorer les actualités
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button size="lg" variant="outline" className="bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm">
+                <MessageSquare className="mr-2 h-5 w-5" />
+                S'abonner à la newsletter
+              </Button>
+            </div>
           </div>
         </div>
+
+        {/* Decorative Elements */}
+        <div className="absolute top-10 right-10 w-32 h-32 bg-gold/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-10 left-10 w-40 h-40 bg-coral/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
       </section>
 
       {/* Categories Filter */}
