@@ -81,12 +81,14 @@ export function ServiceRegistrationDialog({
 
     try {
       // Vérifier si l'utilisateur est déjà inscrit
-      const { data: existingRegistration } = await supabase
+      const { data: existingRegistration, error: checkError } = await supabase
         .from("service_registrations")
         .select("*")
         .eq("user_id", user.id)
         .eq("service_id", service.id_service)
-        .single();
+        .maybeSingle();
+
+      if (checkError) throw checkError;
 
       if (existingRegistration) {
         toast({
