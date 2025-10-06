@@ -77,6 +77,13 @@ export function ServiceRegistrationDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    console.log("=== ServiceRegistrationDialog: handleSubmit called ===");
+    console.log("Service:", service.nom_service);
+    console.log("Is page-based service:", isPageBasedService);
+    console.log("Page count:", pageCount);
+    console.log("Form data:", formData);
+    console.log("Tariff:", tariff);
 
     if (!user) {
       toast({
@@ -90,8 +97,11 @@ export function ServiceRegistrationDialog({
     setIsLoading(true);
 
     try {
+      console.log("=== Starting registration process ===");
+      
       // Pour les services d'abonnement uniquement, vérifier si l'utilisateur est déjà inscrit
       if (!isPageBasedService && !isFreeService) {
+        console.log("Checking for existing subscription...");
         const { data: existingRegistration, error: checkError } = await supabase
           .from("service_registrations")
           .select("*")
@@ -100,9 +110,15 @@ export function ServiceRegistrationDialog({
           .eq("is_paid", true)
           .maybeSingle();
 
-        if (checkError) throw checkError;
+        if (checkError) {
+          console.error("Error checking existing registration:", checkError);
+          throw checkError;
+        }
+
+        console.log("Existing registration:", existingRegistration);
 
         if (existingRegistration) {
+          console.log("User already has active subscription");
           toast({
             title: "Déjà inscrit",
             description: "Vous avez déjà un abonnement actif pour ce service",
@@ -128,20 +144,28 @@ export function ServiceRegistrationDialog({
         },
       };
 
+      console.log("Creating registration with data:", registrationData);
+
       const { data: registration, error: regError } = await supabase
         .from("service_registrations")
         .insert(registrationData)
         .select()
         .single();
 
-      if (regError) throw regError;
+      if (regError) {
+        console.error("Registration error:", regError);
+        throw regError;
+      }
 
+      console.log("Registration created:", registration);
       setRegistrationId(registration.id);
 
       // Si le service est payant
       if (!isFreeService && tariff) {
+        console.log("Service is paid, setting up payment...");
         // Pour les services facturés au nombre de pages, pas besoin de créer un abonnement
         if (!isPageBasedService) {
+          console.log("Creating subscription for non-page-based service");
           const startDate = new Date();
           const endDate = subscriptionType === "monthly" 
             ? new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000)
@@ -166,6 +190,7 @@ export function ServiceRegistrationDialog({
         }
 
         // Afficher les options de paiement
+        console.log("Showing payment options");
         setShowPaymentOptions(true);
       } else {
         toast({
@@ -175,13 +200,18 @@ export function ServiceRegistrationDialog({
         onOpenChange(false);
       }
     } catch (error: any) {
-      console.error("Erreur lors de l'inscription:", error);
+      console.error("=== Error during registration ===");
+      console.error("Error:", error);
+      console.error("Error message:", error.message);
+      console.error("Error details:", error.details);
+      console.error("Error hint:", error.hint);
       toast({
         title: "Erreur",
         description: error.message || "Une erreur est survenue lors de l'inscription",
         variant: "destructive",
       });
     } finally {
+      console.log("=== Registration process ended ===");
       setIsLoading(false);
     }
   };
