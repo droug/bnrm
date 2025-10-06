@@ -28,3 +28,6 @@ verify_jwt = false
 
 [functions.subscribe-newsletter]
 verify_jwt = false
+
+[functions.send-service-registration-email]
+verify_jwt = false

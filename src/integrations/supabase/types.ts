@@ -2594,6 +2594,47 @@ export type Database = {
           },
         ]
       }
+      payment_reminders: {
+        Row: {
+          created_at: string | null
+          days_before_due: number | null
+          id: string
+          is_read: boolean | null
+          reminder_type: string
+          sent_at: string | null
+          subscription_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          days_before_due?: number | null
+          id?: string
+          is_read?: boolean | null
+          reminder_type: string
+          sent_at?: string | null
+          subscription_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          days_before_due?: number | null
+          id?: string
+          is_read?: boolean | null
+          reminder_type?: string
+          sent_at?: string | null
+          subscription_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_reminders_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "service_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_transactions: {
         Row: {
           amount: number
@@ -3551,6 +3592,139 @@ export type Database = {
         }
         Relationships: []
       }
+      service_registrations: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_paid: boolean | null
+          registration_data: Json
+          service_id: string
+          status: string
+          subscription_id: string | null
+          tariff_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_paid?: boolean | null
+          registration_data?: Json
+          service_id: string
+          status?: string
+          subscription_id?: string | null
+          tariff_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_paid?: boolean | null
+          registration_data?: Json
+          service_id?: string
+          status?: string
+          subscription_id?: string | null
+          tariff_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_registrations_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "bnrm_services"
+            referencedColumns: ["id_service"]
+          },
+          {
+            foreignKeyName: "service_registrations_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "service_subscriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_registrations_tariff_id_fkey"
+            columns: ["tariff_id"]
+            isOneToOne: false
+            referencedRelation: "bnrm_tarifs"
+            referencedColumns: ["id_tarif"]
+          },
+        ]
+      }
+      service_subscriptions: {
+        Row: {
+          amount: number
+          auto_renew: boolean | null
+          cancelled_at: string | null
+          created_at: string | null
+          currency: string
+          end_date: string
+          id: string
+          metadata: Json | null
+          payment_status: string
+          service_id: string
+          start_date: string
+          status: string
+          subscription_type: string
+          tariff_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          auto_renew?: boolean | null
+          cancelled_at?: string | null
+          created_at?: string | null
+          currency?: string
+          end_date: string
+          id?: string
+          metadata?: Json | null
+          payment_status?: string
+          service_id: string
+          start_date?: string
+          status?: string
+          subscription_type: string
+          tariff_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          auto_renew?: boolean | null
+          cancelled_at?: string | null
+          created_at?: string | null
+          currency?: string
+          end_date?: string
+          id?: string
+          metadata?: Json | null
+          payment_status?: string
+          service_id?: string
+          start_date?: string
+          status?: string
+          subscription_type?: string
+          tariff_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_subscriptions_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "bnrm_services"
+            referencedColumns: ["id_service"]
+          },
+          {
+            foreignKeyName: "service_subscriptions_tariff_id_fkey"
+            columns: ["tariff_id"]
+            isOneToOne: false
+            referencedRelation: "bnrm_tarifs"
+            referencedColumns: ["id_tarif"]
+          },
+        ]
+      }
       sigb_configuration: {
         Row: {
           api_endpoint: string | null
@@ -4384,6 +4558,10 @@ export type Database = {
       calculate_reproduction_total: {
         Args: { request_uuid: string }
         Returns: number
+      }
+      calculate_subscription_end_date: {
+        Args: { p_start_date: string; p_subscription_type: string }
+        Returns: string
       }
       can_user_download: {
         Args: { p_content_id: string; p_user_id: string }

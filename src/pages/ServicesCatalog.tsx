@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ServiceRegistrationDialog } from "@/components/bnrm/ServiceRegistrationDialog";
 import {
   Select,
   SelectContent,
@@ -48,6 +49,9 @@ export default function ServicesCatalog() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedService, setSelectedService] = useState<string>("all");
+  const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
+  const [selectedServiceForRegistration, setSelectedServiceForRegistration] = useState<BNRMService | null>(null);
+  const [selectedTariffForRegistration, setSelectedTariffForRegistration] = useState<BNRMTariff | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -227,7 +231,11 @@ export default function ServicesCatalog() {
                       )}
                       <Button 
                         className="w-full"
-                        onClick={() => navigate("/auth")}
+                        onClick={() => {
+                          setSelectedServiceForRegistration(service);
+                          setSelectedTariffForRegistration(null);
+                          setRegistrationDialogOpen(true);
+                        }}
                       >
                         Inscription
                       </Button>
@@ -293,7 +301,14 @@ export default function ServicesCatalog() {
                       )}
                       <Button 
                         className="w-full"
-                        onClick={() => navigate("/auth")}
+                        onClick={() => {
+                          const service = services.find(s => s.id_service === tariff.id_service);
+                          if (service) {
+                            setSelectedServiceForRegistration(service);
+                            setSelectedTariffForRegistration(tariff);
+                            setRegistrationDialogOpen(true);
+                          }
+                        }}
                       >
                         Inscription
                       </Button>
@@ -311,6 +326,16 @@ export default function ServicesCatalog() {
           </Tabs>
         </div>
       </main>
+
+      {selectedServiceForRegistration && (
+        <ServiceRegistrationDialog
+          open={registrationDialogOpen}
+          onOpenChange={setRegistrationDialogOpen}
+          service={selectedServiceForRegistration}
+          tariff={selectedTariffForRegistration || undefined}
+        />
+      )}
+
       <Footer />
     </div>
   );

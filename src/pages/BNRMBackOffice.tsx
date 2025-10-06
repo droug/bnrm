@@ -28,6 +28,7 @@ import { BNRMDashboard } from "@/components/bnrm/BNRMDashboard";
 import { BNRMRequestManager } from "@/components/bnrm/BNRMRequestManager";
 import { BNRMNumberAttribution } from "@/components/bnrm/BNRMNumberAttribution";
 import { BNRMWorkflowManager } from "@/components/bnrm/BNRMWorkflowManager";
+import { BNRMPaymentNotificationSettings } from "@/components/bnrm/BNRMPaymentNotificationSettings";
 
 export default function BNRMBackOffice() {
   const { user, profile, loading } = useAuth();
@@ -103,7 +104,7 @@ export default function BNRMBackOffice() {
 
             {/* Navigation Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-7">
+              <TabsList className="grid w-full grid-cols-8">
                 <TabsTrigger value="dashboard" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
                   <span className="hidden lg:inline">{t('bnrm.dashboard.tab')}</span>
@@ -123,6 +124,10 @@ export default function BNRMBackOffice() {
                 <TabsTrigger value="workflow" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
                   <span className="hidden lg:inline">{t('bnrm.workflow.tab')}</span>
+                </TabsTrigger>
+                <TabsTrigger value="notifications" className="flex items-center gap-2">
+                  <Bell className="h-4 w-4" />
+                  <span className="hidden lg:inline">Notifications</span>
                 </TabsTrigger>
                 <TabsTrigger value="reports" className="flex items-center gap-2">
                   <Database className="h-4 w-4" />
@@ -302,6 +307,10 @@ export default function BNRMBackOffice() {
                 <BNRMWorkflowManager />
               </TabsContent>
 
+              {/* Payment Notifications Tab */}
+              <TabsContent value="notifications" className="space-y-4">
+                <BNRMPaymentNotificationSettings />
+              </TabsContent>
 
               {/* Reports Tab */}
               <TabsContent value="reports" className="space-y-4">
