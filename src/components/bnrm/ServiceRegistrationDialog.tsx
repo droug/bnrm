@@ -23,7 +23,9 @@ interface BNRMTariff {
   id_service: string;
   montant: number;
   devise: string;
+  condition_tarif: string | null;
   periode_validite: string;
+  is_active: boolean | null;
 }
 
 interface ServiceRegistrationDialogProps {
@@ -47,6 +49,8 @@ export function ServiceRegistrationDialog({
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [registrationId, setRegistrationId] = useState<string | null>(null);
   const [pageCount, setPageCount] = useState<number>(1);
+  const [availableTariffs, setAvailableTariffs] = useState<BNRMTariff[]>([]);
+  const [selectedTariff, setSelectedTariff] = useState<BNRMTariff | null>(null);
   const [formData, setFormData] = useState({
     phone: "",
     address: "",
@@ -63,6 +67,31 @@ export function ServiceRegistrationDialog({
   
   const isPageBasedService = pageBasedServices.includes(service.nom_service);
 
+  
+  // Charger les tarifs disponibles pour ce service
+  useEffect(() => {
+    const loadTariffs = async () => {
+      const { data, error } = await supabase
+        .from("bnrm_tarifs")
+        .select("*")
+        .eq("id_service", service.id_service)
+        .eq("is_active", true);
+      
+      if (!error && data) {
+        setAvailableTariffs(data);
+        if (tariff) {
+          setSelectedTariff(tariff);
+        } else if (data.length > 0) {
+          setSelectedTariff(data[0]);
+        }
+      }
+    };
+    
+    if (open) {
+      loadTariffs();
+    }
+  }, [open, service.id_service, tariff]);
+
   useEffect(() => {
     if (profile) {
       setFormData(prev => ({
@@ -73,7 +102,7 @@ export function ServiceRegistrationDialog({
     }
   }, [profile]);
 
-  const isFreeService = !tariff;
+  const isFreeService = !selectedTariff;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,7 +161,7 @@ export function ServiceRegistrationDialog({
       const registrationData = {
         user_id: user.id,
         service_id: service.id_service,
-        tariff_id: tariff?.id_tarif || null,
+        tariff_id: selectedTariff?.id_tarif || null,
         status: isFreeService ? "active" : "pending",
         is_paid: isFreeService,
         registration_data: {
@@ -161,7 +190,7 @@ export function ServiceRegistrationDialog({
       setRegistrationId(registration.id);
 
       // Si le service est payant
-      if (!isFreeService && tariff) {
+      if (!isFreeService && selectedTariff) {
         console.log("Service is paid, setting up payment...");
         // Pour les services facturés au nombre de pages, pas besoin de créer un abonnement
         if (!isPageBasedService) {
@@ -176,13 +205,13 @@ export function ServiceRegistrationDialog({
             .insert({
               user_id: user.id,
               service_id: service.id_service,
-              tariff_id: tariff.id_tarif,
+              tariff_id: selectedTariff.id_tarif,
               subscription_type: subscriptionType,
               status: "pending_payment",
               start_date: startDate.toISOString(),
               end_date: endDate.toISOString(),
-              amount: tariff.montant,
-              currency: tariff.devise,
+              amount: selectedTariff.montant,
+              currency: selectedTariff.devise,
               payment_status: "pending",
             });
 
@@ -270,20 +299,20 @@ export function ServiceRegistrationDialog({
 
         {showPaymentOptions ? (
           <div className="space-y-6">
-            <div className="bg-muted/50 p-6 rounded-lg space-y-4">
+              <div className="bg-muted/50 p-6 rounded-lg space-y-4">
               <div className="flex justify-between items-center">
                 <span className="font-semibold">Montant à payer:</span>
                 <span className="text-2xl font-bold text-primary">
-                  {tariff && (isPageBasedService
-                    ? `${tariff.montant * pageCount} ${tariff.devise}`
+                  {selectedTariff && (isPageBasedService
+                    ? `${selectedTariff.montant * pageCount} ${selectedTariff.devise}`
                     : subscriptionType === "monthly" 
-                      ? `${tariff.montant} ${tariff.devise} / mois`
-                      : `${tariff.montant * 12} ${tariff.devise} / an`)}
+                      ? `${selectedTariff.montant} ${selectedTariff.devise} / mois`
+                      : `${selectedTariff.montant * 12} ${selectedTariff.devise} / an`)}
                 </span>
               </div>
               <div className="text-sm text-muted-foreground">
                 {isPageBasedService 
-                  ? `${pageCount} page(s) × ${tariff.montant} ${tariff.devise} = ${tariff.montant * pageCount} ${tariff.devise}`
+                  ? `${pageCount} page(s) × ${selectedTariff?.montant} ${selectedTariff?.devise} = ${(selectedTariff?.montant || 0) * pageCount} ${selectedTariff?.devise}`
                   : `Type d'abonnement: ${subscriptionType === "monthly" ? "Mensuel" : "Annuel"}`}
               </div>
             </div>
@@ -368,9 +397,44 @@ export function ServiceRegistrationDialog({
             </div>
           </div>
 
-          {!isFreeService && tariff && (
+          {!isFreeService && availableTariffs.length > 0 && (
             <div className="space-y-4 border-t pt-4">
-              {isPageBasedService ? (
+              {/* Sélection du tarif si plusieurs disponibles */}
+              {availableTariffs.length > 1 && (
+                <div className="space-y-3">
+                  <Label>Choisissez votre formule</Label>
+                  <RadioGroup 
+                    value={selectedTariff?.id_tarif} 
+                    onValueChange={(value) => {
+                      const tariff = availableTariffs.find(t => t.id_tarif === value);
+                      if (tariff) setSelectedTariff(tariff);
+                    }}
+                  >
+                    {availableTariffs.map((tariff) => (
+                      <div key={tariff.id_tarif} className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                        <RadioGroupItem value={tariff.id_tarif} id={tariff.id_tarif} />
+                        <Label htmlFor={tariff.id_tarif} className="flex-1 cursor-pointer">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-semibold">{tariff.condition_tarif}</div>
+                              {tariff.periode_validite && (
+                                <div className="text-sm text-muted-foreground">
+                                  Validité: {tariff.periode_validite}
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-xl font-bold text-primary">
+                              {tariff.montant} {tariff.devise}
+                            </div>
+                          </div>
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+              )}
+
+              {selectedTariff && isPageBasedService ? (
                 <>
                   <Label htmlFor="pageCount">Nombre de pages *</Label>
                   <Input
@@ -384,17 +448,17 @@ export function ServiceRegistrationDialog({
                   <div className="bg-muted/50 p-4 rounded-lg">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Prix unitaire:</span>
-                      <span className="text-sm">{tariff.montant} {tariff.devise} / page</span>
+                      <span className="text-sm">{selectedTariff.montant} {selectedTariff.devise} / page</span>
                     </div>
                     <div className="flex justify-between items-center mt-2">
                       <span className="font-semibold">Total:</span>
                       <span className="text-lg font-bold text-primary">
-                        {tariff.montant * pageCount} {tariff.devise}
+                        {selectedTariff.montant * pageCount} {selectedTariff.devise}
                       </span>
                     </div>
                   </div>
                 </>
-              ) : (
+              ) : selectedTariff && !isPageBasedService && availableTariffs.length === 1 ? (
                 <>
                   <Label>Type d'abonnement</Label>
                   <RadioGroup value={subscriptionType} onValueChange={(value: any) => setSubscriptionType(value)}>
@@ -403,7 +467,7 @@ export function ServiceRegistrationDialog({
                       <Label htmlFor="monthly" className="flex-1 cursor-pointer">
                         <div className="font-semibold">Abonnement mensuel</div>
                         <div className="text-sm text-muted-foreground">
-                          {tariff.montant} {tariff.devise} / mois
+                          {selectedTariff.montant} {selectedTariff.devise} / mois
                         </div>
                       </Label>
                     </div>
@@ -412,7 +476,7 @@ export function ServiceRegistrationDialog({
                       <Label htmlFor="annual" className="flex-1 cursor-pointer">
                         <div className="font-semibold">Abonnement annuel</div>
                         <div className="text-sm text-muted-foreground">
-                          {tariff.montant * 12} {tariff.devise} / an (économisez 2 mois)
+                          {selectedTariff.montant * 12} {selectedTariff.devise} / an (économisez 2 mois)
                         </div>
                       </Label>
                     </div>
@@ -426,7 +490,7 @@ export function ServiceRegistrationDialog({
                     </p>
                   </div>
                 </>
-              )}
+              ) : null}
             </div>
           )}
 
@@ -450,16 +514,16 @@ export function ServiceRegistrationDialog({
       </DialogContent>
 
       {/* Dialogue de paiement */}
-      {tariff && (
+      {selectedTariff && (
         <PaymentDialog
           open={showPaymentDialog}
           onOpenChange={setShowPaymentDialog}
-          amount={isPageBasedService ? tariff.montant * pageCount : tariff.montant}
-          currency={tariff.devise}
+          amount={isPageBasedService ? selectedTariff.montant * pageCount : selectedTariff.montant}
+          currency={selectedTariff.devise}
           subscriptionType={subscriptionType}
           serviceName={service.nom_service}
           serviceId={service.id_service}
-          tariffId={tariff.id_tarif}
+          tariffId={selectedTariff.id_tarif}
           onPaymentSuccess={handlePaymentSuccess}
         />
       )}

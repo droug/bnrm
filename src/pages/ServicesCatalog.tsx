@@ -244,22 +244,24 @@ export default function ServicesCatalog() {
                             </div>
                           )}
                           
-                          {/* Afficher les tarifs associés */}
+                          {/* Afficher les tarifs disponibles comme options */}
                           {serviceTariffs.length > 0 && (
                             <div className="space-y-2 pt-2 border-t">
-                              <div className="font-semibold text-sm">Tarifs disponibles :</div>
+                              <div className="font-semibold text-sm">Formules disponibles :</div>
                               {serviceTariffs.map((tariff) => (
-                                <div key={tariff.id_tarif} className="flex items-center justify-between bg-muted p-2 rounded">
-                                  <div className="text-sm">
-                                    <div className="font-medium">{tariff.condition_tarif}</div>
-                                    {tariff.periode_validite && (
-                                      <div className="text-xs text-muted-foreground">
-                                        Validité: {tariff.periode_validite}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="text-lg font-bold text-primary">
-                                    {tariff.montant} {tariff.devise}
+                                <div key={tariff.id_tarif} className="bg-muted/30 p-3 rounded-lg">
+                                  <div className="flex items-center justify-between">
+                                    <div className="text-sm">
+                                      <div className="font-medium">{tariff.condition_tarif}</div>
+                                      {tariff.periode_validite && (
+                                        <div className="text-xs text-muted-foreground">
+                                          Validité: {tariff.periode_validite}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="text-lg font-bold text-primary">
+                                      {tariff.montant} {tariff.devise}
+                                    </div>
                                   </div>
                                 </div>
                               ))}
@@ -276,7 +278,7 @@ export default function ServicesCatalog() {
                           className="w-full mt-auto"
                           onClick={() => {
                             setSelectedServiceForRegistration(service);
-                            setSelectedTariffForRegistration(serviceTariffs[0] || null);
+                            setSelectedTariffForRegistration(null); // Ne pas présélectionner
                             setRegistrationDialogOpen(true);
                           }}
                         >
