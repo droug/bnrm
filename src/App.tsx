@@ -78,6 +78,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCanceled from "./pages/PaymentCanceled";
 import Wallet from "./pages/Wallet";
 import PaymentServices from "./pages/PaymentServices";
+import ServicesCatalog from "./pages/ServicesCatalog";
 
 
 const App = () => (
@@ -120,7 +121,7 @@ const App = () => (
             <Route path="/admin/bnrm-tariffs" element={<BNRMTariffsPage />} />
             <Route path="/admin/wysiwyg" element={<WysiwygPage />} />
         <Route path="/bnrm" element={<BNRMPortal />} />
-        <Route path="/services-tarifs" element={<BNRMPortal />} />
+        <Route path="/services-tarifs" element={<ServicesCatalog />} />
         <Route path="/admin/legal-deposit" element={<LegalDepositPage />} />
         <Route path="/admin/archiving" element={<ArchivingPage />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
