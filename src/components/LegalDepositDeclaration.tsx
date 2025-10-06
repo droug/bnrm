@@ -1535,18 +1535,23 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button variant="ghost" onClick={() => setCurrentStep("type_selection")}>
-            {language === 'ar' ? 'رجوع' : 'Retour'}
+          <Button variant="outline" onClick={onClose} className="text-red-600 hover:text-red-700">
+            {language === 'ar' ? 'إلغاء' : 'Annuler'}
           </Button>
-          <Button onClick={() => handleAuthentication("editor", {
-            name: "",
-            address: "",
-            phone: "",
-            email: "",
-            publicationDate: ""
-          })}>
-            {language === 'ar' ? 'متابعة' : 'Continuer'}
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={() => setCurrentStep("type_selection")}>
+              {language === 'ar' ? 'رجوع' : 'Retour'}
+            </Button>
+            <Button onClick={() => handleAuthentication("editor", {
+              name: "",
+              address: "",
+              phone: "",
+              email: "",
+              publicationDate: ""
+            })}>
+              {language === 'ar' ? 'متابعة' : 'Continuer'}
+            </Button>
+          </div>
         </CardFooter>
       </Card>
     );
@@ -1621,18 +1626,23 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           )}
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button variant="ghost" onClick={() => setCurrentStep(userType === "editor" ? "editor_auth" : "type_selection")}>
-            {language === 'ar' ? 'رجوع' : 'Retour'}
+          <Button variant="outline" onClick={onClose} className="text-red-600 hover:text-red-700">
+            {language === 'ar' ? 'إلغاء' : 'Annuler'}
           </Button>
-          <Button onClick={() => handleAuthentication("printer", {
-            name: "",
-            address: "",
-            phone: "",
-            email: "",
-            printRun: ""
-          })}>
-            {language === 'ar' ? 'متابعة' : 'Continuer'}
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={() => setCurrentStep(userType === "editor" ? "editor_auth" : "type_selection")}>
+              {language === 'ar' ? 'رجوع' : 'Retour'}
+            </Button>
+            <Button onClick={() => handleAuthentication("printer", {
+              name: "",
+              address: "",
+              phone: "",
+              email: "",
+              printRun: ""
+            })}>
+              {language === 'ar' ? 'متابعة' : 'Continuer'}
+            </Button>
+          </div>
         </CardFooter>
       </Card>
     );
@@ -1664,15 +1674,20 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
         </CardContent>
 
         <CardFooter className="flex justify-between">
-          <Button variant="ghost" onClick={() => setCurrentStep("printer_auth")}>
-            {language === 'ar' ? 'رجوع' : 'Retour'}
+          <Button variant="outline" onClick={onClose} className="text-red-600 hover:text-red-700">
+            {language === 'ar' ? 'إلغاء' : 'Annuler'}
           </Button>
-          <Button 
-            onClick={handleFormSubmit}
-            disabled={!acceptedPrivacy || !partnerConfirmed}
-          >
-            {language === 'ar' ? 'إرسال التصريح' : 'Soumettre la déclaration'}
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={() => setCurrentStep("printer_auth")}>
+              {language === 'ar' ? 'رجوع' : 'Retour'}
+            </Button>
+            <Button 
+              onClick={handleFormSubmit}
+              disabled={!acceptedPrivacy || !partnerConfirmed}
+            >
+              {language === 'ar' ? 'إرسال التصريح' : 'Soumettre la déclaration'}
+            </Button>
+          </div>
         </CardFooter>
       </Card>
     );
