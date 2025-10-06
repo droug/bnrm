@@ -292,36 +292,6 @@ const Index = () => {
 
                 {/* Grille de contenu avec mosaïques et tons neutres */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  
-                  {/* Carte Découvrir avec mosaïques zellige */}
-                  <Link to="/digital-library">
-                    <Card className="md:col-span-1 relative overflow-hidden group border-3 border-gold/40 shadow-mosaique hover:shadow-moroccan transition-all duration-700 cursor-pointer">
-                      <div 
-                        className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-700"
-                        style={{ backgroundImage: `url(${zelligePattern1})` }}
-                      ></div>
-                      <div className="absolute inset-0 bg-gradient-neutral opacity-85"></div>
-                      <CardContent className="p-8 h-[280px] flex flex-col justify-center items-center text-center space-y-4 relative z-10">
-                        <div className="relative">
-                          <div className="w-20 h-20 bg-gradient-mosaique rounded-3xl flex items-center justify-center mb-4 shadow-mosaique transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border-2 border-gold/20">
-                            <BookOpen className="h-10 w-10 text-primary" />
-                          </div>
-                          <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-pulse" />
-                        </div>
-                        <h3 className="text-xl font-moroccan font-bold text-foreground">
-                          {t('nav.discover')}
-                        </h3>
-                        <p className="text-muted-foreground font-elegant text-sm">
-                          Explorez l'histoire, les missions et les services de notre institution millénaire
-                        </p>
-                        <div className="flex space-x-2">
-                          {[...Array(5)].map((_, i) => (
-                            <div key={i} className="w-2 h-2 bg-gold/60 rounded-full animate-pulse border border-gold/30" style={{ animationDelay: `${i * 0.2}s` }}></div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
 
                   {/* Carte Actualités avec mosaïques subtiles */}
                   <Link to="/news">
