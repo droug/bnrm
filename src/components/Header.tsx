@@ -277,9 +277,9 @@ const Header = () => {
                     <div className="space-y-1">
                       <h4 className="text-xs font-bold text-primary mb-1 pb-1">{t('nav.practical.info')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/informations-pratiques" className="block p-2 text-xs hover:bg-primary/10 rounded">
+                        <Link to="/practical-info" className="block p-2 text-xs hover:bg-primary/10 rounded">
                           {t('nav.schedules.access')}
-                        </a>
+                        </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/services-tarifs" className="block p-2 text-xs hover:bg-primary/10 rounded">

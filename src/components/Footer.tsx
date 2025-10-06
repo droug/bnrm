@@ -60,7 +60,7 @@ const Footer = () => {
   const quickLinks = [
     { title: t('header.catalog'), href: "#catalogue" },
     { title: t('header.collections'), href: "#collections" },
-    { title: t('footer.hours'), href: "#horaires" },
+    { title: t('footer.hours'), href: "/practical-info" },
     { title: t('footer.about'), href: "#inscription" },
     { title: t('header.services'), href: "#depot-legal" },
     { title: t('footer.contact'), href: "#contact" }
