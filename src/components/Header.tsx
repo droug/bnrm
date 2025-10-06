@@ -282,9 +282,9 @@ const Header = () => {
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/services-tarifs" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <Link to="/services-tarifs" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.services.catalog')}
-                        </a>
+                        </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <Link to="/help" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">

@@ -1,0 +1,318 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Search, FileText, Printer, Users, BookOpen, DollarSign } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface BNRMService {
+  id_service: string;
+  categorie: string;
+  nom_service: string;
+  description: string | null;
+  public_cible: string | null;
+  reference_legale: string | null;
+}
+
+interface BNRMTariff {
+  id_tarif: string;
+  id_service: string;
+  montant: number;
+  devise: string;
+  condition_tarif: string | null;
+  periode_validite: string;
+  is_active: boolean | null;
+  bnrm_services?: {
+    nom_service: string;
+    categorie: string;
+  };
+}
+
+export default function ServicesCatalog() {
+  const [services, setServices] = useState<BNRMService[]>([]);
+  const [tariffs, setTariffs] = useState<BNRMTariff[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedService, setSelectedService] = useState<string>("all");
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch services
+      const { data: servicesData, error: servicesError } = await supabase
+        .from("bnrm_services")
+        .select("*")
+        .order("nom_service");
+
+      if (servicesError) throw servicesError;
+      setServices(servicesData || []);
+
+      // Fetch tariffs with service information
+      const { data: tariffsData, error: tariffsError } = await supabase
+        .from("bnrm_tarifs")
+        .select(`
+          *,
+          bnrm_services (
+            nom_service,
+            categorie
+          )
+        `)
+        .eq("is_active", true)
+        .order("montant");
+
+      if (tariffsError) throw tariffsError;
+      setTariffs(tariffsData || []);
+
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredServices = services.filter((service) => {
+    const matchesSearch = service.nom_service.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || service.categorie === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const filteredTariffs = tariffs.filter((tariff) => {
+    const matchesSearch = tariff.bnrm_services?.nom_service.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesService = selectedService === "all" || tariff.id_service === selectedService;
+    return matchesSearch && matchesService;
+  });
+
+  const getCategoryColor = (category: string) => {
+    const colors: Record<string, string> = {
+      "Dépôt légal": "bg-blue-100 text-blue-800",
+      "Reproduction": "bg-green-100 text-green-800",
+      "Recherche": "bg-purple-100 text-purple-800",
+      "Numérisation": "bg-orange-100 text-orange-800",
+      "Formation": "bg-pink-100 text-pink-800",
+    };
+    return colors[category] || "bg-gray-100 text-gray-800";
+  };
+
+  const getCategoryIcon = (category: string) => {
+    const icons: Record<string, any> = {
+      "Dépôt légal": FileText,
+      "Reproduction": Printer,
+      "Recherche": Search,
+      "Numérisation": BookOpen,
+      "Formation": Users,
+    };
+    const Icon = icons[category] || FileText;
+    return <Icon className="h-5 w-5" />;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="container mx-auto px-4 py-8">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold text-primary">Catalogue de Services et Tarifs</h1>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Découvrez l'ensemble des services proposés par la Bibliothèque Nationale du Royaume du Maroc et leurs tarifs associés.
+            </p>
+          </div>
+
+          {/* Search and Filters */}
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher un service..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {/* Tabs for Services and Tariffs */}
+          <Tabs defaultValue="services" className="w-full">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+              <TabsTrigger value="services">Services</TabsTrigger>
+              <TabsTrigger value="tarifs">Tarifs</TabsTrigger>
+            </TabsList>
+
+            {/* Services Tab */}
+            <TabsContent value="services" className="space-y-6 mt-6">
+              <div className="flex gap-4 items-center">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Catégorie" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les catégories</SelectItem>
+                    <SelectItem value="Dépôt légal">Dépôt légal</SelectItem>
+                    <SelectItem value="Reproduction">Reproduction</SelectItem>
+                    <SelectItem value="Recherche">Recherche</SelectItem>
+                    <SelectItem value="Numérisation">Numérisation</SelectItem>
+                    <SelectItem value="Formation">Formation</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredServices.map((service) => (
+                  <Card key={service.id_service} className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          {getCategoryIcon(service.categorie)}
+                          <CardTitle className="text-lg">{service.nom_service}</CardTitle>
+                        </div>
+                      </div>
+                      <Badge className={getCategoryColor(service.categorie)}>
+                        {service.categorie}
+                      </Badge>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {service.description && (
+                        <CardDescription className="text-sm">
+                          {service.description}
+                        </CardDescription>
+                      )}
+                      {service.public_cible && (
+                        <div className="text-sm">
+                          <span className="font-semibold">Public cible : </span>
+                          {service.public_cible}
+                        </div>
+                      )}
+                      {service.reference_legale && (
+                        <div className="text-xs text-muted-foreground">
+                          Référence légale : {service.reference_legale}
+                        </div>
+                      )}
+                      <Button 
+                        className="w-full"
+                        onClick={() => navigate("/auth")}
+                      >
+                        Inscription
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {filteredServices.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  Aucun service trouvé.
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Tariffs Tab */}
+            <TabsContent value="tarifs" className="space-y-6 mt-6">
+              <div className="flex gap-4 items-center">
+                <Select value={selectedService} onValueChange={setSelectedService}>
+                  <SelectTrigger className="w-[250px]">
+                    <SelectValue placeholder="Filtrer par service" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les services</SelectItem>
+                    {services.map((service) => (
+                      <SelectItem key={service.id_service} value={service.id_service}>
+                        {service.nom_service}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredTariffs.map((tariff) => (
+                  <Card key={tariff.id_tarif} className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <CardTitle className="text-lg">
+                        {tariff.bnrm_services?.nom_service || "Service non spécifié"}
+                      </CardTitle>
+                      {tariff.bnrm_services?.categorie && (
+                        <Badge className={getCategoryColor(tariff.bnrm_services.categorie)}>
+                          {tariff.bnrm_services.categorie}
+                        </Badge>
+                      )}
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-5 w-5 text-primary" />
+                        <span className="text-2xl font-bold text-primary">
+                          {tariff.montant} {tariff.devise}
+                        </span>
+                      </div>
+                      {tariff.condition_tarif && (
+                        <div className="text-sm">
+                          <span className="font-semibold">Conditions : </span>
+                          {tariff.condition_tarif}
+                        </div>
+                      )}
+                      {tariff.periode_validite && (
+                        <div className="text-xs text-muted-foreground">
+                          Période de validité : {tariff.periode_validite}
+                        </div>
+                      )}
+                      <Button 
+                        className="w-full"
+                        onClick={() => navigate("/auth")}
+                      >
+                        Inscription
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {filteredTariffs.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  Aucun tarif trouvé.
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
