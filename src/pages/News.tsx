@@ -1,11 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, User, ArrowRight, MessageSquare, Heart, Share2 } from "lucide-react";
+import { Calendar, Clock, User, ArrowRight, MessageSquare, Heart, Share2, ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useNavigate } from "react-router-dom";
 
 const News = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   const newsArticles = [
     {
@@ -89,6 +91,14 @@ const News = () => {
         {/* Content */}
         <div className="relative h-full container mx-auto px-4 flex items-center">
           <div className="max-w-3xl animate-fade-in">
+            <Button
+              variant="ghost"
+              onClick={() => navigate(-1)}
+              className="text-white hover:bg-white/10 mb-6 -ml-2"
+            >
+              <ArrowLeft className="mr-2 h-5 w-5" />
+              Retour
+            </Button>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center shadow-gold border border-white/20">
                 <MessageSquare className="h-6 w-6 text-white" />
