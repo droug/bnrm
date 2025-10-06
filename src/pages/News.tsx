@@ -1,13 +1,26 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, User, ArrowRight, MessageSquare, Heart, Share2, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, User, ArrowRight, MessageSquare, Heart, Share2, ArrowLeft, Mail, Loader2 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useNavigate } from "react-router-dom";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+const emailSchema = z.string().trim().email({ message: "Email invalide" }).max(255);
 
 const News = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const newsArticles = [
     {
@@ -73,6 +86,49 @@ const News = () => {
     { name: "Expositions", count: 1 }
   ];
 
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      emailSchema.parse(email);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer une adresse email valide",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('subscribe-newsletter', {
+        body: { email }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Inscription réussie !",
+        description: "Vous êtes maintenant abonné à la newsletter BNRM",
+      });
+      
+      setEmail("");
+      setIsNewsletterOpen(false);
+    } catch (error: any) {
+      console.error('Newsletter subscription error:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'inscription",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Banner */}
@@ -124,7 +180,12 @@ const News = () => {
                 Explorer les actualités
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button size="lg" variant="outline" className="bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm"
+                onClick={() => setIsNewsletterOpen(true)}
+              >
                 <MessageSquare className="mr-2 h-5 w-5" />
                 S'abonner à la newsletter
               </Button>
@@ -273,7 +334,11 @@ const News = () => {
                   <p className="text-primary-foreground/90 text-sm mb-4">
                     Recevez nos dernières actualités et événements directement dans votre boîte mail
                   </p>
-                  <Button variant="secondary" className="w-full">
+                  <Button 
+                    variant="secondary" 
+                    className="w-full"
+                    onClick={() => setIsNewsletterOpen(true)}
+                  >
                     S'abonner
                   </Button>
                 </CardContent>
@@ -305,6 +370,66 @@ const News = () => {
           </div>
         </div>
       </section>
+
+      {/* Newsletter Dialog */}
+      <Dialog open={isNewsletterOpen} onOpenChange={setIsNewsletterOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full mx-auto mb-4">
+              <Mail className="h-6 w-6 text-primary" />
+            </div>
+            <DialogTitle className="text-center text-2xl">Newsletter BNRM</DialogTitle>
+            <DialogDescription className="text-center">
+              Recevez nos dernières actualités, événements culturels et nouveautés directement dans votre boîte mail
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleNewsletterSubmit} className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="newsletter-email">Adresse email</Label>
+              <Input
+                id="newsletter-email"
+                type="email"
+                placeholder="votre.email@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isSubmitting}
+                className="w-full"
+              />
+            </div>
+            
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsNewsletterOpen(false)}
+                disabled={isSubmitting}
+                className="flex-1"
+              >
+                Annuler
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex-1"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Inscription...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="mr-2 h-4 w-4" />
+                    S'abonner
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
