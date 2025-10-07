@@ -268,6 +268,77 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Admin Quick Actions */}
+        <PermissionGuard permission="requests.manage">
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-4">Actions Administrateur</h2>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <Card className="border-orange-200 bg-orange-50/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Clock className="h-5 w-5 text-orange-600" />
+                    <span>Demandes d'accès</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Gérer les demandes d'accès en attente
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm text-muted-foreground">En attente</span>
+                    <Badge variant="outline" className="bg-orange-100 text-orange-700 border-orange-300">
+                      {stats.pendingRequests}
+                    </Badge>
+                  </div>
+                  <Button className="w-full" onClick={() => window.location.href = '/admin/access-requests'}>
+                    Gérer les demandes
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-blue-200 bg-blue-50/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Users className="h-5 w-5 text-blue-600" />
+                    <span>Gestion utilisateurs</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Administrer les comptes utilisateurs
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm text-muted-foreground">Total</span>
+                    <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300">
+                      {stats.totalUsers}
+                    </Badge>
+                  </div>
+                  <Button className="w-full" variant="outline" onClick={() => window.location.href = '/admin/users'}>
+                    Gérer les utilisateurs
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-purple-200 bg-purple-50/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Settings className="h-5 w-5 text-purple-600" />
+                    <span>Administration</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Accéder aux paramètres système
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="w-full" variant="outline" onClick={() => window.location.href = '/admin/settings'}>
+                    Paramètres admin
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </PermissionGuard>
       </main>
       </div>
     </WatermarkContainer>
