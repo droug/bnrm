@@ -42,6 +42,7 @@ interface NumberAttribution {
   metadata: {
     publication_title?: string;
     declarant_name?: string;
+    dl_number?: string;
     range_start?: string;
     range_end?: string;
     agency_response?: any;
@@ -99,7 +100,59 @@ export const BNRMNumberAttribution = () => {
         .eq("status", "validated")
         .order("created_at", { ascending: true });
 
-      setPendingRequests(requests || []);
+      // Mock pending requests if none exist
+      const mockRequests = requests && requests.length > 0 ? requests : [
+        {
+          id: 'mock-1',
+          deposit_number: 'DL-2025-000045',
+          deposit_type: 'monographie',
+          status: 'validated',
+          metadata: {
+            publication: {
+              title: 'Histoire du Maroc Contemporain',
+            },
+            declarant: {
+              name: 'Editions Al Manahil',
+              organization: 'Maison d\'édition'
+            }
+          },
+          updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: 'mock-2',
+          deposit_number: 'DL-2025-000046',
+          deposit_type: 'periodique',
+          status: 'validated',
+          metadata: {
+            publication: {
+              title: 'Revue Marocaine de Sciences Humaines',
+            },
+            declarant: {
+              name: 'Institut de Recherche CNRS',
+              organization: 'Institut de recherche'
+            }
+          },
+          updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: 'mock-3',
+          deposit_number: 'DL-2025-000047',
+          deposit_type: 'monographie',
+          status: 'validated',
+          metadata: {
+            publication: {
+              title: 'La Littérature Amazighe Moderne',
+            },
+            declarant: {
+              name: 'Dar Al Kitab',
+              organization: 'Editeur'
+            }
+          },
+          updated_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+        }
+      ];
+
+      setPendingRequests(mockRequests);
 
       // Mock data for attributions and ranges - in real app, these would come from respective tables
       setAttributions([
@@ -112,7 +165,8 @@ export const BNRMNumberAttribution = () => {
           status: 'attributed',
           metadata: {
             publication_title: 'Histoire du Maroc Moderne',
-            declarant_name: 'Editions Al Manahil'
+            declarant_name: 'Editions Al Manahil',
+            dl_number: 'DL-2025-000123'
           }
         },
         {
@@ -124,7 +178,21 @@ export const BNRMNumberAttribution = () => {
           status: 'confirmed',
           metadata: {
             publication_title: 'Revue Marocaine de Sciences',
-            declarant_name: 'Institut de Recherche'
+            declarant_name: 'Institut de Recherche',
+            dl_number: 'DL-2025-000124'
+          }
+        },
+        {
+          id: '3',
+          deposit_id: 'dep-003',
+          number_type: 'dl',
+          attributed_number: 'DL-2025-000125',
+          attribution_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'attributed',
+          metadata: {
+            publication_title: 'La Culture Berbère',
+            declarant_name: 'Dar Al Kitab',
+            dl_number: 'DL-2025-000125'
           }
         }
       ]);
@@ -615,17 +683,18 @@ export const BNRMNumberAttribution = () => {
             </CardHeader>
             <CardContent>
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Numéro attribué</TableHead>
-                    <TableHead>Publication</TableHead>
-                    <TableHead>Déclarant</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Numéro attribué</TableHead>
+                      <TableHead>N° DL</TableHead>
+                      <TableHead>Publication</TableHead>
+                      <TableHead>Déclarant</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Statut</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
                 <TableBody>
                   {attributions
                     .filter(attr => 
@@ -648,6 +717,9 @@ export const BNRMNumberAttribution = () => {
                           </TableCell>
                           <TableCell className="font-mono font-medium">
                             {attribution.attributed_number}
+                          </TableCell>
+                          <TableCell className="font-mono text-sm text-muted-foreground">
+                            {attribution.metadata.dl_number || '-'}
                           </TableCell>
                           <TableCell className="max-w-xs truncate">
                             {attribution.metadata.publication_title}
