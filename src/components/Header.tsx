@@ -29,7 +29,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isChatBotOpen, setIsChatBotOpen] = useState(false);
   const { language, setLanguage, t, isRTL } = useLanguage();
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const isHomePage = location.pathname === "/";
@@ -183,52 +183,64 @@ const Header = () => {
             
             {/* Utilisateur */}
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className={`gap-1 px-2 ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
-                    <User className="h-4 w-4" />
-                    <span className="hidden md:inline text-xs max-w-[80px] truncate">
-                      {profile?.first_name || 'Compte'}
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-background border border-primary/20 z-50">
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link to="/my-library-space" className="flex items-center gap-2">
-                      <BookOpen className="h-4 w-4" />
-                      Mon Espace
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link to="/wallet" className="flex items-center gap-2">
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                      </svg>
-                      e-Wallet
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link to="/profile" className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className={`gap-1 px-2 ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
                       <User className="h-4 w-4" />
-                      Mon Profil
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link to="/dashboard" className="flex items-center gap-2">
-                      <BookOpen className="h-4 w-4" />
-                      Tableau de bord
-                    </Link>
-                  </DropdownMenuItem>
-                  {(profile?.role === 'admin' || profile?.role === 'librarian') && (
+                      <span className="hidden md:inline text-xs max-w-[80px] truncate">
+                        {profile?.first_name || 'Compte'}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-background border border-primary/20 z-50">
                     <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link to="/admin/settings" className="flex items-center gap-2">
-                        <Shield className="h-4 w-4" />
-                        Administration
+                      <Link to="/my-library-space" className="flex items-center gap-2">
+                        <BookOpen className="h-4 w-4" />
+                        Mon Espace
                       </Link>
                     </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link to="/wallet" className="flex items-center gap-2">
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                        e-Wallet
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link to="/profile" className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Mon Profil
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link to="/dashboard" className="flex items-center gap-2">
+                        <BookOpen className="h-4 w-4" />
+                        Tableau de bord
+                      </Link>
+                    </DropdownMenuItem>
+                    {(profile?.role === 'admin' || profile?.role === 'librarian') && (
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link to="/admin/settings" className="flex items-center gap-2">
+                          <Shield className="h-4 w-4" />
+                          Administration
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={signOut}
+                  className={`px-2 ${isHomePage ? 'text-white hover:bg-white/20' : 'hover:bg-destructive/10 text-destructive'}`}
+                  title="Déconnexion"
+                >
+                  <LogIn className="h-4 w-4 rotate-180" />
+                </Button>
+              </div>
             ) : (
               <Link to="/auth">
                 <Button size="sm" className={`gap-1 px-3 ${isHomePage ? 'bg-white text-primary hover:bg-white/90' : ''}`}>
