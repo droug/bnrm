@@ -100,59 +100,7 @@ export const BNRMNumberAttribution = () => {
         .eq("status", "validated")
         .order("created_at", { ascending: true });
 
-      // Mock pending requests if none exist
-      const mockRequests = requests && requests.length > 0 ? requests : [
-        {
-          id: 'mock-1',
-          deposit_number: 'DL-2025-000045',
-          deposit_type: 'monographie',
-          status: 'validated',
-          metadata: {
-            publication: {
-              title: 'Histoire du Maroc Contemporain',
-            },
-            declarant: {
-              name: 'Editions Al Manahil',
-              organization: 'Maison d\'édition'
-            }
-          },
-          updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          id: 'mock-2',
-          deposit_number: 'DL-2025-000046',
-          deposit_type: 'periodique',
-          status: 'validated',
-          metadata: {
-            publication: {
-              title: 'Revue Marocaine de Sciences Humaines',
-            },
-            declarant: {
-              name: 'Institut de Recherche CNRS',
-              organization: 'Institut de recherche'
-            }
-          },
-          updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          id: 'mock-3',
-          deposit_number: 'DL-2025-000047',
-          deposit_type: 'monographie',
-          status: 'validated',
-          metadata: {
-            publication: {
-              title: 'La Littérature Amazighe Moderne',
-            },
-            declarant: {
-              name: 'Dar Al Kitab',
-              organization: 'Editeur'
-            }
-          },
-          updated_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
-        }
-      ];
-
-      setPendingRequests(mockRequests);
+      setPendingRequests(requests || []);
 
       // Mock data for attributions and ranges - in real app, these would come from respective tables
       setAttributions([
