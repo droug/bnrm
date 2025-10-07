@@ -14,6 +14,8 @@ import { Navigate } from "react-router-dom";
 import LegalDepositBackoffice from "@/components/LegalDepositBackoffice";
 import { AdminHeader } from "@/components/AdminHeader";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { NumberManagement } from "@/components/legal-deposit/NumberManagement";
 
 const LegalDepositPage = () => {
   console.log("LegalDepositPage component is rendering");
@@ -118,7 +120,20 @@ const LegalDepositPage = () => {
           </div>
 
           {/* Nouveau Backoffice Dépôt Légal conforme au CPS */}
-          <LegalDepositBackoffice />
+          <Tabs defaultValue="requests" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="requests">Demandes de dépôt</TabsTrigger>
+              <TabsTrigger value="numbers">Gestion des numéros</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="requests">
+              <LegalDepositBackoffice />
+            </TabsContent>
+
+            <TabsContent value="numbers">
+              <NumberManagement />
+            </TabsContent>
+          </Tabs>
         </main>
       </div>
     </WatermarkContainer>
