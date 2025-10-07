@@ -177,7 +177,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectContent className="bg-popover border shadow-lg">
                       <SelectItem value="physique">Personne physique</SelectItem>
                       <SelectItem value="morale">Personne morale (collectivités)</SelectItem>
                     </SelectContent>
@@ -233,7 +233,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectContent className="bg-popover border shadow-lg">
                       <SelectItem value="printed">Imprimé</SelectItem>
                       <SelectItem value="electronic">Électronique</SelectItem>
                     </SelectContent>
@@ -266,7 +266,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner la langue" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectContent className="bg-popover border shadow-lg">
                       <SelectItem value="ar">Arabe</SelectItem>
                       <SelectItem value="fr">Français</SelectItem>
                       <SelectItem value="en">Anglais</SelectItem>
@@ -291,7 +291,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectContent className="bg-popover border shadow-lg">
                       <SelectItem value="yes">Oui</SelectItem>
                       <SelectItem value="no">Non</SelectItem>
                     </SelectContent>
@@ -452,7 +452,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectContent className="bg-popover border shadow-lg">
                       <SelectItem value="printed">Imprimé</SelectItem>
                       <SelectItem value="electronic">Électronique</SelectItem>
                     </SelectContent>
@@ -475,7 +475,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner la périodicité" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectContent className="bg-popover border shadow-lg">
                       <SelectItem value="daily">Quotidien</SelectItem>
                       <SelectItem value="weekly">Hebdomadaire</SelectItem>
                       <SelectItem value="monthly">Mensuel</SelectItem>
@@ -491,7 +491,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner la langue" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectContent className="bg-popover border shadow-lg">
                       <SelectItem value="ar">Arabe</SelectItem>
                       <SelectItem value="fr">Français</SelectItem>
                       <SelectItem value="en">Anglais</SelectItem>
@@ -596,7 +596,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectContent className="bg-popover border shadow-lg">
                       <SelectItem value="physique">Personne physique</SelectItem>
                       <SelectItem value="morale">Personne morale (collectivités)</SelectItem>
                     </SelectContent>
@@ -652,7 +652,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectContent className="bg-popover border shadow-lg">
                       <SelectItem value="database">Base de données</SelectItem>
                       <SelectItem value="software">Logiciel</SelectItem>
                       <SelectItem value="audiovisual">Document audiovisuel</SelectItem>
@@ -666,7 +666,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner la langue" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectContent className="bg-popover border shadow-lg">
                       <SelectItem value="ar">Arabe</SelectItem>
                       <SelectItem value="fr">Français</SelectItem>
                       <SelectItem value="en">Anglais</SelectItem>
@@ -781,7 +781,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectContent className="bg-popover border shadow-lg">
                       <SelectItem value="physique">Personne physique</SelectItem>
                       <SelectItem value="morale">Personne morale (collectivités)</SelectItem>
                     </SelectContent>
@@ -847,7 +847,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner la langue" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectContent className="bg-popover border shadow-lg">
                       <SelectItem value="ar">Arabe</SelectItem>
                       <SelectItem value="fr">Français</SelectItem>
                       <SelectItem value="en">Anglais</SelectItem>
@@ -1123,7 +1123,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <SelectTrigger>
                 <SelectValue placeholder="اختر النوع" />
               </SelectTrigger>
-              <SelectContent className="bg-background border shadow-lg z-50">
+              <SelectContent className="bg-popover border shadow-lg">
                 <SelectItem value="physique">شخص مادي</SelectItem>
                 <SelectItem value="morale">شخص معنوي (هيئة)</SelectItem>
               </SelectContent>
@@ -1179,7 +1179,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <SelectTrigger>
                 <SelectValue placeholder="اختر نوع الحامل" />
               </SelectTrigger>
-              <SelectContent className="bg-background border shadow-lg z-50">
+              <SelectContent className="bg-popover border shadow-lg">
                 <SelectItem value="printed">مطبوع</SelectItem>
                 <SelectItem value="electronic">إلكتروني</SelectItem>
               </SelectContent>
@@ -1212,7 +1212,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <SelectTrigger>
                 <SelectValue placeholder="اختر اللغة" />
               </SelectTrigger>
-              <SelectContent className="bg-background border shadow-lg z-50">
+              <SelectContent className="bg-popover border shadow-lg">
                 <SelectItem value="ar">العربية</SelectItem>
                 <SelectItem value="fr">الفرنسية</SelectItem>
                 <SelectItem value="en">الإنجليزية</SelectItem>
@@ -1237,7 +1237,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <SelectTrigger>
                 <SelectValue placeholder="اختر" />
               </SelectTrigger>
-              <SelectContent className="bg-background border shadow-lg z-50">
+              <SelectContent className="bg-popover border shadow-lg">
                 <SelectItem value="yes">نعم</SelectItem>
                 <SelectItem value="no">لا</SelectItem>
               </SelectContent>
