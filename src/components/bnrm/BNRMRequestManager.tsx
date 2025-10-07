@@ -95,8 +95,168 @@ interface DepositForm {
 }
 
 export const BNRMRequestManager = () => {
-  const [requests, setRequests] = useState<DepositRequest[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [requests, setRequests] = useState<DepositRequest[]>([
+    {
+      id: "1",
+      deposit_number: "DL-2025-001234",
+      submitter_id: "user1",
+      deposit_type: 'monographie',
+      status: 'submitted',
+      submission_date: "2025-01-15T10:30:00Z",
+      metadata: {
+        declarant: {
+          name: "Ahmed Ben Ali",
+          type: 'editeur',
+          organization: "Éditions Al-Maarifa",
+          address: "45 Avenue Mohammed V, Rabat",
+          phone: "+212 5 37 12 34 56",
+          email: "a.benali@almaarifa.ma"
+        },
+        publication: {
+          title: "Histoire du Maroc Contemporain",
+          author: "Dr. Fatima Zahra El Mansouri",
+          isbn_issn: "978-9954-123-456-7",
+          publication_date: "2025-01-10",
+          language: "fr",
+          pages: 324,
+          format: "16x24 cm",
+          edition: "1ère édition"
+        }
+      },
+      created_at: "2025-01-15T10:30:00Z",
+      updated_at: "2025-01-15T10:30:00Z"
+    },
+    {
+      id: "2",
+      deposit_number: "DL-2025-001235",
+      submitter_id: "user2",
+      deposit_type: 'periodique',
+      status: 'validated',
+      submission_date: "2025-01-10T14:20:00Z",
+      metadata: {
+        declarant: {
+          name: "Société de Presse Maghreb",
+          type: 'editeur',
+          organization: "Maghreb Media Group",
+          address: "12 Rue des Journalistes, Casablanca",
+          phone: "+212 5 22 98 76 54",
+          email: "depot@maghrebmedia.ma"
+        },
+        publication: {
+          title: "Revue Économique Marocaine - Janvier 2025",
+          author: "Collectif",
+          isbn_issn: "ISSN 2345-6789",
+          publication_date: "2025-01-01",
+          language: "fr",
+          pages: 64,
+          format: "21x29.7 cm",
+          edition: "Vol. 12 N°1"
+        },
+        validation: {
+          validator_id: "admin1",
+          validation_date: "2025-01-12T09:15:00Z",
+          comments: "Dossier complet et conforme"
+        }
+      },
+      created_at: "2025-01-10T14:20:00Z",
+      updated_at: "2025-01-12T09:15:00Z"
+    },
+    {
+      id: "3",
+      deposit_number: "DL-2025-001236",
+      submitter_id: "user3",
+      deposit_type: 'monographie',
+      status: 'processed',
+      submission_date: "2025-01-05T11:00:00Z",
+      acknowledgment_date: "2025-01-18T16:30:00Z",
+      metadata: {
+        declarant: {
+          name: "Imprimerie Nationale",
+          type: 'imprimeur',
+          organization: "Imprimerie Nationale du Maroc",
+          address: "Avenue Annakhil, Hay Riad, Rabat",
+          phone: "+212 5 37 57 12 34",
+          email: "depot@imprimerienationale.ma"
+        },
+        publication: {
+          title: "Recueil des Textes Législatifs 2024",
+          author: "Royaume du Maroc",
+          publication_date: "2024-12-31",
+          language: "fr",
+          pages: 856,
+          format: "A4",
+          edition: "Édition officielle 2024"
+        },
+        validation: {
+          validator_id: "admin1",
+          validation_date: "2025-01-08T10:00:00Z",
+          comments: "Publication officielle validée"
+        }
+      },
+      created_at: "2025-01-05T11:00:00Z",
+      updated_at: "2025-01-18T16:30:00Z"
+    },
+    {
+      id: "4",
+      deposit_number: "DL-2025-001237",
+      submitter_id: "user4",
+      deposit_type: 'audiovisuel',
+      status: 'submitted',
+      submission_date: "2025-01-18T09:45:00Z",
+      metadata: {
+        declarant: {
+          name: "Productions Atlas Films",
+          type: 'editeur',
+          organization: "Atlas Films & Media",
+          address: "Zone Industrielle Ain Sebaâ, Casablanca",
+          phone: "+212 5 22 34 56 78",
+          email: "depot@atlasfilms.ma"
+        },
+        publication: {
+          title: "Documentaire: Patrimoine Architectural Marocain",
+          author: "Réalisé par Youssef Bennani",
+          publication_date: "2025-01-15",
+          language: "ar",
+          pages: 0,
+          format: "DVD - 90 minutes",
+          edition: "Version originale"
+        }
+      },
+      created_at: "2025-01-18T09:45:00Z",
+      updated_at: "2025-01-18T09:45:00Z"
+    },
+    {
+      id: "5",
+      deposit_number: "DL-2025-001238",
+      submitter_id: "user5",
+      deposit_type: 'numerique',
+      status: 'submitted',
+      submission_date: "2025-01-19T15:20:00Z",
+      metadata: {
+        declarant: {
+          name: "Hassan Tazi",
+          type: 'auteur',
+          organization: "Auteur indépendant",
+          address: "34 Rue Oued Souss, Agadir",
+          phone: "+212 6 12 34 56 78",
+          email: "h.tazi@email.ma"
+        },
+        publication: {
+          title: "Guide Numérique du Tourisme Durable au Maroc",
+          author: "Hassan Tazi",
+          isbn_issn: "978-9954-789-012-3",
+          publication_date: "2025-01-15",
+          language: "fr",
+          pages: 0,
+          format: "E-book PDF",
+          edition: "1ère édition numérique"
+        }
+      },
+      created_at: "2025-01-19T15:20:00Z",
+      updated_at: "2025-01-19T15:20:00Z"
+    }
+  ]);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
