@@ -38,7 +38,7 @@ interface DepositRequest {
   deposit_number?: string;
   submitter_id: string;
   deposit_type: 'monographie' | 'periodique' | 'audiovisuel' | 'numerique';
-  status: 'submitted' | 'validated' | 'rejected' | 'processed' | 'acknowledged';
+  status: 'brouillon' | 'soumis' | 'en_attente_validation_b' | 'valide_par_b' | 'rejete_par_b' | 'en_cours' | 'receptionne' | 'traite';
   submission_date: string;
   acknowledgment_date?: string;
   metadata: {
@@ -101,7 +101,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001234",
       submitter_id: "user1",
       deposit_type: 'monographie',
-      status: 'submitted',
+      status: 'soumis',
       submission_date: "2025-01-15T10:30:00Z",
       metadata: {
         declarant: {
@@ -131,7 +131,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001235",
       submitter_id: "user2",
       deposit_type: 'periodique',
-      status: 'validated',
+      status: 'valide_par_b',
       submission_date: "2025-01-10T14:20:00Z",
       metadata: {
         declarant: {
@@ -166,7 +166,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001236",
       submitter_id: "user3",
       deposit_type: 'monographie',
-      status: 'processed',
+      status: 'traite',
       submission_date: "2025-01-05T11:00:00Z",
       acknowledgment_date: "2025-01-18T16:30:00Z",
       metadata: {
@@ -201,7 +201,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001237",
       submitter_id: "user4",
       deposit_type: 'audiovisuel',
-      status: 'submitted',
+      status: 'soumis',
       submission_date: "2025-01-18T09:45:00Z",
       metadata: {
         declarant: {
@@ -230,7 +230,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001238",
       submitter_id: "user5",
       deposit_type: 'numerique',
-      status: 'submitted',
+      status: 'soumis',
       submission_date: "2025-01-19T15:20:00Z",
       metadata: {
         declarant: {
@@ -318,7 +318,7 @@ export const BNRMRequestManager = () => {
         .from("legal_deposits")
         .insert([{
           deposit_type: newRequestForm.deposit_type,
-          status: 'submitted',
+          status: 'brouillon',
           submitter_id: (await supabase.auth.getUser()).data.user?.id,
           content_id: crypto.randomUUID(),
           metadata: {
@@ -378,12 +378,12 @@ export const BNRMRequestManager = () => {
         updated_at: new Date().toISOString()
       };
       
-      if (newStatus === 'acknowledged') {
+      if (newStatus === 'receptionne') {
         updateData.acknowledgment_date = new Date().toISOString();
       }
 
       // Add validation metadata
-      if (comments || newStatus === 'validated' || newStatus === 'rejected') {
+      if (comments || newStatus === 'valide_par_b' || newStatus === 'rejete_par_b') {
         const currentRequest = requests.find(r => r.id === requestId);
         updateData.metadata = {
           ...currentRequest?.metadata,
@@ -391,7 +391,7 @@ export const BNRMRequestManager = () => {
             validator_id: (await supabase.auth.getUser()).data.user?.id,
             validation_date: new Date().toISOString(),
             comments: comments,
-            rejection_reason: newStatus === 'rejected' ? comments : undefined
+            rejection_reason: newStatus === 'rejete_par_b' ? comments : undefined
           }
         };
       }
@@ -420,14 +420,17 @@ export const BNRMRequestManager = () => {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      submitted: { color: "bg-blue-100 text-blue-800", label: "Soumis", icon: Clock },
-      validated: { color: "bg-yellow-100 text-yellow-800", label: "Validé", icon: CheckCircle },
-      processed: { color: "bg-green-100 text-green-800", label: "Traité", icon: CheckCircle },
-      acknowledged: { color: "bg-purple-100 text-purple-800", label: "Accusé", icon: CheckCircle },
-      rejected: { color: "bg-red-100 text-red-800", label: "Rejeté", icon: XCircle },
+      brouillon: { color: "bg-gray-100 text-gray-800", label: "Brouillon", icon: FileText },
+      soumis: { color: "bg-blue-100 text-blue-800", label: "Soumis", icon: Clock },
+      en_attente_validation_b: { color: "bg-orange-100 text-orange-800", label: "En attente", icon: Clock },
+      valide_par_b: { color: "bg-yellow-100 text-yellow-800", label: "Validé", icon: CheckCircle },
+      en_cours: { color: "bg-indigo-100 text-indigo-800", label: "En cours", icon: Clock },
+      receptionne: { color: "bg-purple-100 text-purple-800", label: "Réceptionné", icon: CheckCircle },
+      traite: { color: "bg-green-100 text-green-800", label: "Traité", icon: CheckCircle },
+      rejete_par_b: { color: "bg-red-100 text-red-800", label: "Rejeté", icon: XCircle },
     };
     
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.submitted;
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.brouillon;
     const Icon = config.icon;
     
     return (
@@ -768,11 +771,14 @@ export const BNRMRequestManager = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous les statuts</SelectItem>
-            <SelectItem value="submitted">Soumis</SelectItem>
-            <SelectItem value="validated">Validé</SelectItem>
-            <SelectItem value="processed">Traité</SelectItem>
-            <SelectItem value="acknowledged">Accusé</SelectItem>
-            <SelectItem value="rejected">Rejeté</SelectItem>
+            <SelectItem value="brouillon">Brouillon</SelectItem>
+            <SelectItem value="soumis">Soumis</SelectItem>
+            <SelectItem value="en_attente_validation_b">En attente</SelectItem>
+            <SelectItem value="valide_par_b">Validé</SelectItem>
+            <SelectItem value="en_cours">En cours</SelectItem>
+            <SelectItem value="receptionne">Réceptionné</SelectItem>
+            <SelectItem value="traite">Traité</SelectItem>
+            <SelectItem value="rejete_par_b">Rejeté</SelectItem>
           </SelectContent>
         </Select>
         
@@ -865,7 +871,7 @@ export const BNRMRequestManager = () => {
                             <Eye className="h-4 w-4" />
                           </Button>
                           
-                          {request.status === 'submitted' && (
+                          {request.status === 'soumis' && (
                             <>
                               <Button
                                 variant="ghost"
@@ -881,7 +887,7 @@ export const BNRMRequestManager = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => updateRequestStatus(request.id, 'rejected', 'Demande incomplète')}
+                                onClick={() => updateRequestStatus(request.id, 'rejete_par_b', 'Demande incomplète')}
                                 title="Rejeter"
                               >
                                 <XCircle className="h-4 w-4 text-red-600" />
@@ -1004,13 +1010,13 @@ export const BNRMRequestManager = () => {
                       </div>
                     )}
                     
-                    {selectedRequest.status === 'submitted' && (
+                    {selectedRequest.status === 'soumis' && (
                       <div className="space-y-4 pt-4 border-t">
                         <h4 className="font-semibold">Actions de validation</h4>
                         <div className="flex space-x-2">
                           <Button 
                             onClick={() => {
-                              updateRequestStatus(selectedRequest.id, 'validated');
+                              updateRequestStatus(selectedRequest.id, 'valide_par_b');
                               setIsDetailsOpen(false);
                             }}
                             className="bg-green-600 hover:bg-green-700"
@@ -1021,7 +1027,7 @@ export const BNRMRequestManager = () => {
                           <Button 
                             variant="destructive"
                             onClick={() => {
-                              updateRequestStatus(selectedRequest.id, 'rejected', 'Demande incomplète');
+                              updateRequestStatus(selectedRequest.id, 'rejete_par_b', 'Demande incomplète');
                               setIsDetailsOpen(false);
                             }}
                           >
@@ -1054,9 +1060,9 @@ export const BNRMRequestManager = () => {
                         </div>
                       </div>
                       
-                      <div className={`flex items-center space-x-3 ${selectedRequest.status === 'validated' || selectedRequest.status === 'processed' || selectedRequest.status === 'acknowledged' ? '' : 'opacity-50'}`}>
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${selectedRequest.status === 'validated' || selectedRequest.status === 'processed' || selectedRequest.status === 'acknowledged' ? 'bg-green-500' : 'bg-gray-300'}`}>
-                          {selectedRequest.status === 'validated' || selectedRequest.status === 'processed' || selectedRequest.status === 'acknowledged' ? (
+                      <div className={`flex items-center space-x-3 ${selectedRequest.status === 'valide_par_b' || selectedRequest.status === 'en_cours' || selectedRequest.status === 'traite' || selectedRequest.status === 'receptionne' ? '' : 'opacity-50'}`}>
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${selectedRequest.status === 'valide_par_b' || selectedRequest.status === 'en_cours' || selectedRequest.status === 'traite' || selectedRequest.status === 'receptionne' ? 'bg-green-500' : 'bg-gray-300'}`}>
+                          {selectedRequest.status === 'valide_par_b' || selectedRequest.status === 'en_cours' || selectedRequest.status === 'traite' || selectedRequest.status === 'receptionne' ? (
                             <CheckCircle className="w-3 h-3 text-white" />
                           ) : (
                             <Clock className="w-3 h-3 text-gray-600" />
@@ -1073,9 +1079,9 @@ export const BNRMRequestManager = () => {
                         </div>
                       </div>
                       
-                      <div className={`flex items-center space-x-3 ${selectedRequest.status === 'processed' || selectedRequest.status === 'acknowledged' ? '' : 'opacity-50'}`}>
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${selectedRequest.status === 'processed' || selectedRequest.status === 'acknowledged' ? 'bg-green-500' : 'bg-gray-300'}`}>
-                          {selectedRequest.status === 'processed' || selectedRequest.status === 'acknowledged' ? (
+                      <div className={`flex items-center space-x-3 ${selectedRequest.status === 'en_cours' || selectedRequest.status === 'traite' || selectedRequest.status === 'receptionne' ? '' : 'opacity-50'}`}>
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${selectedRequest.status === 'en_cours' || selectedRequest.status === 'traite' || selectedRequest.status === 'receptionne' ? 'bg-green-500' : 'bg-gray-300'}`}>
+                          {selectedRequest.status === 'en_cours' || selectedRequest.status === 'traite' || selectedRequest.status === 'receptionne' ? (
                             <CheckCircle className="w-3 h-3 text-white" />
                           ) : (
                             <Clock className="w-3 h-3 text-gray-600" />
@@ -1087,9 +1093,9 @@ export const BNRMRequestManager = () => {
                         </div>
                       </div>
                       
-                      <div className={`flex items-center space-x-3 ${selectedRequest.status === 'acknowledged' ? '' : 'opacity-50'}`}>
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${selectedRequest.status === 'acknowledged' ? 'bg-green-500' : 'bg-gray-300'}`}>
-                          {selectedRequest.status === 'acknowledged' ? (
+                      <div className={`flex items-center space-x-3 ${selectedRequest.status === 'receptionne' ? '' : 'opacity-50'}`}>
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${selectedRequest.status === 'receptionne' ? 'bg-green-500' : 'bg-gray-300'}`}>
+                          {selectedRequest.status === 'receptionne' ? (
                             <CheckCircle className="w-3 h-3 text-white" />
                           ) : (
                             <Clock className="w-3 h-3 text-gray-600" />

@@ -97,7 +97,7 @@ export const BNRMNumberAttribution = () => {
       const { data: requests } = await supabase
         .from("legal_deposits")
         .select("*")
-        .eq("status", "validated")
+        .eq("status", "valide_par_b")
         .order("created_at", { ascending: true });
 
       setPendingRequests(requests || []);
