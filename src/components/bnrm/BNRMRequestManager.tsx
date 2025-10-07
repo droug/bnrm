@@ -1094,9 +1094,16 @@ export const BNRMRequestManager = () => {
                       </div>
                     )}
                     
+                    {selectedRequest.status && (
+                      <>
+                        {console.log('Status de la demande:', selectedRequest.status)}
+                        {console.log('Afficher les boutons?', selectedRequest.status === 'soumis' || selectedRequest.status === 'en_attente_validation_b')}
+                      </>
+                    )}
+                    
                     {(selectedRequest.status === 'soumis' || selectedRequest.status === 'en_attente_validation_b') && (
-                      <div className="space-y-4 pt-4 border-t">
-                        <h4 className="font-semibold">Actions de validation</h4>
+                      <div className="space-y-4 pt-4 border-t mt-4">
+                        <h4 className="font-semibold text-lg">Actions de validation</h4>
                         <div className="space-y-2">
                           <Label htmlFor="validation-comments">Commentaire (optionnel)</Label>
                           <Textarea 
@@ -1107,7 +1114,7 @@ export const BNRMRequestManager = () => {
                             className="min-h-[100px]"
                           />
                         </div>
-                        <div className="flex space-x-2">
+                        <div className="flex gap-3">
                           <Button 
                             onClick={() => {
                               updateRequestStatus(selectedRequest.id, 'valide_par_b', validationComments);
