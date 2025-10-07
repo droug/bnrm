@@ -227,13 +227,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input placeholder="Titre de l'ouvrage" />
                 </div>
 
-                <div className="space-y-2 relative">
+                <div className="space-y-2">
                   <Label>Type de support</Label>
                   <Select>
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
-                    <SelectContent className="z-[100]">
+                    <SelectContent>
                       <SelectItem value="printed">Imprimé</SelectItem>
                       <SelectItem value="electronic">Électronique</SelectItem>
                     </SelectContent>
@@ -260,13 +260,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input placeholder="Mots clés" />
                 </div>
 
-                <div className="space-y-2 relative">
+                <div className="space-y-2">
                   <Label>Langue</Label>
                   <Select>
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner la langue" />
                     </SelectTrigger>
-                    <SelectContent className="z-[100]">
+                    <SelectContent>
                       <SelectItem value="ar">Arabe</SelectItem>
                       <SelectItem value="fr">Français</SelectItem>
                       <SelectItem value="en">Anglais</SelectItem>
@@ -285,13 +285,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input type="number" placeholder="Nombre de pages" />
                 </div>
 
-                <div className="space-y-2 relative">
+                <div className="space-y-2">
                   <Label>Première demande d'ISBN</Label>
                   <Select>
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner" />
                     </SelectTrigger>
-                    <SelectContent className="z-[100]">
+                    <SelectContent>
                       <SelectItem value="yes">Oui</SelectItem>
                       <SelectItem value="no">Non</SelectItem>
                     </SelectContent>
@@ -446,13 +446,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input placeholder="Titre du périodique" />
                 </div>
 
-                <div className="space-y-2 relative">
+                <div className="space-y-2">
                   <Label>Type de support</Label>
                   <Select>
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
-                    <SelectContent className="z-[100]">
+                    <SelectContent>
                       <SelectItem value="printed">Imprimé</SelectItem>
                       <SelectItem value="electronic">Électronique</SelectItem>
                     </SelectContent>
@@ -469,13 +469,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input placeholder="Numéro du fascicule" />
                 </div>
 
-                <div className="space-y-2 relative">
+                <div className="space-y-2">
                   <Label>Périodicité</Label>
                   <Select>
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner la périodicité" />
                     </SelectTrigger>
-                    <SelectContent className="z-[100]">
+                    <SelectContent>
                       <SelectItem value="daily">Quotidien</SelectItem>
                       <SelectItem value="weekly">Hebdomadaire</SelectItem>
                       <SelectItem value="monthly">Mensuel</SelectItem>
@@ -485,13 +485,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   </Select>
                 </div>
 
-                <div className="space-y-2 relative">
+                <div className="space-y-2">
                   <Label>Langue</Label>
                   <Select>
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner la langue" />
                     </SelectTrigger>
-                    <SelectContent className="z-[100]">
+                    <SelectContent>
                       <SelectItem value="ar">Arabe</SelectItem>
                       <SelectItem value="fr">Français</SelectItem>
                       <SelectItem value="en">Anglais</SelectItem>
