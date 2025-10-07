@@ -31,7 +31,7 @@ export function AdminHeader({
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/dashboard')}
             className="flex items-center space-x-2 hover:bg-accent transition-all duration-300"
           >
             <ArrowLeft className="h-4 w-4" />
