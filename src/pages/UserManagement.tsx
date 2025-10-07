@@ -86,6 +86,13 @@ const ROLE_PERMISSIONS = {
     maxRequests: 200,
     accessLevel: 'institutional'
   },
+  producer: {
+    name: 'Producteur',
+    permissions: ['Dépôt légal productions', 'Gestion catalogue productions', 'Services dédiés'],
+    description: 'Accès pour les producteurs de contenus éditoriaux',
+    maxRequests: 150,
+    accessLevel: 'professional'
+  },
   librarian: {
     name: 'Bibliothécaire',
     permissions: ['Gestion des manuscrits', 'Approbation des demandes', 'Gestion des collections'],
