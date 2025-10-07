@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -100,6 +101,7 @@ export default function BNRMEditorialMonitoring() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [confirmRejectOpen, setConfirmRejectOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<EditorialMonitoringItem | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
 
@@ -497,9 +499,17 @@ export default function BNRMEditorialMonitoring() {
     ));
   };
 
-  const handleReject = () => {
-    if (!selectedItem || !rejectionReason.trim()) {
+  const handleRejectClick = () => {
+    if (!rejectionReason.trim()) {
       toast.error("Veuillez saisir un motif de rejet");
+      return;
+    }
+    // Ouvrir la fenêtre de confirmation
+    setConfirmRejectOpen(true);
+  };
+
+  const handleRejectConfirm = () => {
+    if (!selectedItem || !rejectionReason.trim()) {
       return;
     }
 
@@ -511,6 +521,7 @@ export default function BNRMEditorialMonitoring() {
         : i
     ));
     
+    setConfirmRejectOpen(false);
     setRejectDialogOpen(false);
     setRejectionReason("");
     setSelectedItem(null);
@@ -916,16 +927,58 @@ export default function BNRMEditorialMonitoring() {
               </Button>
               <Button
                 variant="destructive"
-                onClick={handleReject}
+                onClick={handleRejectClick}
                 disabled={!rejectionReason.trim()}
               >
                 <XCircle className="h-4 w-4 mr-2" />
-                Confirmer le rejet
+                Rejeter la demande
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Confirmation Alert Dialog */}
+      <AlertDialog open={confirmRejectOpen} onOpenChange={setConfirmRejectOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-destructive" />
+              Confirmer le rejet de la demande
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>
+                Êtes-vous sûr de vouloir rejeter définitivement cette demande de dépôt légal ?
+              </p>
+              {selectedItem && (
+                <div className="bg-muted rounded-lg p-3 space-y-1">
+                  <div className="text-sm">
+                    <span className="font-semibold">N° DL:</span> {selectedItem.dlNumber}
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-semibold">Titre:</span> {selectedItem.title}
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-semibold">Éditeur:</span> {selectedItem.publisher}
+                  </div>
+                </div>
+              )}
+              <p className="text-destructive font-semibold">
+                Cette action générera automatiquement une lettre de rejet officielle et ne pourra pas être annulée.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleRejectConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Confirmer le rejet
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
