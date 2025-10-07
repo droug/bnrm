@@ -291,7 +291,10 @@ export default function Dashboard() {
                       {stats.pendingRequests}
                     </Badge>
                   </div>
-                  <Button className="w-full" onClick={() => window.location.href = '/admin/access-requests'}>
+                  <Button 
+                    className="w-full bg-orange-600 hover:bg-orange-700 text-white" 
+                    onClick={() => window.location.href = '/admin/access-requests'}
+                  >
                     Gérer les demandes
                   </Button>
                 </CardContent>
