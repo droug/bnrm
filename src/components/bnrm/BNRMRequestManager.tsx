@@ -131,7 +131,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001235",
       submitter_id: "user2",
       deposit_type: 'periodique',
-      status: 'valide_par_b',
+      status: 'soumis',
       submission_date: "2025-01-10T14:20:00Z",
       metadata: {
         declarant: {
@@ -151,22 +151,17 @@ export const BNRMRequestManager = () => {
           pages: 64,
           format: "21x29.7 cm",
           edition: "Vol. 12 N°1"
-        },
-        validation: {
-          validator_id: "admin1",
-          validation_date: "2025-01-12T09:15:00Z",
-          comments: "Dossier complet et conforme"
         }
       },
       created_at: "2025-01-10T14:20:00Z",
-      updated_at: "2025-01-12T09:15:00Z"
+      updated_at: "2025-01-10T14:20:00Z"
     },
     {
       id: "3",
       deposit_number: "DL-2025-001236",
       submitter_id: "user3",
       deposit_type: 'monographie',
-      status: 'traite',
+      status: 'valide_par_b',
       submission_date: "2025-01-05T11:00:00Z",
       acknowledgment_date: "2025-01-18T16:30:00Z",
       metadata: {
@@ -254,6 +249,94 @@ export const BNRMRequestManager = () => {
       },
       created_at: "2025-01-19T15:20:00Z",
       updated_at: "2025-01-19T15:20:00Z"
+    },
+    {
+      id: "6",
+      deposit_number: "DL-2025-001239",
+      submitter_id: "user6",
+      deposit_type: 'monographie',
+      status: 'soumis',
+      submission_date: "2025-01-20T08:15:00Z",
+      metadata: {
+        declarant: {
+          name: "Laila Benjelloun",
+          type: 'editeur',
+          organization: "Éditions Toubkal",
+          address: "23 Rue Tarik Ibn Ziad, Casablanca",
+          phone: "+212 5 22 44 55 66",
+          email: "contact@editionstoubkal.ma"
+        },
+        publication: {
+          title: "Poésie Contemporaine Marocaine",
+          author: "Anthologie dirigée par Abdellatif Laâbi",
+          publication_date: "2025-01-18",
+          language: "ar",
+          pages: 256,
+          format: "14x21 cm",
+          edition: "1ère édition"
+        }
+      },
+      created_at: "2025-01-20T08:15:00Z",
+      updated_at: "2025-01-20T08:15:00Z"
+    },
+    {
+      id: "7",
+      deposit_number: "DL-2025-001240",
+      submitter_id: "user7",
+      deposit_type: 'periodique',
+      status: 'soumis',
+      submission_date: "2025-01-20T11:30:00Z",
+      metadata: {
+        declarant: {
+          name: "Mohamed Rachidi",
+          type: 'editeur',
+          organization: "Magazine Sciences & Vie Maroc",
+          address: "15 Boulevard Zerktouni, Casablanca",
+          phone: "+212 5 22 77 88 99",
+          email: "redaction@sciencesvie.ma"
+        },
+        publication: {
+          title: "Sciences & Vie Maroc - Février 2025",
+          author: "Équipe de rédaction",
+          isbn_issn: "ISSN 2458-7890",
+          publication_date: "2025-02-01",
+          language: "fr",
+          pages: 98,
+          format: "20x27 cm",
+          edition: "N° 145"
+        }
+      },
+      created_at: "2025-01-20T11:30:00Z",
+      updated_at: "2025-01-20T11:30:00Z"
+    },
+    {
+      id: "8",
+      deposit_number: "DL-2025-001241",
+      submitter_id: "user8",
+      deposit_type: 'monographie',
+      status: 'soumis',
+      submission_date: "2025-01-20T14:45:00Z",
+      metadata: {
+        declarant: {
+          name: "Karim El Fassi",
+          type: 'auteur',
+          organization: "Auto-édition",
+          address: "78 Rue des FAR, Rabat",
+          phone: "+212 6 61 23 45 67",
+          email: "k.elfassi@gmail.com"
+        },
+        publication: {
+          title: "L'Architecture Traditionnelle de Fès",
+          author: "Karim El Fassi",
+          publication_date: "2025-01-15",
+          language: "fr",
+          pages: 412,
+          format: "21x29.7 cm",
+          edition: "1ère édition"
+        }
+      },
+      created_at: "2025-01-20T14:45:00Z",
+      updated_at: "2025-01-20T14:45:00Z"
     }
   ]);
   const [loading, setLoading] = useState(false);
