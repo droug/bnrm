@@ -31,3 +31,6 @@ verify_jwt = false
 
 [functions.send-service-registration-email]
 verify_jwt = false
+
+[functions.auto-translate-content]
+verify_jwt = true
