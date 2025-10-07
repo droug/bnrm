@@ -29,7 +29,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isChatBotOpen, setIsChatBotOpen] = useState(false);
   const { language, setLanguage, t, isRTL } = useLanguage();
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const isHomePage = location.pathname === "/";
@@ -227,6 +227,13 @@ const Header = () => {
                       </Link>
                     </DropdownMenuItem>
                   )}
+                  <DropdownMenuItem 
+                    onClick={signOut}
+                    className="cursor-pointer text-destructive hover:text-destructive"
+                  >
+                    <LogIn className="h-4 w-4 mr-2 rotate-180" />
+                    Déconnexion
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
