@@ -500,19 +500,24 @@ export default function BNRMEditorialMonitoring() {
   };
 
   const handleRejectClick = () => {
+    console.log("handleRejectClick appelé, raison:", rejectionReason);
     if (!rejectionReason.trim()) {
       toast.error("Veuillez saisir un motif de rejet");
       return;
     }
     // Ouvrir la fenêtre de confirmation
+    console.log("Ouverture de la confirmation");
     setConfirmRejectOpen(true);
   };
 
   const handleRejectConfirm = () => {
+    console.log("handleRejectConfirm appelé");
     if (!selectedItem || !rejectionReason.trim()) {
+      console.log("Erreur: item ou raison manquant");
       return;
     }
 
+    console.log("Génération de la lettre de rejet pour:", selectedItem.dlNumber);
     generateRejectionLetter(selectedItem, rejectionReason);
     
     setItems(items.map(i => 
@@ -801,8 +806,10 @@ export default function BNRMEditorialMonitoring() {
                                 variant="outline"
                                 className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
                                 onClick={() => {
+                                  console.log("Bouton Rejeter cliqué pour:", item);
                                   setSelectedItem(item);
                                   setRejectDialogOpen(true);
+                                  console.log("Dialog ouvert:", true);
                                 }}
                               >
                                 <XCircle className="h-3 w-3 mr-1" />
@@ -871,7 +878,10 @@ export default function BNRMEditorialMonitoring() {
       </Tabs>
 
       {/* Rejection Dialog */}
-      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+      <Dialog open={rejectDialogOpen} onOpenChange={(open) => {
+        console.log("Dialog state change:", open);
+        setRejectDialogOpen(open);
+      }}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Rejeter la demande de dépôt légal</DialogTitle>
