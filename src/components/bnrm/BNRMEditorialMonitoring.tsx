@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Mail, FileText, Calendar, Send, Settings, AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
+import { Bell, Mail, FileText, Calendar, Send, Settings, AlertCircle, CheckCircle, Clock, XCircle, X } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from 'jspdf';
 import logoOfficiel from "@/assets/logo-bnrm-officiel.png";
@@ -27,6 +27,7 @@ interface EditorialMonitoringItem {
   lastAction: string;
   nextAction: string;
   nextActionDate: string;
+  rejectionReason?: string;
 }
 
 interface NotificationSettings {
@@ -98,6 +99,9 @@ export default function BNRMEditorialMonitoring() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<EditorialMonitoringItem | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -293,6 +297,195 @@ export default function BNRMEditorialMonitoring() {
     toast.success("Lettre de réclamation générée avec succès");
   };
 
+  const generateRejectionLetter = (item: EditorialMonitoringItem, reason: string) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // En-tête avec logo officiel centré
+    const logoWidth = 180;
+    const logoHeight = 25;
+    const logoX = (pageWidth - logoWidth) / 2;
+    doc.addImage(logoOfficiel, 'PNG', logoX, 10, logoWidth, logoHeight);
+
+    // Ligne de séparation décorative
+    doc.setDrawColor(139, 0, 0);
+    doc.setLineWidth(0.5);
+    doc.line(15, 40, pageWidth - 15, 40);
+
+    // Informations de l'expéditeur
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(60, 60, 60);
+    doc.text("Royaume du Maroc", 15, 50);
+    doc.text("Ministère de la Jeunesse, de la Culture", 15, 55);
+    doc.text("et de la Communication", 15, 60);
+    doc.text("Département de la Culture", 15, 65);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 51, 102);
+    doc.text("Bibliothèque Nationale du Royaume du Maroc", 15, 72);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(60, 60, 60);
+    doc.text("Avenue Ibn Battouta, BP 1003", 15, 77);
+    doc.text("Rabat - Agdal, Maroc", 15, 82);
+    doc.text("Tél: +212 (0)5 37 77 18 74", 15, 87);
+
+    // Date et référence
+    const today = new Date().toLocaleDateString('fr-FR', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(60, 60, 60);
+    doc.text(`Rabat, le ${today}`, pageWidth - 15, 50, { align: 'right' });
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(139, 0, 0);
+    doc.text(`Réf: BNRM/ABN/DL/${item.dlNumber}`, pageWidth - 15, 58, { align: 'right' });
+
+    // Cadre pour le destinataire
+    doc.setDrawColor(200, 200, 200);
+    doc.setFillColor(248, 248, 248);
+    doc.roundedRect(15, 95, 90, 25, 2, 2, 'FD');
+    
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'italic');
+    doc.setTextColor(100, 100, 100);
+    doc.text("À l'attention de", 20, 102);
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(item.publisher, 20, 108);
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(60, 60, 60);
+    doc.text(`Concernant: "${item.title}"`, 20, 114);
+
+    // Objet de la lettre - encadré
+    doc.setDrawColor(139, 0, 0);
+    doc.setLineWidth(0.3);
+    doc.line(15, 130, pageWidth - 15, 130);
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(139, 0, 0);
+    doc.text("OBJET : REJET DE LA DEMANDE DE DÉPÔT LÉGAL", pageWidth / 2, 138, { align: 'center' });
+    doc.line(15, 143, pageWidth - 15, 143);
+
+    // Corps de la lettre
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(40, 40, 40);
+    
+    let yPos = 155;
+    const lineHeight = 6;
+    const marginLeft = 15;
+    const marginRight = 15;
+    const maxWidth = pageWidth - marginLeft - marginRight;
+
+    // Salutation
+    doc.text("Madame, Monsieur,", marginLeft, yPos);
+    yPos += lineHeight * 1.5;
+
+    // Paragraphe 1 - Accusé de réception
+    const para1 = `Nous accusons réception de votre demande de dépôt légal portant le numéro ${item.dlNumber}, concernant l'ouvrage intitulé "${item.title}" de ${item.author}, reçue en date du ${new Date(item.attributionDate).toLocaleDateString('fr-FR')}.`;
+    const para1Lines = doc.splitTextToSize(para1, maxWidth);
+    doc.text(para1Lines, marginLeft, yPos);
+    yPos += para1Lines.length * lineHeight + 4;
+
+    // Paragraphe 2 - Analyse et décision
+    const para2 = "Après examen attentif de votre demande par nos services compétents, nous avons le regret de vous informer que celle-ci ne peut être validée pour les raisons suivantes :";
+    const para2Lines = doc.splitTextToSize(para2, maxWidth);
+    doc.text(para2Lines, marginLeft, yPos);
+    yPos += para2Lines.length * lineHeight + 4;
+
+    // Encadré avec motif de rejet
+    doc.setFillColor(255, 240, 240);
+    doc.setDrawColor(220, 53, 69);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(marginLeft, yPos - 2, maxWidth, 25, 2, 2, 'FD');
+    
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(139, 0, 0);
+    doc.setFontSize(9);
+    doc.text("MOTIF(S) DE REJET :", marginLeft + 2, yPos + 4);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(60, 60, 60);
+    const reasonLines = doc.splitTextToSize(reason, maxWidth - 4);
+    doc.text(reasonLines, marginLeft + 2, yPos + 10);
+    yPos += 29;
+
+    // Paragraphe 3 - Conformité légale
+    doc.setFontSize(10);
+    doc.setTextColor(40, 40, 40);
+    const para3 = "Cette décision a été prise en conformité avec les dispositions de la loi n° 67-99 relative au dépôt légal et de ses textes d'application, notamment les articles régissant les conditions et critères d'attribution du numéro de dépôt légal.";
+    const para3Lines = doc.splitTextToSize(para3, maxWidth);
+    doc.text(para3Lines, marginLeft, yPos);
+    yPos += para3Lines.length * lineHeight + 6;
+
+    // Encadré avec recours possible
+    doc.setFillColor(240, 248, 255);
+    doc.setDrawColor(0, 123, 255);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(marginLeft, yPos - 2, maxWidth, 22, 2, 2, 'FD');
+    
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 51, 102);
+    doc.setFontSize(9);
+    doc.text("POSSIBILITÉ DE RECOURS :", marginLeft + 2, yPos + 4);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(40, 40, 40);
+    const recours = "Vous disposez d'un délai de 30 jours à compter de la réception de cette lettre pour soumettre une nouvelle demande rectifiée, accompagnée des documents et justificatifs requis.";
+    const recoursLines = doc.splitTextToSize(recours, maxWidth - 4);
+    doc.text(recoursLines, marginLeft + 2, yPos + 10);
+    yPos += 26;
+
+    // Paragraphe 4 - Assistance
+    const para4 = "Nos services restent à votre disposition pour toute information complémentaire ou assistance dans la préparation d'une nouvelle demande conforme aux exigences réglementaires.";
+    const para4Lines = doc.splitTextToSize(para4, maxWidth);
+    doc.text(para4Lines, marginLeft, yPos);
+    yPos += para4Lines.length * lineHeight + 6;
+
+    // Formule de politesse
+    const closing = "Nous vous prions d'agréer, Madame, Monsieur, l'expression de nos salutations distinguées.";
+    const closingLines = doc.splitTextToSize(closing, maxWidth);
+    doc.text(closingLines, marginLeft, yPos);
+    yPos += closingLines.length * lineHeight + 10;
+
+    // Signature
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(0, 51, 102);
+    doc.text("Le Chef du Département", pageWidth - 15, yPos, { align: 'right' });
+    doc.text("Agence Bibliographique Nationale", pageWidth - 15, yPos + 6, { align: 'right' });
+    
+    // Cachet (simulé)
+    doc.setDrawColor(0, 51, 102);
+    doc.setLineWidth(0.5);
+    doc.circle(pageWidth - 35, yPos + 18, 12, 'S');
+    doc.setFontSize(7);
+    doc.text("BNRM", pageWidth - 35, yPos + 17, { align: 'center' });
+    doc.text("ABN", pageWidth - 35, yPos + 20, { align: 'center' });
+
+    // Ligne de séparation footer
+    doc.setDrawColor(139, 0, 0);
+    doc.setLineWidth(0.5);
+    doc.line(15, pageHeight - 25, pageWidth - 15, pageHeight - 25);
+
+    // Footer
+    doc.setFontSize(7);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text("Bibliothèque Nationale du Royaume du Maroc - Avenue Ibn Battouta, BP 1003, Rabat-Agdal", pageWidth / 2, pageHeight - 20, { align: 'center' });
+    doc.text("Tél: +212 (0)5 37 77 18 74 | Fax: +212 (0)5 37 77 19 79 | Email: contact@bnrm.ma | www.bnrm.ma", pageWidth / 2, pageHeight - 15, { align: 'center' });
+    doc.setFont(undefined, 'italic');
+    doc.setFontSize(6);
+    doc.text("Document généré automatiquement par le système de gestion du dépôt légal - Ne nécessite pas de signature manuscrite", pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+    doc.save(`Rejet_DL_${item.dlNumber}_${new Date().toISOString().split('T')[0]}.pdf`);
+    toast.success("Lettre de rejet générée avec succès");
+  };
+
   const sendReminder = (item: EditorialMonitoringItem, type: '20' | '40') => {
     toast.success(`Rappel ${type} jours envoyé pour ${item.dlNumber}`);
     // Update item status
@@ -302,6 +495,25 @@ export default function BNRMEditorialMonitoring() {
         ? { ...i, status: newStatus as any, lastAction: `Rappel ${type}j envoyé` }
         : i
     ));
+  };
+
+  const handleReject = () => {
+    if (!selectedItem || !rejectionReason.trim()) {
+      toast.error("Veuillez saisir un motif de rejet");
+      return;
+    }
+
+    generateRejectionLetter(selectedItem, rejectionReason);
+    
+    setItems(items.map(i => 
+      i.id === selectedItem.id 
+        ? { ...i, status: 'rejected' as any, lastAction: 'Demande rejetée', rejectionReason }
+        : i
+    ));
+    
+    setRejectDialogOpen(false);
+    setRejectionReason("");
+    setSelectedItem(null);
   };
 
   const filteredItems = items.filter(item => {
@@ -572,6 +784,20 @@ export default function BNRMEditorialMonitoring() {
                                 Réclamation
                               </Button>
                             )}
+                            {!['received', 'rejected'].includes(item.status) && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                                onClick={() => {
+                                  setSelectedItem(item);
+                                  setRejectDialogOpen(true);
+                                }}
+                              >
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Rejeter
+                              </Button>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -632,6 +858,74 @@ export default function BNRMEditorialMonitoring() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Rejection Dialog */}
+      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Rejeter la demande de dépôt légal</DialogTitle>
+            <DialogDescription>
+              {selectedItem && (
+                <>
+                  N° DL: <strong>{selectedItem.dlNumber}</strong> - {selectedItem.title}
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="rejection-reason">Motif du rejet *</Label>
+              <Textarea
+                id="rejection-reason"
+                placeholder="Veuillez saisir le(s) motif(s) de rejet détaillé(s)..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows={6}
+                className="resize-none"
+              />
+              <p className="text-xs text-muted-foreground">
+                Ce motif sera inclus dans la lettre de rejet officielle envoyée au déclarant.
+              </p>
+            </div>
+
+            <div className="bg-muted/50 rounded-lg p-4 border">
+              <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-orange-500" />
+                Exemples de motifs courants
+              </h4>
+              <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
+                <li>Documents incomplets ou non conformes aux exigences réglementaires</li>
+                <li>Informations manquantes ou erronées dans la déclaration</li>
+                <li>Non-respect des critères d'éligibilité au dépôt légal</li>
+                <li>Format ou support non conforme aux spécifications techniques</li>
+                <li>Absence de justificatifs requis (statut éditeur, autorisation, etc.)</li>
+              </ul>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setRejectDialogOpen(false);
+                  setRejectionReason("");
+                  setSelectedItem(null);
+                }}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Annuler
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleReject}
+                disabled={!rejectionReason.trim()}
+              >
+                <XCircle className="h-4 w-4 mr-2" />
+                Confirmer le rejet
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
