@@ -170,7 +170,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             {/* Identification de l'auteur */}
             <div>
               <h3 className="text-lg font-semibold mb-4">Identification de l'auteur</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-visible">
                 <div className="space-y-2">
                   <Label>Type de l'auteur</Label>
                   <Select>
@@ -221,7 +221,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             {/* Identification de la publication */}
             <div>
               <h3 className="text-lg font-semibold mb-4">Identification de la publication</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-visible">
                 <div className="space-y-2 md:col-span-2">
                   <Label>Titre de l'ouvrage</Label>
                   <Input placeholder="Titre de l'ouvrage" />
