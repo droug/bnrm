@@ -83,6 +83,20 @@ export default function BNRMEditorialMonitoring() {
       lastAction: "Lettre réclamation envoyée",
       nextAction: "Suivi juridique",
       nextActionDate: "2025-10-15"
+    },
+    {
+      id: "4",
+      dlNumber: "DL-2025-001156",
+      title: "Guide Pratique du Marketing Digital",
+      author: "Karim Benjelloun",
+      publisher: "Editions Modernes",
+      attributionDate: "2025-06-15",
+      daysElapsed: 115,
+      status: "rejected",
+      lastAction: "Demande rejetée",
+      nextAction: "N/A",
+      nextActionDate: "",
+      rejectionReason: "Documents incomplets : absence de justificatif du statut d'éditeur et informations ISBN manquantes dans la déclaration initiale."
     }
   ]);
 
@@ -750,6 +764,7 @@ export default function BNRMEditorialMonitoring() {
                     <SelectItem value="reminded_20">Rappel 20j</SelectItem>
                     <SelectItem value="reminded_40">Rappel 40j</SelectItem>
                     <SelectItem value="claim_sent">Réclamation</SelectItem>
+                    <SelectItem value="rejected">Rejeté</SelectItem>
                     <SelectItem value="received">Reçu</SelectItem>
                   </SelectContent>
                 </Select>
