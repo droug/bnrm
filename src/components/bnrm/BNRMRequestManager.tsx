@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import jsPDF from 'jspdf';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import logoOfficiel from "@/assets/logo-bnrm-officiel.png";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -28,7 +31,9 @@ import {
   BookOpen,
   Newspaper,
   Database,
-  Archive
+  Archive,
+  Undo2,
+  X
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -339,6 +344,11 @@ export const BNRMRequestManager = () => {
       updated_at: "2025-01-20T14:45:00Z"
     }
   ]);
+  
+  const [confirmRejectOpen, setConfirmRejectOpen] = useState(false);
+  const [confirmCancelRejectOpen, setConfirmCancelRejectOpen] = useState(false);
+  const [selectedRequestForAction, setSelectedRequestForAction] = useState<DepositRequest | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -501,6 +511,212 @@ export const BNRMRequestManager = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const generateRejectionLetter = (request: DepositRequest) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // En-tête avec logo officiel centré
+    const logoWidth = 180;
+    const logoHeight = 25;
+    const logoX = (pageWidth - logoWidth) / 2;
+    doc.addImage(logoOfficiel, 'PNG', logoX, 10, logoWidth, logoHeight);
+
+    // Ligne de séparation
+    doc.setDrawColor(139, 0, 0);
+    doc.setLineWidth(0.5);
+    doc.line(15, 40, pageWidth - 15, 40);
+
+    // Informations expéditeur
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(60, 60, 60);
+    doc.text("Royaume du Maroc", 15, 50);
+    doc.text("Ministère de la Jeunesse, de la Culture", 15, 55);
+    doc.text("et de la Communication", 15, 60);
+    doc.text("Département de la Culture", 15, 65);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 51, 102);
+    doc.text("Bibliothèque Nationale du Royaume du Maroc", 15, 72);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(60, 60, 60);
+    doc.text("Avenue Ibn Battouta, BP 1003", 15, 77);
+    doc.text("Rabat - Agdal, Maroc", 15, 82);
+    doc.text("Tél: +212 (0)5 37 77 18 74", 15, 87);
+
+    // Date et référence
+    const today = new Date().toLocaleDateString('fr-FR', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    doc.setFontSize(10);
+    doc.text(`Rabat, le ${today}`, pageWidth - 15, 50, { align: 'right' });
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(139, 0, 0);
+    doc.text(`Réf: BNRM/ABN/DL/${request.deposit_number}`, pageWidth - 15, 58, { align: 'right' });
+
+    // Destinataire
+    doc.setDrawColor(200, 200, 200);
+    doc.setFillColor(248, 248, 248);
+    doc.roundedRect(15, 95, 90, 25, 2, 2, 'FD');
+    
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'italic');
+    doc.setTextColor(100, 100, 100);
+    doc.text("À l'attention de", 20, 102);
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(request.metadata.declarant?.organization || "", 20, 108);
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(60, 60, 60);
+    doc.text(`Concernant: "${request.metadata.publication?.title}"`, 20, 114);
+
+    // Objet
+    doc.setDrawColor(139, 0, 0);
+    doc.setLineWidth(0.3);
+    doc.line(15, 130, pageWidth - 15, 130);
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(139, 0, 0);
+    doc.text("OBJET : REJET DE LA DEMANDE DE DÉPÔT LÉGAL", pageWidth / 2, 138, { align: 'center' });
+    doc.line(15, 143, pageWidth - 15, 143);
+
+    // Corps de la lettre
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(40, 40, 40);
+    
+    let yPos = 155;
+    const lineHeight = 6;
+    const marginLeft = 15;
+    const marginRight = 15;
+    const maxWidth = pageWidth - marginLeft - marginRight;
+
+    doc.text("Madame, Monsieur,", marginLeft, yPos);
+    yPos += lineHeight * 1.5;
+
+    const para1 = `Nous accusons réception de votre demande de dépôt légal portant le numéro ${request.deposit_number}, concernant l'ouvrage intitulé "${request.metadata.publication?.title}" de ${request.metadata.publication?.author}.`;
+    const para1Lines = doc.splitTextToSize(para1, maxWidth);
+    doc.text(para1Lines, marginLeft, yPos);
+    yPos += para1Lines.length * lineHeight + 4;
+
+    const para2 = "Après examen attentif de votre demande par nos services compétents, nous avons le regret de vous informer que celle-ci ne peut être validée pour les raisons suivantes :";
+    const para2Lines = doc.splitTextToSize(para2, maxWidth);
+    doc.text(para2Lines, marginLeft, yPos);
+    yPos += para2Lines.length * lineHeight + 4;
+
+    // Motif rejet
+    const reason = request.metadata.validation?.rejection_reason || "Non conforme aux exigences réglementaires";
+    doc.setFillColor(255, 240, 240);
+    doc.setDrawColor(220, 53, 69);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(marginLeft, yPos - 2, maxWidth, 25, 2, 2, 'FD');
+    
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(139, 0, 0);
+    doc.setFontSize(9);
+    doc.text("MOTIF(S) DE REJET :", marginLeft + 2, yPos + 4);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(60, 60, 60);
+    const reasonLines = doc.splitTextToSize(reason, maxWidth - 4);
+    doc.text(reasonLines, marginLeft + 2, yPos + 10);
+    yPos += 29;
+
+    // Conformité légale
+    doc.setFontSize(10);
+    doc.setTextColor(40, 40, 40);
+    const para3 = "Cette décision a été prise en conformité avec les dispositions de la loi n° 67-99 relative au dépôt légal et de ses textes d'application.";
+    const para3Lines = doc.splitTextToSize(para3, maxWidth);
+    doc.text(para3Lines, marginLeft, yPos);
+    yPos += para3Lines.length * lineHeight + 6;
+
+    // Recours
+    doc.setFillColor(240, 248, 255);
+    doc.setDrawColor(0, 123, 255);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(marginLeft, yPos - 2, maxWidth, 22, 2, 2, 'FD');
+    
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 51, 102);
+    doc.setFontSize(9);
+    doc.text("POSSIBILITÉ DE RECOURS :", marginLeft + 2, yPos + 4);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(40, 40, 40);
+    const recours = "Vous disposez d'un délai de 30 jours pour soumettre une nouvelle demande rectifiée avec les documents requis.";
+    const recoursLines = doc.splitTextToSize(recours, maxWidth - 4);
+    doc.text(recoursLines, marginLeft + 2, yPos + 10);
+    yPos += 26;
+
+    // Formule de politesse
+    const closing = "Nous vous prions d'agréer, Madame, Monsieur, l'expression de nos salutations distinguées.";
+    const closingLines = doc.splitTextToSize(closing, maxWidth);
+    doc.text(closingLines, marginLeft, yPos);
+    yPos += closingLines.length * lineHeight + 10;
+
+    // Signature
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(0, 51, 102);
+    doc.text("Le Chef du Département", pageWidth - 15, yPos, { align: 'right' });
+    doc.text("Agence Bibliographique Nationale", pageWidth - 15, yPos + 6, { align: 'right' });
+    
+    // Cachet
+    doc.setDrawColor(0, 51, 102);
+    doc.setLineWidth(0.5);
+    doc.circle(pageWidth - 35, yPos + 18, 12, 'S');
+    doc.setFontSize(7);
+    doc.text("BNRM", pageWidth - 35, yPos + 17, { align: 'center' });
+    doc.text("ABN", pageWidth - 35, yPos + 20, { align: 'center' });
+
+    // Footer
+    doc.setDrawColor(139, 0, 0);
+    doc.setLineWidth(0.5);
+    doc.line(15, pageHeight - 25, pageWidth - 15, pageHeight - 25);
+    doc.setFontSize(7);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text("Bibliothèque Nationale du Royaume du Maroc - Avenue Ibn Battouta, BP 1003, Rabat-Agdal", pageWidth / 2, pageHeight - 20, { align: 'center' });
+    doc.text("Tél: +212 (0)5 37 77 18 74 | Email: contact@bnrm.ma | www.bnrm.ma", pageWidth / 2, pageHeight - 15, { align: 'center' });
+    doc.setFont(undefined, 'italic');
+    doc.setFontSize(6);
+    doc.text("Document généré automatiquement - Ne nécessite pas de signature manuscrite", pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+    doc.save(`Rejet_${request.deposit_number}_${new Date().toISOString().split('T')[0]}.pdf`);
+    
+    toast({
+      title: "Lettre générée",
+      description: "La lettre de rejet a été téléchargée",
+    });
+  };
+
+  const handleCancelReject = (requestId: string) => {
+    setRequests(prev => prev.map(req => {
+      if (req.id === requestId) {
+        return {
+          ...req,
+          status: 'soumis' as DepositRequest['status'],
+          metadata: {
+            ...req.metadata,
+            validation: undefined
+          },
+          updated_at: new Date().toISOString()
+        };
+      }
+      return req;
+    }));
+    
+    setConfirmCancelRejectOpen(false);
+    setSelectedRequestForAction(null);
+    
+    toast({
+      title: "Rejet annulé",
+      description: "La demande a été réactivée",
+    });
   };
 
   const getStatusBadge = (status: string) => {
@@ -973,12 +1189,30 @@ export const BNRMRequestManager = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => updateRequestStatus(request.id, 'rejete_par_b', 'Demande incomplète')}
+                                onClick={() => {
+                                  setSelectedRequestForAction(request);
+                                  setConfirmRejectOpen(true);
+                                }}
                                 title="Rejeter"
                               >
                                 <XCircle className="h-4 w-4 text-red-600" />
                               </Button>
                             </>
+                          )}
+                          
+                          {request.status === 'rejete_par_b' && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedRequestForAction(request);
+                                setConfirmCancelRejectOpen(true);
+                              }}
+                              title="Annuler le rejet"
+                              className="text-blue-600"
+                            >
+                              <Undo2 className="h-4 w-4" />
+                            </Button>
                           )}
                         </div>
                       </TableCell>
@@ -1218,6 +1452,135 @@ export const BNRMRequestManager = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Reject Confirmation Dialog */}
+      <AlertDialog open={confirmRejectOpen} onOpenChange={setConfirmRejectOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-destructive" />
+              Confirmer le rejet de la demande
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              {selectedRequestForAction && (
+                <>
+                  <p>Êtes-vous sûr de vouloir rejeter définitivement cette demande ?</p>
+                  <div className="bg-muted rounded-lg p-3 space-y-1">
+                    <div className="text-sm">
+                      <span className="font-semibold">N° Dépôt:</span> {selectedRequestForAction.deposit_number}
+                    </div>
+                    <div className="text-sm">
+                      <span className="font-semibold">Titre:</span> {selectedRequestForAction.metadata.publication?.title}
+                    </div>
+                    <div className="text-sm">
+                      <span className="font-semibold">Déclarant:</span> {selectedRequestForAction.metadata.declarant?.organization}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rejection-reason">Motif du rejet *</Label>
+                    <Textarea
+                      id="rejection-reason"
+                      placeholder="Veuillez saisir le(s) motif(s) de rejet détaillé(s)..."
+                      value={rejectionReason}
+                      onChange={(e) => setRejectionReason(e.target.value)}
+                      rows={4}
+                      className="resize-none"
+                    />
+                  </div>
+                  <p className="text-destructive font-semibold text-sm">
+                    Cette action générera automatiquement une lettre de rejet officielle.
+                  </p>
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setRejectionReason("");
+              setSelectedRequestForAction(null);
+            }}>
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (selectedRequestForAction && rejectionReason.trim()) {
+                  generateRejectionLetter(selectedRequestForAction);
+                  updateRequestStatus(selectedRequestForAction.id, 'rejete_par_b', rejectionReason);
+                  setConfirmRejectOpen(false);
+                  setRejectionReason("");
+                  setSelectedRequestForAction(null);
+                } else {
+                  toast({
+                    title: "Erreur",
+                    description: "Veuillez saisir un motif de rejet",
+                    variant: "destructive"
+                  });
+                }
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={!rejectionReason.trim()}
+            >
+              Confirmer le rejet
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Cancel Reject Confirmation Dialog */}
+      <AlertDialog open={confirmCancelRejectOpen} onOpenChange={setConfirmCancelRejectOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Undo2 className="h-5 w-5 text-blue-600" />
+              Annuler le rejet de la demande
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              {selectedRequestForAction && (
+                <>
+                  <p>Êtes-vous sûr de vouloir annuler le rejet de cette demande ?</p>
+                  <div className="bg-muted rounded-lg p-3 space-y-1">
+                    <div className="text-sm">
+                      <span className="font-semibold">N° Dépôt:</span> {selectedRequestForAction.deposit_number}
+                    </div>
+                    <div className="text-sm">
+                      <span className="font-semibold">Titre:</span> {selectedRequestForAction.metadata.publication?.title}
+                    </div>
+                    <div className="text-sm">
+                      <span className="font-semibold">Déclarant:</span> {selectedRequestForAction.metadata.declarant?.organization}
+                    </div>
+                    {selectedRequestForAction.metadata.validation?.rejection_reason && (
+                      <div className="text-sm mt-2 pt-2 border-t">
+                        <span className="font-semibold">Motif du rejet initial:</span>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {selectedRequestForAction.metadata.validation.rejection_reason}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-blue-600 font-semibold">
+                    La demande sera réactivée et passera au statut "Soumis" pour un nouveau traitement.
+                  </p>
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setSelectedRequestForAction(null)}>
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (selectedRequestForAction) {
+                  handleCancelReject(selectedRequestForAction.id);
+                }
+              }}
+              className="bg-blue-600 text-white hover:bg-blue-700"
+            >
+              Confirmer l'annulation du rejet
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
