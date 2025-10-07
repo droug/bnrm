@@ -19,9 +19,17 @@ import {
 import { format, subDays, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { fr } from "date-fns/locale";
 
+interface StatusLevel {
+  main: string;
+  sub: string;
+  count: number;
+  color: string;
+}
+
 interface StatsData {
   totalRequests: number;
   byStatus: Record<string, number>;
+  byStatusTwoLevels: StatusLevel[];
   byType: Record<string, number>;
   averageProcessingTime: number;
   requestsOverTime: Array<{ date: string; count: number }>;
@@ -44,18 +52,41 @@ export const BNRMStatistics = () => {
   const [selectedType, setSelectedType] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [stats, setStats] = useState<StatsData>({
-    totalRequests: 8,
+    totalRequests: 58,
     byStatus: {
       'soumis': 5,
       'valide_par_b': 1,
       'receptionne': 1,
       'traite': 1
     },
+    byStatusTwoLevels: [
+      // Niveau 1: En cours
+      { main: 'En cours', sub: 'Soumis', count: 12, color: '#3B82F6' },
+      { main: 'En cours', sub: 'En révision', count: 8, color: '#60A5FA' },
+      { main: 'En cours', sub: 'En traitement', count: 5, color: '#93C5FD' },
+      
+      // Niveau 1: Attente
+      { main: 'Attente', sub: 'Attente validation', count: 7, color: '#F59E0B' },
+      { main: 'Attente', sub: 'Attente documents', count: 4, color: '#FBBF24' },
+      { main: 'Attente', sub: 'Attente paiement', count: 3, color: '#FCD34D' },
+      
+      // Niveau 1: Validé
+      { main: 'Validé', sub: 'Validé BNRM', count: 6, color: '#10B981' },
+      { main: 'Validé', sub: 'Validé éditeur', count: 4, color: '#34D399' },
+      
+      // Niveau 1: Attribué
+      { main: 'Attribué', sub: 'ISBN attribué', count: 5, color: '#8B5CF6' },
+      { main: 'Attribué', sub: 'ISSN attribué', count: 2, color: '#A78BFA' },
+      { main: 'Attribué', sub: 'DL attribué', count: 1, color: '#C4B5FD' },
+      
+      // Niveau 1: Rejeté
+      { main: 'Rejeté', sub: 'Non conforme', count: 1, color: '#EF4444' }
+    ],
     byType: {
-      'monographie': 4,
-      'periodique': 2,
-      'audiovisuel': 1,
-      'numerique': 1
+      'monographie': 24,
+      'periodique': 15,
+      'audiovisuel': 11,
+      'numerique': 8
     },
     averageProcessingTime: 3.5,
     requestsOverTime: [
@@ -68,7 +99,7 @@ export const BNRMStatistics = () => {
     monthlyTrends: [
       { month: 'Nov 2024', submitted: 12, processed: 10 },
       { month: 'Déc 2024', submitted: 15, processed: 14 },
-      { month: 'Jan 2025', submitted: 8, processed: 3 }
+      { month: 'Jan 2025', submitted: 58, processed: 35 }
     ],
     editionForecasts: [
       { year: 2023, count: 45 },
@@ -133,6 +164,10 @@ export const BNRMStatistics = () => {
       ['Temps moyen de traitement (jours)', stats.averageProcessingTime],
       ['Auteurs secondaires', stats.secondaryAuthors],
       ['Doublons détectés', stats.duplicatesDetected],
+      [''],
+      ['Répartition par statut (2 niveaux)'],
+      ['Statut principal', 'Sous-statut', 'Nombre'],
+      ...stats.byStatusTwoLevels.map(s => [s.main, s.sub, s.count]),
       [''],
       ['Répartition par statut'],
       ...statusData.map(s => [`Statut: ${s.name}`, s.value]),
@@ -309,32 +344,57 @@ export const BNRMStatistics = () => {
 
       {/* Graphiques */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Répartition par statut */}
-        <Card>
+        {/* Répartition par statut - 2 niveaux */}
+        <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Répartition par statut</CardTitle>
-            <CardDescription>Distribution des demandes selon leur statut</CardDescription>
+            <CardTitle>Répartition par statut (2 niveaux)</CardTitle>
+            <CardDescription>Distribution détaillée des demandes selon leur statut principal et secondaire</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={statusData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name}: ${value}`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {statusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              {['En cours', 'Attente', 'Validé', 'Attribué', 'Rejeté'].map(mainStatus => {
+                const subStatuses = stats.byStatusTwoLevels.filter(s => s.main === mainStatus);
+                const total = subStatuses.reduce((acc, s) => acc + s.count, 0);
+                
+                return (
+                  <div key={mainStatus} className="space-y-2">
+                    <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                      <h4 className="font-semibold">{mainStatus}</h4>
+                      <Badge variant="secondary">{total}</Badge>
+                    </div>
+                    <div className="space-y-1">
+                      {subStatuses.map((status, idx) => (
+                        <div 
+                          key={idx} 
+                          className="flex items-center justify-between p-2 rounded border"
+                          style={{ borderLeftColor: status.color, borderLeftWidth: '3px' }}
+                        >
+                          <span className="text-sm">{status.sub}</span>
+                          <span className="text-sm font-medium">{status.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            <div className="mt-6">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={stats.byStatusTwoLevels}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="sub" angle={-45} textAnchor="end" height={100} />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="count" name="Nombre de demandes">
+                    {stats.byStatusTwoLevels.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
 
