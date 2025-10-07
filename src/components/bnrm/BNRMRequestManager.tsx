@@ -372,18 +372,21 @@ export const BNRMRequestManager = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchRequests();
+    // On ne charge pas depuis la base de données pour l'instant, on garde les données mockées
+    // fetchRequests();
   }, []);
 
   const fetchRequests = async () => {
     try {
       const { data, error } = await supabase
-        .from("legal_deposits")
+        .from("legal_deposit_requests")
         .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setRequests(data as DepositRequest[] || []);
+      
+      // Mapper les données de la base vers l'interface DepositRequest si nécessaire
+      // Pour l'instant, on ne fait rien pour garder les données mockées
     } catch (error) {
       console.error("Error fetching requests:", error);
       toast({
@@ -398,25 +401,24 @@ export const BNRMRequestManager = () => {
 
   const createNewRequest = async () => {
     try {
-      const { data, error } = await supabase
-        .from("legal_deposits")
-        .insert([{
-          deposit_type: newRequestForm.deposit_type,
-          status: 'brouillon',
-          submitter_id: (await supabase.auth.getUser()).data.user?.id,
-          content_id: crypto.randomUUID(),
-          metadata: {
-            declarant: newRequestForm.declarant,
-            publication: newRequestForm.publication,
-            documents: newRequestForm.documents
-          }
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      await fetchRequests();
+      // Pour l'instant, on ajoute localement sans sauvegarder dans la base
+      const user = await supabase.auth.getUser();
+      const newRequest: DepositRequest = {
+        id: `temp-${Date.now()}`,
+        deposit_number: `DL-2025-${String(requests.length + 1).padStart(6, '0')}`,
+        deposit_type: newRequestForm.deposit_type,
+        status: 'brouillon',
+        submitter_id: user.data.user?.id || 'anonymous',
+        submission_date: new Date().toISOString(),
+        metadata: {
+          declarant: newRequestForm.declarant,
+          publication: newRequestForm.publication
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      setRequests(prev => [newRequest, ...prev]);
       setIsNewRequestOpen(false);
       setNewRequestForm({
         deposit_type: 'monographie',
@@ -457,37 +459,36 @@ export const BNRMRequestManager = () => {
 
   const updateRequestStatus = async (requestId: string, newStatus: string, comments?: string) => {
     try {
-      const updateData: any = { 
-        status: newStatus,
-        updated_at: new Date().toISOString()
-      };
+      const user = await supabase.auth.getUser();
       
-      if (newStatus === 'receptionne') {
-        updateData.acknowledgment_date = new Date().toISOString();
-      }
-
-      // Add validation metadata
-      if (comments || newStatus === 'valide_par_b' || newStatus === 'rejete_par_b') {
-        const currentRequest = requests.find(r => r.id === requestId);
-        updateData.metadata = {
-          ...currentRequest?.metadata,
-          validation: {
-            validator_id: (await supabase.auth.getUser()).data.user?.id,
-            validation_date: new Date().toISOString(),
-            comments: comments,
-            rejection_reason: newStatus === 'rejete_par_b' ? comments : undefined
+      // Mise à jour locale
+      setRequests(prev => prev.map(req => {
+        if (req.id === requestId) {
+          const updatedMetadata = { ...req.metadata };
+          
+          if (comments || newStatus === 'valide_par_b' || newStatus === 'rejete_par_b') {
+            updatedMetadata.validation = {
+              validator_id: user.data.user?.id,
+              validation_date: new Date().toISOString(),
+              comments: comments,
+              rejection_reason: newStatus === 'rejete_par_b' ? comments : undefined
+            };
           }
-        };
-      }
-
-      const { error } = await supabase
-        .from("legal_deposits")
-        .update(updateData)
-        .eq("id", requestId);
-
-      if (error) throw error;
-
-      await fetchRequests();
+          
+          return {
+            ...req,
+            status: newStatus as DepositRequest['status'],
+            acknowledgment_date: newStatus === 'receptionne' ? new Date().toISOString() : req.acknowledgment_date,
+            metadata: updatedMetadata,
+            updated_at: new Date().toISOString()
+          };
+        }
+        return req;
+      }));
+      
+      setValidationComments("");
+      setIsDetailsOpen(false);
+      
       toast({
         title: "Succès",
         description: "Statut mis à jour avec succès",
