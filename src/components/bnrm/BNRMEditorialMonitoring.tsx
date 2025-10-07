@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Mail, FileText, Calendar, Send, Settings, AlertCircle, CheckCircle, Clock, XCircle, X } from "lucide-react";
+import { Bell, Mail, FileText, Calendar, Send, Settings, AlertCircle, CheckCircle, Clock, XCircle, X, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from 'jspdf';
 import logoOfficiel from "@/assets/logo-bnrm-officiel.png";
@@ -102,6 +102,7 @@ export default function BNRMEditorialMonitoring() {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [confirmRejectOpen, setConfirmRejectOpen] = useState(false);
+  const [confirmCancelRejectOpen, setConfirmCancelRejectOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<EditorialMonitoringItem | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
 
@@ -532,6 +533,29 @@ export default function BNRMEditorialMonitoring() {
     setSelectedItem(null);
   };
 
+  const handleCancelReject = () => {
+    if (!selectedItem) {
+      return;
+    }
+
+    setItems(items.map(i => 
+      i.id === selectedItem.id 
+        ? { 
+            ...i, 
+            status: 'pending' as any, 
+            lastAction: 'Rejet annulé - En attente de traitement',
+            rejectionReason: undefined,
+            nextAction: 'Rappel 20j',
+            nextActionDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+          }
+        : i
+    ));
+    
+    toast.success("Le rejet a été annulé. La demande est réactivée.");
+    setConfirmCancelRejectOpen(false);
+    setSelectedItem(null);
+  };
+
   const filteredItems = items.filter(item => {
     const matchesSearch = 
       item.dlNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -816,6 +840,20 @@ export default function BNRMEditorialMonitoring() {
                                 Rejeter
                               </Button>
                             )}
+                            {item.status === 'rejected' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-blue-600 hover:bg-blue-50"
+                                onClick={() => {
+                                  setSelectedItem(item);
+                                  setConfirmCancelRejectOpen(true);
+                                }}
+                              >
+                                <Undo2 className="h-3 w-3 mr-1" />
+                                Annuler le rejet
+                              </Button>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -985,6 +1023,54 @@ export default function BNRMEditorialMonitoring() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Confirmer le rejet
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Cancel Rejection Confirmation Dialog */}
+      <AlertDialog open={confirmCancelRejectOpen} onOpenChange={setConfirmCancelRejectOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Undo2 className="h-5 w-5 text-blue-600" />
+              Annuler le rejet de la demande
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>
+                Êtes-vous sûr de vouloir annuler le rejet de cette demande ?
+              </p>
+              {selectedItem && (
+                <div className="bg-muted rounded-lg p-3 space-y-1">
+                  <div className="text-sm">
+                    <span className="font-semibold">N° DL:</span> {selectedItem.dlNumber}
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-semibold">Titre:</span> {selectedItem.title}
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-semibold">Éditeur:</span> {selectedItem.publisher}
+                  </div>
+                  {selectedItem.rejectionReason && (
+                    <div className="text-sm mt-2 pt-2 border-t">
+                      <span className="font-semibold">Motif du rejet initial:</span>
+                      <p className="text-xs text-muted-foreground mt-1">{selectedItem.rejectionReason}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+              <p className="text-blue-600 font-semibold">
+                La demande sera réactivée et passera au statut "En attente" pour un nouveau traitement.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelReject}
+              className="bg-blue-600 text-white hover:bg-blue-700"
+            >
+              Confirmer l'annulation du rejet
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
