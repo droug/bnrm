@@ -346,6 +346,7 @@ export const BNRMRequestManager = () => {
   const [selectedRequest, setSelectedRequest] = useState<DepositRequest | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isNewRequestOpen, setIsNewRequestOpen] = useState(false);
+  const [validationComments, setValidationComments] = useState("");
   const [newRequestForm, setNewRequestForm] = useState<DepositForm>({
     deposit_type: 'monographie',
     declarant: {
@@ -1096,19 +1097,24 @@ export const BNRMRequestManager = () => {
                     {(selectedRequest.status === 'soumis' || selectedRequest.status === 'en_attente_validation_b') && (
                       <div className="space-y-4 pt-4 border-t">
                         <h4 className="font-semibold">Actions de validation</h4>
-                        <Textarea 
-                          placeholder="Ajouter un commentaire (optionnel)"
-                          id="validation-comments"
-                          className="mb-2"
-                        />
+                        <div className="space-y-2">
+                          <Label htmlFor="validation-comments">Commentaire (optionnel)</Label>
+                          <Textarea 
+                            placeholder="Ajouter un commentaire de validation..."
+                            id="validation-comments"
+                            value={validationComments}
+                            onChange={(e) => setValidationComments(e.target.value)}
+                            className="min-h-[100px]"
+                          />
+                        </div>
                         <div className="flex space-x-2">
                           <Button 
                             onClick={() => {
-                              const comments = (document.getElementById('validation-comments') as HTMLTextAreaElement)?.value;
-                              updateRequestStatus(selectedRequest.id, 'valide_par_b', comments);
+                              updateRequestStatus(selectedRequest.id, 'valide_par_b', validationComments);
+                              setValidationComments("");
                               setIsDetailsOpen(false);
                             }}
-                            className="bg-green-600 hover:bg-green-700 text-white"
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                           >
                             <CheckCircle className="w-4 h-4 mr-2" />
                             Valider la demande
@@ -1116,10 +1122,11 @@ export const BNRMRequestManager = () => {
                           <Button 
                             variant="destructive"
                             onClick={() => {
-                              const comments = (document.getElementById('validation-comments') as HTMLTextAreaElement)?.value || 'Demande rejetée';
-                              updateRequestStatus(selectedRequest.id, 'rejete_par_b', comments);
+                              updateRequestStatus(selectedRequest.id, 'rejete_par_b', validationComments || 'Demande rejetée');
+                              setValidationComments("");
                               setIsDetailsOpen(false);
                             }}
+                            className="flex-1"
                           >
                             <XCircle className="w-4 h-4 mr-2" />
                             Rejeter la demande
