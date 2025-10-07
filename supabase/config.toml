@@ -34,3 +34,6 @@ verify_jwt = false
 
 [functions.auto-translate-content]
 verify_jwt = true
+
+[functions.batch-translate-all-content]
+verify_jwt = true

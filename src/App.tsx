@@ -79,6 +79,8 @@ import PaymentCanceled from "./pages/PaymentCanceled";
 import Wallet from "./pages/Wallet";
 import PaymentServices from "./pages/PaymentServices";
 import ServicesCatalog from "./pages/ServicesCatalog";
+import TranslationManagementPage from "./pages/TranslationManagementPage";
+
 
 
 const App = () => (
@@ -181,6 +183,10 @@ const App = () => (
           <Route path="/e-wallet" element={<Wallet />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-canceled" element={<PaymentCanceled />} />
+
+          {/* Translation Management */}
+          <Route path="/admin/translations" element={<TranslationManagementPage />} />
+          <Route path="/admin/traductions" element={<TranslationManagementPage />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
