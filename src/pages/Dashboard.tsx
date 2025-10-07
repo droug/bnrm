@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import logoBnrm from "@/assets/logo-bnrm.png";
 
 export default function Dashboard() {
   const { user, profile, signOut, loading } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalManuscripts: 0,
     totalCollections: 0,
@@ -115,7 +116,7 @@ export default function Dashboard() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="sm" onClick={() => window.location.href = '/admin/settings'}>
+                    <Button variant="outline" size="sm" onClick={() => navigate('/admin/settings')}>
                       <Cog className="h-4 w-4 mr-2" />
                       <span className="hidden sm:inline">Paramétrage</span>
                     </Button>
@@ -228,7 +229,7 @@ export default function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" onClick={() => window.location.href = '/manuscripts'}>
+              <Button className="w-full" onClick={() => navigate('/manuscripts')}>
                 Accéder aux manuscrits
               </Button>
             </CardContent>
@@ -245,7 +246,7 @@ export default function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" variant="outline" onClick={() => window.location.href = '/access-request'}>
+              <Button className="w-full" variant="outline" onClick={() => navigate('/access-request')}>
                 Nouvelle demande
               </Button>
             </CardContent>
@@ -262,7 +263,7 @@ export default function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" variant="outline" onClick={() => window.location.href = '/collections'}>
+              <Button className="w-full" variant="outline" onClick={() => navigate('/collections')}>
                 Voir les collections
               </Button>
             </CardContent>
@@ -293,7 +294,7 @@ export default function Dashboard() {
                   </div>
                   <Button 
                     className="w-full bg-orange-600 hover:bg-orange-700 text-white" 
-                    onClick={() => window.location.href = '/admin/access-requests'}
+                    onClick={() => navigate('/admin/access-requests')}
                   >
                     Gérer les demandes
                   </Button>
@@ -317,7 +318,7 @@ export default function Dashboard() {
                       {stats.totalUsers}
                     </Badge>
                   </div>
-                  <Button className="w-full" variant="outline" onClick={() => window.location.href = '/admin/users'}>
+                  <Button className="w-full" variant="outline" onClick={() => navigate('/admin/users')}>
                     Gérer les utilisateurs
                   </Button>
                 </CardContent>
@@ -334,7 +335,7 @@ export default function Dashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full" variant="outline" onClick={() => window.location.href = '/admin/settings'}>
+                  <Button className="w-full" variant="outline" onClick={() => navigate('/admin/settings')}>
                     Paramètres admin
                   </Button>
                 </CardContent>
