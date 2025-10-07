@@ -511,6 +511,7 @@ export const BNRMRequestManager = () => {
       en_cours: { color: "bg-indigo-100 text-indigo-800", label: "En cours", icon: Clock },
       receptionne: { color: "bg-purple-100 text-purple-800", label: "Réceptionné", icon: CheckCircle },
       traite: { color: "bg-green-100 text-green-800", label: "Traité", icon: CheckCircle },
+      processed: { color: "bg-green-100 text-green-800", label: "Traité", icon: CheckCircle },
       rejete_par_b: { color: "bg-red-100 text-red-800", label: "Rejeté", icon: XCircle },
     };
     
@@ -1092,13 +1093,6 @@ export const BNRMRequestManager = () => {
                           </div>
                         )}
                       </div>
-                    )}
-                    
-                    {selectedRequest.status && (
-                      <>
-                        {console.log('Status de la demande:', selectedRequest.status)}
-                        {console.log('Afficher les boutons?', selectedRequest.status === 'soumis' || selectedRequest.status === 'en_attente_validation_b')}
-                      </>
                     )}
                     
                     {(selectedRequest.status === 'soumis' || selectedRequest.status === 'en_attente_validation_b') && (
