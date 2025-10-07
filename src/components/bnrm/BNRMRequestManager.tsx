@@ -1093,16 +1093,22 @@ export const BNRMRequestManager = () => {
                       </div>
                     )}
                     
-                    {selectedRequest.status === 'soumis' && (
+                    {(selectedRequest.status === 'soumis' || selectedRequest.status === 'en_attente_validation_b') && (
                       <div className="space-y-4 pt-4 border-t">
                         <h4 className="font-semibold">Actions de validation</h4>
+                        <Textarea 
+                          placeholder="Ajouter un commentaire (optionnel)"
+                          id="validation-comments"
+                          className="mb-2"
+                        />
                         <div className="flex space-x-2">
                           <Button 
                             onClick={() => {
-                              updateRequestStatus(selectedRequest.id, 'valide_par_b');
+                              const comments = (document.getElementById('validation-comments') as HTMLTextAreaElement)?.value;
+                              updateRequestStatus(selectedRequest.id, 'valide_par_b', comments);
                               setIsDetailsOpen(false);
                             }}
-                            className="bg-green-600 hover:bg-green-700"
+                            className="bg-green-600 hover:bg-green-700 text-white"
                           >
                             <CheckCircle className="w-4 h-4 mr-2" />
                             Valider la demande
@@ -1110,7 +1116,8 @@ export const BNRMRequestManager = () => {
                           <Button 
                             variant="destructive"
                             onClick={() => {
-                              updateRequestStatus(selectedRequest.id, 'rejete_par_b', 'Demande incomplète');
+                              const comments = (document.getElementById('validation-comments') as HTMLTextAreaElement)?.value || 'Demande rejetée';
+                              updateRequestStatus(selectedRequest.id, 'rejete_par_b', comments);
                               setIsDetailsOpen(false);
                             }}
                           >
