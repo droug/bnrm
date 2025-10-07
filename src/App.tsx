@@ -80,6 +80,7 @@ import Wallet from "./pages/Wallet";
 import PaymentServices from "./pages/PaymentServices";
 import ServicesCatalog from "./pages/ServicesCatalog";
 import TranslationManagementPage from "./pages/TranslationManagementPage";
+import AccessRequestsManagement from "./pages/AccessRequestsManagement";
 
 
 
@@ -187,6 +188,10 @@ const App = () => (
           {/* Translation Management */}
           <Route path="/admin/translations" element={<TranslationManagementPage />} />
           <Route path="/admin/traductions" element={<TranslationManagementPage />} />
+
+          {/* Access Requests Management */}
+          <Route path="/admin/access-requests" element={<AccessRequestsManagement />} />
+          <Route path="/admin/demandes-acces" element={<AccessRequestsManagement />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
