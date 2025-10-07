@@ -710,7 +710,11 @@ export const BNRMRequestManager = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => updateRequestStatus(request.id, 'validated')}
+                                onClick={() => {
+                                  setSelectedRequest(request);
+                                  setIsDetailsOpen(true);
+                                }}
+                                title="Valider"
                               >
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                               </Button>
@@ -718,6 +722,7 @@ export const BNRMRequestManager = () => {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => updateRequestStatus(request.id, 'rejected', 'Demande incomplète')}
+                                title="Rejeter"
                               >
                                 <XCircle className="h-4 w-4 text-red-600" />
                               </Button>
