@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bell, Mail, FileText, Calendar, Send, Settings, AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from 'jspdf';
-import logoHeader from "@/assets/logo-header-report.png";
+import logoOfficiel from "@/assets/logo-bnrm-officiel.png";
 
 interface EditorialMonitoringItem {
   id: string;
@@ -122,78 +122,175 @@ export default function BNRMEditorialMonitoring() {
 
   const generateClaimLetter = (item: EditorialMonitoringItem) => {
     const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    // Add logo
-    doc.addImage(logoHeader, 'PNG', 15, 10, 50, 15);
+    // En-tête avec logo officiel centré
+    const logoWidth = 180;
+    const logoHeight = 25;
+    const logoX = (pageWidth - logoWidth) / 2;
+    doc.addImage(logoOfficiel, 'PNG', logoX, 10, logoWidth, logoHeight);
 
-    // Header
-    doc.setFontSize(10);
-    doc.text("Bibliothèque Nationale du Royaume du Maroc", 15, 35);
-    doc.text("Avenue Ibn Battouta, BP 1003", 15, 40);
-    doc.text("Rabat, Maroc", 15, 45);
+    // Ligne de séparation décorative
+    doc.setDrawColor(139, 0, 0); // Couleur bordeaux
+    doc.setLineWidth(0.5);
+    doc.line(15, 40, pageWidth - 15, 40);
 
-    // Date and reference
-    doc.setFontSize(10);
-    const today = new Date().toLocaleDateString('fr-FR');
-    doc.text(`Rabat, le ${today}`, 140, 60);
-    doc.text(`Réf: BNRM/DL/${item.dlNumber}`, 15, 70);
-
-    // Recipient
-    doc.setFontSize(11);
-    doc.text("À l'attention de", 15, 85);
-    doc.setFont(undefined, 'bold');
-    doc.text(item.publisher, 15, 90);
+    // Informations de l'expéditeur (à gauche)
+    doc.setFontSize(9);
     doc.setFont(undefined, 'normal');
-
-    // Subject
-    doc.setFontSize(12);
+    doc.setTextColor(60, 60, 60);
+    doc.text("Royaume du Maroc", 15, 50);
+    doc.text("Ministère de la Jeunesse, de la Culture", 15, 55);
+    doc.text("et de la Communication", 15, 60);
+    doc.text("Département de la Culture", 15, 65);
     doc.setFont(undefined, 'bold');
-    doc.text("Objet: Réclamation - Dépôt Légal", 15, 105);
+    doc.setTextColor(0, 51, 102);
+    doc.text("Bibliothèque Nationale du Royaume du Maroc", 15, 72);
     doc.setFont(undefined, 'normal');
+    doc.setTextColor(60, 60, 60);
+    doc.text("Avenue Ibn Battouta, BP 1003", 15, 77);
+    doc.text("Rabat - Agdal, Maroc", 15, 82);
+    doc.text("Tél: +212 (0)5 37 77 18 74", 15, 87);
 
-    // Body
-    doc.setFontSize(11);
-    const bodyText = [
-      "Madame, Monsieur,",
-      "",
-      `Nous accusons réception de votre déclaration de dépôt légal numéro ${item.dlNumber}`,
-      `pour l'ouvrage intitulé "${item.title}" de ${item.author}, attribué le ${new Date(item.attributionDate).toLocaleDateString('fr-FR')}.`,
-      "",
-      "Conformément aux dispositions de la loi n° 67-99 relative au dépôt légal,",
-      "nous constatons que les exemplaires réglementaires n'ont pas été déposés",
-      "à la Bibliothèque Nationale dans les délais impartis.",
-      "",
-      "Malgré nos rappels précédents, aucun exemplaire n'a été reçu à ce jour.",
-      "",
-      "Nous vous prions de bien vouloir régulariser votre situation en déposant",
-      "les exemplaires requis dans un délai de 15 jours à compter de la réception",
-      "de la présente lettre.",
-      "",
-      "À défaut, nous nous verrons dans l'obligation de transmettre votre dossier",
-      "au Service des Affaires Juridiques pour les suites appropriées.",
-      "",
-      "Nous vous prions d'agréer, Madame, Monsieur, l'expression de nos",
-      "salutations distinguées.",
-    ];
-
-    let yPosition = 115;
-    bodyText.forEach(line => {
-      doc.text(line, 15, yPosition);
-      yPosition += 6;
+    // Date et référence (à droite)
+    const today = new Date().toLocaleDateString('fr-FR', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
     });
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(60, 60, 60);
+    doc.text(`Rabat, le ${today}`, pageWidth - 15, 50, { align: 'right' });
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(139, 0, 0);
+    doc.text(`Réf: BNRM/ABN/DL/${item.dlNumber}`, pageWidth - 15, 58, { align: 'right' });
+
+    // Cadre pour le destinataire
+    doc.setDrawColor(200, 200, 200);
+    doc.setFillColor(248, 248, 248);
+    doc.roundedRect(15, 95, 90, 25, 2, 2, 'FD');
+    
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'italic');
+    doc.setTextColor(100, 100, 100);
+    doc.text("À l'attention de", 20, 102);
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(item.publisher, 20, 108);
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(60, 60, 60);
+    doc.text(`Concernant: "${item.title}"`, 20, 114);
+
+    // Objet de la lettre - encadré
+    doc.setDrawColor(139, 0, 0);
+    doc.setLineWidth(0.3);
+    doc.line(15, 130, pageWidth - 15, 130);
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(139, 0, 0);
+    doc.text("OBJET : RÉCLAMATION - DÉPÔT LÉGAL", pageWidth / 2, 138, { align: 'center' });
+    doc.line(15, 143, pageWidth - 15, 143);
+
+    // Corps de la lettre avec formatage amélioré
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(40, 40, 40);
+    
+    let yPos = 155;
+    const lineHeight = 6;
+    const marginLeft = 15;
+    const marginRight = 15;
+    const maxWidth = pageWidth - marginLeft - marginRight;
+
+    // Salutation
+    doc.text("Madame, Monsieur,", marginLeft, yPos);
+    yPos += lineHeight * 1.5;
+
+    // Paragraphe 1 - Contexte
+    const para1 = `Nous accusons réception de votre déclaration de dépôt légal portant le numéro ${item.dlNumber}, concernant l'ouvrage intitulé "${item.title}" de ${item.author}, pour lequel un numéro de dépôt légal vous a été attribué en date du ${new Date(item.attributionDate).toLocaleDateString('fr-FR')}.`;
+    const para1Lines = doc.splitTextToSize(para1, maxWidth);
+    doc.text(para1Lines, marginLeft, yPos);
+    yPos += para1Lines.length * lineHeight + 4;
+
+    // Paragraphe 2 - Constat
+    doc.setFont(undefined, 'bold');
+    const para2 = "Conformément aux dispositions de la loi n° 67-99 relative au dépôt légal et de ses textes d'application, nous constatons avec regret que les exemplaires réglementaires n'ont pas été déposés à la Bibliothèque Nationale dans les délais légalement impartis.";
+    const para2Lines = doc.splitTextToSize(para2, maxWidth);
+    doc.text(para2Lines, marginLeft, yPos);
+    doc.setFont(undefined, 'normal');
+    yPos += para2Lines.length * lineHeight + 4;
+
+    // Paragraphe 3 - Rappels précédents
+    const para3 = `Malgré nos rappels successifs en date des ${new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')} et ${new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}, aucun exemplaire n'a été reçu à ce jour par nos services.`;
+    const para3Lines = doc.splitTextToSize(para3, maxWidth);
+    doc.text(para3Lines, marginLeft, yPos);
+    yPos += para3Lines.length * lineHeight + 4;
+
+    // Encadré avec demande - fond coloré
+    doc.setFillColor(255, 248, 240);
+    doc.setDrawColor(255, 140, 0);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(marginLeft, yPos - 2, maxWidth, 20, 2, 2, 'FD');
+    
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(139, 0, 0);
+    const para4 = "Par conséquent, nous vous prions instamment de bien vouloir régulariser votre situation en déposant les exemplaires requis dans un délai maximum de QUINZE (15) jours à compter de la réception de la présente lettre.";
+    const para4Lines = doc.splitTextToSize(para4, maxWidth - 4);
+    doc.text(para4Lines, marginLeft + 2, yPos + 4);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(40, 40, 40);
+    yPos += 24;
+
+    // Paragraphe 5 - Conséquences
+    doc.setFont(undefined, 'italic');
+    const para5 = "À défaut de régularisation dans les délais impartis, nous nous verrons dans l'obligation de transmettre votre dossier au Service des Affaires Juridiques pour les suites légales appropriées, conformément aux sanctions prévues par la loi.";
+    const para5Lines = doc.splitTextToSize(para5, maxWidth);
+    doc.text(para5Lines, marginLeft, yPos);
+    doc.setFont(undefined, 'normal');
+    yPos += para5Lines.length * lineHeight + 6;
+
+    // Formule de politesse
+    const closing = "Nous vous prions d'agréer, Madame, Monsieur, l'expression de nos salutations distinguées.";
+    const closingLines = doc.splitTextToSize(closing, maxWidth);
+    doc.text(closingLines, marginLeft, yPos);
+    yPos += closingLines.length * lineHeight + 10;
 
     // Signature
     doc.setFont(undefined, 'bold');
-    doc.text("Le Chef du Département", 15, yPosition + 10);
-    doc.text("Agence Bibliographique Nationale", 15, yPosition + 15);
+    doc.setFontSize(11);
+    doc.setTextColor(0, 51, 102);
+    doc.text("Le Chef du Département", pageWidth - 15, yPos, { align: 'right' });
+    doc.text("Agence Bibliographique Nationale", pageWidth - 15, yPos + 6, { align: 'right' });
+    
+    // Cachet (simulé)
+    doc.setDrawColor(0, 51, 102);
+    doc.setLineWidth(0.5);
+    doc.circle(pageWidth - 35, yPos + 18, 12, 'S');
+    doc.setFontSize(7);
+    doc.text("BNRM", pageWidth - 35, yPos + 17, { align: 'center' });
+    doc.text("ABN", pageWidth - 35, yPos + 20, { align: 'center' });
 
-    // Footer
-    doc.setFontSize(8);
+    // Ligne de séparation footer
+    doc.setDrawColor(139, 0, 0);
+    doc.setLineWidth(0.5);
+    doc.line(15, pageHeight - 25, pageWidth - 15, pageHeight - 25);
+
+    // Footer avec informations de contact
+    doc.setFontSize(7);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text("Bibliothèque Nationale du Royaume du Maroc - Avenue Ibn Battouta, BP 1003, Rabat-Agdal", pageWidth / 2, pageHeight - 20, { align: 'center' });
+    doc.text("Tél: +212 (0)5 37 77 18 74 | Fax: +212 (0)5 37 77 19 79 | Email: contact@bnrm.ma | www.bnrm.ma", pageWidth / 2, pageHeight - 15, { align: 'center' });
     doc.setFont(undefined, 'italic');
-    doc.text("Ce document est généré automatiquement par le système de gestion du dépôt légal de la BNRM", 15, 280);
+    doc.setFontSize(6);
+    doc.text("Document généré automatiquement par le système de gestion du dépôt légal - Ne nécessite pas de signature manuscrite", pageWidth / 2, pageHeight - 10, { align: 'center' });
 
-    doc.save(`Reclamation_${item.dlNumber}.pdf`);
-    toast.success("Lettre de réclamation générée");
+    doc.save(`Reclamation_DL_${item.dlNumber}_${new Date().toISOString().split('T')[0]}.pdf`);
+    toast.success("Lettre de réclamation générée avec succès");
   };
 
   const sendReminder = (item: EditorialMonitoringItem, type: '20' | '40') => {
