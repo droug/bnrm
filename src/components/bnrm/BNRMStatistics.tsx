@@ -26,6 +26,17 @@ interface StatsData {
   averageProcessingTime: number;
   requestsOverTime: Array<{ date: string; count: number }>;
   monthlyTrends: Array<{ month: string; submitted: number; processed: number }>;
+  editionForecasts: Array<{ year: number; count: number }>;
+  byAuthorNationality: Record<string, number>;
+  byAuthorGender: Record<string, number>;
+  secondaryAuthors: number;
+  duplicatesDetected: number;
+  reciprocalValidations: Array<{ 
+    editor: string; 
+    printer: string; 
+    validated: boolean;
+    date: string;
+  }>;
 }
 
 export const BNRMStatistics = () => {
@@ -58,6 +69,28 @@ export const BNRMStatistics = () => {
       { month: 'Nov 2024', submitted: 12, processed: 10 },
       { month: 'Déc 2024', submitted: 15, processed: 14 },
       { month: 'Jan 2025', submitted: 8, processed: 3 }
+    ],
+    editionForecasts: [
+      { year: 2023, count: 45 },
+      { year: 2024, count: 67 },
+      { year: 2025, count: 52 }
+    ],
+    byAuthorNationality: {
+      'Maroc': 42,
+      'France': 8,
+      'Algérie': 5,
+      'Tunisie': 3
+    },
+    byAuthorGender: {
+      'Masculin': 35,
+      'Féminin': 23
+    },
+    secondaryAuthors: 12,
+    duplicatesDetected: 3,
+    reciprocalValidations: [
+      { editor: 'Maison d\'édition Al Madariss', printer: 'Imprimerie Nationale', validated: true, date: '2025-01-15' },
+      { editor: 'Éditions du Maroc', printer: 'Print House', validated: true, date: '2025-01-18' },
+      { editor: 'Dar Al Kotob', printer: 'Imprimerie Moderne', validated: false, date: '2025-01-20' }
     ]
   });
 
@@ -98,11 +131,35 @@ export const BNRMStatistics = () => {
       ['Type de statistique', 'Valeur'],
       ['Demandes totales', stats.totalRequests],
       ['Temps moyen de traitement (jours)', stats.averageProcessingTime],
+      ['Auteurs secondaires', stats.secondaryAuthors],
+      ['Doublons détectés', stats.duplicatesDetected],
+      [''],
+      ['Répartition par statut'],
       ...statusData.map(s => [`Statut: ${s.name}`, s.value]),
-      ...typeData.map(t => [`Type: ${t.name}`, t.value])
-    ].map(row => row.join(',')).join('\n');
+      [''],
+      ['Répartition par type'],
+      ...typeData.map(t => [`Type: ${t.name}`, t.value]),
+      [''],
+      ['Prévisions d\'édition par an'],
+      ...stats.editionForecasts.map(f => [`Année ${f.year}`, f.count]),
+      [''],
+      ['Nationalité des auteurs'],
+      ...Object.entries(stats.byAuthorNationality).map(([nat, count]) => [nat, count]),
+      [''],
+      ['Genre des auteurs'],
+      ...Object.entries(stats.byAuthorGender).map(([genre, count]) => [genre, count]),
+      [''],
+      ['Validations réciproques éditeur-imprimeur'],
+      ['Éditeur', 'Imprimeur', 'Statut', 'Date'],
+      ...stats.reciprocalValidations.map(v => [
+        v.editor, 
+        v.printer, 
+        v.validated ? 'Validé' : 'En attente',
+        format(new Date(v.date), 'dd/MM/yyyy')
+      ])
+    ].map(row => Array.isArray(row) ? row.join(',') : row).join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -176,7 +233,7 @@ export const BNRMStatistics = () => {
       </Card>
 
       {/* KPIs principaux */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -221,6 +278,30 @@ export const BNRMStatistics = () => {
                 <p className="text-3xl font-bold mt-2">{stats.averageProcessingTime}j</p>
               </div>
               <Calendar className="w-10 h-10 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Auteurs secondaires</p>
+                <p className="text-3xl font-bold mt-2">{stats.secondaryAuthors}</p>
+              </div>
+              <FileText className="w-10 h-10 text-indigo-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Doublons détectés</p>
+                <p className="text-3xl font-bold mt-2">{stats.duplicatesDetected}</p>
+              </div>
+              <TrendingUp className="w-10 h-10 text-red-500" />
             </div>
           </CardContent>
         </Card>
@@ -329,6 +410,107 @@ export const BNRMStatistics = () => {
                 <Bar dataKey="processed" fill="#10B981" name="Traitées" />
               </BarChart>
             </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Prévisions d'édition par an */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Prévisions d'édition</CardTitle>
+            <CardDescription>Nombre de publications prévues par année</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={stats.editionForecasts}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="year" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#8B5CF6" name="Prévisions" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Nationalité des auteurs */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Nationalité des auteurs</CardTitle>
+            <CardDescription>Répartition géographique</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={Object.entries(stats.byAuthorNationality).map(([name, value]) => ({ name, value }))}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, value }) => `${name}: ${value}`}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {Object.entries(stats.byAuthorNationality).map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={['#3B82F6', '#10B981', '#F59E0B', '#EF4444'][index % 4]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Genre des auteurs */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Genre des auteurs</CardTitle>
+            <CardDescription>Répartition par genre</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={Object.entries(stats.byAuthorGender).map(([name, value]) => ({ name, value }))}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, value }) => `${name}: ${value}`}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  <Cell fill="#6366F1" />
+                  <Cell fill="#EC4899" />
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Validations réciproques */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Validations réciproques éditeur-imprimeur</CardTitle>
+            <CardDescription>Suivi des validations croisées</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {stats.reciprocalValidations.map((validation, index) => (
+                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex-1">
+                    <p className="font-medium">{validation.editor} ↔ {validation.printer}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {format(new Date(validation.date), 'dd MMMM yyyy', { locale: fr })}
+                    </p>
+                  </div>
+                  <Badge variant={validation.validated ? "default" : "secondary"}>
+                    {validation.validated ? 'Validé' : 'En attente'}
+                  </Badge>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
