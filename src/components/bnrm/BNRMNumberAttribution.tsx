@@ -23,7 +23,11 @@ import {
   RefreshCw,
   FileText,
   Settings,
-  BarChart3
+  BarChart3,
+  Upload,
+  Plus,
+  Edit,
+  Trash2
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -46,7 +50,7 @@ interface NumberAttribution {
 
 interface NumberRange {
   id: string;
-  number_type: 'isbn' | 'issn';
+  number_type: 'isbn' | 'issn' | 'dl';
   range_start: string;
   range_end: string;
   current_position: string;
@@ -55,6 +59,8 @@ interface NumberRange {
   status: 'active' | 'exhausted' | 'reserved';
   assigned_date: string;
   expiry_date?: string;
+  source?: 'manual' | 'imported' | 'agency';
+  agency?: string;
 }
 
 export const BNRMNumberAttribution = () => {
@@ -68,6 +74,16 @@ export const BNRMNumberAttribution = () => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isAttributionDialogOpen, setIsAttributionDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [isRangeDialogOpen, setIsRangeDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [newRange, setNewRange] = useState({
+    number_type: 'isbn' as 'isbn' | 'issn' | 'dl',
+    range_start: '',
+    range_end: '',
+    source: 'manual' as 'manual' | 'imported' | 'agency',
+    agency: '',
+    expiry_date: ''
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -124,7 +140,9 @@ export const BNRMNumberAttribution = () => {
           used_numbers: 2346,
           status: 'active',
           assigned_date: '2024-01-01',
-          expiry_date: '2026-12-31'
+          expiry_date: '2026-12-31',
+          source: 'agency',
+          agency: 'Agence Internationale ISBN'
         },
         {
           id: '2',
@@ -135,7 +153,21 @@ export const BNRMNumberAttribution = () => {
           total_numbers: 10000,
           used_numbers: 4567,
           status: 'active',
-          assigned_date: '2024-01-01'
+          assigned_date: '2024-01-01',
+          source: 'agency',
+          agency: 'Centre International ISSN'
+        },
+        {
+          id: '3',
+          number_type: 'dl',
+          range_start: 'DL-2025-000001',
+          range_end: 'DL-2025-999999',
+          current_position: 'DL-2025-000123',
+          total_numbers: 999999,
+          used_numbers: 123,
+          status: 'active',
+          assigned_date: '2025-01-01',
+          source: 'manual'
         }
       ]);
 
@@ -288,6 +320,92 @@ export const BNRMNumberAttribution = () => {
     return 'bg-green-500';
   };
 
+  const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      // Simulate Excel import - in real app, use a library like xlsx
+      toast({
+        title: "Import en cours",
+        description: "Traitement du fichier Excel...",
+      });
+
+      // Mock processing
+      setTimeout(() => {
+        toast({
+          title: "Succès",
+          description: "50 numéros importés avec succès",
+        });
+        setIsImportDialogOpen(false);
+      }, 2000);
+
+    } catch (error) {
+      console.error("Error importing Excel:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'importer le fichier",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddRange = () => {
+    const calculateTotalNumbers = () => {
+      if (newRange.number_type === 'isbn') {
+        // Calculate from ISBN ranges
+        return 10000;
+      } else if (newRange.number_type === 'issn') {
+        return 10000;
+      } else {
+        // DL numbers
+        const start = parseInt(newRange.range_start.split('-').pop() || '0');
+        const end = parseInt(newRange.range_end.split('-').pop() || '0');
+        return end - start + 1;
+      }
+    };
+
+    const range: NumberRange = {
+      id: Date.now().toString(),
+      number_type: newRange.number_type,
+      range_start: newRange.range_start,
+      range_end: newRange.range_end,
+      current_position: newRange.range_start,
+      total_numbers: calculateTotalNumbers(),
+      used_numbers: 0,
+      status: 'active',
+      assigned_date: new Date().toISOString().split('T')[0],
+      expiry_date: newRange.expiry_date || undefined,
+      source: newRange.source,
+      agency: newRange.agency || undefined
+    };
+
+    setRanges(prev => [...prev, range]);
+    
+    toast({
+      title: "Succès",
+      description: `Plage ${newRange.number_type.toUpperCase()} ajoutée avec succès`,
+    });
+
+    setIsRangeDialogOpen(false);
+    setNewRange({
+      number_type: 'isbn',
+      range_start: '',
+      range_end: '',
+      source: 'manual',
+      agency: '',
+      expiry_date: ''
+    });
+  };
+
+  const downloadExcelTemplate = () => {
+    // In real app, generate actual Excel template
+    toast({
+      title: "Téléchargement",
+      description: "Template Excel en cours de téléchargement...",
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -300,14 +418,59 @@ export const BNRMNumberAttribution = () => {
         </div>
         
         <div className="flex space-x-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={downloadExcelTemplate}>
             <Download className="w-4 h-4 mr-2" />
-            Rapport mensuel
+            Template Excel
           </Button>
-          <Button variant="outline">
-            <Settings className="w-4 h-4 mr-2" />
-            Configurer tranches
-          </Button>
+          <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Upload className="w-4 h-4 mr-2" />
+                Importer Excel
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Importer des numéros depuis Excel</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label>Type de numéros</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner le type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="isbn">ISBN</SelectItem>
+                      <SelectItem value="issn">ISSN</SelectItem>
+                      <SelectItem value="dl">Dépôt Légal</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label>Fichier Excel</Label>
+                  <Input 
+                    type="file" 
+                    accept=".xlsx,.xls"
+                    onChange={handleImportExcel}
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Format: numéro_début, numéro_fin, agence, date_expiration
+                  </p>
+                </div>
+
+                <div className="bg-muted p-3 rounded-md text-sm">
+                  <p className="font-medium mb-1">Instructions:</p>
+                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                    <li>Téléchargez le template Excel ci-dessus</li>
+                    <li>Remplissez les colonnes avec vos numéros</li>
+                    <li>Importez le fichier complété</li>
+                  </ul>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -570,6 +733,16 @@ export const BNRMNumberAttribution = () => {
                         <div className="flex justify-between">
                           <span>Date d'expiration:</span>
                           <span>{format(new Date(range.expiry_date), "dd/MM/yyyy", { locale: fr })}</span>
+                        </div>
+                      )}
+                      {range.source && (
+                        <div className="flex justify-between">
+                          <span>Source:</span>
+                          <Badge variant="outline" className="text-xs">
+                            {range.source === 'agency' ? `🌐 ${range.agency}` :
+                             range.source === 'imported' ? '📊 Import Excel' :
+                             '✏️ Manuel'}
+                          </Badge>
                         </div>
                       )}
                     </div>
