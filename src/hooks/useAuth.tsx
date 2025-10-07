@@ -23,7 +23,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<any | null>(null);
 
   useEffect(() => {
-    // Get initial session first
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Fetch user profile
+          setTimeout(async () => {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .single();
+            
+            // Fetch user role from user_roles table
+            const { data: roleData } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', session.user.id)
+              .order('granted_at', { ascending: false })
+              .limit(1)
+              .single();
+            
+            // Combine profile with role
+            setProfile({
+              ...profileData,
+              role: roleData?.role || 'visitor'
+            });
+          }, 0);
+        } else {
+          setProfile(null);
+        }
+        
+        setLoading(false);
+      }
+    );
+
+    // Get initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       console.log("AuthProvider - Initial session:", session?.user?.id);
       setSession(session);
@@ -36,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .from('profiles')
           .select('*')
           .eq('user_id', session.user.id)
-          .maybeSingle();
+          .single();
         console.log("AuthProvider - Profile query result:", { profileData, error });
         
         // Fetch user role from user_roles table
@@ -46,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .eq('user_id', session.user.id)
           .order('granted_at', { ascending: false })
           .limit(1)
-          .maybeSingle();
+          .single();
         
         // Combine profile with role
         setProfile({
@@ -60,42 +98,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       setLoading(false);
     });
-
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Defer profile fetch to avoid blocking
-          setTimeout(async () => {
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('user_id', session.user.id)
-              .maybeSingle();
-            
-            // Fetch user role from user_roles table
-            const { data: roleData } = await supabase
-              .from('user_roles')
-              .select('role')
-              .eq('user_id', session.user.id)
-              .order('granted_at', { ascending: false })
-              .limit(1)
-              .maybeSingle();
-            
-            // Combine profile with role
-            setProfile({
-              ...profileData,
-              role: roleData?.role || 'visitor'
-            });
-          }, 0);
-        } else {
-          setProfile(null);
-        }
-      }
-    );
 
     return () => subscription.unsubscribe();
   }, []);
@@ -170,7 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .single();
       
       // Fetch user role
       const { data: roleData } = await supabase
@@ -179,7 +181,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('user_id', user.id)
         .order('granted_at', { ascending: false })
         .limit(1)
-        .maybeSingle();
+        .single();
       
       // Combine profile with role
       setProfile({
