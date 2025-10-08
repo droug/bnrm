@@ -106,42 +106,42 @@ export default function BNRMBackOffice() {
 
             {/* Navigation Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-10 gap-2 h-auto p-2">
-                <TabsTrigger value="dashboard" className="flex items-center gap-2 px-3 py-2">
-                  <BarChart3 className="h-4 w-4" />
-                  <span className="hidden lg:inline">{t('bnrm.dashboard.tab')}</span>
+              <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto p-2 bg-muted">
+                <TabsTrigger value="dashboard" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                  <BarChart3 className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden md:inline">Tableau de bord</span>
                 </TabsTrigger>
-                <TabsTrigger value="requests" className="flex items-center gap-2 px-3 py-2">
-                  <FileText className="h-4 w-4" />
-                  <span className="hidden lg:inline">Demandes en Attente</span>
+                <TabsTrigger value="requests" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                  <FileText className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden md:inline">Demandes en Attente</span>
                 </TabsTrigger>
-                <TabsTrigger value="attribution" className="flex items-center gap-2 px-3 py-2">
-                  <Hash className="h-4 w-4" />
-                  <span className="hidden lg:inline">Attribution</span>
+                <TabsTrigger value="attribution" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                  <Hash className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden md:inline">Attributions</span>
                 </TabsTrigger>
-                <TabsTrigger value="deposits" className="flex items-center gap-2 px-3 py-2">
-                  <Archive className="h-4 w-4" />
-                  <span className="hidden lg:inline">Dépôts</span>
+                <TabsTrigger value="deposits" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                  <Archive className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden md:inline">Dépôts</span>
                 </TabsTrigger>
-                <TabsTrigger value="workflow" className="flex items-center gap-2 px-3 py-2">
-                  <Settings className="h-4 w-4" />
-                  <span className="hidden lg:inline">{t('bnrm.workflow.tab')}</span>
+                <TabsTrigger value="workflow" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                  <Settings className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden md:inline">Workflow</span>
                 </TabsTrigger>
-                <TabsTrigger value="statistics" className="flex items-center gap-2 px-3 py-2">
-                  <BarChart3 className="h-4 w-4" />
-                  <span className="hidden lg:inline">Statistiques</span>
+                <TabsTrigger value="statistics" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                  <BarChart3 className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden md:inline">Statistiques</span>
                 </TabsTrigger>
-                <TabsTrigger value="editorial-monitoring" className="flex items-center gap-2 px-3 py-2">
-                  <Search className="h-4 w-4" />
-                  <span className="hidden lg:inline">Veille</span>
+                <TabsTrigger value="editorial-monitoring" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                  <Search className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden md:inline">Veille</span>
                 </TabsTrigger>
-                <TabsTrigger value="notifications" className="flex items-center gap-2 px-3 py-2">
-                  <Bell className="h-4 w-4" />
-                  <span className="hidden lg:inline">Notifications</span>
+                <TabsTrigger value="notifications" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                  <Bell className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden md:inline">Notifications</span>
                 </TabsTrigger>
-                <TabsTrigger value="reports" className="flex items-center gap-2 px-3 py-2">
-                  <Database className="h-4 w-4" />
-                  <span className="hidden lg:inline">{t('bnrm.reports.tab')}</span>
+                <TabsTrigger value="reports" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                  <Database className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden md:inline">Rapports</span>
                 </TabsTrigger>
               </TabsList>
 
