@@ -48,6 +48,8 @@ import ReproductionDetailsPage from "./pages/ReproductionDetailsPage";
 import HelpPage from "./pages/HelpPage";
 import PreservationPage from "./pages/PreservationPage";
 import DigitalLibraryBackoffice from "./pages/DigitalLibraryBackoffice";
+import ProfessionalManagement from "./pages/ProfessionalManagement";
+import ProfessionalSignup from "./pages/ProfessionalSignup";
 import DigitalLibraryDocuments from "./pages/DigitalLibraryDocuments";
 import DigitalLibraryUsers from "./pages/DigitalLibraryUsers";
 import DigitalLibraryAnalytics from "./pages/DigitalLibraryAnalytics";
@@ -161,6 +163,8 @@ const App = () => (
           <Route path="/admin/digital-library/bulk-import" element={<DigitalLibraryBulkImport />} />
           <Route path="/access-policies" element={<AccessPolicies />} />
           <Route path="/politiques-acces" element={<AccessPolicies />} />
+          <Route path="/admin/professional-management" element={<ProfessionalManagement />} />
+          <Route path="/professional-signup" element={<ProfessionalSignup />} />
           
           {/* CBM Portal Routes */}
           <Route path="/cbm" element={<CBMPortal />} />

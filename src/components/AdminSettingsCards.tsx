@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, Edit, Library } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, Edit, Library, UserCog } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -63,6 +63,13 @@ export function AdminSettingsCards() {
       description: "Gestion des documents numérisés et leurs permissions",
       href: "/admin/digital-library",
       permission: "content.manage"
+    },
+    {
+      icon: UserCog,
+      title: "Demandes Professionnelles",
+      description: "Inviter et valider les inscriptions des professionnels",
+      href: "/admin/professional-management",
+      permission: "users.manage"
     }
   ];
 
