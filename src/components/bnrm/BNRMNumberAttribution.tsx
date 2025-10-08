@@ -101,7 +101,53 @@ export const BNRMNumberAttribution = () => {
         .eq("status", "valide_par_b")
         .order("created_at", { ascending: true });
 
-      setPendingRequests(requests || []);
+      // Mock data for demonstration if no real data
+      const mockPendingRequests = [
+        {
+          id: '1',
+          status: 'valide_par_b',
+          metadata: {
+            publication: {
+              title: 'Histoire Contemporaine du Maroc',
+              type: 'monographie'
+            },
+            declarant: {
+              name: 'Editions Dar Al Fikr'
+            }
+          },
+          created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: '2',
+          status: 'valide_par_b',
+          metadata: {
+            publication: {
+              title: 'Revue Marocaine de Droit',
+              type: 'periodique'
+            },
+            declarant: {
+              name: 'Faculté de Droit de Rabat'
+            }
+          },
+          created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: '3',
+          status: 'valide_par_b',
+          metadata: {
+            publication: {
+              title: 'Atlas du Patrimoine Marocain',
+              type: 'monographie'
+            },
+            declarant: {
+              name: 'Institut Royal de la Culture Amazighe'
+            }
+          },
+          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+        }
+      ];
+
+      setPendingRequests((requests && requests.length > 0) ? requests : mockPendingRequests);
 
       // Mock data for attributions and ranges - in real app, these would come from respective tables
       setAttributions([

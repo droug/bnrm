@@ -65,16 +65,10 @@ export const ReservedRangesManager = () => {
     try {
       setLoading(true);
 
-      // Fetch reserved ranges with user info
+      // Fetch reserved ranges without join (no foreign key exists)
       const { data: rangesData, error: rangesError } = await supabase
         .from('reserved_number_ranges')
-        .select(`
-          *,
-          requester:requester_id (
-            id,
-            email
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (rangesError) throw rangesError;
