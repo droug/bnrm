@@ -165,7 +165,6 @@ serve(async (req) => {
         publication_type: 'monographies',
         monograph_type: 'livres',
         author_name: 'Dr. Ahmed El Fassi',
-        isbn_requested: true,
         language: 'fr',
         publication_date: new Date().toISOString().split('T')[0],
         publisher_name: 'Éditions Test Maroc',
