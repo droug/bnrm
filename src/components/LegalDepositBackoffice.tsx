@@ -22,8 +22,11 @@ import {
   Mail,
   Calendar,
   BookOpen,
-  Archive
+  Archive,
+  UserPlus
 } from "lucide-react";
+import { AddPartyDialog } from "@/components/legal-deposit/AddPartyDialog";
+import { PartiesListForRequest } from "@/components/legal-deposit/PartiesListForRequest";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -534,6 +537,28 @@ const RequestDetailsModal = ({ request, onUpdateStatus, onAssignNumbers }: {
                 <p><strong>Type:</strong> {request.initiator?.professional_type}</p>
                 <p><strong>Email:</strong> {request.initiator?.email}</p>
               </div>
+              
+              {request.collaborator && (
+                <div className="mt-4">
+                  <h4 className="font-medium mb-2">Collaborateur</h4>
+                  <div className="space-y-2 text-sm">
+                    <p><strong>Société:</strong> {request.collaborator?.company_name}</p>
+                    <p><strong>Type:</strong> {request.collaborator?.professional_type}</p>
+                    <p><strong>Email:</strong> {request.collaborator?.email}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="mt-4">
+            <h4 className="font-medium mb-2 flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Parties impliquées
+            </h4>
+            <PartiesListForRequest requestId={request.id} />
+            <div className="mt-2">
+              <AddPartyDialog requestId={request.id} onPartyAdded={() => {}} />
             </div>
           </div>
         </TabsContent>
