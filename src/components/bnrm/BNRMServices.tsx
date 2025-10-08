@@ -96,9 +96,11 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
     // Appliquer le filtre de catégorie si spécifié
     let matchesFilter = true;
     if (filterCategory === "Inscription") {
-      matchesFilter = service.categorie === "Inscription";
+      // Abonnements = uniquement S001, S002, S003
+      matchesFilter = ['S001', 'S002', 'S003'].includes(service.id_service);
     } else if (filterCategory === "exclude-Inscription") {
-      matchesFilter = service.categorie !== "Inscription";
+      // Services = tous sauf S001, S002, S003
+      matchesFilter = !['S001', 'S002', 'S003'].includes(service.id_service);
     }
     
     return matchesSearch && matchesCategory && matchesFilter;
