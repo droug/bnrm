@@ -138,15 +138,15 @@ export function BoxReservationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>Réservation de Box</DialogTitle>
           <DialogDescription>
             Remplissez le formulaire pour réserver un box de travail
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form id="box-reservation-form" onSubmit={handleSubmit} className="space-y-6 overflow-y-auto flex-1 px-1">
           <div className="bg-muted/30 p-4 rounded-lg space-y-4">
             <h3 className="font-semibold text-sm">Informations personnelles</h3>
             
@@ -270,22 +270,23 @@ export function BoxReservationDialog({
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Annuler
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Envoi en cours...
-                </>
-              ) : (
-                "Confirmer la réservation"
-              )}
-            </Button>
-          </div>
         </form>
+
+        <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Annuler
+          </Button>
+          <Button type="submit" form="box-reservation-form" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Envoi en cours...
+              </>
+            ) : (
+              "Confirmer la réservation"
+            )}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
