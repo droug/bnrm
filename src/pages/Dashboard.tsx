@@ -282,7 +282,7 @@ export default function Dashboard() {
                     <span>Demandes d'accès</span>
                   </CardTitle>
                   <CardDescription>
-                    Gérer les demandes d'accès aux manuscrits
+                    Traiter et gérer les demandes d'accès
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
