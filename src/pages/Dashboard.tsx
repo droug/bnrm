@@ -282,7 +282,7 @@ export default function Dashboard() {
                     <span>Demandes d'accès</span>
                   </CardTitle>
                   <CardDescription>
-                    Gérer les demandes d'accès en attente
+                    Gérer les demandes d'accès aux manuscrits
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -296,7 +296,7 @@ export default function Dashboard() {
                     className="w-full bg-orange-600 hover:bg-orange-700 text-white" 
                     onClick={() => navigate('/admin/access-requests')}
                   >
-                    Gérer les demandes
+                    Gérer les demandes d'accès
                   </Button>
                 </CardContent>
               </Card>
