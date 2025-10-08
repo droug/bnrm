@@ -37,3 +37,22 @@ verify_jwt = true
 
 [functions.batch-translate-all-content]
 verify_jwt = true
+
+# Microservices Architecture
+[functions.analytics-service]
+verify_jwt = false
+
+[functions.workflow-service]
+verify_jwt = true
+
+[functions.notification-service]
+verify_jwt = false
+
+[functions.document-service]
+verify_jwt = false
+
+[functions.content-service]
+verify_jwt = true
+
+[functions.user-service]
+verify_jwt = true
