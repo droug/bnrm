@@ -63,8 +63,8 @@ export default function BNRMTariffsPage() {
                   Services d'abonnement et tarifs associés
                 </p>
               </div>
-              <BNRMServices />
-              <BNRMTariffs />
+              <BNRMServices filterCategory="Inscription" />
+              <BNRMTariffs filterCategory="Inscription" />
             </TabsContent>
 
             <TabsContent value="services" className="space-y-6 mt-6">
@@ -74,8 +74,8 @@ export default function BNRMTariffsPage() {
                   Services à la demande et tarifs associés
                 </p>
               </div>
-              <BNRMServices />
-              <BNRMTariffs />
+              <BNRMServices filterCategory="exclude-Inscription" />
+              <BNRMTariffs filterCategory="exclude-Inscription" />
             </TabsContent>
 
             <TabsContent value="statistics" className="space-y-6 mt-6">

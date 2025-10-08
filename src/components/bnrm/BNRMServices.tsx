@@ -21,7 +21,11 @@ interface BNRMService {
   updated_at: string;
 }
 
-export function BNRMServices() {
+interface BNRMServicesProps {
+  filterCategory?: string; // "Inscription" pour abonnements, "exclude-Inscription" pour services
+}
+
+export function BNRMServices({ filterCategory }: BNRMServicesProps) {
   const [services, setServices] = useState<BNRMService[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -70,7 +74,16 @@ export function BNRMServices() {
     const matchesSearch = service.nom_service.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          service.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || service.categorie === selectedCategory;
-    return matchesSearch && matchesCategory;
+    
+    // Appliquer le filtre de catégorie si spécifié
+    let matchesFilter = true;
+    if (filterCategory === "Inscription") {
+      matchesFilter = service.categorie === "Inscription";
+    } else if (filterCategory === "exclude-Inscription") {
+      matchesFilter = service.categorie !== "Inscription";
+    }
+    
+    return matchesSearch && matchesCategory && matchesFilter;
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
