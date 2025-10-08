@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File } from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -18,6 +19,7 @@ interface LegalDepositDeclarationProps {
 }
 
 export default function LegalDepositDeclaration({ depositType, onClose }: LegalDepositDeclarationProps) {
+  const navigate = useNavigate();
   const { language, isRTL } = useLanguage();
   const [currentStep, setCurrentStep] = useState<"type_selection" | "editor_auth" | "printer_auth" | "form_filling" | "confirmation">("type_selection");
   const [userType, setUserType] = useState<"editor" | "printer" | null>(null);
@@ -1718,24 +1720,34 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
   if (currentStep === "form_filling") {
     return (
-      <Card className="w-full max-w-6xl mx-auto">
-        <CardHeader>
-          <CardTitle>
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
+      <div className="w-full max-w-6xl mx-auto space-y-4">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-2"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          {language === 'ar' ? 'رجوع' : 'Retour'}
+        </Button>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                {language === 'ar' ? 
+                  `تصريح الإيداع القانوني - ${depositTypeLabels[depositType]}` :
+                  `Déclaration de dépôt légal - ${depositTypeLabels[depositType]}`
+                }
+              </div>
+            </CardTitle>
+            <CardDescription>
               {language === 'ar' ? 
-                `تصريح الإيداع القانوني - ${depositTypeLabels[depositType]}` :
-                `Déclaration de dépôt légal - ${depositTypeLabels[depositType]}`
+                'يرجى ملء جميع الحقول المطلوبة' :
+                'Veuillez remplir tous les champs requis'
               }
-            </div>
-          </CardTitle>
-          <CardDescription>
-            {language === 'ar' ? 
-              'يرجى ملء جميع الحقول المطلوبة' :
-              'Veuillez remplir tous les champs requis'
-            }
-          </CardDescription>
-        </CardHeader>
+            </CardDescription>
+          </CardHeader>
         
         <CardContent className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
           {language === 'ar' ? renderArabicForm() : renderFrenchForm()}
@@ -1757,7 +1769,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             </Button>
           </div>
         </CardFooter>
-      </Card>
+        </Card>
+      </div>
     );
   }
 
