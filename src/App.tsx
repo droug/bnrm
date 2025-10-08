@@ -84,6 +84,7 @@ import AccessRequestsManagement from "./pages/AccessRequestsManagement";
 import CommitteeDashboard from "./pages/CommitteeDashboard";
 import DepositApprovals from "./pages/DepositApprovals";
 import EmailManagement from "./pages/EmailManagement";
+import LegalDepositApprovals from "./pages/LegalDepositApprovals";
 
 
 
@@ -135,6 +136,8 @@ const App = () => (
         <Route path="/admin/catalog-metadata" element={<CatalogMetadata />} />
         <Route path="/admin/reproduction" element={<ReproductionBackofficePage />} />
         <Route path="/admin/committee" element={<CommitteeDashboard />} />
+        <Route path="/legal-deposit/approvals" element={<LegalDepositApprovals />} />
+        <Route path="/depot-legal/approbations" element={<LegalDepositApprovals />} />
         <Route path="/digital-library" element={<DigitalLibrary />} />
         <Route path="/digital-library/:category" element={<DigitalLibrary />} />
         <Route path="/book-reader/:id" element={<BookReader />} />
