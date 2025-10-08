@@ -5,6 +5,7 @@ import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
 import { useNavigate } from "react-router-dom";
+import { CreateTestDepositButton } from "@/components/admin/CreateTestDepositButton";
 
 export default function AdminSettings() {
   const navigate = useNavigate();
@@ -134,6 +135,21 @@ export default function AdminSettings() {
                   Gérez les paramètres système et les fonctionnalités administratives
                 </p>
               </div>
+            </div>
+            
+            {/* Bouton de création de test */}
+            <div className="mb-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle>🧪 Environnement de Test</CardTitle>
+                  <CardDescription>
+                    Créer des données de test pour le système de dépôt légal
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CreateTestDepositButton />
+                </CardContent>
+              </Card>
             </div>
             
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
