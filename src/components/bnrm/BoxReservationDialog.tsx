@@ -138,10 +138,23 @@ export function BoxReservationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl p-0 max-h-none overflow-visible">
-        <div className="w-full max-h-[85vh] flex flex-col bg-background rounded-lg">
-          {/* Header fixe */}
-          <div className="p-4 border-b bg-background flex-shrink-0 rounded-t-lg">
+      <DialogContent 
+        className="max-w-2xl p-0 gap-0"
+        style={{
+          position: 'fixed',
+          top: '5vh',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          maxHeight: '90vh',
+          width: '90vw',
+          maxWidth: '800px',
+          margin: 0,
+        }}
+      >
+        {/* Container principal avec hauteur fixe */}
+        <div style={{ display: 'flex', flexDirection: 'column', height: '85vh', maxHeight: '650px' }}>
+          {/* Header - hauteur fixe */}
+          <div style={{ flexShrink: 0, padding: '16px', borderBottom: '1px solid hsl(var(--border))' }}>
             <DialogHeader>
               <DialogTitle>Réservation de Box</DialogTitle>
               <DialogDescription>
@@ -150,10 +163,15 @@ export function BoxReservationDialog({
             </DialogHeader>
           </div>
 
-          {/* Zone scrollable avec hauteur calculée */}
-          <div className="overflow-y-auto overflow-x-hidden p-4 flex-1 min-h-0">
+          {/* Zone de contenu - scrollable */}
+          <div style={{ 
+            flex: 1, 
+            overflowY: 'auto', 
+            overflowX: 'hidden', 
+            padding: '16px',
+            minHeight: 0 
+          }}>
             <form id="box-reservation-form" onSubmit={handleSubmit} className="space-y-4">
-              {/* Section informations personnelles */}
               <div className="bg-muted/30 p-3 rounded-lg space-y-3">
                 <h3 className="font-semibold text-sm">Informations personnelles</h3>
                 
@@ -179,7 +197,6 @@ export function BoxReservationDialog({
                 </div>
               </div>
 
-              {/* Section détails de réservation */}
               <div className="bg-muted/30 p-3 rounded-lg space-y-3">
                 <h3 className="font-semibold text-sm">Détails de la réservation</h3>
                 
@@ -282,8 +299,16 @@ export function BoxReservationDialog({
             </form>
           </div>
 
-          {/* Footer fixe */}
-          <div className="flex justify-end gap-2 p-4 border-t bg-background flex-shrink-0 rounded-b-lg">
+          {/* Footer - hauteur fixe */}
+          <div style={{ 
+            flexShrink: 0, 
+            padding: '16px', 
+            borderTop: '1px solid hsl(var(--border))',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '8px',
+            backgroundColor: 'hsl(var(--background))'
+          }}>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Annuler
             </Button>
