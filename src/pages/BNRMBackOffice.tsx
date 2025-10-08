@@ -106,40 +106,40 @@ export default function BNRMBackOffice() {
 
             {/* Navigation Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-10">
-                <TabsTrigger value="dashboard" className="flex items-center gap-2">
+              <TabsList className="grid w-full grid-cols-10 gap-2 h-auto p-2">
+                <TabsTrigger value="dashboard" className="flex items-center gap-2 px-3 py-2">
                   <BarChart3 className="h-4 w-4" />
                   <span className="hidden lg:inline">{t('bnrm.dashboard.tab')}</span>
                 </TabsTrigger>
-                <TabsTrigger value="requests" className="flex items-center gap-2">
+                <TabsTrigger value="requests" className="flex items-center gap-2 px-3 py-2">
                   <FileText className="h-4 w-4" />
                   <span className="hidden lg:inline">Demandes en Attente</span>
                 </TabsTrigger>
-                <TabsTrigger value="attribution" className="flex items-center gap-2">
+                <TabsTrigger value="attribution" className="flex items-center gap-2 px-3 py-2">
                   <Hash className="h-4 w-4" />
                   <span className="hidden lg:inline">Attribution</span>
                 </TabsTrigger>
-                <TabsTrigger value="deposits" className="flex items-center gap-2">
+                <TabsTrigger value="deposits" className="flex items-center gap-2 px-3 py-2">
                   <Archive className="h-4 w-4" />
                   <span className="hidden lg:inline">Dépôts</span>
                 </TabsTrigger>
-                <TabsTrigger value="workflow" className="flex items-center gap-2">
+                <TabsTrigger value="workflow" className="flex items-center gap-2 px-3 py-2">
                   <Settings className="h-4 w-4" />
                   <span className="hidden lg:inline">{t('bnrm.workflow.tab')}</span>
                 </TabsTrigger>
-                <TabsTrigger value="statistics" className="flex items-center gap-2">
+                <TabsTrigger value="statistics" className="flex items-center gap-2 px-3 py-2">
                   <BarChart3 className="h-4 w-4" />
                   <span className="hidden lg:inline">Statistiques</span>
                 </TabsTrigger>
-                <TabsTrigger value="editorial-monitoring" className="flex items-center gap-2">
+                <TabsTrigger value="editorial-monitoring" className="flex items-center gap-2 px-3 py-2">
                   <Search className="h-4 w-4" />
                   <span className="hidden lg:inline">Veille</span>
                 </TabsTrigger>
-                <TabsTrigger value="notifications" className="flex items-center gap-2">
+                <TabsTrigger value="notifications" className="flex items-center gap-2 px-3 py-2">
                   <Bell className="h-4 w-4" />
                   <span className="hidden lg:inline">Notifications</span>
                 </TabsTrigger>
-                <TabsTrigger value="reports" className="flex items-center gap-2">
+                <TabsTrigger value="reports" className="flex items-center gap-2 px-3 py-2">
                   <Database className="h-4 w-4" />
                   <span className="hidden lg:inline">{t('bnrm.reports.tab')}</span>
                 </TabsTrigger>
