@@ -1,13 +1,5 @@
 import { useState } from "react";
-import { 
-  ScrollableDialog, 
-  ScrollableDialogContent, 
-  ScrollableDialogDescription, 
-  ScrollableDialogHeader, 
-  ScrollableDialogTitle,
-  ScrollableDialogBody,
-  ScrollableDialogFooter
-} from "@/components/ui/scrollable-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -128,35 +120,35 @@ export function BoxReservationDialog({
 
   if (!user) {
     return (
-      <ScrollableDialog open={open} onOpenChange={onOpenChange}>
-        <ScrollableDialogContent className="max-w-md">
-          <ScrollableDialogHeader>
-            <ScrollableDialogTitle>Authentification requise</ScrollableDialogTitle>
-            <ScrollableDialogDescription>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Authentification requise</DialogTitle>
+            <DialogDescription>
               Veuillez vous connecter pour réserver un box.
-            </ScrollableDialogDescription>
-          </ScrollableDialogHeader>
-          <ScrollableDialogBody>
-            <Button onClick={() => window.location.href = "/auth"} className="w-full">
-              Se connecter / S'inscrire
-            </Button>
-          </ScrollableDialogBody>
-        </ScrollableDialogContent>
-      </ScrollableDialog>
+            </DialogDescription>
+          </DialogHeader>
+          <Button onClick={() => window.location.href = "/auth"} className="w-full">
+            Se connecter / S'inscrire
+          </Button>
+        </DialogContent>
+      </Dialog>
     );
   }
 
   return (
-    <ScrollableDialog open={open} onOpenChange={onOpenChange}>
-      <ScrollableDialogContent className="max-w-2xl">
-        <ScrollableDialogHeader>
-          <ScrollableDialogTitle>Réservation de Box</ScrollableDialogTitle>
-          <ScrollableDialogDescription>
-            Remplissez le formulaire pour réserver un box de travail
-          </ScrollableDialogDescription>
-        </ScrollableDialogHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl p-0 gap-0 max-h-[600px] flex flex-col">
+        <div className="p-4 pb-3 border-b">
+          <DialogHeader>
+            <DialogTitle>Réservation de Box</DialogTitle>
+            <DialogDescription>
+              Remplissez le formulaire pour réserver un box de travail
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <ScrollableDialogBody>
+        <div className="overflow-y-auto flex-1 p-4" style={{ maxHeight: '400px' }}>
           <form id="box-reservation-form" onSubmit={handleSubmit} className="space-y-4">
             <div className="bg-muted/30 p-3 rounded-lg space-y-3">
               <h3 className="font-semibold text-sm">Informations personnelles</h3>
@@ -283,9 +275,9 @@ export function BoxReservationDialog({
               </div>
             </div>
           </form>
-        </ScrollableDialogBody>
+        </div>
 
-        <ScrollableDialogFooter>
+        <div className="flex justify-end gap-2 p-4 pt-3 border-t bg-background">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
@@ -299,8 +291,8 @@ export function BoxReservationDialog({
               "Confirmer la réservation"
             )}
           </Button>
-        </ScrollableDialogFooter>
-      </ScrollableDialogContent>
-    </ScrollableDialog>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
