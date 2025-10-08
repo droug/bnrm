@@ -37,7 +37,7 @@ export default function AdminSettings() {
     {
       icon: ClockAlert,
       title: "Demandes en attente",
-      description: "Traiter les demandes d'accès aux manuscrits",
+      description: "Traiter les demandes d'accès et Abonnements",
       href: "/admin/access-requests",
       permission: "requests.manage",
       gradient: "from-orange-500 to-amber-600"
@@ -105,6 +105,14 @@ export default function AdminSettings() {
       href: "/admin/email-management",
       permission: "content.manage",
       gradient: "from-green-500 to-emerald-600"
+    },
+    {
+      icon: UserCog,
+      title: "Demandes Professionnelles",
+      description: "Inviter et valider les inscriptions des professionnels",
+      href: "/admin/professional-management",
+      permission: "users.manage",
+      gradient: "from-indigo-500 to-indigo-600"
     }
   ];
 
