@@ -92,6 +92,12 @@ export default function AccessRequestsManagement() {
 
       if (error) throw error;
       
+      // Filtrer uniquement les demandes avec types d'abonnements
+      const subscriptionTypes = ['free_access', 'basic_subscription', 'premium_subscription', 'institutional_subscription'];
+      const filteredDbRequests = requestsWithProfiles.filter(req => 
+        subscriptionTypes.includes(req.request_type)
+      );
+      
       // Ajouter des exemples de demandes avec types d'abonnements
       const mockRequests: AccessRequest[] = [
         {
@@ -180,8 +186,8 @@ export default function AccessRequestsManagement() {
         }
       ];
 
-      // Combiner les vraies données avec les exemples
-      const allRequests = [...mockRequests, ...requestsWithProfiles];
+      // Combiner uniquement avec les demandes filtrées de la base de données
+      const allRequests = [...mockRequests, ...filteredDbRequests];
       setRequests(allRequests);
     } catch (error) {
       console.error('Error fetching requests:', error);
