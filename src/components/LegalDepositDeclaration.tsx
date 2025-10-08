@@ -12,6 +12,8 @@ import { Separator } from "@/components/ui/separator";
 import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LegalDepositDeclarationProps {
   depositType: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees";
@@ -21,6 +23,7 @@ interface LegalDepositDeclarationProps {
 export default function LegalDepositDeclaration({ depositType, onClose }: LegalDepositDeclarationProps) {
   const navigate = useNavigate();
   const { language, isRTL } = useLanguage();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<"type_selection" | "editor_auth" | "printer_auth" | "form_filling" | "confirmation">("type_selection");
   const [userType, setUserType] = useState<"editor" | "printer" | null>(null);
   const [partnerConfirmed, setPartnerConfirmed] = useState(false);
@@ -1480,13 +1483,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   };
 
   const handleFormSubmit = async () => {
-    if (!acceptedPrivacy) {
-      toast.error(language === 'ar' ? "يجب قبول شرط حماية البيانات" : "Vous devez accepter la clause de protection des données");
+    if (!user) {
+      toast.error("Vous devez être connecté pour soumettre une déclaration");
       return;
     }
 
-    if (!partnerConfirmed) {
-      toast.error(language === 'ar' ? "تأكيد الشراكة مطلوب" : "La confirmation réciproque entre éditeur et imprimeur est requise");
+    if (!acceptedPrivacy) {
+      toast.error(language === 'ar' ? "يجب قبول شرط حماية البيانات" : "Vous devez accepter la clause de protection des données");
       return;
     }
 
@@ -1502,22 +1505,120 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       return;
     }
 
-    // Submit form data with files
-    console.log("Submitting declaration:", {
-      type: depositType,
-      editor: editorData,
-      printer: printerData,
-      declaration: formData,
-      documents: Object.keys(uploadedFiles).map(key => ({
-        type: key,
-        file: uploadedFiles[key],
-        name: uploadedFiles[key].name,
-        size: uploadedFiles[key].size
-      }))
-    });
+    try {
+      // Récupérer l'ID du registre professionnel de l'utilisateur
+      const { data: professionalData, error: professionalError } = await supabase
+        .from('professional_registry')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
 
-    toast.success(language === 'ar' ? "تم إرسال التصريح بنجاح" : "Déclaration de dépôt légal soumise avec succès");
-    setCurrentStep("confirmation");
+      if (professionalError || !professionalData) {
+        toast.error("Vous devez être enregistré comme professionnel pour soumettre une déclaration");
+        return;
+      }
+
+      // Créer la demande de dépôt légal
+      const requestNumber = `DL-${new Date().getFullYear()}-${Date.now()}`;
+      
+      const newRequest = {
+        initiator_id: professionalData.id,
+        request_number: requestNumber,
+        support_type: 'imprime' as const,
+        monograph_type: 'livres' as const,
+        status: 'brouillon' as const,
+        title: formData.title || 'Sans titre',
+        author_name: formData.author_name || '',
+        metadata: {
+          editor: editorData,
+          printer: printerData,
+          depositType,
+          ...formData
+        }
+      };
+      
+      const { data: requestData, error: requestError } = await supabase
+        .from('legal_deposit_requests')
+        .insert([newRequest])
+        .select()
+        .single();
+
+      if (requestError) throw requestError;
+
+      // Créer l'entrée pour l'initiateur dans legal_deposit_parties
+      const { error: partyError } = await supabase
+        .from('legal_deposit_parties')
+        .insert({
+          request_id: requestData.id,
+          user_id: user.id,
+          party_role: userType || 'editor',
+          is_initiator: true,
+          approval_status: 'approved', // L'initiateur est automatiquement approuvé
+          approval_date: new Date().toISOString()
+        });
+
+      if (partyError) throw partyError;
+
+      // Si un collaborateur a été spécifié, l'ajouter
+      if (printerData && printerData.email) {
+        // Trouver le professionnel par email
+        const { data: collaboratorProf } = await supabase
+          .from('professional_registry')
+          .select('id, user_id')
+          .eq('email', printerData.email)
+          .single();
+
+        if (collaboratorProf) {
+          // Mettre à jour la demande avec le collaborateur
+          await supabase
+            .from('legal_deposit_requests')
+            .update({ collaborator_id: collaboratorProf.id })
+            .eq('id', requestData.id);
+
+          // Créer l'entrée pour le collaborateur
+          await supabase
+            .from('legal_deposit_parties')
+            .insert({
+              request_id: requestData.id,
+              user_id: collaboratorProf.user_id,
+              party_role: 'printer',
+              is_initiator: false,
+              approval_status: 'pending'
+            });
+
+          // Envoyer une notification au collaborateur
+          await supabase.functions.invoke('notify-deposit-party', {
+            body: {
+              requestId: requestData.id,
+              partyUserId: collaboratorProf.user_id,
+              partyRole: 'printer'
+            }
+          });
+        }
+      }
+
+      // Soumettre la demande
+      const { error: submitError } = await supabase
+        .from('legal_deposit_requests')
+        .update({ 
+          status: 'soumis',
+          submission_date: new Date().toISOString()
+        })
+        .eq('id', requestData.id);
+
+      if (submitError) throw submitError;
+
+      toast.success(language === 'ar' ? "تم إرسال التصريح بنجاح" : "Déclaration de dépôt légal soumise avec succès");
+      setCurrentStep("confirmation");
+      
+      // Rediriger vers la page des approbations après 2 secondes
+      setTimeout(() => {
+        navigate('/deposit-approvals');
+      }, 2000);
+    } catch (error: any) {
+      console.error("Error submitting declaration:", error);
+      toast.error(`Erreur lors de la soumission: ${error.message}`);
+    }
   };
 
   if (currentStep === "type_selection") {
