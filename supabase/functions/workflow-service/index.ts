@@ -158,8 +158,9 @@ function getWorkflowSteps(type: string): string[] {
       return [
         'Réception de la demande',
         'Vérification des documents',
+        'Validation par le comité',
         'Attribution du numéro',
-        'Validation',
+        'Validation finale',
         'Archivage',
       ];
     case 'reproduction':

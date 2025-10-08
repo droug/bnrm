@@ -81,6 +81,7 @@ import PaymentServices from "./pages/PaymentServices";
 import ServicesCatalog from "./pages/ServicesCatalog";
 import TranslationManagementPage from "./pages/TranslationManagementPage";
 import AccessRequestsManagement from "./pages/AccessRequestsManagement";
+import CommitteeDashboard from "./pages/CommitteeDashboard";
 
 
 
@@ -131,6 +132,7 @@ const App = () => (
         <Route path="/admin/bnrm-backoffice" element={<BNRMBackOffice />} />
         <Route path="/admin/catalog-metadata" element={<CatalogMetadata />} />
         <Route path="/admin/reproduction" element={<ReproductionBackofficePage />} />
+        <Route path="/admin/committee" element={<CommitteeDashboard />} />
         <Route path="/digital-library" element={<DigitalLibrary />} />
         <Route path="/digital-library/:category" element={<DigitalLibrary />} />
         <Route path="/book-reader/:id" element={<BookReader />} />

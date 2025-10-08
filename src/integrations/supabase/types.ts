@@ -1657,6 +1657,57 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_deposit_committee_reviews: {
+        Row: {
+          comments: string | null
+          committee_member_id: string
+          created_at: string | null
+          decision_rationale: string | null
+          id: string
+          request_id: string
+          review_date: string | null
+          review_status: string
+          updated_at: string | null
+        }
+        Insert: {
+          comments?: string | null
+          committee_member_id: string
+          created_at?: string | null
+          decision_rationale?: string | null
+          id?: string
+          request_id: string
+          review_date?: string | null
+          review_status: string
+          updated_at?: string | null
+        }
+        Update: {
+          comments?: string | null
+          committee_member_id?: string
+          created_at?: string | null
+          decision_rationale?: string | null
+          id?: string
+          request_id?: string
+          review_date?: string | null
+          review_status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_deposit_committee_reviews_committee_member_id_fkey"
+            columns: ["committee_member_id"]
+            isOneToOne: false
+            referencedRelation: "legal_deposit_validation_committee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "legal_deposit_committee_reviews_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "legal_deposit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_deposit_requests: {
         Row: {
           attribution_date: string | null
@@ -1770,6 +1821,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      legal_deposit_validation_committee: {
+        Row: {
+          appointed_by: string | null
+          appointed_date: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          member_id: string
+          role: string
+          specialization: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          appointed_by?: string | null
+          appointed_date?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          member_id: string
+          role: string
+          specialization?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          appointed_by?: string | null
+          appointed_date?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          member_id?: string
+          role?: string
+          specialization?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       legal_deposits: {
         Row: {
@@ -4567,6 +4654,10 @@ export type Database = {
         Args: { p_content_id: string; p_user_id: string }
         Returns: boolean
       }
+      check_committee_approval: {
+        Args: { request_uuid: string }
+        Returns: boolean
+      }
       cleanup_old_activity_logs: {
         Args: Record<PropertyKey, never>
         Returns: number
@@ -4787,6 +4878,9 @@ export type Database = {
         | "attribue"
         | "receptionne"
         | "rejete"
+        | "en_attente_comite_validation"
+        | "valide_par_comite"
+        | "rejete_par_comite"
       manuscript_platform_role: "viewer" | "contributor" | "editor" | "admin"
       manuscript_status:
         | "available"
@@ -4987,6 +5081,9 @@ export const Constants = {
         "attribue",
         "receptionne",
         "rejete",
+        "en_attente_comite_validation",
+        "valide_par_comite",
+        "rejete_par_comite",
       ],
       manuscript_platform_role: ["viewer", "contributor", "editor", "admin"],
       manuscript_status: [

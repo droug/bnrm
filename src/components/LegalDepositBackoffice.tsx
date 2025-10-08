@@ -33,7 +33,7 @@ interface LegalDepositRequest {
   request_number: string;
   title: string;
   author_name?: string;
-  status: 'brouillon' | 'soumis' | 'en_attente_validation_b' | 'valide_par_b' | 'rejete_par_b' | 'en_cours' | 'attribue' | 'receptionne' | 'rejete';
+  status: 'brouillon' | 'soumis' | 'en_attente_validation_b' | 'valide_par_b' | 'rejete_par_b' | 'en_cours' | 'attribue' | 'receptionne' | 'rejete' | 'en_attente_comite_validation' | 'valide_par_comite' | 'rejete_par_comite';
   support_type: 'imprime' | 'electronique';
   monograph_type: string;
   submission_date?: string;
