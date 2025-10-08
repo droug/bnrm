@@ -43,7 +43,7 @@ interface DepositRequest {
   deposit_number?: string;
   submitter_id: string;
   deposit_type: 'monographie' | 'periodique' | 'audiovisuel' | 'numerique';
-  status: 'brouillon' | 'soumis' | 'en_attente_validation_b' | 'valide_par_b' | 'rejete_par_b' | 'en_cours' | 'receptionne' | 'traite';
+  status: 'brouillon' | 'soumis' | 'en_attente_validation_dlbn' | 'valide_par_dlbn' | 'rejete_par_dlbn' | 'en_attente_validation_abn' | 'valide_par_abn' | 'rejete_par_abn' | 'en_cours' | 'receptionne' | 'traite';
   submission_date: string;
   acknowledgment_date?: string;
   metadata: {
@@ -65,7 +65,13 @@ interface DepositRequest {
       format: string;
       edition: string;
     };
-    validation?: {
+    validation_dlbn?: {
+      validator_id?: string;
+      validation_date?: string;
+      comments?: string;
+      rejection_reason?: string;
+    };
+    validation_abn?: {
       validator_id?: string;
       validation_date?: string;
       comments?: string;
@@ -106,7 +112,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001234",
       submitter_id: "user1",
       deposit_type: 'monographie',
-      status: 'soumis',
+      status: 'en_attente_validation_dlbn',
       submission_date: "2025-01-15T10:30:00Z",
       metadata: {
         declarant: {
@@ -136,7 +142,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001235",
       submitter_id: "user2",
       deposit_type: 'periodique',
-      status: 'soumis',
+      status: 'en_attente_validation_dlbn',
       submission_date: "2025-01-10T14:20:00Z",
       metadata: {
         declarant: {
@@ -166,7 +172,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001236",
       submitter_id: "user3",
       deposit_type: 'monographie',
-      status: 'valide_par_b',
+      status: 'valide_par_dlbn',
       submission_date: "2025-01-05T11:00:00Z",
       acknowledgment_date: "2025-01-18T16:30:00Z",
       metadata: {
@@ -187,10 +193,10 @@ export const BNRMRequestManager = () => {
           format: "A4",
           edition: "Édition officielle 2024"
         },
-        validation: {
+        validation_dlbn: {
           validator_id: "admin1",
           validation_date: "2025-01-08T10:00:00Z",
-          comments: "Publication officielle validée"
+          comments: "Publication officielle validée par le Service DLBN"
         }
       },
       created_at: "2025-01-05T11:00:00Z",
@@ -201,7 +207,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001237",
       submitter_id: "user4",
       deposit_type: 'audiovisuel',
-      status: 'soumis',
+      status: 'en_attente_validation_abn',
       submission_date: "2025-01-18T09:45:00Z",
       metadata: {
         declarant: {
@@ -230,7 +236,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001238",
       submitter_id: "user5",
       deposit_type: 'numerique',
-      status: 'soumis',
+      status: 'en_attente_validation_abn',
       submission_date: "2025-01-19T15:20:00Z",
       metadata: {
         declarant: {
@@ -260,7 +266,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001239",
       submitter_id: "user6",
       deposit_type: 'monographie',
-      status: 'soumis',
+      status: 'en_attente_validation_dlbn',
       submission_date: "2025-01-20T08:15:00Z",
       metadata: {
         declarant: {
@@ -289,7 +295,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001240",
       submitter_id: "user7",
       deposit_type: 'periodique',
-      status: 'soumis',
+      status: 'valide_par_abn',
       submission_date: "2025-01-20T11:30:00Z",
       metadata: {
         declarant: {
@@ -319,7 +325,7 @@ export const BNRMRequestManager = () => {
       deposit_number: "DL-2025-001241",
       submitter_id: "user8",
       deposit_type: 'monographie',
-      status: 'soumis',
+      status: 'en_attente_validation_dlbn',
       submission_date: "2025-01-20T14:45:00Z",
       metadata: {
         declarant: {
@@ -467,7 +473,7 @@ export const BNRMRequestManager = () => {
     }
   };
 
-  const updateRequestStatus = async (requestId: string, newStatus: string, comments?: string) => {
+  const updateRequestStatus = async (requestId: string, newStatus: string, comments?: string, validationType?: 'dlbn' | 'abn') => {
     try {
       const user = await supabase.auth.getUser();
       
@@ -476,12 +482,23 @@ export const BNRMRequestManager = () => {
         if (req.id === requestId) {
           const updatedMetadata = { ...req.metadata };
           
-          if (comments || newStatus === 'valide_par_b' || newStatus === 'rejete_par_b') {
-            updatedMetadata.validation = {
+          // Gestion de la validation DLBN
+          if (validationType === 'dlbn' && (newStatus === 'valide_par_dlbn' || newStatus === 'rejete_par_dlbn')) {
+            updatedMetadata.validation_dlbn = {
               validator_id: user.data.user?.id,
               validation_date: new Date().toISOString(),
               comments: comments,
-              rejection_reason: newStatus === 'rejete_par_b' ? comments : undefined
+              rejection_reason: newStatus === 'rejete_par_dlbn' ? comments : undefined
+            };
+          }
+          
+          // Gestion de la validation ABN
+          if (validationType === 'abn' && (newStatus === 'valide_par_abn' || newStatus === 'rejete_par_abn')) {
+            updatedMetadata.validation_abn = {
+              validator_id: user.data.user?.id,
+              validation_date: new Date().toISOString(),
+              comments: comments,
+              rejection_reason: newStatus === 'rejete_par_abn' ? comments : undefined
             };
           }
           
@@ -611,7 +628,7 @@ export const BNRMRequestManager = () => {
     yPos += para2Lines.length * lineHeight + 4;
 
     // Motif rejet
-    const reason = request.metadata.validation?.rejection_reason || "Non conforme aux exigences réglementaires";
+    const reason = request.metadata.validation_dlbn?.rejection_reason || request.metadata.validation_abn?.rejection_reason || "Non conforme aux exigences réglementaires";
     doc.setFillColor(255, 240, 240);
     doc.setDrawColor(220, 53, 69);
     doc.setLineWidth(0.5);
@@ -702,7 +719,8 @@ export const BNRMRequestManager = () => {
           status: 'soumis' as DepositRequest['status'],
           metadata: {
             ...req.metadata,
-            validation: undefined
+            validation_dlbn: undefined,
+            validation_abn: undefined
           },
           updated_at: new Date().toISOString()
         };
@@ -723,13 +741,16 @@ export const BNRMRequestManager = () => {
     const statusConfig = {
       brouillon: { color: "bg-gray-100 text-gray-800", label: "Brouillon", icon: FileText },
       soumis: { color: "bg-blue-100 text-blue-800", label: "Soumis", icon: Clock },
-      en_attente_validation_b: { color: "bg-orange-100 text-orange-800", label: "En attente", icon: Clock },
-      valide_par_b: { color: "bg-yellow-100 text-yellow-800", label: "Validé", icon: CheckCircle },
+      en_attente_validation_dlbn: { color: "bg-orange-100 text-orange-800", label: "En attente DLBN", icon: Clock },
+      valide_par_dlbn: { color: "bg-yellow-100 text-yellow-800", label: "Validé DLBN", icon: CheckCircle },
+      rejete_par_dlbn: { color: "bg-red-100 text-red-800", label: "Rejeté DLBN", icon: XCircle },
+      en_attente_validation_abn: { color: "bg-amber-100 text-amber-800", label: "En attente ABN", icon: Clock },
+      valide_par_abn: { color: "bg-lime-100 text-lime-800", label: "Validé ABN", icon: CheckCircle },
+      rejete_par_abn: { color: "bg-rose-100 text-rose-800", label: "Rejeté ABN", icon: XCircle },
       en_cours: { color: "bg-indigo-100 text-indigo-800", label: "En cours", icon: Clock },
       receptionne: { color: "bg-purple-100 text-purple-800", label: "Réceptionné", icon: CheckCircle },
       traite: { color: "bg-green-100 text-green-800", label: "Traité", icon: CheckCircle },
       processed: { color: "bg-green-100 text-green-800", label: "Traité", icon: CheckCircle },
-      rejete_par_b: { color: "bg-red-100 text-red-800", label: "Rejeté", icon: XCircle },
     };
     
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.brouillon;
@@ -1200,7 +1221,7 @@ export const BNRMRequestManager = () => {
                             </>
                           )}
                           
-                          {request.status === 'rejete_par_b' && (
+                          {(request.status === 'rejete_par_dlbn' || request.status === 'rejete_par_abn') && (
                             <Button
                               variant="ghost"
                               size="sm"
@@ -1312,25 +1333,45 @@ export const BNRMRequestManager = () => {
                       {getStatusBadge(selectedRequest.status)}
                     </div>
                     
-                    {selectedRequest.metadata?.validation && (
+                    {selectedRequest.metadata?.validation_dlbn && (
                       <div className="space-y-2">
+                        <h4 className="font-semibold">Validation Service DLBN</h4>
                         <div>
-                          <strong>Validé le:</strong> {selectedRequest.metadata.validation.validation_date && format(new Date(selectedRequest.metadata.validation.validation_date), "dd/MM/yyyy HH:mm", { locale: fr })}
+                          <strong>Validé le:</strong> {selectedRequest.metadata.validation_dlbn.validation_date && format(new Date(selectedRequest.metadata.validation_dlbn.validation_date), "dd/MM/yyyy HH:mm", { locale: fr })}
                         </div>
-                        {selectedRequest.metadata.validation.comments && (
+                        {selectedRequest.metadata.validation_dlbn.comments && (
                           <div>
-                            <strong>Commentaires:</strong> {selectedRequest.metadata.validation.comments}
+                            <strong>Commentaires:</strong> {selectedRequest.metadata.validation_dlbn.comments}
                           </div>
                         )}
-                        {selectedRequest.metadata.validation.rejection_reason && (
+                        {selectedRequest.metadata.validation_dlbn.rejection_reason && (
                           <div>
-                            <strong>Raison du rejet:</strong> {selectedRequest.metadata.validation.rejection_reason}
+                            <strong>Raison du rejet:</strong> {selectedRequest.metadata.validation_dlbn.rejection_reason}
                           </div>
                         )}
                       </div>
                     )}
                     
-                    {(selectedRequest.status === 'soumis' || selectedRequest.status === 'en_attente_validation_b') && (
+                    {selectedRequest.metadata?.validation_abn && (
+                      <div className="space-y-2 mt-4">
+                        <h4 className="font-semibold">Validation Département ABN</h4>
+                        <div>
+                          <strong>Validé le:</strong> {selectedRequest.metadata.validation_abn.validation_date && format(new Date(selectedRequest.metadata.validation_abn.validation_date), "dd/MM/yyyy HH:mm", { locale: fr })}
+                        </div>
+                        {selectedRequest.metadata.validation_abn.comments && (
+                          <div>
+                            <strong>Commentaires:</strong> {selectedRequest.metadata.validation_abn.comments}
+                          </div>
+                        )}
+                        {selectedRequest.metadata.validation_abn.rejection_reason && (
+                          <div>
+                            <strong>Raison du rejet:</strong> {selectedRequest.metadata.validation_abn.rejection_reason}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {(selectedRequest.status === 'en_attente_validation_dlbn' || selectedRequest.status === 'en_attente_validation_abn') && (
                       <div className="space-y-4 pt-4 border-t mt-4">
                         <h4 className="font-semibold text-lg">Actions de validation</h4>
                         <div className="space-y-2">
@@ -1344,29 +1385,60 @@ export const BNRMRequestManager = () => {
                           />
                         </div>
                         <div className="flex gap-3">
-                          <Button 
-                            onClick={() => {
-                              updateRequestStatus(selectedRequest.id, 'valide_par_b', validationComments);
-                              setValidationComments("");
-                              setIsDetailsOpen(false);
-                            }}
-                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Valider la demande
-                          </Button>
-                          <Button 
-                            variant="destructive"
-                            onClick={() => {
-                              updateRequestStatus(selectedRequest.id, 'rejete_par_b', validationComments || 'Demande rejetée');
-                              setValidationComments("");
-                              setIsDetailsOpen(false);
-                            }}
-                            className="flex-1"
-                          >
-                            <XCircle className="w-4 h-4 mr-2" />
-                            Rejeter la demande
-                          </Button>
+                          {selectedRequest.status === 'en_attente_validation_dlbn' && (
+                            <>
+                              <Button 
+                                onClick={() => {
+                                  updateRequestStatus(selectedRequest.id, 'valide_par_dlbn', validationComments, 'dlbn');
+                                  setValidationComments("");
+                                  setIsDetailsOpen(false);
+                                }}
+                                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                              >
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Valider (Service DLBN)
+                              </Button>
+                              <Button 
+                                variant="destructive"
+                                onClick={() => {
+                                  updateRequestStatus(selectedRequest.id, 'rejete_par_dlbn', validationComments || 'Demande rejetée par le Service DLBN', 'dlbn');
+                                  setValidationComments("");
+                                  setIsDetailsOpen(false);
+                                }}
+                                className="flex-1"
+                              >
+                                <XCircle className="w-4 h-4 mr-2" />
+                                Rejeter (Service DLBN)
+                              </Button>
+                            </>
+                          )}
+                          {selectedRequest.status === 'en_attente_validation_abn' && (
+                            <>
+                              <Button 
+                                onClick={() => {
+                                  updateRequestStatus(selectedRequest.id, 'valide_par_abn', validationComments, 'abn');
+                                  setValidationComments("");
+                                  setIsDetailsOpen(false);
+                                }}
+                                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                              >
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Valider (Département ABN)
+                              </Button>
+                              <Button 
+                                variant="destructive"
+                                onClick={() => {
+                                  updateRequestStatus(selectedRequest.id, 'rejete_par_abn', validationComments || 'Demande rejetée par le Département ABN', 'abn');
+                                  setValidationComments("");
+                                  setIsDetailsOpen(false);
+                                }}
+                                className="flex-1"
+                              >
+                                <XCircle className="w-4 h-4 mr-2" />
+                                Rejeter (Département ABN)
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </div>
                     )}
@@ -1393,9 +1465,9 @@ export const BNRMRequestManager = () => {
                         </div>
                       </div>
                       
-                      <div className={`flex items-center space-x-3 ${selectedRequest.status === 'valide_par_b' || selectedRequest.status === 'en_cours' || selectedRequest.status === 'traite' || selectedRequest.status === 'receptionne' ? '' : 'opacity-50'}`}>
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${selectedRequest.status === 'valide_par_b' || selectedRequest.status === 'en_cours' || selectedRequest.status === 'traite' || selectedRequest.status === 'receptionne' ? 'bg-green-500' : 'bg-gray-300'}`}>
-                          {selectedRequest.status === 'valide_par_b' || selectedRequest.status === 'en_cours' || selectedRequest.status === 'traite' || selectedRequest.status === 'receptionne' ? (
+                      <div className={`flex items-center space-x-3 ${selectedRequest.status === 'valide_par_dlbn' || selectedRequest.status === 'valide_par_abn' || selectedRequest.status === 'en_cours' || selectedRequest.status === 'traite' || selectedRequest.status === 'receptionne' ? '' : 'opacity-50'}`}>
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${selectedRequest.status === 'valide_par_dlbn' || selectedRequest.status === 'valide_par_abn' || selectedRequest.status === 'en_cours' || selectedRequest.status === 'traite' || selectedRequest.status === 'receptionne' ? 'bg-green-500' : 'bg-gray-300'}`}>
+                          {selectedRequest.status === 'valide_par_dlbn' || selectedRequest.status === 'valide_par_abn' || selectedRequest.status === 'en_cours' || selectedRequest.status === 'traite' || selectedRequest.status === 'receptionne' ? (
                             <CheckCircle className="w-3 h-3 text-white" />
                           ) : (
                             <Clock className="w-3 h-3 text-gray-600" />
@@ -1404,8 +1476,8 @@ export const BNRMRequestManager = () => {
                         <div>
                           <div className="font-medium">Validation de la demande</div>
                           <div className="text-sm text-muted-foreground">
-                            {selectedRequest.metadata?.validation?.validation_date ? 
-                              format(new Date(selectedRequest.metadata.validation.validation_date), "dd/MM/yyyy HH:mm", { locale: fr }) :
+                            {selectedRequest.metadata?.validation_dlbn?.validation_date || selectedRequest.metadata?.validation_abn?.validation_date ? 
+                              format(new Date(selectedRequest.metadata.validation_dlbn?.validation_date || selectedRequest.metadata.validation_abn?.validation_date || new Date()), "dd/MM/yyyy HH:mm", { locale: fr }) :
                               "En attente"
                             }
                           </div>
@@ -1548,11 +1620,11 @@ export const BNRMRequestManager = () => {
                     <div className="text-sm">
                       <span className="font-semibold">Déclarant:</span> {selectedRequestForAction.metadata.declarant?.organization}
                     </div>
-                    {selectedRequestForAction.metadata.validation?.rejection_reason && (
+                    {(selectedRequestForAction.metadata.validation_dlbn?.rejection_reason || selectedRequestForAction.metadata.validation_abn?.rejection_reason) && (
                       <div className="text-sm mt-2 pt-2 border-t">
                         <span className="font-semibold">Motif du rejet initial:</span>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {selectedRequestForAction.metadata.validation.rejection_reason}
+                          {selectedRequestForAction.metadata.validation_dlbn?.rejection_reason || selectedRequestForAction.metadata.validation_abn?.rejection_reason}
                         </p>
                       </div>
                     )}
