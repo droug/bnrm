@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { ReservedRangesManager } from "@/components/legal-deposit/ReservedRangesManager";
 
 interface NumberAttribution {
   id: string;
@@ -494,7 +495,7 @@ export const BNRMNumberAttribution = () => {
         <TabsList>
           <TabsTrigger value="pending">Demandes en attente</TabsTrigger>
           <TabsTrigger value="attributions">Attributions</TabsTrigger>
-          <TabsTrigger value="ranges">Gestion des tranches</TabsTrigger>
+          <TabsTrigger value="reserved">Tranches réservées</TabsTrigger>
           <TabsTrigger value="statistics">Statistiques</TabsTrigger>
         </TabsList>
 
@@ -702,86 +703,9 @@ export const BNRMNumberAttribution = () => {
           </Card>
         </TabsContent>
 
-        {/* Number Ranges Management */}
-        <TabsContent value="ranges" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            {ranges.map((range) => {
-              const TypeIcon = getNumberTypeIcon(range.number_type);
-              const progressPercentage = getRangeProgressPercentage(range);
-              
-              return (
-                <Card key={range.id}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <TypeIcon className="h-5 w-5" />
-                      <span>Tranche {range.number_type.toUpperCase()}</span>
-                      <Badge variant={range.status === 'active' ? 'default' : 'secondary'}>
-                        {range.status}
-                      </Badge>
-                    </CardTitle>
-                    <CardDescription>
-                      {range.range_start} → {range.range_end}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>Utilisation</span>
-                        <span>{range.used_numbers} / {range.total_numbers}</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full ${getRangeStatusColor(range)}`}
-                          style={{ width: `${progressPercentage}%` }}
-                        ></div>
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {progressPercentage.toFixed(1)}% utilisé
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Position actuelle:</span>
-                        <span className="font-mono">{range.current_position}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Date d'attribution:</span>
-                        <span>{format(new Date(range.assigned_date), "dd/MM/yyyy", { locale: fr })}</span>
-                      </div>
-                      {range.expiry_date && (
-                        <div className="flex justify-between">
-                          <span>Date d'expiration:</span>
-                          <span>{format(new Date(range.expiry_date), "dd/MM/yyyy", { locale: fr })}</span>
-                        </div>
-                      )}
-                      {range.source && (
-                        <div className="flex justify-between">
-                          <span>Source:</span>
-                          <Badge variant="outline" className="text-xs">
-                            {range.source === 'agency' ? `🌐 ${range.agency}` :
-                             range.source === 'imported' ? '📊 Import Excel' :
-                             '✏️ Manuel'}
-                          </Badge>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <RefreshCw className="w-4 h-4 mr-2" />
-                        Renouveler
-                      </Button>
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <Send className="w-4 h-4 mr-2" />
-                        Rapport agence
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+        {/* Reserved Ranges Management */}
+        <TabsContent value="reserved" className="space-y-4">
+          <ReservedRangesManager />
         </TabsContent>
 
         {/* Statistics */}
