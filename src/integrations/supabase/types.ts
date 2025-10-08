@@ -3265,6 +3265,180 @@ export type Database = {
         }
         Relationships: []
       }
+      professional_invitations: {
+        Row: {
+          campaign_id: string | null
+          created_at: string | null
+          email: string
+          expires_at: string | null
+          id: string
+          invitation_token: string | null
+          invited_at: string | null
+          invited_by: string | null
+          last_deposit_number: string
+          professional_type: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          created_at?: string | null
+          email: string
+          expires_at?: string | null
+          id?: string
+          invitation_token?: string | null
+          invited_at?: string | null
+          invited_by?: string | null
+          last_deposit_number: string
+          professional_type: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          campaign_id?: string | null
+          created_at?: string | null
+          email?: string
+          expires_at?: string | null
+          id?: string
+          invitation_token?: string | null
+          invited_at?: string | null
+          invited_by?: string | null
+          last_deposit_number?: string
+          professional_type?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_invitations_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "email_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      professional_registration_documents: {
+        Row: {
+          created_at: string | null
+          document_type: string
+          file_name: string
+          file_size_kb: number | null
+          file_url: string
+          id: string
+          invitation_id: string | null
+          mime_type: string | null
+          rejection_reason: string | null
+          uploaded_at: string | null
+          user_id: string | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_type: string
+          file_name: string
+          file_size_kb?: number | null
+          file_url: string
+          id?: string
+          invitation_id?: string | null
+          mime_type?: string | null
+          rejection_reason?: string | null
+          uploaded_at?: string | null
+          user_id?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_type?: string
+          file_name?: string
+          file_size_kb?: number | null
+          file_url?: string
+          id?: string
+          invitation_id?: string | null
+          mime_type?: string | null
+          rejection_reason?: string | null
+          uploaded_at?: string | null
+          user_id?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_registration_documents_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "professional_invitations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      professional_registration_requests: {
+        Row: {
+          cndp_acceptance: boolean | null
+          cndp_accepted_at: string | null
+          company_name: string | null
+          created_at: string | null
+          id: string
+          invitation_id: string | null
+          professional_type: string
+          registration_data: Json | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+          verified_deposit_number: string
+        }
+        Insert: {
+          cndp_acceptance?: boolean | null
+          cndp_accepted_at?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          id?: string
+          invitation_id?: string | null
+          professional_type: string
+          registration_data?: Json | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          verified_deposit_number: string
+        }
+        Update: {
+          cndp_acceptance?: boolean | null
+          cndp_accepted_at?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          id?: string
+          invitation_id?: string | null
+          professional_type?: string
+          registration_data?: Json | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          verified_deposit_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_registration_requests_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "professional_invitations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_registry: {
         Row: {
           address: string | null
@@ -4902,6 +5076,10 @@ export type Database = {
         Args: { user_agent_str: string }
         Returns: string
       }
+      approve_professional_registration: {
+        Args: { p_request_id: string; p_role: string }
+        Returns: boolean
+      }
       calculate_checksum: {
         Args: { content_data: string }
         Returns: string
@@ -5134,6 +5312,14 @@ export type Database = {
       verify_backup_integrity: {
         Args: { backup_id: string }
         Returns: boolean
+      }
+      verify_professional_deposit_number: {
+        Args: {
+          p_deposit_number: string
+          p_email: string
+          p_professional_type: string
+        }
+        Returns: Json
       }
     }
     Enums: {
