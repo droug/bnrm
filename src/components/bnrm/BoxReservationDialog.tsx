@@ -138,10 +138,8 @@ export function BoxReservationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
-        className="!max-h-none !overflow-visible max-w-2xl p-0 !fixed !top-[50%] !left-[50%] !translate-x-[-50%] !translate-y-[-50%] !z-[9999]"
-      >
-        <div className="w-full max-h-[90vh] flex flex-col bg-background rounded-lg">
+      <DialogContent className="max-w-2xl p-0 max-h-none overflow-visible">
+        <div className="w-full max-h-[85vh] flex flex-col bg-background rounded-lg">
           {/* Header fixe */}
           <div className="p-4 border-b bg-background flex-shrink-0 rounded-t-lg">
             <DialogHeader>
@@ -153,7 +151,7 @@ export function BoxReservationDialog({
           </div>
 
           {/* Zone scrollable avec hauteur calculée */}
-          <div className="overflow-y-auto overflow-x-hidden p-4 flex-1" style={{ maxHeight: 'calc(90vh - 180px)' }}>
+          <div className="overflow-y-auto overflow-x-hidden p-4 flex-1 min-h-0">
             <form id="box-reservation-form" onSubmit={handleSubmit} className="space-y-4">
               {/* Section informations personnelles */}
               <div className="bg-muted/30 p-3 rounded-lg space-y-3">
@@ -215,7 +213,7 @@ export function BoxReservationDialog({
                           {startDate ? format(startDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner"}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 z-[10000]" align="start">
+                      <PopoverContent className="w-auto p-0 z-[100]" align="start">
                         <Calendar
                           mode="single"
                           selected={startDate}
@@ -242,7 +240,7 @@ export function BoxReservationDialog({
                           {endDate ? format(endDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner"}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 z-[10000]" align="start">
+                      <PopoverContent className="w-auto p-0 z-[100]" align="start">
                         <Calendar
                           mode="single"
                           selected={endDate}
