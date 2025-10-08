@@ -4,10 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, FileText, Printer, Users, BookOpen } from "lucide-react";
+import { Search, FileText, Printer, Users, BookOpen, Package } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ServiceRegistrationDialog } from "@/components/bnrm/ServiceRegistrationDialog";
+import { BoxReservationDialog } from "@/components/bnrm/BoxReservationDialog";
 import {
   Select,
   SelectContent,
@@ -42,8 +43,10 @@ export function BNRMServicesPublic() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
+  const [boxReservationDialogOpen, setBoxReservationDialogOpen] = useState(false);
   const [selectedServiceForRegistration, setSelectedServiceForRegistration] = useState<BNRMService | null>(null);
   const [selectedTariffForRegistration, setSelectedTariffForRegistration] = useState<BNRMTariff | null>(null);
+  const [boxTariff, setBoxTariff] = useState<BNRMTariff | undefined>(undefined);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -132,6 +135,7 @@ export function BNRMServicesPublic() {
       "Numérisation": BookOpen,
       "Formation": Users,
       "Inscription": Users,
+      "Boxes": Package,
     };
     const Icon = icons[category] || FileText;
     return <Icon className="h-5 w-5" />;
@@ -289,6 +293,52 @@ export function BNRMServicesPublic() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Special Box Reservation Card */}
+            <Card className="hover:shadow-lg transition-shadow flex flex-col border-primary/50">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-5 w-5" />
+                    <CardTitle className="text-lg">Réservation de Box</CardTitle>
+                  </div>
+                </div>
+                <Badge className="bg-purple-100 text-purple-800">
+                  Boxes
+                </Badge>
+              </CardHeader>
+              <CardContent className="flex flex-col flex-1">
+                <div className="flex-1 space-y-3 mb-4">
+                  <CardDescription className="text-sm">
+                    Réservez un box de travail pour vos recherches à la BNRM. Espaces calmes et équipés.
+                  </CardDescription>
+                  <div className="text-sm">
+                    <span className="font-semibold">Public cible : </span>
+                    Chercheurs, étudiants, professionnels
+                  </div>
+                  
+                  <div className="pt-2 border-t">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-bold text-primary">
+                        50 DH
+                      </span>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Par jour
+                    </div>
+                  </div>
+                </div>
+                <Button 
+                  className="w-full"
+                  onClick={() => {
+                    setBoxTariff({ id_tarif: "T007", id_service: "S007", montant: 50, devise: "DH", condition_tarif: "Par jour", periode_validite: "2025", is_active: true });
+                    setBoxReservationDialogOpen(true);
+                  }}
+                >
+                  Réserver un box
+                </Button>
+              </CardContent>
+            </Card>
+            
             {filteredOneTimeServices.map((service) => {
               const serviceTariffs = getTariffsForService(service.id_service);
               const firstTariff = serviceTariffs[0];
@@ -374,6 +424,12 @@ export function BNRMServicesPublic() {
           tariff={selectedTariffForRegistration || undefined}
         />
       )}
+      
+      <BoxReservationDialog
+        open={boxReservationDialogOpen}
+        onOpenChange={setBoxReservationDialogOpen}
+        tariff={boxTariff}
+      />
     </div>
   );
 }
