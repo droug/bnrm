@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -96,6 +96,14 @@ export default function AdminSettings() {
       href: "/admin/translations",
       permission: "content.manage",
       gradient: "from-violet-500 to-purple-600"
+    },
+    {
+      icon: Mail,
+      title: "Gestion des Emails",
+      description: "Gérer les campagnes de mailing de masse et les modèles d'emails",
+      href: "/admin/email-management",
+      permission: "content.manage",
+      gradient: "from-green-500 to-emerald-600"
     }
   ];
 
