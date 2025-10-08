@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { 
+  ScrollableDialog, 
+  ScrollableDialogContent, 
+  ScrollableDialogDescription, 
+  ScrollableDialogHeader, 
+  ScrollableDialogTitle,
+  ScrollableDialogBody,
+  ScrollableDialogFooter
+} from "@/components/ui/scrollable-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -120,163 +128,162 @@ export function BoxReservationDialog({
 
   if (!user) {
     return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Authentification requise</DialogTitle>
-            <DialogDescription>
+      <ScrollableDialog open={open} onOpenChange={onOpenChange}>
+        <ScrollableDialogContent className="max-w-md">
+          <ScrollableDialogHeader>
+            <ScrollableDialogTitle>Authentification requise</ScrollableDialogTitle>
+            <ScrollableDialogDescription>
               Veuillez vous connecter pour réserver un box.
-            </DialogDescription>
-          </DialogHeader>
-          <Button onClick={() => window.location.href = "/auth"}>
-            Se connecter / S'inscrire
-          </Button>
-        </DialogContent>
-      </Dialog>
+            </ScrollableDialogDescription>
+          </ScrollableDialogHeader>
+          <ScrollableDialogBody>
+            <Button onClick={() => window.location.href = "/auth"} className="w-full">
+              Se connecter / S'inscrire
+            </Button>
+          </ScrollableDialogBody>
+        </ScrollableDialogContent>
+      </ScrollableDialog>
     );
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl h-auto max-h-[85vh] overflow-hidden flex flex-col p-0">
-        <div className="p-6 pb-4 flex-shrink-0">
-          <DialogHeader>
-            <DialogTitle>Réservation de Box</DialogTitle>
-            <DialogDescription>
-              Remplissez le formulaire pour réserver un box de travail
-            </DialogDescription>
-          </DialogHeader>
-        </div>
+    <ScrollableDialog open={open} onOpenChange={onOpenChange}>
+      <ScrollableDialogContent className="max-w-2xl">
+        <ScrollableDialogHeader>
+          <ScrollableDialogTitle>Réservation de Box</ScrollableDialogTitle>
+          <ScrollableDialogDescription>
+            Remplissez le formulaire pour réserver un box de travail
+          </ScrollableDialogDescription>
+        </ScrollableDialogHeader>
 
-        <div className="overflow-y-auto flex-1 px-6">
-          <form id="box-reservation-form" onSubmit={handleSubmit} className="space-y-6 pb-4">
+        <ScrollableDialogBody>
+          <form id="box-reservation-form" onSubmit={handleSubmit} className="space-y-6">
             <div className="bg-muted/30 p-4 rounded-lg space-y-4">
-            <h3 className="font-semibold text-sm">Informations personnelles</h3>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>Prénom</Label>
-                <Input value={profile?.first_name || ""} disabled />
-              </div>
-              <div className="grid gap-2">
-                <Label>Nom</Label>
-                <Input value={profile?.last_name || ""} disabled />
-              </div>
-            </div>
-
-            <div className="grid gap-2">
-              <Label>Email</Label>
-              <Input value={user.email || ""} disabled />
-            </div>
-
-            <div className="grid gap-2">
-              <Label>Téléphone</Label>
-              <Input value={profile?.phone || ""} disabled />
-            </div>
-          </div>
-
-          <div className="bg-muted/30 p-4 rounded-lg space-y-4">
-            <h3 className="font-semibold text-sm">Détails de la réservation</h3>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="boxNumber">Numéro de box préféré (optionnel)</Label>
-              <Input
-                id="boxNumber"
-                value={boxNumber}
-                onChange={(e) => setBoxNumber(e.target.value)}
-                placeholder="Ex: B12, A05..."
-              />
-              <p className="text-xs text-muted-foreground">
-                Si disponible, nous essaierons de vous attribuer ce box
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>Date de début *</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "justify-start text-left font-normal",
-                        !startDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "PPP", { locale: fr }) : "Sélectionner"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={setStartDate}
-                      disabled={(date) => date < new Date()}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+              <h3 className="font-semibold text-sm">Informations personnelles</h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label>Prénom</Label>
+                  <Input value={profile?.first_name || ""} disabled />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Nom</Label>
+                  <Input value={profile?.last_name || ""} disabled />
+                </div>
               </div>
 
               <div className="grid gap-2">
-                <Label>Date de fin *</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "justify-start text-left font-normal",
-                        !endDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "PPP", { locale: fr }) : "Sélectionner"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={setEndDate}
-                      disabled={(date) => !startDate || date <= startDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <Label>Email</Label>
+                <Input value={user.email || ""} disabled />
+              </div>
+
+              <div className="grid gap-2">
+                <Label>Téléphone</Label>
+                <Input value={profile?.phone || ""} disabled />
               </div>
             </div>
 
-            {startDate && endDate && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                <p className="text-sm">
-                  <strong>Durée:</strong> {calculateDuration()} jour(s)
+            <div className="bg-muted/30 p-4 rounded-lg space-y-4">
+              <h3 className="font-semibold text-sm">Détails de la réservation</h3>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="boxNumber">Numéro de box préféré (optionnel)</Label>
+                <Input
+                  id="boxNumber"
+                  value={boxNumber}
+                  onChange={(e) => setBoxNumber(e.target.value)}
+                  placeholder="Ex: B12, A05..."
+                />
+                <p className="text-xs text-muted-foreground">
+                  Si disponible, nous essaierons de vous attribuer ce box
                 </p>
-                {tariff && (
-                  <p className="text-sm font-semibold text-primary mt-1">
-                    <strong>Total:</strong> {calculateTotal()} {tariff.devise}
-                  </p>
-                )}
               </div>
-            )}
 
-            <div className="grid gap-2">
-              <Label htmlFor="purpose">Objet de la réservation *</Label>
-              <Textarea
-                id="purpose"
-                value={purpose}
-                onChange={(e) => setPurpose(e.target.value)}
-                placeholder="Décrivez brièvement le motif de votre réservation..."
-                required
-                rows={4}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label>Date de début *</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "justify-start text-left font-normal",
+                          !startDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {startDate ? format(startDate, "PPP", { locale: fr }) : "Sélectionner"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        disabled={(date) => date < new Date()}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label>Date de fin *</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "justify-start text-left font-normal",
+                          !endDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {endDate ? format(endDate, "PPP", { locale: fr }) : "Sélectionner"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        disabled={(date) => !startDate || date <= startDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
+              {startDate && endDate && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                  <p className="text-sm">
+                    <strong>Durée:</strong> {calculateDuration()} jour(s)
+                  </p>
+                  {tariff && (
+                    <p className="text-sm font-semibold text-primary mt-1">
+                      <strong>Total:</strong> {calculateTotal()} {tariff.devise}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="grid gap-2">
+                <Label htmlFor="purpose">Objet de la réservation *</Label>
+                <Textarea
+                  id="purpose"
+                  value={purpose}
+                  onChange={(e) => setPurpose(e.target.value)}
+                  placeholder="Décrivez brièvement le motif de votre réservation..."
+                  required
+                  rows={4}
+                />
+              </div>
             </div>
-          </div>
-
           </form>
-        </div>
+        </ScrollableDialogBody>
 
-        <div className="flex justify-end gap-2 p-6 pt-4 border-t flex-shrink-0 bg-background">
+        <ScrollableDialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
@@ -290,8 +297,8 @@ export function BoxReservationDialog({
               "Confirmer la réservation"
             )}
           </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </ScrollableDialogFooter>
+      </ScrollableDialogContent>
+    </ScrollableDialog>
   );
 }
