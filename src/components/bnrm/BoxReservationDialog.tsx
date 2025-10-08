@@ -157,65 +157,66 @@ export function BoxReservationDialog({
         </ScrollableDialogHeader>
 
         <ScrollableDialogBody>
-          <form id="box-reservation-form" onSubmit={handleSubmit} className="space-y-6">
-            <div className="bg-muted/30 p-4 rounded-lg space-y-4">
+          <form id="box-reservation-form" onSubmit={handleSubmit} className="space-y-4">
+            <div className="bg-muted/30 p-3 rounded-lg space-y-3">
               <h3 className="font-semibold text-sm">Informations personnelles</h3>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label>Prénom</Label>
-                  <Input value={profile?.first_name || ""} disabled />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Prénom</Label>
+                  <Input value={profile?.first_name || ""} disabled className="h-9" />
                 </div>
-                <div className="grid gap-2">
-                  <Label>Nom</Label>
-                  <Input value={profile?.last_name || ""} disabled />
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Nom</Label>
+                  <Input value={profile?.last_name || ""} disabled className="h-9" />
                 </div>
               </div>
 
-              <div className="grid gap-2">
-                <Label>Email</Label>
-                <Input value={user.email || ""} disabled />
+              <div className="space-y-1.5">
+                <Label className="text-xs">Email</Label>
+                <Input value={user.email || ""} disabled className="h-9" />
               </div>
 
-              <div className="grid gap-2">
-                <Label>Téléphone</Label>
-                <Input value={profile?.phone || ""} disabled />
+              <div className="space-y-1.5">
+                <Label className="text-xs">Téléphone</Label>
+                <Input value={profile?.phone || ""} disabled className="h-9" />
               </div>
             </div>
 
-            <div className="bg-muted/30 p-4 rounded-lg space-y-4">
+            <div className="bg-muted/30 p-3 rounded-lg space-y-3">
               <h3 className="font-semibold text-sm">Détails de la réservation</h3>
               
-              <div className="grid gap-2">
-                <Label htmlFor="boxNumber">Numéro de box préféré (optionnel)</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="boxNumber" className="text-xs">Numéro de box préféré (optionnel)</Label>
                 <Input
                   id="boxNumber"
                   value={boxNumber}
                   onChange={(e) => setBoxNumber(e.target.value)}
                   placeholder="Ex: B12, A05..."
+                  className="h-9"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[11px] text-muted-foreground">
                   Si disponible, nous essaierons de vous attribuer ce box
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label>Date de début *</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Date de début *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "justify-start text-left font-normal",
+                          "w-full justify-start text-left font-normal h-9 text-xs",
                           !startDate && "text-muted-foreground"
                         )}
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {startDate ? format(startDate, "PPP", { locale: fr }) : "Sélectionner"}
+                        <CalendarIcon className="mr-2 h-3 w-3" />
+                        {startDate ? format(startDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className="w-auto p-0 z-[100]" align="start">
                       <Calendar
                         mode="single"
                         selected={startDate}
@@ -227,22 +228,22 @@ export function BoxReservationDialog({
                   </Popover>
                 </div>
 
-                <div className="grid gap-2">
-                  <Label>Date de fin *</Label>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Date de fin *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "justify-start text-left font-normal",
+                          "w-full justify-start text-left font-normal h-9 text-xs",
                           !endDate && "text-muted-foreground"
                         )}
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {endDate ? format(endDate, "PPP", { locale: fr }) : "Sélectionner"}
+                        <CalendarIcon className="mr-2 h-3 w-3" />
+                        {endDate ? format(endDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className="w-auto p-0 z-[100]" align="start">
                       <Calendar
                         mode="single"
                         selected={endDate}
@@ -256,27 +257,28 @@ export function BoxReservationDialog({
               </div>
 
               {startDate && endDate && (
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                  <p className="text-sm">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-2.5 rounded-lg">
+                  <p className="text-xs">
                     <strong>Durée:</strong> {calculateDuration()} jour(s)
                   </p>
                   {tariff && (
-                    <p className="text-sm font-semibold text-primary mt-1">
+                    <p className="text-xs font-semibold text-primary mt-0.5">
                       <strong>Total:</strong> {calculateTotal()} {tariff.devise}
                     </p>
                   )}
                 </div>
               )}
 
-              <div className="grid gap-2">
-                <Label htmlFor="purpose">Objet de la réservation *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="purpose" className="text-xs">Objet de la réservation *</Label>
                 <Textarea
                   id="purpose"
                   value={purpose}
                   onChange={(e) => setPurpose(e.target.value)}
                   placeholder="Décrivez brièvement le motif de votre réservation..."
                   required
-                  rows={4}
+                  rows={3}
+                  className="text-sm resize-none"
                 />
               </div>
             </div>

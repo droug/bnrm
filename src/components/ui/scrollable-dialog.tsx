@@ -65,7 +65,7 @@ const ScrollableDialogContent = React.forwardRef<
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         "sm:rounded-lg",
-        "max-h-[85vh] h-auto", // Hauteur maximale garantie
+        "max-h-[90vh] h-auto", // Augmenté à 90vh pour plus d'espace
         "flex flex-col", // Structure flex pour layout optimal
         "overflow-hidden", // Empêche le scroll sur le container principal
         className
@@ -93,7 +93,7 @@ const ScrollableDialogHeader = ({
   <div
     className={cn(
       "flex flex-col space-y-1.5 text-center sm:text-left",
-      "p-6 pb-4 flex-shrink-0 border-b", // Border pour séparer visuellement
+      "p-4 pb-3 flex-shrink-0", // Padding réduit
       className
     )}
     {...props}
@@ -112,8 +112,8 @@ const ScrollableDialogBody = ({
   <div
     className={cn(
       "overflow-y-auto overflow-x-hidden", // Active le scroll vertical
-      "flex-1", // Prend tout l'espace disponible
-      "px-6 py-4", // Padding interne
+      "flex-1 min-h-0", // min-h-0 crucial pour permettre le scroll dans un flex container
+      "px-4 py-3", // Padding réduit
       className
     )}
     {...props}
@@ -132,7 +132,7 @@ const ScrollableDialogFooter = ({
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      "p-6 pt-4 flex-shrink-0 border-t", // Border pour séparer visuellement
+      "p-4 pt-3 flex-shrink-0 border-t", // Padding réduit
       "bg-background", // Background pour masquer le contenu qui scrolle en dessous
       className
     )}
