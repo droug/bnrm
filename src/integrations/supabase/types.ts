@@ -1271,6 +1271,169 @@ export type Database = {
           },
         ]
       }
+      email_campaign_logs: {
+        Row: {
+          campaign_id: string | null
+          clicked_at: string | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          opened_at: string | null
+          recipient_email: string
+          recipient_id: string | null
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          campaign_id?: string | null
+          clicked_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          opened_at?: string | null
+          recipient_email: string
+          recipient_id?: string | null
+          sent_at?: string | null
+          status: string
+        }
+        Update: {
+          campaign_id?: string | null
+          clicked_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          opened_at?: string | null
+          recipient_email?: string
+          recipient_id?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_campaign_logs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "email_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_campaigns: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          custom_recipients: string[] | null
+          description: string | null
+          from_email: string
+          from_name: string
+          id: string
+          name: string
+          recipient_type: string
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string | null
+          subject: string
+          template_id: string | null
+          total_failed: number | null
+          total_recipients: number | null
+          total_sent: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          custom_recipients?: string[] | null
+          description?: string | null
+          from_email?: string
+          from_name?: string
+          id?: string
+          name: string
+          recipient_type: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject: string
+          template_id?: string | null
+          total_failed?: number | null
+          total_recipients?: number | null
+          total_sent?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          custom_recipients?: string[] | null
+          description?: string | null
+          from_email?: string
+          from_name?: string
+          id?: string
+          name?: string
+          recipient_type?: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject?: string
+          template_id?: string | null
+          total_failed?: number | null
+          total_recipients?: number | null
+          total_sent?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_campaigns_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_templates: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          html_content: string
+          html_content_ar: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          subject: string
+          subject_ar: string | null
+          template_type: string
+          updated_at: string | null
+          variables: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          html_content: string
+          html_content_ar?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          subject: string
+          subject_ar?: string | null
+          template_type: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          html_content?: string
+          html_content_ar?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          subject?: string
+          subject_ar?: string | null
+          template_type?: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Relationships: []
+      }
       exhibition_resources: {
         Row: {
           added_at: string | null

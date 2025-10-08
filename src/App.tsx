@@ -82,6 +82,7 @@ import ServicesCatalog from "./pages/ServicesCatalog";
 import TranslationManagementPage from "./pages/TranslationManagementPage";
 import AccessRequestsManagement from "./pages/AccessRequestsManagement";
 import CommitteeDashboard from "./pages/CommitteeDashboard";
+import EmailManagement from "./pages/EmailManagement";
 
 
 
@@ -194,6 +195,10 @@ const App = () => (
           {/* Access Requests Management */}
           <Route path="/admin/access-requests" element={<AccessRequestsManagement />} />
           <Route path="/admin/demandes-acces" element={<AccessRequestsManagement />} />
+
+          {/* Email Management */}
+          <Route path="/admin/email-management" element={<EmailManagement />} />
+          <Route path="/admin/gestion-emails" element={<EmailManagement />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
