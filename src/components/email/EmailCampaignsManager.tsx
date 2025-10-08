@@ -50,7 +50,7 @@ export function EmailCampaignsManager() {
     from_name: "BNRM",
     from_email: "notifications@bnrm.ma",
     recipient_type: "all_subscribers",
-    template_id: "",
+    template_id: "none",
     custom_recipients: "",
   });
 
@@ -109,7 +109,7 @@ export function EmailCampaignsManager() {
           from_name: formData.from_name,
           from_email: formData.from_email,
           recipient_type: formData.recipient_type,
-          template_id: formData.template_id || null,
+          template_id: formData.template_id === "none" ? null : formData.template_id,
           custom_recipients: formData.custom_recipients ? formData.custom_recipients.split(",").map(e => e.trim()) : null,
         }])
         .select()
@@ -130,7 +130,7 @@ export function EmailCampaignsManager() {
         from_name: "BNRM",
         from_email: "notifications@bnrm.ma",
         recipient_type: "all_subscribers",
-        template_id: "",
+        template_id: "none",
         custom_recipients: "",
       });
       fetchCampaigns();
@@ -325,7 +325,7 @@ export function EmailCampaignsManager() {
                     <SelectValue placeholder="Sélectionner un modèle" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Aucun modèle</SelectItem>
+                    <SelectItem value="none">Aucun modèle</SelectItem>
                     {templates.map((template) => (
                       <SelectItem key={template.id} value={template.id}>
                         {template.name} ({template.template_type})
