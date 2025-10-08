@@ -76,14 +76,22 @@ export function AdminHeader({
           
           {/* Boutons d'action */}
           {showNotifications && (
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/admin/settings')}
+            >
               <Bell className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Notifications</span>
             </Button>
           )}
           
           {showSettings && (
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/admin/settings')}
+            >
               <Settings className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Paramètres</span>
             </Button>
