@@ -450,6 +450,19 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
+                  <Label>Nature publication</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner la nature" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="etatique">Étatique</SelectItem>
+                      <SelectItem value="non-etatique">Non étatique</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
                   <Label>Titre du périodique</Label>
                   <Input placeholder="Titre du périodique" />
                 </div>
