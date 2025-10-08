@@ -138,16 +138,19 @@ export function BoxReservationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="flex-shrink-0">
-          <DialogTitle>Réservation de Box</DialogTitle>
-          <DialogDescription>
-            Remplissez le formulaire pour réserver un box de travail
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-2xl h-auto max-h-[85vh] overflow-hidden flex flex-col p-0">
+        <div className="p-6 pb-4 flex-shrink-0">
+          <DialogHeader>
+            <DialogTitle>Réservation de Box</DialogTitle>
+            <DialogDescription>
+              Remplissez le formulaire pour réserver un box de travail
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <form id="box-reservation-form" onSubmit={handleSubmit} className="space-y-6 overflow-y-auto flex-1 px-1">
-          <div className="bg-muted/30 p-4 rounded-lg space-y-4">
+        <div className="overflow-y-auto flex-1 px-6">
+          <form id="box-reservation-form" onSubmit={handleSubmit} className="space-y-6 pb-4">
+            <div className="bg-muted/30 p-4 rounded-lg space-y-4">
             <h3 className="font-semibold text-sm">Informations personnelles</h3>
             
             <div className="grid grid-cols-2 gap-4">
@@ -270,9 +273,10 @@ export function BoxReservationDialog({
             </div>
           </div>
 
-        </form>
+          </form>
+        </div>
 
-        <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0">
+        <div className="flex justify-end gap-2 p-6 pt-4 border-t flex-shrink-0 bg-background">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
