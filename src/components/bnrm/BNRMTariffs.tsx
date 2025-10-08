@@ -111,11 +111,11 @@ export function BNRMTariffs({ filterCategory }: BNRMTariffsProps) {
     // Appliquer le filtre de catégorie si spécifié
     let matchesFilter = true;
     if (filterCategory === "Inscription") {
-      // Abonnements = catégorie Inscription SAUF S001, S002, S003
-      matchesFilter = tariff.bnrm_services?.categorie === "Inscription" && !['S001', 'S002', 'S003'].includes(tariff.id_service);
+      // Abonnements = services avec ID commençant par I
+      matchesFilter = tariff.id_service.startsWith('I');
     } else if (filterCategory === "exclude-Inscription") {
-      // Services = tous les autres + S001, S002, S003
-      matchesFilter = tariff.bnrm_services?.categorie !== "Inscription" || ['S001', 'S002', 'S003'].includes(tariff.id_service);
+      // Services = tous sauf ceux commençant par I
+      matchesFilter = !tariff.id_service.startsWith('I');
     }
     
     return matchesSearch && matchesService && matchesFilter;

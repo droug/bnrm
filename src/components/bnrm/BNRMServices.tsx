@@ -96,11 +96,11 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
     // Appliquer le filtre de catégorie si spécifié
     let matchesFilter = true;
     if (filterCategory === "Inscription") {
-      // Abonnements = catégorie Inscription SAUF S001, S002, S003
-      matchesFilter = service.categorie === "Inscription" && !['S001', 'S002', 'S003'].includes(service.id_service);
+      // Abonnements = services avec ID commençant par I
+      matchesFilter = service.id_service.startsWith('I');
     } else if (filterCategory === "exclude-Inscription") {
-      // Services = tous les autres + S001, S002, S003
-      matchesFilter = service.categorie !== "Inscription" || ['S001', 'S002', 'S003'].includes(service.id_service);
+      // Services = tous sauf ceux commençant par I
+      matchesFilter = !service.id_service.startsWith('I');
     }
     
     return matchesSearch && matchesCategory && matchesFilter;
