@@ -1064,15 +1064,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             
             {renderFileUpload("cin", "Envoyer une copie de la CIN de l'auteur", true, "image/jpeg,application/pdf")}
             
-            {depositType === "periodique" && (
-              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-700">
-                  Pour les périodiques dont l'éditeur n'est pas étatique, il est nécessaire d'envoyer la décision du tribunal de première instance, 
-                  dont le délai de réception ne doit pas excéder une année.
-                </p>
-                {renderFileUpload("court-decision", "Décision du tribunal (pour les périodiques non étatiques)", false, "application/pdf")}
-              </div>
-            )}
 
             {depositType === "monographie" && (
               <>
