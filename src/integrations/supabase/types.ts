@@ -3575,6 +3575,57 @@ export type Database = {
           },
         ]
       }
+      reserved_number_ranges: {
+        Row: {
+          created_at: string | null
+          current_position: string
+          deposit_type: string
+          id: string
+          notes: string | null
+          number_type: string
+          range_end: string
+          range_start: string
+          requester_id: string
+          reserved_by: string | null
+          status: string | null
+          total_numbers: number
+          updated_at: string | null
+          used_numbers: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_position: string
+          deposit_type: string
+          id?: string
+          notes?: string | null
+          number_type: string
+          range_end: string
+          range_start: string
+          requester_id: string
+          reserved_by?: string | null
+          status?: string | null
+          total_numbers: number
+          updated_at?: string | null
+          used_numbers?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          current_position?: string
+          deposit_type?: string
+          id?: string
+          notes?: string | null
+          number_type?: string
+          range_end?: string
+          range_start?: string
+          requester_id?: string
+          reserved_by?: string | null
+          status?: string | null
+          total_numbers?: number
+          updated_at?: string | null
+          used_numbers?: number | null
+        }
+        Relationships: []
+      }
       role_permissions: {
         Row: {
           created_at: string | null

@@ -24,6 +24,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import * as XLSX from 'xlsx';
+import { ReservedRangesManager } from "./ReservedRangesManager";
 
 interface NumberRange {
   id: string;
@@ -262,6 +263,7 @@ export const NumberManagement = () => {
       <Tabs defaultValue="ranges" className="space-y-4">
         <TabsList>
           <TabsTrigger value="ranges">Plages de numéros</TabsTrigger>
+          <TabsTrigger value="reserved">Tranches réservées</TabsTrigger>
           <TabsTrigger value="attributions">Historique d'attribution</TabsTrigger>
           <TabsTrigger value="stats">Statistiques</TabsTrigger>
         </TabsList>
@@ -329,6 +331,10 @@ export const NumberManagement = () => {
               ))}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="reserved">
+          <ReservedRangesManager />
         </TabsContent>
 
         <TabsContent value="attributions">
