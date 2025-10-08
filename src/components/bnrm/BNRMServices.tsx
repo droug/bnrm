@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Search, DollarSign } from "lucide-react";
+import { Plus, Edit, Trash2, Search, DollarSign, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 
 interface BNRMService {
   id_service: string;
@@ -50,6 +52,16 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
     public_cible: "",
     reference_legale: ""
   });
+
+  const [tariffs, setTariffs] = useState<Array<{
+    id_tarif: string;
+    montant: string;
+    devise: string;
+    condition_tarif: string;
+    periode_validite: string;
+    is_active: boolean;
+    isNew?: boolean;
+  }>>([]);
 
   useEffect(() => {
     fetchServices();
@@ -117,10 +129,44 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
           .eq('id_service', editingService.id_service);
         
         if (error) throw error;
+
+        // Gérer les tarifs
+        for (const tariff of tariffs) {
+          if (tariff.isNew) {
+            // Créer un nouveau tarif
+            const { error: tariffError } = await supabase
+              .from('bnrm_tarifs')
+              .insert([{
+                id_tarif: tariff.id_tarif,
+                id_service: formData.id_service,
+                montant: parseFloat(tariff.montant),
+                devise: tariff.devise,
+                condition_tarif: tariff.condition_tarif,
+                periode_validite: tariff.periode_validite,
+                is_active: tariff.is_active
+              }]);
+            
+            if (tariffError) throw tariffError;
+          } else {
+            // Mettre à jour un tarif existant
+            const { error: tariffError } = await supabase
+              .from('bnrm_tarifs')
+              .update({
+                montant: parseFloat(tariff.montant),
+                devise: tariff.devise,
+                condition_tarif: tariff.condition_tarif,
+                periode_validite: tariff.periode_validite,
+                is_active: tariff.is_active
+              })
+              .eq('id_tarif', tariff.id_tarif);
+            
+            if (tariffError) throw tariffError;
+          }
+        }
         
         toast({
           title: "Succès",
-          description: "Service modifié avec succès"
+          description: "Service et tarifs modifiés avec succès"
         });
       } else {
         const { error } = await supabase
@@ -128,6 +174,25 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
           .insert([formData]);
         
         if (error) throw error;
+
+        // Créer les tarifs associés
+        if (tariffs.length > 0) {
+          const tariffsToInsert = tariffs.map(t => ({
+            id_tarif: t.id_tarif,
+            id_service: formData.id_service,
+            montant: parseFloat(t.montant),
+            devise: t.devise,
+            condition_tarif: t.condition_tarif,
+            periode_validite: t.periode_validite,
+            is_active: t.is_active
+          }));
+
+          const { error: tariffsError } = await supabase
+            .from('bnrm_tarifs')
+            .insert(tariffsToInsert);
+          
+          if (tariffsError) throw tariffsError;
+        }
         
         toast({
           title: "Succès",
@@ -158,6 +223,18 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
       public_cible: service.public_cible,
       reference_legale: service.reference_legale
     });
+    
+    // Charger les tarifs associés
+    const existingTariffs = service.bnrm_tarifs?.map(t => ({
+      id_tarif: t.id_tarif,
+      montant: t.montant.toString(),
+      devise: t.devise,
+      condition_tarif: t.condition_tarif,
+      periode_validite: t.periode_validite,
+      is_active: t.is_active
+    })) || [];
+    setTariffs(existingTariffs);
+    
     setIsDialogOpen(true);
   };
 
@@ -197,7 +274,31 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
       public_cible: "",
       reference_legale: ""
     });
+    setTariffs([]);
     setEditingService(null);
+  };
+
+  const addTariff = () => {
+    const newTariff = {
+      id_tarif: "",
+      montant: "",
+      devise: "DH",
+      condition_tarif: "",
+      periode_validite: "2025",
+      is_active: true,
+      isNew: true
+    };
+    setTariffs([...tariffs, newTariff]);
+  };
+
+  const removeTariff = (index: number) => {
+    setTariffs(tariffs.filter((_, i) => i !== index));
+  };
+
+  const updateTariff = (index: number, field: string, value: any) => {
+    const updatedTariffs = [...tariffs];
+    updatedTariffs[index] = { ...updatedTariffs[index], [field]: value };
+    setTariffs(updatedTariffs);
   };
 
   const getCategoryColor = (category: string) => {
@@ -329,6 +430,115 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
                   required
                 />
               </div>
+
+              {editingService && (
+                <>
+                  <Separator className="my-6" />
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold">Tarifs associés</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Gérez les tarifs pour ce service
+                        </p>
+                      </div>
+                      <Button type="button" onClick={addTariff} size="sm">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Ajouter un tarif
+                      </Button>
+                    </div>
+
+                    {tariffs.map((tariff, index) => (
+                      <Card key={index} className="p-4">
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <Badge variant={tariff.isNew ? "default" : "secondary"}>
+                              {tariff.isNew ? "Nouveau" : tariff.id_tarif}
+                            </Badge>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeTariff(index)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            {tariff.isNew && (
+                              <div>
+                                <Label>ID Tarif</Label>
+                                <Input
+                                  value={tariff.id_tarif}
+                                  onChange={(e) => updateTariff(index, 'id_tarif', e.target.value)}
+                                  placeholder="T001"
+                                  required
+                                />
+                              </div>
+                            )}
+                            <div>
+                              <Label>Montant</Label>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                value={tariff.montant}
+                                onChange={(e) => updateTariff(index, 'montant', e.target.value)}
+                                placeholder="150.00"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <Label>Devise</Label>
+                              <Input
+                                value={tariff.devise}
+                                onChange={(e) => updateTariff(index, 'devise', e.target.value)}
+                                placeholder="DH"
+                                required
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <Label>Condition</Label>
+                            <Input
+                              value={tariff.condition_tarif}
+                              onChange={(e) => updateTariff(index, 'condition_tarif', e.target.value)}
+                              placeholder="Condition tarifaire"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label>Période de validité</Label>
+                              <Input
+                                value={tariff.periode_validite}
+                                onChange={(e) => updateTariff(index, 'periode_validite', e.target.value)}
+                                placeholder="2025"
+                                required
+                              />
+                            </div>
+                            <div className="flex items-center space-x-2 mt-7">
+                              <Switch
+                                checked={tariff.is_active}
+                                onCheckedChange={(checked) => updateTariff(index, 'is_active', checked)}
+                              />
+                              <Label>Tarif actif</Label>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+
+                    {tariffs.length === 0 && (
+                      <div className="text-center py-6 text-muted-foreground border rounded-md">
+                        Aucun tarif défini. Cliquez sur "Ajouter un tarif" pour en créer un.
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
               
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
