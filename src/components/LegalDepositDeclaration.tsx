@@ -518,7 +518,10 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Type de support</Label>
-                  <Select>
+                  <Select 
+                    onValueChange={(value) => setFormData({ ...formData, supportType: value })}
+                    value={formData.supportType}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
@@ -528,6 +531,18 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     </SelectContent>
                   </Select>
                 </div>
+
+                {formData.supportType === "electronic" && (
+                  <div className="space-y-2">
+                    <Label>URL Opérationnelle</Label>
+                    <Input 
+                      type="url" 
+                      placeholder="https://exemple.com" 
+                      value={formData.operationalUrl || ''}
+                      onChange={(e) => setFormData({ ...formData, operationalUrl: e.target.value })}
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label>Discipline</Label>
