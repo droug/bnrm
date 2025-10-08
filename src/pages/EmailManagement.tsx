@@ -6,11 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmailCampaignsManager } from "@/components/email/EmailCampaignsManager";
 import { EmailTemplatesManager } from "@/components/email/EmailTemplatesManager";
 import { Mail, FileText } from "lucide-react";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 export default function EmailManagement() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { isLibrarian } = useAccessControl();
 
-  if (!user || !profile || !['admin', 'librarian'].includes(profile.role)) {
+  if (!user || !isLibrarian) {
     return <Navigate to="/" replace />;
   }
 
