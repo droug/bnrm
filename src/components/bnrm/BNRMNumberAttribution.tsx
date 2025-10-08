@@ -552,96 +552,12 @@ export const BNRMNumberAttribution = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="pending" className="w-full">
+      <Tabs defaultValue="attributions" className="w-full">
         <TabsList>
-          <TabsTrigger value="pending">Demandes en attente</TabsTrigger>
           <TabsTrigger value="attributions">Attributions</TabsTrigger>
           <TabsTrigger value="reserved">Tranches réservées</TabsTrigger>
           <TabsTrigger value="statistics">Statistiques</TabsTrigger>
         </TabsList>
-
-        {/* Pending Requests */}
-        <TabsContent value="pending" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Demandes de dépôt légal en attente de validation</CardTitle>
-              <CardDescription>
-                Vérifier et valider les demandes avant attribution des numéros
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex items-center justify-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : pendingRequests.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  Aucune demande en attente de validation
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>N° Demande</TableHead>
-                      <TableHead>Titre</TableHead>
-                      <TableHead>Déclarant</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Date de soumission</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pendingRequests.map((request) => (
-                      <TableRow key={request.id}>
-                        <TableCell className="font-mono text-sm">
-                          {request.request_number || 'N/A'}
-                        </TableCell>
-                        <TableCell className="max-w-xs truncate">
-                          {request.metadata?.publication?.title || "Sans titre"}
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">
-                              {request.metadata?.declarant?.name || "Non spécifié"}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {request.metadata?.declarant?.organization}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            {request.deposit_type === 'monographie' && <BookOpen className="h-4 w-4" />}
-                            {request.deposit_type === 'periodique' && <Newspaper className="h-4 w-4" />}
-                            <span className="capitalize">{request.deposit_type}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {format(new Date(request.created_at), "dd/MM/yyyy", { locale: fr })}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setSelectedRequestForView(request);
-                                setIsViewRequestDialogOpen(true);
-                              }}
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              Visualiser
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         {/* Attributions History */}
         <TabsContent value="attributions" className="space-y-4">
@@ -692,7 +608,7 @@ export const BNRMNumberAttribution = () => {
                       <TableHead>Déclarant</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Statut</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead className="text-center">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                 <TableBody>
@@ -734,16 +650,19 @@ export const BNRMNumberAttribution = () => {
                             {getStatusBadge(attribution.status)}
                           </TableCell>
                           <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedAttribution(attribution);
-                                setIsDetailsOpen(true);
-                              }}
-                            >
-                              <FileText className="h-4 w-4" />
-                            </Button>
+                            <div className="flex items-center justify-center space-x-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedAttribution(attribution);
+                                  setIsDetailsOpen(true);
+                                }}
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                Visualiser
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       );
