@@ -167,7 +167,6 @@ serve(async (req) => {
         author_name: 'Dr. Ahmed El Fassi',
         isbn_requested: true,
         language: 'fr',
-        copies_count: 5,
         publication_date: new Date().toISOString().split('T')[0],
         publisher_name: 'Éditions Test Maroc',
         printer_name: 'Imprimerie Nationale Test',
