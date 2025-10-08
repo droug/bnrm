@@ -174,6 +174,10 @@ export default function AccessRequestsManagement() {
 
   const getRequestTypeLabel = (type: string) => {
     const types: { [key: string]: string } = {
+      'free_access': 'Accès gratuit',
+      'basic_subscription': 'Abonnement Basique',
+      'premium_subscription': 'Abonnement Premium',
+      'institutional_subscription': 'Abonnement Institutionnel',
       'consultation': 'Consultation sur place',
       'reproduction': 'Demande de reproduction',
       'research': 'Recherche académique',
@@ -199,7 +203,7 @@ export default function AccessRequestsManagement() {
       <div className="min-h-screen bg-background">
         <AdminHeader 
           title="Gestion des Demandes d'Accès"
-          subtitle="Traiter et gérer les demandes d'accès aux manuscrits"
+          subtitle="Traiter et gérer les demandes d'accès"
         />
 
         <main className="container py-8">
@@ -217,7 +221,7 @@ export default function AccessRequestsManagement() {
                 <div>
                   <h1 className="text-3xl font-bold">Demandes d'Accès</h1>
                   <p className="text-muted-foreground">
-                    Gérer les demandes d'accès aux manuscrits
+                    Gérer les demandes d'accès
                   </p>
                 </div>
               </div>
@@ -300,11 +304,10 @@ export default function AccessRequestsManagement() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Tous les types</SelectItem>
-                        <SelectItem value="consultation">Consultation</SelectItem>
-                        <SelectItem value="reproduction">Reproduction</SelectItem>
-                        <SelectItem value="research">Recherche</SelectItem>
-                        <SelectItem value="exhibition">Exposition</SelectItem>
-                        <SelectItem value="other">Autre</SelectItem>
+                        <SelectItem value="free_access">Accès gratuit</SelectItem>
+                        <SelectItem value="basic_subscription">Abonnement Basique</SelectItem>
+                        <SelectItem value="premium_subscription">Abonnement Premium</SelectItem>
+                        <SelectItem value="institutional_subscription">Abonnement Institutionnel</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -317,7 +320,7 @@ export default function AccessRequestsManagement() {
               <CardHeader>
                 <CardTitle>Liste des demandes ({filteredRequests.length})</CardTitle>
                 <CardDescription>
-                  Gérer et traiter les demandes d'accès aux manuscrits
+                  Gérer et traiter les demandes d'accès
                 </CardDescription>
               </CardHeader>
               <CardContent>
