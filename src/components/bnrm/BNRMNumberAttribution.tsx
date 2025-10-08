@@ -106,44 +106,53 @@ export const BNRMNumberAttribution = () => {
         {
           id: '1',
           status: 'valide_par_b',
+          deposit_type: 'monographie',
           metadata: {
             publication: {
               title: 'Histoire Contemporaine du Maroc',
               type: 'monographie'
             },
             declarant: {
-              name: 'Editions Dar Al Fikr'
+              name: 'Editions Dar Al Fikr',
+              organization: 'Maison d\'édition'
             }
           },
-          created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+          created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
         },
         {
           id: '2',
           status: 'valide_par_b',
+          deposit_type: 'periodique',
           metadata: {
             publication: {
               title: 'Revue Marocaine de Droit',
               type: 'periodique'
             },
             declarant: {
-              name: 'Faculté de Droit de Rabat'
+              name: 'Faculté de Droit de Rabat',
+              organization: 'Institution universitaire'
             }
           },
-          created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+          created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+          updated_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
         },
         {
           id: '3',
           status: 'valide_par_b',
+          deposit_type: 'monographie',
           metadata: {
             publication: {
               title: 'Atlas du Patrimoine Marocain',
               type: 'monographie'
             },
             declarant: {
-              name: 'Institut Royal de la Culture Amazighe'
+              name: 'Institut Royal de la Culture Amazighe',
+              organization: 'Organisme public'
             }
           },
-          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          updated_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
         }
       ];
 
