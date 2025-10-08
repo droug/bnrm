@@ -91,7 +91,98 @@ export default function AccessRequestsManagement() {
       );
 
       if (error) throw error;
-      setRequests(requestsWithProfiles || []);
+      
+      // Ajouter des exemples de demandes avec types d'abonnements
+      const mockRequests: AccessRequest[] = [
+        {
+          id: 'mock-1',
+          user_id: 'mock-user-1',
+          manuscript_id: 'mock-ms-1',
+          request_type: 'free_access',
+          purpose: 'Recherche académique sur l\'histoire marocaine',
+          requested_date: '2025-10-06',
+          status: 'pending',
+          notes: '',
+          created_at: '2025-10-06T10:00:00Z',
+          manuscripts: {
+            title: 'Recueil de poésie',
+            author: 'Auteur inconnu',
+            cote: 'MS-1234'
+          },
+          profiles: {
+            first_name: 'Ahmed',
+            last_name: 'Benani',
+            institution: 'Université Mohammed V'
+          }
+        },
+        {
+          id: 'mock-2',
+          user_id: 'mock-user-2',
+          manuscript_id: 'mock-ms-2',
+          request_type: 'basic_subscription',
+          purpose: 'Consultation régulière des manuscrits',
+          requested_date: '2025-10-05',
+          status: 'pending',
+          notes: '',
+          created_at: '2025-10-05T14:30:00Z',
+          manuscripts: {
+            title: 'Kitab al-Hikmah',
+            author: 'Al-Kindi',
+            cote: 'MS-5678'
+          },
+          profiles: {
+            first_name: 'Fatima',
+            last_name: 'El Amrani',
+            institution: 'Bibliothèque municipale de Rabat'
+          }
+        },
+        {
+          id: 'mock-3',
+          user_id: 'mock-user-3',
+          manuscript_id: 'mock-ms-3',
+          request_type: 'premium_subscription',
+          purpose: 'Demande de reproduction pour publication',
+          requested_date: '2025-10-02',
+          status: 'pending',
+          notes: '',
+          created_at: '2025-10-02T09:15:00Z',
+          manuscripts: {
+            title: 'Chronique de la conquête',
+            author: 'Ibn al-Qutiyya',
+            cote: 'MS-9012'
+          },
+          profiles: {
+            first_name: 'Hassan',
+            last_name: 'Tazi',
+            institution: 'Institut Royal des Études Islamiques'
+          }
+        },
+        {
+          id: 'mock-4',
+          user_id: 'mock-user-4',
+          manuscript_id: 'mock-ms-4',
+          request_type: 'basic_subscription',
+          purpose: 'Consultation sur place pour étude',
+          requested_date: '2025-09-22',
+          status: 'approved',
+          notes: '',
+          created_at: '2025-09-22T16:45:00Z',
+          manuscripts: {
+            title: 'Traité de médecine',
+            author: 'Ibn Sina',
+            cote: 'MS-3456'
+          },
+          profiles: {
+            first_name: 'Amina',
+            last_name: 'Chakir',
+            institution: 'Faculté de Médecine de Casablanca'
+          }
+        }
+      ];
+
+      // Combiner les vraies données avec les exemples
+      const allRequests = [...mockRequests, ...requestsWithProfiles];
+      setRequests(allRequests);
     } catch (error) {
       console.error('Error fetching requests:', error);
       toast({
