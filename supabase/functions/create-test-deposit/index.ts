@@ -150,7 +150,7 @@ serve(async (req) => {
       printerProfessionalId = profReg?.id;
     }
 
-    // 3. Créer la demande de dépôt légal
+    // 3. Créer la demande de dépôt légal (sans copies_count)
     const year = new Date().getFullYear();
     const timestamp = Date.now();
     const requestNumber = `DL-${year}-TEST-${timestamp}`;
