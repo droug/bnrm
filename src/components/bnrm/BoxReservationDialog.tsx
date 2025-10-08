@@ -138,10 +138,12 @@ export function BoxReservationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!max-h-none !overflow-visible max-w-2xl p-0">
-        <div className="w-full max-h-[90vh] flex flex-col">
+      <DialogContent 
+        className="!max-h-none !overflow-visible max-w-2xl p-0 !fixed !top-[50%] !left-[50%] !translate-x-[-50%] !translate-y-[-50%] !z-[9999]"
+      >
+        <div className="w-full max-h-[90vh] flex flex-col bg-background rounded-lg">
           {/* Header fixe */}
-          <div className="p-4 border-b bg-background flex-shrink-0">
+          <div className="p-4 border-b bg-background flex-shrink-0 rounded-t-lg">
             <DialogHeader>
               <DialogTitle>Réservation de Box</DialogTitle>
               <DialogDescription>
@@ -213,7 +215,7 @@ export function BoxReservationDialog({
                           {startDate ? format(startDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner"}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 z-[100]" align="start">
+                      <PopoverContent className="w-auto p-0 z-[10000]" align="start">
                         <Calendar
                           mode="single"
                           selected={startDate}
@@ -240,7 +242,7 @@ export function BoxReservationDialog({
                           {endDate ? format(endDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner"}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 z-[100]" align="start">
+                      <PopoverContent className="w-auto p-0 z-[10000]" align="start">
                         <Calendar
                           mode="single"
                           selected={endDate}
@@ -283,7 +285,7 @@ export function BoxReservationDialog({
           </div>
 
           {/* Footer fixe */}
-          <div className="flex justify-end gap-2 p-4 border-t bg-background flex-shrink-0">
+          <div className="flex justify-end gap-2 p-4 border-t bg-background flex-shrink-0 rounded-b-lg">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Annuler
             </Button>
