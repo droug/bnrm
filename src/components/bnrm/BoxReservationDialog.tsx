@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CustomDialog, CustomDialogContent, CustomDialogDescription, CustomDialogHeader, CustomDialogTitle } from "@/components/ui/custom-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -120,187 +120,184 @@ export function BoxReservationDialog({
 
   if (!user) {
     return (
-      <CustomDialog open={open} onOpenChange={onOpenChange}>
-        <CustomDialogContent className="max-w-md">
-          <div className="p-6">
-            <CustomDialogHeader>
-              <CustomDialogTitle>Authentification requise</CustomDialogTitle>
-              <CustomDialogDescription>
-                Veuillez vous connecter pour réserver un box.
-              </CustomDialogDescription>
-            </CustomDialogHeader>
-            <Button onClick={() => window.location.href = "/auth"} className="w-full mt-4">
-              Se connecter / S'inscrire
-            </Button>
-          </div>
-        </CustomDialogContent>
-      </CustomDialog>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Authentification requise</DialogTitle>
+            <DialogDescription>
+              Veuillez vous connecter pour réserver un box.
+            </DialogDescription>
+          </DialogHeader>
+          <Button onClick={() => window.location.href = "/auth"} className="w-full">
+            Se connecter / S'inscrire
+          </Button>
+        </DialogContent>
+      </Dialog>
     );
   }
 
   return (
-    <CustomDialog open={open} onOpenChange={onOpenChange}>
-      <CustomDialogContent className="max-w-2xl w-[95vw] sm:w-full">
-        {/* Structure avec hauteur fixe et scroll interne */}
-        <div className="flex flex-col h-[80vh] max-h-[700px]">
-          {/* Header - Position fixe */}
-          <div className="flex-shrink-0 p-4 pb-3 border-b">
-            <CustomDialogHeader>
-              <CustomDialogTitle>Réservation de Box</CustomDialogTitle>
-              <CustomDialogDescription>
-                Remplissez le formulaire pour réserver un box de travail
-              </CustomDialogDescription>
-            </CustomDialogHeader>
-          </div>
-
-          {/* Zone de contenu scrollable */}
-          <div className="flex-1 overflow-y-auto p-4 min-h-0">
-            <form id="box-reservation-form" onSubmit={handleSubmit} className="space-y-4">
-              <div className="bg-muted/30 p-3 rounded-lg space-y-3">
-                <h3 className="font-semibold text-sm">Informations personnelles</h3>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Prénom</Label>
-                    <Input value={profile?.first_name || ""} disabled className="h-9" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Nom</Label>
-                    <Input value={profile?.last_name || ""} disabled className="h-9" />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Email</Label>
-                  <Input value={user.email || ""} disabled className="h-9" />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Téléphone</Label>
-                  <Input value={profile?.phone || ""} disabled className="h-9" />
-                </div>
-              </div>
-
-              <div className="bg-muted/30 p-3 rounded-lg space-y-3">
-                <h3 className="font-semibold text-sm">Détails de la réservation</h3>
-                
-                <div className="space-y-1.5">
-                  <Label htmlFor="boxNumber" className="text-xs">Numéro de box préféré (optionnel)</Label>
-                  <Input
-                    id="boxNumber"
-                    value={boxNumber}
-                    onChange={(e) => setBoxNumber(e.target.value)}
-                    placeholder="Ex: B12, A05..."
-                    className="h-9"
-                  />
-                  <p className="text-[11px] text-muted-foreground">
-                    Si disponible, nous essaierons de vous attribuer ce box
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Date de début *</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal h-9 text-xs",
-                            !startDate && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-3 w-3" />
-                          {startDate ? format(startDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 z-[100]" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={startDate}
-                          onSelect={setStartDate}
-                          disabled={(date) => date < new Date()}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Date de fin *</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal h-9 text-xs",
-                            !endDate && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-3 w-3" />
-                          {endDate ? format(endDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 z-[100]" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={endDate}
-                          onSelect={setEndDate}
-                          disabled={(date) => !startDate || date <= startDate}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
-
-                {startDate && endDate && (
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-2.5 rounded-lg">
-                    <p className="text-xs">
-                      <strong>Durée:</strong> {calculateDuration()} jour(s)
-                    </p>
-                    {tariff && (
-                      <p className="text-xs font-semibold text-primary mt-0.5">
-                        <strong>Total:</strong> {calculateTotal()} {tariff.devise}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="purpose" className="text-xs">Objet de la réservation *</Label>
-                  <Textarea
-                    id="purpose"
-                    value={purpose}
-                    onChange={(e) => setPurpose(e.target.value)}
-                    placeholder="Décrivez brièvement le motif de votre réservation..."
-                    required
-                    rows={3}
-                    className="text-sm resize-none"
-                  />
-                </div>
-              </div>
-            </form>
-          </div>
-
-          {/* Footer - Position fixe */}
-          <div className="flex-shrink-0 flex justify-end gap-2 p-4 pt-3 border-t bg-background">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Annuler
-            </Button>
-            <Button type="submit" form="box-reservation-form" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Envoi en cours...
-                </>
-              ) : (
-                "Confirmer la réservation"
-              )}
-            </Button>
-          </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl p-0 overflow-hidden" style={{ maxHeight: '90vh' }}>
+        {/* Header */}
+        <div className="p-4 border-b">
+          <DialogHeader>
+            <DialogTitle>Réservation de Box</DialogTitle>
+            <DialogDescription>
+              Remplissez le formulaire pour réserver un box de travail
+            </DialogDescription>
+          </DialogHeader>
         </div>
-      </CustomDialogContent>
-    </CustomDialog>
+
+        {/* Contenu scrollable avec hauteur fixe */}
+        <div className="overflow-y-auto p-4" style={{ maxHeight: '500px' }}>
+          <form id="box-reservation-form" onSubmit={handleSubmit} className="space-y-4">
+            {/* Section informations personnelles */}
+            <div className="bg-muted/30 p-3 rounded-lg space-y-3">
+              <h3 className="font-semibold text-sm">Informations personnelles</h3>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Prénom</Label>
+                  <Input value={profile?.first_name || ""} disabled className="h-9" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Nom</Label>
+                  <Input value={profile?.last_name || ""} disabled className="h-9" />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs">Email</Label>
+                <Input value={user.email || ""} disabled className="h-9" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs">Téléphone</Label>
+                <Input value={profile?.phone || ""} disabled className="h-9" />
+              </div>
+            </div>
+
+            {/* Section détails de réservation */}
+            <div className="bg-muted/30 p-3 rounded-lg space-y-3">
+              <h3 className="font-semibold text-sm">Détails de la réservation</h3>
+              
+              <div className="space-y-1.5">
+                <Label htmlFor="boxNumber" className="text-xs">Numéro de box préféré (optionnel)</Label>
+                <Input
+                  id="boxNumber"
+                  value={boxNumber}
+                  onChange={(e) => setBoxNumber(e.target.value)}
+                  placeholder="Ex: B12, A05..."
+                  className="h-9"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  Si disponible, nous essaierons de vous attribuer ce box
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Date de début *</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal h-9 text-xs",
+                          !startDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-3 w-3" />
+                        {startDate ? format(startDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 z-[100]" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        disabled={(date) => date < new Date()}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Date de fin *</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal h-9 text-xs",
+                          !endDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-3 w-3" />
+                        {endDate ? format(endDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 z-[100]" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        disabled={(date) => !startDate || date <= startDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
+              {startDate && endDate && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-2.5 rounded-lg">
+                  <p className="text-xs">
+                    <strong>Durée:</strong> {calculateDuration()} jour(s)
+                  </p>
+                  {tariff && (
+                    <p className="text-xs font-semibold text-primary mt-0.5">
+                      <strong>Total:</strong> {calculateTotal()} {tariff.devise}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <Label htmlFor="purpose" className="text-xs">Objet de la réservation *</Label>
+                <Textarea
+                  id="purpose"
+                  value={purpose}
+                  onChange={(e) => setPurpose(e.target.value)}
+                  placeholder="Décrivez brièvement le motif de votre réservation..."
+                  required
+                  rows={3}
+                  className="text-sm resize-none"
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-end gap-2 p-4 border-t bg-background">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Annuler
+          </Button>
+          <Button type="submit" form="box-reservation-form" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Envoi en cours...
+              </>
+            ) : (
+              "Confirmer la réservation"
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
