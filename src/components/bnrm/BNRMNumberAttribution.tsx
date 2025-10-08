@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -22,6 +23,9 @@ import {
   Send,
   RefreshCw,
   FileText,
+  Eye,
+  CheckCheck,
+  X,
   Settings,
   BarChart3,
   Upload,
@@ -78,6 +82,8 @@ export const BNRMNumberAttribution = () => {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [isRangeDialogOpen, setIsRangeDialogOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isViewRequestDialogOpen, setIsViewRequestDialogOpen] = useState(false);
+  const [selectedRequestForView, setSelectedRequestForView] = useState<any>(null);
   const [newRange, setNewRange] = useState({
     number_type: 'isbn' as 'isbn' | 'issn' | 'dl',
     range_start: '',
@@ -94,11 +100,11 @@ export const BNRMNumberAttribution = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch pending requests that need number attribution
+      // Fetch pending requests that need validation (submitted status)
       const { data: requests } = await supabase
         .from("legal_deposits")
         .select("*")
-        .eq("status", "valide_par_b")
+        .eq("status", "submitted")
         .order("created_at", { ascending: true });
 
       // Mock data for demonstration if no real data
@@ -558,9 +564,9 @@ export const BNRMNumberAttribution = () => {
         <TabsContent value="pending" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Demandes validées en attente d'attribution</CardTitle>
+              <CardTitle>Demandes de dépôt légal en attente de validation</CardTitle>
               <CardDescription>
-                Demandes prêtes pour l'attribution des numéros ISBN/ISSN/DL
+                Vérifier et valider les demandes avant attribution des numéros
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -568,20 +574,28 @@ export const BNRMNumberAttribution = () => {
                 <div className="flex items-center justify-center h-32">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
+              ) : pendingRequests.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Aucune demande en attente de validation
+                </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>N° Demande</TableHead>
                       <TableHead>Titre</TableHead>
                       <TableHead>Déclarant</TableHead>
                       <TableHead>Type</TableHead>
-                      <TableHead>Date validation</TableHead>
+                      <TableHead>Date de soumission</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {pendingRequests.map((request) => (
                       <TableRow key={request.id}>
+                        <TableCell className="font-mono text-sm">
+                          {request.request_number || 'N/A'}
+                        </TableCell>
                         <TableCell className="max-w-xs truncate">
                           {request.metadata?.publication?.title || "Sans titre"}
                         </TableCell>
@@ -603,39 +617,21 @@ export const BNRMNumberAttribution = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {format(new Date(request.updated_at), "dd/MM/yyyy", { locale: fr })}
+                          {format(new Date(request.created_at), "dd/MM/yyyy", { locale: fr })}
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
                             <Button
                               size="sm"
-                              onClick={() => attributeNumber(request.id, 'dl')}
+                              variant="outline"
+                              onClick={() => {
+                                setSelectedRequestForView(request);
+                                setIsViewRequestDialogOpen(true);
+                              }}
                             >
-                              <Hash className="w-4 h-4 mr-1" />
-                              N° DL
+                              <Eye className="w-4 h-4 mr-1" />
+                              Visualiser
                             </Button>
-                            
-                            {request.deposit_type === 'monographie' && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => attributeNumber(request.id, 'isbn')}
-                              >
-                                <BookOpen className="w-4 h-4 mr-1" />
-                                ISBN
-                              </Button>
-                            )}
-                            
-                            {request.deposit_type === 'periodique' && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => attributeNumber(request.id, 'issn')}
-                              >
-                                <Newspaper className="w-4 h-4 mr-1" />
-                                ISSN
-                              </Button>
-                            )}
                           </div>
                         </TableCell>
                       </TableRow>
