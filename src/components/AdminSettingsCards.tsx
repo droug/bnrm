@@ -25,7 +25,7 @@ export function AdminSettingsCards() {
     {
       icon: Clock,
       title: "Demandes en attente",
-      description: "Traiter les demandes d'accès aux manuscrits",
+      description: "Traiter les demandes d'accès et Abonnements",
       href: "/admin/access-requests",
       permission: "requests.manage"
     },
