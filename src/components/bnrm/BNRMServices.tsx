@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Search } from "lucide-react";
+import { Plus, Edit, Trash2, Search, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
@@ -19,6 +19,14 @@ interface BNRMService {
   reference_legale: string;
   created_at: string;
   updated_at: string;
+  bnrm_tarifs?: Array<{
+    id_tarif: string;
+    montant: number;
+    devise: string;
+    condition_tarif: string;
+    periode_validite: string;
+    is_active: boolean;
+  }>;
 }
 
 interface BNRMServicesProps {
@@ -51,7 +59,17 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
     try {
       const { data, error } = await supabase
         .from('bnrm_services')
-        .select('*')
+        .select(`
+          *,
+          bnrm_tarifs (
+            id_tarif,
+            montant,
+            devise,
+            condition_tarif,
+            periode_validite,
+            is_active
+          )
+        `)
         .order('id_service');
 
       if (error) throw error;
@@ -188,6 +206,10 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
       "Formation": "bg-orange-100 text-orange-800"
     };
     return colors[category] || "bg-gray-100 text-gray-800";
+  };
+
+  const formatPrice = (amount: number, currency: string) => {
+    return `${amount.toLocaleString('fr-FR')} ${currency}`;
   };
 
   if (loading) {
@@ -354,6 +376,43 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
                   <span className="font-medium">Référence légale :</span>
                   <p className="text-muted-foreground">{service.reference_legale}</p>
                 </div>
+              </div>
+
+              {/* Tarifs associés */}
+              <div className="mt-4 pt-4 border-t">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-sm flex items-center gap-1">
+                    <DollarSign className="h-4 w-4" />
+                    Tarifs
+                  </span>
+                </div>
+                
+                {service.bnrm_tarifs && service.bnrm_tarifs.length > 0 ? (
+                  <div className="space-y-2">
+                    {service.bnrm_tarifs
+                      .filter(tarif => tarif.is_active)
+                      .map((tarif) => (
+                        <div 
+                          key={tarif.id_tarif} 
+                          className="p-2 bg-muted/50 rounded-md"
+                        >
+                          <div className="font-semibold text-primary">
+                            {formatPrice(tarif.montant, tarif.devise)}
+                          </div>
+                          {tarif.condition_tarif && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {tarif.condition_tarif}
+                            </div>
+                          )}
+                          <div className="text-xs text-muted-foreground">
+                            Période: {tarif.periode_validite}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">Aucun tarif défini</p>
+                )}
               </div>
             </CardContent>
           </Card>
