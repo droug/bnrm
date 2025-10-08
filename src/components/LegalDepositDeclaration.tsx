@@ -660,17 +660,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Label>Chiffre de tirage</Label>
                   <Input type="number" placeholder="Chiffre de tirage" />
                 </div>
-
-                <div className="space-y-2 md:col-span-2 flex justify-end">
-                  <Button 
-                    type="button"
-                    onClick={() => {
-                      toast.success("Informations de l'imprimeur validées");
-                    }}
-                  >
-                    {language === 'ar' ? 'التحقق' : 'Validation'}
-                  </Button>
-                </div>
               </div>
             </div>
 
