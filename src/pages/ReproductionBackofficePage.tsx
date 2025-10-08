@@ -7,9 +7,10 @@ import { Navigate } from "react-router-dom";
 export default function ReproductionBackofficePage() {
   const { user, profile } = useAuth();
 
-  // Only admins and librarians can access
-  if (!user || !profile || !['admin', 'librarian'].includes(profile.role)) {
-    return <Navigate to="/" replace />;
+  // Bloquer l'accès aux comptes professionnels
+  const professionalRoles = ['editor', 'printer', 'producer'];
+  if (!user || !profile || !['admin', 'librarian'].includes(profile.role) || professionalRoles.includes(profile.role)) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (

@@ -49,7 +49,9 @@ export default function BNRMBackOffice() {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!profile?.is_approved || (profile?.role !== 'admin' && profile?.role !== 'librarian')) {
+  // Bloquer l'accès aux comptes professionnels
+  const professionalRoles = ['editor', 'printer', 'producer'];
+  if (!profile?.is_approved || (profile?.role !== 'admin' && profile?.role !== 'librarian') || professionalRoles.includes(profile?.role)) {
     return <Navigate to="/dashboard" replace />;
   }
 

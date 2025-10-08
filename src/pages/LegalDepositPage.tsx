@@ -51,8 +51,9 @@ const LegalDepositPage = () => {
     );
   }
 
-  // Check role once profile is loaded
-  if (profile?.role !== 'admin' && profile?.role !== 'librarian') {
+  // Bloquer l'accès aux comptes professionnels
+  const professionalRoles = ['editor', 'printer', 'producer'];
+  if (profile?.role !== 'admin' && profile?.role !== 'librarian' || professionalRoles.includes(profile?.role)) {
     console.log("LegalDepositPage - Access denied. Profile role:", profile?.role);
     return <Navigate to="/dashboard" replace />;
   }

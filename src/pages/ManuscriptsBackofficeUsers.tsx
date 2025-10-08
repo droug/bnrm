@@ -10,8 +10,10 @@ export default function ManuscriptsBackofficeUsers() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
 
-  if (!user || !profile || !['admin', 'librarian'].includes(profile.role)) {
-    return <Navigate to="/" replace />;
+  // Bloquer l'accès aux comptes professionnels
+  const professionalRoles = ['editor', 'printer', 'producer'];
+  if (!user || !profile || !['admin', 'librarian'].includes(profile.role) || professionalRoles.includes(profile.role)) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (
