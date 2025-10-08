@@ -113,7 +113,7 @@ export default function BNRMBackOffice() {
                 </TabsTrigger>
                 <TabsTrigger value="requests" className="flex items-center gap-2">
                   <FileText className="h-4 w-4" />
-                  <span className="hidden lg:inline">{t('bnrm.requests.tab')}</span>
+                  <span className="hidden lg:inline">Demandes en Attente</span>
                 </TabsTrigger>
                 <TabsTrigger value="attribution" className="flex items-center gap-2">
                   <Hash className="h-4 w-4" />
