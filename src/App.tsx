@@ -82,6 +82,7 @@ import ServicesCatalog from "./pages/ServicesCatalog";
 import TranslationManagementPage from "./pages/TranslationManagementPage";
 import AccessRequestsManagement from "./pages/AccessRequestsManagement";
 import CommitteeDashboard from "./pages/CommitteeDashboard";
+import DepositApprovals from "./pages/DepositApprovals";
 import EmailManagement from "./pages/EmailManagement";
 
 
@@ -197,8 +198,10 @@ const App = () => (
           <Route path="/admin/demandes-acces" element={<AccessRequestsManagement />} />
 
           {/* Email Management */}
-          <Route path="/admin/email-management" element={<EmailManagement />} />
-          <Route path="/admin/gestion-emails" element={<EmailManagement />} />
+        <Route path="/admin/email-management" element={<EmailManagement />} />
+        <Route path="/admin/gestion-emails" element={<EmailManagement />} />
+        <Route path="/deposit-approvals" element={<DepositApprovals />} />
+        <Route path="/approbations-depot" element={<DepositApprovals />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />

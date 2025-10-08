@@ -1871,6 +1871,56 @@ export type Database = {
           },
         ]
       }
+      legal_deposit_parties: {
+        Row: {
+          approval_comments: string | null
+          approval_date: string | null
+          approval_status: string | null
+          created_at: string | null
+          id: string
+          is_initiator: boolean | null
+          notified_at: string | null
+          party_role: string
+          request_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          approval_comments?: string | null
+          approval_date?: string | null
+          approval_status?: string | null
+          created_at?: string | null
+          id?: string
+          is_initiator?: boolean | null
+          notified_at?: string | null
+          party_role: string
+          request_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          approval_comments?: string | null
+          approval_date?: string | null
+          approval_status?: string | null
+          created_at?: string | null
+          id?: string
+          is_initiator?: boolean | null
+          notified_at?: string | null
+          party_role?: string
+          request_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_deposit_parties_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "legal_deposit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_deposit_requests: {
         Row: {
           attribution_date: string | null
@@ -4868,6 +4918,10 @@ export type Database = {
         Args: { p_content_id: string; p_user_id: string }
         Returns: boolean
       }
+      check_all_parties_approved: {
+        Args: { p_request_id: string }
+        Returns: boolean
+      }
       check_committee_approval: {
         Args: { request_uuid: string }
         Returns: boolean
@@ -4912,6 +4966,10 @@ export type Database = {
           updated_at: string
           user_id: string
         }[]
+      }
+      get_professional_role: {
+        Args: { p_user_id: string }
+        Returns: string
       }
       get_profile_permissions: {
         Args: { user_uuid: string }
