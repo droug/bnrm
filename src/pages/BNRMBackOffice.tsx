@@ -31,6 +31,7 @@ import { BNRMWorkflowManager } from "@/components/bnrm/BNRMWorkflowManager";
 import { BNRMPaymentNotificationSettings } from "@/components/bnrm/BNRMPaymentNotificationSettings";
 import { BNRMStatistics } from "@/components/bnrm/BNRMStatistics";
 import BNRMEditorialMonitoring from "@/components/bnrm/BNRMEditorialMonitoring";
+import { DepositValidationWorkflow } from "@/components/legal-deposit/DepositValidationWorkflow";
 
 export default function BNRMBackOffice() {
   const { user, profile, loading } = useAuth();
@@ -154,7 +155,7 @@ export default function BNRMBackOffice() {
 
               {/* Request Management Tab */}
               <TabsContent value="requests" className="space-y-4">
-                <BNRMRequestManager />
+                <DepositValidationWorkflow />
               </TabsContent>
 
               {/* Number Attribution Tab */}
