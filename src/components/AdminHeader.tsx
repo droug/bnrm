@@ -77,12 +77,13 @@ export function AdminHeader({
           {/* Boutons d'action */}
           {showNotifications && (
             <Button 
-              variant="outline" 
-              size="sm"
+              variant="ghost" 
+              size="icon"
               onClick={() => navigate('/admin/settings')}
+              className="relative"
             >
-              <Bell className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Notifications</span>
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-1 right-1 h-2 w-2 bg-primary rounded-full"></span>
             </Button>
           )}
           
