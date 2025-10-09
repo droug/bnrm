@@ -11,13 +11,26 @@ export function CreateTestDepositButton() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('create-test-users');
+      // Appeler directement l'URL de la fonction edge
+      const response = await fetch(
+        'https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/create-test-users',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhZmVwcG16bnVwenFrcW16anp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzNzMxNDYsImV4cCI6MjA3Mzk0OTE0Nn0._lNseTnhm88eUPMAMxeTZ-qn2vWGPm73M66lppaoSWE`
+          }
+        }
+      );
 
-      if (error) {
-        console.error("Error calling create-test-users function:", error);
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Error response:", error);
         toast.error("Erreur lors de la création des utilisateurs de test");
         return;
       }
+
+      const data = await response.json();
 
       if (data?.success) {
         toast.success(
