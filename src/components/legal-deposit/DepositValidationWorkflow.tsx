@@ -23,18 +23,18 @@ interface DepositRequest {
   support_type: string;
   status: string;
   created_at: string;
-  validation_dlbn_status?: string;
-  validation_dlbn_date?: string;
-  validation_dlbn_by?: string;
-  validation_dlbn_comments?: string;
-  validation_abn_status?: string;
-  validation_abn_date?: string;
-  validation_abn_by?: string;
-  validation_abn_comments?: string;
-  committee_validation_status?: string;
-  committee_validation_date?: string;
-  committee_validation_by?: string;
-  committee_validation_comments?: string;
+  validated_by_service?: string;
+  service_validated_at?: string;
+  service_validation_notes?: string;
+  validated_by_department?: string;
+  department_validated_at?: string;
+  department_validation_notes?: string;
+  validated_by_committee?: string;
+  committee_validated_at?: string;
+  committee_validation_notes?: string;
+  rejected_by?: string;
+  rejected_at?: string;
+  rejection_reason?: string;
   initiator?: {
     first_name: string;
     last_name: string;
@@ -68,18 +68,18 @@ export function DepositValidationWorkflow() {
         support_type,
         status,
         created_at,
-        validation_dlbn_status,
-        validation_dlbn_date,
-        validation_dlbn_by,
-        validation_dlbn_comments,
-        validation_abn_status,
-        validation_abn_date,
-        validation_abn_by,
-        validation_abn_comments,
-        committee_validation_status,
-        committee_validation_date,
-        committee_validation_by,
-        committee_validation_comments,
+        validated_by_service,
+        service_validated_at,
+        service_validation_notes,
+        validated_by_department,
+        department_validated_at,
+        department_validation_notes,
+        validated_by_committee,
+        committee_validated_at,
+        committee_validation_notes,
+        rejected_by,
+        rejected_at,
+        rejection_reason,
         initiator:profiles!initiator_id (
           first_name,
           last_name
@@ -106,9 +106,9 @@ export function DepositValidationWorkflow() {
   };
 
   const getValidationStep = (request: DepositRequest): number => {
-    if (request.committee_validation_status === "approved") return 3;
-    if (request.validation_abn_status === "approved") return 2;
-    if (request.validation_dlbn_status === "approved") return 1;
+    if (request.validated_by_committee) return 3;
+    if (request.validated_by_department) return 2;
+    if (request.validated_by_service) return 1;
     return 0;
   };
 
@@ -128,34 +128,42 @@ export function DepositValidationWorkflow() {
 
   const handleValidation = async (
     requestId: string,
-    validationType: "dlbn" | "abn" | "committee",
+    validationType: "service" | "department" | "committee",
     status: "approved" | "rejected"
   ) => {
     setIsLoading(true);
 
     try {
-      const updateData: any = {
-        [`validation_${validationType}_status`]: status,
-        [`validation_${validationType}_date`]: new Date().toISOString(),
-        [`validation_${validationType}_by`]: user!.id,
-        [`validation_${validationType}_comments`]: comments || null,
-      };
+      const updateData: any = {};
 
-      // Mettre à jour le statut global
-      if (status === "rejected") {
-        if (validationType === "dlbn") {
+      if (status === "approved") {
+        if (validationType === "service") {
+          updateData.validated_by_service = user!.id;
+          updateData.service_validated_at = new Date().toISOString();
+          updateData.service_validation_notes = comments || null;
+          updateData.status = "en_attente_validation_b";
+        } else if (validationType === "department") {
+          updateData.validated_by_department = user!.id;
+          updateData.department_validated_at = new Date().toISOString();
+          updateData.department_validation_notes = comments || null;
+          updateData.status = "en_attente_comite_validation";
+        } else if (validationType === "committee") {
+          updateData.validated_by_committee = user!.id;
+          updateData.committee_validated_at = new Date().toISOString();
+          updateData.committee_validation_notes = comments || null;
+          updateData.status = "valide_par_comite";
+        }
+      } else {
+        updateData.rejected_by = user!.id;
+        updateData.rejected_at = new Date().toISOString();
+        updateData.rejection_reason = comments || null;
+        
+        if (validationType === "service") {
           updateData.status = "rejete_par_b";
         } else if (validationType === "committee") {
           updateData.status = "rejete_par_comite";
         } else {
           updateData.status = "rejete";
-        }
-      } else {
-        // Progression vers l'étape suivante
-        if (validationType === "dlbn") {
-          updateData.status = "en_attente_comite_validation";
-        } else if (validationType === "committee") {
-          updateData.status = "valide_par_comite";
         }
       }
 
@@ -167,7 +175,7 @@ export function DepositValidationWorkflow() {
       if (error) throw error;
 
       // Générer le document approprié
-      if (status === "approved" && validationType === "dlbn") {
+      if (status === "approved" && validationType === "service") {
         await generateValidationForm(selectedRequest!);
       } else if (status === "rejected") {
         await generateRejectionLetter(selectedRequest!);
@@ -196,17 +204,14 @@ export function DepositValidationWorkflow() {
   const generateValidationForm = async (request: DepositRequest) => {
     const doc = new jsPDF();
     
-    // En-tête
     doc.setFontSize(20);
     doc.text("Bibliothèque Nationale du Royaume du Maroc", 105, 20, { align: "center" });
     doc.setFontSize(16);
     doc.text("Formulaire Canevas de Validation", 105, 30, { align: "center" });
     
-    // Ligne de séparation
     doc.setLineWidth(0.5);
     doc.line(20, 35, 190, 35);
     
-    // Informations de la demande
     doc.setFontSize(12);
     doc.text("Numéro de demande:", 20, 50);
     doc.setFont(undefined, "bold");
@@ -217,7 +222,6 @@ export function DepositValidationWorkflow() {
     doc.setFont(undefined, "bold");
     doc.text(format(new Date(), "dd/MM/yyyy à HH:mm", { locale: fr }), 80, 60);
     
-    // Détails de la publication
     doc.setFont(undefined, "normal");
     doc.setFontSize(14);
     doc.text("Détails de la Publication", 20, 75);
@@ -236,7 +240,6 @@ export function DepositValidationWorkflow() {
     doc.text("Type de support:", 20, 115);
     doc.text(request.support_type, 20, 122);
     
-    // Validation DLBN
     doc.setFontSize(14);
     doc.text("Validation Service DLBN", 20, 140);
     doc.line(20, 142, 100, 142);
@@ -245,39 +248,32 @@ export function DepositValidationWorkflow() {
     doc.text("Statut: APPROUVÉ", 20, 150);
     doc.text(`Date: ${format(new Date(), "dd/MM/yyyy", { locale: fr })}`, 20, 157);
     
-    // Pied de page
     doc.setFontSize(9);
     doc.text("Ce document certifie la conformité de la demande de dépôt légal.", 105, 280, { align: "center" });
     doc.text("Bibliothèque Nationale du Royaume du Maroc", 105, 287, { align: "center" });
     
-    // Télécharger le PDF
     doc.save(`Validation_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
   };
 
   const generateRejectionLetter = async (request: DepositRequest) => {
     const doc = new jsPDF();
     
-    // En-tête officiel
     doc.setFontSize(20);
     doc.text("Bibliothèque Nationale du Royaume du Maroc", 105, 20, { align: "center" });
     doc.setFontSize(14);
     doc.text("Service du Dépôt Légal", 105, 28, { align: "center" });
     
-    // Ligne de séparation
     doc.setLineWidth(0.5);
     doc.line(20, 35, 190, 35);
     
-    // Date et référence
     doc.setFontSize(11);
     doc.text(`Rabat, le ${format(new Date(), "dd MMMM yyyy", { locale: fr })}`, 140, 45);
     doc.text(`Réf: ${request.request_number}`, 20, 55);
     
-    // Objet
     doc.setFontSize(12);
     doc.setFont(undefined, "bold");
     doc.text("Objet: Notification de rejet de demande de dépôt légal", 20, 70);
     
-    // Corps de la lettre
     doc.setFont(undefined, "normal");
     doc.setFontSize(11);
     
@@ -307,17 +303,14 @@ export function DepositValidationWorkflow() {
       yPos += 7;
     });
     
-    // Signature
     doc.setFont(undefined, "bold");
     doc.text("Le Directeur du Service du Dépôt Légal", 105, 240, { align: "center" });
     
-    // Pied de page
     doc.setFont(undefined, "normal");
     doc.setFontSize(9);
     doc.text("Bibliothèque Nationale du Royaume du Maroc - Av. Ibn Batouta, Rabat", 105, 280, { align: "center" });
     doc.text("Tél: +212 5XX XX XX XX | Email: depot.legal@bnrm.ma", 105, 287, { align: "center" });
     
-    // Télécharger le PDF
     doc.save(`Rejet_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
   };
 
@@ -341,18 +334,18 @@ export function DepositValidationWorkflow() {
     const steps = [
       {
         name: "Service DLBN",
-        status: request.validation_dlbn_status,
-        date: request.validation_dlbn_date,
+        validated: !!request.validated_by_service,
+        date: request.service_validated_at,
       },
       {
         name: "Département ABN",
-        status: request.validation_abn_status,
-        date: request.validation_abn_date,
+        validated: !!request.validated_by_department,
+        date: request.department_validated_at,
       },
       {
         name: "Comité de Validation",
-        status: request.committee_validation_status,
-        date: request.committee_validation_date,
+        validated: !!request.validated_by_committee,
+        date: request.committee_validated_at,
       },
     ];
 
@@ -363,16 +356,16 @@ export function DepositValidationWorkflow() {
             <div className="flex flex-col items-center flex-1">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  step.status === "approved"
+                  step.validated
                     ? "bg-green-500 text-white"
-                    : step.status === "rejected"
+                    : request.rejected_by
                     ? "bg-red-500 text-white"
                     : "bg-gray-300 text-gray-600"
                 }`}
               >
-                {step.status === "approved" ? (
+                {step.validated ? (
                   <CheckCircle className="h-5 w-5" />
-                ) : step.status === "rejected" ? (
+                ) : request.rejected_by ? (
                   <XCircle className="h-5 w-5" />
                 ) : (
                   <Clock className="h-5 w-5" />
@@ -388,7 +381,7 @@ export function DepositValidationWorkflow() {
             {index < steps.length - 1 && (
               <div
                 className={`h-0.5 flex-1 ${
-                  step.status === "approved" ? "bg-green-500" : "bg-gray-300"
+                  step.validated ? "bg-green-500" : "bg-gray-300"
                 }`}
               />
             )}
@@ -520,67 +513,88 @@ export function DepositValidationWorkflow() {
               </div>
 
               {/* Historique des validations */}
-              {(selectedRequest.validation_dlbn_status ||
-                selectedRequest.validation_abn_status ||
-                selectedRequest.committee_validation_status) && (
+              {(selectedRequest.validated_by_service ||
+                selectedRequest.validated_by_department ||
+                selectedRequest.validated_by_committee ||
+                selectedRequest.rejected_by) && (
                 <div>
                   <h3 className="font-semibold mb-3">Historique des Validations</h3>
                   <div className="space-y-3">
-                    {selectedRequest.validation_dlbn_status && (
+                    {selectedRequest.validated_by_service && (
                       <div className="border-l-4 border-blue-500 pl-4 py-2">
                         <div className="flex items-center gap-2">
-                          <Badge variant={selectedRequest.validation_dlbn_status === "approved" ? "default" : "destructive"}>
-                            Service DLBN - {selectedRequest.validation_dlbn_status === "approved" ? "Approuvé" : "Rejeté"}
+                          <Badge variant="default">
+                            Service DLBN - Approuvé
                           </Badge>
-                          {selectedRequest.validation_dlbn_date && (
+                          {selectedRequest.service_validated_at && (
                             <span className="text-xs text-muted-foreground">
-                              {format(new Date(selectedRequest.validation_dlbn_date), "dd/MM/yyyy à HH:mm")}
+                              {format(new Date(selectedRequest.service_validated_at), "dd/MM/yyyy à HH:mm")}
                             </span>
                           )}
                         </div>
-                        {selectedRequest.validation_dlbn_comments && (
+                        {selectedRequest.service_validation_notes && (
                           <p className="text-sm mt-2 text-muted-foreground">
-                            {selectedRequest.validation_dlbn_comments}
+                            {selectedRequest.service_validation_notes}
                           </p>
                         )}
                       </div>
                     )}
 
-                    {selectedRequest.validation_abn_status && (
+                    {selectedRequest.validated_by_department && (
                       <div className="border-l-4 border-purple-500 pl-4 py-2">
                         <div className="flex items-center gap-2">
-                          <Badge variant={selectedRequest.validation_abn_status === "approved" ? "default" : "destructive"}>
-                            Département ABN - {selectedRequest.validation_abn_status === "approved" ? "Approuvé" : "Rejeté"}
+                          <Badge variant="default">
+                            Département ABN - Approuvé
                           </Badge>
-                          {selectedRequest.validation_abn_date && (
+                          {selectedRequest.department_validated_at && (
                             <span className="text-xs text-muted-foreground">
-                              {format(new Date(selectedRequest.validation_abn_date), "dd/MM/yyyy à HH:mm")}
+                              {format(new Date(selectedRequest.department_validated_at), "dd/MM/yyyy à HH:mm")}
                             </span>
                           )}
                         </div>
-                        {selectedRequest.validation_abn_comments && (
+                        {selectedRequest.department_validation_notes && (
                           <p className="text-sm mt-2 text-muted-foreground">
-                            {selectedRequest.validation_abn_comments}
+                            {selectedRequest.department_validation_notes}
                           </p>
                         )}
                       </div>
                     )}
 
-                    {selectedRequest.committee_validation_status && (
+                    {selectedRequest.validated_by_committee && (
                       <div className="border-l-4 border-green-500 pl-4 py-2">
                         <div className="flex items-center gap-2">
-                          <Badge variant={selectedRequest.committee_validation_status === "approved" ? "default" : "destructive"}>
-                            Comité - {selectedRequest.committee_validation_status === "approved" ? "Approuvé" : "Rejeté"}
+                          <Badge variant="default">
+                            Comité de Validation - Approuvé
                           </Badge>
-                          {selectedRequest.committee_validation_date && (
+                          {selectedRequest.committee_validated_at && (
                             <span className="text-xs text-muted-foreground">
-                              {format(new Date(selectedRequest.committee_validation_date), "dd/MM/yyyy à HH:mm")}
+                              {format(new Date(selectedRequest.committee_validated_at), "dd/MM/yyyy à HH:mm")}
                             </span>
                           )}
                         </div>
-                        {selectedRequest.committee_validation_comments && (
+                        {selectedRequest.committee_validation_notes && (
                           <p className="text-sm mt-2 text-muted-foreground">
-                            {selectedRequest.committee_validation_comments}
+                            {selectedRequest.committee_validation_notes}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {selectedRequest.rejected_by && (
+                      <div className="border-l-4 border-red-500 pl-4 py-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="destructive">
+                            Demande Rejetée
+                          </Badge>
+                          {selectedRequest.rejected_at && (
+                            <span className="text-xs text-muted-foreground">
+                              {format(new Date(selectedRequest.rejected_at), "dd/MM/yyyy à HH:mm")}
+                            </span>
+                          )}
+                        </div>
+                        {selectedRequest.rejection_reason && (
+                          <p className="text-sm mt-2 text-muted-foreground">
+                            {selectedRequest.rejection_reason}
                           </p>
                         )}
                       </div>
@@ -589,85 +603,108 @@ export function DepositValidationWorkflow() {
                 </div>
               )}
 
-              {!selectedRequest.status.includes("valide") && !selectedRequest.status.includes("rejete") && (
-                <>
-                  <div>
-                    <Label htmlFor="comments">
-                      Commentaires de Validation {selectedRequest.status === "rejected" && "(Motif de rejet)"}
-                    </Label>
-                    <Textarea
-                      id="comments"
-                      value={comments}
-                      onChange={(e) => setComments(e.target.value)}
-                      placeholder="Ajoutez vos commentaires..."
-                      rows={4}
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <div className="flex gap-2 justify-end pt-4 border-t">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setSelectedRequest(null);
-                        setComments("");
-                      }}
-                      disabled={isLoading}
-                    >
-                      Annuler
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => {
-                        const validationType =
-                          getValidationStep(selectedRequest) === 0
-                            ? "dlbn"
-                            : getValidationStep(selectedRequest) === 1
-                            ? "abn"
-                            : "committee";
-                        handleValidation(selectedRequest.id, validationType, "rejected");
-                      }}
-                      disabled={isLoading}
-                    >
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Rejeter (Générer Lettre)
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        const validationType =
-                          getValidationStep(selectedRequest) === 0
-                            ? "dlbn"
-                            : getValidationStep(selectedRequest) === 1
-                            ? "abn"
-                            : "committee";
-                        handleValidation(selectedRequest.id, validationType, "approved");
-                      }}
-                      disabled={isLoading}
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Approuver {getValidationStep(selectedRequest) === 0 && "(Générer Canevas)"}
-                    </Button>
-                  </div>
-                </>
+              {/* Formulaire de validation */}
+              {!selectedRequest.rejected_by && (
+                <div>
+                  <Label htmlFor="comments">Commentaires / Motif</Label>
+                  <Textarea
+                    id="comments"
+                    value={comments}
+                    onChange={(e) => setComments(e.target.value)}
+                    placeholder="Ajouter des commentaires ou le motif de rejet..."
+                    className="mt-2"
+                    rows={4}
+                  />
+                </div>
               )}
 
-              {(selectedRequest.status.includes("valide") || selectedRequest.status.includes("rejete")) && (
-                <div className="flex gap-2 justify-end pt-4 border-t">
-                  <Button variant="outline" onClick={() => setSelectedRequest(null)}>
-                    Fermer
+              {/* Actions de validation */}
+              {!selectedRequest.rejected_by && (
+                <div className="flex gap-3 justify-end">
+                  {!selectedRequest.validated_by_service && (
+                    <>
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleValidation(selectedRequest.id, "service", "rejected")}
+                        disabled={isLoading}
+                      >
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Rejeter (DLBN)
+                      </Button>
+                      <Button
+                        onClick={() => handleValidation(selectedRequest.id, "service", "approved")}
+                        disabled={isLoading}
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Approuver (DLBN)
+                      </Button>
+                    </>
+                  )}
+
+                  {selectedRequest.validated_by_service && !selectedRequest.validated_by_department && (
+                    <>
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleValidation(selectedRequest.id, "department", "rejected")}
+                        disabled={isLoading}
+                      >
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Rejeter (ABN)
+                      </Button>
+                      <Button
+                        onClick={() => handleValidation(selectedRequest.id, "department", "approved")}
+                        disabled={isLoading}
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Approuver (ABN)
+                      </Button>
+                    </>
+                  )}
+
+                  {selectedRequest.validated_by_department && !selectedRequest.validated_by_committee && (
+                    <>
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleValidation(selectedRequest.id, "committee", "rejected")}
+                        disabled={isLoading}
+                      >
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Rejeter (Comité)
+                      </Button>
+                      <Button
+                        onClick={() => handleValidation(selectedRequest.id, "committee", "approved")}
+                        disabled={isLoading}
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Approuver (Comité)
+                      </Button>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Boutons de génération de documents */}
+              {selectedRequest.validated_by_service && (
+                <div className="flex gap-3 border-t pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => generateValidationForm(selectedRequest)}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Télécharger Formulaire de Validation
                   </Button>
-                  {selectedRequest.status === "validated" && (
-                    <Button onClick={() => generateValidationForm(selectedRequest)}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Télécharger Canevas
-                    </Button>
-                  )}
-                  {selectedRequest.status === "rejected" && (
-                    <Button variant="destructive" onClick={() => generateRejectionLetter(selectedRequest)}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Télécharger Lettre de Rejet
-                    </Button>
-                  )}
+                </div>
+              )}
+
+              {selectedRequest.rejected_by && (
+                <div className="flex gap-3 border-t pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => generateRejectionLetter(selectedRequest)}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Télécharger Lettre de Rejet
+                  </Button>
                 </div>
               )}
             </div>
