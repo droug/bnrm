@@ -122,19 +122,19 @@ const LegalDepositPage = () => {
           </div>
 
           {/* Nouveau Backoffice Dépôt Légal conforme au CPS */}
-          <Tabs defaultValue="requests" className="space-y-6">
+          <Tabs defaultValue="validation" className="space-y-6">
             <TabsList>
-              <TabsTrigger value="requests">Demandes de dépôt</TabsTrigger>
               <TabsTrigger value="validation">Demandes en attente</TabsTrigger>
+              <TabsTrigger value="requests">Toutes les demandes</TabsTrigger>
               <TabsTrigger value="numbers">Gestion des numéros</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="requests">
-              <LegalDepositBackoffice />
-            </TabsContent>
-
             <TabsContent value="validation">
               <DepositValidationWorkflow />
+            </TabsContent>
+
+            <TabsContent value="requests">
+              <LegalDepositBackoffice />
             </TabsContent>
 
             <TabsContent value="numbers">
