@@ -72,7 +72,7 @@ serve(async (req) => {
         continue;
       }
 
-      // Créer le profil
+      // Créer le profil (sans le champ role qui n'existe pas dans profiles)
       const { error: profileError } = await supabaseAdmin
         .from('profiles')
         .upsert({
@@ -80,7 +80,6 @@ serve(async (req) => {
           first_name: testUser.firstName,
           last_name: testUser.lastName,
           institution: testUser.institution,
-          role: testUser.role,
           is_approved: true
         });
 
