@@ -1926,7 +1926,11 @@ export type Database = {
           attribution_date: string | null
           author_name: string | null
           collaborator_id: string | null
+          committee_validated_at: string | null
+          committee_validation_notes: string | null
           created_at: string | null
+          department_validated_at: string | null
+          department_validation_notes: string | null
           dl_number: string | null
           documents_urls: Json | null
           id: string
@@ -1944,13 +1948,21 @@ export type Database = {
           processing_start_date: string | null
           publication_date: string | null
           reception_date: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
           request_number: string
+          service_validated_at: string | null
+          service_validation_notes: string | null
           status: Database["public"]["Enums"]["deposit_status"] | null
           submission_date: string | null
           subtitle: string | null
           support_type: Database["public"]["Enums"]["support_type"]
           title: string
           updated_at: string | null
+          validated_by_committee: string | null
+          validated_by_department: string | null
+          validated_by_service: string | null
           validation_b_date: string | null
           validation_code: string | null
         }
@@ -1958,7 +1970,11 @@ export type Database = {
           attribution_date?: string | null
           author_name?: string | null
           collaborator_id?: string | null
+          committee_validated_at?: string | null
+          committee_validation_notes?: string | null
           created_at?: string | null
+          department_validated_at?: string | null
+          department_validation_notes?: string | null
           dl_number?: string | null
           documents_urls?: Json | null
           id?: string
@@ -1976,13 +1992,21 @@ export type Database = {
           processing_start_date?: string | null
           publication_date?: string | null
           reception_date?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
           request_number: string
+          service_validated_at?: string | null
+          service_validation_notes?: string | null
           status?: Database["public"]["Enums"]["deposit_status"] | null
           submission_date?: string | null
           subtitle?: string | null
           support_type: Database["public"]["Enums"]["support_type"]
           title: string
           updated_at?: string | null
+          validated_by_committee?: string | null
+          validated_by_department?: string | null
+          validated_by_service?: string | null
           validation_b_date?: string | null
           validation_code?: string | null
         }
@@ -1990,7 +2014,11 @@ export type Database = {
           attribution_date?: string | null
           author_name?: string | null
           collaborator_id?: string | null
+          committee_validated_at?: string | null
+          committee_validation_notes?: string | null
           created_at?: string | null
+          department_validated_at?: string | null
+          department_validation_notes?: string | null
           dl_number?: string | null
           documents_urls?: Json | null
           id?: string
@@ -2008,13 +2036,21 @@ export type Database = {
           processing_start_date?: string | null
           publication_date?: string | null
           reception_date?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
           request_number?: string
+          service_validated_at?: string | null
+          service_validation_notes?: string | null
           status?: Database["public"]["Enums"]["deposit_status"] | null
           submission_date?: string | null
           subtitle?: string | null
           support_type?: Database["public"]["Enums"]["support_type"]
           title?: string
           updated_at?: string | null
+          validated_by_committee?: string | null
+          validated_by_department?: string | null
+          validated_by_service?: string | null
           validation_b_date?: string | null
           validation_code?: string | null
         }

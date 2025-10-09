@@ -16,6 +16,7 @@ import { AdminHeader } from "@/components/AdminHeader";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NumberManagement } from "@/components/legal-deposit/NumberManagement";
+import { DepositValidationWorkflow } from "@/components/legal-deposit/DepositValidationWorkflow";
 
 const LegalDepositPage = () => {
   console.log("LegalDepositPage component is rendering");
@@ -124,11 +125,16 @@ const LegalDepositPage = () => {
           <Tabs defaultValue="requests" className="space-y-6">
             <TabsList>
               <TabsTrigger value="requests">Demandes de dépôt</TabsTrigger>
+              <TabsTrigger value="validation">Demandes en attente</TabsTrigger>
               <TabsTrigger value="numbers">Gestion des numéros</TabsTrigger>
             </TabsList>
 
             <TabsContent value="requests">
               <LegalDepositBackoffice />
+            </TabsContent>
+
+            <TabsContent value="validation">
+              <DepositValidationWorkflow />
             </TabsContent>
 
             <TabsContent value="numbers">
