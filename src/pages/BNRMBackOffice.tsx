@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CreateTestDepositButton } from "@/components/admin/CreateTestDepositButton";
 import { 
   ArrowLeft, 
   Settings,
@@ -154,9 +155,12 @@ export default function BNRMBackOffice() {
               </TabsContent>
 
               {/* Request Management Tab */}
-              <TabsContent value="requests" className="space-y-4">
-                <DepositValidationWorkflow />
-              </TabsContent>
+          <TabsContent value="requests" className="space-y-4">
+            <div className="flex justify-end mb-4">
+              <CreateTestDepositButton />
+            </div>
+            <DepositValidationWorkflow />
+          </TabsContent>
 
               {/* Number Attribution Tab */}
               <TabsContent value="attribution" className="space-y-4">
