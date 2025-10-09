@@ -22,6 +22,7 @@ interface DepositRequest {
   subtitle: string;
   support_type: string;
   status: string;
+  author_name: string;
   created_at: string;
   validated_by_service?: string;
   service_validated_at?: string;
@@ -35,10 +36,6 @@ interface DepositRequest {
   rejected_by?: string;
   rejected_at?: string;
   rejection_reason?: string;
-  initiator?: {
-    first_name: string;
-    last_name: string;
-  };
 }
 
 export function DepositValidationWorkflow() {
@@ -67,6 +64,7 @@ export function DepositValidationWorkflow() {
         subtitle,
         support_type,
         status,
+        author_name,
         created_at,
         validated_by_service,
         service_validated_at,
@@ -79,11 +77,7 @@ export function DepositValidationWorkflow() {
         committee_validation_notes,
         rejected_by,
         rejected_at,
-        rejection_reason,
-        initiator:profiles!initiator_id (
-          first_name,
-          last_name
-        )
+        rejection_reason
       `)
       .order("created_at", { ascending: false });
 
@@ -99,6 +93,11 @@ export function DepositValidationWorkflow() {
 
     if (error) {
       console.error("Error fetching requests:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les demandes",
+        variant: "destructive"
+      });
       return;
     }
 
