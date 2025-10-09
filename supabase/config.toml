@@ -5,6 +5,9 @@ enabled = true
 site_url = "https://lovable.dev"
 additional_redirect_urls = ["https://lovable.dev"]
 
+[functions.create-test-users]
+verify_jwt = false
+
 [functions.cleanup-activity-logs]
 verify_jwt = false
 
