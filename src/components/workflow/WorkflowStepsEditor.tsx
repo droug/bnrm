@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
   TableBody,
@@ -18,6 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,14 +56,42 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
   const [steps, setSteps] = useState<WorkflowStep[]>([]);
   const [roles, setRoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [editingStep, setEditingStep] = useState<WorkflowStep | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [stepToDelete, setStepToDelete] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  // Form state
+  const [formData, setFormData] = useState({
+    step_name: "",
+    step_type: "approval",
+    required_role: "",
+    description: "",
+  });
 
   useEffect(() => {
     loadSteps();
     loadRoles();
   }, [workflowId]);
+
+  useEffect(() => {
+    if (editingStep) {
+      setFormData({
+        step_name: editingStep.step_name,
+        step_type: editingStep.step_type || "approval",
+        required_role: editingStep.required_role || "",
+        description: "",
+      });
+    } else {
+      setFormData({
+        step_name: "",
+        step_type: "approval",
+        required_role: "",
+        description: "",
+      });
+    }
+  }, [editingStep]);
 
   const loadSteps = async () => {
     try {
@@ -88,6 +125,67 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
     }
   };
 
+  const handleOpenSheet = (step?: WorkflowStep) => {
+    if (step) {
+      setEditingStep(step);
+    } else {
+      setEditingStep(null);
+    }
+    setSheetOpen(true);
+  };
+
+  const handleSaveStep = async () => {
+    if (!formData.step_name.trim()) {
+      toast.error("Le nom de l'étape est requis");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      if (editingStep) {
+        // Modifier une étape existante
+        const { error } = await supabase
+          .from('workflow_steps_new')
+          .update({
+            step_name: formData.step_name,
+            step_type: formData.step_type,
+            required_role: formData.required_role || null,
+          })
+          .eq('id', editingStep.id);
+
+        if (error) throw error;
+        toast.success("Étape modifiée avec succès");
+      } else {
+        // Créer une nouvelle étape
+        const nextStepNumber = steps.length > 0 
+          ? Math.max(...steps.map(s => s.step_number)) + 1 
+          : 1;
+
+        const { error } = await supabase
+          .from('workflow_steps_new')
+          .insert({
+            workflow_id: workflowId,
+            step_name: formData.step_name,
+            step_number: nextStepNumber,
+            step_type: formData.step_type,
+            required_role: formData.required_role || null,
+          });
+
+        if (error) throw error;
+        toast.success("Étape créée avec succès");
+      }
+
+      loadSteps();
+      setSheetOpen(false);
+      setEditingStep(null);
+    } catch (error) {
+      console.error('Error saving step:', error);
+      toast.error("Erreur lors de l'enregistrement");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleDeleteStep = async () => {
     if (!stepToDelete) return;
 
@@ -117,7 +215,7 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Étapes du Workflow</h3>
-        <Button size="sm">
+        <Button size="sm" onClick={() => handleOpenSheet()}>
           <Plus className="h-4 w-4 mr-2" />
           Ajouter une étape
         </Button>
@@ -145,7 +243,7 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setEditingStep(step)}
+                    onClick={() => handleOpenSheet(step)}
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -172,6 +270,103 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
           )}
         </TableBody>
       </Table>
+
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>
+              {editingStep ? "Modifier l'étape" : "Nouvelle étape"}
+            </SheetTitle>
+            <SheetDescription>
+              Configurez les paramètres de l'étape du workflow
+            </SheetDescription>
+          </SheetHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="step_name">Nom de l'étape *</Label>
+              <Input
+                id="step_name"
+                placeholder="Ex: Validation du document"
+                value={formData.step_name}
+                onChange={(e) =>
+                  setFormData({ ...formData, step_name: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="step_type">Type d'étape *</Label>
+              <Select
+                value={formData.step_type}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, step_type: value })
+                }
+              >
+                <SelectTrigger id="step_type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="approval">Approbation</SelectItem>
+                  <SelectItem value="review">Révision</SelectItem>
+                  <SelectItem value="validation">Validation</SelectItem>
+                  <SelectItem value="processing">Traitement</SelectItem>
+                  <SelectItem value="notification">Notification</SelectItem>
+                  <SelectItem value="decision">Décision</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="required_role">Rôle requis</Label>
+              <Select
+                value={formData.required_role}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, required_role: value })
+                }
+              >
+                <SelectTrigger id="required_role">
+                  <SelectValue placeholder="Sélectionner un rôle (optionnel)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Aucun rôle spécifique</SelectItem>
+                  {roles.map((role) => (
+                    <SelectItem key={role.id} value={role.role_name}>
+                      {role.role_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                placeholder="Description de l'étape..."
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                rows={3}
+              />
+            </div>
+          </div>
+
+          <SheetFooter>
+            <Button
+              variant="outline"
+              onClick={() => setSheetOpen(false)}
+              disabled={saving}
+            >
+              Annuler
+            </Button>
+            <Button onClick={handleSaveStep} disabled={saving}>
+              {saving ? "Enregistrement..." : editingStep ? "Modifier" : "Créer"}
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
