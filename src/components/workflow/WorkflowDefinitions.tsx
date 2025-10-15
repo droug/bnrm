@@ -6,6 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Play, Pause } from "lucide-react";
 import { toast } from "sonner";
 import { CreateWorkflowDialog } from "./CreateWorkflowDialog";
+import { EditWorkflowDialog } from "./EditWorkflowDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface WorkflowDefinition {
   id: string;
@@ -22,6 +33,10 @@ export function WorkflowDefinitions() {
   const [workflows, setWorkflows] = useState<WorkflowDefinition[]>([]);
   const [loading, setLoading] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState<string>("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [workflowToDelete, setWorkflowToDelete] = useState<string>("");
 
   useEffect(() => {
     loadWorkflows();
@@ -58,6 +73,34 @@ export function WorkflowDefinitions() {
     } catch (error) {
       console.error('Error toggling workflow status:', error);
       toast.error("Erreur lors de la mise à jour du statut");
+    }
+  };
+
+  const handleEdit = (workflowId: string) => {
+    setSelectedWorkflowId(workflowId);
+    setEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (workflowId: string) => {
+    setWorkflowToDelete(workflowId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const { error } = await supabase
+        .from('workflow_definitions')
+        .delete()
+        .eq('id', workflowToDelete);
+
+      if (error) throw error;
+      
+      toast.success("Workflow supprimé avec succès");
+      loadWorkflows();
+      setDeleteDialogOpen(false);
+    } catch (error) {
+      console.error('Error deleting workflow:', error);
+      toast.error("Erreur lors de la suppression du workflow");
     }
   };
 
@@ -124,11 +167,21 @@ export function WorkflowDefinitions() {
                   Module: {workflow.module}
                 </div>
                 <div className="flex gap-2 mt-4">
-                  <Button variant="outline" size="sm" className="flex-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => handleEdit(workflow.id)}
+                  >
                     <Edit className="w-3 h-3 mr-1" />
                     Modifier
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => handleDeleteClick(workflow.id)}
+                  >
                     <Trash2 className="w-3 h-3 mr-1" />
                     Supprimer
                   </Button>
@@ -150,6 +203,30 @@ export function WorkflowDefinitions() {
         onOpenChange={setCreateDialogOpen}
         onSuccess={loadWorkflows}
       />
+
+      <EditWorkflowDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        workflowId={selectedWorkflowId}
+        onSuccess={loadWorkflows}
+      />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer ce workflow ? Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
