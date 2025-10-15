@@ -11,18 +11,43 @@ html, body {
   height: auto !important;
 }
 
-/* Désactive tous les effets visuels sur les conteneurs et overlays */
+/* ✅ Suppression complète du flou résiduel sur les modales */
+[class*="overlay"],
+[class*="backdrop-blur"],
+[class*="bg-background/80"],
+[data-radix-dialog-overlay] {
+  backdrop-filter: none !important;
+  filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  -webkit-filter: none !important;
+  background-color: rgba(0, 0, 0, 0.45) !important; /* fond sombre semi-transparent */
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Neutraliser les effets d'héritage possibles (Radix + shadcn/ui) */
+[data-state="open"] [data-radix-dialog-overlay] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Neutraliser les backgrounds avec opacité qui ajoutent du flou */
+.bg-muted\/50, 
+.bg-background\/70,
+.bg-background\/80,
+.bg-black\/80 {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Désactive tous les effets visuels sur les conteneurs généraux */
 html, body,
 .lovable-root,
-.lovable-preview-overlay,
-[class*="overlay"],
-[class*="backdrop"],
-[class*="backdrop-blur"],
-[class*="bg-background/80"] {
+.lovable-preview-overlay {
   backdrop-filter: none !important;
   filter: none !important;
   -webkit-filter: none !important;
-  background-color: rgba(0,0,0,0.4) !important;
 }
 
 /* Force containers to not clip modals */
