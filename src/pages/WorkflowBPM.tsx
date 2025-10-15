@@ -10,7 +10,8 @@ import { WorkflowIntegrations } from "@/components/workflow/WorkflowIntegrations
 import { WorkflowRolesManager } from "@/components/workflow/WorkflowRolesManager";
 import { WorkflowModelsManager } from "@/components/workflow/WorkflowModelsManager";
 import { WorkflowDynamicSelects } from "@/components/workflow/WorkflowDynamicSelects";
-import { Activity, GitBranch, Settings, TrendingUp, Users, ArrowLeft, FolderKanban, ListFilter } from "lucide-react";
+import { PredefinedWorkflowsImporter } from "@/components/workflow/PredefinedWorkflowsImporter";
+import { Activity, GitBranch, Settings, TrendingUp, Users, ArrowLeft, FolderKanban, ListFilter, Package } from "lucide-react";
 
 export default function WorkflowBPM() {
   const { user, profile } = useAuth();
@@ -49,8 +50,12 @@ export default function WorkflowBPM() {
           </p>
         </div>
 
-        <Tabs defaultValue="configurator" className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-6">
+        <Tabs defaultValue="predefined" className="w-full">
+          <TabsList className="grid w-full grid-cols-8 mb-6">
+            <TabsTrigger value="predefined">
+              <Package className="w-4 h-4 mr-2" />
+              Modèles Prédéfinis
+            </TabsTrigger>
             <TabsTrigger value="configurator">
               <ListFilter className="w-4 h-4 mr-2" />
               Configurateur
@@ -80,6 +85,10 @@ export default function WorkflowBPM() {
               Intégrations
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="predefined" className="mt-6">
+            <PredefinedWorkflowsImporter />
+          </TabsContent>
 
           <TabsContent value="configurator" className="mt-6">
             <WorkflowDynamicSelects />

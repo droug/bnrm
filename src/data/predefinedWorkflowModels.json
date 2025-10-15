@@ -1,0 +1,552 @@
+[
+  {
+    "code": "WF_DL_01",
+    "name": "Workflow Dépôt Légal",
+    "module": "legal_deposit",
+    "workflow_type": "legal_deposit",
+    "version": "1.0",
+    "description": "Circuit de traitement du dépôt légal jusqu'à validation et archivage.",
+    "color": "blue",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Soumission du dépôt",
+        "type": "creation",
+        "required_role": "Auteur/Éditeur",
+        "description": "Soumission initiale du document pour dépôt légal"
+      },
+      {
+        "order": 2,
+        "name": "Vérification de conformité",
+        "type": "validation",
+        "required_role": "Agent Dépôt Légal",
+        "description": "Vérification de la conformité du dépôt"
+      },
+      {
+        "order": 3,
+        "name": "Validation BNRM",
+        "type": "validation",
+        "required_role": "Validateur BN",
+        "description": "Validation finale par le responsable BNRM"
+      },
+      {
+        "order": 4,
+        "name": "Archivage",
+        "type": "archivage",
+        "required_role": "Archiviste GED",
+        "description": "Archivage sécurisé du document validé"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Soumettre le dépôt",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Soumettre"
+      },
+      {
+        "name": "Vérifier la conformité",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Valider"
+      },
+      {
+        "name": "Validation finale",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Approuver"
+      },
+      {
+        "name": "Archiver",
+        "from_step": 3,
+        "to_step": null,
+        "trigger_type": "automatic",
+        "action": "Archiver"
+      },
+      {
+        "name": "Retour pour correction",
+        "from_step": 1,
+        "to_step": 0,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      },
+      {
+        "name": "Retour depuis validation",
+        "from_step": 2,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Corriger"
+      }
+    ],
+    "roles": [
+      {"name": "Auteur/Éditeur", "level": "module"},
+      {"name": "Agent Dépôt Légal", "level": "module"},
+      {"name": "Validateur BN", "level": "module"},
+      {"name": "Archiviste GED", "level": "system"}
+    ]
+  },
+  {
+    "code": "WF_CAT_01",
+    "name": "Workflow Catalogage",
+    "module": "cataloging",
+    "workflow_type": "cataloging",
+    "version": "1.0",
+    "description": "Création, validation et publication des notices bibliographiques.",
+    "color": "green",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Création de la notice",
+        "type": "creation",
+        "required_role": "Catalogueur",
+        "description": "Création initiale de la notice bibliographique"
+      },
+      {
+        "order": 2,
+        "name": "Validation du catalogage",
+        "type": "validation",
+        "required_role": "Responsable Validation",
+        "description": "Vérification et validation de la notice"
+      },
+      {
+        "order": 3,
+        "name": "Publication dans le portail",
+        "type": "transmission",
+        "required_role": "Administrateur BNRM",
+        "description": "Publication de la notice dans le catalogue public"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Créer la notice",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Créer"
+      },
+      {
+        "name": "Soumettre pour validation",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Soumettre"
+      },
+      {
+        "name": "Publier",
+        "from_step": 2,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Publier"
+      },
+      {
+        "name": "Retour pour correction",
+        "from_step": 2,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Corriger"
+      }
+    ],
+    "roles": [
+      {"name": "Catalogueur", "level": "module"},
+      {"name": "Responsable Validation", "level": "module"},
+      {"name": "Administrateur BNRM", "level": "admin"}
+    ]
+  },
+  {
+    "code": "WF_GED_01",
+    "name": "Workflow Archivage GED",
+    "module": "ged",
+    "workflow_type": "ged",
+    "version": "1.0",
+    "description": "Traitement documentaire jusqu'à l'archivage final sécurisé.",
+    "color": "purple",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Numérisation",
+        "type": "creation",
+        "required_role": "Agent Numérisation",
+        "description": "Numérisation du document physique"
+      },
+      {
+        "order": 2,
+        "name": "Indexation et contrôle qualité",
+        "type": "validation",
+        "required_role": "Contrôleur Qualité",
+        "description": "Indexation et vérification de la qualité"
+      },
+      {
+        "order": 3,
+        "name": "Validation",
+        "type": "validation",
+        "required_role": "Responsable GED",
+        "description": "Validation finale avant archivage"
+      },
+      {
+        "order": 4,
+        "name": "Archivage sécurisé",
+        "type": "archivage",
+        "required_role": "Archiviste",
+        "description": "Archivage définitif et sécurisé"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Démarrer numérisation",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Numériser"
+      },
+      {
+        "name": "Indexer",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Indexer"
+      },
+      {
+        "name": "Valider",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Valider"
+      },
+      {
+        "name": "Archiver définitivement",
+        "from_step": 3,
+        "to_step": null,
+        "trigger_type": "automatic",
+        "action": "Archiver"
+      },
+      {
+        "name": "Rejeter",
+        "from_step": 2,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      }
+    ],
+    "roles": [
+      {"name": "Agent Numérisation", "level": "module"},
+      {"name": "Contrôleur Qualité", "level": "module"},
+      {"name": "Responsable GED", "level": "module"},
+      {"name": "Archiviste", "level": "system"}
+    ]
+  },
+  {
+    "code": "WF_CBM_01",
+    "name": "Workflow CBM",
+    "module": "cbm",
+    "workflow_type": "cbm",
+    "version": "1.0",
+    "description": "Synchronisation et contrôle qualité des catalogues partenaires.",
+    "color": "orange",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Importation du catalogue partenaire",
+        "type": "creation",
+        "required_role": "Bibliothèque Partenaire",
+        "description": "Import des données du catalogue partenaire"
+      },
+      {
+        "order": 2,
+        "name": "Vérification des métadonnées",
+        "type": "validation",
+        "required_role": "Coordinateur CBM",
+        "description": "Contrôle qualité des métadonnées importées"
+      },
+      {
+        "order": 3,
+        "name": "Fusion / Résolution des doublons",
+        "type": "correction",
+        "required_role": "Coordinateur CBM",
+        "description": "Fusion et déduplication des notices"
+      },
+      {
+        "order": 4,
+        "name": "Publication CBM",
+        "type": "transmission",
+        "required_role": "Administrateur CBM",
+        "description": "Publication dans le catalogue collectif"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Importer catalogue",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Importer"
+      },
+      {
+        "name": "Vérifier",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Vérifier"
+      },
+      {
+        "name": "Fusionner",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Fusionner"
+      },
+      {
+        "name": "Publier CBM",
+        "from_step": 3,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Publier"
+      },
+      {
+        "name": "Retour pour correction",
+        "from_step": 2,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Corriger"
+      }
+    ],
+    "roles": [
+      {"name": "Bibliothèque Partenaire", "level": "module"},
+      {"name": "Coordinateur CBM", "level": "module"},
+      {"name": "Administrateur CBM", "level": "admin"}
+    ]
+  },
+  {
+    "code": "WF_PAY_01",
+    "name": "Workflow e-Payment",
+    "module": "payment",
+    "workflow_type": "payment",
+    "version": "1.0",
+    "description": "Validation et confirmation de paiements électroniques.",
+    "color": "yellow",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Création de la demande de paiement",
+        "type": "creation",
+        "required_role": "Utilisateur Demandeur",
+        "description": "Initiation de la demande de paiement"
+      },
+      {
+        "order": 2,
+        "name": "Validation du paiement",
+        "type": "validation",
+        "required_role": "Gestionnaire Financier",
+        "description": "Validation des informations de paiement"
+      },
+      {
+        "order": 3,
+        "name": "Confirmation de transaction",
+        "type": "validation",
+        "required_role": "Responsable e-Payment",
+        "description": "Confirmation de la transaction bancaire"
+      },
+      {
+        "order": 4,
+        "name": "Archivage comptable",
+        "type": "archivage",
+        "required_role": "Service Comptabilité",
+        "description": "Archivage de la transaction"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Initier paiement",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Initier"
+      },
+      {
+        "name": "Valider",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Valider"
+      },
+      {
+        "name": "Confirmer",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "automatic",
+        "action": "Confirmer"
+      },
+      {
+        "name": "Archiver",
+        "from_step": 3,
+        "to_step": null,
+        "trigger_type": "automatic",
+        "action": "Archiver"
+      },
+      {
+        "name": "Annuler",
+        "from_step": 1,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Annuler"
+      }
+    ],
+    "roles": [
+      {"name": "Utilisateur Demandeur", "level": "module"},
+      {"name": "Gestionnaire Financier", "level": "module"},
+      {"name": "Responsable e-Payment", "level": "module"},
+      {"name": "Service Comptabilité", "level": "system"}
+    ]
+  },
+  {
+    "code": "WF_PUB_01",
+    "name": "Workflow Publication de contenu",
+    "module": "portal",
+    "workflow_type": "content",
+    "version": "1.0",
+    "description": "Gestion des contenus à publier avec validation éditoriale.",
+    "color": "red",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Création de contenu",
+        "type": "creation",
+        "required_role": "Rédacteur",
+        "description": "Rédaction du contenu"
+      },
+      {
+        "order": 2,
+        "name": "Relecture et validation",
+        "type": "validation",
+        "required_role": "Responsable Éditorial",
+        "description": "Relecture et validation éditoriale"
+      },
+      {
+        "order": 3,
+        "name": "Publication sur le portail",
+        "type": "transmission",
+        "required_role": "Administrateur Portail",
+        "description": "Publication sur le site web"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Créer contenu",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Créer"
+      },
+      {
+        "name": "Soumettre pour validation",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Soumettre"
+      },
+      {
+        "name": "Publier",
+        "from_step": 2,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Publier"
+      },
+      {
+        "name": "Rejeter",
+        "from_step": 2,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      }
+    ],
+    "roles": [
+      {"name": "Rédacteur", "level": "module"},
+      {"name": "Responsable Éditorial", "level": "module"},
+      {"name": "Administrateur Portail", "level": "admin"}
+    ]
+  },
+  {
+    "code": "WF_STAT_01",
+    "name": "Workflow Reporting et Statistiques",
+    "module": "analytics",
+    "workflow_type": "reporting",
+    "version": "1.0",
+    "description": "Génération et validation des rapports statistiques.",
+    "color": "cyan",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Génération de rapport",
+        "type": "creation",
+        "required_role": "Analyste",
+        "description": "Génération automatique du rapport"
+      },
+      {
+        "order": 2,
+        "name": "Vérification des indicateurs",
+        "type": "validation",
+        "required_role": "Responsable Suivi-Évaluation",
+        "description": "Vérification des données statistiques"
+      },
+      {
+        "order": 3,
+        "name": "Validation finale",
+        "type": "validation",
+        "required_role": "Direction BNRM",
+        "description": "Approbation finale du rapport"
+      },
+      {
+        "order": 4,
+        "name": "Archivage / diffusion",
+        "type": "archivage",
+        "required_role": "Administrateur Reporting",
+        "description": "Archivage et diffusion du rapport"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Générer rapport",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "automatic",
+        "action": "Générer"
+      },
+      {
+        "name": "Vérifier",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Vérifier"
+      },
+      {
+        "name": "Valider",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Valider"
+      },
+      {
+        "name": "Archiver et diffuser",
+        "from_step": 3,
+        "to_step": null,
+        "trigger_type": "automatic",
+        "action": "Diffuser"
+      },
+      {
+        "name": "Régénérer",
+        "from_step": 2,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Corriger"
+      }
+    ],
+    "roles": [
+      {"name": "Analyste", "level": "module"},
+      {"name": "Responsable Suivi-Évaluation", "level": "module"},
+      {"name": "Direction BNRM", "level": "admin"},
+      {"name": "Administrateur Reporting", "level": "system"}
+    ]
+  }
+]
