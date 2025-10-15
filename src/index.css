@@ -403,30 +403,48 @@ Enhanced Moroccan Heritage Design System
     filter: none !important;
   }
 
-  /* BPM Modals - Guaranteed centering with flexbox */
-  .modal,
-  .dialog,
+  /* BPM Modals - Force centered positioning */
   .workflow-editor-modal,
   .transition-config-modal,
   .role-assignment-modal,
   .workflow-settings-modal,
   .bpm-diagram-modal,
   .audit-log-modal,
-  .confirm-dialog,
+  .confirm-dialog {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 999999 !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+    width: 70% !important;
+    max-width: 950px !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    padding: 1.5rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    margin: 0 !important;
+    transition: none !important;
+  }
+
+  /* Override any radix/dialog default positioning */
   [role="dialog"] {
     position: fixed !important;
-    inset: 0 !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    margin: 0 !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
     z-index: 999999 !important;
-    pointer-events: all !important;
+    margin: 0 !important;
+    inset: auto !important;
   }
 
   /* Modal content wrapper */
   .modal-content,
-  [role="dialog"] > * {
+  [role="dialog"] > div {
     background: hsl(var(--background));
     border-radius: 12px;
     box-shadow: 0 6px 30px rgba(0, 0, 0, 0.25);
@@ -435,12 +453,18 @@ Enhanced Moroccan Heritage Design System
     max-height: 85vh;
     overflow-y: auto;
     padding: 1.5rem;
-    pointer-events: all;
   }
 
   @media (max-width: 768px) {
+    .workflow-editor-modal,
+    .transition-config-modal,
+    .role-assignment-modal,
+    .workflow-settings-modal,
+    .bpm-diagram-modal,
+    .audit-log-modal,
+    .confirm-dialog,
     .modal-content,
-    [role="dialog"] > * {
+    [role="dialog"] > div {
       width: 95% !important;
       max-height: 90vh !important;
     }

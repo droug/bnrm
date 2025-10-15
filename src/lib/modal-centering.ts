@@ -11,30 +11,38 @@ const MODAL_SELECTORS = [
   '.bpm-diagram-modal',
   '.audit-log-modal',
   '.confirm-dialog',
-  '[role="dialog"]',
-  '[data-state="open"][role="dialog"]'
+  '[role="dialog"]'
 ].join(', ');
 
+function centerModal(modal: HTMLElement) {
+  if (!modal) return;
+  
+  // Move to body if not already there
+  if (modal.parentElement && modal.parentElement !== document.body) {
+    document.body.appendChild(modal);
+  }
+  
+  // Calculate exact center position
+  const viewportHeight = window.innerHeight;
+  const viewportWidth = window.innerWidth;
+  
+  // Force centered positioning using transform
+  Object.assign(modal.style, {
+    position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: '999999',
+    margin: '0',
+    inset: 'auto'
+  });
+}
+
 function forceModalCentering() {
-  const modals = document.querySelectorAll(MODAL_SELECTORS);
+  const modals = document.querySelectorAll<HTMLElement>(MODAL_SELECTORS);
   
   modals.forEach((modal) => {
-    if (!(modal instanceof HTMLElement)) return;
-    
-    // Move to body if not already there
-    if (modal.parentElement && modal.parentElement !== document.body) {
-      document.body.appendChild(modal);
-    }
-    
-    // Force fixed positioning and centering
-    Object.assign(modal.style, {
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      zIndex: '999999',
-      margin: '0'
-    });
+    centerModal(modal);
   });
 }
 
@@ -52,5 +60,15 @@ export function initModalCentering() {
     subtree: true
   });
   
-  return () => observer.disconnect();
+  // Re-center on window resize
+  const handleResize = () => {
+    forceModalCentering();
+  };
+  
+  window.addEventListener('resize', handleResize);
+  
+  return () => {
+    observer.disconnect();
+    window.removeEventListener('resize', handleResize);
+  };
 }
