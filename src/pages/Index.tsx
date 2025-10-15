@@ -31,15 +31,14 @@ const Index = () => {
 
   // Vérifier si le popup d'accueil doit être affiché
   useEffect(() => {
-    // Temporairement désactivé pour déboguer
-    // const hasSeenWelcome = localStorage.getItem('bnrm-welcome-popup-dismissed');
-    // if (!hasSeenWelcome) {
-    //   // Attendre un petit délai pour une meilleure expérience utilisateur
-    //   const timer = setTimeout(() => {
-    //     setShowWelcomePopup(true);
-    //   }, 1000);
-    //   return () => clearTimeout(timer);
-    // }
+    const hasSeenWelcome = localStorage.getItem('bnrm-welcome-popup-dismissed');
+    if (!hasSeenWelcome) {
+      // Attendre que la page soit complètement chargée
+      const timer = setTimeout(() => {
+        setShowWelcomePopup(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   const handleLegalDepositClick = (type: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees") => {
