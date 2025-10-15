@@ -406,7 +406,7 @@ Enhanced Moroccan Heritage Design System
     z-index: 1 !important;
   }
 
-  /* BPM Modals - Force centered positioning */
+  /* BPM Modals - Force centered positioning with maximum priority */
   .workflow-editor-modal,
   .transition-config-modal,
   .role-assignment-modal,
@@ -418,10 +418,10 @@ Enhanced Moroccan Heritage Design System
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    z-index: 999999 !important;
-    background: #ffffff !important;
+    z-index: 2147483647 !important; /* Priorité absolue */
+    background: #fff !important;
     border-radius: 12px !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25) !important;
     width: 70% !important;
     max-width: 950px !important;
     max-height: 85vh !important;
@@ -432,6 +432,8 @@ Enhanced Moroccan Heritage Design System
     justify-content: flex-start !important;
     margin: 0 !important;
     transition: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   /* Override any radix/dialog default positioning */
