@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ScrollableDialog,
+  ScrollableDialogContent,
+  ScrollableDialogHeader,
+  ScrollableDialogTitle,
+  ScrollableDialogBody,
+} from "@/components/ui/scrollable-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -67,65 +68,67 @@ export function WorkflowBuilderDialog({
 
   if (loading) {
     return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-5xl max-h-[90vh]">
+      <ScrollableDialog open={open} onOpenChange={onOpenChange}>
+        <ScrollableDialogContent className="max-w-5xl">
           <div className="flex items-center justify-center p-8">
             Chargement...
           </div>
-        </DialogContent>
-      </Dialog>
+        </ScrollableDialogContent>
+      </ScrollableDialog>
     );
   }
 
   if (!workflow) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl">
+    <ScrollableDialog open={open} onOpenChange={onOpenChange}>
+      <ScrollableDialogContent className="max-w-5xl">
+        <ScrollableDialogHeader>
+          <ScrollableDialogTitle className="text-xl">
             {workflow.name} - v{workflow.version}
-          </DialogTitle>
+          </ScrollableDialogTitle>
           <div className="text-sm text-muted-foreground">
             {workflow.module} • {workflow.workflow_type}
           </div>
-        </DialogHeader>
+        </ScrollableDialogHeader>
 
-        <Tabs defaultValue="steps" className="mt-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="steps">
-              <List className="h-4 w-4 mr-2" />
-              Étapes
-            </TabsTrigger>
-            <TabsTrigger value="transitions">
-              <Settings className="h-4 w-4 mr-2" />
-              Transitions
-            </TabsTrigger>
-            <TabsTrigger value="history">
-              <History className="h-4 w-4 mr-2" />
-              Historique
-            </TabsTrigger>
-          </TabsList>
+        <ScrollableDialogBody>
+          <Tabs defaultValue="steps">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="steps">
+                <List className="h-4 w-4 mr-2" />
+                Étapes
+              </TabsTrigger>
+              <TabsTrigger value="transitions">
+                <Settings className="h-4 w-4 mr-2" />
+                Transitions
+              </TabsTrigger>
+              <TabsTrigger value="history">
+                <History className="h-4 w-4 mr-2" />
+                Historique
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="steps" className="mt-4">
-            <Card className="p-4">
-              <WorkflowStepsEditor workflowId={workflow.id} />
-            </Card>
-          </TabsContent>
+            <TabsContent value="steps" className="mt-4">
+              <Card className="p-4">
+                <WorkflowStepsEditor workflowId={workflow.id} />
+              </Card>
+            </TabsContent>
 
-          <TabsContent value="transitions" className="mt-4">
-            <Card className="p-4">
-              <WorkflowTransitionsEditor workflowId={workflow.id} />
-            </Card>
-          </TabsContent>
+            <TabsContent value="transitions" className="mt-4">
+              <Card className="p-4">
+                <WorkflowTransitionsEditor workflowId={workflow.id} />
+              </Card>
+            </TabsContent>
 
-          <TabsContent value="history" className="mt-4">
-            <Card className="p-4">
-              <WorkflowVersionHistory workflowId={workflow.id} />
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+            <TabsContent value="history" className="mt-4">
+              <Card className="p-4">
+                <WorkflowVersionHistory workflowId={workflow.id} />
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </ScrollableDialogBody>
+      </ScrollableDialogContent>
+    </ScrollableDialog>
   );
 }
