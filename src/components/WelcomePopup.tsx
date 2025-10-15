@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +61,10 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique">
+      <DialogContent 
+        className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique"
+        aria-describedby="welcome-description"
+      >
         {/* Header with Moroccan design */}
         <div className="relative overflow-hidden bg-gradient-zellige-main p-6 text-white">
           <div className="absolute inset-0 bg-pattern-zellige-complex opacity-30"></div>
@@ -87,8 +90,8 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
                 </Button>
               </div>
               
-              <DialogDescription className="text-white/95 text-lg font-elegant italic text-center">
-                "Découvrez les trésors du patrimoine marocain millénaire"
+              <DialogDescription id="welcome-description" className="text-white/95 text-lg font-elegant italic text-center">
+                Découvrez les trésors du patrimoine marocain millénaire et profitez de nos services numériques améliorés.
               </DialogDescription>
               
               <div className="flex justify-center space-x-1 mt-3">
@@ -182,12 +185,16 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
             </div>
             
             <div className="flex space-x-3">
-              <Button variant="outline" onClick={handleClose}>
-                Fermer
-              </Button>
-              <Button onClick={handleClose} className="bg-gradient-neutral hover:bg-gradient-neutral/90">
-                Commencer l'exploration
-              </Button>
+              <DialogClose asChild>
+                <Button variant="outline">
+                  Fermer
+                </Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button className="bg-gradient-neutral hover:bg-gradient-neutral/90">
+                  Commencer l'exploration
+                </Button>
+              </DialogClose>
             </div>
           </div>
         </div>
