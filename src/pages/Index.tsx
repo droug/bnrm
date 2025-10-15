@@ -31,12 +31,16 @@ const Index = () => {
 
   // Vérifier si le popup d'accueil doit être affiché
   useEffect(() => {
+    console.log('Index useEffect - Setting up welcome popup timer');
     // Forcer l'affichage pour test - retirer la vérification localStorage temporairement
     const timer = setTimeout(() => {
+      console.log('Index - Opening welcome popup');
       setShowWelcomePopup(true);
     }, 2000);
     return () => clearTimeout(timer);
   }, []);
+
+  console.log('Index rendered, showWelcomePopup:', showWelcomePopup);
 
   const handleLegalDepositClick = (type: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees") => {
     setSelectedDepositType(type);

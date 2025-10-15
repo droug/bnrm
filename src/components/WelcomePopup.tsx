@@ -17,7 +17,10 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
   const { t } = useLanguage();
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
+  console.log('WelcomePopup rendered, isOpen:', isOpen);
+
   const handleClose = () => {
+    console.log('WelcomePopup handleClose called, dontShowAgain:', dontShowAgain);
     if (dontShowAgain) {
       localStorage.setItem('bnrm-welcome-popup-dismissed', 'true');
     }
