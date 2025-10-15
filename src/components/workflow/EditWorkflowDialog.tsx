@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -112,6 +112,9 @@ export function EditWorkflowDialog({ open, onOpenChange, workflowId, onSuccess }
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Modifier le Workflow</DialogTitle>
+          <DialogDescription>
+            Modifiez les paramètres de ce workflow
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

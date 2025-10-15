@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -81,6 +81,9 @@ export function CreateWorkflowDialog({ open, onOpenChange, onSuccess }: CreateWo
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Créer un nouveau workflow</DialogTitle>
+          <DialogDescription>
+            Configurez les paramètres de votre nouveau workflow
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

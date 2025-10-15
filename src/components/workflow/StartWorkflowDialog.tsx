@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -125,6 +126,9 @@ export function StartWorkflowDialog({
             <Play className="h-5 w-5" />
             Lancer un Workflow
           </DialogTitle>
+          <DialogDescription>
+            Sélectionnez le workflow à démarrer pour cette demande
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
