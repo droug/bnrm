@@ -378,6 +378,60 @@ Enhanced Moroccan Heritage Design System
     perspective: 1000px;
   }
 
+  /* BPM Modal Overlay - Simple sans flou */
+  .bpm-modal-overlay,
+  .modal-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    background-color: rgba(0, 0, 0, 0.35) !important;
+    z-index: 999998 !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    will-change: auto !important;
+  }
+
+  /* BPM Modals - Centrage stable sans effets visuels */
+  .workflow-editor-modal,
+  .transition-config-modal,
+  .role-assignment-modal,
+  .workflow-settings-modal,
+  .bpm-diagram-modal,
+  .audit-log-modal,
+  .confirm-dialog {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 999999 !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+    width: 70% !important;
+    max-width: 950px !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    padding: 1.5rem !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    will-change: contents !important;
+    transform-style: flat !important;
+    transition: none !important;
+  }
+
+  @media (max-width: 768px) {
+    .workflow-editor-modal,
+    .transition-config-modal,
+    .role-assignment-modal,
+    .workflow-settings-modal,
+    .bpm-diagram-modal,
+    .audit-log-modal,
+    .confirm-dialog {
+      width: 95% !important;
+      max-height: 90vh !important;
+    }
+  }
+
   /* Wiggle animation for avatar */
   @keyframes wiggle {
     0%, 7% { transform: rotateZ(0deg); }
