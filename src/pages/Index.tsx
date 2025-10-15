@@ -31,14 +31,11 @@ const Index = () => {
 
   // Vérifier si le popup d'accueil doit être affiché
   useEffect(() => {
-    const hasSeenWelcome = localStorage.getItem('bnrm-welcome-popup-dismissed');
-    if (!hasSeenWelcome) {
-      // Attendre que la page soit complètement chargée
-      const timer = setTimeout(() => {
-        setShowWelcomePopup(true);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
+    // Forcer l'affichage pour test - retirer la vérification localStorage temporairement
+    const timer = setTimeout(() => {
+      setShowWelcomePopup(true);
+    }, 2000);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleLegalDepositClick = (type: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees") => {
