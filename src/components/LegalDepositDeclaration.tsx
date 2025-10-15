@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SimpleDropdown } from "@/components/ui/simple-dropdown";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -179,15 +180,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de l'auteur</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner le type" />
-                    </SelectTrigger>
-                    <SelectContent position="popper" side="bottom" align="start">
-                      <SelectItem value="physique">Personne physique</SelectItem>
-                      <SelectItem value="morale">Personne morale (collectivités)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    placeholder="Sélectionner le type"
+                    options={[
+                      { value: "physique", label: "Personne physique" },
+                      { value: "morale", label: "Personne morale (collectivités)" },
+                    ]}
+                  />
                 </div>
                 
                 <div className="space-y-2">
@@ -235,15 +234,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Type de support</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner le type" />
-                    </SelectTrigger>
-                    <SelectContent position="popper" side="bottom" align="start">
-                      <SelectItem value="printed">Imprimé</SelectItem>
-                      <SelectItem value="electronic">Électronique</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    placeholder="Sélectionner le type"
+                    options={[
+                      { value: "printed", label: "Imprimé" },
+                      { value: "electronic", label: "Électronique" },
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -268,17 +265,15 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Langue</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner la langue" />
-                    </SelectTrigger>
-                    <SelectContent position="popper" side="bottom" align="start">
-                      <SelectItem value="ar">Arabe</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="en">Anglais</SelectItem>
-                      <SelectItem value="ber">Amazigh</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    placeholder="Sélectionner la langue"
+                    options={[
+                      { value: "ar", label: "Arabe" },
+                      { value: "fr", label: "Français" },
+                      { value: "en", label: "Anglais" },
+                      { value: "ber", label: "Amazigh" },
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -293,15 +288,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Première demande d'ISBN</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner" />
-                    </SelectTrigger>
-                    <SelectContent position="popper" side="bottom" align="start">
-                      <SelectItem value="yes">Oui</SelectItem>
-                      <SelectItem value="no">Non</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    placeholder="Sélectionner"
+                    options={[
+                      { value: "yes", label: "Oui" },
+                      { value: "no", label: "Non" },
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
