@@ -1804,7 +1804,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       <div className="w-full max-w-6xl mx-auto space-y-4">
         <Button
           variant="ghost"
-          onClick={() => navigate(-1)}
+          onClick={() => setCurrentStep("printer_auth")}
           className="mb-2"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
