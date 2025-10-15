@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -98,32 +99,34 @@ const Index = () => {
     );
   }
 
+  const testPopup = showWelcomePopup && createPortal(
+    <div 
+      style={{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: 'red',
+        padding: '50px',
+        zIndex: 999999999,
+        border: '10px solid yellow',
+        fontSize: '30px',
+        fontWeight: 'bold',
+        color: 'white'
+      }}
+      onClick={() => {
+        console.log('Popup clicked!');
+        setShowWelcomePopup(false);
+      }}
+    >
+      CLIQUEZ ICI POUR FERMER - TEST PORTAL
+    </div>,
+    document.body
+  );
+
   return (
     <>
-      {/* Test simple popup */}
-      {showWelcomePopup && (
-        <div 
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'red',
-            padding: '50px',
-            zIndex: 999999999,
-            border: '10px solid yellow',
-            fontSize: '30px',
-            fontWeight: 'bold',
-            color: 'white'
-          }}
-          onClick={() => {
-            console.log('Popup clicked!');
-            setShowWelcomePopup(false);
-          }}
-        >
-          CLIQUEZ ICI POUR FERMER
-        </div>
-      )}
+      {testPopup}
       
       {/* Popup d'accueil */}
       {/* <WelcomePopup 
