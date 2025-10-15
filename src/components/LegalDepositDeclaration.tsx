@@ -437,28 +437,26 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de publication</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner le type" />
-                    </SelectTrigger>
-                    <SelectContent position="popper" side="bottom" align="start">
-                      <SelectItem value="journal">Journal</SelectItem>
-                      <SelectItem value="revue">Revue</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    placeholder="Sélectionner le type"
+                    options={[
+                      { value: "journal", label: "Journal" },
+                      { value: "revue", label: "Revue" },
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Nature publication</Label>
-                  <Select onValueChange={setNaturePublication} value={naturePublication}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner la nature" />
-                    </SelectTrigger>
-                    <SelectContent position="popper" side="bottom" align="start">
-                      <SelectItem value="etatique">Étatique</SelectItem>
-                      <SelectItem value="non-etatique">Non étatique</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    value={naturePublication}
+                    onChange={setNaturePublication}
+                    placeholder="Sélectionner la nature"
+                    options={[
+                      { value: "etatique", label: "Étatique" },
+                      { value: "non-etatique", label: "Non étatique" },
+                    ]}
+                  />
                 </div>
 
                 {naturePublication === "non-etatique" && (
@@ -514,18 +512,15 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Type de support</Label>
-                  <Select 
-                    onValueChange={(value) => setFormData({ ...formData, supportType: value })}
+                  <SimpleDropdown
                     value={formData.supportType}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner le type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="printed">Imprimé</SelectItem>
-                      <SelectItem value="electronic">Électronique</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    onChange={(value) => setFormData({ ...formData, supportType: value })}
+                    placeholder="Sélectionner le type"
+                    options={[
+                      { value: "printed", label: "Imprimé" },
+                      { value: "electronic", label: "Électronique" },
+                    ]}
+                  />
                 </div>
 
                 {formData.supportType === "electronic" && (
@@ -552,33 +547,29 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Périodicité</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner la périodicité" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="daily">Quotidien</SelectItem>
-                      <SelectItem value="weekly">Hebdomadaire</SelectItem>
-                      <SelectItem value="monthly">Mensuel</SelectItem>
-                      <SelectItem value="quarterly">Trimestriel</SelectItem>
-                      <SelectItem value="yearly">Annuel</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    placeholder="Sélectionner la périodicité"
+                    options={[
+                      { value: "daily", label: "Quotidien" },
+                      { value: "weekly", label: "Hebdomadaire" },
+                      { value: "monthly", label: "Mensuel" },
+                      { value: "quarterly", label: "Trimestriel" },
+                      { value: "yearly", label: "Annuel" },
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Langue</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner la langue" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ar">Arabe</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="en">Anglais</SelectItem>
-                      <SelectItem value="ber">Amazigh</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    placeholder="Sélectionner la langue"
+                    options={[
+                      { value: "ar", label: "Arabe" },
+                      { value: "fr", label: "Français" },
+                      { value: "en", label: "Anglais" },
+                      { value: "ber", label: "Amazigh" },
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -673,15 +664,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de l'auteur</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner le type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="physique">Personne physique</SelectItem>
-                      <SelectItem value="morale">Personne morale (collectivités)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    placeholder="Sélectionner le type"
+                    options={[
+                      { value: "physique", label: "Personne physique" },
+                      { value: "morale", label: "Personne morale (collectivités)" },
+                    ]}
+                  />
                 </div>
                 
                 <div className="space-y-2">
@@ -729,31 +718,27 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Type de publication</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner le type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="database">Base de données</SelectItem>
-                      <SelectItem value="software">Logiciel</SelectItem>
-                      <SelectItem value="audiovisual">Document audiovisuel</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    placeholder="Sélectionner le type"
+                    options={[
+                      { value: "database", label: "Base de données" },
+                      { value: "software", label: "Logiciel" },
+                      { value: "audiovisual", label: "Document audiovisuel" },
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Langue</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner la langue" />
-                    </SelectTrigger>
-                    <SelectContent position="popper" side="bottom" align="start">
-                      <SelectItem value="ar">Arabe</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="en">Anglais</SelectItem>
-                      <SelectItem value="ber">Amazigh</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    placeholder="Sélectionner la langue"
+                    options={[
+                      { value: "ar", label: "Arabe" },
+                      { value: "fr", label: "Français" },
+                      { value: "en", label: "Anglais" },
+                      { value: "ber", label: "Amazigh" },
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -858,15 +843,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de l'auteur</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner le type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="physique">Personne physique</SelectItem>
-                      <SelectItem value="morale">Personne morale (collectivités)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    placeholder="Sélectionner le type"
+                    options={[
+                      { value: "physique", label: "Personne physique" },
+                      { value: "morale", label: "Personne morale (collectivités)" },
+                    ]}
+                  />
                 </div>
                 
                 <div className="space-y-2">
@@ -924,17 +907,15 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Langue</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner la langue" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ar">Arabe</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="en">Anglais</SelectItem>
-                      <SelectItem value="ber">Amazigh</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    placeholder="Sélectionner la langue"
+                    options={[
+                      { value: "ar", label: "Arabe" },
+                      { value: "fr", label: "Français" },
+                      { value: "en", label: "Anglais" },
+                      { value: "ber", label: "Amazigh" },
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-2">
