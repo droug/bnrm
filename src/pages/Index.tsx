@@ -100,11 +100,58 @@ const Index = () => {
 
   return (
     <>
+      {/* Test simple popup */}
+      {showWelcomePopup && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            zIndex: 9999999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onClick={() => setShowWelcomePopup(false)}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              padding: '2rem',
+              borderRadius: '8px',
+              maxWidth: '500px',
+              color: 'black'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '1rem' }}>Test Popup</h2>
+            <p>Si vous voyez ceci, le problème vient du composant Dialog de Radix UI.</p>
+            <button 
+              onClick={() => setShowWelcomePopup(false)}
+              style={{
+                marginTop: '1rem',
+                padding: '0.5rem 1rem',
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                borderRadius: '4px',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
+      
       {/* Popup d'accueil */}
-      <WelcomePopup 
+      {/* <WelcomePopup 
         isOpen={showWelcomePopup} 
         onClose={() => setShowWelcomePopup(false)} 
-      />
+      /> */}
       <div className="min-h-screen bg-background relative overflow-hidden">
         {/* Arrière-plan de la page avec mosaïques zellige raffinées */}
         <div className="fixed inset-0 z-0">
