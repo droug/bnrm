@@ -320,16 +320,15 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
             <div className="space-y-2">
               <Label htmlFor="required_role">Rôle requis</Label>
               <Select
-                value={formData.required_role}
+                value={formData.required_role || undefined}
                 onValueChange={(value) =>
                   setFormData({ ...formData, required_role: value })
                 }
               >
                 <SelectTrigger id="required_role">
-                  <SelectValue placeholder="Sélectionner un rôle (optionnel)" />
+                  <SelectValue placeholder="Aucun rôle spécifique" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Aucun rôle spécifique</SelectItem>
                   {roles.map((role) => (
                     <SelectItem key={role.id} value={role.role_name}>
                       {role.role_name}
