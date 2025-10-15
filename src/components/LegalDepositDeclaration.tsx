@@ -176,14 +176,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             {/* Identification de l'auteur */}
             <div>
               <h3 className="text-lg font-semibold mb-4">Identification de l'auteur</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-visible">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de l'auteur</Label>
                   <Select>
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper" side="bottom" align="start">
                       <SelectItem value="physique">Personne physique</SelectItem>
                       <SelectItem value="morale">Personne morale (collectivités)</SelectItem>
                     </SelectContent>
@@ -227,7 +227,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             {/* Identification de la publication */}
             <div>
               <h3 className="text-lg font-semibold mb-4">Identification de la publication</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-visible">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 md:col-span-2">
                   <Label>Titre de l'ouvrage</Label>
                   <Input placeholder="Titre de l'ouvrage" />
@@ -239,7 +239,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper" side="bottom" align="start">
                       <SelectItem value="printed">Imprimé</SelectItem>
                       <SelectItem value="electronic">Électronique</SelectItem>
                     </SelectContent>
@@ -272,7 +272,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner la langue" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper" side="bottom" align="start">
                       <SelectItem value="ar">Arabe</SelectItem>
                       <SelectItem value="fr">Français</SelectItem>
                       <SelectItem value="en">Anglais</SelectItem>
@@ -297,7 +297,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper" side="bottom" align="start">
                       <SelectItem value="yes">Oui</SelectItem>
                       <SelectItem value="no">Non</SelectItem>
                     </SelectContent>
@@ -448,7 +448,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper" side="bottom" align="start">
                       <SelectItem value="journal">Journal</SelectItem>
                       <SelectItem value="revue">Revue</SelectItem>
                     </SelectContent>
@@ -461,7 +461,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner la nature" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper" side="bottom" align="start">
                       <SelectItem value="etatique">Étatique</SelectItem>
                       <SelectItem value="non-etatique">Non étatique</SelectItem>
                     </SelectContent>
@@ -754,7 +754,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner la langue" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper" side="bottom" align="start">
                       <SelectItem value="ar">Arabe</SelectItem>
                       <SelectItem value="fr">Français</SelectItem>
                       <SelectItem value="en">Anglais</SelectItem>
