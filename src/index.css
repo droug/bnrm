@@ -392,25 +392,4 @@ Enhanced Moroccan Heritage Design System
   .animate-wiggle {
     animation: wiggle 1.5s ease-in-out;
   }
-
-  /* ✅ Correction du centrage et du positionnement global des modales */
-  [data-radix-dialog-content],
-  [role="dialog"],
-  [class*="dialog-content"] {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    margin: 0 !important;
-    z-index: 9999 !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    display: block !important;
-    pointer-events: auto !important;
-    max-height: 90vh !important;
-    overflow-y: auto !important;
-    background-color: var(--background, #fff) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 40px rgba(0,0,0,0.3) !important;
-  }
 }
