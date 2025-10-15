@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,10 +8,11 @@ import { WorkflowInstances } from "@/components/workflow/WorkflowInstances";
 import { WorkflowMetrics } from "@/components/workflow/WorkflowMetrics";
 import { WorkflowIntegrations } from "@/components/workflow/WorkflowIntegrations";
 import { WorkflowRolesManager } from "@/components/workflow/WorkflowRolesManager";
-import { Activity, GitBranch, Settings, TrendingUp, Users } from "lucide-react";
+import { Activity, GitBranch, Settings, TrendingUp, Users, ArrowLeft } from "lucide-react";
 
 export default function WorkflowBPM() {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
 
   if (!user) {
     return <Navigate to="/auth" replace />;
@@ -29,6 +30,15 @@ export default function WorkflowBPM() {
       <Header />
       <main className="container mx-auto p-6">
         <div className="mb-8">
+          <div className="flex items-center gap-4 mb-4">
+            <button
+              onClick={() => navigate('/admin/settings')}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5" />
+              Retour
+            </button>
+          </div>
           <h1 className="text-3xl font-bold mb-2">
             Moteur de Workflows et Circuits de Validation – BNRM
           </h1>
