@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import { Routes, Route } from "react-router-dom";
 import ScrollToTop from "@/components/ScrollToTop";
+import { BPMModalManagerComponent } from "@/components/BPMModalManager";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import SignupPage from "./pages/SignupPage";
@@ -92,6 +93,7 @@ import WorkflowBPM from "./pages/WorkflowBPM";
 const App = () => (
   <TooltipProvider>
     <LanguageProvider>
+      <BPMModalManagerComponent />
       <ScrollToTop />
       <Toaster />
       <Sonner />
