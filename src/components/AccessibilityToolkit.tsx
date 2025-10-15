@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogDescription,
+  CustomDialogClose,
+} from '@/components/ui/custom-portal-dialog';
 import {
   Tooltip,
   TooltipContent,
@@ -137,14 +138,16 @@ export const AccessibilityToolkit = () => {
       </Tooltip>
 
       {/* Dialog d'accessibilité */}
-      <Dialog open={isOpen} onOpenChange={(open) => {
+      <CustomDialog open={isOpen} onOpenChange={(open) => {
         console.log('Dialog onOpenChange called with:', open);
         setIsOpen(open);
       }}>
-        <DialogContent className="w-full max-w-md z-[9999] p-0">
-          <DialogHeader className="p-4 border-b border-border">
+        <CustomDialogContent className="w-full max-w-md p-0">
+          <CustomDialogClose onClose={() => setIsOpen(false)} />
+          
+          <CustomDialogHeader className="p-4 border-b border-border">
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-lg font-semibold">Accessibilité</DialogTitle>
+              <CustomDialogTitle className="text-lg font-semibold">Accessibilité</CustomDialogTitle>
               <Button
                 variant="ghost"
                 size="sm"
@@ -155,10 +158,10 @@ export const AccessibilityToolkit = () => {
                 Réinitialiser
               </Button>
             </div>
-            <DialogDescription className="sr-only">
+            <CustomDialogDescription className="sr-only">
               Ajustez les paramètres d'accessibilité pour améliorer votre expérience de navigation.
-            </DialogDescription>
-          </DialogHeader>
+            </CustomDialogDescription>
+          </CustomDialogHeader>
 
           {/* Grille des contrôles - 2 colonnes, 4 lignes */}
           <div className="p-4">
@@ -320,8 +323,8 @@ export const AccessibilityToolkit = () => {
               </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </CustomDialogContent>
+      </CustomDialog>
     </TooltipProvider>
   );
 };
