@@ -392,15 +392,18 @@ Enhanced Moroccan Heritage Design System
     perspective: 1000px;
   }
 
-  /* BPM Modal Overlay - Simple and stable */
+  /* BPM Modal Overlay - Désactive toute couche Lovable floue */
+  .bpm-overlay,
   .modal-backdrop,
-  .bpm-overlay {
+  [data-lovable-overlay],
+  [class*="overlay"] {
     position: fixed !important;
     inset: 0 !important;
-    background-color: rgba(0, 0, 0, 0.35) !important;
-    z-index: 999998 !important;
     backdrop-filter: none !important;
     filter: none !important;
+    background: rgba(0, 0, 0, 0.25) !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
   }
 
   /* BPM Modals - Force centered positioning */
