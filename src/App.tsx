@@ -1,12 +1,9 @@
-import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import { Routes, Route } from "react-router-dom";
 import ScrollToTop from "@/components/ScrollToTop";
-import { ModalCenteringManager } from "@/components/ModalCenteringManager";
-import { initOverlayCleanup } from "@/lib/cleanup-orphan-overlays";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import SignupPage from "./pages/SignupPage";
@@ -92,21 +89,13 @@ import EmailManagement from "./pages/EmailManagement";
 import LegalDepositApprovals from "./pages/LegalDepositApprovals";
 import WorkflowBPM from "./pages/WorkflowBPM";
 
-const App = () => {
-  useEffect(() => {
-    // Initialize overlay cleanup on app mount
-    const cleanup = initOverlayCleanup();
-    return cleanup;
-  }, []);
-
-  return (
-    <TooltipProvider>
-      <LanguageProvider>
-        <ScrollToTop />
-        <ModalCenteringManager />
-        <Toaster />
-        <Sonner />
-        <Routes>
+const App = () => (
+  <TooltipProvider>
+    <LanguageProvider>
+      <ScrollToTop />
+      <Toaster />
+      <Sonner />
+      <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/auth" element={<Auth />} />
@@ -229,7 +218,6 @@ const App = () => {
       </Routes>
     </LanguageProvider>
   </TooltipProvider>
-  );
-};
+);
 
 export default App;

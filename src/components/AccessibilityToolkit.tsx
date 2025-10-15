@@ -141,13 +141,7 @@ export const AccessibilityToolkit = () => {
         console.log('Dialog onOpenChange called with:', open);
         setIsOpen(open);
       }}>
-        <DialogContent 
-          className="w-full max-w-md z-[9999] p-0"
-          aria-describedby="accessibility-description"
-        >
-          <DialogDescription id="accessibility-description" className="sr-only">
-            Configurez les options d'accessibilité pour adapter l'affichage à vos besoins
-          </DialogDescription>
+        <DialogContent className="w-full max-w-md z-[9999] p-0">
           <DialogHeader className="p-4 border-b border-border">
             <div className="flex items-center justify-between">
               <DialogTitle className="text-lg font-semibold">Accessibilité</DialogTitle>
