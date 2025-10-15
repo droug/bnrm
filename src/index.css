@@ -11,6 +11,21 @@ html, body {
   height: auto !important;
 }
 
+/* Désactive tous les effets visuels sur les conteneurs et overlays */
+html, body,
+.lovable-root,
+.lovable-preview-overlay,
+[class*="overlay"],
+[class*="backdrop"] {
+  backdrop-filter: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  perspective: none !important;
+  will-change: auto !important;
+}
+
 /* Force containers to not clip modals */
 .lovable-root,
 .scroll-container,
