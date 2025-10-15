@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import { Routes, Route } from "react-router-dom";
 import ScrollToTop from "@/components/ScrollToTop";
+import { ModalCenteringManager } from "@/components/ModalCenteringManager";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import SignupPage from "./pages/SignupPage";
@@ -93,6 +94,7 @@ const App = () => (
   <TooltipProvider>
     <LanguageProvider>
       <ScrollToTop />
+      <ModalCenteringManager />
       <Toaster />
       <Sonner />
       <Routes>
