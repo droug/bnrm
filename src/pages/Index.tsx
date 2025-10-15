@@ -101,7 +101,9 @@ const Index = () => {
   return (
     <>
       {/* Test simple popup */}
-      {showWelcomePopup && (
+      {(() => {
+        console.log('Rendering popup condition, showWelcomePopup:', showWelcomePopup);
+        return showWelcomePopup && (
         <div 
           style={{
             position: 'fixed',
@@ -145,7 +147,8 @@ const Index = () => {
             </button>
           </div>
         </div>
-      )}
+        );
+      })()}
       
       {/* Popup d'accueil */}
       {/* <WelcomePopup 
