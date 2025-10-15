@@ -87,8 +87,8 @@ export function CreateTransitionDialog({
       const { error } = await supabase.from('workflow_transitions').insert({
         workflow_id: workflowId,
         transition_name: transitionName.trim(),
-        from_step_id: fromStep || null,
-        to_step_id: toStep || null,
+        from_step_id: fromStep && fromStep !== "none" ? fromStep : null,
+        to_step_id: toStep && toStep !== "none" ? toStep : null,
         trigger_type: triggerType,
       });
 
@@ -142,7 +142,7 @@ export function CreateTransitionDialog({
                 <SelectValue placeholder="Sélectionner une étape..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Aucune (début du workflow)</SelectItem>
+                <SelectItem value="none">Aucune (début du workflow)</SelectItem>
                 {steps.map((step) => (
                   <SelectItem key={step.id} value={step.id}>
                     {step.step_name}
@@ -159,7 +159,7 @@ export function CreateTransitionDialog({
                 <SelectValue placeholder="Sélectionner une étape..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Aucune (fin du workflow)</SelectItem>
+                <SelectItem value="none">Aucune (fin du workflow)</SelectItem>
                 {steps.map((step) => (
                   <SelectItem key={step.id} value={step.id}>
                     {step.step_name}

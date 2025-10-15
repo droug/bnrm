@@ -91,7 +91,7 @@ export function CreateStepDialog({ open, onOpenChange, workflowId, onSaved }: Cr
         step_name: stepName.trim(),
         step_type: stepType,
         step_number: nextStepNumber,
-        required_role: requiredRole || null,
+        required_role: requiredRole && requiredRole !== "none" ? requiredRole : null,
       });
 
       if (error) throw error;
@@ -162,7 +162,7 @@ export function CreateStepDialog({ open, onOpenChange, workflowId, onSaved }: Cr
                 <SelectValue placeholder="Sélectionner un rôle..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Aucun rôle spécifique</SelectItem>
+                <SelectItem value="none">Aucun rôle spécifique</SelectItem>
                 {roles.map((role) => (
                   <SelectItem key={role.id} value={role.role_name}>
                     {role.role_name}
