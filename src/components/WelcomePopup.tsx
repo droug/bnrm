@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { useState } from "react";
+import { CustomDialog, CustomDialogContent, CustomDialogHeader, CustomDialogTitle, CustomDialogDescription, CustomDialogClose } from "@/components/ui/custom-portal-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -63,43 +63,37 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
   ];
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose} modal={true}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique" style={{ zIndex: 9999999 }}>
+    <CustomDialog open={isOpen} onOpenChange={handleClose} modal={true}>
+      <CustomDialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique">
+        <CustomDialogClose onClose={handleClose} />
+        
         {/* Header with Moroccan design */}
         <div className="relative overflow-hidden bg-gradient-zellige-main p-6 text-white">
           <div className="absolute inset-0 bg-pattern-zellige-complex opacity-30"></div>
           <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-20"></div>
           
           <div className="relative z-10">
-            <DialogHeader>
+            <CustomDialogHeader>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-10 w-10 object-contain drop-shadow-lg" />
-                  <DialogTitle className="text-2xl font-moroccan font-bold text-white">
+                  <CustomDialogTitle className="text-2xl font-moroccan font-bold text-white">
                     Bienvenue à la BNRM
-                  </DialogTitle>
+                  </CustomDialogTitle>
                   <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-10 w-10 object-contain drop-shadow-lg" />
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClose}
-                  className="text-white/80 hover:text-white hover:bg-white/10 h-8 w-8 p-0"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
               </div>
               
-              <DialogDescription className="text-white/95 text-lg font-elegant italic text-center">
+              <CustomDialogDescription className="text-white/95 text-lg font-elegant italic text-center">
                 "Découvrez les trésors du patrimoine marocain millénaire"
-              </DialogDescription>
+              </CustomDialogDescription>
               
               <div className="flex justify-center space-x-1 mt-3">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-4 w-4 text-gold fill-gold animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
                 ))}
               </div>
-            </DialogHeader>
+            </CustomDialogHeader>
           </div>
         </div>
 
@@ -194,8 +188,8 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
             </div>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </CustomDialogContent>
+    </CustomDialog>
   );
 };
 
