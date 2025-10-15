@@ -8,7 +8,8 @@ import { WorkflowInstances } from "@/components/workflow/WorkflowInstances";
 import { WorkflowMetrics } from "@/components/workflow/WorkflowMetrics";
 import { WorkflowIntegrations } from "@/components/workflow/WorkflowIntegrations";
 import { WorkflowRolesManager } from "@/components/workflow/WorkflowRolesManager";
-import { Activity, GitBranch, Settings, TrendingUp, Users, ArrowLeft } from "lucide-react";
+import { WorkflowModelsManager } from "@/components/workflow/WorkflowModelsManager";
+import { Activity, GitBranch, Settings, TrendingUp, Users, ArrowLeft, FolderKanban } from "lucide-react";
 
 export default function WorkflowBPM() {
   const { user, profile } = useAuth();
@@ -47,8 +48,12 @@ export default function WorkflowBPM() {
           </p>
         </div>
 
-        <Tabs defaultValue="definitions" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6">
+        <Tabs defaultValue="models" className="w-full">
+          <TabsList className="grid w-full grid-cols-6 mb-6">
+            <TabsTrigger value="models">
+              <FolderKanban className="w-4 h-4 mr-2" />
+              Modèles
+            </TabsTrigger>
             <TabsTrigger value="definitions">
               <GitBranch className="w-4 h-4 mr-2" />
               Workflows
@@ -70,6 +75,10 @@ export default function WorkflowBPM() {
               Intégrations
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="models" className="mt-6">
+            <WorkflowModelsManager />
+          </TabsContent>
 
           <TabsContent value="definitions" className="mt-6">
             <WorkflowDefinitions />

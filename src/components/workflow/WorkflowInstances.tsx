@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Activity, CheckCircle2, Clock, XCircle, Pause } from "lucide-react";
+import { Activity, CheckCircle2, Clock, XCircle, Pause, Eye, Play } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { StartWorkflowDialog } from "./StartWorkflowDialog";
 
 interface WorkflowInstance {
   id: string;
@@ -25,6 +27,7 @@ interface WorkflowInstance {
 export function WorkflowInstances() {
   const [instances, setInstances] = useState<WorkflowInstance[]>([]);
   const [loading, setLoading] = useState(true);
+  const [startDialogOpen, setStartDialogOpen] = useState(false);
   const [stats, setStats] = useState({
     pending: 0,
     in_progress: 0,
@@ -135,7 +138,13 @@ export function WorkflowInstances() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Instances Actives</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Instances Actives</CardTitle>
+            <Button onClick={() => setStartDialogOpen(true)}>
+              <Play className="h-4 w-4 mr-2" />
+              Lancer un workflow
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -181,6 +190,13 @@ export function WorkflowInstances() {
           </Table>
         </CardContent>
       </Card>
+
+      <StartWorkflowDialog
+        open={startDialogOpen}
+        onOpenChange={setStartDialogOpen}
+        referenceType="general"
+        onWorkflowStarted={loadInstances}
+      />
     </div>
   );
 }
