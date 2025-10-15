@@ -87,8 +87,7 @@ import CommitteeDashboard from "./pages/CommitteeDashboard";
 import DepositApprovals from "./pages/DepositApprovals";
 import EmailManagement from "./pages/EmailManagement";
 import LegalDepositApprovals from "./pages/LegalDepositApprovals";
-
-
+import WorkflowBPM from "./pages/WorkflowBPM";
 
 const App = () => (
   <TooltipProvider>
@@ -209,6 +208,10 @@ const App = () => (
         <Route path="/admin/gestion-emails" element={<EmailManagement />} />
         <Route path="/deposit-approvals" element={<DepositApprovals />} />
         <Route path="/approbations-depot" element={<DepositApprovals />} />
+
+        {/* Workflow BPM */}
+        <Route path="/admin/workflow-bpm" element={<WorkflowBPM />} />
+        <Route path="/admin/moteur-workflows" element={<WorkflowBPM />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
