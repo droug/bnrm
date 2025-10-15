@@ -392,4 +392,58 @@ Enhanced Moroccan Heritage Design System
   .animate-wiggle {
     animation: wiggle 1.5s ease-in-out;
   }
+
+  /* ===== MODAL GLOBAL PORTAL STYLING ===== */
+  /* Force all modals to render properly outside scrollable containers */
+  
+  /* Ensure parent containers don't clip modals */
+  html, body, #root, .app-root, .main-wrapper, .content-root, .scroll-container {
+    overflow: visible !important;
+  }
+
+  /* Global modal and dialog styling */
+  [data-radix-dialog-overlay],
+  [data-radix-dialog-content],
+  [data-state="open"][role="dialog"],
+  .modal,
+  .dialog,
+  [data-modal] {
+    position: fixed !important;
+  }
+
+  /* Modal content - always centered and on top */
+  [data-radix-dialog-content],
+  [data-state="open"][role="dialog"]:not([data-radix-dialog-overlay]) {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 99999 !important;
+    max-height: 85vh !important;
+    pointer-events: all !important;
+  }
+
+  /* Modal overlay - full screen backdrop */
+  [data-radix-dialog-overlay],
+  .modal-backdrop,
+  [data-state="open"][role="dialog"][data-radix-dialog-overlay] {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 99998 !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+    backdrop-filter: blur(2px) !important;
+    pointer-events: all !important;
+  }
+
+  /* Block body scroll when modal is open */
+  body.modal-open,
+  body:has([data-state="open"][role="dialog"]) {
+    overflow: hidden !important;
+  }
+
+  /* Ensure scrollable dialog content maintains proper overflow */
+  [data-radix-dialog-content] > div:has([data-radix-scroll-area-viewport]) {
+    overflow-y: auto !important;
+    max-height: calc(85vh - 120px) !important;
+  }
 }
