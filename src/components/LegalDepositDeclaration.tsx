@@ -17,6 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { moroccanRegions, getCitiesByRegion } from "@/data/moroccanRegions";
 import { bookDisciplines } from "@/data/bookDisciplines";
+import { worldLanguages } from "@/data/worldLanguages";
 
 interface LegalDepositDeclarationProps {
   depositType: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees";
@@ -45,6 +46,10 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [authorStatus, setAuthorStatus] = useState<string>("");
   const [selectedDiscipline, setSelectedDiscipline] = useState<string>("");
   const [disciplineSearch, setDisciplineSearch] = useState<string>("");
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [languageSearch, setLanguageSearch] = useState<string>("");
+  const [multipleVolumes, setMultipleVolumes] = useState<string>("");
+  const [numberOfVolumes, setNumberOfVolumes] = useState<string>("");
 
   const depositTypeLabels = {
     monographie: "Monographies",
@@ -406,37 +411,77 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Mots clés</Label>
-                  <Input placeholder="Mots clés" />
+                  <Label>Langues</Label>
+                  <div className="relative">
+                    <Input
+                      placeholder="Rechercher et sélectionner des langues..."
+                      value={languageSearch}
+                      onChange={(e) => setLanguageSearch(e.target.value)}
+                      className="pr-10"
+                    />
+                    {languageSearch && (
+                      <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                        {worldLanguages
+                          .filter(lang => 
+                            lang.name.toLowerCase().includes(languageSearch.toLowerCase())
+                          )
+                          .map((lang) => (
+                            <button
+                              key={lang.code}
+                              type="button"
+                              className="w-full text-left px-4 py-2 hover:bg-accent transition-colors flex items-center justify-between"
+                              onClick={() => {
+                                if (!selectedLanguages.includes(lang.name)) {
+                                  setSelectedLanguages([...selectedLanguages, lang.name]);
+                                }
+                                setLanguageSearch("");
+                              }}
+                            >
+                              <span>{lang.name}</span>
+                              {selectedLanguages.includes(lang.name) && (
+                                <span className="text-primary">✓</span>
+                              )}
+                            </button>
+                          ))}
+                        {worldLanguages.filter(lang => 
+                          lang.name.toLowerCase().includes(languageSearch.toLowerCase())
+                        ).length === 0 && (
+                          <div className="px-4 py-2 text-sm text-muted-foreground">
+                            Aucune langue trouvée
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {selectedLanguages.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {selectedLanguages.map((lang, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm"
+                        >
+                          {lang}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedLanguages(selectedLanguages.filter((_, i) => i !== index));
+                            }}
+                            className="hover:text-primary/80"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Langue</Label>
-                  <SimpleDropdown
-                    placeholder="Sélectionner la langue"
-                    options={[
-                      { value: "ar", label: "Arabe" },
-                      { value: "fr", label: "Français" },
-                      { value: "en", label: "Anglais" },
-                      { value: "ber", label: "Amazigh" },
-                    ]}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Nombre de volumes</Label>
-                  <Input type="number" placeholder="Nombre de volumes" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Nombre de pages</Label>
-                  <Input type="number" placeholder="Nombre de pages" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Première demande d'ISBN</Label>
+                  <Label>Publication en plusieurs volumes</Label>
                   <SimpleDropdown
                     placeholder="Sélectionner"
+                    value={multipleVolumes}
+                    onChange={setMultipleVolumes}
                     options={[
                       { value: "yes", label: "Oui" },
                       { value: "no", label: "Non" },
@@ -444,9 +489,22 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Résumé de l'ouvrage</Label>
-                  <Textarea placeholder="Résumé de l'ouvrage" rows={4} />
+                {multipleVolumes === "yes" && (
+                  <div className="space-y-2">
+                    <Label>Nombre de volumes</Label>
+                    <Input 
+                      type="number" 
+                      min="1"
+                      placeholder="Nombre de volumes" 
+                      value={numberOfVolumes}
+                      onChange={(e) => setNumberOfVolumes(e.target.value)}
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label>Nombre de pages</Label>
+                  <Input type="number" placeholder="Nombre de pages" />
                 </div>
               </div>
             </div>
