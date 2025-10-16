@@ -70,6 +70,39 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
   const [publicationDate, setPublicationDate] = useState<Date>();
   const [publicationDateInput, setPublicationDateInput] = useState<string>("");
+  const [publicationType, setPublicationType] = useState<string>("");
+  const [publicationTypes, setPublicationTypes] = useState<Array<{code: string, label: string}>>([]);
+
+  // Fetch publication types from database
+  useEffect(() => {
+    const fetchPublicationTypes = async () => {
+      const { data: listData, error: listError } = await supabase
+        .from('system_lists')
+        .select('id')
+        .eq('list_code', 'TYPE_PUBLICATION')
+        .single();
+      
+      if (listError) {
+        console.error('Error fetching publication types list:', listError);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('system_list_values')
+        .select('value_code, value_label')
+        .eq('list_id', listData.id)
+        .eq('is_active', true)
+        .order('sort_order');
+      
+      if (error) {
+        console.error('Error fetching publication types:', error);
+      } else {
+        setPublicationTypes(data?.map(v => ({ code: v.value_code, label: v.value_label })) || []);
+      }
+    };
+
+    fetchPublicationTypes();
+  }, []);
 
   // Fetch publishers from database
   useEffect(() => {
@@ -436,6 +469,16 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       { value: "printed", label: "Imprimé" },
                       { value: "electronic", label: "Électronique" },
                     ]}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Type de publication <span className="text-destructive">*</span></Label>
+                  <SimpleDropdown
+                    placeholder="Sélectionner le type de publication"
+                    value={publicationType}
+                    onChange={setPublicationType}
+                    options={publicationTypes.map(t => ({ value: t.code, label: t.label }))}
                   />
                 </div>
 
@@ -1395,22 +1438,23 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             
             {renderFileUpload("cin", "Envoyer une copie de la CIN de l'auteur", true, "image/jpeg,application/pdf")}
             
-
-            {depositType === "monographie" && (
-              <>
-                {renderFileUpload(
-                  "thesis-recommendation", 
-                  "Recommandation de publication (pour les thèses)", 
-                  false, 
-                  "application/pdf"
-                )}
-                {renderFileUpload(
-                  "quran-authorization", 
-                  "Autorisation de publication de la Fondation Mohammed VI (pour les Corans)", 
-                  false, 
-                  "application/pdf"
-                )}
-              </>
+            {/* Pièces conditionnelles selon le type de publication */}
+            {depositType === "monographie" && publicationType === "THE" && (
+              renderFileUpload(
+                "thesis-recommendation", 
+                "Recommandation de publication (pour les thèses)", 
+                true, 
+                "application/pdf"
+              )
+            )}
+            
+            {depositType === "monographie" && publicationType === "COR" && (
+              renderFileUpload(
+                "quran-authorization", 
+                "Autorisation de publication de la Fondation Mohammed VI (pour les Corans)", 
+                true, 
+                "application/pdf"
+              )
             )}
           </div>
 

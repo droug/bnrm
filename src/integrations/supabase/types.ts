@@ -4471,6 +4471,80 @@ export type Database = {
         }
         Relationships: []
       }
+      system_list_values: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          list_id: string
+          metadata: Json | null
+          sort_order: number | null
+          updated_at: string | null
+          value_code: string
+          value_label: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          list_id: string
+          metadata?: Json | null
+          sort_order?: number | null
+          updated_at?: string | null
+          value_code: string
+          value_label: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          list_id?: string
+          metadata?: Json | null
+          sort_order?: number | null
+          updated_at?: string | null
+          value_code?: string
+          value_label?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_list_values_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "system_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      system_lists: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          list_code: string
+          list_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          list_code: string
+          list_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          list_code?: string
+          list_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       translation_keys: {
         Row: {
           category: string | null

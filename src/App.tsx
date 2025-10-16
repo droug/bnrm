@@ -88,6 +88,7 @@ import DepositApprovals from "./pages/DepositApprovals";
 import EmailManagement from "./pages/EmailManagement";
 import LegalDepositApprovals from "./pages/LegalDepositApprovals";
 import WorkflowBPM from "./pages/WorkflowBPM";
+import SystemListsPage from "./pages/SystemListsPage";
 
 const App = () => (
   <TooltipProvider>
@@ -212,6 +213,10 @@ const App = () => (
         {/* Workflow BPM */}
         <Route path="/admin/workflow-bpm" element={<WorkflowBPM />} />
         <Route path="/admin/moteur-workflows" element={<WorkflowBPM />} />
+
+        {/* System Lists Management */}
+        <Route path="/admin/system-lists" element={<SystemListsPage />} />
+        <Route path="/admin/listes-systeme" element={<SystemListsPage />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
