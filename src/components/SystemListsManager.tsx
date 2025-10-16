@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Plus, Upload, Download, Edit2 } from "lucide-react";
+import { Trash2, Plus, Upload, Download, Edit2, Zap, List } from "lucide-react";
 import * as XLSX from 'xlsx';
 
 interface SystemList {
@@ -17,6 +17,9 @@ interface SystemList {
   list_name: string;
   description: string | null;
   is_active: boolean;
+  module: string | null;
+  form_name: string | null;
+  field_type: string | null;
 }
 
 interface SystemListValue {
@@ -38,6 +41,8 @@ export const SystemListsManager = () => {
   const [editingValue, setEditingValue] = useState<SystemListValue | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [moduleFilter, setModuleFilter] = useState<string>("");
+  const [filteredLists, setFilteredLists] = useState<SystemList[]>([]);
 
   useEffect(() => {
     fetchLists();
@@ -48,6 +53,17 @@ export const SystemListsManager = () => {
       fetchListValues(selectedList);
     }
   }, [selectedList]);
+
+  useEffect(() => {
+    if (moduleFilter) {
+      const filtered = lists.filter(list => 
+        `${list.module || ''} - ${list.form_name || ''}`.toLowerCase().includes(moduleFilter.toLowerCase())
+      );
+      setFilteredLists(filtered);
+    } else {
+      setFilteredLists(lists);
+    }
+  }, [moduleFilter, lists]);
 
   const fetchLists = async () => {
     try {
@@ -274,19 +290,76 @@ export const SystemListsManager = () => {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
-          <Label>Sélectionner une liste</Label>
-          <Select value={selectedList || ""} onValueChange={setSelectedList}>
-            <SelectTrigger>
-              <SelectValue placeholder="Choisir une liste" />
-            </SelectTrigger>
-            <SelectContent>
-              {lists.map((list) => (
-                <SelectItem key={list.id} value={list.id}>
-                  {list.list_name} ({list.list_code})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div>
+            <Label>Filtrer les listes par module / formulaire</Label>
+            <Input
+              placeholder="Ex: Dépôt légal, Identification..."
+              value={moduleFilter}
+              onChange={(e) => setModuleFilter(e.target.value)}
+              className="mt-2"
+            />
+            {moduleFilter && (
+              <p className="text-sm text-muted-foreground mt-2">
+                {filteredLists.length} liste(s) trouvée(s)
+              </p>
+            )}
+          </div>
+          
+          <div>
+            <Label>Sélectionner une liste</Label>
+            <Select value={selectedList || ""} onValueChange={setSelectedList}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choisir une liste" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                {filteredLists.map((list) => (
+                  <SelectItem key={list.id} value={list.id}>
+                    <div className="flex items-center gap-2">
+                      {list.field_type === 'auto_select' ? (
+                        <Zap className="w-4 h-4 text-amber-500" />
+                      ) : (
+                        <List className="w-4 h-4 text-blue-500" />
+                      )}
+                      <span className="font-medium">{list.list_name}</span>
+                      <span className="text-muted-foreground text-xs">({list.list_code})</span>
+                      {list.module && list.form_name && (
+                        <span className="text-xs text-muted-foreground">
+                          - {list.module} / {list.form_name}
+                        </span>
+                      )}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {selectedList && (
+              <div className="mt-2 p-3 bg-muted/50 rounded-md">
+                {(() => {
+                  const list = lists.find(l => l.id === selectedList);
+                  return list ? (
+                    <div className="space-y-1 text-sm">
+                      <div className="flex items-center gap-2">
+                        {list.field_type === 'auto_select' ? (
+                          <>
+                            <Zap className="w-4 h-4 text-amber-500" />
+                            <span className="font-medium text-amber-700">Champ Auto select (autocomplétion)</span>
+                          </>
+                        ) : (
+                          <>
+                            <List className="w-4 h-4 text-blue-500" />
+                            <span className="font-medium text-blue-700">Liste déroulante simple</span>
+                          </>
+                        )}
+                      </div>
+                      {list.module && <p className="text-muted-foreground">Module: {list.module}</p>}
+                      {list.form_name && <p className="text-muted-foreground">Formulaire: {list.form_name}</p>}
+                      {list.description && <p className="text-muted-foreground mt-2">{list.description}</p>}
+                    </div>
+                  ) : null;
+                })()}
+              </div>
+            )}
+          </div>
         </div>
 
         {selectedList && (

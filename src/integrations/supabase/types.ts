@@ -4519,28 +4519,37 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string | null
+          field_type: string | null
+          form_name: string | null
           id: string
           is_active: boolean | null
           list_code: string
           list_name: string
+          module: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           description?: string | null
+          field_type?: string | null
+          form_name?: string | null
           id?: string
           is_active?: boolean | null
           list_code: string
           list_name: string
+          module?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           description?: string | null
+          field_type?: string | null
+          form_name?: string | null
           id?: string
           is_active?: boolean | null
           list_code?: string
           list_name?: string
+          module?: string | null
           updated_at?: string | null
         }
         Relationships: []
