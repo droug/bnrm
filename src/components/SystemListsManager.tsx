@@ -8,7 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Plus, Upload, Download, Edit2, Zap, List } from "lucide-react";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Trash2, Plus, Upload, Download, Edit2, Zap, List, Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import * as XLSX from 'xlsx';
 
 interface SystemList {
@@ -43,6 +46,8 @@ export const SystemListsManager = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [moduleFilter, setModuleFilter] = useState<string>("");
   const [filteredLists, setFilteredLists] = useState<SystemList[]>([]);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [uniqueModuleForms, setUniqueModuleForms] = useState<Array<{ value: string; label: string; module: string; form: string }>>([]);
 
   useEffect(() => {
     fetchLists();
@@ -55,9 +60,32 @@ export const SystemListsManager = () => {
   }, [selectedList]);
 
   useEffect(() => {
+    // Extraire les combinaisons uniques de module + formulaire
+    const uniqueCombinations = new Map<string, { module: string; form: string }>();
+    lists.forEach(list => {
+      if (list.module && list.form_name) {
+        const key = `${list.module}|${list.form_name}`;
+        if (!uniqueCombinations.has(key)) {
+          uniqueCombinations.set(key, { module: list.module, form: list.form_name });
+        }
+      }
+    });
+    
+    const options = Array.from(uniqueCombinations.entries()).map(([key, value]) => ({
+      value: key,
+      label: `${value.module} - ${value.form}`,
+      module: value.module,
+      form: value.form
+    })).sort((a, b) => a.label.localeCompare(b.label));
+    
+    setUniqueModuleForms(options);
+  }, [lists]);
+
+  useEffect(() => {
     if (moduleFilter) {
+      const [selectedModule, selectedForm] = moduleFilter.split('|');
       const filtered = lists.filter(list => 
-        `${list.module || ''} - ${list.form_name || ''}`.toLowerCase().includes(moduleFilter.toLowerCase())
+        list.module === selectedModule && list.form_name === selectedForm
       );
       setFilteredLists(filtered);
     } else {
@@ -292,12 +320,67 @@ export const SystemListsManager = () => {
         <div className="space-y-4">
           <div>
             <Label>Filtrer les listes par module / formulaire</Label>
-            <Input
-              placeholder="Ex: Dépôt légal, Identification..."
-              value={moduleFilter}
-              onChange={(e) => setModuleFilter(e.target.value)}
-              className="mt-2"
-            />
+            <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={filterOpen}
+                  className="w-full justify-between mt-2"
+                >
+                  {moduleFilter
+                    ? uniqueModuleForms.find((item) => item.value === moduleFilter)?.label
+                    : "Sélectionner un module / formulaire..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[600px] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Rechercher un module ou formulaire..." />
+                  <CommandList>
+                    <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
+                    <CommandGroup>
+                      <CommandItem
+                        value="all"
+                        onSelect={() => {
+                          setModuleFilter("");
+                          setFilterOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            moduleFilter === "" ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        Toutes les listes
+                      </CommandItem>
+                      {uniqueModuleForms.map((item) => (
+                        <CommandItem
+                          key={item.value}
+                          value={item.label}
+                          onSelect={() => {
+                            setModuleFilter(item.value === moduleFilter ? "" : item.value);
+                            setFilterOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              moduleFilter === item.value ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <div className="flex flex-col">
+                            <span className="font-medium">{item.module}</span>
+                            <span className="text-xs text-muted-foreground">{item.form}</span>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
             {moduleFilter && (
               <p className="text-sm text-muted-foreground mt-2">
                 {filteredLists.length} liste(s) trouvée(s)
