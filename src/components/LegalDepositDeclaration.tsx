@@ -39,6 +39,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [authorType, setAuthorType] = useState<string>("");
   const [selectedRegion, setSelectedRegion] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string>("");
+  const [authorGender, setAuthorGender] = useState<string>("");
+  const [declarationNature, setDeclarationNature] = useState<string>("");
+  const [authorStatus, setAuthorStatus] = useState<string>("");
 
   const depositTypeLabels = {
     monographie: "Monographies",
@@ -210,6 +213,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <div className="space-y-2">
                       <Label>Statut</Label>
                       <SimpleDropdown
+                        value={authorStatus}
+                        onChange={setAuthorStatus}
                         placeholder="Sélectionner le statut"
                         options={[
                           { value: "etatique", label: "Étatique" },
@@ -225,6 +230,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <div className="space-y-2">
                       <Label>Genre</Label>
                       <SimpleDropdown
+                        value={authorGender}
+                        onChange={setAuthorGender}
                         placeholder="Sélectionner le genre"
                         options={[
                           { value: "homme", label: "Homme" },
@@ -241,6 +248,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <div className="space-y-2">
                       <Label>Nature de la déclaration</Label>
                       <SimpleDropdown
+                        value={declarationNature}
+                        onChange={setDeclarationNature}
                         placeholder="Sélectionner la nature"
                         options={[
                           { value: "depot-initial", label: "Dépôt initial (ou premier dépôt)" },
@@ -271,7 +280,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     value={selectedRegion}
                     onChange={(value) => {
                       setSelectedRegion(value);
-                      setSelectedCity(""); // Reset city when region changes
+                      setSelectedCity("");
                     }}
                     placeholder="Sélectionner la région"
                     options={moroccanRegions.map(region => ({
@@ -293,11 +302,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     })) : []}
                     disabled={!selectedRegion}
                   />
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Adresse</Label>
-                  <Textarea placeholder="Adresse complète" />
                 </div>
               </div>
             </div>
