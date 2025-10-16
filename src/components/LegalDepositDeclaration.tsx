@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { moroccanRegions, getCitiesByRegion } from "@/data/moroccanRegions";
 
 interface LegalDepositDeclarationProps {
   depositType: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees";
@@ -35,6 +36,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, File>>({});
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const [naturePublication, setNaturePublication] = useState<string>("");
+  const [authorType, setAuthorType] = useState<string>("");
+  const [selectedRegion, setSelectedRegion] = useState<string>("");
+  const [selectedCity, setSelectedCity] = useState<string>("");
 
   const depositTypeLabels = {
     monographie: "Monographies",
@@ -181,6 +185,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <div className="space-y-2">
                   <Label>Type de l'auteur</Label>
                   <SimpleDropdown
+                    value={authorType}
+                    onChange={setAuthorType}
                     placeholder="Sélectionner le type"
                     options={[
                       { value: "physique", label: "Personne physique" },
@@ -190,19 +196,64 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>Nom de la collectivité / Nom de l'auteur</Label>
+                  <Label>{authorType === "morale" ? "Nom de la collectivité" : "Nom de l'auteur"}</Label>
                   <Input placeholder="Nom complet" />
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Sigle</Label>
-                  <Input placeholder="Sigle" />
-                </div>
+                {authorType === "morale" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>Sigle</Label>
+                      <Input placeholder="Sigle" />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label>Nature du déclarant</Label>
-                  <Input placeholder="Nature du déclarant" />
-                </div>
+                    <div className="space-y-2">
+                      <Label>Statut</Label>
+                      <SimpleDropdown
+                        placeholder="Sélectionner le statut"
+                        options={[
+                          { value: "etatique", label: "Étatique" },
+                          { value: "non-etatique", label: "Non étatique" },
+                        ]}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {authorType === "physique" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>Genre</Label>
+                      <SimpleDropdown
+                        placeholder="Sélectionner le genre"
+                        options={[
+                          { value: "homme", label: "Homme" },
+                          { value: "femme", label: "Femme" },
+                        ]}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Date de naissance</Label>
+                      <Input type="date" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Nature de la déclaration</Label>
+                      <SimpleDropdown
+                        placeholder="Sélectionner la nature"
+                        options={[
+                          { value: "depot-initial", label: "Dépôt initial (ou premier dépôt)" },
+                          { value: "nouvelle-edition", label: "Nouvelle édition" },
+                          { value: "reimpression", label: "Réimpression" },
+                          { value: "traduction", label: "Traduction" },
+                          { value: "depot-rectificatif", label: "Dépôt rectificatif ou complémentaire" },
+                          { value: "depot-regularisation", label: "Dépôt de régularisation" },
+                        ]}
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div className="space-y-2">
                   <Label>Téléphone</Label>
@@ -212,6 +263,36 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <div className="space-y-2">
                   <Label>Email</Label>
                   <Input type="email" placeholder="Adresse email" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Région</Label>
+                  <SimpleDropdown
+                    value={selectedRegion}
+                    onChange={(value) => {
+                      setSelectedRegion(value);
+                      setSelectedCity(""); // Reset city when region changes
+                    }}
+                    placeholder="Sélectionner la région"
+                    options={moroccanRegions.map(region => ({
+                      value: region.name,
+                      label: region.name
+                    }))}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Ville</Label>
+                  <SimpleDropdown
+                    value={selectedCity}
+                    onChange={setSelectedCity}
+                    placeholder={selectedRegion ? "Sélectionner la ville" : "Sélectionner d'abord une région"}
+                    options={selectedRegion ? getCitiesByRegion(selectedRegion).map(city => ({
+                      value: city,
+                      label: city
+                    })) : []}
+                    disabled={!selectedRegion}
+                  />
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
@@ -1631,7 +1712,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             variant="outline"
           >
             <FileText className="h-8 w-8" />
-            {language === 'ar' ? 'طابع' : 'Imprimeur/Distributeur'}
+            {language === 'ar' ? 'طابع' : 'Imprimeur'}
           </Button>
         </CardContent>
         <CardFooter>
@@ -1713,17 +1794,17 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>
-            {language === 'ar' ? 'تحديد هوية الطابع/الموزع' : 'Identification de l\'imprimeur/distributeur'}
+            {language === 'ar' ? 'تحديد هوية الطابع' : 'Identification de l\'imprimeur'}
           </CardTitle>
           <CardDescription>
             {userType === "editor" ? 
               (language === 'ar' ? 
-                'الآن نحتاج لمعلومات الطابع/الموزع' :
-                'Nous avons maintenant besoin des informations de l\'imprimeur/distributeur'
+                'الآن نحتاج لمعلومات الطابع' :
+                'Nous avons maintenant besoin des informations de l\'imprimeur'
               ) :
               (language === 'ar' ?
-                'يرجى تقديم معلومات الطابع/الموزع للمصادقة' :
-                'Veuillez fournir les informations de l\'imprimeur/distributeur pour authentification'
+                'يرجى تقديم معلومات الطابع للمصادقة' :
+                'Veuillez fournir les informations de l\'imprimeur pour authentification'
               )
             }
           </CardDescription>
@@ -1732,7 +1813,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{language === 'ar' ? 'الاسم' : 'Nom'}</Label>
-              <Input placeholder={language === 'ar' ? 'اسم الطابع/الموزع' : 'Nom de l\'imprimeur/distributeur'} />
+              <Input placeholder={language === 'ar' ? 'اسم الطابع' : 'Nom de l\'imprimeur'} />
             </div>
             
             <div className="space-y-2">
