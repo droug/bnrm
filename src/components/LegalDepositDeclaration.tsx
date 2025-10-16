@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { moroccanRegions, getCitiesByRegion } from "@/data/moroccanRegions";
 import { bookDisciplines } from "@/data/bookDisciplines";
 import { worldLanguages } from "@/data/worldLanguages";
+
+interface Publisher {
+  id: string;
+  name: string;
+  city: string | null;
+  country: string | null;
+  publisher_type: string | null;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+}
 
 interface LegalDepositDeclarationProps {
   depositType: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees";
@@ -50,6 +61,28 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [languageSearch, setLanguageSearch] = useState<string>("");
   const [multipleVolumes, setMultipleVolumes] = useState<string>("");
   const [numberOfVolumes, setNumberOfVolumes] = useState<string>("");
+  const [publishers, setPublishers] = useState<Publisher[]>([]);
+  const [publisherSearch, setPublisherSearch] = useState<string>("");
+  const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
+
+  // Fetch publishers from database
+  useEffect(() => {
+    const fetchPublishers = async () => {
+      const { data, error } = await supabase
+        .from('publishers')
+        .select('*')
+        .order('name');
+      
+      if (error) {
+        console.error('Error fetching publishers:', error);
+        toast.error('Erreur lors du chargement des éditeurs');
+      } else {
+        setPublishers(data || []);
+      }
+    };
+
+    fetchPublishers();
+  }, []);
 
   const depositTypeLabels = {
     monographie: "Monographies",
@@ -516,23 +549,65 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <h3 className="text-lg font-semibold mb-4">Identification de l'Éditeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Éditeur</Label>
-                  <Input placeholder="Nom de l'éditeur" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Adresse</Label>
-                  <Textarea placeholder="Adresse de l'éditeur" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Téléphone</Label>
-                  <Input placeholder="Téléphone de l'éditeur" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" placeholder="Email de l'éditeur" />
+                  <Label>Identification de l'Éditeur</Label>
+                  <div className="relative">
+                    <Input
+                      placeholder="Rechercher un éditeur..."
+                      value={publisherSearch}
+                      onChange={(e) => setPublisherSearch(e.target.value)}
+                      className="pr-10"
+                    />
+                    {publisherSearch && (
+                      <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                        {publishers
+                          .filter(pub => 
+                            pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
+                          )
+                          .map((pub) => (
+                            <button
+                              key={pub.id}
+                              type="button"
+                              className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                              onClick={() => {
+                                setSelectedPublisher(pub);
+                                setPublisherSearch(pub.name);
+                              }}
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">{pub.name}</span>
+                                {pub.city && (
+                                  <span className="text-sm text-muted-foreground">
+                                    {pub.city}, {pub.country}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        {publishers.filter(pub => 
+                          pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
+                        ).length === 0 && (
+                          <div className="px-4 py-2 text-sm text-muted-foreground">
+                            Aucun éditeur trouvé
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {selectedPublisher && (
+                    <div className="mt-2 p-3 bg-primary/10 rounded-md">
+                      <p className="font-medium">{selectedPublisher.name}</p>
+                      {selectedPublisher.city && (
+                        <p className="text-sm text-muted-foreground">
+                          {selectedPublisher.city}, {selectedPublisher.country}
+                        </p>
+                      )}
+                      {selectedPublisher.publisher_type && (
+                        <p className="text-sm text-muted-foreground">
+                          Type: {selectedPublisher.publisher_type}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
