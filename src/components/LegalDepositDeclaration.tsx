@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +11,10 @@ import { SimpleDropdown } from "@/components/ui/simple-dropdown";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft } from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft, CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
@@ -64,6 +68,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [publisherSearch, setPublisherSearch] = useState<string>("");
   const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
+  const [publicationDate, setPublicationDate] = useState<Date>();
+  const [publicationDateInput, setPublicationDateInput] = useState<string>("");
 
   // Fetch publishers from database
   useEffect(() => {
@@ -639,7 +645,56 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Date prévue de parution</Label>
-                  <Input type="month" placeholder="Date prévue de parution" />
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="JJ/MM/AAAA"
+                      value={publicationDateInput}
+                      onChange={(e) => {
+                        setPublicationDateInput(e.target.value);
+                        // Parse manual input
+                        const parts = e.target.value.split('/');
+                        if (parts.length === 3) {
+                          const day = parseInt(parts[0]);
+                          const month = parseInt(parts[1]) - 1;
+                          const year = parseInt(parts[2]);
+                          if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                            const date = new Date(year, month, day);
+                            if (date.getDate() === day && date.getMonth() === month) {
+                              setPublicationDate(date);
+                            }
+                          }
+                        }
+                      }}
+                      className="flex-1"
+                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-10 p-0",
+                            !publicationDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="h-4 w-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={publicationDate}
+                          onSelect={(date) => {
+                            setPublicationDate(date);
+                            if (date) {
+                              setPublicationDateInput(format(date, "dd/MM/yyyy"));
+                            }
+                          }}
+                          initialFocus
+                          className={cn("p-3 pointer-events-auto")}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
               </div>
             </div>
