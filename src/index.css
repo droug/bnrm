@@ -16,36 +16,39 @@ Enhanced Moroccan Heritage Design System
 
 @layer base {
   :root {
-    /* Palette Neutres et Mosaïques - Inspiration Zellige */
-    --background: 42 25% 97%;
-    --foreground: 30 15% 20%;
+    /* === BNRM Institutional Design System === */
+    /* Charte visuelle Bibliothèque Nationale du Royaume du Maroc */
+    
+    /* Arrière-plan clair et institutionnel */
+    --background: 0 0% 98%;        /* #FAFAFA - Blanc cassé */
+    --foreground: 0 0% 29%;        /* #4A4A4A - Gris foncé texte */
 
-    --card: 40 20% 94%;
-    --card-foreground: 30 15% 20%;
+    --card: 0 0% 97%;              /* #F8F8F8 - Gris très clair */
+    --card-foreground: 0 0% 29%;
 
-    --popover: 40 20% 94%;
-    --popover-foreground: 30 15% 20%;
+    --popover: 0 0% 100%;          /* Blanc pur pour popovers */
+    --popover-foreground: 0 0% 29%;
 
-    /* Bleu Zellige Subtil */
-    --primary: 220 30% 45%;
-    --primary-foreground: 44 15% 98%;
-    --primary-glow: 220 25% 55%;
-    --primary-deep: 220 35% 35%;
+    /* Rouge grenat BNRM - Couleur institutionnelle principale */
+    --primary: 0 72% 27%;          /* #8B1B1B - Rouge grenat BNRM */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 0 65% 35%;     /* Version légèrement plus claire */
+    --primary-deep: 0 80% 20%;     /* Version plus foncée */
 
-    /* Terre Cuite et Sable - Tons Neutres */
-    --secondary: 35 25% 85%;
-    --secondary-foreground: 30 15% 20%;
-    --secondary-warm: 30 30% 80%;
+    /* Gris institutionnels - Tons neutres BNRM */
+    --secondary: 0 0% 94%;         /* Gris clair pour zones secondaires */
+    --secondary-foreground: 0 0% 29%;
+    --secondary-warm: 0 0% 90%;    /* Gris moyen chaud */
 
     /* Tons neutres doux */
-    --muted: 40 15% 90%;
-    --muted-foreground: 35 10% 40%;
+    --muted: 0 0% 96%;             /* Gris très clair pour backgrounds */
+    --muted-foreground: 0 0% 45%;  /* Gris moyen pour textes secondaires */
 
-    /* Vert Olive Subtil */
-    --accent: 155 25% 45%;
-    --accent-foreground: 44 15% 98%;
-    --accent-glow: 155 20% 55%;
-    --accent-bright: 155 30% 50%;
+    /* Accent doré subtil - Touch marocaine */
+    --accent: 43 74% 49%;          /* Or/doré pour accents */
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 43 70% 60%;
+    --accent-bright: 43 80% 55%;
 
     /* Brique Douce */
     --highlight: 12 35% 65%;
@@ -131,12 +134,12 @@ Enhanced Moroccan Heritage Design System
     --shadow-kitab: 0 4px 20px -4px hsl(var(--kitab-primary) / 0.25), 0 2px 8px -2px hsl(var(--kitab-accent) / 0.15);
     --shadow-kitab-strong: 0 8px 32px -8px hsl(var(--kitab-primary) / 0.35), 0 4px 12px -2px hsl(var(--kitab-secondary) / 0.2);
 
-    --destructive: 0 50% 60%;
-    --destructive-foreground: 44 15% 98%;
+    --destructive: 0 72% 45%;      /* Rouge grenat pour destructive */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 40 15% 85%;
-    --input: 40 20% 90%;
-    --ring: 220 30% 45%;
+    --border: 0 0% 88%;            /* Bordures grises claires */
+    --input: 0 0% 100%;            /* Inputs blancs sur fond gris */
+    --ring: 0 72% 27%;             /* Focus ring rouge grenat */
 
     /* Dégradés Mosaïques Zellige */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)), hsl(var(--secondary-warm)));
