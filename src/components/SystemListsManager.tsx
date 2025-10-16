@@ -46,6 +46,16 @@ export const SystemListsManager = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [moduleFilter, setModuleFilter] = useState<string>("");
   const [filteredLists, setFilteredLists] = useState<SystemList[]>([]);
+  const [openModuleCombo, setOpenModuleCombo] = useState(false);
+
+  // Créer une liste unique de modules/formulaires
+  const moduleFormOptions = Array.from(
+    new Set(
+      lists
+        .filter(list => list.module && list.form_name)
+        .map(list => `${list.module} / ${list.form_name}`)
+    )
+  ).sort();
   const [filterOpen, setFilterOpen] = useState(false);
   const [uniqueModuleForms, setUniqueModuleForms] = useState<Array<{ value: string; label: string; module: string; form: string }>>([]);
 
