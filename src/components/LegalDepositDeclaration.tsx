@@ -1507,7 +1507,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <ul className="text-xs text-muted-foreground space-y-1">
                   <li>• Déposer deux exemplaires sur le même type de support</li>
                   <li>• Munir chaque exemplaire d'une pochette avec le titre et les numéros obtenus (DL, ISBN)</li>
-                  <li>• Inclure le résumé sous format texte (Word par exemple)</li>
                   <li>• Recommandation : utiliser des USB au format carte pour une meilleure préservation</li>
                 </ul>
               </div>
