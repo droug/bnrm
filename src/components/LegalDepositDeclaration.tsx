@@ -1387,7 +1387,10 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             {renderFileUpload("cover", "Joindre la couverture (format « jpg » moins de 1 MO)", true, "image/jpeg")}
             
             {(depositType === "monographie" || depositType === "periodique") && (
-              renderFileUpload("summary", "Joindre le sommaire (format « PDF » moins de 2 MO)", true, "application/pdf")
+              <>
+                {renderFileUpload("summary", "Joindre le sommaire (format « PDF » moins de 2 MO)", true, "application/pdf")}
+                {renderFileUpload("abstract", "Joindre résumé de l'ouvrage (format « PDF » moins de 2 MO)", true, "application/pdf")}
+              </>
             )}
             
             {renderFileUpload("cin", "Envoyer une copie de la CIN de l'auteur", true, "image/jpeg,application/pdf")}
