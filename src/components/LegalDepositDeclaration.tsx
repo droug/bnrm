@@ -16,6 +16,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { moroccanRegions, getCitiesByRegion } from "@/data/moroccanRegions";
+import { bookDisciplines } from "@/data/bookDisciplines";
 
 interface LegalDepositDeclarationProps {
   depositType: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees";
@@ -42,6 +43,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [authorGender, setAuthorGender] = useState<string>("");
   const [declarationNature, setDeclarationNature] = useState<string>("");
   const [authorStatus, setAuthorStatus] = useState<string>("");
+  const [selectedDiscipline, setSelectedDiscipline] = useState<string>("");
+  const [disciplineSearch, setDisciplineSearch] = useState<string>("");
 
   const depositTypeLabels = {
     monographie: "Monographies",
@@ -313,6 +316,70 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <h3 className="text-lg font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 md:col-span-2">
+                  <Label>Discipline de l'ouvrage</Label>
+                  <div className="relative">
+                    <Input
+                      placeholder="Rechercher une discipline..."
+                      value={disciplineSearch}
+                      onChange={(e) => setDisciplineSearch(e.target.value)}
+                      className="pr-10"
+                    />
+                    {disciplineSearch && (
+                      <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                        {bookDisciplines
+                          .flatMap(domain => 
+                            domain.children
+                              .filter(subdiscipline => 
+                                domain.label.toLowerCase().includes(disciplineSearch.toLowerCase()) ||
+                                subdiscipline.toLowerCase().includes(disciplineSearch.toLowerCase())
+                              )
+                              .map(subdiscipline => ({
+                                domain: domain.label,
+                                subdiscipline
+                              }))
+                          )
+                          .map((item, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                              onClick={() => {
+                                const fullDiscipline = `${item.domain} → ${item.subdiscipline}`;
+                                setSelectedDiscipline(fullDiscipline);
+                                setDisciplineSearch(fullDiscipline);
+                              }}
+                            >
+                              <div className="text-sm font-medium text-muted-foreground">
+                                {item.domain}
+                              </div>
+                              <div className="text-base">
+                                {item.subdiscipline}
+                              </div>
+                            </button>
+                          ))}
+                        {bookDisciplines
+                          .flatMap(domain => 
+                            domain.children
+                              .filter(subdiscipline => 
+                                domain.label.toLowerCase().includes(disciplineSearch.toLowerCase()) ||
+                                subdiscipline.toLowerCase().includes(disciplineSearch.toLowerCase())
+                              )
+                          ).length === 0 && (
+                            <div className="px-4 py-2 text-sm text-muted-foreground">
+                              Aucune discipline trouvée
+                            </div>
+                          )}
+                      </div>
+                    )}
+                  </div>
+                  {selectedDiscipline && (
+                    <p className="text-sm text-muted-foreground">
+                      Discipline sélectionnée : <span className="font-medium">{selectedDiscipline}</span>
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
                   <Label>Titre de l'ouvrage</Label>
                   <Input placeholder="Titre de l'ouvrage" />
                 </div>
@@ -336,11 +403,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <div className="space-y-2">
                   <Label>Numéro dans la collection</Label>
                   <Input placeholder="Numéro dans la collection" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Disciplines de l'ouvrage</Label>
-                  <Input placeholder="Disciplines de l'ouvrage" />
                 </div>
 
                 <div className="space-y-2">
