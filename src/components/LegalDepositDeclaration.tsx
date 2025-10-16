@@ -586,8 +586,35 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                         {publishers.filter(pub => 
                           pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
                         ).length === 0 && (
-                          <div className="px-4 py-2 text-sm text-muted-foreground">
-                            Aucun éditeur trouvé
+                          <div className="px-4 py-3">
+                            <div className="text-sm text-muted-foreground mb-2">
+                              Aucun éditeur trouvé
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="w-full"
+                              onClick={async () => {
+                                const newName = publisherSearch;
+                                const { data, error } = await supabase
+                                  .from('publishers')
+                                  .insert([{ name: newName }])
+                                  .select()
+                                  .single();
+                                
+                                if (error) {
+                                  toast.error('Erreur lors de l\'ajout de l\'éditeur');
+                                } else {
+                                  setPublishers([...publishers, data]);
+                                  setSelectedPublisher(data);
+                                  setPublisherSearch(data.name);
+                                  toast.success('Éditeur ajouté avec succès');
+                                }
+                              }}
+                            >
+                              + Ajouter "{publisherSearch}"
+                            </Button>
                           </div>
                         )}
                       </div>
