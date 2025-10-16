@@ -726,8 +726,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Chiffre de tirage</Label>
-                  <Input type="number" placeholder="Chiffre de tirage" />
+                  <Label>Nombre de tirage</Label>
+                  <Input type="number" placeholder="Nombre de tirage" />
                 </div>
               </div>
             </div>
@@ -1006,8 +1006,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Chiffre de tirage</Label>
-                  <Input type="number" placeholder="Chiffre de tirage" />
+                  <Label>Nombre de tirage</Label>
+                  <Input type="number" placeholder="Nombre de tirage" />
                 </div>
               </div>
             </div>
@@ -1185,8 +1185,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Chiffre de tirage</Label>
-                  <Input type="number" placeholder="Chiffre de tirage" />
+                  <Label>Nombre de tirage</Label>
+                  <Input type="number" placeholder="Nombre de tirage" />
                 </div>
               </div>
             </div>
@@ -1362,8 +1362,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Chiffre de tirage</Label>
-                  <Input type="number" placeholder="Chiffre de tirage" />
+                  <Label>Nombre de tirage</Label>
+                  <Input type="number" placeholder="Nombre de tirage" />
                 </div>
               </div>
             </div>
