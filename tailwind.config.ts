@@ -14,11 +14,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        'serif': ['Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-        'sans': ['Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-        'arabic': ['Helvetica Neue', 'Helvetica', 'Arial', 'Noto Sans Arabic', 'sans-serif'],
-        'moroccan': ['Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-        'elegant': ['Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        'serif': ['Playfair Display', 'Crimson Text', 'serif'],
+        'sans': ['Inter', 'Noto Sans Arabic', 'sans-serif'],
+        'arabic': ['Amiri', 'Noto Sans Arabic', 'serif'],
+        'moroccan': ['Playfair Display', 'Amiri', 'serif'],
+        'elegant': ['Crimson Text', 'Playfair Display', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
