@@ -1,6 +1,6 @@
 import { AdminHeader } from "@/components/AdminHeader";
 import { ProfessionalInvitationsManager } from "@/components/admin/ProfessionalInvitationsManager";
-import { ProfessionalRegistrationApprovals } from "@/components/admin/ProfessionalRegistrationApprovals";
+import { ProfessionalRequestsManager } from "@/components/admin/ProfessionalRequestsManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ProfessionalManagement() {
@@ -26,7 +26,7 @@ export default function ProfessionalManagement() {
           </TabsContent>
 
           <TabsContent value="approvals">
-            <ProfessionalRegistrationApprovals />
+            <ProfessionalRequestsManager />
           </TabsContent>
         </Tabs>
       </div>
