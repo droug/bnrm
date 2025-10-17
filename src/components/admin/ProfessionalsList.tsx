@@ -49,13 +49,30 @@ export function ProfessionalsList() {
   const [showInjectDialog, setShowInjectDialog] = useState(false);
   const [selectedRoleToInject, setSelectedRoleToInject] = useState<string>("");
 
+  // Récupérer tous les rôles professionnels disponibles
+  const { data: availableRoles } = useQuery({
+    queryKey: ["professional-roles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .in("role", ["editor", "printer", "producer", "distributor"]);
+      
+      if (error) throw error;
+      
+      // Extraire les rôles uniques
+      const uniqueRoles = [...new Set(data?.map(r => r.role) || [])];
+      return uniqueRoles;
+    },
+  });
+
   const { data: professionals, isLoading, refetch } = useQuery({
     queryKey: ["professionals"],
     queryFn: async () => {
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
         .select("user_id, role")
-        .in("role", ["author", "editor", "printer", "producer", "distributor"]);
+        .in("role", ["editor", "printer", "producer", "distributor"]);
 
       if (rolesError) throw rolesError;
 
@@ -114,11 +131,9 @@ export function ProfessionalsList() {
 
   const getRoleBadge = (role: string) => {
     const roleMap: Record<string, { label: string; variant: "default" | "secondary" | "outline" }> = {
-      author: { label: "Auteur", variant: "default" },
-      editor: { label: "Éditeur", variant: "secondary" },
-      printer: { label: "Imprimeur", variant: "outline" },
-      producer: { label: "Producteur", variant: "default" },
-      distributor: { label: "Distributeur", variant: "secondary" },
+      editor: { label: "Éditeur", variant: "default" },
+      printer: { label: "Imprimeur", variant: "secondary" },
+      distributor: { label: "Distributeur", variant: "outline" },
     };
     const roleInfo = roleMap[role] || { label: role, variant: "outline" as const };
     return <Badge variant={roleInfo.variant}>{roleInfo.label}</Badge>;
@@ -126,10 +141,8 @@ export function ProfessionalsList() {
 
   const getRoleLabel = (role: string) => {
     const labels: Record<string, string> = {
-      author: "Auteur",
       editor: "Éditeur",
       printer: "Imprimeur",
-      producer: "Producteur",
       distributor: "Distributeur",
     };
     return labels[role] || role;
@@ -283,14 +296,12 @@ export function ProfessionalsList() {
               <SelectTrigger>
                 <SelectValue placeholder="Tous les rôles" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les rôles</SelectItem>
-                <SelectItem value="author">Auteur</SelectItem>
-                <SelectItem value="editor">Éditeur</SelectItem>
-                <SelectItem value="printer">Imprimeur</SelectItem>
-                <SelectItem value="producer">Producteur</SelectItem>
-                <SelectItem value="distributor">Distributeur</SelectItem>
-              </SelectContent>
+                <SelectContent>
+                  <SelectItem value="all">Tous les rôles</SelectItem>
+                  <SelectItem value="editor">Éditeur</SelectItem>
+                  <SelectItem value="printer">Imprimeur</SelectItem>
+                  <SelectItem value="distributor">Distributeur</SelectItem>
+                </SelectContent>
             </Select>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -621,13 +632,14 @@ export function ProfessionalsList() {
                   <SelectValue placeholder="Sélectionner un type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="author">Auteur</SelectItem>
                   <SelectItem value="editor">Éditeur</SelectItem>
                   <SelectItem value="printer">Imprimeur</SelectItem>
-                  <SelectItem value="producer">Producteur</SelectItem>
                   <SelectItem value="distributor">Distributeur</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground">
+                Les rôles disponibles sont synchronisés avec la configuration du système
+              </p>
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
@@ -637,15 +649,17 @@ export function ProfessionalsList() {
                   setShowInjectDialog(false);
                   setSelectedRoleToInject("");
                 }}
+                className="border-gray-300 text-gray-700 hover:bg-gray-50"
               >
                 Annuler
               </Button>
               <Button 
                 onClick={handleInjectData}
                 disabled={!selectedRoleToInject}
+                className="bg-[#1976D2] hover:bg-[#1565C0] text-white"
               >
                 <Database className="mr-2 h-4 w-4" />
-                Injecter
+                💾 Injecter
               </Button>
             </div>
           </div>
