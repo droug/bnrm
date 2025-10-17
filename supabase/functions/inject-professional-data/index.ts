@@ -14,7 +14,7 @@ serve(async (req) => {
   try {
     const { role } = await req.json();
 
-    if (!role || !['editor', 'printer', 'producer', 'distributor'].includes(role)) {
+    if (!role || !['author', 'editor', 'printer', 'producer', 'distributor'].includes(role)) {
       throw new Error('Type de professionnel invalide');
     }
 
@@ -28,48 +28,69 @@ serve(async (req) => {
     });
 
     const dataByRole: Record<string, any[]> = {
+      author: [
+        {
+          email: `auteur.${Date.now()}@example.ma`,
+          password: 'Test123!',
+          profile: {
+            first_name: 'Hassan',
+            last_name: 'Bennani',
+            phone: '+212-6-11-22-33-44',
+            institution: 'Écrivain indépendant',
+          },
+          registration_data: {
+            cin: 'AB123456',
+            address: '12 Rue de la Liberté, Rabat',
+            city: 'Rabat',
+            postalCode: '10000',
+            nationality: 'Marocaine',
+            birthDate: '1980-03-20',
+            literaryGenre: 'Roman',
+            publishedWorks: 'Les Vents du Désert (2015), Mémoires d\'Anfa (2018)',
+          }
+        },
+        {
+          email: `auteur2.${Date.now()}@example.ma`,
+          password: 'Test123!',
+          profile: {
+            first_name: 'Fatima',
+            last_name: 'Zahra',
+            phone: '+212-6-55-66-77-88',
+            institution: 'Association des Écrivains Marocains',
+          },
+          registration_data: {
+            cin: 'CD789012',
+            address: '78 Boulevard Mohammed V, Fès',
+            city: 'Fès',
+            postalCode: '30000',
+            nationality: 'Marocaine',
+            birthDate: '1975-11-08',
+            literaryGenre: 'Poésie',
+            publishedWorks: 'Chants du Maghreb (2012), Lumières d\'Orient (2020)',
+          }
+        }
+      ],
       editor: [
         {
           email: `editeur.${Date.now()}@example.ma`,
           password: 'Test123!',
           profile: {
-            first_name: 'Hassan',
-            last_name: 'Kadiri',
-            phone: '+212-6-00-11-22-33',
-            institution: 'Éditions Tarik',
+            first_name: 'Mohammed',
+            last_name: 'Alaoui',
+            phone: '+212-5-22-45-67-89',
+            institution: 'Éditions du Maghreb',
           },
           registration_data: {
             type: 'morale',
-            nameAr: 'منشورات طارق',
-            nameFr: 'Éditions Tarik',
+            nameAr: 'منشورات المغرب',
+            nameFr: 'Éditions du Maghreb',
             commerceRegistry: `RC-2022-${Math.floor(Math.random() * 100000)}`,
-            contactPerson: 'Hassan Kadiri',
-            address: '15 Rue des Écrivains',
-            region: 'Rabat-Salé-Kénitra',
-            city: 'Rabat',
-          }
-        },
-        {
-          email: `editeur2.${Date.now()}@example.ma`,
-          password: 'Test123!',
-          profile: {
-            first_name: 'Amina',
-            last_name: 'Bekkali',
-            phone: '+212-6-44-55-66-77',
-            institution: 'Dar Nachr Al Maarifa',
-          },
-          registration_data: {
-            type: 'morale',
-            nameAr: 'دار نشر المعرفة',
-            nameFr: 'Dar Nachr Al Maarifa',
-            commerceRegistry: `RC-2023-${Math.floor(Math.random() * 100000)}`,
-            contactPerson: 'Amina Bekkali',
-            address: '89 Boulevard Hassan II',
+            contactPerson: 'Mohammed Alaoui',
+            address: '45 Avenue Hassan II',
             region: 'Casablanca-Settat',
             city: 'Casablanca',
           }
-        }
-      ],
+        },
       printer: [
         {
           email: `imprimeur.${Date.now()}@example.ma`,

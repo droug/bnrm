@@ -48,7 +48,7 @@ export function ProfessionalsList() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
   const [showInjectDialog, setShowInjectDialog] = useState(false);
-  const [selectedRoleToInject, setSelectedRoleToInject] = useState<string>("editor");
+  const [selectedRoleToInject, setSelectedRoleToInject] = useState<string>("");
 
   const { data: professionals, isLoading, refetch } = useQuery({
     queryKey: ["professionals"],
@@ -613,6 +613,7 @@ export function ProfessionalsList() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="author">Auteur</SelectItem>
                   <SelectItem value="editor">Éditeur</SelectItem>
                   <SelectItem value="printer">Imprimeur</SelectItem>
                   <SelectItem value="producer">Producteur</SelectItem>
@@ -622,10 +623,16 @@ export function ProfessionalsList() {
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setShowInjectDialog(false)}>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowInjectDialog(false)}
+              >
                 Annuler
               </Button>
-              <Button onClick={handleInjectData}>
+              <Button 
+                onClick={handleInjectData}
+                disabled={!selectedRoleToInject}
+              >
                 <Database className="mr-2 h-4 w-4" />
                 Injecter
               </Button>
