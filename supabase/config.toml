@@ -59,3 +59,6 @@ verify_jwt = true
 
 [functions.user-service]
 verify_jwt = true
+
+[functions.inject-professional-data]
+verify_jwt = true
