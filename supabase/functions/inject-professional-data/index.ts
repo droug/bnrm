@@ -14,7 +14,7 @@ serve(async (req) => {
   try {
     const { role } = await req.json();
 
-    if (!role || !['editor', 'printer', 'producer'].includes(role)) {
+    if (!role || !['editor', 'printer', 'producer', 'distributor'].includes(role)) {
       throw new Error('Type de professionnel invalide');
     }
 
@@ -153,6 +153,66 @@ serve(async (req) => {
             description: 'Spécialisés dans la création de livres illustrés pour enfants avec focus sur la culture marocaine.',
             address: '23 Boulevard Mohammed V',
             city: 'Agadir',
+          }
+        }
+      ],
+      distributor: [
+        {
+          email: `distributeur.${Date.now()}@example.ma`,
+          password: 'Test123!',
+          profile: {
+            first_name: 'Youssef',
+            last_name: 'Tazi',
+            phone: '+212-6-22-33-44-55',
+            institution: 'Distribution Nationale du Livre',
+          },
+          registration_data: {
+            companyName: 'Distribution Nationale du Livre',
+            legalForm: 'SARL',
+            registrationNumber: `RC-2021-${Math.floor(Math.random() * 100000)}`,
+            taxNumber: `IF-${Math.floor(Math.random() * 100000000)}`,
+            address: '12 Avenue des FAR',
+            city: 'Casablanca',
+            postalCode: '20250',
+            contactFirstName: 'Youssef',
+            contactLastName: 'Tazi',
+            phone: '+212-6-22-33-44-55',
+            website: 'https://dnl.ma',
+            distributionNetwork: 'National avec points de vente dans 8 villes',
+            territorialCoverage: 'Tout le territoire marocain',
+            storageCapacity: '50000 livres',
+            clientTypes: ['Librairies indépendantes', 'Grandes surfaces culturelles', 'Bibliothèques'],
+            experience: '15',
+            services: ['Distribution physique', 'Stockage et logistique', 'Marketing et promotion'],
+          }
+        },
+        {
+          email: `distributeur2.${Date.now()}@example.ma`,
+          password: 'Test123!',
+          profile: {
+            first_name: 'Laila',
+            last_name: 'Bennani',
+            phone: '+212-6-66-77-88-99',
+            institution: 'Diffusion Maghreb Livres',
+          },
+          registration_data: {
+            companyName: 'Diffusion Maghreb Livres',
+            legalForm: 'SA',
+            registrationNumber: `RC-2019-${Math.floor(Math.random() * 100000)}`,
+            taxNumber: `IF-${Math.floor(Math.random() * 100000000)}`,
+            address: '78 Boulevard Zerktouni',
+            city: 'Marrakech',
+            postalCode: '40000',
+            contactFirstName: 'Laila',
+            contactLastName: 'Bennani',
+            phone: '+212-6-66-77-88-99',
+            website: 'https://maghreblivres.ma',
+            distributionNetwork: 'Régional Sud avec expansion nationale',
+            territorialCoverage: 'Sud du Maroc et expansion',
+            storageCapacity: '35000 livres',
+            clientTypes: ['Librairies en ligne', 'Établissements scolaires', 'Kiosques à journaux'],
+            experience: '10',
+            services: ['Distribution numérique', 'Gestion des retours', 'Suivi des ventes'],
           }
         }
       ]
