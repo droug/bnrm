@@ -86,6 +86,7 @@ serve(async (req) => {
             city: 'Casablanca',
           }
         },
+      ],
       printer: [
         {
           email: `imprimeur.${Date.now()}@example.ma`,
