@@ -609,7 +609,7 @@ export function ProfessionalsList() {
               <label className="text-sm font-medium">Type de professionnel</label>
               <Select value={selectedRoleToInject} onValueChange={setSelectedRoleToInject}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Sélectionner un type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="author">Auteur</SelectItem>
