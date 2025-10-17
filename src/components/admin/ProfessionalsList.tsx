@@ -56,7 +56,7 @@ export function ProfessionalsList() {
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
-        .in("role", ["editor", "printer", "producer", "distributor"]);
+        .in("role", ["editor", "printer", "producer", "distributor", "author"]);
       
       if (error) throw error;
       
@@ -72,7 +72,7 @@ export function ProfessionalsList() {
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
         .select("user_id, role")
-        .in("role", ["editor", "printer", "producer", "distributor"]);
+        .in("role", ["editor", "printer", "producer", "distributor", "author"]);
 
       if (rolesError) throw rolesError;
 
@@ -134,6 +134,8 @@ export function ProfessionalsList() {
       editor: { label: "Éditeur", variant: "default" },
       printer: { label: "Imprimeur", variant: "secondary" },
       distributor: { label: "Distributeur", variant: "outline" },
+      producer: { label: "Producteur", variant: "default" },
+      author: { label: "Auteur", variant: "secondary" },
     };
     const roleInfo = roleMap[role] || { label: role, variant: "outline" as const };
     return <Badge variant={roleInfo.variant}>{roleInfo.label}</Badge>;
@@ -144,6 +146,8 @@ export function ProfessionalsList() {
       editor: "Éditeur",
       printer: "Imprimeur",
       distributor: "Distributeur",
+      producer: "Producteur",
+      author: "Auteur",
     };
     return labels[role] || role;
   };
@@ -301,6 +305,8 @@ export function ProfessionalsList() {
                   <SelectItem value="editor">Éditeur</SelectItem>
                   <SelectItem value="printer">Imprimeur</SelectItem>
                   <SelectItem value="distributor">Distributeur</SelectItem>
+                  <SelectItem value="producer">Producteur</SelectItem>
+                  <SelectItem value="author">Auteur</SelectItem>
                 </SelectContent>
             </Select>
 
