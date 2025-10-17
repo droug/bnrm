@@ -20,9 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, Search } from "lucide-react";
+import { Eye, Search, FileDown, Database } from "lucide-react";
 import { CustomDialog, CustomDialogContent, CustomDialogHeader, CustomDialogTitle, CustomDialogClose } from "@/components/ui/custom-portal-dialog";
 import { CreateTestProfessionalsButton } from "./CreateTestProfessionalsButton";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
+import { useToast } from "@/hooks/use-toast";
 
 interface Professional {
   user_id: string;
@@ -38,10 +42,13 @@ interface Professional {
 }
 
 export function ProfessionalsList() {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
+  const [showInjectDialog, setShowInjectDialog] = useState(false);
+  const [selectedRoleToInject, setSelectedRoleToInject] = useState<string>("editor");
 
   const { data: professionals, isLoading, refetch } = useQuery({
     queryKey: ["professionals"],
@@ -116,13 +123,135 @@ export function ProfessionalsList() {
     return <Badge variant={roleInfo.variant}>{roleInfo.label}</Badge>;
   };
 
+  const getRoleLabel = (role: string) => {
+    const labels: Record<string, string> = {
+      editor: "Éditeur",
+      printer: "Imprimeur",
+      producer: "Producteur",
+    };
+    return labels[role] || role;
+  };
+
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.text("Liste des Professionnels", 14, 20);
+    
+    doc.setFontSize(11);
+    doc.text(`Date: ${new Date().toLocaleDateString("fr-FR")}`, 14, 28);
+    doc.text(`Total: ${filteredProfessionals?.length || 0} professionnels`, 14, 34);
+
+    const tableData = filteredProfessionals?.map(prof => [
+      `${prof.first_name} ${prof.last_name}`,
+      prof.email,
+      prof.institution || "-",
+      getRoleLabel(prof.role),
+      prof.is_approved ? "Approuvé" : "En attente",
+      new Date(prof.created_at).toLocaleDateString("fr-FR"),
+    ]) || [];
+
+    autoTable(doc, {
+      startY: 40,
+      head: [["Nom", "Email", "Institution", "Rôle", "Statut", "Date"]],
+      body: tableData,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [139, 27, 27] },
+    });
+
+    doc.save(`professionnels_${new Date().getTime()}.pdf`);
+    
+    toast({
+      title: "Export réussi",
+      description: "Le PDF a été téléchargé avec succès",
+      className: "bg-green-50 border-green-200",
+    });
+  };
+
+  const handleExportExcel = () => {
+    const excelData = filteredProfessionals?.map(prof => ({
+      Nom: `${prof.first_name} ${prof.last_name}`,
+      Email: prof.email,
+      Téléphone: prof.phone || "-",
+      Institution: prof.institution || "-",
+      Rôle: getRoleLabel(prof.role),
+      Statut: prof.is_approved ? "Approuvé" : "En attente",
+      "Date d'inscription": new Date(prof.created_at).toLocaleDateString("fr-FR"),
+    })) || [];
+
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Professionnels");
+    
+    XLSX.writeFile(wb, `professionnels_${new Date().getTime()}.xlsx`);
+
+    toast({
+      title: "Export réussi",
+      description: "Le fichier Excel a été téléchargé avec succès",
+      className: "bg-green-50 border-green-200",
+    });
+  };
+
+  const handleInjectData = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('inject-professional-data', {
+        body: { role: selectedRoleToInject }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Injection réussie",
+        description: `${data.count || 0} professionnels de type "${getRoleLabel(selectedRoleToInject)}" ont été créés`,
+        className: "bg-green-50 border-green-200",
+      });
+
+      setShowInjectDialog(false);
+      refetch();
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible d'injecter les données",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <>
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Liste des Professionnels</CardTitle>
-            <CreateTestProfessionalsButton />
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportPDF}
+                disabled={!filteredProfessionals || filteredProfessionals.length === 0}
+              >
+                <FileDown className="mr-2 h-4 w-4" />
+                Export PDF
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportExcel}
+                disabled={!filteredProfessionals || filteredProfessionals.length === 0}
+              >
+                <FileDown className="mr-2 h-4 w-4" />
+                Export Excel
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowInjectDialog(true)}
+              >
+                <Database className="mr-2 h-4 w-4" />
+                Injecter données
+              </Button>
+              <CreateTestProfessionalsButton />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -455,6 +584,46 @@ export function ProfessionalsList() {
               )}
             </div>
           )}
+        </CustomDialogContent>
+      </CustomDialog>
+
+      {/* Dialogue d'injection de données */}
+      <CustomDialog open={showInjectDialog} onOpenChange={setShowInjectDialog}>
+        <CustomDialogContent>
+          <CustomDialogClose onClose={() => setShowInjectDialog(false)} />
+          <CustomDialogHeader>
+            <CustomDialogTitle>Injecter des données professionnelles</CustomDialogTitle>
+          </CustomDialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              Sélectionnez le type de professionnel pour lequel vous souhaitez générer des données de test.
+            </p>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Type de professionnel</label>
+              <Select value={selectedRoleToInject} onValueChange={setSelectedRoleToInject}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="editor">Éditeur</SelectItem>
+                  <SelectItem value="printer">Imprimeur</SelectItem>
+                  <SelectItem value="producer">Producteur</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setShowInjectDialog(false)}>
+                Annuler
+              </Button>
+              <Button onClick={handleInjectData}>
+                <Database className="mr-2 h-4 w-4" />
+                Injecter
+              </Button>
+            </div>
+          </div>
         </CustomDialogContent>
       </CustomDialog>
     </>
