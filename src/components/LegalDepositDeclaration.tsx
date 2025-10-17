@@ -2018,7 +2018,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
         request_number: requestNumber,
         support_type: 'imprime' as const,
         monograph_type: 'livres' as const,
-        status: isAmazonPublisher ? 'en_attente_validation_amazon' as const : 'brouillon' as const,
+        status: isAmazonPublisher ? 'en_attente_validation_b' as const : 'brouillon' as const,
         title: formData.title || 'Sans titre',
         author_name: formData.author_name || '',
         amazon_link: isAmazonPublisher ? amazonLink : null,

@@ -44,6 +44,9 @@ interface LegalDepositRequest {
   dl_number?: string;
   isbn_assigned?: string;
   issn_assigned?: string;
+  amazon_link?: string;
+  requires_amazon_validation?: boolean;
+  metadata?: any;
   initiator?: {
     company_name: string;
     professional_type: string;
@@ -129,6 +132,11 @@ export const LegalDepositBackoffice = () => {
       
       if (filters.support_type && filters.support_type !== "all") {
         query = query.eq('support_type', filters.support_type as any);
+      }
+
+      // Filtre Amazon
+      if (filters.professional_type === "amazon_only") {
+        query = query.eq('requires_amazon_validation', true);
       }
       
       if (filters.date_from) {
@@ -363,19 +371,25 @@ export const LegalDepositBackoffice = () => {
                 <SelectItem value="electronique">Électronique</SelectItem>
               </SelectContent>
             </Select>
+
+            <Select 
+              value={filters.professional_type} 
+              onValueChange={(value) => setFilters({ ...filters, professional_type: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Type professionnel" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous</SelectItem>
+                <SelectItem value="amazon_only">Dépôts Amazon uniquement</SelectItem>
+              </SelectContent>
+            </Select>
             
             <Input
               type="date"
               placeholder="Date début"
               value={filters.date_from}
               onChange={(e) => setFilters({ ...filters, date_from: e.target.value })}
-            />
-            
-            <Input
-              type="date"
-              placeholder="Date fin"
-              value={filters.date_to}
-              onChange={(e) => setFilters({ ...filters, date_to: e.target.value })}
             />
             
             <Button 
@@ -423,7 +437,16 @@ export const LegalDepositBackoffice = () => {
               ) : (
                 requests.map((request) => (
                   <TableRow key={request.id}>
-                    <TableCell className="font-medium">{request.request_number}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {request.request_number}
+                        {request.requires_amazon_validation && (
+                          <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 border-yellow-500/20">
+                            🔗 Amazon
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <div>
                         <p className="font-medium">{request.title}</p>
@@ -520,6 +543,39 @@ const RequestDetailsModal = ({ request, onUpdateStatus, onAssignNumbers }: {
         </TabsList>
         
         <TabsContent value="details" className="space-y-4">
+          {/* Amazon Link Display */}
+          {request.requires_amazon_validation && request.amazon_link && (
+            <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle className="h-5 w-5 text-yellow-700" />
+                <h4 className="font-medium text-yellow-700">Dépôt Amazon - Validation manuelle requise</h4>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Lien Amazon:</span>
+                  <a 
+                    href={request.amazon_link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                  >
+                    {request.amazon_link}
+                    <Eye className="h-3 w-3" />
+                  </a>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Vérifiez que les informations (Titre, Auteur, ISBN) correspondent à la page Amazon fournie.
+                </p>
+                {request.metadata?.publisher && (
+                  <div className="mt-2 p-2 bg-background rounded border">
+                    <p className="text-xs font-medium mb-1">Éditeur déclaré:</p>
+                    <p className="text-sm">{request.metadata.publisher.name}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <h4 className="font-medium mb-2">Informations de base</h4>
