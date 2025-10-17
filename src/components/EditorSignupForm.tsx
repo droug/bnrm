@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, User, Building } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { PhoneInput } from "@/components/ui/phone-input";
 
 interface EditorFormData {
   type: "morale" | "physique";
@@ -40,7 +39,7 @@ const EditorSignupForm = () => {
   const [formData, setFormData] = useState<EditorFormData>({
     type: "morale",
     email: "",
-    phone: "",
+    phone: "+212 ",
     address: "",
     region: "",
     city: "",
@@ -255,15 +254,24 @@ const EditorSignupForm = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Téléphone *</Label>
-                <PhoneInput
-                  id="phone"
-                  defaultCountry="MA"
-                  value={formData.phone}
-                  onChange={(value) => setFormData(prev => ({ ...prev, phone: value }))}
-                  placeholder="6 XX XX XX XX"
-                />
+                <div className="flex gap-2">
+                  <div className="flex items-center gap-2 px-3 py-2 border border-input rounded-lg bg-muted/30 min-w-[100px]">
+                    <span className="text-lg">🇲🇦</span>
+                    <span className="text-sm font-medium">+212</span>
+                  </div>
+                  <Input
+                    id="phone"
+                    value={formData.phone.replace('+212', '').trim()}
+                    onChange={(e) => {
+                      const phoneNumber = e.target.value.replace(/[^\d\s]/g, '');
+                      setFormData(prev => ({ ...prev, phone: `+212 ${phoneNumber}` }));
+                    }}
+                    placeholder="6 XX XX XX XX"
+                    className="flex-1"
+                  />
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  L'indicatif du pays est ajouté automatiquement selon votre sélection.
+                  Indicatif du Maroc (+212) uniquement
                 </p>
               </div>
             </div>
