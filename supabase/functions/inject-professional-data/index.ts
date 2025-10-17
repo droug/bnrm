@@ -13,14 +13,18 @@ serve(async (req) => {
 
   try {
     const { role } = await req.json();
+    console.log('📥 Requête reçue avec le rôle:', role);
 
     if (!role || !['author', 'editor', 'printer', 'producer', 'distributor'].includes(role)) {
+      console.error('❌ Type de professionnel invalide:', role);
       throw new Error('Type de professionnel invalide');
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
+    
+    console.log('✅ Client Supabase créé');
 
     const dataByRole: Record<string, any[]> = {
       author: [
@@ -236,10 +240,12 @@ serve(async (req) => {
     };
 
     const professionalsToCreate = dataByRole[role];
+    console.log(`📋 Nombre de professionnels à créer: ${professionalsToCreate?.length || 0}`);
     const results = [];
 
     for (const prof of professionalsToCreate) {
       try {
+        console.log(`👤 Création de l'utilisateur: ${prof.email}`);
         // Créer l'utilisateur
         const { data: authData, error: authError } = await supabase.auth.admin.createUser({
           email: prof.email,
@@ -270,17 +276,19 @@ serve(async (req) => {
           console.error(`Erreur profil ${prof.email}:`, profileError);
         }
 
-        // Attribuer le rôle
+        // Attribuer le rôle (cast explicite vers user_role)
         const { error: roleError } = await supabase
           .from('user_roles')
           .insert({
             user_id: authData.user.id,
-            role: role,
+            role: role as any, // Force le cast pour l'enum
             granted_by: authData.user.id,
           });
 
         if (roleError) {
-          console.error(`Erreur rôle ${prof.email}:`, roleError);
+          console.error(`❌ Erreur rôle ${prof.email}:`, roleError);
+        } else {
+          console.log(`✅ Rôle ${role} attribué à ${prof.email}`);
         }
 
         // Créer invitation et demande
@@ -326,6 +334,8 @@ serve(async (req) => {
         results.push({ email: prof.email, status: 'failed', error: String(err) });
       }
     }
+    
+    console.log('✅ Injection terminée avec succès. Résultats:', results);
 
     return new Response(
       JSON.stringify({ 
@@ -343,9 +353,14 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Erreur:', error);
+    console.error('💥 Erreur globale:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        success: false,
+        error: errorMessage,
+        details: error 
+      }),
       { 
         headers: { 
           ...corsHeaders, 

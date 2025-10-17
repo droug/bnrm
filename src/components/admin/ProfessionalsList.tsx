@@ -197,11 +197,18 @@ export function ProfessionalsList() {
 
   const handleInjectData = async () => {
     try {
+      console.log('🔧 Injection des données pour le rôle:', selectedRoleToInject);
+      
       const { data, error } = await supabase.functions.invoke('inject-professional-data', {
         body: { role: selectedRoleToInject }
       });
 
-      if (error) throw error;
+      console.log('📊 Réponse de la fonction:', { data, error });
+
+      if (error) {
+        console.error('❌ Erreur lors de l\'injection:', error);
+        throw error;
+      }
 
       toast({
         title: "Injection réussie",
@@ -210,8 +217,10 @@ export function ProfessionalsList() {
       });
 
       setShowInjectDialog(false);
+      setSelectedRoleToInject("");
       refetch();
     } catch (error: any) {
+      console.error('💥 Erreur complète:', error);
       toast({
         title: "Erreur",
         description: error.message || "Impossible d'injecter les données",
@@ -624,7 +633,10 @@ export function ProfessionalsList() {
             <div className="flex justify-end gap-2 pt-4">
               <Button 
                 variant="outline" 
-                onClick={() => setShowInjectDialog(false)}
+                onClick={() => {
+                  setShowInjectDialog(false);
+                  setSelectedRoleToInject("");
+                }}
               >
                 Annuler
               </Button>
