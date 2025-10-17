@@ -22,6 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { moroccanRegions, getCitiesByRegion } from "@/data/moroccanRegions";
 import { bookDisciplines } from "@/data/bookDisciplines";
 import { worldLanguages } from "@/data/worldLanguages";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 interface Publisher {
   id: string;
@@ -795,8 +796,18 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
+                  <Label>Pays</Label>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    L'indicatif du pays est ajouté automatiquement selon votre sélection.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
                   <Label>Téléphone</Label>
-                  <Input placeholder="Téléphone de l'imprimerie" />
+                  <PhoneInput 
+                    defaultCountry="MA"
+                    placeholder="6 XX XX XX XX"
+                  />
                 </div>
 
                 <div className="space-y-2">

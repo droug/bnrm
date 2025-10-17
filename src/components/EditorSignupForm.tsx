@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, User, Building } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 interface EditorFormData {
   type: "morale" | "physique";
@@ -254,12 +255,16 @@ const EditorSignupForm = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Téléphone *</Label>
-                <Input
+                <PhoneInput
                   id="phone"
+                  defaultCountry="MA"
                   value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  placeholder="+212 6 XX XX XX XX"
+                  onChange={(value) => setFormData(prev => ({ ...prev, phone: value }))}
+                  placeholder="6 XX XX XX XX"
                 />
+                <p className="text-xs text-muted-foreground">
+                  L'indicatif du pays est ajouté automatiquement selon votre sélection.
+                </p>
               </div>
             </div>
 

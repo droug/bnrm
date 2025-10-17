@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 const distributorSchema = z.object({
   companyName: z.string().min(2, "Nom de l'entreprise requis"),
@@ -22,7 +23,7 @@ const distributorSchema = z.object({
   contactFirstName: z.string().min(2, "Prénom du contact requis"),
   contactLastName: z.string().min(2, "Nom du contact requis"),
   email: z.string().email("Email invalide"),
-  phone: z.string().min(10, "Numéro de téléphone invalide"),
+  phone: z.string().min(8, "Numéro de téléphone invalide"),
   website: z.string().url("Site web invalide").optional().or(z.literal("")),
   distributionNetwork: z.string().min(1, "Réseau de distribution requis"),
   territorialCoverage: z.string().min(1, "Couverture territoriale requise"),
@@ -39,6 +40,7 @@ const DistributorSignupForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedClientTypes, setSelectedClientTypes] = useState<string[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [phoneValue, setPhoneValue] = useState("");
   const { toast } = useToast();
 
   const {
@@ -262,14 +264,22 @@ const DistributorSignupForm = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="phone">Téléphone *</Label>
-                <Input
+                <PhoneInput
                   id="phone"
-                  {...register("phone")}
-                  placeholder="+212 5 XX XX XX XX"
+                  defaultCountry="MA"
+                  value={phoneValue}
+                  onChange={(value) => {
+                    setPhoneValue(value);
+                    setValue("phone", value);
+                  }}
+                  placeholder="6 XX XX XX XX"
                 />
                 {errors.phone && (
                   <p className="text-sm text-destructive">{errors.phone.message}</p>
                 )}
+                <p className="text-xs text-muted-foreground">
+                  L'indicatif du pays est ajouté automatiquement selon votre sélection.
+                </p>
               </div>
             </div>
 

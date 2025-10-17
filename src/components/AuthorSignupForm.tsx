@@ -9,12 +9,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 const authorSchema = z.object({
   firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
   lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
   email: z.string().email("Email invalide"),
-  phone: z.string().min(10, "Numéro de téléphone invalide"),
+  phone: z.string().min(8, "Numéro de téléphone invalide"),
   dateOfBirth: z.string().min(1, "Date de naissance requise"),
   nationality: z.string().min(1, "Nationalité requise"),
   address: z.string().min(5, "Adresse complète requise"),
@@ -28,6 +29,7 @@ type AuthorFormData = z.infer<typeof authorSchema>;
 
 const AuthorSignupForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [phoneValue, setPhoneValue] = useState("");
   const { toast } = useToast();
 
   const {
@@ -112,14 +114,22 @@ const AuthorSignupForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="phone">Téléphone *</Label>
-              <Input
+              <PhoneInput
                 id="phone"
-                {...register("phone")}
-                placeholder="+212 6 XX XX XX XX"
+                defaultCountry="MA"
+                value={phoneValue}
+                onChange={(value) => {
+                  setPhoneValue(value);
+                  setValue("phone", value);
+                }}
+                placeholder="6 XX XX XX XX"
               />
               {errors.phone && (
                 <p className="text-sm text-destructive">{errors.phone.message}</p>
               )}
+              <p className="text-xs text-muted-foreground">
+                L'indicatif du pays est ajouté automatiquement selon votre sélection.
+              </p>
             </div>
 
             <div className="space-y-2">
