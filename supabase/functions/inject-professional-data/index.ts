@@ -225,6 +225,7 @@ serve(async (req) => {
     for (const prof of professionalsToCreate) {
       try {
         console.log(`👤 Création de l'utilisateur: ${prof.email}`);
+        
         // Créer l'utilisateur
         const { data: authData, error: authError } = await supabase.auth.admin.createUser({
           email: prof.email,
@@ -237,23 +238,36 @@ serve(async (req) => {
         });
 
         if (authError) {
-          console.error(`Erreur création auth ${prof.email}:`, authError);
+          console.error(`❌ Erreur création auth ${prof.email}:`, authError);
           results.push({ email: prof.email, status: 'failed', error: authError.message });
           continue;
         }
 
-        // Mettre à jour le profil
+        console.log(`✅ Utilisateur créé: ${authData.user.id}`);
+
+        // Créer ou mettre à jour le profil (garantir qu'il existe)
         const { error: profileError } = await supabase
           .from('profiles')
-          .update({
-            ...prof.profile,
+          .upsert({
+            user_id: authData.user.id,
+            first_name: prof.profile.first_name,
+            last_name: prof.profile.last_name,
+            phone: prof.profile.phone,
+            institution: prof.profile.institution,
             is_approved: true,
-          })
-          .eq('user_id', authData.user.id);
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }, {
+            onConflict: 'user_id'
+          });
 
         if (profileError) {
-          console.error(`Erreur profil ${prof.email}:`, profileError);
+          console.error(`❌ Erreur profil ${prof.email}:`, profileError);
+          results.push({ email: prof.email, status: 'failed', error: profileError.message });
+          continue;
         }
+
+        console.log(`✅ Profil créé pour ${prof.email}`);
 
         // Attribuer le rôle
         const { error: roleError } = await supabase
@@ -266,6 +280,8 @@ serve(async (req) => {
 
         if (roleError) {
           console.error(`❌ Erreur rôle ${prof.email}:`, roleError);
+          results.push({ email: prof.email, status: 'failed', error: roleError.message });
+          continue;
         } else {
           console.log(`✅ Rôle ${role} attribué à ${prof.email}`);
         }
