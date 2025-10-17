@@ -56,7 +56,7 @@ export function ProfessionalsList() {
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
         .select("user_id, role")
-        .in("role", ["editor", "printer", "producer", "distributor"]);
+        .in("role", ["author", "editor", "printer", "producer", "distributor"]);
 
       if (rolesError) throw rolesError;
 
@@ -115,10 +115,11 @@ export function ProfessionalsList() {
 
   const getRoleBadge = (role: string) => {
     const roleMap: Record<string, { label: string; variant: "default" | "secondary" | "outline" }> = {
-      editor: { label: "Éditeur", variant: "default" },
-      printer: { label: "Imprimeur", variant: "secondary" },
-      producer: { label: "Producteur", variant: "outline" },
-      distributor: { label: "Distributeur", variant: "default" },
+      author: { label: "Auteur", variant: "default" },
+      editor: { label: "Éditeur", variant: "secondary" },
+      printer: { label: "Imprimeur", variant: "outline" },
+      producer: { label: "Producteur", variant: "default" },
+      distributor: { label: "Distributeur", variant: "secondary" },
     };
     const roleInfo = roleMap[role] || { label: role, variant: "outline" as const };
     return <Badge variant={roleInfo.variant}>{roleInfo.label}</Badge>;
@@ -126,6 +127,7 @@ export function ProfessionalsList() {
 
   const getRoleLabel = (role: string) => {
     const labels: Record<string, string> = {
+      author: "Auteur",
       editor: "Éditeur",
       printer: "Imprimeur",
       producer: "Producteur",
@@ -275,6 +277,7 @@ export function ProfessionalsList() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous les rôles</SelectItem>
+                <SelectItem value="author">Auteur</SelectItem>
                 <SelectItem value="editor">Éditeur</SelectItem>
                 <SelectItem value="printer">Imprimeur</SelectItem>
                 <SelectItem value="producer">Producteur</SelectItem>
