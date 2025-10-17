@@ -483,6 +483,42 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
+                  <Label>Présence de matériel d'accompagnement <span className="text-destructive">*</span></Label>
+                  <SimpleDropdown
+                    placeholder="Sélectionner"
+                    value={formData.hasAccompanyingMaterial || ""}
+                    onChange={(value) => {
+                      setFormData({ 
+                        ...formData, 
+                        hasAccompanyingMaterial: value,
+                        accompanyingMaterialType: value === "no" ? "" : formData.accompanyingMaterialType
+                      });
+                    }}
+                    options={[
+                      { value: "yes", label: "Oui" },
+                      { value: "no", label: "Non" },
+                    ]}
+                  />
+                </div>
+
+                {formData.hasAccompanyingMaterial === "yes" && (
+                  <div className="space-y-2 animate-fade-in">
+                    <Label>Type de matériel d'accompagnement <span className="text-destructive">*</span></Label>
+                    <SimpleDropdown
+                      placeholder="Sélectionner le type"
+                      value={formData.accompanyingMaterialType || ""}
+                      onChange={(value) => setFormData({ ...formData, accompanyingMaterialType: value })}
+                      options={[
+                        { value: "cd", label: "CD" },
+                        { value: "usb", label: "Clé USB" },
+                        { value: "sd", label: "Carte SD" },
+                        { value: "other", label: "Autre" },
+                      ]}
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-2">
                   <Label>Titre de la collection</Label>
                   <Input placeholder="Titre de la collection" />
                 </div>
