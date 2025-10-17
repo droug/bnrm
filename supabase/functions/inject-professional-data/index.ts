@@ -276,12 +276,12 @@ serve(async (req) => {
           console.error(`Erreur profil ${prof.email}:`, profileError);
         }
 
-        // Attribuer le rôle (cast explicite vers user_role)
+        // Attribuer le rôle
         const { error: roleError } = await supabase
           .from('user_roles')
           .insert({
             user_id: authData.user.id,
-            role: role as any, // Force le cast pour l'enum
+            role: role,
             granted_by: authData.user.id,
           });
 
