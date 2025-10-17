@@ -1,6 +1,7 @@
 import { AdminHeader } from "@/components/AdminHeader";
 import { ProfessionalInvitationsManager } from "@/components/admin/ProfessionalInvitationsManager";
 import { ProfessionalRequestsManager } from "@/components/admin/ProfessionalRequestsManager";
+import { ProfessionalsList } from "@/components/admin/ProfessionalsList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ProfessionalManagement() {
@@ -15,11 +16,16 @@ export default function ProfessionalManagement() {
           </p>
         </div>
 
-        <Tabs defaultValue="approvals" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="list" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="list">Liste des Professionnels</TabsTrigger>
             <TabsTrigger value="approvals">Gestion des Demandes</TabsTrigger>
             <TabsTrigger value="invitations">Invitations</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="list">
+            <ProfessionalsList />
+          </TabsContent>
 
           <TabsContent value="approvals">
             <ProfessionalRequestsManager />
