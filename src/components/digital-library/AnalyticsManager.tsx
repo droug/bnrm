@@ -1,6 +1,6 @@
 import { useState } from "react";
 import jsPDF from "jspdf";
-import logoImage from "@/assets/logo-bnrm.png";
+import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -102,11 +102,12 @@ export default function AnalyticsManager() {
     });
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     const pdf = new jsPDF();
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    let yPos = 20;
+    let yPos = await addBNRMHeader(pdf);
+    yPos += 10;
 
     // Couleurs du design system (Zellige Marocain)
     const colors = {
@@ -157,16 +158,7 @@ export default function AnalyticsManager() {
       pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
       pdf.rect(0, 0, pageWidth, 35, 'F');
       
-      // Logo (si première page)
-      if (isFirstPage) {
-        const img = new Image();
-        img.src = logoImage;
-        try {
-          pdf.addImage(img, 'PNG', 15, 8, 25, 20);
-        } catch (e) {
-          console.log('Logo non chargé');
-        }
-      }
+      // Logo non utilisé ici, voir addBNRMHeader pour l'en-tête officiel
       
       // Titre
       pdf.setTextColor(255, 255, 255);

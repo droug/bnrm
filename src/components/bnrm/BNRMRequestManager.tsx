@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import jsPDF from 'jspdf';
 import { supabase } from "@/integrations/supabase/client";
+import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -530,21 +531,13 @@ export const BNRMRequestManager = () => {
     }
   };
 
-  const generateRejectionLetter = (request: DepositRequest) => {
+  const generateRejectionLetter = async (request: DepositRequest) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
-    // En-tête avec logo officiel centré
-    const logoWidth = 180;
-    const logoHeight = 25;
-    const logoX = (pageWidth - logoWidth) / 2;
-    doc.addImage(logoOfficiel, 'PNG', logoX, 10, logoWidth, logoHeight);
-
-    // Ligne de séparation
-    doc.setDrawColor(139, 0, 0);
-    doc.setLineWidth(0.5);
-    doc.line(15, 40, pageWidth - 15, 40);
+    // En-tête officiel BNRM
+    const headerYReq = await addBNRMHeader(doc);
 
     // Informations expéditeur
     doc.setFontSize(9);
@@ -608,87 +601,87 @@ export const BNRMRequestManager = () => {
     doc.setFont(undefined, 'normal');
     doc.setTextColor(40, 40, 40);
     
-    let yPos = 155;
+    let yPosReq = 155;
     const lineHeight = 6;
     const marginLeft = 15;
     const marginRight = 15;
     const maxWidth = pageWidth - marginLeft - marginRight;
 
-    doc.text("Madame, Monsieur,", marginLeft, yPos);
-    yPos += lineHeight * 1.5;
+    doc.text("Madame, Monsieur,", marginLeft, yPosReq);
+    yPosReq += lineHeight * 1.5;
 
     const para1 = `Nous accusons réception de votre demande de dépôt légal portant le numéro ${request.deposit_number}, concernant l'ouvrage intitulé "${request.metadata.publication?.title}" de ${request.metadata.publication?.author}.`;
     const para1Lines = doc.splitTextToSize(para1, maxWidth);
-    doc.text(para1Lines, marginLeft, yPos);
-    yPos += para1Lines.length * lineHeight + 4;
+    doc.text(para1Lines, marginLeft, yPosReq);
+    yPosReq += para1Lines.length * lineHeight + 4;
 
     const para2 = "Après examen attentif de votre demande par nos services compétents, nous avons le regret de vous informer que celle-ci ne peut être validée pour les raisons suivantes :";
     const para2Lines = doc.splitTextToSize(para2, maxWidth);
-    doc.text(para2Lines, marginLeft, yPos);
-    yPos += para2Lines.length * lineHeight + 4;
+    doc.text(para2Lines, marginLeft, yPosReq);
+    yPosReq += para2Lines.length * lineHeight + 4;
 
     // Motif rejet
     const reason = request.metadata.validation_dlbn?.rejection_reason || request.metadata.validation_abn?.rejection_reason || "Non conforme aux exigences réglementaires";
     doc.setFillColor(255, 240, 240);
     doc.setDrawColor(220, 53, 69);
     doc.setLineWidth(0.5);
-    doc.roundedRect(marginLeft, yPos - 2, maxWidth, 25, 2, 2, 'FD');
+    doc.roundedRect(marginLeft, yPosReq - 2, maxWidth, 25, 2, 2, 'FD');
     
     doc.setFont(undefined, 'bold');
     doc.setTextColor(139, 0, 0);
     doc.setFontSize(9);
-    doc.text("MOTIF(S) DE REJET :", marginLeft + 2, yPos + 4);
+    doc.text("MOTIF(S) DE REJET :", marginLeft + 2, yPosReq + 4);
     doc.setFont(undefined, 'normal');
     doc.setTextColor(60, 60, 60);
     const reasonLines = doc.splitTextToSize(reason, maxWidth - 4);
-    doc.text(reasonLines, marginLeft + 2, yPos + 10);
-    yPos += 29;
+    doc.text(reasonLines, marginLeft + 2, yPosReq + 10);
+    yPosReq += 29;
 
     // Conformité légale
     doc.setFontSize(10);
     doc.setTextColor(40, 40, 40);
     const para3 = "Cette décision a été prise en conformité avec les dispositions de la loi n° 67-99 relative au dépôt légal et de ses textes d'application.";
     const para3Lines = doc.splitTextToSize(para3, maxWidth);
-    doc.text(para3Lines, marginLeft, yPos);
-    yPos += para3Lines.length * lineHeight + 6;
+    doc.text(para3Lines, marginLeft, yPosReq);
+    yPosReq += para3Lines.length * lineHeight + 6;
 
     // Recours
     doc.setFillColor(240, 248, 255);
     doc.setDrawColor(0, 123, 255);
     doc.setLineWidth(0.5);
-    doc.roundedRect(marginLeft, yPos - 2, maxWidth, 22, 2, 2, 'FD');
+    doc.roundedRect(marginLeft, yPosReq - 2, maxWidth, 22, 2, 2, 'FD');
     
     doc.setFont(undefined, 'bold');
     doc.setTextColor(0, 51, 102);
     doc.setFontSize(9);
-    doc.text("POSSIBILITÉ DE RECOURS :", marginLeft + 2, yPos + 4);
+    doc.text("POSSIBILITÉ DE RECOURS :", marginLeft + 2, yPosReq + 4);
     doc.setFont(undefined, 'normal');
     doc.setTextColor(40, 40, 40);
     const recours = "Vous disposez d'un délai de 30 jours pour soumettre une nouvelle demande rectifiée avec les documents requis.";
     const recoursLines = doc.splitTextToSize(recours, maxWidth - 4);
-    doc.text(recoursLines, marginLeft + 2, yPos + 10);
-    yPos += 26;
+    doc.text(recoursLines, marginLeft + 2, yPosReq + 10);
+    yPosReq += 26;
 
     // Formule de politesse
     const closing = "Nous vous prions d'agréer, Madame, Monsieur, l'expression de nos salutations distinguées.";
     const closingLines = doc.splitTextToSize(closing, maxWidth);
-    doc.text(closingLines, marginLeft, yPos);
-    yPos += closingLines.length * lineHeight + 10;
+    doc.text(closingLines, marginLeft, yPosReq);
+    yPosReq += closingLines.length * lineHeight + 10;
 
     // Signature
     doc.setFont(undefined, 'bold');
     doc.setFontSize(11);
     doc.setTextColor(0, 51, 102);
-    doc.text("Le Chef du Département", pageWidth - 15, yPos, { align: 'right' });
-    doc.text("Agence Bibliographique Nationale", pageWidth - 15, yPos + 6, { align: 'right' });
+    doc.text("Le Chef du Département", pageWidth - 15, yPosReq, { align: 'right' });
+    doc.text("Agence Bibliographique Nationale", pageWidth - 15, yPosReq + 6, { align: 'right' });
     
     // Cachet
     doc.setDrawColor(0, 51, 102);
     doc.setLineWidth(0.5);
-    doc.circle(pageWidth - 35, yPos + 18, 12, 'S');
+    doc.circle(pageWidth - 35, yPosReq + 18, 12, 'S');
     doc.setFontSize(7);
-    doc.text("BNRM", pageWidth - 35, yPos + 17, { align: 'center' });
-    doc.text("ABN", pageWidth - 35, yPos + 20, { align: 'center' });
+    doc.text("BNRM", pageWidth - 35, yPosReq + 17, { align: 'center' });
+    doc.text("ABN", pageWidth - 35, yPosReq + 20, { align: 'center' });
 
     // Footer
     doc.setDrawColor(139, 0, 0);

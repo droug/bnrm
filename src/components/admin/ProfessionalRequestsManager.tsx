@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { CheckCircle2, XCircle, FileText, Eye, Edit, Archive, Trash2, FileDown, FileCheck } from 'lucide-react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
 
 interface ProfessionalRequest {
   id: string;
@@ -261,23 +262,12 @@ export function ProfessionalRequestsManager() {
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
 
-    // En-tête institutionnel
-    doc.setFillColor(139, 27, 27); // Grenat BNRM
-    doc.rect(0, 0, pageWidth, 35, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Bibliothèque Nationale du Royaume du Maroc', pageWidth / 2, 15, { align: 'center' });
-    
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Avenue Ibn Battouta - B.P. 1003 - Rabat', pageWidth / 2, 22, { align: 'center' });
-    doc.text('Tél: +212 (0)5 37 77 18 79 - www.bnrm.ma', pageWidth / 2, 28, { align: 'center' });
+    // En-tête officiel BNRM
+    let yPos = await addBNRMHeader(doc);
+    yPos += 5;
 
     // Corps du document
     doc.setTextColor(0, 0, 0);
-    let yPos = 50;
 
     // Date et numéro
     doc.setFontSize(10);

@@ -14,6 +14,7 @@ import { CheckCircle, XCircle, Eye, Clock, FileText, Download, AlertCircle, Chec
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import jsPDF from "jspdf";
+import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
 
 interface DepositRequest {
   id: string;
@@ -203,49 +204,66 @@ export function DepositValidationWorkflow() {
   const generateValidationForm = async (request: DepositRequest) => {
     const doc = new jsPDF();
     
-    doc.setFontSize(20);
-    doc.text("Bibliothèque Nationale du Royaume du Maroc", 105, 20, { align: "center" });
+    // En-tête officiel BNRM
+    let yPos = await addBNRMHeader(doc);
+    yPos += 10;
+    
     doc.setFontSize(16);
-    doc.text("Formulaire Canevas de Validation", 105, 30, { align: "center" });
+    doc.text("Formulaire Canevas de Validation", 105, yPos, { align: "center" });
+    yPos += 10;
     
     doc.setLineWidth(0.5);
-    doc.line(20, 35, 190, 35);
+    doc.line(20, yPos, 190, yPos);
+    yPos += 10;
     
     doc.setFontSize(12);
-    doc.text("Numéro de demande:", 20, 50);
+    doc.text("Numéro de demande:", 20, yPos);
     doc.setFont(undefined, "bold");
-    doc.text(request.request_number, 80, 50);
+    doc.text(request.request_number, 80, yPos);
+    yPos += 10;
     
     doc.setFont(undefined, "normal");
-    doc.text("Date de validation:", 20, 60);
+    doc.text("Date de validation:", 20, yPos);
     doc.setFont(undefined, "bold");
-    doc.text(format(new Date(), "dd/MM/yyyy à HH:mm", { locale: fr }), 80, 60);
+    doc.text(format(new Date(), "dd/MM/yyyy à HH:mm", { locale: fr }), 80, yPos);
+    yPos += 15;
     
     doc.setFont(undefined, "normal");
     doc.setFontSize(14);
-    doc.text("Détails de la Publication", 20, 75);
+    doc.text("Détails de la Publication", 20, yPos);
+    yPos += 2;
     doc.setLineWidth(0.3);
-    doc.line(20, 77, 100, 77);
+    doc.line(20, yPos, 100, yPos);
+    yPos += 8;
     
     doc.setFontSize(11);
-    doc.text("Titre:", 20, 85);
-    doc.text(request.title, 20, 92);
+    doc.text("Titre:", 20, yPos);
+    yPos += 7;
+    doc.text(request.title, 20, yPos);
+    yPos += 8;
     
     if (request.subtitle) {
-      doc.text("Sous-titre:", 20, 100);
-      doc.text(request.subtitle, 20, 107);
+      doc.text("Sous-titre:", 20, yPos);
+      yPos += 7;
+      doc.text(request.subtitle, 20, yPos);
+      yPos += 8;
     }
     
-    doc.text("Type de support:", 20, 115);
-    doc.text(request.support_type, 20, 122);
+    doc.text("Type de support:", 20, yPos);
+    yPos += 7;
+    doc.text(request.support_type, 20, yPos);
+    yPos += 15;
     
     doc.setFontSize(14);
-    doc.text("Validation Service DLBN", 20, 140);
-    doc.line(20, 142, 100, 142);
+    doc.text("Validation Service DLBN", 20, yPos);
+    yPos += 2;
+    doc.line(20, yPos, 100, yPos);
+    yPos += 8;
     
     doc.setFontSize(11);
-    doc.text("Statut: APPROUVÉ", 20, 150);
-    doc.text(`Date: ${format(new Date(), "dd/MM/yyyy", { locale: fr })}`, 20, 157);
+    doc.text("Statut: APPROUVÉ", 20, yPos);
+    yPos += 7;
+    doc.text(`Date: ${format(new Date(), "dd/MM/yyyy", { locale: fr })}`, 20, yPos);
     
     doc.setFontSize(9);
     doc.text("Ce document certifie la conformité de la demande de dépôt légal.", 105, 280, { align: "center" });
@@ -257,17 +275,23 @@ export function DepositValidationWorkflow() {
   const generateRejectionLetter = async (request: DepositRequest) => {
     const doc = new jsPDF();
     
-    doc.setFontSize(20);
-    doc.text("Bibliothèque Nationale du Royaume du Maroc", 105, 20, { align: "center" });
+    // En-tête officiel BNRM
+    let yPos = await addBNRMHeader(doc);
+    yPos += 10;
+    
     doc.setFontSize(14);
-    doc.text("Service du Dépôt Légal", 105, 28, { align: "center" });
+    doc.text("Service du Dépôt Légal", 105, yPos, { align: "center" });
+    yPos += 10;
     
     doc.setLineWidth(0.5);
-    doc.line(20, 35, 190, 35);
+    doc.line(20, yPos, 190, yPos);
+    yPos += 10;
     
     doc.setFontSize(11);
-    doc.text(`Rabat, le ${format(new Date(), "dd MMMM yyyy", { locale: fr })}`, 140, 45);
-    doc.text(`Réf: ${request.request_number}`, 20, 55);
+    doc.text(`Rabat, le ${format(new Date(), "dd MMMM yyyy", { locale: fr })}`, 140, yPos);
+    yPos += 5;
+    doc.text(`Réf: ${request.request_number}`, 20, yPos);
+    yPos += 15;
     
     doc.setFontSize(12);
     doc.setFont(undefined, "bold");
@@ -296,10 +320,10 @@ export function DepositValidationWorkflow() {
       "Nous vous prions d'agréer, Madame, Monsieur, l'expression de nos salutations distinguées.",
     ];
     
-    let yPos = 85;
+    let yPosBody = 85;
     bodyText.forEach((line) => {
-      doc.text(line, 20, yPos);
-      yPos += 7;
+      doc.text(line, 20, yPosBody);
+      yPosBody += 7;
     });
     
     doc.setFont(undefined, "bold");

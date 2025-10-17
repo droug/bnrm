@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bell, Mail, FileText, Calendar, Send, Settings, AlertCircle, CheckCircle, Clock, XCircle, X, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from 'jspdf';
-import logoOfficiel from "@/assets/logo-bnrm-officiel.png";
+import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
 
 interface EditorialMonitoringItem {
   id: string;
@@ -141,21 +141,13 @@ export default function BNRMEditorialMonitoring() {
     );
   };
 
-  const generateClaimLetter = (item: EditorialMonitoringItem) => {
+  const generateClaimLetter = async (item: EditorialMonitoringItem) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
-    // En-tête avec logo officiel centré
-    const logoWidth = 180;
-    const logoHeight = 25;
-    const logoX = (pageWidth - logoWidth) / 2;
-    doc.addImage(logoOfficiel, 'PNG', logoX, 10, logoWidth, logoHeight);
-
-    // Ligne de séparation décorative
-    doc.setDrawColor(139, 0, 0); // Couleur bordeaux
-    doc.setLineWidth(0.5);
-    doc.line(15, 40, pageWidth - 15, 40);
+    // En-tête officiel BNRM
+    const headerY = await addBNRMHeader(doc);
 
     // Informations de l'expéditeur (à gauche)
     doc.setFontSize(9);
@@ -314,21 +306,13 @@ export default function BNRMEditorialMonitoring() {
     toast.success("Lettre de réclamation générée avec succès");
   };
 
-  const generateRejectionLetter = (item: EditorialMonitoringItem, reason: string) => {
+  const generateRejectionLetter = async (item: EditorialMonitoringItem, reason: string) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
-    // En-tête avec logo officiel centré
-    const logoWidth = 180;
-    const logoHeight = 25;
-    const logoX = (pageWidth - logoWidth) / 2;
-    doc.addImage(logoOfficiel, 'PNG', logoX, 10, logoWidth, logoHeight);
-
-    // Ligne de séparation décorative
-    doc.setDrawColor(139, 0, 0);
-    doc.setLineWidth(0.5);
-    doc.line(15, 40, pageWidth - 15, 40);
+    // En-tête officiel BNRM
+    const headerYReject = await addBNRMHeader(doc);
 
     // Informations de l'expéditeur
     doc.setFontSize(9);
@@ -394,95 +378,95 @@ export default function BNRMEditorialMonitoring() {
     doc.setFont(undefined, 'normal');
     doc.setTextColor(40, 40, 40);
     
-    let yPos = 155;
+    let yPosReject = 155;
     const lineHeight = 6;
     const marginLeft = 15;
     const marginRight = 15;
     const maxWidth = pageWidth - marginLeft - marginRight;
 
     // Salutation
-    doc.text("Madame, Monsieur,", marginLeft, yPos);
-    yPos += lineHeight * 1.5;
+    doc.text("Madame, Monsieur,", marginLeft, yPosReject);
+    yPosReject += lineHeight * 1.5;
 
     // Paragraphe 1 - Accusé de réception
     const para1 = `Nous accusons réception de votre demande de dépôt légal portant le numéro ${item.dlNumber}, concernant l'ouvrage intitulé "${item.title}" de ${item.author}, reçue en date du ${new Date(item.attributionDate).toLocaleDateString('fr-FR')}.`;
     const para1Lines = doc.splitTextToSize(para1, maxWidth);
-    doc.text(para1Lines, marginLeft, yPos);
-    yPos += para1Lines.length * lineHeight + 4;
+    doc.text(para1Lines, marginLeft, yPosReject);
+    yPosReject += para1Lines.length * lineHeight + 4;
 
     // Paragraphe 2 - Analyse et décision
     const para2 = "Après examen attentif de votre demande par nos services compétents, nous avons le regret de vous informer que celle-ci ne peut être validée pour les raisons suivantes :";
     const para2Lines = doc.splitTextToSize(para2, maxWidth);
-    doc.text(para2Lines, marginLeft, yPos);
-    yPos += para2Lines.length * lineHeight + 4;
+    doc.text(para2Lines, marginLeft, yPosReject);
+    yPosReject += para2Lines.length * lineHeight + 4;
 
     // Encadré avec motif de rejet
     doc.setFillColor(255, 240, 240);
     doc.setDrawColor(220, 53, 69);
     doc.setLineWidth(0.5);
-    doc.roundedRect(marginLeft, yPos - 2, maxWidth, 25, 2, 2, 'FD');
+    doc.roundedRect(marginLeft, yPosReject - 2, maxWidth, 25, 2, 2, 'FD');
     
     doc.setFont(undefined, 'bold');
     doc.setTextColor(139, 0, 0);
     doc.setFontSize(9);
-    doc.text("MOTIF(S) DE REJET :", marginLeft + 2, yPos + 4);
+    doc.text("MOTIF(S) DE REJET :", marginLeft + 2, yPosReject + 4);
     doc.setFont(undefined, 'normal');
     doc.setTextColor(60, 60, 60);
     const reasonLines = doc.splitTextToSize(reason, maxWidth - 4);
-    doc.text(reasonLines, marginLeft + 2, yPos + 10);
-    yPos += 29;
+    doc.text(reasonLines, marginLeft + 2, yPosReject + 10);
+    yPosReject += 29;
 
     // Paragraphe 3 - Conformité légale
     doc.setFontSize(10);
     doc.setTextColor(40, 40, 40);
     const para3 = "Cette décision a été prise en conformité avec les dispositions de la loi n° 67-99 relative au dépôt légal et de ses textes d'application, notamment les articles régissant les conditions et critères d'attribution du numéro de dépôt légal.";
     const para3Lines = doc.splitTextToSize(para3, maxWidth);
-    doc.text(para3Lines, marginLeft, yPos);
-    yPos += para3Lines.length * lineHeight + 6;
+    doc.text(para3Lines, marginLeft, yPosReject);
+    yPosReject += para3Lines.length * lineHeight + 6;
 
     // Encadré avec recours possible
     doc.setFillColor(240, 248, 255);
     doc.setDrawColor(0, 123, 255);
     doc.setLineWidth(0.5);
-    doc.roundedRect(marginLeft, yPos - 2, maxWidth, 22, 2, 2, 'FD');
+    doc.roundedRect(marginLeft, yPosReject - 2, maxWidth, 22, 2, 2, 'FD');
     
     doc.setFont(undefined, 'bold');
     doc.setTextColor(0, 51, 102);
     doc.setFontSize(9);
-    doc.text("POSSIBILITÉ DE RECOURS :", marginLeft + 2, yPos + 4);
+    doc.text("POSSIBILITÉ DE RECOURS :", marginLeft + 2, yPosReject + 4);
     doc.setFont(undefined, 'normal');
     doc.setTextColor(40, 40, 40);
-    const recours = "Vous disposez d'un délai de 30 jours à compter de la réception de cette lettre pour soumettre une nouvelle demande rectifiée, accompagnée des documents et justificatifs requis.";
+    const recours = "Vous disposez d'un délai de 30 jours à compter de la réception de cette lettre pour soumet une nouvelle demande rectifiée, accompagnée des documents et justificatifs requis.";
     const recoursLines = doc.splitTextToSize(recours, maxWidth - 4);
-    doc.text(recoursLines, marginLeft + 2, yPos + 10);
-    yPos += 26;
+    doc.text(recoursLines, marginLeft + 2, yPosReject + 10);
+    yPosReject += 26;
 
     // Paragraphe 4 - Assistance
     const para4 = "Nos services restent à votre disposition pour toute information complémentaire ou assistance dans la préparation d'une nouvelle demande conforme aux exigences réglementaires.";
     const para4Lines = doc.splitTextToSize(para4, maxWidth);
-    doc.text(para4Lines, marginLeft, yPos);
-    yPos += para4Lines.length * lineHeight + 6;
+    doc.text(para4Lines, marginLeft, yPosReject);
+    yPosReject += para4Lines.length * lineHeight + 6;
 
     // Formule de politesse
     const closing = "Nous vous prions d'agréer, Madame, Monsieur, l'expression de nos salutations distinguées.";
     const closingLines = doc.splitTextToSize(closing, maxWidth);
-    doc.text(closingLines, marginLeft, yPos);
-    yPos += closingLines.length * lineHeight + 10;
+    doc.text(closingLines, marginLeft, yPosReject);
+    yPosReject += closingLines.length * lineHeight + 10;
 
     // Signature
     doc.setFont(undefined, 'bold');
     doc.setFontSize(11);
     doc.setTextColor(0, 51, 102);
-    doc.text("Le Chef du Département", pageWidth - 15, yPos, { align: 'right' });
-    doc.text("Agence Bibliographique Nationale", pageWidth - 15, yPos + 6, { align: 'right' });
+    doc.text("Le Chef du Département", pageWidth - 15, yPosReject, { align: 'right' });
+    doc.text("Agence Bibliographique Nationale", pageWidth - 15, yPosReject + 6, { align: 'right' });
     
     // Cachet (simulé)
     doc.setDrawColor(0, 51, 102);
     doc.setLineWidth(0.5);
-    doc.circle(pageWidth - 35, yPos + 18, 12, 'S');
+    doc.circle(pageWidth - 35, yPosReject + 18, 12, 'S');
     doc.setFontSize(7);
-    doc.text("BNRM", pageWidth - 35, yPos + 17, { align: 'center' });
-    doc.text("ABN", pageWidth - 35, yPos + 20, { align: 'center' });
+    doc.text("BNRM", pageWidth - 35, yPosReject + 17, { align: 'center' });
+    doc.text("ABN", pageWidth - 35, yPosReject + 20, { align: 'center' });
 
     // Ligne de séparation footer
     doc.setDrawColor(139, 0, 0);
