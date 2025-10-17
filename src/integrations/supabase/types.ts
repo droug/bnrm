@@ -1923,6 +1923,7 @@ export type Database = {
       }
       legal_deposit_requests: {
         Row: {
+          amazon_link: string | null
           attribution_date: string | null
           author_name: string | null
           collaborator_id: string | null
@@ -1952,6 +1953,7 @@ export type Database = {
           rejected_by: string | null
           rejection_reason: string | null
           request_number: string
+          requires_amazon_validation: boolean | null
           service_validated_at: string | null
           service_validation_notes: string | null
           status: Database["public"]["Enums"]["deposit_status"] | null
@@ -1967,6 +1969,7 @@ export type Database = {
           validation_code: string | null
         }
         Insert: {
+          amazon_link?: string | null
           attribution_date?: string | null
           author_name?: string | null
           collaborator_id?: string | null
@@ -1996,6 +1999,7 @@ export type Database = {
           rejected_by?: string | null
           rejection_reason?: string | null
           request_number: string
+          requires_amazon_validation?: boolean | null
           service_validated_at?: string | null
           service_validation_notes?: string | null
           status?: Database["public"]["Enums"]["deposit_status"] | null
@@ -2011,6 +2015,7 @@ export type Database = {
           validation_code?: string | null
         }
         Update: {
+          amazon_link?: string | null
           attribution_date?: string | null
           author_name?: string | null
           collaborator_id?: string | null
@@ -2040,6 +2045,7 @@ export type Database = {
           rejected_by?: string | null
           rejection_reason?: string | null
           request_number?: string
+          requires_amazon_validation?: boolean | null
           service_validated_at?: string | null
           service_validation_notes?: string | null
           status?: Database["public"]["Enums"]["deposit_status"] | null
