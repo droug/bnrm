@@ -20,12 +20,7 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, serviceRoleKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    });
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     const dataByRole: Record<string, any[]> = {
       author: [
@@ -243,70 +238,92 @@ serve(async (req) => {
     const results = [];
 
     for (const prof of professionalsToCreate) {
-      // Créer l'utilisateur
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: prof.email,
-        password: prof.password,
-        email_confirm: true,
-        user_metadata: {
-          first_name: prof.profile.first_name,
-          last_name: prof.profile.last_name,
-        }
-      });
-
-      if (authError) {
-        console.error(`Erreur création ${prof.email}:`, authError);
-        continue;
-      }
-
-      // Mettre à jour le profil
-      await supabase
-        .from('profiles')
-        .update({
-          ...prof.profile,
-          is_approved: true,
-        })
-        .eq('user_id', authData.user.id);
-
-      // Attribuer le rôle
-      await supabase
-        .from('user_roles')
-        .insert({
-          user_id: authData.user.id,
-          role: role,
-          granted_by: authData.user.id,
+      try {
+        // Créer l'utilisateur
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+          email: prof.email,
+          password: prof.password,
+          email_confirm: true,
+          user_metadata: {
+            first_name: prof.profile.first_name,
+            last_name: prof.profile.last_name,
+          }
         });
 
-      // Créer invitation et demande
-      const { data: invitation } = await supabase
-        .from('professional_invitations')
-        .insert({
-          email: prof.email,
-          professional_type: role,
-          last_deposit_number: `DL-2024-${Math.floor(Math.random() * 100000).toString().padStart(6, '0')}`,
-          status: 'used',
-        })
-        .select()
-        .single();
+        if (authError) {
+          console.error(`Erreur création auth ${prof.email}:`, authError);
+          results.push({ email: prof.email, status: 'failed', error: authError.message });
+          continue;
+        }
 
-      if (invitation) {
-        await supabase
-          .from('professional_registration_requests')
+        // Mettre à jour le profil
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            ...prof.profile,
+            is_approved: true,
+          })
+          .eq('user_id', authData.user.id);
+
+        if (profileError) {
+          console.error(`Erreur profil ${prof.email}:`, profileError);
+        }
+
+        // Attribuer le rôle
+        const { error: roleError } = await supabase
+          .from('user_roles')
           .insert({
             user_id: authData.user.id,
-            professional_type: role,
-            company_name: prof.registration_data.nameFr || prof.registration_data.companyName || prof.profile.institution,
-            verified_deposit_number: invitation.last_deposit_number,
-            invitation_id: invitation.id,
-            cndp_acceptance: true,
-            registration_data: prof.registration_data,
-            status: 'approved',
-            reviewed_by: authData.user.id,
-            reviewed_at: new Date().toISOString(),
+            role: role,
+            granted_by: authData.user.id,
           });
-      }
 
-      results.push({ email: prof.email, status: 'success' });
+        if (roleError) {
+          console.error(`Erreur rôle ${prof.email}:`, roleError);
+        }
+
+        // Créer invitation et demande
+        const { data: invitation, error: invitError } = await supabase
+          .from('professional_invitations')
+          .insert({
+            email: prof.email,
+            professional_type: role,
+            last_deposit_number: `DL-2024-${Math.floor(Math.random() * 100000).toString().padStart(6, '0')}`,
+            status: 'used',
+          })
+          .select()
+          .single();
+
+        if (invitError) {
+          console.error(`Erreur invitation ${prof.email}:`, invitError);
+        }
+
+        if (invitation) {
+          const { error: requestError } = await supabase
+            .from('professional_registration_requests')
+            .insert({
+              user_id: authData.user.id,
+              professional_type: role,
+              company_name: prof.registration_data.nameFr || prof.registration_data.companyName || prof.profile.institution,
+              verified_deposit_number: invitation.last_deposit_number,
+              invitation_id: invitation.id,
+              cndp_acceptance: true,
+              registration_data: prof.registration_data,
+              status: 'approved',
+              reviewed_by: authData.user.id,
+              reviewed_at: new Date().toISOString(),
+            });
+
+          if (requestError) {
+            console.error(`Erreur demande inscription ${prof.email}:`, requestError);
+          }
+        }
+
+        results.push({ email: prof.email, status: 'success' });
+      } catch (err) {
+        console.error(`Erreur globale ${prof.email}:`, err);
+        results.push({ email: prof.email, status: 'failed', error: String(err) });
+      }
     }
 
     return new Response(

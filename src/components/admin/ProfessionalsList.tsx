@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/select";
 import { Eye, Search, FileDown, Database } from "lucide-react";
 import { CustomDialog, CustomDialogContent, CustomDialogHeader, CustomDialogTitle, CustomDialogClose } from "@/components/ui/custom-portal-dialog";
-import { CreateTestProfessionalsButton } from "./CreateTestProfessionalsButton";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
@@ -254,7 +253,7 @@ export function ProfessionalsList() {
                 <Database className="mr-2 h-4 w-4" />
                 Injecter données
               </Button>
-              <CreateTestProfessionalsButton />
+              
             </div>
           </div>
         </CardHeader>
