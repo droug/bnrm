@@ -60,6 +60,7 @@ export function ProfessionalRequestsManager() {
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showDocPreview, setShowDocPreview] = useState(false);
+  const [showRejectionDialog, setShowRejectionDialog] = useState(false);
 
   useEffect(() => {
     loadRequests();
@@ -170,8 +171,12 @@ export function ProfessionalRequestsManager() {
     setLoading(false);
   };
 
+  const handleOpenRejectionDialog = () => {
+    setShowRejectionDialog(true);
+  };
+
   const handleReject = async () => {
-    if (!selectedRequest || !rejectionReason) {
+    if (!selectedRequest || !rejectionReason.trim()) {
       toast({
         title: 'Erreur',
         description: 'Veuillez saisir la raison du refus',
@@ -209,6 +214,7 @@ export function ProfessionalRequestsManager() {
         variant: 'destructive'
       });
 
+      setShowRejectionDialog(false);
       setSelectedRequest(null);
       setRejectionReason('');
       loadRequests();
@@ -617,18 +623,6 @@ export function ProfessionalRequestsManager() {
                 />
               </div>
 
-              {/* Raison de refus */}
-              {selectedRequest.status === 'pending' && (
-                <div className="form-card">
-                  <h3 className="form-section-title">Raison du refus (si applicable)</h3>
-                  <Textarea
-                    placeholder="Saisissez la raison du refus..."
-                    value={rejectionReason}
-                    onChange={(e) => setRejectionReason(e.target.value)}
-                    rows={3}
-                  />
-                </div>
-              )}
 
               {/* Historique d'activité */}
               <div className="form-card">
@@ -665,9 +659,9 @@ export function ProfessionalRequestsManager() {
                         Valider la demande
                       </Button>
                       <Button
-                        onClick={handleReject}
-                        disabled={loading || !rejectionReason}
-                        variant="destructive"
+                        onClick={handleOpenRejectionDialog}
+                        disabled={loading || selectedRequest.status !== 'pending'}
+                        className="bg-[#C62828] hover:bg-[#B71C1C] text-white disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <XCircle className="h-4 w-4 mr-2" />
                         Refuser la demande
@@ -709,6 +703,53 @@ export function ProfessionalRequestsManager() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Pop-up Raison du refus */}
+      <Dialog open={showRejectionDialog} onOpenChange={setShowRejectionDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#C62828] flex items-center gap-2">
+              <XCircle className="h-5 w-5" />
+              Raison du refus de la demande
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="rejection-reason" className="text-sm font-medium">
+                Veuillez indiquer la raison du refus <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="rejection-reason"
+                placeholder="Saisissez la raison du refus..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows={3}
+                className="resize-none"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowRejectionDialog(false);
+                setRejectionReason('');
+              }}
+              disabled={loading}
+              className="bg-[#E0E0E0] hover:bg-[#BDBDBD] text-gray-700"
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={handleReject}
+              disabled={loading || !rejectionReason.trim()}
+              className="bg-[#C62828] hover:bg-[#B71C1C] text-white"
+            >
+              {loading ? 'Traitement...' : 'Confirmer le refus'}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

@@ -15,18 +15,18 @@ export default function ProfessionalManagement() {
           </p>
         </div>
 
-        <Tabs defaultValue="invitations" className="space-y-6">
+        <Tabs defaultValue="approvals" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="approvals">Gestion des Demandes</TabsTrigger>
             <TabsTrigger value="invitations">Invitations</TabsTrigger>
-            <TabsTrigger value="approvals">Validations</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="invitations">
-            <ProfessionalInvitationsManager />
-          </TabsContent>
 
           <TabsContent value="approvals">
             <ProfessionalRequestsManager />
+          </TabsContent>
+
+          <TabsContent value="invitations">
+            <ProfessionalInvitationsManager />
           </TabsContent>
         </Tabs>
       </div>
