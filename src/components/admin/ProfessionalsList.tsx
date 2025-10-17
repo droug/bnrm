@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Eye, Search } from "lucide-react";
 import { CustomDialog, CustomDialogContent, CustomDialogHeader, CustomDialogTitle, CustomDialogClose } from "@/components/ui/custom-portal-dialog";
+import { CreateTestProfessionalsButton } from "./CreateTestProfessionalsButton";
 
 interface Professional {
   user_id: string;
@@ -33,6 +34,7 @@ interface Professional {
   role: string;
   is_approved: boolean;
   created_at: string;
+  registration_data?: any;
 }
 
 export function ProfessionalsList() {
@@ -41,7 +43,7 @@ export function ProfessionalsList() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
 
-  const { data: professionals, isLoading } = useQuery({
+  const { data: professionals, isLoading, refetch } = useQuery({
     queryKey: ["professionals"],
     queryFn: async () => {
       const { data: userRoles, error: rolesError } = await supabase
@@ -67,13 +69,23 @@ export function ProfessionalsList() {
       
       const users = usersData?.users || [];
 
+      // Récupérer les données d'inscription
+      const { data: registrations } = await supabase
+        .from("professional_registration_requests")
+        .select("*")
+        .in("user_id", userIds)
+        .eq("status", "approved");
+
       return (profiles || []).map(profile => {
         const userRole = userRoles?.find(r => r.user_id === profile.user_id);
         const authUser = users.find((u: any) => u.id === profile.user_id);
+        const registration = registrations?.find(r => r.user_id === profile.user_id);
+        
         return {
           ...profile,
           role: userRole?.role || "unknown",
           email: authUser?.email || "",
+          registration_data: registration?.registration_data,
         };
       });
     },
@@ -108,7 +120,10 @@ export function ProfessionalsList() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Liste des Professionnels</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Liste des Professionnels</CardTitle>
+            <CreateTestProfessionalsButton />
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Filtres */}
@@ -201,52 +216,243 @@ export function ProfessionalsList() {
 
       {/* Modale de visualisation */}
       <CustomDialog open={!!selectedProfessional} onOpenChange={() => setSelectedProfessional(null)}>
-        <CustomDialogContent className="max-w-2xl">
+        <CustomDialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <CustomDialogClose onClose={() => setSelectedProfessional(null)} />
           <CustomDialogHeader>
-            <CustomDialogTitle>Détails du Professionnel</CustomDialogTitle>
+            <CustomDialogTitle>Fiche Professionnelle Complète</CustomDialogTitle>
           </CustomDialogHeader>
           
           {selectedProfessional && (
-            <div className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Nom complet</p>
-                  <p className="text-base font-medium">
-                    {selectedProfessional.first_name} {selectedProfessional.last_name}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Rôle</p>
-                  <div className="mt-1">{getRoleBadge(selectedProfessional.role)}</div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Email</p>
-                  <p className="text-base">{selectedProfessional.email}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Téléphone</p>
-                  <p className="text-base">{selectedProfessional.phone || "-"}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-sm font-medium text-muted-foreground">Institution</p>
-                  <p className="text-base">{selectedProfessional.institution || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Statut</p>
-                  <div className="mt-1">
-                    <Badge variant={selectedProfessional.is_approved ? "default" : "secondary"}>
-                      {selectedProfessional.is_approved ? "Approuvé" : "En attente"}
-                    </Badge>
+            <div className="space-y-6 py-4">
+              {/* Informations générales */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold border-b pb-2">Informations Générales</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Nom complet</p>
+                    <p className="text-base font-medium">
+                      {selectedProfessional.first_name} {selectedProfessional.last_name}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Rôle</p>
+                    <div className="mt-1">{getRoleBadge(selectedProfessional.role)}</div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Email</p>
+                    <p className="text-base">{selectedProfessional.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Téléphone</p>
+                    <p className="text-base">{selectedProfessional.phone || "-"}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-sm font-medium text-muted-foreground">Institution</p>
+                    <p className="text-base">{selectedProfessional.institution || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Statut</p>
+                    <div className="mt-1">
+                      <Badge variant={selectedProfessional.is_approved ? "default" : "secondary"}>
+                        {selectedProfessional.is_approved ? "Approuvé" : "En attente"}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Date d'inscription</p>
+                    <p className="text-base">
+                      {new Date(selectedProfessional.created_at).toLocaleDateString("fr-FR")}
+                    </p>
                   </div>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Date d'inscription</p>
-                  <p className="text-base">
-                    {new Date(selectedProfessional.created_at).toLocaleDateString("fr-FR")}
-                  </p>
-                </div>
               </div>
+
+              {/* Informations spécifiques selon le rôle */}
+              {selectedProfessional.registration_data && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold border-b pb-2">
+                    Informations {selectedProfessional.role === 'editor' ? "de l'Éditeur" : 
+                                  selectedProfessional.role === 'printer' ? "de l'Imprimeur" : 
+                                  "du Producteur"}
+                  </h3>
+
+                  {/* Éditeur */}
+                  {selectedProfessional.role === 'editor' && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Type</p>
+                        <p className="text-base">
+                          {selectedProfessional.registration_data.type === 'morale' ? 'Personne Morale' : 'Personne Physique'}
+                        </p>
+                      </div>
+                      {selectedProfessional.registration_data.nameAr && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Nom (Arabe)</p>
+                          <p className="text-base">{selectedProfessional.registration_data.nameAr}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.nameFr && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Nom (Français)</p>
+                          <p className="text-base">{selectedProfessional.registration_data.nameFr}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.commerceRegistry && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Registre de Commerce</p>
+                          <p className="text-base">{selectedProfessional.registration_data.commerceRegistry}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.contactPerson && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Personne de Contact</p>
+                          <p className="text-base">{selectedProfessional.registration_data.contactPerson}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.cin && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">CIN</p>
+                          <p className="text-base">{selectedProfessional.registration_data.cin}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.address && (
+                        <div className="col-span-2">
+                          <p className="text-sm font-medium text-muted-foreground">Adresse</p>
+                          <p className="text-base">{selectedProfessional.registration_data.address}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.region && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Région</p>
+                          <p className="text-base">{selectedProfessional.registration_data.region}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.city && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Ville</p>
+                          <p className="text-base">{selectedProfessional.registration_data.city}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Imprimeur */}
+                  {selectedProfessional.role === 'printer' && (
+                    <div className="grid grid-cols-2 gap-4">
+                      {selectedProfessional.registration_data.nameAr && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Nom (Arabe)</p>
+                          <p className="text-base">{selectedProfessional.registration_data.nameAr}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.nameFr && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Nom (Français)</p>
+                          <p className="text-base">{selectedProfessional.registration_data.nameFr}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.commerceRegistry && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Registre de Commerce</p>
+                          <p className="text-base">{selectedProfessional.registration_data.commerceRegistry}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.contactPerson && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Personne de Contact</p>
+                          <p className="text-base">{selectedProfessional.registration_data.contactPerson}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.address && (
+                        <div className="col-span-2">
+                          <p className="text-sm font-medium text-muted-foreground">Adresse</p>
+                          <p className="text-base">{selectedProfessional.registration_data.address}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.region && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Région</p>
+                          <p className="text-base">{selectedProfessional.registration_data.region}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.city && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Ville</p>
+                          <p className="text-base">{selectedProfessional.registration_data.city}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Producteur */}
+                  {selectedProfessional.role === 'producer' && (
+                    <div className="grid grid-cols-2 gap-4">
+                      {selectedProfessional.registration_data.companyName && (
+                        <div className="col-span-2">
+                          <p className="text-sm font-medium text-muted-foreground">Nom de l'Entreprise</p>
+                          <p className="text-base font-medium">{selectedProfessional.registration_data.companyName}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.companyRegistrationNumber && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">N° d'Enregistrement</p>
+                          <p className="text-base">{selectedProfessional.registration_data.companyRegistrationNumber}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.taxIdentificationNumber && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Identifiant Fiscal</p>
+                          <p className="text-base">{selectedProfessional.registration_data.taxIdentificationNumber}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.productionType && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Type de Production</p>
+                          <p className="text-base">{selectedProfessional.registration_data.productionType}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.productionCapacity && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Capacité de Production</p>
+                          <p className="text-base">{selectedProfessional.registration_data.productionCapacity}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.yearsOfExperience && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Années d'Expérience</p>
+                          <p className="text-base">{selectedProfessional.registration_data.yearsOfExperience} ans</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.website && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Site Web</p>
+                          <a href={selectedProfessional.registration_data.website} target="_blank" rel="noopener noreferrer" className="text-base text-primary hover:underline">
+                            {selectedProfessional.registration_data.website}
+                          </a>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.address && (
+                        <div className="col-span-2">
+                          <p className="text-sm font-medium text-muted-foreground">Adresse</p>
+                          <p className="text-base">{selectedProfessional.registration_data.address}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.city && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Ville</p>
+                          <p className="text-base">{selectedProfessional.registration_data.city}</p>
+                        </div>
+                      )}
+                      {selectedProfessional.registration_data.description && (
+                        <div className="col-span-2">
+                          <p className="text-sm font-medium text-muted-foreground">Description</p>
+                          <p className="text-base text-muted-foreground">{selectedProfessional.registration_data.description}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </CustomDialogContent>
