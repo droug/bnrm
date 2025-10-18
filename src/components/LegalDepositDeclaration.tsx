@@ -95,6 +95,10 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   });
   const [printerCountry, setPrinterCountry] = useState<string>("");
   const [openPrinterCountry, setOpenPrinterCountry] = useState(false);
+  const [directorRegion, setDirectorRegion] = useState<string>("");
+  const [directorRegionSearch, setDirectorRegionSearch] = useState<string>("");
+  const [directorCity, setDirectorCity] = useState<string>("");
+  const [directorCitySearch, setDirectorCitySearch] = useState<string>("");
 
   // Fetch publication types from database
   useEffect(() => {
@@ -1039,8 +1043,113 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Adresse</Label>
-                  <Textarea placeholder="Adresse" />
+                  <Label>Région</Label>
+                  <div className="relative">
+                    <Input
+                      placeholder="Rechercher une région..."
+                      value={directorRegionSearch}
+                      onChange={(e) => setDirectorRegionSearch(e.target.value)}
+                      className="pr-10"
+                    />
+                    {directorRegionSearch && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-40" 
+                          onClick={() => setDirectorRegionSearch('')}
+                        />
+                        <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                          {moroccanRegions
+                            .filter(region => 
+                              region.name.toLowerCase().includes(directorRegionSearch.toLowerCase())
+                            )
+                            .map((region) => (
+                              <button
+                                key={region.name}
+                                type="button"
+                                className="w-full text-left px-4 py-2 hover:bg-accent transition-colors flex items-center justify-between"
+                                onClick={() => {
+                                  setDirectorRegion(region.name);
+                                  setDirectorCity('');
+                                  setDirectorRegionSearch('');
+                                }}
+                              >
+                                <span>{region.name}</span>
+                                {directorRegion === region.name && (
+                                  <span className="text-primary">✓</span>
+                                )}
+                              </button>
+                            ))}
+                          {moroccanRegions.filter(region => 
+                            region.name.toLowerCase().includes(directorRegionSearch.toLowerCase())
+                          ).length === 0 && (
+                            <div className="px-4 py-2 text-sm text-muted-foreground">
+                              Aucune région trouvée
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  {directorRegion && (
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Région sélectionnée: {directorRegion}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Ville</Label>
+                  <div className="relative">
+                    <Input
+                      placeholder={directorRegion ? "Rechercher une ville..." : "Sélectionnez d'abord une région"}
+                      value={directorCitySearch}
+                      onChange={(e) => setDirectorCitySearch(e.target.value)}
+                      disabled={!directorRegion}
+                      className="pr-10"
+                    />
+                    {directorCitySearch && directorRegion && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-40" 
+                          onClick={() => setDirectorCitySearch('')}
+                        />
+                        <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                          {getCitiesByRegion(directorRegion)
+                            .filter(city => 
+                              city.toLowerCase().includes(directorCitySearch.toLowerCase())
+                            )
+                            .map((city) => (
+                              <button
+                                key={city}
+                                type="button"
+                                className="w-full text-left px-4 py-2 hover:bg-accent transition-colors flex items-center justify-between"
+                                onClick={() => {
+                                  setDirectorCity(city);
+                                  setDirectorCitySearch('');
+                                }}
+                              >
+                                <span>{city}</span>
+                                {directorCity === city && (
+                                  <span className="text-primary">✓</span>
+                                )}
+                              </button>
+                            ))}
+                          {getCitiesByRegion(directorRegion).filter(city => 
+                            city.toLowerCase().includes(directorCitySearch.toLowerCase())
+                          ).length === 0 && (
+                            <div className="px-4 py-2 text-sm text-muted-foreground">
+                              Aucune ville trouvée
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  {directorCity && (
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Ville sélectionnée: {directorCity}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
