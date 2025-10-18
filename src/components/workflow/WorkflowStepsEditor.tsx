@@ -12,13 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SimpleRoleSelector } from "./SimpleRoleSelector";
 import {
   Sheet,
   SheetContent,
@@ -297,45 +291,33 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
 
             <div className="space-y-2">
               <Label htmlFor="step_type">Type d'étape *</Label>
-              <Select
+              <SimpleRoleSelector
                 value={formData.step_type}
-                onValueChange={(value) =>
+                onChange={(value) =>
                   setFormData({ ...formData, step_type: value })
                 }
-              >
-                <SelectTrigger id="step_type">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="approval">Approbation</SelectItem>
-                  <SelectItem value="review">Révision</SelectItem>
-                  <SelectItem value="validation">Validation</SelectItem>
-                  <SelectItem value="processing">Traitement</SelectItem>
-                  <SelectItem value="notification">Notification</SelectItem>
-                  <SelectItem value="decision">Décision</SelectItem>
-                </SelectContent>
-              </Select>
+                roles={[
+                  { id: "approval", role_name: "Approbation" },
+                  { id: "review", role_name: "Révision" },
+                  { id: "validation", role_name: "Validation" },
+                  { id: "processing", role_name: "Traitement" },
+                  { id: "notification", role_name: "Notification" },
+                  { id: "decision", role_name: "Décision" },
+                ]}
+                placeholder="Sélectionner un type..."
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="required_role">Rôle requis</Label>
-              <Select
-                value={formData.required_role || undefined}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, required_role: value })
+              <SimpleRoleSelector
+                value={formData.required_role || ""}
+                onChange={(value) =>
+                  setFormData({ ...formData, required_role: value || null })
                 }
-              >
-                <SelectTrigger id="required_role">
-                  <SelectValue placeholder="Aucun rôle spécifique" />
-                </SelectTrigger>
-                <SelectContent>
-                  {roles.map((role) => (
-                    <SelectItem key={role.id} value={role.role_name}>
-                      {role.role_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                roles={roles.map(r => ({ id: r.role_name, role_name: r.role_name }))}
+                placeholder="Aucun rôle spécifique"
+              />
             </div>
 
             <div className="space-y-2">

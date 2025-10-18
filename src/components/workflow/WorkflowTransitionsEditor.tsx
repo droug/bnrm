@@ -18,13 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SimpleRoleSelector } from "./SimpleRoleSelector";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Plus, Edit, Trash2, ArrowRight } from "lucide-react";
@@ -167,48 +161,30 @@ export function WorkflowTransitionsEditor({ workflowId }: WorkflowTransitionsEdi
             </div>
             <div className="space-y-2">
               <Label>De l'étape</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner une étape" />
-                </SelectTrigger>
-                <SelectContent>
-                  {steps.map((step) => (
-                    <SelectItem key={step.id} value={step.id}>
-                      {step.step_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SimpleRoleSelector
+                value=""
+                onChange={() => {}}
+                roles={steps.map(s => ({ id: s.id, role_name: s.step_name }))}
+                placeholder="Sélectionner une étape"
+              />
             </div>
             <div className="space-y-2">
               <Label>À l'étape</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner une étape" />
-                </SelectTrigger>
-                <SelectContent>
-                  {steps.map((step) => (
-                    <SelectItem key={step.id} value={step.id}>
-                      {step.step_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SimpleRoleSelector
+                value=""
+                onChange={() => {}}
+                roles={steps.map(s => ({ id: s.id, role_name: s.step_name }))}
+                placeholder="Sélectionner une étape"
+              />
             </div>
             <div className="space-y-2">
               <Label>Rôle responsable</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un rôle" />
-                </SelectTrigger>
-                <SelectContent>
-                  {roles.map((role) => (
-                    <SelectItem key={role.id} value={role.id}>
-                      {role.role_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SimpleRoleSelector
+                value=""
+                onChange={() => {}}
+                roles={roles}
+                placeholder="Sélectionner un rôle"
+              />
             </div>
           </div>
         </SheetContent>

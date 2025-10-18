@@ -10,13 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SimpleRoleSelector } from "./SimpleRoleSelector";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
@@ -141,35 +135,22 @@ export function CreateStepDialog({ open, onOpenChange, workflowId, onSaved }: Cr
             <Label htmlFor="step-type">
               Type d'étape <span className="text-destructive">*</span>
             </Label>
-            <Select value={stepType} onValueChange={setStepType}>
-              <SelectTrigger id="step-type">
-                <SelectValue placeholder="Sélectionner un type..." />
-              </SelectTrigger>
-              <SelectContent>
-                {STEP_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SimpleRoleSelector
+              value={stepType}
+              onChange={setStepType}
+              roles={STEP_TYPES.map(t => ({ id: t.value, role_name: t.label }))}
+              placeholder="Sélectionner un type..."
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="required-role">Rôle requis</Label>
-            <Select value={requiredRole} onValueChange={setRequiredRole}>
-              <SelectTrigger id="required-role">
-                <SelectValue placeholder="Sélectionner un rôle..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Aucun rôle spécifique</SelectItem>
-                {roles.map((role) => (
-                  <SelectItem key={role.id} value={role.role_name}>
-                    {role.role_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SimpleRoleSelector
+              value={requiredRole}
+              onChange={setRequiredRole}
+              roles={[{ id: "none", role_name: "Aucun rôle spécifique" }, ...roles]}
+              placeholder="Sélectionner un rôle..."
+            />
           </div>
 
           <div className="space-y-2">

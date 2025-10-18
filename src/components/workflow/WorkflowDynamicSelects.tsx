@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SimpleRoleSelector } from "./SimpleRoleSelector";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -357,27 +358,13 @@ export function WorkflowDynamicSelects() {
           <CardContent className="pt-6">
             <div className="space-y-3">
               <Label>Rôle</Label>
-              <Select 
-                value={selectedRole} 
-                onValueChange={setSelectedRole}
+              <SimpleRoleSelector
+                value={selectedRole}
+                onChange={setSelectedRole}
+                roles={filteredRoles}
+                placeholder="Choisir un rôle..."
                 disabled={!selectedStep}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir un rôle..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredRoles.map((role) => (
-                    <SelectItem key={role.id} value={role.id}>
-                      <div className="flex items-center gap-2">
-                        <span>{role.role_name}</span>
-                        <Badge variant="secondary" className="ml-2">
-                          {role.module}
-                        </Badge>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
               {getRoleInfo() && (
                 <div className="p-3 bg-muted rounded-md text-sm">
                   <p className="font-medium">{getRoleInfo()?.role_name}</p>
