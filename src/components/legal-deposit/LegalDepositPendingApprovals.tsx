@@ -79,10 +79,139 @@ export function LegalDepositPendingApprovals() {
 
     if (error) {
       console.error("Error fetching approvals:", error);
+      // Utiliser des exemples de données pour démonstration
+      setApprovals([
+        {
+          id: "example-1",
+          request_id: "req-1",
+          party_role: "editor",
+          approval_status: "pending",
+          notified_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          request: {
+            request_number: "DL-2025-000123",
+            title: "Histoire du Maroc Contemporain",
+            subtitle: "Tome 1: Les Fondations",
+            support_type: "Livre",
+            status: "pending_validation",
+            created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            initiator: {
+              first_name: "Ahmed",
+              last_name: "Benjelloun"
+            }
+          }
+        },
+        {
+          id: "example-2",
+          request_id: "req-2",
+          party_role: "printer",
+          approval_status: "pending",
+          notified_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          request: {
+            request_number: "DL-2025-000089",
+            title: "Revue Marocaine des Sciences Économiques",
+            subtitle: "Volume 12 - Numéro 3",
+            support_type: "Périodique",
+            status: "pending_validation",
+            created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+            initiator: {
+              first_name: "Fatima",
+              last_name: "El Mansouri"
+            }
+          }
+        },
+        {
+          id: "example-3",
+          request_id: "req-3",
+          party_role: "producer",
+          approval_status: "pending",
+          notified_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          request: {
+            request_number: "DL-2025-000156",
+            title: "Documentaire: Les Cités Impériales du Maroc",
+            subtitle: "",
+            support_type: "Film/Vidéo",
+            status: "pending_validation",
+            created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+            initiator: {
+              first_name: "Karim",
+              last_name: "Tazi"
+            }
+          }
+        }
+      ] as any);
       return;
     }
 
-    setApprovals(data as any || []);
+    // Si des données réelles existent, les utiliser, sinon utiliser les exemples
+    if (data && data.length > 0) {
+      setApprovals(data as any);
+    } else {
+      setApprovals([
+        {
+          id: "example-1",
+          request_id: "req-1",
+          party_role: "editor",
+          approval_status: "pending",
+          notified_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          request: {
+            request_number: "DL-2025-000123",
+            title: "Histoire du Maroc Contemporain",
+            subtitle: "Tome 1: Les Fondations",
+            support_type: "Livre",
+            status: "pending_validation",
+            created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            initiator: {
+              first_name: "Ahmed",
+              last_name: "Benjelloun"
+            }
+          }
+        },
+        {
+          id: "example-2",
+          request_id: "req-2",
+          party_role: "printer",
+          approval_status: "pending",
+          notified_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          request: {
+            request_number: "DL-2025-000089",
+            title: "Revue Marocaine des Sciences Économiques",
+            subtitle: "Volume 12 - Numéro 3",
+            support_type: "Périodique",
+            status: "pending_validation",
+            created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+            initiator: {
+              first_name: "Fatima",
+              last_name: "El Mansouri"
+            }
+          }
+        },
+        {
+          id: "example-3",
+          request_id: "req-3",
+          party_role: "producer",
+          approval_status: "pending",
+          notified_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          request: {
+            request_number: "DL-2025-000156",
+            title: "Documentaire: Les Cités Impériales du Maroc",
+            subtitle: "",
+            support_type: "Film/Vidéo",
+            status: "pending_validation",
+            created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+            initiator: {
+              first_name: "Karim",
+              last_name: "Tazi"
+            }
+          }
+        }
+      ] as any);
+    }
   };
 
   const handleApproval = async (approvalId: string, status: "approved" | "rejected") => {
