@@ -13,7 +13,7 @@ import { SimpleRoleSelector } from "./SimpleRoleSelector";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, RefreshCw, Workflow, GitBranch, Users, ArrowRight, Trash2, Save, AlertTriangle } from "lucide-react";
+import { Plus, RefreshCw, Workflow, GitBranch, Users, ArrowRight, Trash2, Save, AlertTriangle, CheckCircle } from "lucide-react";
 import { CreateWorkflowDialog } from "./CreateWorkflowDialog";
 import { CreateStepDialog } from "./CreateStepDialog";
 import { CreateRoleDialog } from "./CreateRoleDialog";
@@ -762,6 +762,20 @@ export function WorkflowDynamicSelects() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Bouton de validation final */}
+      {selectedWorkflow && (
+        <div className="flex justify-center mt-8">
+          <Button 
+            size="lg"
+            onClick={handleSaveWorkflow}
+            className="bg-[#194D9B] hover:bg-[#194D9B]/90 text-white px-12 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+          >
+            <CheckCircle className="h-6 w-6 mr-3" />
+            💾 Valider et Enregistrer le Workflow
+          </Button>
+        </div>
       )}
 
       {/* Dialogues de création */}
