@@ -241,6 +241,69 @@ export function DepositValidationWorkflow() {
     setIsLoading(true);
 
     try {
+      // Pour les exemples, simuler une mise à jour
+      if (requestId.startsWith("example-")) {
+        // Mise à jour locale pour les exemples
+        const updatedRequests = requests.map(req => {
+          if (req.id === requestId) {
+            const updatedRequest = { ...req };
+            
+            if (status === "approved") {
+              if (validationType === "service") {
+                updatedRequest.validated_by_service = user!.id;
+                updatedRequest.service_validated_at = new Date().toISOString();
+                updatedRequest.service_validation_notes = comments || null;
+                updatedRequest.status = "en_attente_validation_b";
+              } else if (validationType === "department") {
+                updatedRequest.validated_by_department = user!.id;
+                updatedRequest.department_validated_at = new Date().toISOString();
+                updatedRequest.department_validation_notes = comments || null;
+                updatedRequest.status = "en_attente_comite_validation";
+              } else if (validationType === "committee") {
+                updatedRequest.validated_by_committee = user!.id;
+                updatedRequest.committee_validated_at = new Date().toISOString();
+                updatedRequest.committee_validation_notes = comments || null;
+                updatedRequest.status = "valide_par_comite";
+              }
+            } else {
+              updatedRequest.rejected_by = user!.id;
+              updatedRequest.rejected_at = new Date().toISOString();
+              updatedRequest.rejection_reason = comments || null;
+              
+              if (validationType === "service") {
+                updatedRequest.status = "rejete_par_b";
+              } else if (validationType === "committee") {
+                updatedRequest.status = "rejete_par_comite";
+              } else {
+                updatedRequest.status = "rejete";
+              }
+            }
+            
+            return updatedRequest;
+          }
+          return req;
+        });
+        
+        setRequests(updatedRequests);
+        
+        // Générer le document approprié
+        if (status === "approved" && validationType === "service") {
+          await generateValidationForm(selectedRequest!);
+        } else if (status === "rejected") {
+          await generateRejectionLetter(selectedRequest!);
+        }
+        
+        toast({
+          title: "Succès",
+          description: `Demande ${status === "approved" ? "approuvée" : "rejetée"} avec succès (données d'exemple)`,
+        });
+        
+        setSelectedRequest(null);
+        setComments("");
+        return;
+      }
+      
+      // Pour les vraies données, utiliser Supabase
       const updateData: any = {};
 
       if (status === "approved") {
