@@ -26,22 +26,25 @@ export function CreateTestDepositButton() {
       }
 
       if (data?.success) {
-        toast.success(
-          <div className="space-y-2">
-            <p className="font-semibold">Utilisateurs et dépôts de test créés !</p>
-            <div className="text-sm space-y-1">
-              {data.users.map((u: any) => (
-                <div key={u.email} className="font-mono text-xs">
-                  <div><strong>{u.role}:</strong> {u.email}</div>
-                  <div className="text-muted-foreground">Mot de passe: {u.password}</div>
+        const message = data.users && data.users.length > 0 
+          ? (
+              <div className="space-y-2">
+                <p className="font-semibold">Utilisateurs et dépôts de test créés !</p>
+                <div className="text-sm space-y-1">
+                  {data.users.map((u: any) => (
+                    <div key={u.email} className="font-mono text-xs">
+                      <div><strong>{u.role}:</strong> {u.email}</div>
+                      <div className="text-muted-foreground">Mot de passe: {u.password}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>,
-          { duration: 10000 }
-        );
+              </div>
+            )
+          : data.message || "Utilisateurs et dépôts de test créés avec succès !";
         
-        setTimeout(() => window.location.reload(), 2000);
+        toast.success(message, { duration: 8000 });
+      } else {
+        toast.error(data?.message || "Erreur lors de la création");
       }
     } catch (error) {
       console.error("Error creating test users:", error);
