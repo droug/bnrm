@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreateTestDepositButton } from "@/components/admin/CreateTestDepositButton";
+import { toast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
   Settings,
@@ -195,15 +196,42 @@ export default function BNRMBackOffice() {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Button variant="outline" className="w-full justify-start">
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start"
+                            onClick={() => {
+                              toast({
+                                title: "Registre des entrées",
+                                description: "Consultation du registre des dépôts physiques reçus"
+                              });
+                            }}
+                          >
                             <FileText className="h-4 w-4 mr-2" />
                             Registre des entrées
                           </Button>
-                          <Button variant="outline" className="w-full justify-start">
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start"
+                            onClick={() => {
+                              toast({
+                                title: "Vérification de conformité",
+                                description: "Lancement du contrôle de conformité des dépôts"
+                              });
+                            }}
+                          >
                             <Search className="h-4 w-4 mr-2" />
                             Vérifier conformité
                           </Button>
-                          <Button variant="outline" className="w-full justify-start">
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start"
+                            onClick={() => {
+                              toast({
+                                title: "Génération d'accusé de réception",
+                                description: "Document d'accusé de réception généré avec succès"
+                              });
+                            }}
+                          >
                             <Download className="h-4 w-4 mr-2" />
                             Générer accusé réception
                           </Button>
@@ -237,15 +265,42 @@ export default function BNRMBackOffice() {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Button variant="outline" className="w-full justify-start">
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start"
+                            onClick={() => {
+                              toast({
+                                title: "Contrôle des formats et tailles",
+                                description: "Vérification en cours des formats de fichiers et tailles"
+                              });
+                            }}
+                          >
                             <Archive className="h-4 w-4 mr-2" />
                             Contrôle formats/tailles
                           </Button>
-                          <Button variant="outline" className="w-full justify-start">
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start"
+                            onClick={() => {
+                              toast({
+                                title: "Vérification d'intégrité",
+                                description: "Contrôle de l'intégrité des fichiers numériques en cours"
+                              });
+                            }}
+                          >
                             <Shield className="h-4 w-4 mr-2" />
                             Vérification intégrité
                           </Button>
-                          <Button variant="outline" className="w-full justify-start">
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start"
+                            onClick={() => {
+                              toast({
+                                title: "Archivage pérenne",
+                                description: "Processus d'archivage à long terme démarré"
+                              });
+                            }}
+                          >
                             <Database className="h-4 w-4 mr-2" />
                             Archivage pérenne
                           </Button>
@@ -285,7 +340,18 @@ export default function BNRMBackOffice() {
                             </td>
                             <td className="p-2">15/03/2024</td>
                             <td className="p-2">
-                              <Button variant="ghost" size="sm">Voir détails</Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => {
+                                  toast({
+                                    title: "Détails du dépôt",
+                                    description: "Affichage des détails du dépôt DL-2024-001234"
+                                  });
+                                }}
+                              >
+                                Voir détails
+                              </Button>
                             </td>
                           </tr>
                           <tr className="border-b">
@@ -297,7 +363,18 @@ export default function BNRMBackOffice() {
                             </td>
                             <td className="p-2">14/03/2024</td>
                             <td className="p-2">
-                              <Button variant="ghost" size="sm">Corriger</Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => {
+                                  toast({
+                                    title: "Correction nécessaire",
+                                    description: "Formulaire de correction pour le dépôt DL-2024-001235"
+                                  });
+                                }}
+                              >
+                                Corriger
+                              </Button>
                             </td>
                           </tr>
                           <tr className="border-b">
@@ -309,7 +386,18 @@ export default function BNRMBackOffice() {
                             </td>
                             <td className="p-2">13/03/2024</td>
                             <td className="p-2">
-                              <Button variant="ghost" size="sm">Valider</Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => {
+                                  toast({
+                                    title: "Validation du dépôt",
+                                    description: "Dépôt DL-2024-001236 validé avec succès"
+                                  });
+                                }}
+                              >
+                                Valider
+                              </Button>
                             </td>
                           </tr>
                         </tbody>
