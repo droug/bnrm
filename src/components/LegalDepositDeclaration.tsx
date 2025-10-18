@@ -638,89 +638,100 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Identification de l'Éditeur</Label>
-                  <div className="relative">
-                    <Input
-                      placeholder="Rechercher un éditeur..."
-                      value={publisherSearch}
-                      onChange={(e) => setPublisherSearch(e.target.value)}
-                      className="pr-10"
-                    />
-                    {publisherSearch && !selectedPublisher && (
-                      <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
-                        {publishers
-                          .filter(pub => 
+                  {!selectedPublisher ? (
+                    <div className="relative">
+                      <Input
+                        placeholder="Rechercher un éditeur..."
+                        value={publisherSearch}
+                        onChange={(e) => setPublisherSearch(e.target.value)}
+                        className="pr-10"
+                      />
+                      {publisherSearch && (
+                        <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                          {publishers
+                            .filter(pub => 
+                              pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
+                            )
+                            .map((pub) => (
+                              <button
+                                key={pub.id}
+                                type="button"
+                                className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                                onClick={() => {
+                                  setSelectedPublisher(pub);
+                                  setPublisherSearch('');
+                                }}
+                              >
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{pub.name}</span>
+                                  {pub.city && (
+                                    <span className="text-sm text-muted-foreground">
+                                      {pub.city}, {pub.country}
+                                    </span>
+                                  )}
+                                </div>
+                              </button>
+                            ))}
+                          {publishers.filter(pub => 
                             pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
-                          )
-                          .map((pub) => (
-                            <button
-                              key={pub.id}
-                              type="button"
-                              className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
-                              onClick={() => {
-                                setSelectedPublisher(pub);
-                                setPublisherSearch(pub.name);
-                              }}
-                            >
-                              <div className="flex flex-col">
-                                <span className="font-medium">{pub.name}</span>
-                                {pub.city && (
-                                  <span className="text-sm text-muted-foreground">
-                                    {pub.city}, {pub.country}
-                                  </span>
-                                )}
+                          ).length === 0 && (
+                            <div className="px-4 py-3">
+                              <div className="text-sm text-muted-foreground mb-2">
+                                Aucun éditeur trouvé
                               </div>
-                            </button>
-                          ))}
-                        {publishers.filter(pub => 
-                          pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
-                        ).length === 0 && (
-                          <div className="px-4 py-3">
-                            <div className="text-sm text-muted-foreground mb-2">
-                              Aucun éditeur trouvé
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={async () => {
+                                  const newName = publisherSearch;
+                                  const { data, error } = await supabase
+                                    .from('publishers')
+                                    .insert([{ name: newName }])
+                                    .select()
+                                    .single();
+                                  
+                                  if (error) {
+                                    toast.error('Erreur lors de l\'ajout de l\'éditeur');
+                                  } else {
+                                    setPublishers([...publishers, data]);
+                                    setSelectedPublisher(data);
+                                    setPublisherSearch('');
+                                    toast.success('Éditeur ajouté avec succès');
+                                  }
+                                }}
+                              >
+                                + Ajouter "{publisherSearch}"
+                              </Button>
                             </div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="w-full"
-                              onClick={async () => {
-                                const newName = publisherSearch;
-                                const { data, error } = await supabase
-                                  .from('publishers')
-                                  .insert([{ name: newName }])
-                                  .select()
-                                  .single();
-                                
-                                if (error) {
-                                  toast.error('Erreur lors de l\'ajout de l\'éditeur');
-                                } else {
-                                  setPublishers([...publishers, data]);
-                                  setSelectedPublisher(data);
-                                  setPublisherSearch(data.name);
-                                  toast.success('Éditeur ajouté avec succès');
-                                }
-                              }}
-                            >
-                              + Ajouter "{publisherSearch}"
-                            </Button>
-                          </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-primary/10 rounded-md flex justify-between items-start">
+                      <div>
+                        <p className="font-medium">{selectedPublisher.name}</p>
+                        {selectedPublisher.city && (
+                          <p className="text-sm text-muted-foreground">
+                            {selectedPublisher.city}, {selectedPublisher.country}
+                          </p>
+                        )}
+                        {selectedPublisher.publisher_type && (
+                          <p className="text-sm text-muted-foreground">
+                            Type: {selectedPublisher.publisher_type}
+                          </p>
                         )}
                       </div>
-                    )}
-                  </div>
-                  {selectedPublisher && (
-                    <div className="mt-2 p-3 bg-primary/10 rounded-md">
-                      <p className="font-medium">{selectedPublisher.name}</p>
-                      {selectedPublisher.city && (
-                        <p className="text-sm text-muted-foreground">
-                          {selectedPublisher.city}, {selectedPublisher.country}
-                        </p>
-                      )}
-                      {selectedPublisher.publisher_type && (
-                        <p className="text-sm text-muted-foreground">
-                          Type: {selectedPublisher.publisher_type}
-                        </p>
-                      )}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedPublisher(null)}
+                      >
+                        Modifier
+                      </Button>
                     </div>
                   )}
 
