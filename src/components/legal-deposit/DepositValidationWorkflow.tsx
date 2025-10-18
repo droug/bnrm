@@ -817,6 +817,20 @@ export function DepositValidationWorkflow() {
                   {!selectedRequest.validated_by_service && (
                     <>
                       <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedRequest(null);
+                          toast({
+                            title: "Mise en attente",
+                            description: "La demande a été mise en attente de traitement",
+                          });
+                        }}
+                        disabled={isLoading}
+                      >
+                        <Clock className="h-4 w-4 mr-2" />
+                        En attente de traitement
+                      </Button>
+                      <Button
                         variant="destructive"
                         onClick={() => handleValidation(selectedRequest.id, "service", "rejected")}
                         disabled={isLoading}
@@ -837,6 +851,20 @@ export function DepositValidationWorkflow() {
                   {selectedRequest.validated_by_service && !selectedRequest.validated_by_department && (
                     <>
                       <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedRequest(null);
+                          toast({
+                            title: "Mise en attente",
+                            description: "La demande a été mise en attente de traitement",
+                          });
+                        }}
+                        disabled={isLoading}
+                      >
+                        <Clock className="h-4 w-4 mr-2" />
+                        En attente de traitement
+                      </Button>
+                      <Button
                         variant="destructive"
                         onClick={() => handleValidation(selectedRequest.id, "department", "rejected")}
                         disabled={isLoading}
@@ -856,6 +884,20 @@ export function DepositValidationWorkflow() {
 
                   {selectedRequest.validated_by_department && !selectedRequest.validated_by_committee && (
                     <>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedRequest(null);
+                          toast({
+                            title: "Mise en attente",
+                            description: "La demande a été mise en attente de traitement",
+                          });
+                        }}
+                        disabled={isLoading}
+                      >
+                        <Clock className="h-4 w-4 mr-2" />
+                        En attente de traitement
+                      </Button>
                       <Button
                         variant="destructive"
                         onClick={() => handleValidation(selectedRequest.id, "committee", "rejected")}
