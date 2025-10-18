@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft, CalendarIcon, ExternalLink } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { ScrollableDialog, ScrollableDialogContent, ScrollableDialogHeader, ScrollableDialogTitle, ScrollableDialogDescription, ScrollableDialogFooter } from "@/components/ui/scrollable-dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -2477,16 +2477,16 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
         </div>
 
         {/* Modale ISSN */}
-        <Dialog open={isIssnModalOpen} onOpenChange={setIsIssnModalOpen}>
-          <DialogContent className="max-w-[700px] max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-xl text-[#0E2D5C]">
+        <ScrollableDialog open={isIssnModalOpen} onOpenChange={setIsIssnModalOpen}>
+          <ScrollableDialogContent className="max-w-[700px]">
+            <ScrollableDialogHeader>
+              <ScrollableDialogTitle className="text-xl text-[#0E2D5C]">
                 Demande d'ISSN – Publication périodique
-              </DialogTitle>
-              <DialogDescription>
+              </ScrollableDialogTitle>
+              <ScrollableDialogDescription>
                 Veuillez remplir les informations suivantes pour votre demande d'ISSN
-              </DialogDescription>
-            </DialogHeader>
+              </ScrollableDialogDescription>
+            </ScrollableDialogHeader>
 
             <div className="space-y-4 py-4">
               <div className="space-y-2">
@@ -2593,7 +2593,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               </div>
             </div>
 
-            <DialogFooter className="flex justify-end gap-2">
+            <ScrollableDialogFooter className="flex justify-end gap-2">
               <Button
                 type="button"
                 variant="outline"
@@ -2607,9 +2607,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               >
                 ✅ Soumettre la demande ISSN
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </ScrollableDialogFooter>
+          </ScrollableDialogContent>
+        </ScrollableDialog>
       </>
     );
   }
