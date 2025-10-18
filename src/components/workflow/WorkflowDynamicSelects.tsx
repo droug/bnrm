@@ -13,7 +13,7 @@ import { SimpleRoleSelector } from "./SimpleRoleSelector";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, RefreshCw, Workflow, GitBranch, Users, ArrowRight, Trash2, Save, AlertTriangle, CheckCircle } from "lucide-react";
+import { Plus, RefreshCw, Workflow, GitBranch, Users, ArrowRight, Trash2, Save, AlertTriangle, CheckCircle, Edit, ArrowDown } from "lucide-react";
 import { CreateWorkflowDialog } from "./CreateWorkflowDialog";
 import { CreateStepDialog } from "./CreateStepDialog";
 import { CreateRoleDialog } from "./CreateRoleDialog";
@@ -367,7 +367,7 @@ export function WorkflowDynamicSelects() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="space-y-6">
         {/* Sélection du type de workflow */}
         <Card className="border-2 hover:border-primary/50 transition-colors">
           <CardHeader className="bg-blue-50 dark:bg-blue-950/20">
@@ -381,25 +381,26 @@ export function WorkflowDynamicSelects() {
                 variant="outline"
                 onClick={() => setCreateWorkflowOpen(true)}
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4 mr-2" />
+                Créer un nouveau workflow
               </Button>
             </div>
             <CardDescription>
-              Sélectionnez le type de processus métier
+              Sélectionnez le type de processus métier à configurer
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             <div className="space-y-3">
               <Label>Workflow</Label>
               <Select value={selectedWorkflow} onValueChange={setSelectedWorkflow}>
-                <SelectTrigger>
+                <SelectTrigger className="h-12">
                   <SelectValue placeholder="Choisir un workflow..." />
                 </SelectTrigger>
                 <SelectContent>
                   {workflows.map((workflow) => (
                     <SelectItem key={workflow.id} value={workflow.id}>
                       <div className="flex items-center gap-2">
-                        <span>{workflow.name}</span>
+                        <span className="font-medium">{workflow.name}</span>
                         <Badge variant="secondary" className="ml-2">
                           {workflow.module}
                         </Badge>
@@ -409,13 +410,13 @@ export function WorkflowDynamicSelects() {
                 </SelectContent>
               </Select>
               {getWorkflowInfo() && (
-                <div className="p-3 bg-muted rounded-md text-sm">
-                  <p className="font-medium">{getWorkflowInfo()?.name}</p>
+                <div className="p-4 bg-muted rounded-md text-sm border-l-4 border-primary">
+                  <p className="font-medium text-base">{getWorkflowInfo()?.name}</p>
                   <p className="text-muted-foreground text-xs mt-1">
                     {getWorkflowInfo()?.description}
                   </p>
-                  <div className="flex gap-2 mt-2">
-                    <Badge>{getWorkflowInfo()?.workflow_type}</Badge>
+                  <div className="flex gap-2 mt-3">
+                    <Badge className="bg-blue-600">{getWorkflowInfo()?.workflow_type}</Badge>
                     <Badge variant="outline">{getWorkflowInfo()?.module}</Badge>
                   </div>
                 </div>
@@ -424,288 +425,200 @@ export function WorkflowDynamicSelects() {
           </CardContent>
         </Card>
 
-        {/* Sélection du type d'étape */}
-        <Card className={`border-2 transition-colors ${selectedWorkflow ? 'hover:border-primary/50' : 'opacity-60'}`}>
-          <CardHeader className="bg-green-50 dark:bg-green-950/20">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <GitBranch className="h-5 w-5 text-green-600" />
-                <CardTitle>Type d'Étape</CardTitle>
+        {/* Vue complète du workflow */}
+        {selectedWorkflow && (
+          <Card className="border-2 border-primary">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-950/20 dark:to-green-950/20">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl">Configuration Complète du Workflow</CardTitle>
+                  <CardDescription className="mt-1">
+                    Vue d'ensemble de toutes les étapes et transitions
+                  </CardDescription>
+                </div>
+                <Button
+                  onClick={() => setCreateStepOpen(true)}
+                  className="bg-[#194D9B] hover:bg-[#194D9B]/90"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Ajouter une étape
+                </Button>
               </div>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setCreateStepOpen(true)}
-                disabled={!selectedWorkflow}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-            <CardDescription>
-              Choisissez l'étape du processus
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="space-y-3">
-              <Label>Étape</Label>
-              <div className="space-y-2">
-                {filteredSteps.length > 0 ? (
-                  <div className="space-y-2">
-                    {filteredSteps.map((step, index) => (
-                      <div 
-                        key={step.id} 
-                        className={`flex items-center justify-between p-3 border-2 rounded-lg cursor-pointer transition-all ${
-                          selectedStep === step.id 
-                            ? 'border-primary bg-primary/5' 
-                            : 'border-border hover:border-primary/50'
-                        }`}
-                        onClick={() => setSelectedStep(step.id)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-3 h-3 rounded-full ${getStepTypeColor(step.step_type)}`} />
-                          <div>
-                            <p className="font-medium">{step.step_name}</p>
-                            <div className="flex gap-2 mt-1">
-                              <Badge variant="secondary" className="text-xs">
-                                Étape {step.step_number}
-                              </Badge>
-                              <Badge variant="outline" className="text-xs">
-                                {step.step_type}
-                              </Badge>
+            </CardHeader>
+            <CardContent className="pt-8">
+              {filteredSteps.length > 0 ? (
+                <div className="space-y-6">
+                  {filteredSteps.map((step, index) => {
+                    const stepTransitions = filteredTransitions.filter(t => t.from_step_id === step.id);
+                    const nextStep = filteredSteps.find(s => s.step_number === step.step_number + 1);
+                    
+                    return (
+                      <div key={step.id} className="space-y-4">
+                        {/* Carte d'étape */}
+                        <Card className="border-2 border-primary/30 hover:border-primary transition-all shadow-md hover:shadow-lg">
+                          <CardHeader className={`${
+                            step.step_type === 'creation' ? 'bg-blue-50 dark:bg-blue-950/20' :
+                            step.step_type === 'validation' ? 'bg-green-50 dark:bg-green-950/20' :
+                            step.step_type === 'correction' ? 'bg-orange-50 dark:bg-orange-950/20' :
+                            step.step_type === 'archivage' ? 'bg-purple-50 dark:bg-purple-950/20' :
+                            step.step_type === 'transmission' ? 'bg-cyan-50 dark:bg-cyan-950/20' :
+                            'bg-gray-50 dark:bg-gray-950/20'
+                          }`}>
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-4">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getStepTypeColor(step.step_type)} text-white font-bold text-lg shadow-md`}>
+                                  {step.step_number}
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <GitBranch className="h-5 w-5 text-primary" />
+                                    <CardTitle className="text-lg">{step.step_name}</CardTitle>
+                                  </div>
+                                  <div className="flex gap-2 mt-2">
+                                    <Badge className={getStepTypeColor(step.step_type)}>
+                                      {step.step_type}
+                                    </Badge>
+                                    {step.required_role && (
+                                      <Badge variant="outline" className="flex items-center gap-1">
+                                        <Users className="h-3 w-3" />
+                                        {step.required_role}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="text-primary hover:text-primary hover:bg-primary/10"
+                                  onClick={() => {
+                                    setSelectedStep(step.id);
+                                    setCreateStepOpen(true);
+                                  }}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="text-[#B71C1C] hover:text-[#B71C1C] hover:bg-[#B71C1C]/10"
+                                  onClick={() => confirmDelete('step', step.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-[#B71C1C] hover:text-[#B71C1C] hover:bg-[#B71C1C]/10"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            confirmDelete('step', step.id);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground text-sm text-center py-4">
-                    Aucune étape disponible. Cliquez sur + pour ajouter une étape.
-                  </p>
-                )}
-              </div>
-              {getStepInfo() && (
-                <div className="p-3 bg-muted rounded-md text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${getStepTypeColor(getStepInfo()?.step_type || '')}`} />
-                    <p className="font-medium">{getStepInfo()?.step_name}</p>
-                  </div>
-                  <div className="flex gap-2 mt-2">
-                    <Badge>Étape {getStepInfo()?.step_number}</Badge>
-                    <Badge variant="outline">{getStepInfo()?.step_type}</Badge>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Sélection du rôle responsable */}
-        <Card className={`border-2 transition-colors ${selectedStep ? 'hover:border-primary/50' : 'opacity-60'}`}>
-          <CardHeader className="bg-orange-50 dark:bg-orange-950/20">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-orange-600" />
-                <CardTitle>Rôle Responsable</CardTitle>
-              </div>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setCreateRoleOpen(true)}
-                disabled={!selectedStep}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-            <CardDescription>
-              Définissez qui peut agir sur cette étape
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="space-y-3">
-              <Label>Rôle</Label>
-              <Select 
-                value={selectedRole} 
-                onValueChange={setSelectedRole}
-                disabled={!selectedStep}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir un rôle..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredRoles.length > 0 ? (
-                    <>
-                      {/* Rôles administratifs internes */}
-                      {filteredRoles.filter(r => 
-                        ['admin', 'librarian', 'editor', 'printer', 'producer', 'distributor', 'author', 'researcher', 'partner']
-                          .includes(r.role_name.toLowerCase())
-                      ).length > 0 && (
-                        <>
-                          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                            Rôles Administratifs Internes
-                          </div>
-                          {filteredRoles
-                            .filter(r => 
-                              ['admin', 'librarian', 'editor', 'printer', 'producer', 'distributor', 'author', 'researcher', 'partner']
-                                .includes(r.role_name.toLowerCase())
-                            )
-                            .map((role) => (
-                              <SelectItem key={role.id} value={role.id}>
-                                <div className="flex items-center gap-2">
-                                  <Users className="h-3 w-3 text-blue-600" />
-                                  <span className="font-medium">{role.role_name}</span>
-                                  <Badge variant="secondary" className="ml-2 text-xs">
-                                    {role.role_level}
-                                  </Badge>
+                          </CardHeader>
+                          
+                          {/* Transitions de cette étape */}
+                          {stepTransitions.length > 0 && (
+                            <CardContent className="pt-4">
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
+                                  <ArrowRight className="h-4 w-4" />
+                                  Transitions disponibles :
                                 </div>
-                              </SelectItem>
-                            ))}
-                        </>
-                      )}
-                      
-                      {/* Rôles spécifiques au module */}
-                      {filteredRoles.filter(r => 
-                        !['admin', 'librarian', 'editor', 'printer', 'producer', 'distributor', 'author', 'researcher', 'partner']
-                          .includes(r.role_name.toLowerCase())
-                      ).length > 0 && (
-                        <>
-                          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground border-t mt-1 pt-2">
-                            Rôles Spécifiques au Module
-                          </div>
-                          {filteredRoles
-                            .filter(r => 
-                              !['admin', 'librarian', 'editor', 'printer', 'producer', 'distributor', 'author', 'researcher', 'partner']
-                                .includes(r.role_name.toLowerCase())
-                            )
-                            .map((role) => (
-                              <SelectItem key={role.id} value={role.id}>
-                                <div className="flex items-center gap-2">
-                                  <Users className="h-3 w-3 text-orange-600" />
-                                  <span>{role.role_name}</span>
-                                  <Badge variant="outline" className="ml-2 text-xs">
-                                    {role.module}
-                                  </Badge>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                  {stepTransitions.map((transition) => {
+                                    const targetStep = filteredSteps.find(s => s.id === transition.to_step_id);
+                                    return (
+                                      <div 
+                                        key={transition.id}
+                                        className="flex items-center justify-between p-3 border rounded-lg bg-purple-50/50 dark:bg-purple-950/10 hover:bg-purple-50 dark:hover:bg-purple-950/20 transition-colors"
+                                      >
+                                        <div className="flex items-center gap-2">
+                                          <ArrowRight className="h-4 w-4 text-purple-600" />
+                                          <div>
+                                            <p className="font-medium text-sm">{transition.transition_name}</p>
+                                            <div className="flex gap-1 mt-1">
+                                              {transition.trigger_type && (
+                                                <Badge variant="secondary" className="text-xs">
+                                                  {transition.trigger_type}
+                                                </Badge>
+                                              )}
+                                              {targetStep && (
+                                                <Badge variant="outline" className="text-xs">
+                                                  → {targetStep.step_name}
+                                                </Badge>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className="text-[#B71C1C] hover:text-[#B71C1C] hover:bg-[#B71C1C]/10"
+                                          onClick={() => confirmDelete('transition', transition.id)}
+                                        >
+                                          <Trash2 className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    );
+                                  })}
                                 </div>
-                              </SelectItem>
-                            ))}
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <div className="px-2 py-4 text-sm text-center text-muted-foreground">
-                      Aucun rôle disponible. Sélectionnez un workflow et une étape.
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-              {getRoleInfo() && (
-                <div className="p-3 bg-muted rounded-md text-sm">
-                  <p className="font-medium">{getRoleInfo()?.role_name}</p>
-                  <p className="text-muted-foreground text-xs mt-1">
-                    {getRoleInfo()?.description}
-                  </p>
-                  <div className="flex gap-2 mt-2">
-                    <Badge>{getRoleInfo()?.role_level}</Badge>
-                    <Badge variant="outline">{getRoleInfo()?.module}</Badge>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Sélection du type de transition */}
-        <Card className={`border-2 transition-colors ${selectedStep ? 'hover:border-primary/50' : 'opacity-60'}`}>
-          <CardHeader className="bg-purple-50 dark:bg-purple-950/20">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ArrowRight className="h-5 w-5 text-purple-600" />
-                <CardTitle>Type de Transition</CardTitle>
-              </div>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setCreateTransitionOpen(true)}
-                disabled={!selectedStep}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-            <CardDescription>
-              Définissez l'action de transition
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="space-y-3">
-              <Label>Transition</Label>
-              <div className="space-y-2">
-                {filteredTransitions.length > 0 ? (
-                  <div className="space-y-2">
-                    {filteredTransitions.map((transition) => (
-                      <div 
-                        key={transition.id} 
-                        className={`flex items-center justify-between p-3 border-2 rounded-lg cursor-pointer transition-all ${
-                          selectedTransition === transition.id 
-                            ? 'border-primary bg-primary/5' 
-                            : 'border-border hover:border-primary/50'
-                        }`}
-                        onClick={() => setSelectedTransition(transition.id)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <ArrowRight className="h-4 w-4 text-purple-600" />
-                          <div>
-                            <p className="font-medium">{transition.transition_name}</p>
-                            {transition.trigger_type && (
-                              <Badge variant="secondary" className="text-xs mt-1">
-                                {transition.trigger_type}
-                              </Badge>
-                            )}
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="w-full mt-2"
+                                  onClick={() => {
+                                    setSelectedStep(step.id);
+                                    setCreateTransitionOpen(true);
+                                  }}
+                                >
+                                  <Plus className="h-3 w-3 mr-2" />
+                                  Ajouter une transition
+                                </Button>
+                              </div>
+                            </CardContent>
+                          )}
+                          
+                          {stepTransitions.length === 0 && (
+                            <CardContent className="pt-4">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => {
+                                  setSelectedStep(step.id);
+                                  setCreateTransitionOpen(true);
+                                }}
+                              >
+                                <Plus className="h-3 w-3 mr-2" />
+                                Ajouter une transition
+                              </Button>
+                            </CardContent>
+                          )}
+                        </Card>
+                        
+                        {/* Flèche vers l'étape suivante */}
+                        {index < filteredSteps.length - 1 && (
+                          <div className="flex justify-center py-2">
+                            <ArrowDown className="h-8 w-8 text-primary animate-bounce" />
                           </div>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-[#B71C1C] hover:text-[#B71C1C] hover:bg-[#B71C1C]/10"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            confirmDelete('transition', transition.id);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground text-sm text-center py-4">
-                    Aucune transition disponible. Cliquez sur + pour ajouter une transition.
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <GitBranch className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
+                  <p className="text-muted-foreground text-lg mb-4">
+                    Aucune étape configurée pour ce workflow
                   </p>
-                )}
-              </div>
-              {getTransitionInfo() && (
-                <div className="p-3 bg-muted rounded-md text-sm">
-                  <p className="font-medium">{getTransitionInfo()?.transition_name}</p>
-                  <div className="flex gap-2 mt-2">
-                    {getTransitionInfo()?.trigger_type && (
-                      <Badge>{getTransitionInfo()?.trigger_type}</Badge>
-                    )}
-                  </div>
+                  <Button
+                    onClick={() => setCreateStepOpen(true)}
+                    className="bg-[#194D9B] hover:bg-[#194D9B]/90"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Créer la première étape
+                  </Button>
                 </div>
               )}
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Résumé de la configuration */}
