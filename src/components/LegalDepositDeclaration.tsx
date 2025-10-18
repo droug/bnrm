@@ -1025,9 +1025,21 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             <div>
               <h3 className="text-2xl font-semibold mb-4">Directeur de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Informations d'identité */}
                 <div className="space-y-2">
                   <Label>Nom et prénom</Label>
                   <Input placeholder="Nom et prénom" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Pseudonyme</Label>
+                  <Input placeholder="Pseudonyme" />
+                </div>
+
+                {/* Informations de contact */}
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Email" />
                 </div>
 
                 <div className="space-y-2">
@@ -1035,11 +1047,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input placeholder="Téléphone" />
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" placeholder="Email" />
-                </div>
-
+                {/* Informations géographiques */}
                 <div className="space-y-2">
                   <Label>Région</Label>
                   <SimpleDropdown
@@ -1070,11 +1078,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Pseudonyme</Label>
-                  <Input placeholder="Pseudonyme" />
-                </div>
-
+                {/* Informations personnelles */}
                 <div className="space-y-2">
                   <Label>Profession</Label>
                   <Input placeholder="Profession" />
@@ -1088,11 +1092,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <div className="space-y-2">
                   <Label>Lieu de naissance</Label>
                   <Input placeholder="Lieu de naissance" />
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Résumé de l'ouvrage</Label>
-                  <Textarea placeholder="Résumé de l'ouvrage" rows={4} />
                 </div>
               </div>
             </div>
