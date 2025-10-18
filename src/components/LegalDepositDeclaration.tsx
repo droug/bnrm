@@ -645,7 +645,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       onChange={(e) => setPublisherSearch(e.target.value)}
                       className="pr-10"
                     />
-                    {publisherSearch && (
+                    {publisherSearch && !selectedPublisher && (
                       <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
                         {publishers
                           .filter(pub => 
