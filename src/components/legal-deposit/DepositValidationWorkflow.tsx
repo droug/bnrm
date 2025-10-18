@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Eye, Clock, FileText, Download, AlertCircle, CheckCheck } from "lucide-react";
+import { CheckCircle, XCircle, Eye, Clock, FileText, Download, AlertCircle, CheckCheck, Archive } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import jsPDF from "jspdf";
@@ -46,6 +46,7 @@ export function DepositValidationWorkflow() {
   const [comments, setComments] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
+  const [showPendingModal, setShowPendingModal] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -818,13 +819,7 @@ export function DepositValidationWorkflow() {
                     <>
                       <Button
                         variant="outline"
-                        onClick={() => {
-                          setSelectedRequest(null);
-                          toast({
-                            title: "Mise en attente",
-                            description: "La demande a été mise en attente de traitement",
-                          });
-                        }}
+                        onClick={() => setShowPendingModal(true)}
                         disabled={isLoading}
                       >
                         <Clock className="h-4 w-4 mr-2" />
@@ -852,13 +847,7 @@ export function DepositValidationWorkflow() {
                     <>
                       <Button
                         variant="outline"
-                        onClick={() => {
-                          setSelectedRequest(null);
-                          toast({
-                            title: "Mise en attente",
-                            description: "La demande a été mise en attente de traitement",
-                          });
-                        }}
+                        onClick={() => setShowPendingModal(true)}
                         disabled={isLoading}
                       >
                         <Clock className="h-4 w-4 mr-2" />
@@ -886,13 +875,7 @@ export function DepositValidationWorkflow() {
                     <>
                       <Button
                         variant="outline"
-                        onClick={() => {
-                          setSelectedRequest(null);
-                          toast({
-                            title: "Mise en attente",
-                            description: "La demande a été mise en attente de traitement",
-                          });
-                        }}
+                        onClick={() => setShowPendingModal(true)}
                         disabled={isLoading}
                       >
                         <Clock className="h-4 w-4 mr-2" />
@@ -944,6 +927,57 @@ export function DepositValidationWorkflow() {
               )}
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modale "En attente de traitement" */}
+      <Dialog open={showPendingModal} onOpenChange={setShowPendingModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>En attente de traitement</DialogTitle>
+            <DialogDescription>
+              Que souhaitez-vous faire avec cette demande ?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              La demande sera mise en attente et pourra être traitée ultérieurement.
+            </p>
+          </div>
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setShowPendingModal(false)}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowPendingModal(false);
+                setSelectedRequest(null);
+                toast({
+                  title: "Demande fermée",
+                  description: "La demande a été fermée sans modification",
+                });
+              }}
+            >
+              Fermer
+            </Button>
+            <Button
+              onClick={() => {
+                setShowPendingModal(false);
+                setSelectedRequest(null);
+                toast({
+                  title: "Demande archivée",
+                  description: "La demande a été archivée pour traitement ultérieur",
+                });
+              }}
+            >
+              <Archive className="h-4 w-4 mr-2" />
+              Archiver
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </>
