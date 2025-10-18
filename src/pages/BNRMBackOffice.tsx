@@ -6,10 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreateTestDepositButton } from "@/components/admin/CreateTestDepositButton";
 import { toast } from "@/hooks/use-toast";
 import { 
@@ -45,6 +47,8 @@ export default function BNRMBackOffice() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedDepositModal, setSelectedDepositModal] = useState<string | null>(null);
   const [selectedDepositData, setSelectedDepositData] = useState<any>(null);
+  const [confirmAction, setConfirmAction] = useState<{type: string, data?: any} | null>(null);
+  const [documentForm, setDocumentForm] = useState<{type: string, data?: any} | null>(null);
 
   if (loading) {
     return (
@@ -202,14 +206,14 @@ export default function BNRMBackOffice() {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Button 
-                            variant="outline" 
-                            className="w-full justify-start"
-                            onClick={() => setSelectedDepositModal("registre")}
-                          >
-                            <FileText className="h-4 w-4 mr-2" />
-                            Registre des entrées
-                          </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => setDocumentForm({ type: 'registre_entrees', data: { depositType: 'physique' } })}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Registre des entrées
+                  </Button>
                           <Button 
                             variant="outline" 
                             className="w-full justify-start"
@@ -218,14 +222,14 @@ export default function BNRMBackOffice() {
                             <Search className="h-4 w-4 mr-2" />
                             Vérifier conformité
                           </Button>
-                          <Button 
-                            variant="outline" 
-                            className="w-full justify-start"
-                            onClick={() => setSelectedDepositModal("accuse")}
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            Générer accusé réception
-                          </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => setDocumentForm({ type: 'accuse_reception', data: { depositType: 'physique' } })}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Générer accusé réception
+                  </Button>
                         </div>
                       </div>
                     </CardContent>
@@ -272,14 +276,14 @@ export default function BNRMBackOffice() {
                             <Shield className="h-4 w-4 mr-2" />
                             Vérification intégrité
                           </Button>
-                          <Button 
-                            variant="outline" 
-                            className="w-full justify-start"
-                            onClick={() => setSelectedDepositModal("archivage")}
-                          >
-                            <Database className="h-4 w-4 mr-2" />
-                            Archivage pérenne
-                          </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => setConfirmAction({ type: 'archivage_perenne', data: { depositType: 'numerique' } })}
+                  >
+                    <Database className="h-4 w-4 mr-2" />
+                    Archivage pérenne
+                  </Button>
                         </div>
                       </div>
                     </CardContent>
@@ -343,16 +347,18 @@ export default function BNRMBackOffice() {
                             <td className="p-2">14/03/2024</td>
                             <td className="p-2">
                               <Button 
-                                variant="ghost" 
+                                 variant="ghost" 
                                 size="sm"
                                 onClick={() => {
-                                  setSelectedDepositData({
-                                    number: "DL-2024-001235",
-                                    title: "Magazine Tech Innovation",
-                                    type: "Périodique",
-                                    status: "Non conforme"
+                                  setDocumentForm({ 
+                                    type: 'correction_demande', 
+                                    data: {
+                                      numero: "DL-2024-001235",
+                                      title: "Magazine Tech Innovation",
+                                      type: "Périodique",
+                                      status: "Non conforme"
+                                    }
                                   });
-                                  setSelectedDepositModal("corriger");
                                 }}
                               >
                                 Corriger
@@ -369,16 +375,18 @@ export default function BNRMBackOffice() {
                             <td className="p-2">13/03/2024</td>
                             <td className="p-2">
                               <Button 
-                                variant="ghost" 
+                                 variant="ghost" 
                                 size="sm"
                                 onClick={() => {
-                                  setSelectedDepositData({
-                                    number: "DL-2024-001236",
-                                    title: "Atlas historique du Maroc",
-                                    type: "Livre",
-                                    status: "En cours"
+                                  setConfirmAction({ 
+                                    type: 'valider_conformite', 
+                                    data: {
+                                      numero: "DL-2024-001236",
+                                      title: "Atlas historique du Maroc",
+                                      type: "Livre",
+                                      status: "En cours"
+                                    }
                                   });
-                                  setSelectedDepositModal("valider");
                                 }}
                               >
                                 Valider
@@ -789,77 +797,286 @@ export default function BNRMBackOffice() {
           </DialogContent>
         </Dialog>
 
-        <Dialog open={selectedDepositModal === "corriger"} onOpenChange={() => setSelectedDepositModal(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Correction du Dépôt</DialogTitle>
-              <DialogDescription>
-                Formulaire de correction pour le dépôt {selectedDepositData?.number}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label>Problèmes identifiés</Label>
-                <Textarea 
-                  placeholder="Décrire les non-conformités détectées..."
-                  rows={4}
-                  defaultValue="ISBN manquant sur la page de garde"
-                />
-              </div>
-              <div>
-                <Label>Actions correctives requises</Label>
-                <Textarea 
-                  placeholder="Actions à entreprendre pour la mise en conformité..."
-                  rows={3}
-                  defaultValue="Ajouter l'ISBN sur la page de garde et soumettre à nouveau"
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setSelectedDepositModal(null)}>Annuler</Button>
-                <Button>Envoyer notification de correction</Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        {/* AlertDialog pour confirmations */}
+        <AlertDialog open={!!confirmAction} onOpenChange={() => setConfirmAction(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {confirmAction?.type === 'archivage_perenne' && 'Confirmer l\'archivage pérenne'}
+                {confirmAction?.type === 'valider_conformite' && 'Valider la conformité'}
+                {confirmAction?.type === 'rejeter_depot' && 'Rejeter le dépôt'}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {confirmAction?.type === 'archivage_perenne' && 
+                  'Êtes-vous sûr de vouloir procéder à l\'archivage pérenne de ce dépôt numérique ? Cette action est irréversible.'
+                }
+                {confirmAction?.type === 'valider_conformite' && 
+                  `Confirmer la validation de conformité pour le dépôt "${confirmAction.data?.numero}" ?`
+                }
+                {confirmAction?.type === 'rejeter_depot' && 
+                  `Confirmer le rejet du dépôt "${confirmAction.data?.numero}" ? Le déposant sera notifié.`
+                }
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annuler</AlertDialogCancel>
+              <AlertDialogAction onClick={() => {
+                toast({
+                  title: "Action confirmée",
+                  description: "L'opération a été effectuée avec succès."
+                });
+                setConfirmAction(null);
+              }}>
+                Confirmer
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-        <Dialog open={selectedDepositModal === "valider"} onOpenChange={() => setSelectedDepositModal(null)}>
-          <DialogContent>
+        {/* Dialog pour formulaires de documents */}
+        <Dialog open={!!documentForm} onOpenChange={() => setDocumentForm(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Validation du Dépôt</DialogTitle>
+              <DialogTitle>
+                {documentForm?.type === 'registre_entrees' && 'Registre des entrées'}
+                {documentForm?.type === 'accuse_reception' && 'Accusé de réception'}
+                {documentForm?.type === 'correction_demande' && 'Demande de correction'}
+                {documentForm?.type === 'rapport_conformite' && 'Rapport de conformité'}
+              </DialogTitle>
               <DialogDescription>
-                Validation finale du dépôt {selectedDepositData?.number}
+                Remplissez les informations nécessaires pour générer le document
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
-              <div className="border rounded-lg p-4 bg-muted">
-                <h4 className="font-semibold mb-2">Résumé de la validation</h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Conformité physique</span>
-                    <Badge className="bg-green-100 text-green-800">✓ Validée</Badge>
+
+            {/* Formulaire Registre des entrées */}
+            {documentForm?.type === 'registre_entrees' && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Date d'entrée</Label>
+                    <Input type="date" defaultValue={new Date().toISOString().split('T')[0]} />
                   </div>
-                  <div className="flex justify-between">
-                    <span>Métadonnées complètes</span>
-                    <Badge className="bg-green-100 text-green-800">✓ Validées</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Contrôle qualité</span>
-                    <Badge className="bg-green-100 text-green-800">✓ Validé</Badge>
+                  <div className="space-y-2">
+                    <Label>Numéro d'enregistrement</Label>
+                    <Input placeholder="AUTO-GÉNÉRÉ" disabled />
                   </div>
                 </div>
+                
+                <div className="space-y-2">
+                  <Label>Déposant</Label>
+                  <Input placeholder="Nom du déposant" />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Type de document</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="livre">Livre</SelectItem>
+                        <SelectItem value="periodique">Périodique</SelectItem>
+                        <SelectItem value="these">Thèse</SelectItem>
+                        <SelectItem value="audiovisuel">Audiovisuel</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Nombre d'exemplaires</Label>
+                    <Input type="number" min="1" defaultValue="2" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Titre de l'œuvre</Label>
+                  <Input placeholder="Titre complet" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>ISBN/ISSN</Label>
+                  <Input placeholder="Ex: 978-3-16-148410-0" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Observations</Label>
+                  <Textarea placeholder="Remarques particulières..." rows={3} />
+                </div>
               </div>
-              <div>
-                <Label>Commentaires de validation</Label>
-                <Textarea 
-                  placeholder="Remarques complémentaires..."
-                  rows={3}
-                />
+            )}
+
+            {/* Formulaire Accusé de réception */}
+            {documentForm?.type === 'accuse_reception' && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Destinataire</Label>
+                  <Input placeholder="Nom du déposant" />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Adresse email</Label>
+                  <Input type="email" placeholder="email@example.com" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Date de réception</Label>
+                    <Input type="date" defaultValue={new Date().toISOString().split('T')[0]} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Numéro de dépôt</Label>
+                    <Input placeholder="Ex: DL-2025-001" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Documents reçus</Label>
+                  <Textarea 
+                    placeholder="Liste des documents reçus..."
+                    rows={4}
+                    defaultValue="- 2 exemplaires du livre&#10;- Formulaire de dépôt légal complété&#10;- Pièce d'identité du déposant"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Format de génération</Label>
+                  <Select defaultValue="pdf">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pdf">PDF</SelectItem>
+                      <SelectItem value="email">Email</SelectItem>
+                      <SelectItem value="both">PDF + Email</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Message personnalisé (optionnel)</Label>
+                  <Textarea placeholder="Message additionnel..." rows={3} />
+                </div>
               </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setSelectedDepositModal(null)}>Annuler</Button>
-                <Button>Valider définitivement</Button>
+            )}
+
+            {/* Formulaire Demande de correction */}
+            {documentForm?.type === 'correction_demande' && (
+              <div className="space-y-4">
+                <div className="bg-muted p-3 rounded-lg">
+                  <p className="text-sm"><strong>Dépôt :</strong> {documentForm.data?.numero}</p>
+                  <p className="text-sm"><strong>Type :</strong> {documentForm.data?.type}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Type de non-conformité</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="exemplaires_manquants">Exemplaires manquants</SelectItem>
+                      <SelectItem value="documents_incomplets">Documents incomplets</SelectItem>
+                      <SelectItem value="qualite_insuffisante">Qualité insuffisante</SelectItem>
+                      <SelectItem value="metadata_incorrectes">Métadonnées incorrectes</SelectItem>
+                      <SelectItem value="format_invalide">Format invalide</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Description détaillée</Label>
+                  <Textarea 
+                    placeholder="Décrivez précisément les éléments à corriger..."
+                    rows={5}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Actions requises</Label>
+                  <Textarea 
+                    placeholder="Listez les actions à effectuer par le déposant..."
+                    rows={4}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Délai de correction (jours)</Label>
+                  <Input type="number" min="1" defaultValue="15" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Mode de notification</Label>
+                  <Select defaultValue="email">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="email">Email</SelectItem>
+                      <SelectItem value="courrier">Courrier postal</SelectItem>
+                      <SelectItem value="both">Email + Courrier</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Formulaire Rapport de conformité */}
+            {documentForm?.type === 'rapport_conformite' && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Numéro de dépôt</Label>
+                  <Input defaultValue={documentForm.data?.numero} disabled />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Statut de conformité</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="conforme">Conforme</SelectItem>
+                      <SelectItem value="conforme_reserve">Conforme avec réserves</SelectItem>
+                      <SelectItem value="non_conforme">Non conforme</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Points vérifiés</Label>
+                  <Textarea 
+                    rows={6}
+                    defaultValue="✓ Nombre d'exemplaires règlementaire&#10;✓ Qualité de l'impression&#10;✓ Complétude des métadonnées&#10;✓ Respect des formats&#10;✓ Documentation accompagnatrice"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Observations</Label>
+                  <Textarea placeholder="Remarques générales..." rows={4} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Validé par</Label>
+                  <Input placeholder="Nom du validateur" />
+                </div>
+              </div>
+            )}
+
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setDocumentForm(null)}>
+                Annuler
+              </Button>
+              <Button onClick={() => {
+                toast({
+                  title: "Document généré",
+                  description: "Le document a été créé avec succès."
+                });
+                setDocumentForm(null);
+              }}>
+                <FileText className="h-4 w-4 mr-2" />
+                Générer le document
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
