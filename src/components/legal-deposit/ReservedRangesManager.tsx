@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollableDialog, ScrollableDialogContent, ScrollableDialogHeader, ScrollableDialogTitle } from "@/components/ui/scrollable-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -443,11 +443,11 @@ export const ReservedRangesManager = () => {
       )}
 
       {/* Dialog pour réserver une tranche */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Réserver une tranche de numéros</DialogTitle>
-          </DialogHeader>
+      <ScrollableDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <ScrollableDialogContent className="max-w-2xl">
+          <ScrollableDialogHeader>
+            <ScrollableDialogTitle>Réserver une tranche de numéros</ScrollableDialogTitle>
+          </ScrollableDialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -553,8 +553,8 @@ export const ReservedRangesManager = () => {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </ScrollableDialogContent>
+      </ScrollableDialog>
     </div>
   );
 };
