@@ -1482,9 +1482,57 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input type="email" placeholder="Email de l'imprimerie" />
                 </div>
 
+                <div className="space-y-2 relative">
+                  <Label>Pays</Label>
+                  <div className="relative">
+                    <Input
+                      placeholder="Rechercher un pays..."
+                      value={printerCountry ? worldCountries.find(c => c.code === printerCountry)?.name || '' : ''}
+                      onChange={(e) => {
+                        setPrinterCountry('');
+                        setOpenPrinterCountry(true);
+                      }}
+                      onFocus={() => setOpenPrinterCountry(true)}
+                      className="w-full"
+                    />
+                    {openPrinterCountry && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-background border rounded-md shadow-lg max-h-60 overflow-y-auto z-50">
+                        {worldCountries
+                          .filter(country => 
+                            !printerCountry || 
+                            country.name.toLowerCase().includes(printerCountry.toLowerCase())
+                          )
+                          .map((country) => (
+                            <div
+                              key={country.code}
+                              className="px-3 py-2 hover:bg-accent cursor-pointer flex items-center gap-2"
+                              onClick={() => {
+                                setPrinterCountry(country.code);
+                                setOpenPrinterCountry(false);
+                              }}
+                            >
+                              <span>{country.flag}</span>
+                              <span>{country.name}</span>
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                  {openPrinterCountry && (
+                    <div 
+                      className="fixed inset-0 z-40" 
+                      onClick={() => setOpenPrinterCountry(false)}
+                    />
+                  )}
+                </div>
+
                 <div className="space-y-2">
                   <Label>Téléphone</Label>
-                  <Input placeholder="Téléphone de l'imprimerie" />
+                  <PhoneInput 
+                    key={printerCountry || 'MA'}
+                    defaultCountry={printerCountry || 'MA'}
+                    placeholder="6 XX XX XX XX"
+                  />
                 </div>
 
                 <div className="space-y-2">
