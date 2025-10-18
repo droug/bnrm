@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft, CalendarIcon, ExternalLink } from "lucide-react";
-import { ScrollableDialog, ScrollableDialogContent, ScrollableDialogHeader, ScrollableDialogTitle, ScrollableDialogDescription, ScrollableDialogFooter } from "@/components/ui/scrollable-dialog";
+import { ScrollableDialog, ScrollableDialogContent, ScrollableDialogHeader, ScrollableDialogTitle, ScrollableDialogDescription, ScrollableDialogFooter, ScrollableDialogBody } from "@/components/ui/scrollable-dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -2488,112 +2488,114 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               </ScrollableDialogDescription>
             </ScrollableDialogHeader>
 
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label>Titre de la publication <span className="text-destructive">*</span></Label>
-                <Input
-                  placeholder="Titre de la publication"
-                  value={issnFormData.title}
-                  onChange={(e) => setIssnFormData({ ...issnFormData, title: e.target.value })}
-                />
-              </div>
+            <ScrollableDialogBody>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Titre de la publication <span className="text-destructive">*</span></Label>
+                  <Input
+                    placeholder="Titre de la publication"
+                    value={issnFormData.title}
+                    onChange={(e) => setIssnFormData({ ...issnFormData, title: e.target.value })}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label>Discipline / domaine <span className="text-destructive">*</span></Label>
-                <Input
-                  placeholder="Discipline ou domaine"
-                  value={issnFormData.discipline}
-                  onChange={(e) => setIssnFormData({ ...issnFormData, discipline: e.target.value })}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label>Discipline / domaine <span className="text-destructive">*</span></Label>
+                  <Input
+                    placeholder="Discipline ou domaine"
+                    value={issnFormData.discipline}
+                    onChange={(e) => setIssnFormData({ ...issnFormData, discipline: e.target.value })}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label>Langue principale <span className="text-destructive">*</span></Label>
-                <Input
-                  placeholder="Langue principale"
-                  value={issnFormData.language}
-                  onChange={(e) => setIssnFormData({ ...issnFormData, language: e.target.value })}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label>Langue principale <span className="text-destructive">*</span></Label>
+                  <Input
+                    placeholder="Langue principale"
+                    value={issnFormData.language}
+                    onChange={(e) => setIssnFormData({ ...issnFormData, language: e.target.value })}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label>Pays d'édition <span className="text-destructive">*</span></Label>
-                <Input
-                  placeholder="Pays d'édition"
-                  value={issnFormData.country}
-                  onChange={(e) => setIssnFormData({ ...issnFormData, country: e.target.value })}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label>Pays d'édition <span className="text-destructive">*</span></Label>
+                  <Input
+                    placeholder="Pays d'édition"
+                    value={issnFormData.country}
+                    onChange={(e) => setIssnFormData({ ...issnFormData, country: e.target.value })}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label>Éditeur <span className="text-destructive">*</span></Label>
-                <Input
-                  placeholder="Nom de l'éditeur"
-                  value={issnFormData.publisher}
-                  onChange={(e) => setIssnFormData({ ...issnFormData, publisher: e.target.value })}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label>Éditeur <span className="text-destructive">*</span></Label>
+                  <Input
+                    placeholder="Nom de l'éditeur"
+                    value={issnFormData.publisher}
+                    onChange={(e) => setIssnFormData({ ...issnFormData, publisher: e.target.value })}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label>Support <span className="text-destructive">*</span></Label>
-                <SimpleDropdown
-                  placeholder="Sélectionner le support"
-                  value={issnFormData.support}
-                  onChange={(value) => setIssnFormData({ ...issnFormData, support: value })}
-                  options={[
-                    { value: "papier", label: "Papier" },
-                    { value: "en_ligne", label: "En ligne" },
-                    { value: "mixte", label: "Mixte" },
-                  ]}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label>Support <span className="text-destructive">*</span></Label>
+                  <SimpleDropdown
+                    placeholder="Sélectionner le support"
+                    value={issnFormData.support}
+                    onChange={(value) => setIssnFormData({ ...issnFormData, support: value })}
+                    options={[
+                      { value: "papier", label: "Papier" },
+                      { value: "en_ligne", label: "En ligne" },
+                      { value: "mixte", label: "Mixte" },
+                    ]}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label>Fréquence de parution <span className="text-destructive">*</span></Label>
-                <SimpleDropdown
-                  placeholder="Sélectionner la fréquence"
-                  value={issnFormData.frequency}
-                  onChange={(value) => setIssnFormData({ ...issnFormData, frequency: value })}
-                  options={[
-                    { value: "hebdomadaire", label: "Hebdomadaire" },
-                    { value: "mensuelle", label: "Mensuelle" },
-                    { value: "trimestrielle", label: "Trimestrielle" },
-                    { value: "annuelle", label: "Annuelle" },
-                  ]}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label>Fréquence de parution <span className="text-destructive">*</span></Label>
+                  <SimpleDropdown
+                    placeholder="Sélectionner la fréquence"
+                    value={issnFormData.frequency}
+                    onChange={(value) => setIssnFormData({ ...issnFormData, frequency: value })}
+                    options={[
+                      { value: "hebdomadaire", label: "Hebdomadaire" },
+                      { value: "mensuelle", label: "Mensuelle" },
+                      { value: "trimestrielle", label: "Trimestrielle" },
+                      { value: "annuelle", label: "Annuelle" },
+                    ]}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label>Adresse de contact <span className="text-destructive">*</span></Label>
-                <Textarea
-                  placeholder="Adresse de contact complète"
-                  value={issnFormData.contactAddress}
-                  onChange={(e) => setIssnFormData({ ...issnFormData, contactAddress: e.target.value })}
-                  className="min-h-[80px]"
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label>Adresse de contact <span className="text-destructive">*</span></Label>
+                  <Textarea
+                    placeholder="Adresse de contact complète"
+                    value={issnFormData.contactAddress}
+                    onChange={(e) => setIssnFormData({ ...issnFormData, contactAddress: e.target.value })}
+                    className="min-h-[80px]"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label>Fichier justificatif (exemple de couverture ou sommaire)</Label>
-                <Input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setIssnFormData({ ...issnFormData, justificationFile: file });
-                    }
-                  }}
-                />
-                {issnFormData.justificationFile && (
-                  <p className="text-xs text-muted-foreground">
-                    Fichier sélectionné : {issnFormData.justificationFile.name}
-                  </p>
-                )}
+                <div className="space-y-2">
+                  <Label>Fichier justificatif (exemple de couverture ou sommaire)</Label>
+                  <Input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setIssnFormData({ ...issnFormData, justificationFile: file });
+                      }
+                    }}
+                  />
+                  {issnFormData.justificationFile && (
+                    <p className="text-xs text-muted-foreground">
+                      Fichier sélectionné : {issnFormData.justificationFile.name}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
+            </ScrollableDialogBody>
 
-            <ScrollableDialogFooter className="flex justify-end gap-2">
+            <ScrollableDialogFooter>
               <Button
                 type="button"
                 variant="outline"
