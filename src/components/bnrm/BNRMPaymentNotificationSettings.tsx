@@ -13,12 +13,12 @@ export function BNRMPaymentNotificationSettings() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
-    payment_reminder_enabled: true,
-    days_before_due: 7,
-    overdue_reminder_enabled: true,
-    overdue_reminder_frequency: 3,
-    subscription_expiry_enabled: true,
-    days_before_expiry: 15,
+    deposit_submission_enabled: true,
+    deposit_validation_enabled: true,
+    deposit_rejection_enabled: true,
+    number_attribution_enabled: true,
+    conformity_check_enabled: true,
+    physical_receipt_enabled: true,
   });
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export function BNRMPaymentNotificationSettings() {
       const { data, error } = await supabase
         .from("bnrm_parametres")
         .select("*")
-        .eq("parametre", "payment_notifications");
+        .eq("parametre", "deposit_notifications");
 
       if (error) throw error;
 
@@ -58,9 +58,9 @@ export function BNRMPaymentNotificationSettings() {
       const { error } = await supabase
         .from("bnrm_parametres")
         .upsert({
-          parametre: "payment_notifications",
+          parametre: "deposit_notifications",
           valeur: JSON.stringify(settings),
-          commentaire: "Paramètres de notifications de paiement pour les abonnements",
+          commentaire: "Paramètres de notifications pour le dépôt légal",
         }, {
           onConflict: "parametre"
         });
@@ -98,139 +98,131 @@ export function BNRMPaymentNotificationSettings() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5" />
-          Paramètres de Notifications de Paiement
+          Paramètres de Notifications du Dépôt Légal
         </CardTitle>
         <CardDescription>
-          Configurez les notifications automatiques pour les paiements d'abonnements
+          Configurez les notifications automatiques pour les différentes étapes du dépôt légal
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Rappel de paiement avant échéance */}
+        {/* Notification de soumission de dépôt */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <Label htmlFor="payment_reminder">Rappel avant échéance</Label>
+              <Label htmlFor="deposit_submission">Notification de soumission</Label>
               <p className="text-sm text-muted-foreground">
-                Envoyer un rappel avant la date d'échéance du paiement
+                Notifier lors de la soumission d'une nouvelle demande de dépôt légal
               </p>
             </div>
             <Switch
-              id="payment_reminder"
-              checked={settings.payment_reminder_enabled}
+              id="deposit_submission"
+              checked={settings.deposit_submission_enabled}
               onCheckedChange={(checked) =>
-                setSettings({ ...settings, payment_reminder_enabled: checked })
+                setSettings({ ...settings, deposit_submission_enabled: checked })
               }
             />
           </div>
-
-          {settings.payment_reminder_enabled && (
-            <div className="ml-6 space-y-2">
-              <Label htmlFor="days_before_due">
-                Nombre de jours avant l'échéance
-              </Label>
-              <Input
-                id="days_before_due"
-                type="number"
-                min="1"
-                max="30"
-                value={settings.days_before_due}
-                onChange={(e) =>
-                  setSettings({ ...settings, days_before_due: parseInt(e.target.value) })
-                }
-                className="max-w-xs"
-              />
-              <p className="text-xs text-muted-foreground">
-                Envoyer un rappel {settings.days_before_due} jour(s) avant la date d'échéance
-              </p>
-            </div>
-          )}
         </div>
 
-        {/* Rappel de paiement en retard */}
+        {/* Notification de validation */}
         <div className="space-y-4 border-t pt-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <Label htmlFor="overdue_reminder">Rappel de paiement en retard</Label>
+              <Label htmlFor="deposit_validation">Notification de validation</Label>
               <p className="text-sm text-muted-foreground">
-                Envoyer des rappels pour les paiements en retard
+                Notifier le déposant lorsque son dépôt est validé
               </p>
             </div>
             <Switch
-              id="overdue_reminder"
-              checked={settings.overdue_reminder_enabled}
+              id="deposit_validation"
+              checked={settings.deposit_validation_enabled}
               onCheckedChange={(checked) =>
-                setSettings({ ...settings, overdue_reminder_enabled: checked })
+                setSettings({ ...settings, deposit_validation_enabled: checked })
               }
             />
           </div>
-
-          {settings.overdue_reminder_enabled && (
-            <div className="ml-6 space-y-2">
-              <Label htmlFor="overdue_frequency">
-                Fréquence des rappels (en jours)
-              </Label>
-              <Input
-                id="overdue_frequency"
-                type="number"
-                min="1"
-                max="30"
-                value={settings.overdue_reminder_frequency}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    overdue_reminder_frequency: parseInt(e.target.value),
-                  })
-                }
-                className="max-w-xs"
-              />
-              <p className="text-xs text-muted-foreground">
-                Envoyer un rappel tous les {settings.overdue_reminder_frequency} jour(s) après l'échéance
-              </p>
-            </div>
-          )}
         </div>
 
-        {/* Rappel avant expiration de l'abonnement */}
+        {/* Notification de rejet */}
         <div className="space-y-4 border-t pt-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <Label htmlFor="subscription_expiry">
-                Rappel avant expiration de l'abonnement
-              </Label>
+              <Label htmlFor="deposit_rejection">Notification de rejet</Label>
               <p className="text-sm text-muted-foreground">
-                Prévenir avant l'expiration de l'abonnement
+                Notifier le déposant en cas de rejet de son dépôt
               </p>
             </div>
             <Switch
-              id="subscription_expiry"
-              checked={settings.subscription_expiry_enabled}
+              id="deposit_rejection"
+              checked={settings.deposit_rejection_enabled}
               onCheckedChange={(checked) =>
-                setSettings({ ...settings, subscription_expiry_enabled: checked })
+                setSettings({ ...settings, deposit_rejection_enabled: checked })
               }
             />
           </div>
+        </div>
 
-          {settings.subscription_expiry_enabled && (
-            <div className="ml-6 space-y-2">
-              <Label htmlFor="days_before_expiry">
-                Nombre de jours avant expiration
+        {/* Notification d'attribution de numéro */}
+        <div className="space-y-4 border-t pt-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label htmlFor="number_attribution">
+                Notification d'attribution de numéro
               </Label>
-              <Input
-                id="days_before_expiry"
-                type="number"
-                min="1"
-                max="60"
-                value={settings.days_before_expiry}
-                onChange={(e) =>
-                  setSettings({ ...settings, days_before_expiry: parseInt(e.target.value) })
-                }
-                className="max-w-xs"
-              />
-              <p className="text-xs text-muted-foreground">
-                Envoyer une notification {settings.days_before_expiry} jour(s) avant l'expiration
+              <p className="text-sm text-muted-foreground">
+                Notifier lors de l'attribution d'un numéro ISBN/ISSN
               </p>
             </div>
-          )}
+            <Switch
+              id="number_attribution"
+              checked={settings.number_attribution_enabled}
+              onCheckedChange={(checked) =>
+                setSettings({ ...settings, number_attribution_enabled: checked })
+              }
+            />
+          </div>
+        </div>
+
+        {/* Notification de contrôle de conformité */}
+        <div className="space-y-4 border-t pt-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label htmlFor="conformity_check">
+                Notification de contrôle de conformité
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Notifier les résultats du contrôle de conformité
+              </p>
+            </div>
+            <Switch
+              id="conformity_check"
+              checked={settings.conformity_check_enabled}
+              onCheckedChange={(checked) =>
+                setSettings({ ...settings, conformity_check_enabled: checked })
+              }
+            />
+          </div>
+        </div>
+
+        {/* Notification de réception physique */}
+        <div className="space-y-4 border-t pt-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label htmlFor="physical_receipt">
+                Notification de réception physique
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Notifier la réception des exemplaires physiques
+              </p>
+            </div>
+            <Switch
+              id="physical_receipt"
+              checked={settings.physical_receipt_enabled}
+              onCheckedChange={(checked) =>
+                setSettings({ ...settings, physical_receipt_enabled: checked })
+              }
+            />
+          </div>
         </div>
 
         <div className="flex justify-end pt-4">
