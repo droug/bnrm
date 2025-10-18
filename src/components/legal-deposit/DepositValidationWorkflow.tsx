@@ -99,10 +99,117 @@ export function DepositValidationWorkflow() {
         description: "Impossible de charger les demandes",
         variant: "destructive"
       });
+      // Utiliser des exemples de données pour démonstration
+      setRequests(getExampleRequests());
       return;
     }
 
-    setRequests(data as any || []);
+    // Si des données réelles existent, les utiliser, sinon utiliser les exemples
+    if (data && data.length > 0) {
+      setRequests(data as any);
+    } else {
+      setRequests(getExampleRequests());
+    }
+  };
+
+  const getExampleRequests = (): DepositRequest[] => {
+    const baseDate = new Date();
+    
+    if (activeTab === "pending") {
+      return [
+        {
+          id: "example-1",
+          request_number: "DL-2025-000123",
+          title: "Histoire du Maroc Contemporain",
+          subtitle: "Tome 1: Les Fondations",
+          support_type: "Livre",
+          status: "soumis",
+          author_name: "Dr. Ahmed Benjelloun",
+          created_at: new Date(baseDate.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+        {
+          id: "example-2",
+          request_number: "DL-2025-000089",
+          title: "Revue Marocaine des Sciences Économiques",
+          subtitle: "Volume 12 - Numéro 3",
+          support_type: "Périodique",
+          status: "en_attente_validation_b",
+          author_name: "Prof. Fatima El Mansouri",
+          created_at: new Date(baseDate.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          validated_by_service: "service-user-id",
+          service_validated_at: new Date(baseDate.getTime() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+        {
+          id: "example-3",
+          request_number: "DL-2025-000156",
+          title: "Documentaire: Les Cités Impériales du Maroc",
+          subtitle: "",
+          support_type: "Film/Vidéo",
+          status: "en_attente_comite_validation",
+          author_name: "Karim Tazi Productions",
+          created_at: new Date(baseDate.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          validated_by_service: "service-user-id",
+          service_validated_at: new Date(baseDate.getTime() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+          validated_by_department: "dept-user-id",
+          department_validated_at: new Date(baseDate.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+      ];
+    } else if (activeTab === "validated") {
+      return [
+        {
+          id: "example-4",
+          request_number: "DL-2025-000045",
+          title: "Patrimoine Architectural Marocain",
+          subtitle: "Guide Illustré",
+          support_type: "Livre",
+          status: "valide_par_comite",
+          author_name: "Architectes Associés",
+          created_at: new Date(baseDate.getTime() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+          validated_by_service: "service-user-id",
+          service_validated_at: new Date(baseDate.getTime() - 13 * 24 * 60 * 60 * 1000).toISOString(),
+          validated_by_department: "dept-user-id",
+          department_validated_at: new Date(baseDate.getTime() - 11 * 24 * 60 * 60 * 1000).toISOString(),
+          validated_by_committee: "committee-user-id",
+          committee_validated_at: new Date(baseDate.getTime() - 9 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+        {
+          id: "example-5",
+          request_number: "DL-2025-000012",
+          title: "Atlas Linguistique du Maroc",
+          subtitle: "Édition 2025",
+          support_type: "Atlas",
+          status: "valide_par_comite",
+          author_name: "Institut National des Langues",
+          created_at: new Date(baseDate.getTime() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+          validated_by_service: "service-user-id",
+          service_validated_at: new Date(baseDate.getTime() - 18 * 24 * 60 * 60 * 1000).toISOString(),
+          validated_by_department: "dept-user-id",
+          department_validated_at: new Date(baseDate.getTime() - 16 * 24 * 60 * 60 * 1000).toISOString(),
+          validated_by_committee: "committee-user-id",
+          committee_validated_at: new Date(baseDate.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+      ];
+    } else if (activeTab === "rejected") {
+      return [
+        {
+          id: "example-6",
+          request_number: "DL-2025-000078",
+          title: "Publication Incomplète",
+          subtitle: "",
+          support_type: "Livre",
+          status: "rejete_par_b",
+          author_name: "Auteur Anonyme",
+          created_at: new Date(baseDate.getTime() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+          validated_by_service: "service-user-id",
+          service_validated_at: new Date(baseDate.getTime() - 9 * 24 * 60 * 60 * 1000).toISOString(),
+          rejected_by: "dept-user-id",
+          rejected_at: new Date(baseDate.getTime() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+          rejection_reason: "Dossier incomplet : ISBN manquant, page de garde non conforme",
+        },
+      ];
+    }
+    
+    return [];
   };
 
   const getValidationStep = (request: DepositRequest): number => {
