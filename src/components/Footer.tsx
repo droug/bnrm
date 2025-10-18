@@ -19,6 +19,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import logoBnrm from "@/assets/logo-bnrm.png";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -110,18 +111,11 @@ const Footer = () => {
           {/* Col 1: À propos */}
           <div className="lg:col-span-1 space-y-6">
             <div className="flex items-center space-x-3">
-              <div className={isKitabPage 
-                ? "w-12 h-12 bg-[hsl(var(--kitab-accent))]/10 rounded-full flex items-center justify-center"
-                : "w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center"
-              }>
-                <Book className={isKitabPage ? "h-6 w-6 text-[hsl(var(--kitab-accent))]" : "h-6 w-6 text-accent-foreground"} />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold">{isKitabPage ? "Kitab" : "BNRM"}</h3>
-                <p className="text-sm opacity-80">
-                  {isKitabPage ? "Plateforme Nationale" : "Bibliothèque Nationale"}
-                </p>
-              </div>
+              <img 
+                src={logoBnrm} 
+                alt={isKitabPage ? "Logo Kitab" : "Logo BNRM"} 
+                className="h-16 w-auto object-contain"
+              />
             </div>
             
             <p className="text-sm opacity-90 leading-relaxed">
