@@ -60,7 +60,7 @@ export function SimpleRoleSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-white border border-input rounded-lg shadow-lg max-h-60 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-1 z-[100001] bg-white border border-input rounded-lg shadow-lg max-h-60 overflow-y-auto">
           {roles.length === 0 ? (
             <div className="px-4 py-3 text-sm text-muted-foreground">
               Aucun rôle disponible
