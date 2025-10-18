@@ -17,6 +17,7 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbS
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NumberManagement } from "@/components/legal-deposit/NumberManagement";
 import { DepositValidationWorkflow } from "@/components/legal-deposit/DepositValidationWorkflow";
+import IssnRequestsManager from "@/components/legal-deposit/IssnRequestsManager";
 
 const LegalDepositPage = () => {
   console.log("LegalDepositPage component is rendering");
@@ -126,6 +127,7 @@ const LegalDepositPage = () => {
             <TabsList>
               <TabsTrigger value="validation">Demandes en attente</TabsTrigger>
               <TabsTrigger value="requests">Toutes les demandes</TabsTrigger>
+              <TabsTrigger value="issn">Demandes ISSN</TabsTrigger>
               <TabsTrigger value="numbers">Gestion des numéros</TabsTrigger>
             </TabsList>
 
@@ -135,6 +137,10 @@ const LegalDepositPage = () => {
 
             <TabsContent value="requests">
               <LegalDepositBackoffice />
+            </TabsContent>
+
+            <TabsContent value="issn">
+              <IssnRequestsManager />
             </TabsContent>
 
             <TabsContent value="numbers">

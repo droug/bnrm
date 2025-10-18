@@ -11,7 +11,8 @@ import { SimpleDropdown } from "@/components/ui/simple-dropdown";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft, CalendarIcon } from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft, CalendarIcon, ExternalLink } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -75,6 +76,21 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [publicationTypes, setPublicationTypes] = useState<Array<{code: string, label: string}>>([]);
   const [amazonLink, setAmazonLink] = useState<string>("");
   const [amazonLinkError, setAmazonLinkError] = useState<string>("");
+  const [authorPseudonym, setAuthorPseudonym] = useState<string>("");
+  const [isPeriodic, setIsPeriodic] = useState<string>("");
+  const [isIssnModalOpen, setIsIssnModalOpen] = useState(false);
+  const [issnSubmitted, setIssnSubmitted] = useState(false);
+  const [issnFormData, setIssnFormData] = useState({
+    title: "",
+    discipline: "",
+    language: "",
+    country: "",
+    publisher: "",
+    support: "",
+    frequency: "",
+    contactAddress: "",
+    justificationFile: null as File | null
+  });
 
   // Fetch publication types from database
   useEffect(() => {
@@ -286,6 +302,18 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input placeholder="Nom complet" />
                 </div>
 
+                <div className="space-y-2">
+                  <Label>Pseudonyme</Label>
+                  <Input 
+                    placeholder="Saisir le pseudonyme de l'auteur (le cas échéant)" 
+                    value={authorPseudonym}
+                    onChange={(e) => setAuthorPseudonym(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    À renseigner uniquement si l'auteur publie sous un autre nom.
+                  </p>
+                </div>
+
                 {authorType === "morale" && (
                   <>
                     <div className="space-y-2">
@@ -484,6 +512,45 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     options={publicationTypes.map(t => ({ value: t.code, label: t.label }))}
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <Label>Périodicité <span className="text-destructive">*</span></Label>
+                  <SimpleDropdown
+                    placeholder="Sélectionner"
+                    value={isPeriodic}
+                    onChange={(value) => {
+                      setIsPeriodic(value);
+                      if (value === "no") {
+                        setIssnSubmitted(false);
+                      }
+                    }}
+                    options={[
+                      { value: "yes", label: "Oui" },
+                      { value: "no", label: "Non" },
+                    ]}
+                  />
+                </div>
+
+                {isPeriodic === "yes" && (
+                  <div className="space-y-2 animate-fade-in md:col-span-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsIssnModalOpen(true)}
+                      disabled={issnSubmitted}
+                      className="w-full md:w-auto"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Lien vers Formulaire ISSN
+                    </Button>
+                    {issnSubmitted && (
+                      <div className="flex items-center gap-2 text-sm text-green-600">
+                        <CheckCircle className="w-4 h-4" />
+                        Demande ISSN effectuée
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label>Présence de matériel d'accompagnement <span className="text-destructive">*</span></Label>
@@ -2437,5 +2504,165 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     );
   }
 
-  return null;
+  const handleIssnSubmit = async () => {
+    // Validation
+    if (!issnFormData.title || !issnFormData.discipline || !issnFormData.language || 
+        !issnFormData.country || !issnFormData.publisher || !issnFormData.support || 
+        !issnFormData.frequency || !issnFormData.contactAddress) {
+      toast.error("Veuillez remplir tous les champs obligatoires");
+      return;
+    }
+
+    try {
+      // TODO: Sauvegarder la demande ISSN dans la base de données
+      setIssnSubmitted(true);
+      setIsIssnModalOpen(false);
+      toast.success("✅ Demande ISSN effectuée avec succès");
+    } catch (error) {
+      console.error("Error submitting ISSN request:", error);
+      toast.error("Erreur lors de la soumission de la demande ISSN");
+    }
+  };
+
+  return (
+    <>
+      {/* Modale ISSN */}
+      <Dialog open={isIssnModalOpen} onOpenChange={setIsIssnModalOpen}>
+        <DialogContent className="max-w-[700px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-[#0E2D5C]">
+              Demande d'ISSN – Publication périodique
+            </DialogTitle>
+            <DialogDescription>
+              Veuillez remplir les informations suivantes pour votre demande d'ISSN
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Titre de la publication <span className="text-destructive">*</span></Label>
+              <Input
+                placeholder="Titre de la publication"
+                value={issnFormData.title}
+                onChange={(e) => setIssnFormData({ ...issnFormData, title: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Discipline / domaine <span className="text-destructive">*</span></Label>
+              <Input
+                placeholder="Discipline ou domaine"
+                value={issnFormData.discipline}
+                onChange={(e) => setIssnFormData({ ...issnFormData, discipline: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Langue principale <span className="text-destructive">*</span></Label>
+              <Input
+                placeholder="Langue principale"
+                value={issnFormData.language}
+                onChange={(e) => setIssnFormData({ ...issnFormData, language: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Pays d'édition <span className="text-destructive">*</span></Label>
+              <Input
+                placeholder="Pays d'édition"
+                value={issnFormData.country}
+                onChange={(e) => setIssnFormData({ ...issnFormData, country: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Éditeur <span className="text-destructive">*</span></Label>
+              <Input
+                placeholder="Nom de l'éditeur"
+                value={issnFormData.publisher}
+                onChange={(e) => setIssnFormData({ ...issnFormData, publisher: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Support <span className="text-destructive">*</span></Label>
+              <SimpleDropdown
+                placeholder="Sélectionner le support"
+                value={issnFormData.support}
+                onChange={(value) => setIssnFormData({ ...issnFormData, support: value })}
+                options={[
+                  { value: "papier", label: "Papier" },
+                  { value: "en_ligne", label: "En ligne" },
+                  { value: "mixte", label: "Mixte" },
+                ]}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Fréquence de parution <span className="text-destructive">*</span></Label>
+              <SimpleDropdown
+                placeholder="Sélectionner la fréquence"
+                value={issnFormData.frequency}
+                onChange={(value) => setIssnFormData({ ...issnFormData, frequency: value })}
+                options={[
+                  { value: "hebdomadaire", label: "Hebdomadaire" },
+                  { value: "mensuelle", label: "Mensuelle" },
+                  { value: "trimestrielle", label: "Trimestrielle" },
+                  { value: "annuelle", label: "Annuelle" },
+                ]}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Adresse de contact <span className="text-destructive">*</span></Label>
+              <Textarea
+                placeholder="Adresse de contact complète"
+                value={issnFormData.contactAddress}
+                onChange={(e) => setIssnFormData({ ...issnFormData, contactAddress: e.target.value })}
+                className="min-h-[80px]"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Fichier justificatif (exemple de couverture ou sommaire)</Label>
+              <Input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setIssnFormData({ ...issnFormData, justificationFile: file });
+                  }
+                }}
+              />
+              {issnFormData.justificationFile && (
+                <p className="text-xs text-muted-foreground">
+                  Fichier sélectionné : {issnFormData.justificationFile.name}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsIssnModalOpen(false)}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="button"
+              onClick={handleIssnSubmit}
+            >
+              ✅ Soumettre la demande ISSN
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Render nothing if no step is matched */}
+      {null}
+    </>
+  );
 }
