@@ -56,27 +56,39 @@ serve(async (req) => {
     const createdUsers: any[] = [];
 
     for (const testUser of testUsers) {
-      // Créer l'utilisateur
-      const { data: user, error: userError } = await supabaseAdmin.auth.admin.createUser({
-        email: testUser.email,
-        password: testUser.password,
-        email_confirm: true,
-        user_metadata: {
-          first_name: testUser.firstName,
-          last_name: testUser.lastName
-        }
-      });
+      // Vérifier si l'utilisateur existe déjà
+      const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+      const existingUser = existingUsers.users.find(u => u.email === testUser.email);
 
-      if (userError) {
-        console.error(`Erreur création utilisateur ${testUser.email}:`, userError);
-        continue;
+      let userId: string;
+      
+      if (existingUser) {
+        console.log(`Utilisateur ${testUser.email} existe déjà, utilisation de l'utilisateur existant`);
+        userId = existingUser.id;
+      } else {
+        // Créer l'utilisateur s'il n'existe pas
+        const { data: user, error: userError } = await supabaseAdmin.auth.admin.createUser({
+          email: testUser.email,
+          password: testUser.password,
+          email_confirm: true,
+          user_metadata: {
+            first_name: testUser.firstName,
+            last_name: testUser.lastName
+          }
+        });
+
+        if (userError) {
+          console.error(`Erreur création utilisateur ${testUser.email}:`, userError);
+          continue;
+        }
+        userId = user.user.id;
       }
 
-      // Créer le profil (sans le champ role qui n'existe pas dans profiles)
+      // Créer/mettre à jour le profil
       const { error: profileError } = await supabaseAdmin
         .from('profiles')
         .upsert({
-          user_id: user.user.id,
+          user_id: userId,
           first_name: testUser.firstName,
           last_name: testUser.lastName,
           institution: testUser.institution,
@@ -91,21 +103,21 @@ serve(async (req) => {
       const { error: roleError } = await supabaseAdmin
         .from('user_roles')
         .upsert({
-          user_id: user.user.id,
+          user_id: userId,
           role: testUser.role,
-          granted_by: user.user.id
+          granted_by: userId
         });
 
       if (roleError) {
         console.error(`Erreur attribution rôle ${testUser.email}:`, roleError);
       }
 
-      // Créer une entrée dans professional_registry pour les professionnels
+      // Créer/mettre à jour une entrée dans professional_registry pour les professionnels
       if (['editor', 'printer', 'producer'].includes(testUser.role)) {
         const { data: registryData, error: registryError } = await supabaseAdmin
           .from('professional_registry')
           .upsert({
-            user_id: user.user.id,
+            user_id: userId,
             professional_type: testUser.role,
             organization_name: testUser.institution,
             contact_email: testUser.email,
@@ -121,14 +133,14 @@ serve(async (req) => {
 
         createdUsers.push({
           email: testUser.email,
-          userId: user.user.id,
+          userId: userId,
           registryId: registryData?.id,
           role: testUser.role
         });
       } else {
         createdUsers.push({
           email: testUser.email,
-          userId: user.user.id,
+          userId: userId,
           role: testUser.role
         });
       }
