@@ -993,7 +993,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <div className="space-y-2">
                   <Label>Téléphone</Label>
                   <PhoneInput 
-                    defaultCountry="MA"
+                    key={printerCountry || 'MA'}
+                    defaultCountry={printerCountry || 'MA'}
                     placeholder="6 XX XX XX XX"
                   />
                 </div>
