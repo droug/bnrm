@@ -112,16 +112,89 @@ export function WorkflowDynamicSelects() {
   useEffect(() => {
     if (selectedStep) {
       const step = steps.find(s => s.id === selectedStep);
-      if (step?.required_role) {
-        const filtered = roles.filter(r => r.role_name === step.required_role);
+      const workflow = workflows.find(w => w.id === selectedWorkflow);
+      
+      if (workflow) {
+        // Rôles administratifs internes de base
+        const adminRoles = [
+          'admin',
+          'librarian',
+          'editor',
+          'printer',
+          'producer',
+          'distributor',
+          'author',
+          'researcher',
+          'partner'
+        ];
+        
+        // Rôles spécifiques par module/workflow
+        const moduleSpecificRoles: Record<string, string[]> = {
+          'legal_deposit': [
+            'Agent Dépôt Légal',
+            'Validateur BN',
+            'Archiviste GED',
+            'Auteur/Éditeur'
+          ],
+          'cataloging': [
+            'Catalogueur',
+            'Responsable Validation',
+            'Administrateur BNRM'
+          ],
+          'ged': [
+            'Agent Numérisation',
+            'Contrôleur Qualité',
+            'Responsable GED',
+            'Archiviste'
+          ],
+          'cbm': [
+            'Bibliothèque Partenaire',
+            'Coordinateur CBM',
+            'Administrateur CBM'
+          ],
+          'payment': [
+            'Utilisateur Demandeur',
+            'Gestionnaire Financier',
+            'Responsable e-Payment',
+            'Service Comptabilité'
+          ],
+          'portal': [
+            'Rédacteur',
+            'Responsable Éditorial',
+            'Administrateur Portail'
+          ],
+          'analytics': [
+            'Analyste',
+            'Responsable Suivi-Évaluation',
+            'Direction BNRM'
+          ]
+        };
+        
+        // Combiner les rôles de la base de données avec les rôles prédéfinis
+        let availableRoles = [...roles];
+        
+        // Ajouter les rôles spécifiques au module si disponibles
+        const moduleRoles = moduleSpecificRoles[workflow.module] || [];
+        moduleRoles.forEach(roleName => {
+          if (!availableRoles.find(r => r.role_name === roleName)) {
+            availableRoles.push({
+              id: `predefined-${roleName}`,
+              role_name: roleName,
+              module: workflow.module,
+              role_level: 'module',
+              description: `Rôle ${roleName} pour ${workflow.module}`
+            });
+          }
+        });
+        
+        // Filtrer par module
+        const filtered = availableRoles.filter(r => 
+          r.module === workflow.module || 
+          adminRoles.includes(r.role_name.toLowerCase()) ||
+          moduleRoles.includes(r.role_name)
+        );
+        
         setFilteredRoles(filtered);
-      } else {
-        // Si pas de rôle requis spécifique, montrer tous les rôles du module
-        const workflow = workflows.find(w => w.id === selectedWorkflow);
-        if (workflow) {
-          const filtered = roles.filter(r => r.module === workflow.module);
-          setFilteredRoles(filtered);
-        }
       }
       setSelectedRole("");
       setSelectedTransition("");
@@ -462,13 +535,80 @@ export function WorkflowDynamicSelects() {
           <CardContent className="pt-6">
             <div className="space-y-3">
               <Label>Rôle</Label>
-              <SimpleRoleSelector
-                value={selectedRole}
-                onChange={setSelectedRole}
-                roles={filteredRoles}
-                placeholder="Choisir un rôle..."
+              <Select 
+                value={selectedRole} 
+                onValueChange={setSelectedRole}
                 disabled={!selectedStep}
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisir un rôle..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {filteredRoles.length > 0 ? (
+                    <>
+                      {/* Rôles administratifs internes */}
+                      {filteredRoles.filter(r => 
+                        ['admin', 'librarian', 'editor', 'printer', 'producer', 'distributor', 'author', 'researcher', 'partner']
+                          .includes(r.role_name.toLowerCase())
+                      ).length > 0 && (
+                        <>
+                          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                            Rôles Administratifs Internes
+                          </div>
+                          {filteredRoles
+                            .filter(r => 
+                              ['admin', 'librarian', 'editor', 'printer', 'producer', 'distributor', 'author', 'researcher', 'partner']
+                                .includes(r.role_name.toLowerCase())
+                            )
+                            .map((role) => (
+                              <SelectItem key={role.id} value={role.id}>
+                                <div className="flex items-center gap-2">
+                                  <Users className="h-3 w-3 text-blue-600" />
+                                  <span className="font-medium">{role.role_name}</span>
+                                  <Badge variant="secondary" className="ml-2 text-xs">
+                                    {role.role_level}
+                                  </Badge>
+                                </div>
+                              </SelectItem>
+                            ))}
+                        </>
+                      )}
+                      
+                      {/* Rôles spécifiques au module */}
+                      {filteredRoles.filter(r => 
+                        !['admin', 'librarian', 'editor', 'printer', 'producer', 'distributor', 'author', 'researcher', 'partner']
+                          .includes(r.role_name.toLowerCase())
+                      ).length > 0 && (
+                        <>
+                          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground border-t mt-1 pt-2">
+                            Rôles Spécifiques au Module
+                          </div>
+                          {filteredRoles
+                            .filter(r => 
+                              !['admin', 'librarian', 'editor', 'printer', 'producer', 'distributor', 'author', 'researcher', 'partner']
+                                .includes(r.role_name.toLowerCase())
+                            )
+                            .map((role) => (
+                              <SelectItem key={role.id} value={role.id}>
+                                <div className="flex items-center gap-2">
+                                  <Users className="h-3 w-3 text-orange-600" />
+                                  <span>{role.role_name}</span>
+                                  <Badge variant="outline" className="ml-2 text-xs">
+                                    {role.module}
+                                  </Badge>
+                                </div>
+                              </SelectItem>
+                            ))}
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <div className="px-2 py-4 text-sm text-center text-muted-foreground">
+                      Aucun rôle disponible. Sélectionnez un workflow et une étape.
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
               {getRoleInfo() && (
                 <div className="p-3 bg-muted rounded-md text-sm">
                   <p className="font-medium">{getRoleInfo()?.role_name}</p>
