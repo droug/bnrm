@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollableDialog, ScrollableDialogContent, ScrollableDialogDescription, ScrollableDialogHeader, ScrollableDialogTitle, ScrollableDialogTrigger, ScrollableDialogBody } from "@/components/ui/scrollable-dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -575,144 +576,146 @@ export default function BNRMEditorialMonitoring() {
             Suivi des publications non déposées après attribution du numéro DL
           </p>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
+        <ScrollableDialog>
+          <ScrollableDialogTrigger asChild>
             <Button variant="outline">
               <Settings className="h-4 w-4 mr-2" />
               Paramètres
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Paramètres de la Veille Éditoriale</DialogTitle>
-              <DialogDescription>
+          </ScrollableDialogTrigger>
+          <ScrollableDialogContent className="max-w-2xl">
+            <ScrollableDialogHeader>
+              <ScrollableDialogTitle>Paramètres de la Veille Éditoriale</ScrollableDialogTitle>
+              <ScrollableDialogDescription>
                 Configuration des notifications et rappels automatiques
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-6 py-4">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
+              </ScrollableDialogDescription>
+            </ScrollableDialogHeader>
+            <ScrollableDialogBody>
+              <div className="space-y-6 py-4">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Rappel à 20 jours</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Envoyer un rappel après 20 jours
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.reminder20Enabled}
+                      onCheckedChange={(checked) =>
+                        setSettings({ ...settings, reminder20Enabled: checked })
+                      }
+                    />
+                  </div>
+
+                  {settings.reminder20Enabled && (
+                    <div className="space-y-2 pl-4">
+                      <Label>Nombre de jours</Label>
+                      <Input
+                        type="number"
+                        value={settings.reminder20Days}
+                        onChange={(e) =>
+                          setSettings({ ...settings, reminder20Days: parseInt(e.target.value) })
+                        }
+                      />
+                      <Label>Modèle d'email</Label>
+                      <Textarea
+                        value={settings.emailTemplate20}
+                        onChange={(e) =>
+                          setSettings({ ...settings, emailTemplate20: e.target.value })
+                        }
+                        rows={3}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Rappel à 40 jours</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Envoyer un rappel après 40 jours
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.reminder40Enabled}
+                      onCheckedChange={(checked) =>
+                        setSettings({ ...settings, reminder40Enabled: checked })
+                      }
+                    />
+                  </div>
+
+                  {settings.reminder40Enabled && (
+                    <div className="space-y-2 pl-4">
+                      <Label>Nombre de jours</Label>
+                      <Input
+                        type="number"
+                        value={settings.reminder40Days}
+                        onChange={(e) =>
+                          setSettings({ ...settings, reminder40Days: parseInt(e.target.value) })
+                        }
+                      />
+                      <Label>Modèle d'email</Label>
+                      <Textarea
+                        value={settings.emailTemplate40}
+                        onChange={(e) =>
+                          setSettings({ ...settings, emailTemplate40: e.target.value })
+                        }
+                        rows={3}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Lettre de réclamation</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Générer après 2 mois (60 jours)
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.claimEnabled}
+                      onCheckedChange={(checked) =>
+                        setSettings({ ...settings, claimEnabled: checked })
+                      }
+                    />
+                  </div>
+
+                  {settings.claimEnabled && (
+                    <div className="space-y-2 pl-4">
+                      <Label>Nombre de jours</Label>
+                      <Input
+                        type="number"
+                        value={settings.claimDays}
+                        onChange={(e) =>
+                          setSettings({ ...settings, claimDays: parseInt(e.target.value) })
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t">
                   <div className="space-y-0.5">
-                    <Label>Rappel à 20 jours</Label>
+                    <Label>Envoi automatique</Label>
                     <p className="text-sm text-muted-foreground">
-                      Envoyer un rappel après 20 jours
+                      Envoyer automatiquement les rappels et réclamations
                     </p>
                   </div>
                   <Switch
-                    checked={settings.reminder20Enabled}
+                    checked={settings.autoSend}
                     onCheckedChange={(checked) =>
-                      setSettings({ ...settings, reminder20Enabled: checked })
+                      setSettings({ ...settings, autoSend: checked })
                     }
                   />
                 </div>
-
-                {settings.reminder20Enabled && (
-                  <div className="space-y-2 pl-4">
-                    <Label>Nombre de jours</Label>
-                    <Input
-                      type="number"
-                      value={settings.reminder20Days}
-                      onChange={(e) =>
-                        setSettings({ ...settings, reminder20Days: parseInt(e.target.value) })
-                      }
-                    />
-                    <Label>Modèle d'email</Label>
-                    <Textarea
-                      value={settings.emailTemplate20}
-                      onChange={(e) =>
-                        setSettings({ ...settings, emailTemplate20: e.target.value })
-                      }
-                      rows={3}
-                    />
-                  </div>
-                )}
               </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Rappel à 40 jours</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Envoyer un rappel après 40 jours
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.reminder40Enabled}
-                    onCheckedChange={(checked) =>
-                      setSettings({ ...settings, reminder40Enabled: checked })
-                    }
-                  />
-                </div>
-
-                {settings.reminder40Enabled && (
-                  <div className="space-y-2 pl-4">
-                    <Label>Nombre de jours</Label>
-                    <Input
-                      type="number"
-                      value={settings.reminder40Days}
-                      onChange={(e) =>
-                        setSettings({ ...settings, reminder40Days: parseInt(e.target.value) })
-                      }
-                    />
-                    <Label>Modèle d'email</Label>
-                    <Textarea
-                      value={settings.emailTemplate40}
-                      onChange={(e) =>
-                        setSettings({ ...settings, emailTemplate40: e.target.value })
-                      }
-                      rows={3}
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Lettre de réclamation</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Générer après 2 mois (60 jours)
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.claimEnabled}
-                    onCheckedChange={(checked) =>
-                      setSettings({ ...settings, claimEnabled: checked })
-                    }
-                  />
-                </div>
-
-                {settings.claimEnabled && (
-                  <div className="space-y-2 pl-4">
-                    <Label>Nombre de jours</Label>
-                    <Input
-                      type="number"
-                      value={settings.claimDays}
-                      onChange={(e) =>
-                        setSettings({ ...settings, claimDays: parseInt(e.target.value) })
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between pt-4 border-t">
-                <div className="space-y-0.5">
-                  <Label>Envoi automatique</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Envoyer automatiquement les rappels et réclamations
-                  </p>
-                </div>
-                <Switch
-                  checked={settings.autoSend}
-                  onCheckedChange={(checked) =>
-                    setSettings({ ...settings, autoSend: checked })
-                  }
-                />
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </ScrollableDialogBody>
+          </ScrollableDialogContent>
+        </ScrollableDialog>
       </div>
 
       <Tabs defaultValue="monitoring" className="space-y-4">
