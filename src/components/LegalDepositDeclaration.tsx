@@ -946,51 +946,48 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input type="email" placeholder="Email de l'imprimerie" />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 relative">
                   <Label>Pays</Label>
-                  <Popover open={openPrinterCountry} onOpenChange={setOpenPrinterCountry}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={openPrinterCountry}
-                        className="w-full justify-between"
-                      >
-                        {printerCountry
-                          ? worldCountries.find((country) => country.code === printerCountry)?.name
-                          : "Sélectionner un pays"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full p-0 bg-background" align="start">
-                      <Command className="bg-background">
-                        <CommandInput placeholder="Rechercher un pays..." />
-                        <CommandList>
-                          <CommandEmpty>Aucun pays trouvé.</CommandEmpty>
-                          <CommandGroup>
-                            {worldCountries.map((country) => (
-                              <CommandItem
-                                key={country.code}
-                                value={country.name}
-                                onSelect={() => {
-                                  setPrinterCountry(country.code);
-                                  setOpenPrinterCountry(false);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    printerCountry === country.code ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {country.flag} {country.name}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  <div className="relative">
+                    <Input
+                      placeholder="Rechercher un pays..."
+                      value={printerCountry ? worldCountries.find(c => c.code === printerCountry)?.name || '' : ''}
+                      onChange={(e) => {
+                        setPrinterCountry('');
+                        setOpenPrinterCountry(true);
+                      }}
+                      onFocus={() => setOpenPrinterCountry(true)}
+                      className="w-full"
+                    />
+                    {openPrinterCountry && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-background border rounded-md shadow-lg max-h-60 overflow-y-auto z-50">
+                        {worldCountries
+                          .filter(country => 
+                            !printerCountry || 
+                            country.name.toLowerCase().includes(printerCountry.toLowerCase())
+                          )
+                          .map((country) => (
+                            <div
+                              key={country.code}
+                              className="px-3 py-2 hover:bg-accent cursor-pointer flex items-center gap-2"
+                              onClick={() => {
+                                setPrinterCountry(country.code);
+                                setOpenPrinterCountry(false);
+                              }}
+                            >
+                              <span>{country.flag}</span>
+                              <span>{country.name}</span>
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                  {openPrinterCountry && (
+                    <div 
+                      className="fixed inset-0 z-40" 
+                      onClick={() => setOpenPrinterCountry(false)}
+                    />
+                  )}
                 </div>
 
                 <div className="space-y-2">
