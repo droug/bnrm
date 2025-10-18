@@ -15,7 +15,7 @@ const ScrollableDialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-[99998] bg-black/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-[100000] bg-black/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -59,15 +59,15 @@ const ScrollableDialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-[99999] w-full translate-x-[-50%] translate-y-[-50%]",
+        "fixed left-[50%] top-[50%] z-[100001] w-full translate-x-[-50%] translate-y-[-50%]",
         "border bg-background shadow-lg duration-200",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         "sm:rounded-lg",
-        "max-h-[90vh] h-auto", // Augmenté à 90vh pour plus d'espace
-        "flex flex-col", // Structure flex pour layout optimal
-        "overflow-hidden", // Empêche le scroll sur le container principal
+        "max-h-[90vh] h-auto",
+        "flex flex-col",
+        "overflow-hidden",
         className
       )}
       {...props}
