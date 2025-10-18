@@ -142,13 +142,13 @@ export default function BNRMBackOffice() {
                   <Settings className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Workflow</span>
                 </TabsTrigger>
-                <TabsTrigger value="statistics" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
-                  <BarChart3 className="h-4 w-4 flex-shrink-0" />
-                  <span className="hidden md:inline">Statistiques</span>
-                </TabsTrigger>
                 <TabsTrigger value="editorial-monitoring" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
                   <Search className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Veille</span>
+                </TabsTrigger>
+                <TabsTrigger value="statistics" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                  <BarChart3 className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden md:inline">Statistiques</span>
                 </TabsTrigger>
                 <TabsTrigger value="notifications" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
                   <Bell className="h-4 w-4 flex-shrink-0" />
