@@ -35,7 +35,6 @@ import { AdminHeader } from "@/components/AdminHeader";
 import { BNRMDashboard } from "@/components/bnrm/BNRMDashboard";
 import { BNRMRequestManager } from "@/components/bnrm/BNRMRequestManager";
 import { BNRMNumberAttribution } from "@/components/bnrm/BNRMNumberAttribution";
-import { BNRMWorkflowManager } from "@/components/bnrm/BNRMWorkflowManager";
 import { BNRMPaymentNotificationSettings } from "@/components/bnrm/BNRMPaymentNotificationSettings";
 import { BNRMStatistics } from "@/components/bnrm/BNRMStatistics";
 import BNRMEditorialMonitoring from "@/components/bnrm/BNRMEditorialMonitoring";
@@ -137,10 +136,6 @@ export default function BNRMBackOffice() {
                 <TabsTrigger value="deposits" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
                   <Archive className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Dépôts</span>
-                </TabsTrigger>
-                <TabsTrigger value="workflow" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
-                  <Settings className="h-4 w-4 flex-shrink-0" />
-                  <span className="hidden md:inline">Workflow</span>
                 </TabsTrigger>
                 <TabsTrigger value="editorial-monitoring" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
                   <Search className="h-4 w-4 flex-shrink-0" />
@@ -398,11 +393,6 @@ export default function BNRMBackOffice() {
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
-
-              {/* Workflow Management Tab */}
-              <TabsContent value="workflow" className="space-y-4">
-                <BNRMWorkflowManager />
               </TabsContent>
 
               {/* Statistics Tab */}
