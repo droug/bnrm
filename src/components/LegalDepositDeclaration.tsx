@@ -2013,12 +2013,15 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       const requestNumber = `DL-${new Date().getFullYear()}-${Date.now()}`;
       const isAmazonPublisher = selectedPublisher && selectedPublisher.name.toLowerCase().includes('amazon');
       
+      type DepositStatus = 'en_attente_validation_b' | 'brouillon';
+      const depositStatus: DepositStatus = isAmazonPublisher ? 'en_attente_validation_b' : 'brouillon';
+      
       const newRequest = {
         initiator_id: professionalData.id,
         request_number: requestNumber,
         support_type: 'imprime' as const,
         monograph_type: 'livres' as const,
-        status: isAmazonPublisher ? 'en_attente_validation_b' as const : 'brouillon' as const,
+        status: depositStatus,
         title: formData.title || 'Sans titre',
         author_name: formData.author_name || '',
         amazon_link: isAmazonPublisher ? amazonLink : null,
