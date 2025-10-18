@@ -11,10 +11,11 @@ import { SimpleDropdown } from "@/components/ui/simple-dropdown";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft, CalendarIcon, ExternalLink } from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft, CalendarIcon, ExternalLink, Check, ChevronsUpDown } from "lucide-react";
 import { ScrollableDialog, ScrollableDialogContent, ScrollableDialogHeader, ScrollableDialogTitle, ScrollableDialogDescription, ScrollableDialogFooter, ScrollableDialogBody } from "@/components/ui/scrollable-dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -23,6 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { moroccanRegions, getCitiesByRegion } from "@/data/moroccanRegions";
 import { bookDisciplines } from "@/data/bookDisciplines";
 import { worldLanguages } from "@/data/worldLanguages";
+import { worldCountries } from "@/data/worldCountries";
 import { PhoneInput } from "@/components/ui/phone-input";
 
 interface Publisher {
@@ -91,6 +93,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     contactAddress: "",
     justificationFile: null as File | null
   });
+  const [printerCountry, setPrinterCountry] = useState<string>("");
+  const [openPrinterCountry, setOpenPrinterCountry] = useState(false);
 
   // Fetch publication types from database
   useEffect(() => {
@@ -944,9 +948,49 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Pays</Label>
-                  <p className="text-xs text-muted-foreground mb-1">
-                    L'indicatif du pays est ajouté automatiquement selon votre sélection.
-                  </p>
+                  <Popover open={openPrinterCountry} onOpenChange={setOpenPrinterCountry}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={openPrinterCountry}
+                        className="w-full justify-between"
+                      >
+                        {printerCountry
+                          ? worldCountries.find((country) => country.code === printerCountry)?.name
+                          : "Sélectionner un pays"}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0 bg-background" align="start">
+                      <Command className="bg-background">
+                        <CommandInput placeholder="Rechercher un pays..." />
+                        <CommandList>
+                          <CommandEmpty>Aucun pays trouvé.</CommandEmpty>
+                          <CommandGroup>
+                            {worldCountries.map((country) => (
+                              <CommandItem
+                                key={country.code}
+                                value={country.name}
+                                onSelect={() => {
+                                  setPrinterCountry(country.code);
+                                  setOpenPrinterCountry(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    printerCountry === country.code ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {country.flag} {country.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
                 <div className="space-y-2">
