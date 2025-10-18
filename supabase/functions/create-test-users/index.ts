@@ -100,11 +100,38 @@ serve(async (req) => {
         console.error(`Erreur attribution rôle ${testUser.email}:`, roleError);
       }
 
-      createdUsers.push({
-        email: testUser.email,
-        id: user.user.id,
-        role: testUser.role
-      });
+      // Créer une entrée dans professional_registry pour les professionnels
+      if (['editor', 'printer', 'producer'].includes(testUser.role)) {
+        const { data: registryData, error: registryError } = await supabaseAdmin
+          .from('professional_registry')
+          .upsert({
+            user_id: user.user.id,
+            professional_type: testUser.role,
+            organization_name: testUser.institution,
+            contact_email: testUser.email,
+            is_active: true,
+            approval_status: 'approved'
+          })
+          .select()
+          .single();
+
+        if (registryError) {
+          console.error(`Erreur création registre professionnel ${testUser.email}:`, registryError);
+        }
+
+        createdUsers.push({
+          email: testUser.email,
+          userId: user.user.id,
+          registryId: registryData?.id,
+          role: testUser.role
+        });
+      } else {
+        createdUsers.push({
+          email: testUser.email,
+          userId: user.user.id,
+          role: testUser.role
+        });
+      }
     }
 
     // Créer des dépôts légaux de test pour différents états du workflow
@@ -112,7 +139,7 @@ serve(async (req) => {
     const printerUser = createdUsers.find(u => u.role === 'printer');
     const producerUser = createdUsers.find(u => u.role === 'producer');
 
-    if (editorUser) {
+    if (editorUser && editorUser.registryId) {
       const testDeposits = [
         // Dépôt en brouillon - début du workflow
         {
@@ -124,7 +151,7 @@ serve(async (req) => {
           monograph_type: "livres",
           language: "fr",
           status: "brouillon",
-          initiator_id: editorUser.id,
+          initiator_id: editorUser.registryId,
           page_count: 320,
           publication_date: '2025-01-15',
         },
@@ -138,7 +165,7 @@ serve(async (req) => {
           monograph_type: "livres",
           language: "ar",
           status: "soumis",
-          initiator_id: editorUser.id,
+          initiator_id: editorUser.registryId,
           submission_date: new Date().toISOString(),
           page_count: 256,
           publication_date: '2025-02-01',
@@ -153,9 +180,9 @@ serve(async (req) => {
           monograph_type: "livres",
           language: "ar",
           status: "en_attente_validation_b",
-          initiator_id: editorUser.id,
+          initiator_id: editorUser.registryId,
           submission_date: new Date(Date.now() - 86400000).toISOString(),
-          validated_by_service: editorUser.id,
+          validated_by_service: editorUser.userId,
           service_validated_at: new Date(Date.now() - 43200000).toISOString(),
           service_validation_notes: "Dossier complet et conforme",
           page_count: 450,
@@ -171,11 +198,11 @@ serve(async (req) => {
           monograph_type: "beaux_livres",
           language: "fr",
           status: "en_attente_comite_validation",
-          initiator_id: editorUser.id,
+          initiator_id: editorUser.registryId,
           submission_date: new Date(Date.now() - 172800000).toISOString(),
-          validated_by_service: editorUser.id,
+          validated_by_service: editorUser.userId,
           service_validated_at: new Date(Date.now() - 129600000).toISOString(),
-          validated_by_department: editorUser.id,
+          validated_by_department: editorUser.userId,
           department_validated_at: new Date(Date.now() - 86400000).toISOString(),
           page_count: 280,
           publication_date: '2025-03-01',
@@ -190,13 +217,13 @@ serve(async (req) => {
           monograph_type: "livres",
           language: "fr",
           status: "valide",
-          initiator_id: editorUser.id,
+          initiator_id: editorUser.registryId,
           submission_date: new Date(Date.now() - 259200000).toISOString(),
-          validated_by_service: editorUser.id,
+          validated_by_service: editorUser.userId,
           service_validated_at: new Date(Date.now() - 216000000).toISOString(),
-          validated_by_department: editorUser.id,
+          validated_by_department: editorUser.userId,
           department_validated_at: new Date(Date.now() - 172800000).toISOString(),
-          validated_by_committee: editorUser.id,
+          validated_by_committee: editorUser.userId,
           committee_validated_at: new Date(Date.now() - 129600000).toISOString(),
           dl_number: 'DL-2025-00123',
           isbn_assigned: '978-9954-0-1234-5',
@@ -214,7 +241,7 @@ serve(async (req) => {
           monograph_type: "livres",
           language: "fr",
           status: "soumis",
-          initiator_id: editorUser.id,
+          initiator_id: editorUser.registryId,
           submission_date: new Date().toISOString(),
           page_count: 420,
           publication_date: '2025-01-10',
@@ -231,7 +258,7 @@ serve(async (req) => {
     }
 
     // Créer des dépôts pour l'imprimeur
-    if (printerUser) {
+    if (printerUser && printerUser.registryId) {
       const printerDeposits = [
         {
           request_number: `DL-2025-${Date.now()}-101`,
@@ -242,7 +269,7 @@ serve(async (req) => {
           monograph_type: "periodiques",
           language: "fr",
           status: "soumis",
-          initiator_id: printerUser.id,
+          initiator_id: printerUser.registryId,
           submission_date: new Date().toISOString(),
           page_count: 64,
           publication_date: '2025-01-01',
@@ -256,9 +283,9 @@ serve(async (req) => {
           monograph_type: "periodiques",
           language: "ar",
           status: "en_attente_validation_b",
-          initiator_id: printerUser.id,
+          initiator_id: printerUser.registryId,
           submission_date: new Date(Date.now() - 86400000).toISOString(),
-          validated_by_service: printerUser.id,
+          validated_by_service: printerUser.userId,
           service_validated_at: new Date(Date.now() - 43200000).toISOString(),
           page_count: 72,
           publication_date: '2024-12-01',
@@ -275,7 +302,7 @@ serve(async (req) => {
     }
 
     // Créer des dépôts audiovisuels pour le producteur
-    if (producerUser) {
+    if (producerUser && producerUser.registryId) {
       const producerDeposits = [
         {
           request_number: `DL-2025-${Date.now()}-201`,
@@ -286,7 +313,7 @@ serve(async (req) => {
           monograph_type: "audiovisuel",
           language: "fr",
           status: "soumis",
-          initiator_id: producerUser.id,
+          initiator_id: producerUser.registryId,
           submission_date: new Date().toISOString(),
           publication_date: '2025-02-01',
         },
