@@ -13,11 +13,12 @@ import { SimpleRoleSelector } from "./SimpleRoleSelector";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, RefreshCw, Workflow, GitBranch, Users, ArrowRight } from "lucide-react";
+import { Plus, RefreshCw, Workflow, GitBranch, Users, ArrowRight, Trash2, Save, AlertTriangle } from "lucide-react";
 import { CreateWorkflowDialog } from "./CreateWorkflowDialog";
 import { CreateStepDialog } from "./CreateStepDialog";
 import { CreateRoleDialog } from "./CreateRoleDialog";
 import { CreateTransitionDialog } from "./CreateTransitionDialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface WorkflowModel {
   id: string;
@@ -77,11 +78,22 @@ export function WorkflowDynamicSelects() {
   const [createStepOpen, setCreateStepOpen] = useState(false);
   const [createRoleOpen, setCreateRoleOpen] = useState(false);
   const [createTransitionOpen, setCreateTransitionOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ type: 'step' | 'transition', id: string } | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [exitWarningOpen, setExitWarningOpen] = useState(false);
 
   // Charger les données initiales
   useEffect(() => {
     loadAllData();
   }, []);
+
+  // Charger automatiquement les étapes du workflow standard
+  useEffect(() => {
+    if (selectedWorkflow) {
+      loadDefaultSteps();
+    }
+  }, [selectedWorkflow]);
 
   // Filtrer les étapes quand le workflow change
   useEffect(() => {
@@ -150,6 +162,7 @@ export function WorkflowDynamicSelects() {
       setSteps(stepsData.data || []);
       setRoles(rolesData.data || []);
       setTransitions(transitionsData.data || []);
+      setHasUnsavedChanges(false);
       
       toast.success("Données chargées avec succès");
     } catch (error) {
@@ -158,6 +171,64 @@ export function WorkflowDynamicSelects() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadDefaultSteps = async () => {
+    if (!selectedWorkflow) return;
+    
+    // Les étapes sont déjà chargées dans loadAllData
+    // On va juste filtrer pour afficher les étapes par défaut du workflow
+    const defaultSteps = steps.filter(s => s.workflow_id === selectedWorkflow);
+    setFilteredSteps(defaultSteps);
+  };
+
+  const handleDeleteStep = async (stepId: string) => {
+    try {
+      const { error } = await supabase
+        .from('workflow_steps_new')
+        .delete()
+        .eq('id', stepId);
+
+      if (error) throw error;
+
+      toast.success("Étape supprimée avec succès");
+      await loadAllData();
+      setDeleteConfirmOpen(false);
+      setItemToDelete(null);
+    } catch (error) {
+      console.error('Error deleting step:', error);
+      toast.error("Erreur lors de la suppression de l'étape");
+    }
+  };
+
+  const handleDeleteTransition = async (transitionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('workflow_transitions')
+        .delete()
+        .eq('id', transitionId);
+
+      if (error) throw error;
+
+      toast.success("Transition supprimée avec succès");
+      await loadAllData();
+      setDeleteConfirmOpen(false);
+      setItemToDelete(null);
+    } catch (error) {
+      console.error('Error deleting transition:', error);
+      toast.error("Erreur lors de la suppression de la transition");
+    }
+  };
+
+  const confirmDelete = (type: 'step' | 'transition', id: string) => {
+    setItemToDelete({ type, id });
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleSaveWorkflow = async () => {
+    // Ici on pourrait ajouter une logique de sauvegarde supplémentaire si nécessaire
+    toast.success("Workflow enregistré avec succès");
+    setHasUnsavedChanges(false);
   };
 
   const getWorkflowInfo = () => {
@@ -209,10 +280,18 @@ export function WorkflowDynamicSelects() {
             Configurez les workflows en sélectionnant type, étapes, rôles et transitions
           </p>
         </div>
-        <Button onClick={loadAllData} variant="outline">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Actualiser
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={loadAllData} variant="outline">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Actualiser
+          </Button>
+          {hasUnsavedChanges && (
+            <Button onClick={handleSaveWorkflow} className="bg-[#194D9B] hover:bg-[#194D9B]/90">
+              <Save className="h-4 w-4 mr-2" />
+              Enregistrer le Workflow
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -296,28 +375,53 @@ export function WorkflowDynamicSelects() {
           <CardContent className="pt-6">
             <div className="space-y-3">
               <Label>Étape</Label>
-              <Select 
-                value={selectedStep} 
-                onValueChange={setSelectedStep}
-                disabled={!selectedWorkflow}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir une étape..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredSteps.map((step) => (
-                    <SelectItem key={step.id} value={step.id}>
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${getStepTypeColor(step.step_type)}`} />
-                        <span>{step.step_name}</span>
-                        <Badge variant="secondary" className="ml-2">
-                          {step.step_type}
-                        </Badge>
+              <div className="space-y-2">
+                {filteredSteps.length > 0 ? (
+                  <div className="space-y-2">
+                    {filteredSteps.map((step, index) => (
+                      <div 
+                        key={step.id} 
+                        className={`flex items-center justify-between p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                          selectedStep === step.id 
+                            ? 'border-primary bg-primary/5' 
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                        onClick={() => setSelectedStep(step.id)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-3 h-3 rounded-full ${getStepTypeColor(step.step_type)}`} />
+                          <div>
+                            <p className="font-medium">{step.step_name}</p>
+                            <div className="flex gap-2 mt-1">
+                              <Badge variant="secondary" className="text-xs">
+                                Étape {step.step_number}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">
+                                {step.step_type}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-[#B71C1C] hover:text-[#B71C1C] hover:bg-[#B71C1C]/10"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            confirmDelete('step', step.id);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm text-center py-4">
+                    Aucune étape disponible. Cliquez sur + pour ajouter une étape.
+                  </p>
+                )}
+              </div>
               {getStepInfo() && (
                 <div className="p-3 bg-muted rounded-md text-sm">
                   <div className="flex items-center gap-2">
@@ -405,29 +509,50 @@ export function WorkflowDynamicSelects() {
           <CardContent className="pt-6">
             <div className="space-y-3">
               <Label>Transition</Label>
-              <Select 
-                value={selectedTransition} 
-                onValueChange={setSelectedTransition}
-                disabled={!selectedStep}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir une transition..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredTransitions.map((transition) => (
-                    <SelectItem key={transition.id} value={transition.id}>
-                      <div className="flex items-center gap-2">
-                        <span>{transition.transition_name}</span>
-                        {transition.trigger_type && (
-                          <Badge variant="secondary" className="ml-2">
-                            {transition.trigger_type}
-                          </Badge>
-                        )}
+              <div className="space-y-2">
+                {filteredTransitions.length > 0 ? (
+                  <div className="space-y-2">
+                    {filteredTransitions.map((transition) => (
+                      <div 
+                        key={transition.id} 
+                        className={`flex items-center justify-between p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                          selectedTransition === transition.id 
+                            ? 'border-primary bg-primary/5' 
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                        onClick={() => setSelectedTransition(transition.id)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <ArrowRight className="h-4 w-4 text-purple-600" />
+                          <div>
+                            <p className="font-medium">{transition.transition_name}</p>
+                            {transition.trigger_type && (
+                              <Badge variant="secondary" className="text-xs mt-1">
+                                {transition.trigger_type}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-[#B71C1C] hover:text-[#B71C1C] hover:bg-[#B71C1C]/10"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            confirmDelete('transition', transition.id);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm text-center py-4">
+                    Aucune transition disponible. Cliquez sur + pour ajouter une transition.
+                  </p>
+                )}
+              </div>
               {getTransitionInfo() && (
                 <div className="p-3 bg-muted rounded-md text-sm">
                   <p className="font-medium">{getTransitionInfo()?.transition_name}</p>
@@ -503,26 +628,97 @@ export function WorkflowDynamicSelects() {
       <CreateWorkflowDialog 
         open={createWorkflowOpen} 
         onOpenChange={setCreateWorkflowOpen}
-        onSuccess={loadAllData}
+        onSuccess={() => {
+          loadAllData();
+          setHasUnsavedChanges(true);
+        }}
       />
       <CreateStepDialog 
         open={createStepOpen} 
         onOpenChange={setCreateStepOpen}
         workflowId={selectedWorkflow}
-        onSaved={loadAllData}
+        onSaved={() => {
+          loadAllData();
+          setHasUnsavedChanges(true);
+        }}
       />
       <CreateRoleDialog 
         open={createRoleOpen} 
         onOpenChange={setCreateRoleOpen}
-        onSaved={loadAllData}
+        onSaved={() => {
+          loadAllData();
+          setHasUnsavedChanges(true);
+        }}
       />
       <CreateTransitionDialog 
         open={createTransitionOpen} 
         onOpenChange={setCreateTransitionOpen}
         workflowId={selectedWorkflow}
         fromStepId={selectedStep}
-        onSaved={loadAllData}
+        onSaved={() => {
+          loadAllData();
+          setHasUnsavedChanges(true);
+        }}
       />
+
+      {/* Dialogue de confirmation de suppression */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-[#B71C1C]" />
+              Confirmer la suppression
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Voulez-vous vraiment supprimer cette {itemToDelete?.type === 'step' ? 'étape' : 'transition'} du workflow ? 
+              Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>❌ Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-[#B71C1C] hover:bg-[#B71C1C]/90"
+              onClick={() => {
+                if (itemToDelete) {
+                  if (itemToDelete.type === 'step') {
+                    handleDeleteStep(itemToDelete.id);
+                  } else {
+                    handleDeleteTransition(itemToDelete.id);
+                  }
+                }
+              }}
+            >
+              ✅ Confirmer la suppression
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Dialogue d'avertissement avant de quitter */}
+      <AlertDialog open={exitWarningOpen} onOpenChange={setExitWarningOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-600" />
+              Modifications non enregistrées
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Les modifications non enregistrées seront perdues. Souhaitez-vous continuer ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setHasUnsavedChanges(false);
+                setExitWarningOpen(false);
+              }}
+            >
+              Continuer sans enregistrer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
