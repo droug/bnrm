@@ -6,6 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { CreateTestDepositButton } from "@/components/admin/CreateTestDepositButton";
 import { toast } from "@/hooks/use-toast";
 import { 
@@ -39,6 +43,8 @@ export default function BNRMBackOffice() {
   const { user, profile, loading } = useAuth();
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [selectedDepositModal, setSelectedDepositModal] = useState<string | null>(null);
+  const [selectedDepositData, setSelectedDepositData] = useState<any>(null);
 
   if (loading) {
     return (
@@ -199,12 +205,7 @@ export default function BNRMBackOffice() {
                           <Button 
                             variant="outline" 
                             className="w-full justify-start"
-                            onClick={() => {
-                              toast({
-                                title: "Registre des entrées",
-                                description: "Consultation du registre des dépôts physiques reçus"
-                              });
-                            }}
+                            onClick={() => setSelectedDepositModal("registre")}
                           >
                             <FileText className="h-4 w-4 mr-2" />
                             Registre des entrées
@@ -212,12 +213,7 @@ export default function BNRMBackOffice() {
                           <Button 
                             variant="outline" 
                             className="w-full justify-start"
-                            onClick={() => {
-                              toast({
-                                title: "Vérification de conformité",
-                                description: "Lancement du contrôle de conformité des dépôts"
-                              });
-                            }}
+                            onClick={() => setSelectedDepositModal("conformite")}
                           >
                             <Search className="h-4 w-4 mr-2" />
                             Vérifier conformité
@@ -225,12 +221,7 @@ export default function BNRMBackOffice() {
                           <Button 
                             variant="outline" 
                             className="w-full justify-start"
-                            onClick={() => {
-                              toast({
-                                title: "Génération d'accusé de réception",
-                                description: "Document d'accusé de réception généré avec succès"
-                              });
-                            }}
+                            onClick={() => setSelectedDepositModal("accuse")}
                           >
                             <Download className="h-4 w-4 mr-2" />
                             Générer accusé réception
@@ -268,12 +259,7 @@ export default function BNRMBackOffice() {
                           <Button 
                             variant="outline" 
                             className="w-full justify-start"
-                            onClick={() => {
-                              toast({
-                                title: "Contrôle des formats et tailles",
-                                description: "Vérification en cours des formats de fichiers et tailles"
-                              });
-                            }}
+                            onClick={() => setSelectedDepositModal("formats")}
                           >
                             <Archive className="h-4 w-4 mr-2" />
                             Contrôle formats/tailles
@@ -281,12 +267,7 @@ export default function BNRMBackOffice() {
                           <Button 
                             variant="outline" 
                             className="w-full justify-start"
-                            onClick={() => {
-                              toast({
-                                title: "Vérification d'intégrité",
-                                description: "Contrôle de l'intégrité des fichiers numériques en cours"
-                              });
-                            }}
+                            onClick={() => setSelectedDepositModal("integrite")}
                           >
                             <Shield className="h-4 w-4 mr-2" />
                             Vérification intégrité
@@ -294,12 +275,7 @@ export default function BNRMBackOffice() {
                           <Button 
                             variant="outline" 
                             className="w-full justify-start"
-                            onClick={() => {
-                              toast({
-                                title: "Archivage pérenne",
-                                description: "Processus d'archivage à long terme démarré"
-                              });
-                            }}
+                            onClick={() => setSelectedDepositModal("archivage")}
                           >
                             <Database className="h-4 w-4 mr-2" />
                             Archivage pérenne
@@ -344,10 +320,13 @@ export default function BNRMBackOffice() {
                                 variant="ghost" 
                                 size="sm"
                                 onClick={() => {
-                                  toast({
-                                    title: "Détails du dépôt",
-                                    description: "Affichage des détails du dépôt DL-2024-001234"
+                                  setSelectedDepositData({
+                                    number: "DL-2024-001234",
+                                    title: "Guide du développeur React",
+                                    type: "Livre",
+                                    status: "Conforme"
                                   });
+                                  setSelectedDepositModal("details");
                                 }}
                               >
                                 Voir détails
@@ -367,10 +346,13 @@ export default function BNRMBackOffice() {
                                 variant="ghost" 
                                 size="sm"
                                 onClick={() => {
-                                  toast({
-                                    title: "Correction nécessaire",
-                                    description: "Formulaire de correction pour le dépôt DL-2024-001235"
+                                  setSelectedDepositData({
+                                    number: "DL-2024-001235",
+                                    title: "Magazine Tech Innovation",
+                                    type: "Périodique",
+                                    status: "Non conforme"
                                   });
+                                  setSelectedDepositModal("corriger");
                                 }}
                               >
                                 Corriger
@@ -390,10 +372,13 @@ export default function BNRMBackOffice() {
                                 variant="ghost" 
                                 size="sm"
                                 onClick={() => {
-                                  toast({
-                                    title: "Validation du dépôt",
-                                    description: "Dépôt DL-2024-001236 validé avec succès"
+                                  setSelectedDepositData({
+                                    number: "DL-2024-001236",
+                                    title: "Atlas historique du Maroc",
+                                    type: "Livre",
+                                    status: "En cours"
                                   });
+                                  setSelectedDepositModal("valider");
                                 }}
                               >
                                 Valider
@@ -520,6 +505,363 @@ export default function BNRMBackOffice() {
             </Tabs>
           </div>
         </main>
+
+        {/* Modales pour les différentes actions */}
+        <Dialog open={selectedDepositModal === "registre"} onOpenChange={() => setSelectedDepositModal(null)}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Registre des Entrées - Dépôts Physiques</DialogTitle>
+              <DialogDescription>
+                Consultation et gestion des dépôts physiques reçus
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <Label>Date de début</Label>
+                  <Input type="date" />
+                </div>
+                <div>
+                  <Label>Date de fin</Label>
+                  <Input type="date" />
+                </div>
+              </div>
+              <div className="border rounded-lg p-4">
+                <h4 className="font-semibold mb-3">Entrées récentes</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center p-2 bg-muted rounded">
+                    <span>DL-2024-001234 - Guide du développeur React</span>
+                    <Badge>Reçu</Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-2 bg-muted rounded">
+                    <span>DL-2024-001235 - Magazine Tech Innovation</span>
+                    <Badge variant="secondary">En attente</Badge>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setSelectedDepositModal(null)}>Fermer</Button>
+                <Button>Exporter le registre</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={selectedDepositModal === "conformite"} onOpenChange={() => setSelectedDepositModal(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Vérification de Conformité</DialogTitle>
+              <DialogDescription>
+                Contrôle de conformité des dépôts physiques
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Numéro de dépôt</Label>
+                <Input placeholder="DL-YYYY-NNNNNN" />
+              </div>
+              <div className="space-y-2">
+                <Label>Éléments à vérifier</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" id="check1" />
+                    <label htmlFor="check1">Exemplaires complets (nombre requis)</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" id="check2" />
+                    <label htmlFor="check2">Page de garde conforme</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" id="check3" />
+                    <label htmlFor="check3">ISBN/ISSN présent</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" id="check4" />
+                    <label htmlFor="check4">Mentions légales complètes</label>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <Label>Observations</Label>
+                <Textarea placeholder="Notes sur la conformité..." rows={3} />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setSelectedDepositModal(null)}>Annuler</Button>
+                <Button variant="destructive">Non conforme</Button>
+                <Button>Conforme</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={selectedDepositModal === "accuse"} onOpenChange={() => setSelectedDepositModal(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Générer Accusé de Réception</DialogTitle>
+              <DialogDescription>
+                Génération du document d'accusé de réception
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Numéro de dépôt</Label>
+                <Input placeholder="DL-YYYY-NNNNNN" />
+              </div>
+              <div>
+                <Label>Date de réception</Label>
+                <Input type="date" />
+              </div>
+              <div>
+                <Label>Nombre d'exemplaires reçus</Label>
+                <Input type="number" defaultValue="2" />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setSelectedDepositModal(null)}>Annuler</Button>
+                <Button><Download className="h-4 w-4 mr-2" />Générer PDF</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={selectedDepositModal === "formats"} onOpenChange={() => setSelectedDepositModal(null)}>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Contrôle des Formats et Tailles</DialogTitle>
+              <DialogDescription>
+                Vérification technique des fichiers numériques
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="border rounded-lg p-4">
+                <h4 className="font-semibold mb-3">Fichiers en attente de validation</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center p-2 bg-muted rounded">
+                    <div>
+                      <p className="font-medium">document_1.pdf</p>
+                      <p className="text-sm text-muted-foreground">2.3 MB - PDF/A-1b</p>
+                    </div>
+                    <Badge className="bg-green-100 text-green-800">Conforme</Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-2 bg-muted rounded">
+                    <div>
+                      <p className="font-medium">couverture.jpg</p>
+                      <p className="text-sm text-muted-foreground">1.8 MB - JPEG</p>
+                    </div>
+                    <Badge className="bg-green-100 text-green-800">Conforme</Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-2 bg-muted rounded">
+                    <div>
+                      <p className="font-medium">metadata.xml</p>
+                      <p className="text-sm text-muted-foreground">45 KB - XML</p>
+                    </div>
+                    <Badge variant="destructive">Format non supporté</Badge>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setSelectedDepositModal(null)}>Fermer</Button>
+                <Button>Valider les fichiers conformes</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={selectedDepositModal === "integrite"} onOpenChange={() => setSelectedDepositModal(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Vérification d'Intégrité</DialogTitle>
+              <DialogDescription>
+                Contrôle de l'intégrité des fichiers numériques
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Numéro de dépôt</Label>
+                <Input placeholder="DL-YYYY-NNNNNN" />
+              </div>
+              <div className="border rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span>Calcul checksum MD5</span>
+                  <Badge className="bg-green-100 text-green-800">OK</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Vérification signature numérique</span>
+                  <Badge className="bg-green-100 text-green-800">OK</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Scan antivirus</span>
+                  <Badge className="bg-green-100 text-green-800">Propre</Badge>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setSelectedDepositModal(null)}>Fermer</Button>
+                <Button>Générer rapport d'intégrité</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={selectedDepositModal === "archivage"} onOpenChange={() => setSelectedDepositModal(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Archivage Pérenne</DialogTitle>
+              <DialogDescription>
+                Configuration de l'archivage à long terme
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Numéro de dépôt</Label>
+                <Input placeholder="DL-YYYY-NNNNNN" />
+              </div>
+              <div>
+                <Label>Format de préservation</Label>
+                <select className="w-full border rounded-md p-2">
+                  <option>PDF/A-2b</option>
+                  <option>TIFF (non compressé)</option>
+                  <option>JPEG2000</option>
+                </select>
+              </div>
+              <div>
+                <Label>Niveau de redondance</Label>
+                <select className="w-full border rounded-md p-2">
+                  <option>Triple (recommandé)</option>
+                  <option>Double</option>
+                  <option>Simple</option>
+                </select>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setSelectedDepositModal(null)}>Annuler</Button>
+                <Button>Lancer l'archivage</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={selectedDepositModal === "details"} onOpenChange={() => setSelectedDepositModal(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Détails du Dépôt</DialogTitle>
+              <DialogDescription>
+                Informations complètes sur le dépôt {selectedDepositData?.number}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <Label>Numéro de dépôt</Label>
+                  <p className="font-medium">{selectedDepositData?.number}</p>
+                </div>
+                <div>
+                  <Label>Titre</Label>
+                  <p className="font-medium">{selectedDepositData?.title}</p>
+                </div>
+                <div>
+                  <Label>Type</Label>
+                  <p className="font-medium">{selectedDepositData?.type}</p>
+                </div>
+                <div>
+                  <Label>Statut</Label>
+                  <Badge className="bg-green-100 text-green-800">{selectedDepositData?.status}</Badge>
+                </div>
+              </div>
+              <div>
+                <Label>Historique</Label>
+                <div className="border rounded-lg p-4 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Dépôt enregistré</span>
+                    <span className="text-sm text-muted-foreground">15/03/2024 10:30</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Contrôle de conformité</span>
+                    <span className="text-sm text-muted-foreground">15/03/2024 14:20</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Validation finale</span>
+                    <span className="text-sm text-muted-foreground">15/03/2024 16:45</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Button variant="outline" onClick={() => setSelectedDepositModal(null)}>Fermer</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={selectedDepositModal === "corriger"} onOpenChange={() => setSelectedDepositModal(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Correction du Dépôt</DialogTitle>
+              <DialogDescription>
+                Formulaire de correction pour le dépôt {selectedDepositData?.number}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Problèmes identifiés</Label>
+                <Textarea 
+                  placeholder="Décrire les non-conformités détectées..."
+                  rows={4}
+                  defaultValue="ISBN manquant sur la page de garde"
+                />
+              </div>
+              <div>
+                <Label>Actions correctives requises</Label>
+                <Textarea 
+                  placeholder="Actions à entreprendre pour la mise en conformité..."
+                  rows={3}
+                  defaultValue="Ajouter l'ISBN sur la page de garde et soumettre à nouveau"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setSelectedDepositModal(null)}>Annuler</Button>
+                <Button>Envoyer notification de correction</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={selectedDepositModal === "valider"} onOpenChange={() => setSelectedDepositModal(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Validation du Dépôt</DialogTitle>
+              <DialogDescription>
+                Validation finale du dépôt {selectedDepositData?.number}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="border rounded-lg p-4 bg-muted">
+                <h4 className="font-semibold mb-2">Résumé de la validation</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Conformité physique</span>
+                    <Badge className="bg-green-100 text-green-800">✓ Validée</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Métadonnées complètes</span>
+                    <Badge className="bg-green-100 text-green-800">✓ Validées</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Contrôle qualité</span>
+                    <Badge className="bg-green-100 text-green-800">✓ Validé</Badge>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <Label>Commentaires de validation</Label>
+                <Textarea 
+                  placeholder="Remarques complémentaires..."
+                  rows={3}
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setSelectedDepositModal(null)}>Annuler</Button>
+                <Button>Valider définitivement</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </WatermarkContainer>
   );
