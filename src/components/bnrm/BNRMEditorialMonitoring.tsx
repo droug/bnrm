@@ -919,7 +919,7 @@ export default function BNRMEditorialMonitoring() {
         console.log("Dialog state change:", open);
         setRejectDialogOpen(open);
       }}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
           <DialogHeader>
             <DialogTitle>Rejeter la demande de dépôt légal</DialogTitle>
             <DialogDescription>
@@ -987,7 +987,7 @@ export default function BNRMEditorialMonitoring() {
 
       {/* Confirmation Alert Dialog */}
       <AlertDialog open={confirmRejectOpen} onOpenChange={setConfirmRejectOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-destructive" />
@@ -1029,7 +1029,7 @@ export default function BNRMEditorialMonitoring() {
 
       {/* Cancel Rejection Confirmation Dialog */}
       <AlertDialog open={confirmCancelRejectOpen} onOpenChange={setConfirmCancelRejectOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Undo2 className="h-5 w-5 text-blue-600" />
