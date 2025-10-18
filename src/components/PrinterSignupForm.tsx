@@ -123,7 +123,7 @@ const PrinterSignupForm = () => {
 
           {/* Informations de contact */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold border-b pb-2">Informations de contact</h3>
+            <h3 className="text-2xl font-semibold border-b pb-2">Informations de contact</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -203,7 +203,7 @@ const PrinterSignupForm = () => {
 
           {/* Informations légales */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold border-b pb-2">Informations légales</h3>
+            <h3 className="text-2xl font-semibold border-b pb-2">Informations légales</h3>
             
             <div className="space-y-2">
               <Label htmlFor="commerceRegistry">Registre de commerce *</Label>

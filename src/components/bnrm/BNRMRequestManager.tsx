@@ -834,7 +834,7 @@ export const BNRMRequestManager = () => {
 
               {/* Informations du déclarant */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Informations du déclarant</h3>
+                <h3 className="text-2xl font-semibold">Informations du déclarant</h3>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -930,7 +930,7 @@ export const BNRMRequestManager = () => {
 
               {/* Informations de la publication */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Informations de la publication</h3>
+                <h3 className="text-2xl font-semibold">Informations de la publication</h3>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">

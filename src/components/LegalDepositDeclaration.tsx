@@ -302,7 +302,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           <>
             {/* Identification de l'auteur */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de l'auteur</h3>
+            <h3 className="text-2xl font-semibold mb-4">Identification de l'auteur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de l'auteur</Label>
@@ -441,7 +441,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             {/* Identification de la publication */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de la publication</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Discipline de l'ouvrage</Label>
@@ -721,7 +721,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             {/* Identification de l'Éditeur */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de l'Éditeur</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de l'Éditeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Identification de l'Éditeur</Label>
@@ -930,7 +930,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             {/* Identification de l'imprimeur */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de l'imprimeur</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de l'imprimeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Imprimerie</Label>
@@ -979,7 +979,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           <>
             {/* Directeur de la publication */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Directeur de la publication</h3>
+              <h3 className="text-2xl font-semibold mb-4">Directeur de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Nom et prénom</Label>
@@ -1032,7 +1032,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             {/* Identification de la publication */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de la publication</h3>
+            <h3 className="text-2xl font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de publication</Label>
@@ -1187,7 +1187,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             {/* Identification de l'Éditeur */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de l'Éditeur</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de l'Éditeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Éditeur</Label>
@@ -1220,7 +1220,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             {/* Identification de l'Imprimeur */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de l'Imprimeur</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de l'Imprimeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Imprimerie</Label>
@@ -1259,7 +1259,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           <>
             {/* Identification de l'auteur */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de l'auteur</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de l'auteur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de l'auteur</Label>
@@ -1308,7 +1308,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             {/* Identification de la publication */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de la publication</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 md:col-span-2">
                   <Label>Titre de la publication</Label>
@@ -1361,7 +1361,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             {/* Identification de l'Éditeur */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de l'Éditeur</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de l'Éditeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Éditeur</Label>
@@ -1399,7 +1399,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             {/* Identification de distributeur */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de distributeur</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de distributeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Nom de distributeur</Label>
@@ -1438,7 +1438,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           <>
             {/* Identification de l'auteur */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de l'auteur</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de l'auteur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de l'auteur</Label>
@@ -1487,7 +1487,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             {/* Identification de la publication */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de la publication</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de publication</Label>
@@ -1538,7 +1538,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             {/* Identification de l'Éditeur */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de l'Éditeur</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de l'Éditeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Éditeur</Label>
@@ -1576,7 +1576,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             {/* Identification de l'Imprimeur */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Identification de l'Imprimeur</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification de l'Imprimeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Imprimerie</Label>
@@ -1619,7 +1619,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
         
         {/* Pièces à fournir */}
         <div>
-          <h3 className="text-xl font-semibold mb-4">Pièces à fournir</h3>
+          <h3 className="text-2xl font-semibold mb-4">Pièces à fournir</h3>
           <div className="space-y-4">
             {renderFileUpload("cover", "Joindre la couverture (format « jpg » moins de 1 MO)", true, "image/jpeg")}
             
@@ -1770,7 +1770,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     <>
       {/* التعريف بالمؤلف */}
       <div>
-        <h3 className="text-xl font-semibold mb-4">التعريف بالمؤلف</h3>
+        <h3 className="text-2xl font-semibold mb-4">التعريف بالمؤلف</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>نوع المؤلف</Label>
@@ -1821,7 +1821,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
       {/* التعريف بالوثيقة */}
       <div>
-        <h3 className="text-xl font-semibold mb-4">التعريف بالوثيقة</h3>
+        <h3 className="text-2xl font-semibold mb-4">التعريف بالوثيقة</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2 md:col-span-2">
             <Label>عنوان الكتاب</Label>
@@ -1910,7 +1910,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
       {/* التعريف بالناشر */}
       <div>
-        <h3 className="text-xl font-semibold mb-4">التعريف بالناشر</h3>
+        <h3 className="text-2xl font-semibold mb-4">التعريف بالناشر</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>اسم الناشر بالعربية والفرنسية</Label>
@@ -1943,7 +1943,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
       {/* التعريف بالطابع */}
       <div>
-        <h3 className="text-xl font-semibold mb-4">التعريف بالطابع</h3>
+        <h3 className="text-2xl font-semibold mb-4">التعريف بالطابع</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>اسم المطبعة</Label>
@@ -1976,7 +1976,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
       {/* الوثائق المطلوب تقديمها */}
       <div>
-        <h3 className="text-xl font-semibold mb-4">الوثائق المطلوب تقديمها</h3>
+        <h3 className="text-2xl font-semibold mb-4">الوثائق المطلوب تقديمها</h3>
         <div className="space-y-4">
           {renderFileUpload("cover", "إرفاق الغلاف (Format « jpg » moins de 1 MO)", true, "image/jpeg")}
           {renderFileUpload("summary", "إرفاق الفهرس (Format « PDF » moins de 2 MO)", true, "application/pdf")}

@@ -386,7 +386,7 @@ export function ProfessionalsList() {
             <div className="space-y-6 py-4">
               {/* Informations générales */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">Informations Générales</h3>
+                <h3 className="text-2xl font-semibold border-b pb-2">Informations Générales</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Nom complet</p>

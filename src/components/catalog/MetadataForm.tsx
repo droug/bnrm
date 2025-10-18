@@ -111,7 +111,7 @@ export default function MetadataForm({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Identifiants */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Identifiants</h3>
+            <h3 className="text-2xl font-semibold">Identifiants</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="isbn">ISBN</Label>
@@ -147,7 +147,7 @@ export default function MetadataForm({
 
           {/* Informations bibliographiques */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Informations Bibliographiques</h3>
+            <h3 className="text-2xl font-semibold">Informations Bibliographiques</h3>
             <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="original_title">Titre Original *</Label>
@@ -173,7 +173,7 @@ export default function MetadataForm({
 
           {/* Auteurs et contributeurs */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Auteurs et Contributeurs</h3>
+            <h3 className="text-2xl font-semibold">Auteurs et Contributeurs</h3>
             <div className="space-y-2">
               <Label htmlFor="main_author">Auteur Principal</Label>
               <Input 
@@ -226,7 +226,7 @@ export default function MetadataForm({
 
           {/* Publication */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Publication</h3>
+            <h3 className="text-2xl font-semibold">Publication</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="publisher">Éditeur</Label>
@@ -260,7 +260,7 @@ export default function MetadataForm({
 
           {/* Description physique */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Description Physique</h3>
+            <h3 className="text-2xl font-semibold">Description Physique</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="page_count">Nombre de Pages</Label>
@@ -286,7 +286,7 @@ export default function MetadataForm({
 
           {/* Sujets et mots-clés */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Sujets et Mots-clés</h3>
+            <h3 className="text-2xl font-semibold">Sujets et Mots-clés</h3>
             
             <div className="space-y-2">
               <Label>Sujets</Label>
@@ -369,7 +369,7 @@ export default function MetadataForm({
 
           {/* Notes */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Notes et Annotations</h3>
+            <h3 className="text-2xl font-semibold">Notes et Annotations</h3>
             <div className="space-y-2">
               <Label htmlFor="general_notes">Notes Générales</Label>
               <Textarea 
@@ -395,7 +395,7 @@ export default function MetadataForm({
 
           {/* Droits */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Droits et Accès</h3>
+            <h3 className="text-2xl font-semibold">Droits et Accès</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="copyright_status">Statut des Droits</Label>
