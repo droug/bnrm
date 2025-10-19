@@ -1936,10 +1936,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input placeholder="Mots clés" />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Résumé de la publication</Label>
-                  <Textarea placeholder="Résumé de la publication" rows={4} />
-                </div>
               </div>
             </div>
 
@@ -2214,6 +2210,10 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 {renderFileUpload("summary", "Joindre le sommaire (format « PDF » moins de 2 MO)", true, "application/pdf")}
                 {renderFileUpload("abstract", "Joindre résumé de l'ouvrage (format « PDF » moins de 2 MO)", true, "application/pdf")}
               </>
+            )}
+            
+            {depositType === "bd_logiciels" && (
+              renderFileUpload("summary", "Joindre le Résumé de la publication (format « PDF » moins de 2 MO)", true, "application/pdf")
             )}
             
             {renderFileUpload("cin", "Envoyer une copie de la CIN de l'auteur", true, "image/jpeg,application/pdf")}
