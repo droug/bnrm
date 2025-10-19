@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,8 @@ interface ActivityLog {
 }
 
 export const ActivityMonitor = () => {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { isAdmin, isLibrarian, loading: rolesLoading } = useSecureRoles();
   const { toast } = useToast();
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,14 +50,14 @@ export const ActivityMonitor = () => {
   const [isCleaningUp, setIsCleaningUp] = useState(false);
 
   // Check if user has permission to view logs
-  const canViewLogs = profile?.role === 'admin';
-  const canViewLimitedLogs = profile?.role === 'librarian';
+  const canViewLogs = isAdmin;
+  const canViewLimitedLogs = isLibrarian;
 
   useEffect(() => {
-    if (user && (canViewLogs || canViewLimitedLogs)) {
+    if (!rolesLoading && user && (canViewLogs || canViewLimitedLogs)) {
       fetchLogs();
     }
-  }, [user, profile, canViewLogs, canViewLimitedLogs]);
+  }, [user, rolesLoading, canViewLogs, canViewLimitedLogs]);
 
   const fetchLogs = async () => {
     try {

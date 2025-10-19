@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,7 +71,8 @@ interface ReproductionRequest {
 export function ReproductionRequestDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { isAdmin, isLibrarian } = useSecureRoles();
   const { language } = useLanguage();
   const [request, setRequest] = useState<ReproductionRequest | null>(null);
   const [items, setItems] = useState<ReproductionItem[]>([]);
@@ -94,7 +96,7 @@ export function ReproductionRequestDetails() {
       if (requestError) throw requestError;
 
       // Check access rights
-      if (requestData.user_id !== user?.id && profile?.role !== 'admin' && profile?.role !== 'librarian') {
+      if (requestData.user_id !== user?.id && !isAdmin && !isLibrarian) {
         toast.error(language === "ar" ? "ليس لديك صلاحية للوصول" : "Accès non autorisé");
         navigate("/reproduction");
         return;
@@ -285,7 +287,7 @@ export function ReproductionRequestDetails() {
               </div>
             )}
 
-            {request.internal_notes && (profile?.role === 'admin' || profile?.role === 'librarian') && (
+            {request.internal_notes && (isAdmin || isLibrarian) && (
               <div className="p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg">
                 <label className="text-sm font-medium text-amber-800 dark:text-amber-400">
                   {language === "ar" ? "ملاحظات داخلية" : "Notes internes"}

@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Bell, Settings } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import logoImage from "@/assets/logo-bnrm.png";
 
 interface AdminHeaderProps {
@@ -21,6 +22,7 @@ export function AdminHeader({
   showSettings = true 
 }: AdminHeaderProps) {
   const { profile } = useAuth();
+  const { isAdmin, isLibrarian } = useSecureRoles();
   const navigate = useNavigate();
 
   return (
@@ -68,8 +70,8 @@ export function AdminHeader({
               {profile?.first_name} {profile?.last_name}
             </span>
             <Badge variant="default">
-              {profile?.role === 'admin' ? 'Administrateur' : 
-               profile?.role === 'librarian' ? 'Bibliothécaire' : 
+              {isAdmin ? 'Administrateur' : 
+               isLibrarian ? 'Bibliothécaire' : 
                'Agent DL'}
             </Badge>
           </div>

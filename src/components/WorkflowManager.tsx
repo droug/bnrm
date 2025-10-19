@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -87,7 +88,8 @@ interface ContentValidation {
 }
 
 export default function WorkflowManager() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { isAdmin, isLibrarian, loading: rolesLoading } = useSecureRoles();
   const { toast } = useToast();
   
   const [workflows, setWorkflows] = useState<WorkflowData[]>([]);
@@ -99,10 +101,10 @@ export default function WorkflowManager() {
   const [actionComments, setActionComments] = useState("");
 
   useEffect(() => {
-    if (user && (profile?.role === 'admin' || profile?.role === 'librarian')) {
+    if (!rolesLoading && user && (isAdmin || isLibrarian)) {
       fetchData();
     }
-  }, [user, profile]);
+  }, [user, rolesLoading, isAdmin, isLibrarian]);
 
   const fetchData = async () => {
     try {
