@@ -58,7 +58,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const { language, isRTL } = useLanguage();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<"type_selection" | "editor_auth" | "printer_auth" | "form_filling" | "confirmation">("type_selection");
-  const [userType, setUserType] = useState<"editor" | "printer" | null>(null);
+  const [userType, setUserType] = useState<"editor" | "printer" | "producer" | "distributor" | null>(null);
   const [partnerConfirmed, setPartnerConfirmed] = useState(false);
   const [editorData, setEditorData] = useState<any>({});
   const [printerData, setPrinterData] = useState<any>({});
@@ -152,7 +152,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       
       if (error) {
         console.error('Error fetching publishers:', error);
-        toast.error('Erreur lors du chargement des éditeurs');
+        const errorMsg = depositType === 'bd_logiciels' ? 'Erreur lors du chargement des producteurs' : 'Erreur lors du chargement des éditeurs';
+        toast.error(errorMsg);
       } else {
         setPublishers(data || []);
       }
@@ -166,7 +167,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       
       if (error) {
         console.error('Error fetching printers:', error);
-        toast.error('Erreur lors du chargement des imprimeries');
+        const errorMsg = depositType === 'bd_logiciels' ? 'Erreur lors du chargement des distributeurs' : 'Erreur lors du chargement des imprimeries';
+        toast.error(errorMsg);
       } else {
         setPrinters(data || []);
       }
@@ -2539,21 +2541,25 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     return renderMonographieArabicForm();
   };
 
-  const handleAuthentication = async (type: "editor" | "printer", credentials: any) => {
+  const handleAuthentication = async (type: "editor" | "printer" | "producer" | "distributor", credentials: any) => {
+    const isBDLogiciels = depositType === 'bd_logiciels';
+    
     // Simulate authentication
     console.log(`Authenticating ${type}:`, credentials);
     
-    if (type === "editor") {
+    if (type === "editor" || type === "producer") {
       setEditorData(credentials);
-      toast.success("Éditeur authentifié avec succès");
-      // Si l'utilisateur est un éditeur, passer à l'authentification de l'imprimeur
-      if (userType === "editor") {
+      const successMsg = isBDLogiciels ? "Producteur authentifié avec succès" : "Éditeur authentifié avec succès";
+      toast.success(successMsg);
+      // Si l'utilisateur est un éditeur/producteur, passer à l'authentification de l'imprimeur/distributeur
+      if (userType === "editor" || userType === "producer") {
         setCurrentStep("printer_auth");
       }
     } else {
       setPrinterData(credentials);
-      toast.success("Imprimeur authentifié avec succès");
-      // Après l'authentification de l'imprimeur, passer au formulaire
+      const successMsg = isBDLogiciels ? "Distributeur authentifié avec succès" : "Imprimeur authentifié avec succès";
+      toast.success(successMsg);
+      // Après l'authentification de l'imprimeur/distributeur, passer au formulaire
       setCurrentStep("form_filling");
     }
   };
@@ -2648,12 +2654,19 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       if (requestError) throw requestError;
 
       // Créer l'entrée pour l'initiateur dans legal_deposit_parties
+      const isBDLogiciels = depositType === 'bd_logiciels';
+      let partyRole = 'editor';
+      if (userType === 'producer') partyRole = 'producer';
+      else if (userType === 'printer') partyRole = 'printer';
+      else if (userType === 'distributor') partyRole = 'printer'; // Distributor uses printer role in DB
+      else if (userType === 'editor') partyRole = 'editor';
+      
       const { error: partyError } = await supabase
         .from('legal_deposit_parties')
         .insert({
           request_id: requestData.id,
           user_id: user.id,
-          party_role: userType || 'editor',
+          party_role: partyRole,
           is_initiator: true,
           approval_status: 'approved', // L'initiateur est automatiquement approuvé
           approval_date: new Date().toISOString()
@@ -2724,6 +2737,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   };
 
   if (currentStep === "type_selection") {
+    const isBDLogiciels = depositType === 'bd_logiciels';
+    
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
@@ -2740,26 +2755,32 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
         <CardContent className="space-y-4">
           <Button 
             onClick={() => {
-              setUserType("editor");
+              setUserType(isBDLogiciels ? "producer" : "editor");
               setCurrentStep("editor_auth");
             }}
             className="w-full h-20 text-lg flex flex-col items-center justify-center gap-2"
             variant="outline"
           >
             <FileText className="h-8 w-8" />
-            {language === 'ar' ? 'ناشر' : 'Éditeur'}
+            {language === 'ar' ? 
+              (isBDLogiciels ? 'منتج' : 'ناشر') : 
+              (isBDLogiciels ? 'Producteur' : 'Éditeur')
+            }
           </Button>
           
           <Button 
             onClick={() => {
-              setUserType("printer");
+              setUserType(isBDLogiciels ? "distributor" : "printer");
               setCurrentStep("printer_auth");
             }}
             className="w-full h-20 text-lg flex flex-col items-center justify-center gap-2"
             variant="outline"
           >
             <FileText className="h-8 w-8" />
-            {language === 'ar' ? 'طابع' : 'Imprimeur'}
+            {language === 'ar' ? 
+              (isBDLogiciels ? 'موزع' : 'طابع') : 
+              (isBDLogiciels ? 'Distributeur' : 'Imprimeur')
+            }
           </Button>
         </CardContent>
         <CardFooter>
@@ -2772,24 +2793,32 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   }
 
   if (currentStep === "editor_auth") {
+    const isBDLogiciels = depositType === 'bd_logiciels';
+    const roleLabel = isBDLogiciels ? 
+      (language === 'ar' ? 'المنتج' : 'producteur') : 
+      (language === 'ar' ? 'الناشر' : 'éditeur');
+    const roleTitleLabel = isBDLogiciels ? 
+      (language === 'ar' ? 'تحديد هوية المنتج' : 'Identification du producteur') : 
+      (language === 'ar' ? 'تحديد هوية الناشر' : 'Identification de l\'éditeur');
+    const roleDescLabel = isBDLogiciels ?
+      (language === 'ar' ? 'يرجى تقديم معلومات المنتج للمصادقة' : 'Veuillez fournir les informations du producteur pour authentification') :
+      (language === 'ar' ? 'يرجى تقديم معلومات الناشر للمصادقة' : 'Veuillez fournir les informations de l\'éditeur pour authentification');
+    
     return (
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>
-            {language === 'ar' ? 'تحديد هوية الناشر' : 'Identification de l\'éditeur'}
+            {roleTitleLabel}
           </CardTitle>
           <CardDescription>
-            {language === 'ar' ? 
-              'يرجى تقديم معلومات الناشر للمصادقة' :
-              'Veuillez fournir les informations de l\'éditeur pour authentification'
-            }
+            {roleDescLabel}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{language === 'ar' ? 'الاسم' : 'Nom'}</Label>
-              <Input placeholder={language === 'ar' ? 'اسم الناشر' : 'Nom de l\'éditeur'} />
+              <Input placeholder={language === 'ar' ? `اسم ${roleLabel}` : `Nom du ${roleLabel}`} />
             </div>
             
             <div className="space-y-2">
@@ -2821,7 +2850,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             <Button variant="ghost" onClick={() => setCurrentStep("type_selection")}>
               {language === 'ar' ? 'رجوع' : 'Retour'}
             </Button>
-            <Button onClick={() => handleAuthentication("editor", {
+            <Button onClick={() => handleAuthentication(isBDLogiciels ? "producer" : "editor", {
               name: "",
               address: "",
               phone: "",
@@ -2837,21 +2866,33 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   }
 
   if (currentStep === "printer_auth") {
+    const isBDLogiciels = depositType === 'bd_logiciels';
+    const roleLabel = isBDLogiciels ? 
+      (language === 'ar' ? 'الموزع' : 'distributeur') : 
+      (language === 'ar' ? 'الطابع' : 'imprimeur');
+    const roleTitleLabel = isBDLogiciels ? 
+      (language === 'ar' ? 'تحديد هوية الموزع' : 'Identification du distributeur') : 
+      (language === 'ar' ? 'تحديد هوية الطابع' : 'Identification de l\'imprimeur');
+    const firstRoleLabel = isBDLogiciels ?
+      (language === 'ar' ? 'المنتج' : 'producteur') :
+      (language === 'ar' ? 'الناشر' : 'éditeur');
+    const isFirstRole = userType === "editor" || userType === "producer";
+    
     return (
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>
-            {language === 'ar' ? 'تحديد هوية الطابع' : 'Identification de l\'imprimeur'}
+            {roleTitleLabel}
           </CardTitle>
           <CardDescription>
-            {userType === "editor" ? 
+            {isFirstRole ? 
               (language === 'ar' ? 
-                'الآن نحتاج لمعلومات الطابع' :
-                'Nous avons maintenant besoin des informations de l\'imprimeur'
+                `الآن نحتاج لمعلومات ${roleLabel}` :
+                `Nous avons maintenant besoin des informations du ${roleLabel}`
               ) :
               (language === 'ar' ?
-                'يرجى تقديم معلومات الطابع للمصادقة' :
-                'Veuillez fournir les informations de l\'imprimeur pour authentification'
+                `يرجى تقديم معلومات ${roleLabel} للمصادقة` :
+                `Veuillez fournir les informations du ${roleLabel} pour authentification`
               )
             }
           </CardDescription>
@@ -2860,7 +2901,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{language === 'ar' ? 'الاسم' : 'Nom'}</Label>
-              <Input placeholder={language === 'ar' ? 'اسم الطابع' : 'Nom de l\'imprimeur'} />
+              <Input placeholder={language === 'ar' ? `اسم ${roleLabel}` : `Nom du ${roleLabel}`} />
             </div>
             
             <div className="space-y-2">
@@ -2884,7 +2925,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             </div>
           </div>
 
-          {userType === "printer" && (
+          {(userType === "printer" || userType === "distributor") && (
             <div className="mt-6 p-4 bg-muted/50 rounded-lg">
               <div className="flex items-center space-x-2 mb-3">
                 <Clock className="h-5 w-5 text-muted-foreground" />
@@ -2894,8 +2935,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               </div>
               <p className="text-sm text-muted-foreground mb-4">
                 {language === 'ar' ? 
-                  'في انتظار تأكيد الناشر للتعاون المتبادل' :
-                  'En attente de la confirmation réciproque de l\'éditeur'
+                  `في انتظار تأكيد ${firstRoleLabel} للتعاون المتبادل` :
+                  `En attente de la confirmation réciproque du ${firstRoleLabel}`
                 }
               </p>
               <Button onClick={handlePartnerConfirmation} size="sm">
@@ -2909,10 +2950,10 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             {language === 'ar' ? 'إلغاء' : 'Annuler'}
           </Button>
           <div className="flex gap-2">
-            <Button variant="ghost" onClick={() => setCurrentStep(userType === "editor" ? "editor_auth" : "type_selection")}>
+            <Button variant="ghost" onClick={() => setCurrentStep(isFirstRole ? "editor_auth" : "type_selection")}>
               {language === 'ar' ? 'رجوع' : 'Retour'}
             </Button>
-            <Button onClick={() => handleAuthentication("printer", {
+            <Button onClick={() => handleAuthentication(isBDLogiciels ? "distributor" : "printer", {
               name: "",
               address: "",
               phone: "",
