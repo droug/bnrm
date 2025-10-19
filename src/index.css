@@ -372,6 +372,12 @@ Enhanced Moroccan Heritage Design System
     --word-spacing: 0px;
     --line-height-add: 0;
     --cursor-size: 1;
+    
+    /* Z-index system for dialogs and modals */
+    --z-dialog-overlay: 9998;
+    --z-dialog-content: 9999;
+    --z-sheet-overlay: 9998;
+    --z-sheet-content: 9999;
   }
 
   * {
@@ -414,29 +420,52 @@ Enhanced Moroccan Heritage Design System
     animation: wiggle 1.5s ease-in-out;
   }
 
-  /* Classe de centrage universelle pour toutes les modales BNRM */
-  .bnrm-modal-centered {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    z-index: 1000;
-    background: hsl(var(--background));
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    max-width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 24px;
-    transition: all 0.25s ease-in-out;
-  }
-
-  /* Overlay pour modales - couverture complète du viewport */
+  /* Universal Modal and Dialog Centering Styles */
+  .dialog-overlay,
   .bnrm-modal-overlay {
-    position: fixed !important;
-    inset: 0 !important;
-    z-index: 999;
+    position: fixed;
+    inset: 0;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
+    z-index: var(--z-dialog-overlay);
+  }
+
+  .dialog-content,
+  .bnrm-modal-centered {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: hsl(var(--background));
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    z-index: var(--z-dialog-content);
+    max-width: min(90vw, 600px);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2rem;
+  }
+
+  /* Ensure dialogs are never clipped by parent containers */
+  [data-radix-dialog-overlay],
+  [data-radix-alert-dialog-overlay],
+  [data-radix-sheet-overlay] {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-dialog-overlay);
+  }
+
+  [data-radix-dialog-content],
+  [data-radix-alert-dialog-content] {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: var(--z-dialog-content);
+  }
+
+  [data-radix-sheet-content] {
+    position: fixed;
+    z-index: var(--z-sheet-content);
   }
 }

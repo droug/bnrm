@@ -15,10 +15,9 @@ const ScrollableDialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-[100000] bg-black/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "dialog-overlay fixed inset-0 bg-black/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
-    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
     {...props}
   />
 ));
@@ -60,7 +59,7 @@ const ScrollableDialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-[100001] w-full translate-x-[-50%] translate-y-[-50%]",
+        "dialog-content fixed left-[50%] top-[50%] w-full translate-x-[-50%] translate-y-[-50%]",
         "border bg-background shadow-lg duration-200",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
@@ -71,7 +70,6 @@ const ScrollableDialogContent = React.forwardRef<
         "overflow-hidden",
         className
       )}
-      style={{ position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
       {...props}
     >
       {children}

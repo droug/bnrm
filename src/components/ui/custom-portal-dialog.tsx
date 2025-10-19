@@ -39,23 +39,16 @@ export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialog
       <>
         {/* Overlay */}
         <div 
-          className="fixed inset-0 z-[999998] bg-black/80 backdrop-blur-sm animate-in fade-in-0"
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+          className="dialog-overlay fixed inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in-0"
         />
         
         {/* Content */}
         <div
           ref={ref}
           className={cn(
-            "fixed left-[50%] top-[50%] z-[999999] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 sm:rounded-lg max-h-[90vh] overflow-y-auto",
+            "dialog-content fixed left-[50%] top-[50%] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 sm:rounded-lg max-h-[90vh] overflow-y-auto",
             className
           )}
-          style={{ 
-            position: 'fixed',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)'
-          }}
           {...props}
         >
           {children}
