@@ -707,7 +707,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Langues</Label>
+                  <Label>Langue</Label>
                   <div className="relative">
                     <Input
                       placeholder="Rechercher et sélectionner des langues..."
