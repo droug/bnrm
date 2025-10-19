@@ -373,7 +373,14 @@ Enhanced Moroccan Heritage Design System
     --line-height-add: 0;
     --cursor-size: 1;
     
-    /* Z-index system for dialogs and modals */
+    /* Z-index system - Unified layer management */
+    --z-overlay: 9998;
+    --z-dialog: 9999;
+    --z-popover: 1000;
+    --z-dropdown: 100;
+    --z-navbar: 200;
+    
+    /* Legacy compatibility - will be migrated */
     --z-dialog-overlay: 9998;
     --z-dialog-content: 9999;
     --z-sheet-overlay: 9998;
@@ -398,7 +405,7 @@ Enhanced Moroccan Heritage Design System
   /* Fixed chat window that stays on top during scroll */
   .fixed-chat {
     position: fixed !important;
-    z-index: 99999 !important;
+    z-index: var(--z-dialog) !important;
     transform: translateZ(0);
     will-change: transform;
     backface-visibility: hidden;

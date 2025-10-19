@@ -15,11 +15,12 @@ const CustomDialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-[99998] bg-black/80 backdrop-blur-sm",
+      "dialog-overlay fixed inset-0 bg-black/50 backdrop-filter backdrop-blur-sm",
       "data-[state=open]:animate-in data-[state=closed]:animate-out",
       "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
+    style={{ zIndex: 'var(--z-overlay)' }}
     {...props}
   />
 ));
@@ -38,7 +39,7 @@ const CustomDialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-[99999]",
+        "dialog-content fixed left-[50%] top-[50%]",
         "w-full translate-x-[-50%] translate-y-[-50%]",
         "border bg-background shadow-lg",
         "duration-200",
@@ -51,6 +52,7 @@ const CustomDialogContent = React.forwardRef<
         "max-h-[90vh] overflow-y-auto",
         className
       )}
+      style={{ zIndex: 'var(--z-dialog)' }}
       {...props}
     >
       {children}
