@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, X, ChevronRight, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 
 interface SearchMatch {
   page_id: string;
@@ -167,7 +168,7 @@ export function ManuscriptSearchInDocument({ manuscriptId, onPageSelect }: Manus
                           <div className="flex-1 min-w-0">
                             <p 
                               className="text-xs leading-relaxed"
-                              dangerouslySetInnerHTML={{ __html: highlightQuery(position.context) }}
+                              dangerouslySetInnerHTML={{ __html: sanitizeHtml(highlightQuery(position.context)) }}
                             />
                           </div>
                           <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />

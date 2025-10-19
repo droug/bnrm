@@ -16,6 +16,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 
 interface SearchResult {
   id: string;
@@ -478,7 +479,7 @@ export default function SearchResults() {
                             <span 
                               className="hover:text-primary transition-colors"
                               dangerouslySetInnerHTML={{
-                                __html: formatHighlight(hit.document.title, hit.highlights?.title)
+                                __html: sanitizeHtml(formatHighlight(hit.document.title, hit.highlights?.title))
                               }}
                             />
                           </h3>
@@ -504,10 +505,10 @@ export default function SearchResults() {
                           <p 
                             className="text-muted-foreground mb-3 line-clamp-2"
                             dangerouslySetInnerHTML={{
-                              __html: formatHighlight(
+                              __html: sanitizeHtml(formatHighlight(
                                 hit.document.excerpt || hit.document.content, 
                                 hit.highlights?.excerpt || hit.highlights?.content
-                              )
+                              ))
                             }}
                           />
 
@@ -552,10 +553,10 @@ export default function SearchResults() {
                                     key={i}
                                     className="text-sm text-muted-foreground p-2 bg-muted/30 rounded"
                                     dangerouslySetInnerHTML={{ 
-                                      __html: snippet.replace(
+                                      __html: sanitizeHtml(snippet.replace(
                                         /<mark>/g, 
                                         '<mark class="bg-yellow-200 dark:bg-yellow-500/30 text-foreground font-medium px-1 rounded">'
-                                      )
+                                      ))
                                     }}
                                   />
                                 ))}
@@ -756,10 +757,10 @@ export default function SearchResults() {
                   <div 
                     className="prose prose-sm max-w-none dark:prose-invert"
                     dangerouslySetInnerHTML={{ 
-                      __html: selectedResult.content.replace(
+                      __html: sanitizeHtml(selectedResult.content.replace(
                         new RegExp(`(${query})`, 'gi'),
                         '<mark class="bg-yellow-200 dark:bg-yellow-500/30 text-foreground font-medium px-1 rounded">$1</mark>'
-                      )
+                      ))
                     }}
                   />
                 </div>

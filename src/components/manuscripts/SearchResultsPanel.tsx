@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, ChevronRight, FileText } from "lucide-react";
 import { SearchResult } from "@/hooks/useManuscriptSearch";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 
 interface SearchResultsPanelProps {
   results: SearchResult[];
@@ -59,21 +60,21 @@ export function SearchResultsPanel({ results, searchQuery, onResultClick, highli
                   <div className="flex items-start justify-between gap-2">
                     <h4 
                       className="font-medium text-sm leading-tight flex-1"
-                      dangerouslySetInnerHTML={{ __html: highlightText(result.title, searchQuery) }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(highlightText(result.title, searchQuery)) }}
                     />
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                   </div>
 
                   {result.author && (
                     <p className="text-xs text-muted-foreground">
-                      Par: <span dangerouslySetInnerHTML={{ __html: highlightText(result.author, searchQuery) }} />
+                      Par: <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(highlightText(result.author, searchQuery)) }} />
                     </p>
                   )}
 
                   {result.description && (
                     <p 
                       className="text-xs text-muted-foreground line-clamp-2"
-                      dangerouslySetInnerHTML={{ __html: highlightText(result.description, searchQuery) }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(highlightText(result.description, searchQuery)) }}
                     />
                   )}
 
@@ -123,7 +124,7 @@ export function SearchResultsPanel({ results, searchQuery, onResultClick, highli
                     <h3 className="font-semibold mb-2">Description</h3>
                     <p 
                       className="text-sm text-muted-foreground leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: highlightText(selectedResult.description || '', searchQuery) }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(highlightText(selectedResult.description || '', searchQuery)) }}
                     />
                   </div>
 
