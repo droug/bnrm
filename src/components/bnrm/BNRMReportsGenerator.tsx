@@ -1,40 +1,54 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { toast } from "@/hooks/use-toast";
+import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
 
-export const generateISBNMonthlyReport = () => {
+export const generateISBNMonthlyReport = async () => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   
-  // En-tête
+  // Ajouter l'en-tête officiel BNRM
+  let yPos = await addBNRMHeader(doc);
+  yPos += 10;
+  
+  // Titre du rapport
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text('Rapport Mensuel - Agence ISBN', pageWidth / 2, 20, { align: 'center' });
+  doc.text('Rapport Mensuel - Agence ISBN', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 10;
   
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
-  doc.text('Période: Mars 2024', pageWidth / 2, 30, { align: 'center' });
-  doc.text('Date de génération: ' + new Date().toLocaleDateString('fr-FR'), pageWidth / 2, 37, { align: 'center' });
+  doc.text('Période: Mars 2024', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 7;
+  doc.text('Date de génération: ' + new Date().toLocaleDateString('fr-FR'), pageWidth / 2, yPos, { align: 'center' });
+  yPos += 13;
   
   // Statistiques globales
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Statistiques Globales', 14, 50);
+  doc.text('Statistiques Globales', 14, yPos);
+  yPos += 10;
   
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text('• Total ISBN attribués: 1,234', 14, 60);
-  doc.text('• Nouveaux éditeurs enregistrés: 45', 14, 67);
-  doc.text('• ISBN préfixes attribués: 12', 14, 74);
-  doc.text('• Délai moyen de traitement: 2.3 jours', 14, 81);
+  doc.text('• Total ISBN attribués: 1,234', 14, yPos);
+  yPos += 7;
+  doc.text('• Nouveaux éditeurs enregistrés: 45', 14, yPos);
+  yPos += 7;
+  doc.text('• ISBN préfixes attribués: 12', 14, yPos);
+  yPos += 7;
+  doc.text('• Délai moyen de traitement: 2.3 jours', 14, yPos);
+  yPos += 14;
   
   // Répartition par type de publication
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Répartition par Type de Publication', 14, 95);
+  doc.text('Répartition par Type de Publication', 14, yPos);
+  yPos += 5;
   
   autoTable(doc, {
-    startY: 100,
+    startY: yPos,
     head: [['Type', 'Nombre', 'Pourcentage']],
     body: [
       ['Livres', '856', '69.4%'],
@@ -64,17 +78,11 @@ export const generateISBNMonthlyReport = () => {
     headStyles: { fillColor: [41, 128, 185] }
   });
   
-  // Pied de page
+  // Pied de page avec numéros de page
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
-    doc.setFontSize(9);
-    doc.text(
-      `BNRM - Bibliothèque Nationale du Royaume du Maroc | Page ${i}/${pageCount}`,
-      pageWidth / 2,
-      doc.internal.pageSize.getHeight() - 10,
-      { align: 'center' }
-    );
+    addBNRMFooter(doc, i);
   }
   
   doc.save('Rapport_ISBN_Mars_2024.pdf');
@@ -84,39 +92,52 @@ export const generateISBNMonthlyReport = () => {
   });
 };
 
-export const generateISSNReport = () => {
+export const generateISSNReport = async () => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   
-  // En-tête
+  // Ajouter l'en-tête officiel BNRM
+  let yPos = await addBNRMHeader(doc);
+  yPos += 10;
+  
+  // Titre du rapport
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text('Rapport - Centre International ISSN', pageWidth / 2, 20, { align: 'center' });
+  doc.text('Rapport - Centre International ISSN', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 10;
   
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
-  doc.text('Période: Mars 2024', pageWidth / 2, 30, { align: 'center' });
-  doc.text('Date de génération: ' + new Date().toLocaleDateString('fr-FR'), pageWidth / 2, 37, { align: 'center' });
+  doc.text('Période: Mars 2024', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 7;
+  doc.text('Date de génération: ' + new Date().toLocaleDateString('fr-FR'), pageWidth / 2, yPos, { align: 'center' });
+  yPos += 13;
   
   // Statistiques globales
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Statistiques Globales', 14, 50);
+  doc.text('Statistiques Globales', 14, yPos);
+  yPos += 10;
   
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text('• Total ISSN attribués: 87', 14, 60);
-  doc.text('• Nouvelles publications périodiques: 23', 14, 67);
-  doc.text('• ISSN en ligne: 34', 14, 74);
-  doc.text('• ISSN imprimés: 53', 14, 81);
+  doc.text('• Total ISSN attribués: 87', 14, yPos);
+  yPos += 7;
+  doc.text('• Nouvelles publications périodiques: 23', 14, yPos);
+  yPos += 7;
+  doc.text('• ISSN en ligne: 34', 14, yPos);
+  yPos += 7;
+  doc.text('• ISSN imprimés: 53', 14, yPos);
+  yPos += 14;
   
   // Répartition par domaine
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Répartition par Domaine', 14, 95);
+  doc.text('Répartition par Domaine', 14, yPos);
+  yPos += 5;
   
   autoTable(doc, {
-    startY: 100,
+    startY: yPos,
     head: [['Domaine', 'Nombre', 'Pourcentage']],
     body: [
       ['Sciences et Technologies', '28', '32.2%'],
@@ -148,17 +169,11 @@ export const generateISSNReport = () => {
     headStyles: { fillColor: [52, 152, 219] }
   });
   
-  // Pied de page
+  // Pied de page avec numéros de page
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
-    doc.setFontSize(9);
-    doc.text(
-      `BNRM - Bibliothèque Nationale du Royaume du Maroc | Page ${i}/${pageCount}`,
-      pageWidth / 2,
-      doc.internal.pageSize.getHeight() - 10,
-      { align: 'center' }
-    );
+    addBNRMFooter(doc, i);
   }
   
   doc.save('Rapport_ISSN_Mars_2024.pdf');
@@ -168,39 +183,52 @@ export const generateISSNReport = () => {
   });
 };
 
-export const generateDepositTypeStats = () => {
+export const generateDepositTypeStats = async () => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   
-  // En-tête
+  // Ajouter l'en-tête officiel BNRM
+  let yPos = await addBNRMHeader(doc);
+  yPos += 10;
+  
+  // Titre du rapport
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text('Statistiques de Dépôt par Type', pageWidth / 2, 20, { align: 'center' });
+  doc.text('Statistiques de Dépôt par Type', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 10;
   
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
-  doc.text('Période: Janvier - Mars 2024', pageWidth / 2, 30, { align: 'center' });
-  doc.text('Date de génération: ' + new Date().toLocaleDateString('fr-FR'), pageWidth / 2, 37, { align: 'center' });
+  doc.text('Période: Janvier - Mars 2024', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 7;
+  doc.text('Date de génération: ' + new Date().toLocaleDateString('fr-FR'), pageWidth / 2, yPos, { align: 'center' });
+  yPos += 13;
   
   // Vue d'ensemble
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Vue d\'Ensemble', 14, 50);
+  doc.text('Vue d\'Ensemble', 14, yPos);
+  yPos += 10;
   
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text('• Total dépôts reçus: 2,847', 14, 60);
-  doc.text('• Dépôts physiques: 1,823 (64%)', 14, 67);
-  doc.text('• Dépôts numériques: 1,024 (36%)', 14, 74);
-  doc.text('• Taux de conformité: 94.2%', 14, 81);
+  doc.text('• Total dépôts reçus: 2,847', 14, yPos);
+  yPos += 7;
+  doc.text('• Dépôts physiques: 1,823 (64%)', 14, yPos);
+  yPos += 7;
+  doc.text('• Dépôts numériques: 1,024 (36%)', 14, yPos);
+  yPos += 7;
+  doc.text('• Taux de conformité: 94.2%', 14, yPos);
+  yPos += 14;
   
   // Détail par type de support
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Répartition Détaillée par Type de Support', 14, 95);
+  doc.text('Répartition Détaillée par Type de Support', 14, yPos);
+  yPos += 5;
   
   autoTable(doc, {
-    startY: 100,
+    startY: yPos,
     head: [['Type de Support', 'Nombre', '%', 'Conformes']],
     body: [
       ['Livres imprimés', '1,456', '51.2%', '1,398'],
@@ -232,17 +260,11 @@ export const generateDepositTypeStats = () => {
     headStyles: { fillColor: [155, 89, 182] }
   });
   
-  // Pied de page
+  // Pied de page avec numéros de page
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
-    doc.setFontSize(9);
-    doc.text(
-      `BNRM - Bibliothèque Nationale du Royaume du Maroc | Page ${i}/${pageCount}`,
-      pageWidth / 2,
-      doc.internal.pageSize.getHeight() - 10,
-      { align: 'center' }
-    );
+    addBNRMFooter(doc, i);
   }
   
   doc.save('Statistiques_Depot_Type_T1_2024.pdf');
@@ -252,39 +274,52 @@ export const generateDepositTypeStats = () => {
   });
 };
 
-export const generatePublishersActivityReport = () => {
+export const generatePublishersActivityReport = async () => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   
-  // En-tête
+  // Ajouter l'en-tête officiel BNRM
+  let yPos = await addBNRMHeader(doc);
+  yPos += 10;
+  
+  // Titre du rapport
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text('Rapport d\'Activité des Éditeurs', pageWidth / 2, 20, { align: 'center' });
+  doc.text('Rapport d\'Activité des Éditeurs', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 10;
   
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
-  doc.text('Période: Mars 2024', pageWidth / 2, 30, { align: 'center' });
-  doc.text('Date de génération: ' + new Date().toLocaleDateString('fr-FR'), pageWidth / 2, 37, { align: 'center' });
+  doc.text('Période: Mars 2024', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 7;
+  doc.text('Date de génération: ' + new Date().toLocaleDateString('fr-FR'), pageWidth / 2, yPos, { align: 'center' });
+  yPos += 13;
   
   // Synthèse
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Synthèse de l\'Activité', 14, 50);
+  doc.text('Synthèse de l\'Activité', 14, yPos);
+  yPos += 10;
   
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text('• Éditeurs actifs: 324', 14, 60);
-  doc.text('• Nouveaux éditeurs: 45', 14, 67);
-  doc.text('• Publications totales: 2,847', 14, 74);
-  doc.text('• Moyenne publications/éditeur: 8.8', 14, 81);
+  doc.text('• Éditeurs actifs: 324', 14, yPos);
+  yPos += 7;
+  doc.text('• Nouveaux éditeurs: 45', 14, yPos);
+  yPos += 7;
+  doc.text('• Publications totales: 2,847', 14, yPos);
+  yPos += 7;
+  doc.text('• Moyenne publications/éditeur: 8.8', 14, yPos);
+  yPos += 14;
   
   // Top 10 éditeurs
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Top 10 Éditeurs par Volume', 14, 95);
+  doc.text('Top 10 Éditeurs par Volume', 14, yPos);
+  yPos += 5;
   
   autoTable(doc, {
-    startY: 100,
+    startY: yPos,
     head: [['Rang', 'Éditeur', 'Publications', 'ISBN/ISSN']],
     body: [
       ['1', 'Éditions Savoir', '156', '142'],
@@ -322,17 +357,11 @@ export const generatePublishersActivityReport = () => {
     headStyles: { fillColor: [231, 76, 60] }
   });
   
-  // Pied de page
+  // Pied de page avec numéros de page
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
-    doc.setFontSize(9);
-    doc.text(
-      `BNRM - Bibliothèque Nationale du Royaume du Maroc | Page ${i}/${pageCount}`,
-      pageWidth / 2,
-      doc.internal.pageSize.getHeight() - 10,
-      { align: 'center' }
-    );
+    addBNRMFooter(doc, i);
   }
   
   doc.save('Rapport_Activite_Editeurs_Mars_2024.pdf');
