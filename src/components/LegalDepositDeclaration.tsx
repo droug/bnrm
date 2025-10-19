@@ -2418,32 +2418,156 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Éditeur</Label>
-                  <Input placeholder="Nom de l'éditeur" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Adresse</Label>
-                  <Textarea placeholder="Adresse de l'éditeur" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Téléphone</Label>
-                  <Input placeholder="Téléphone de l'éditeur" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" placeholder="Email de l'éditeur" />
+                  {!selectedPublisher ? (
+                    <div className="relative">
+                      <Input
+                        placeholder="Rechercher un éditeur..."
+                        value={publisherSearch}
+                        onChange={(e) => setPublisherSearch(e.target.value)}
+                        className="pr-10"
+                      />
+                      {publisherSearch && (
+                        <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                          {publishers
+                            .filter(pub => 
+                              pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
+                            )
+                            .map((pub) => (
+                              <button
+                                key={pub.id}
+                                type="button"
+                                className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                                onClick={() => {
+                                  setSelectedPublisher(pub);
+                                  setPublisherSearch('');
+                                }}
+                              >
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{pub.name}</span>
+                                  {pub.city && (
+                                    <span className="text-sm text-muted-foreground">
+                                      {pub.city}, {pub.country}
+                                    </span>
+                                  )}
+                                </div>
+                              </button>
+                            ))}
+                          {publishers.filter(pub => 
+                            pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
+                          ).length === 0 && (
+                            <div className="px-4 py-3">
+                              <div className="text-sm text-muted-foreground mb-2">
+                                Aucun éditeur trouvé
+                              </div>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={async () => {
+                                  const newName = publisherSearch;
+                                  const { data, error } = await supabase
+                                    .from('publishers')
+                                    .insert([{ name: newName }])
+                                    .select()
+                                    .single();
+                                  
+                                  if (error) {
+                                    toast.error('Erreur lors de l\'ajout de l\'éditeur');
+                                  } else {
+                                    setPublishers([...publishers, data]);
+                                    setSelectedPublisher(data);
+                                    setPublisherSearch('');
+                                    toast.success('Éditeur ajouté avec succès');
+                                  }
+                                }}
+                              >
+                                + Ajouter "{publisherSearch}"
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-primary/10 rounded-md flex justify-between items-start">
+                      <div>
+                        <p className="font-medium">{selectedPublisher.name}</p>
+                        {selectedPublisher.city && (
+                          <p className="text-sm text-muted-foreground">
+                            {selectedPublisher.city}, {selectedPublisher.country}
+                          </p>
+                        )}
+                        {selectedPublisher.publisher_type && (
+                          <p className="text-sm text-muted-foreground">
+                            Type: {selectedPublisher.publisher_type}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedPublisher(null)}
+                      >
+                        Modifier
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label>Date prévue de parution</Label>
-                  <Input type="month" placeholder="Date prévue de parution" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Mention d'édition</Label>
-                  <Input placeholder="Mention d'édition" />
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="JJ/MM/AAAA"
+                      value={publicationDateInput}
+                      onChange={(e) => {
+                        setPublicationDateInput(e.target.value);
+                        // Parse manual input
+                        const parts = e.target.value.split('/');
+                        if (parts.length === 3) {
+                          const day = parseInt(parts[0]);
+                          const month = parseInt(parts[1]) - 1;
+                          const year = parseInt(parts[2]);
+                          if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                            const date = new Date(year, month, day);
+                            if (date.getDate() === day && date.getMonth() === month) {
+                              setPublicationDate(date);
+                            }
+                          }
+                        }
+                      }}
+                      className="flex-1"
+                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-10 p-0",
+                            !publicationDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="h-4 w-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={publicationDate}
+                          onSelect={(date) => {
+                            setPublicationDate(date);
+                            if (date) {
+                              setPublicationDateInput(format(date, "dd/MM/yyyy"));
+                            }
+                          }}
+                          initialFocus
+                          className={cn("p-3 pointer-events-auto")}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
               </div>
             </div>
