@@ -1,13 +1,15 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRoles } from "@/hooks/useUserRoles";
 import { canAccessContent, canDownload, canRequestReproduction, hasAdvancedSearch, getAccessMessage, UserRole, AccessLevel } from "@/config/accessPolicies";
 
 /**
  * Hook personnalisé pour gérer les permissions d'accès
- * Note: Le rôle est maintenant récupéré depuis la table user_roles pour plus de sécurité
+ * Utilise la table user_roles pour plus de sécurité (évite l'escalade de privilèges)
  */
 export function useAccessControl() {
-  const { profile } = useAuth();
-  const userRole = (profile?.role as UserRole) || 'visitor';
+  const { user } = useAuth();
+  const { getPrimaryRole, hasRole, loading } = useUserRoles();
+  const userRole = (getPrimaryRole() as UserRole) || 'visitor';
 
   /**
    * Vérifie si l'utilisateur peut accéder à un contenu
@@ -49,9 +51,10 @@ export function useAccessControl() {
     checkDownload,
     checkReproduction,
     checkAdvancedSearch,
-    isAuthenticated: !!profile,
-    isAdmin: userRole === 'admin',
-    isLibrarian: userRole === 'librarian' || userRole === 'admin',
-    isSubscriber: userRole === 'subscriber' || userRole === 'researcher' || userRole === 'partner',
+    isAuthenticated: !!user,
+    isAdmin: hasRole('admin'),
+    isLibrarian: hasRole('librarian') || hasRole('admin'),
+    isSubscriber: hasRole('subscriber') || hasRole('researcher') || hasRole('partner'),
+    loading,
   };
 }

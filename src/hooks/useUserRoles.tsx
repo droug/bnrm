@@ -25,7 +25,7 @@ export function useUserRoles(targetUserId?: string) {
   const [loading, setLoading] = useState(true);
   
   const userId = targetUserId || user?.id;
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = roles.some(r => r.role === 'admin' && (!r.expires_at || new Date(r.expires_at) > new Date()));
 
   useEffect(() => {
     if (!userId) {
