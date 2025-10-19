@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Z-index management */
+:root {
+  --z-dropdown: 1000;
+  --z-popover: 1000;
+  --z-dialog: 1100;
+  --z-dialog-content: 1101;
+  --z-toast: 1200;
+}
+
 /* Prevent horizontal scroll and ensure proper centering */
 html, body {
   overflow-x: hidden;
