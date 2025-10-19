@@ -412,7 +412,93 @@ export default function BNRMBackOffice() {
 
               {/* Reports Tab */}
               <TabsContent value="reports" className="space-y-4">
-                <BNRMStatistics />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Database className="h-5 w-5" />
+                        <span>Rapports Statistiques</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Tableaux de bord interactifs et export de données
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <Button variant="outline" className="w-full justify-start">
+                          <BarChart3 className="h-4 w-4 mr-2" />
+                          Rapport mensuel agence ISBN
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start">
+                          <FileText className="h-4 w-4 mr-2" />
+                          Rapport centre international ISSN
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start">
+                          <Archive className="h-4 w-4 mr-2" />
+                          Statistiques de dépôt par type
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start">
+                          <Users className="h-4 w-4 mr-2" />
+                          Rapport activité éditeurs
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Search className="h-5 w-5" />
+                        <span>Filtres Avancés</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Recherche multicritères et exports personnalisés
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <Button variant="outline" className="w-full justify-start">
+                          Filtrer par période
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start">
+                          Filtrer par éditeur
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start">
+                          Filtrer par type de support
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start">
+                          Export Excel personnalisé
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Aperçu des statistiques globales</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-4 md:grid-cols-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-primary">2,847</div>
+                        <div className="text-sm text-muted-foreground">Demandes traitées</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600">1,234</div>
+                        <div className="text-sm text-muted-foreground">ISBN attribués</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">87</div>
+                        <div className="text-sm text-muted-foreground">ISSN attribués</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-purple-600">2.3j</div>
+                        <div className="text-sm text-muted-foreground">Délai moyen</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
             </Tabs>
           </div>
