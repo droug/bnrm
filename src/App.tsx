@@ -3,92 +3,124 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import { Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import ScrollToTop from "@/components/ScrollToTop";
+
+// Always loaded (critical routes)
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import SignupPage from "./pages/SignupPage";
-import Dashboard from "./pages/Dashboard";
-import Manuscripts from "./pages/Manuscripts";
-import ManuscriptsPlatform from "./pages/ManuscriptsPlatform";
-import ManuscriptsBackoffice from "./pages/ManuscriptsBackoffice";
-import ManuscriptsBackofficeDashboard from "./pages/ManuscriptsBackofficeDashboard";
-import ManuscriptsBackofficeDocuments from "./pages/ManuscriptsBackofficeDocuments";
-import ManuscriptsBackofficeUsers from "./pages/ManuscriptsBackofficeUsers";
-import ManuscriptsBackofficeAnalytics from "./pages/ManuscriptsBackofficeAnalytics";
-import ManuscriptsBackofficeExhibitions from "./pages/ManuscriptsBackofficeExhibitions";
-import ManuscriptsBackofficeReports from "./pages/ManuscriptsBackofficeReports";
-import ManuscriptsBackofficeAccess from "./pages/ManuscriptsBackofficeAccess";
-import ManuscriptsBackofficeSettings from "./pages/ManuscriptsBackofficeSettings";
-import ManuscriptReader from "./pages/ManuscriptReader";
-import MyManuscriptsSpace from "./pages/MyManuscriptsSpace";
-import ManuscriptsHelp from "./pages/ManuscriptsHelp";
-import AccessRequest from "./pages/AccessRequest";
-import Profile from "./pages/Profile";
-import UserManagement from "./pages/UserManagement";
-import ContentManagement from "./pages/ContentManagement";
-import News from "./pages/News";
-import PracticalInfo from "./pages/PracticalInfo";
-import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
-import WysiwygPage from "./pages/WysiwygPage";
-import BNRMPortal from "./pages/BNRMPortal";
-import BNRMTariffsPage from "./pages/BNRMTariffsPage";
-import AdminSettings from "./pages/AdminSettings";
-import LegalDepositPage from "./pages/LegalDepositPage";
-import ArchivingPage from "./pages/ArchivingPage";
-import BNRMBackOffice from "./pages/BNRMBackOffice";
-import SearchResults from "./pages/SearchResults";
-import DigitalLibrary from "./pages/DigitalLibrary";
-import BookReader from "./pages/BookReader";
-import MyLibrarySpace from "./pages/MyLibrarySpace";
-import CatalogMetadata from "./pages/CatalogMetadata";
-import ReproductionPage from "./pages/ReproductionPage";
-import ReproductionBackofficePage from "./pages/ReproductionBackofficePage";
-import ReproductionDetailsPage from "./pages/ReproductionDetailsPage";
-import HelpPage from "./pages/HelpPage";
-import PreservationPage from "./pages/PreservationPage";
-import DigitalLibraryBackoffice from "./pages/DigitalLibraryBackoffice";
-import ProfessionalManagement from "./pages/ProfessionalManagement";
-import ProfessionalSignup from "./pages/ProfessionalSignup";
-import DigitalLibraryDocuments from "./pages/DigitalLibraryDocuments";
-import DigitalLibraryUsers from "./pages/DigitalLibraryUsers";
-import DigitalLibraryAnalytics from "./pages/DigitalLibraryAnalytics";
-import DigitalLibraryExhibitions from "./pages/DigitalLibraryExhibitions";
-import DigitalLibraryReproduction from "./pages/DigitalLibraryReproduction";
-import DigitalLibraryRestrictions from "./pages/DigitalLibraryRestrictions";
-import DigitalLibraryCopyright from "./pages/DigitalLibraryCopyright";
-import DigitalLibraryBulkImport from "./pages/DigitalLibraryBulkImport";
-import AccessPolicies from "./pages/AccessPolicies";
-import CBMPortal from "./pages/CBMPortal";
-import CBMObjectifs from "./pages/CBMObjectifs";
-import CBMPlanActions from "./pages/CBMPlanActions";
-import CBMOrganesGestion from "./pages/CBMOrganesGestion";
-import CBMAdhesion from "./pages/CBMAdhesion";
-import CBMRecherche from "./pages/CBMRecherche";
-import CBMAccesRapide from "./pages/CBMAccesRapide";
-import KitabPortal from "./pages/KitabPortal";
-import KitabAbout from "./pages/KitabAbout";
-import KitabUpcoming from "./pages/KitabUpcoming";
-import KitabNewPublications from "./pages/KitabNewPublications";
-import KitabBibliography from "./pages/KitabBibliography";
-import KitabFAQ from "./pages/KitabFAQ";
-import KitabRepertoireEditeurs from "./pages/KitabRepertoireEditeurs";
-import KitabRepertoireAuteurs from "./pages/KitabRepertoireAuteurs";
-import KitabRepertoireImprimeurs from "./pages/KitabRepertoireImprimeurs";
-import KitabRepertoireDistributeurs from "./pages/KitabRepertoireDistributeurs";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import PaymentCanceled from "./pages/PaymentCanceled";
-import Wallet from "./pages/Wallet";
-import PaymentServices from "./pages/PaymentServices";
-import ServicesCatalog from "./pages/ServicesCatalog";
-import TranslationManagementPage from "./pages/TranslationManagementPage";
-import AccessRequestsManagement from "./pages/AccessRequestsManagement";
-import CommitteeDashboard from "./pages/CommitteeDashboard";
-import DepositApprovals from "./pages/DepositApprovals";
-import EmailManagement from "./pages/EmailManagement";
-import LegalDepositApprovals from "./pages/LegalDepositApprovals";
-import WorkflowBPM from "./pages/WorkflowBPM";
-import SystemListsPage from "./pages/SystemListsPage";
+
+// Lazy-loaded routes for better performance
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const SearchResults = lazy(() => import("./pages/SearchResults"));
+const SignupPage = lazy(() => import("./pages/SignupPage"));
+const Profile = lazy(() => import("./pages/Profile"));
+const SettingsPage = lazy(() => import("./pages/Settings"));
+const HelpPage = lazy(() => import("./pages/HelpPage"));
+const News = lazy(() => import("./pages/News"));
+const PracticalInfo = lazy(() => import("./pages/PracticalInfo"));
+
+// Manuscripts Platform (lazy)
+const Manuscripts = lazy(() => import("./pages/Manuscripts"));
+const ManuscriptsPlatform = lazy(() => import("./pages/ManuscriptsPlatform"));
+const ManuscriptReader = lazy(() => import("./pages/ManuscriptReader"));
+const MyManuscriptsSpace = lazy(() => import("./pages/MyManuscriptsSpace"));
+const ManuscriptsHelp = lazy(() => import("./pages/ManuscriptsHelp"));
+const AccessRequest = lazy(() => import("./pages/AccessRequest"));
+
+// Admin - Manuscripts Backoffice (lazy)
+const ManuscriptsBackoffice = lazy(() => import("./pages/ManuscriptsBackoffice"));
+const ManuscriptsBackofficeDashboard = lazy(() => import("./pages/ManuscriptsBackofficeDashboard"));
+const ManuscriptsBackofficeDocuments = lazy(() => import("./pages/ManuscriptsBackofficeDocuments"));
+const ManuscriptsBackofficeUsers = lazy(() => import("./pages/ManuscriptsBackofficeUsers"));
+const ManuscriptsBackofficeAnalytics = lazy(() => import("./pages/ManuscriptsBackofficeAnalytics"));
+const ManuscriptsBackofficeExhibitions = lazy(() => import("./pages/ManuscriptsBackofficeExhibitions"));
+const ManuscriptsBackofficeReports = lazy(() => import("./pages/ManuscriptsBackofficeReports"));
+const ManuscriptsBackofficeAccess = lazy(() => import("./pages/ManuscriptsBackofficeAccess"));
+const ManuscriptsBackofficeSettings = lazy(() => import("./pages/ManuscriptsBackofficeSettings"));
+
+// Admin - General (lazy)
+const UserManagement = lazy(() => import("./pages/UserManagement"));
+const ContentManagement = lazy(() => import("./pages/ContentManagement"));
+const AdminSettings = lazy(() => import("./pages/AdminSettings"));
+const WysiwygPage = lazy(() => import("./pages/WysiwygPage"));
+const ArchivingPage = lazy(() => import("./pages/ArchivingPage"));
+const PreservationPage = lazy(() => import("./pages/PreservationPage"));
+const CatalogMetadata = lazy(() => import("./pages/CatalogMetadata"));
+const TranslationManagementPage = lazy(() => import("./pages/TranslationManagementPage"));
+const AccessRequestsManagement = lazy(() => import("./pages/AccessRequestsManagement"));
+const EmailManagement = lazy(() => import("./pages/EmailManagement"));
+const SystemListsPage = lazy(() => import("./pages/SystemListsPage"));
+const WorkflowBPM = lazy(() => import("./pages/WorkflowBPM"));
+
+// BNRM Portal (lazy)
+const BNRMPortal = lazy(() => import("./pages/BNRMPortal"));
+const BNRMTariffsPage = lazy(() => import("./pages/BNRMTariffsPage"));
+const BNRMBackOffice = lazy(() => import("./pages/BNRMBackOffice"));
+const ServicesCatalog = lazy(() => import("./pages/ServicesCatalog"));
+
+// Legal Deposit (lazy)
+const LegalDepositPage = lazy(() => import("./pages/LegalDepositPage"));
+const LegalDepositApprovals = lazy(() => import("./pages/LegalDepositApprovals"));
+const DepositApprovals = lazy(() => import("./pages/DepositApprovals"));
+const CommitteeDashboard = lazy(() => import("./pages/CommitteeDashboard"));
+const ProfessionalManagement = lazy(() => import("./pages/ProfessionalManagement"));
+const ProfessionalSignup = lazy(() => import("./pages/ProfessionalSignup"));
+
+// Digital Library (lazy)
+const DigitalLibrary = lazy(() => import("./pages/DigitalLibrary"));
+const BookReader = lazy(() => import("./pages/BookReader"));
+const MyLibrarySpace = lazy(() => import("./pages/MyLibrarySpace"));
+const DigitalLibraryBackoffice = lazy(() => import("./pages/DigitalLibraryBackoffice"));
+const DigitalLibraryDocuments = lazy(() => import("./pages/DigitalLibraryDocuments"));
+const DigitalLibraryUsers = lazy(() => import("./pages/DigitalLibraryUsers"));
+const DigitalLibraryAnalytics = lazy(() => import("./pages/DigitalLibraryAnalytics"));
+const DigitalLibraryExhibitions = lazy(() => import("./pages/DigitalLibraryExhibitions"));
+const DigitalLibraryReproduction = lazy(() => import("./pages/DigitalLibraryReproduction"));
+const DigitalLibraryRestrictions = lazy(() => import("./pages/DigitalLibraryRestrictions"));
+const DigitalLibraryCopyright = lazy(() => import("./pages/DigitalLibraryCopyright"));
+const DigitalLibraryBulkImport = lazy(() => import("./pages/DigitalLibraryBulkImport"));
+const AccessPolicies = lazy(() => import("./pages/AccessPolicies"));
+
+// Reproduction (lazy)
+const ReproductionPage = lazy(() => import("./pages/ReproductionPage"));
+const ReproductionBackofficePage = lazy(() => import("./pages/ReproductionBackofficePage"));
+const ReproductionDetailsPage = lazy(() => import("./pages/ReproductionDetailsPage"));
+
+// CBM Portal (lazy)
+const CBMPortal = lazy(() => import("./pages/CBMPortal"));
+const CBMObjectifs = lazy(() => import("./pages/CBMObjectifs"));
+const CBMPlanActions = lazy(() => import("./pages/CBMPlanActions"));
+const CBMOrganesGestion = lazy(() => import("./pages/CBMOrganesGestion"));
+const CBMAdhesion = lazy(() => import("./pages/CBMAdhesion"));
+const CBMRecherche = lazy(() => import("./pages/CBMRecherche"));
+const CBMAccesRapide = lazy(() => import("./pages/CBMAccesRapide"));
+
+// Kitab Platform (lazy)
+const KitabPortal = lazy(() => import("./pages/KitabPortal"));
+const KitabAbout = lazy(() => import("./pages/KitabAbout"));
+const KitabUpcoming = lazy(() => import("./pages/KitabUpcoming"));
+const KitabNewPublications = lazy(() => import("./pages/KitabNewPublications"));
+const KitabBibliography = lazy(() => import("./pages/KitabBibliography"));
+const KitabFAQ = lazy(() => import("./pages/KitabFAQ"));
+const KitabRepertoireEditeurs = lazy(() => import("./pages/KitabRepertoireEditeurs"));
+const KitabRepertoireAuteurs = lazy(() => import("./pages/KitabRepertoireAuteurs"));
+const KitabRepertoireImprimeurs = lazy(() => import("./pages/KitabRepertoireImprimeurs"));
+const KitabRepertoireDistributeurs = lazy(() => import("./pages/KitabRepertoireDistributeurs"));
+
+// Payment & Wallet (lazy)
+const PaymentServices = lazy(() => import("./pages/PaymentServices"));
+const Wallet = lazy(() => import("./pages/Wallet"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PaymentCanceled = lazy(() => import("./pages/PaymentCanceled"));
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  </div>
+);
 
 const App = () => (
   <TooltipProvider>
@@ -96,7 +128,8 @@ const App = () => (
       <ScrollToTop />
       <Toaster />
       <Sonner />
-      <Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/auth" element={<Auth />} />
@@ -218,9 +251,10 @@ const App = () => (
         <Route path="/admin/system-lists" element={<SystemListsPage />} />
         <Route path="/admin/listes-systeme" element={<SystemListsPage />} />
 
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
     </LanguageProvider>
   </TooltipProvider>
 );
