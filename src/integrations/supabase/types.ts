@@ -4580,6 +4580,7 @@ export type Database = {
           is_active: boolean | null
           list_id: string
           metadata: Json | null
+          parent_code: string | null
           sort_order: number | null
           updated_at: string | null
           value_code: string
@@ -4591,6 +4592,7 @@ export type Database = {
           is_active?: boolean | null
           list_id: string
           metadata?: Json | null
+          parent_code?: string | null
           sort_order?: number | null
           updated_at?: string | null
           value_code: string
@@ -4602,6 +4604,7 @@ export type Database = {
           is_active?: boolean | null
           list_id?: string
           metadata?: Json | null
+          parent_code?: string | null
           sort_order?: number | null
           updated_at?: string | null
           value_code?: string
@@ -4625,6 +4628,7 @@ export type Database = {
           form_name: string | null
           id: string
           is_active: boolean | null
+          is_hierarchical: boolean | null
           list_code: string
           list_name: string
           module: string | null
@@ -4637,6 +4641,7 @@ export type Database = {
           form_name?: string | null
           id?: string
           is_active?: boolean | null
+          is_hierarchical?: boolean | null
           list_code: string
           list_name: string
           module?: string | null
@@ -4649,6 +4654,7 @@ export type Database = {
           form_name?: string | null
           id?: string
           is_active?: boolean | null
+          is_hierarchical?: boolean | null
           list_code?: string
           list_name?: string
           module?: string | null

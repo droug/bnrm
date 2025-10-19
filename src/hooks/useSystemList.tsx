@@ -5,8 +5,8 @@ export interface SystemListValue {
   value_code: string;
   value_label: string;
   sort_order?: number;
-  metadata?: Record<string, any>;
-  parent_code?: string;
+  metadata?: any; // JSON type from Supabase
+  parent_code?: string | null;
 }
 
 export interface SystemList {
