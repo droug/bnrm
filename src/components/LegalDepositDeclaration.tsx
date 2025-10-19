@@ -1867,28 +1867,28 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
             <Separator />
 
-            {/* Identification de l'Éditeur */}
+            {/* Identification du Producteur */}
             <div>
-              <h3 className="text-2xl font-semibold mb-4">Identification de l'Éditeur</h3>
+              <h3 className="text-2xl font-semibold mb-4">Identification du Producteur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Éditeur</Label>
-                  <Input placeholder="Nom de l'éditeur" />
+                  <Label>Producteur</Label>
+                  <Input placeholder="Nom du producteur" />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Adresse</Label>
-                  <Textarea placeholder="Adresse de l'éditeur" />
+                  <Textarea placeholder="Adresse du producteur" />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Téléphone</Label>
-                  <Input placeholder="Téléphone de l'éditeur" />
+                  <Input placeholder="Téléphone du producteur" />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Email</Label>
-                  <Input type="email" placeholder="Email de l'éditeur" />
+                  <Input type="email" placeholder="Email du producteur" />
                 </div>
 
                 <div className="space-y-2">
