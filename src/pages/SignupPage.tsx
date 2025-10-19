@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Building, Printer, Users, UserPlus, PenTool, Truck, Clapperboard } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EditorSignupForm from "@/components/EditorSignupForm";
@@ -15,6 +15,7 @@ import { WatermarkContainer } from "@/components/ui/watermark";
 
 const SignupPage = () => {
   const [selectedType, setSelectedType] = useState<string>("");
+  const navigate = useNavigate();
 
   const renderTypeSelection = () => (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -29,7 +30,7 @@ const SignupPage = () => {
         {/* Compte utilisateur standard */}
         <Card 
           className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-primary"
-          onClick={() => window.location.href = '/auth'}
+          onClick={() => navigate('/auth')}
         >
           <CardHeader className="text-center">
             <UserPlus className="h-12 w-12 mx-auto mb-4 text-primary" />

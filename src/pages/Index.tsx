@@ -517,14 +517,14 @@ const Index = () => {
                         { icon: FileText, label: "Dépôt légal", color: "text-primary", bg: "bg-primary/10", border: "border-primary/25", href: "/legal-deposit" },
                         { icon: BookOpen, label: "Réserver un ouvrage", color: "text-accent", bg: "bg-accent/10", border: "border-accent/25", href: "/digital-library" },
                         { icon: Download, label: "Reproduction", color: "text-highlight", bg: "bg-highlight/10", border: "border-highlight/25", href: "/reproduction" },
-                        { icon: Users, label: "Inscription", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25", href: "/signup" },
-                        { icon: Calendar, label: "Événements", color: "text-gold", bg: "bg-gold/10", border: "border-gold/25", href: "/news" }
-                       ].map((service, index) => (
-                         <div 
-                           key={index} 
-                           className={`text-center p-5 rounded-2xl ${service.bg} hover:shadow-zellige transition-all duration-300 transform hover:scale-105 border-2 ${service.border} relative overflow-hidden group cursor-pointer`}
-                           onClick={() => service.href && (window.location.href = service.href)}
-                         >
+                         { icon: Users, label: "Inscription", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25", href: "/signup" },
+                         { icon: Calendar, label: "Événements", color: "text-gold", bg: "bg-gold/10", border: "border-gold/25", href: "/news" }
+                        ].map((service, index) => (
+                          <div 
+                            key={index} 
+                            className={`text-center p-5 rounded-2xl ${service.bg} hover:shadow-zellige transition-all duration-300 transform hover:scale-105 border-2 ${service.border} relative overflow-hidden group cursor-pointer`}
+                            onClick={() => service.href && navigate(service.href)}
+                          >
                            <div className="absolute inset-0 bg-pattern-filigrane opacity-10 group-hover:opacity-20 transition-opacity duration-300"></div>
                            <service.icon className={`h-10 w-10 ${service.color} mx-auto mb-3 relative z-10`} />
                            <p className="text-sm font-semibold text-foreground font-serif relative z-10">{service.label}</p>

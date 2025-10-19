@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function CBMAdhesion() {
   const [step, setStep] = useState(1);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const criteres = [
     "Être une bibliothèque institutionnelle reconnue (publique, universitaire, spécialisée)",
@@ -271,7 +273,7 @@ export default function CBMAdhesion() {
                       <li>Formation et mise en production</li>
                     </ol>
                   </div>
-                  <Button variant="outline" className="w-full" onClick={() => window.location.href = '/cbm'}>
+                  <Button variant="outline" className="w-full" onClick={() => navigate('/cbm')}>
                     Retour au Portail CBM
                   </Button>
                 </CardContent>

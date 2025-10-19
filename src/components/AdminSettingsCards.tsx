@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Settings, Shield, FileText, Clock, Archive, Scale, Edit, Library, UserCog } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useNavigate } from "react-router-dom";
 
 export function AdminSettingsCards() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   
   const adminCards = [
     {
@@ -97,7 +99,7 @@ export function AdminSettingsCards() {
                 <Button 
                   className="w-full" 
                   variant="outline"
-                  onClick={() => window.location.href = card.href}
+                  onClick={() => navigate(card.href)}
                 >
                   {t('common.view')}
                 </Button>

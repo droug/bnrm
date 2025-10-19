@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ export function BoxReservationDialog({
 }: BoxReservationDialogProps) {
   const { toast } = useToast();
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
@@ -128,7 +130,7 @@ export function BoxReservationDialog({
               Veuillez vous connecter pour réserver un box.
             </DialogDescription>
           </DialogHeader>
-          <Button onClick={() => window.location.href = "/auth"} className="w-full">
+          <Button onClick={() => navigate("/auth")} className="w-full">
             Se connecter / S'inscrire
           </Button>
         </DialogContent>

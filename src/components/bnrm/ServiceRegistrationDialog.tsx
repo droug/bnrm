@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Loader2, Search, X } from "lucide-react";
 import { PaymentDialog } from "./PaymentDialog";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface BNRMService {
   id_service: string;
@@ -44,6 +45,7 @@ export function ServiceRegistrationDialog({
 }: ServiceRegistrationDialogProps) {
   const { toast } = useToast();
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [subscriptionType, setSubscriptionType] = useState<"monthly" | "annual">("monthly");
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
@@ -332,7 +334,7 @@ export function ServiceRegistrationDialog({
               Veuillez vous connecter ou créer un compte pour vous inscrire à ce service.
             </DialogDescription>
           </DialogHeader>
-          <Button onClick={() => window.location.href = "/auth"}>
+          <Button onClick={() => navigate("/auth")}>
             Se connecter / S'inscrire
           </Button>
         </DialogContent>
