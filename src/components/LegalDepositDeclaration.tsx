@@ -2075,23 +2075,57 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Adresse</Label>
-                  <Textarea placeholder="Adresse du producteur" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Téléphone</Label>
-                  <Input placeholder="Téléphone du producteur" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" placeholder="Email du producteur" />
-                </div>
-
-                <div className="space-y-2">
                   <Label>Date prévue de parution</Label>
-                  <Input type="month" placeholder="Date prévue de parution" />
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="JJ/MM/AAAA"
+                      value={publicationDateInput}
+                      onChange={(e) => {
+                        setPublicationDateInput(e.target.value);
+                        // Parse manual input
+                        const parts = e.target.value.split('/');
+                        if (parts.length === 3) {
+                          const day = parseInt(parts[0]);
+                          const month = parseInt(parts[1]) - 1;
+                          const year = parseInt(parts[2]);
+                          if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                            const date = new Date(year, month, day);
+                            if (date.getDate() === day && date.getMonth() === month) {
+                              setPublicationDate(date);
+                            }
+                          }
+                        }
+                      }}
+                      className="flex-1"
+                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-10 p-0",
+                            !publicationDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="h-4 w-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={publicationDate}
+                          onSelect={(date) => {
+                            setPublicationDate(date);
+                            if (date) {
+                              setPublicationDateInput(format(date, "dd/MM/yyyy"));
+                            }
+                          }}
+                          initialFocus
+                          className={cn("p-3 pointer-events-auto")}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
