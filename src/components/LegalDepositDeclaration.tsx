@@ -1947,7 +1947,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Producteur</Label>
-                  <Input placeholder="Nom du producteur" />
+                  <Combobox
+                    data={producers.map(p => ({ value: p.name, label: p.name }))}
+                    placeholder="Sélectionner un producteur"
+                    searchPlaceholder="Rechercher un producteur..."
+                    emptyText="Aucun producteur trouvé"
+                  />
                 </div>
 
                 <div className="space-y-2">
