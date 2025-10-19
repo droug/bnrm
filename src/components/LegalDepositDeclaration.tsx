@@ -48,6 +48,14 @@ interface Printer {
   email: string | null;
 }
 
+interface Producer {
+  id: string;
+  name: string;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+}
+
 interface LegalDepositDeclarationProps {
   depositType: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees";
   onClose: () => void;
@@ -110,6 +118,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [printers, setPrinters] = useState<Printer[]>([]);
   const [printerSearch, setPrinterSearch] = useState<string>("");
   const [selectedPrinter, setSelectedPrinter] = useState<Printer | null>(null);
+  const [producers, setProducers] = useState<Producer[]>([]);
+  const [producerSearch, setProducerSearch] = useState<string>("");
+  const [selectedProducer, setSelectedProducer] = useState<Producer | null>(null);
 
   // Fetch publication types from database
   useEffect(() => {
@@ -174,8 +185,23 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       }
     };
 
+    const fetchProducers = async () => {
+      const { data, error } = await supabase
+        .from('producers')
+        .select('*')
+        .order('name');
+      
+      if (error) {
+        console.error('Error fetching producers:', error);
+        toast.error('Erreur lors du chargement des producteurs');
+      } else {
+        setProducers(data || []);
+      }
+    };
+
     fetchPublishers();
     fetchPrinters();
+    fetchProducers();
   }, []);
 
   const depositTypeLabels = {
@@ -1947,12 +1973,57 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Producteur</Label>
-                  <Combobox
-                    data={producers.map(p => ({ value: p.name, label: p.name }))}
-                    placeholder="Sélectionner un producteur"
-                    searchPlaceholder="Rechercher un producteur..."
-                    emptyText="Aucun producteur trouvé"
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className={cn(
+                          "w-full justify-between",
+                          !selectedProducer && "text-muted-foreground"
+                        )}
+                      >
+                        {selectedProducer ? selectedProducer.name : "Sélectionner un producteur"}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput 
+                          placeholder="Rechercher un producteur..." 
+                          value={producerSearch}
+                          onValueChange={setProducerSearch}
+                        />
+                        <CommandList>
+                          <CommandEmpty>Aucun producteur trouvé</CommandEmpty>
+                          <CommandGroup>
+                            {producers
+                              .filter(producer => 
+                                producer.name.toLowerCase().includes(producerSearch.toLowerCase())
+                              )
+                              .map((producer) => (
+                                <CommandItem
+                                  key={producer.id}
+                                  value={producer.name}
+                                  onSelect={() => {
+                                    setSelectedProducer(producer);
+                                    setProducerSearch("");
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      selectedProducer?.id === producer.id ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {producer.name}
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
                 <div className="space-y-2">
