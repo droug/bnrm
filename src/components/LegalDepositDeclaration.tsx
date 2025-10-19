@@ -56,6 +56,14 @@ interface Producer {
   email: string | null;
 }
 
+interface Producer {
+  id: string;
+  name: string;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+}
+
 interface LegalDepositDeclarationProps {
   depositType: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees";
   onClose: () => void;
