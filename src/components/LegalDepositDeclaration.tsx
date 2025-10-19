@@ -794,7 +794,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <h3 className="text-2xl font-semibold mb-4">Identification de l'Éditeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Identification de l'Éditeur</Label>
+                  <Label>Éditeur</Label>
                   {!selectedPublisher ? (
                     <div className="relative">
                       <Input
