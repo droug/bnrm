@@ -387,25 +387,29 @@ Enhanced Moroccan Heritage Design System
     --z-sheet-content: 9999;
   }
 
-  * {
-    font-size: calc(1em * var(--font-size-multiplier, 1)) !important;
-    letter-spacing: calc(var(--letter-spacing, 0px)) !important;
-    word-spacing: calc(var(--word-spacing, 0px)) !important;
-    line-height: calc(1.5 + var(--line-height-add, 0)) !important;
+  /* Accessibility: font size, spacing, and line height adjustments */
+  body.accessibility-enabled * {
+    font-size: calc(1em * var(--font-size-multiplier, 1));
+    letter-spacing: calc(var(--letter-spacing, 0px));
+    word-spacing: calc(var(--word-spacing, 0px));
+    line-height: calc(1.5 + var(--line-height-add, 0));
   }
 
-  .contrast-light {
-    filter: grayscale(0.5) contrast(0.8) brightness(1.2) !important;
+  /* Accessibility: contrast modes */
+  body.contrast-light,
+  body.contrast-light * {
+    filter: grayscale(0.5) contrast(0.8) brightness(1.2);
   }
 
-  .contrast-dark {
-    filter: grayscale(1) contrast(2) brightness(0.8) !important;
+  body.contrast-dark,
+  body.contrast-dark * {
+    filter: grayscale(1) contrast(2) brightness(0.8);
   }
 
   /* Fixed chat window that stays on top during scroll */
   .fixed-chat {
-    position: fixed !important;
-    z-index: var(--z-dialog) !important;
+    position: fixed;
+    z-index: var(--z-dialog);
     transform: translateZ(0);
     will-change: transform;
     backface-visibility: hidden;
