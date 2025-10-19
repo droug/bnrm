@@ -1981,57 +1981,97 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Producteur</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          "w-full justify-between",
-                          !selectedProducer && "text-muted-foreground"
+                  {!selectedProducer ? (
+                    <div className="relative">
+                      <Input
+                        placeholder="Rechercher un producteur..."
+                        value={producerSearch}
+                        onChange={(e) => setProducerSearch(e.target.value)}
+                        className="pr-10"
+                      />
+                      {producerSearch && (
+                        <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                          {producers
+                            .filter(prod => 
+                              prod.name.toLowerCase().includes(producerSearch.toLowerCase())
+                            )
+                            .map((prod) => (
+                              <button
+                                key={prod.id}
+                                type="button"
+                                className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                                onClick={() => {
+                                  setSelectedProducer(prod);
+                                  setProducerSearch('');
+                                }}
+                              >
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{prod.name}</span>
+                                  {prod.address && (
+                                    <span className="text-sm text-muted-foreground">
+                                      {prod.address}
+                                    </span>
+                                  )}
+                                </div>
+                              </button>
+                            ))}
+                          {producers.filter(prod => 
+                            prod.name.toLowerCase().includes(producerSearch.toLowerCase())
+                          ).length === 0 && (
+                            <div className="px-4 py-3">
+                              <div className="text-sm text-muted-foreground mb-2">
+                                Aucun producteur trouvé
+                              </div>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={async () => {
+                                  const newName = producerSearch;
+                                  const { data, error } = await supabase
+                                    .from('producers')
+                                    .insert([{ name: newName }])
+                                    .select()
+                                    .single();
+                                  
+                                  if (error) {
+                                    toast.error('Erreur lors de l\'ajout du producteur');
+                                  } else {
+                                    setProducers([...producers, data]);
+                                    setSelectedProducer(data);
+                                    setProducerSearch('');
+                                    toast.success('Producteur ajouté avec succès');
+                                  }
+                                }}
+                              >
+                                Ajouter "{producerSearch}"
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 p-3 bg-accent/10 rounded-lg border">
+                      <div className="flex-1">
+                        <div className="font-medium">{selectedProducer.name}</div>
+                        {selectedProducer.address && (
+                          <div className="text-sm text-muted-foreground">
+                            {selectedProducer.address}
+                          </div>
                         )}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedProducer(null)}
                       >
-                        {selectedProducer ? selectedProducer.name : "Sélectionner un producteur"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        <X className="h-4 w-4" />
                       </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full p-0">
-                      <Command>
-                        <CommandInput 
-                          placeholder="Rechercher un producteur..." 
-                          value={producerSearch}
-                          onValueChange={setProducerSearch}
-                        />
-                        <CommandList>
-                          <CommandEmpty>Aucun producteur trouvé</CommandEmpty>
-                          <CommandGroup>
-                            {producers
-                              .filter(producer => 
-                                producer.name.toLowerCase().includes(producerSearch.toLowerCase())
-                              )
-                              .map((producer) => (
-                                <CommandItem
-                                  key={producer.id}
-                                  value={producer.name}
-                                  onSelect={() => {
-                                    setSelectedProducer(producer);
-                                    setProducerSearch("");
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      selectedProducer?.id === producer.id ? "opacity-100" : "opacity-0"
-                                    )}
-                                  />
-                                  {producer.name}
-                                </CommandItem>
-                              ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
