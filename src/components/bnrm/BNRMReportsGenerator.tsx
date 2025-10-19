@@ -3,6 +3,114 @@ import autoTable from 'jspdf-autotable';
 import { toast } from "@/hooks/use-toast";
 import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
 
+// Fonction helper pour dessiner un graphique en barres
+const drawBarChart = (doc: jsPDF, x: number, y: number, width: number, height: number, data: {label: string, value: number, color: number[]}[]) => {
+  const maxValue = Math.max(...data.map(d => d.value));
+  const barWidth = width / data.length - 10;
+  const chartHeight = height - 30;
+  
+  // Dessiner les axes
+  doc.setDrawColor(100);
+  doc.line(x, y + chartHeight, x + width, y + chartHeight); // Axe X
+  doc.line(x, y, x, y + chartHeight); // Axe Y
+  
+  // Dessiner les barres
+  data.forEach((item, index) => {
+    const barHeight = (item.value / maxValue) * chartHeight;
+    const barX = x + (index * (barWidth + 10)) + 5;
+    const barY = y + chartHeight - barHeight;
+    
+    // Barre colorée
+    doc.setFillColor(item.color[0], item.color[1], item.color[2]);
+    doc.rect(barX, barY, barWidth, barHeight, 'F');
+    
+    // Bordure de la barre
+    doc.setDrawColor(0);
+    doc.rect(barX, barY, barWidth, barHeight);
+    
+    // Valeur au-dessus de la barre
+    doc.setFontSize(8);
+    doc.setTextColor(0);
+    doc.text(item.value.toString(), barX + barWidth / 2, barY - 2, { align: 'center' });
+    
+    // Label sous la barre
+    doc.setFontSize(7);
+    const labelLines = doc.splitTextToSize(item.label, barWidth);
+    doc.text(labelLines, barX + barWidth / 2, y + chartHeight + 5, { align: 'center' });
+  });
+};
+
+// Fonction helper pour dessiner un graphique circulaire (camembert)
+const drawPieChart = (doc: jsPDF, centerX: number, centerY: number, radius: number, data: {label: string, value: number, color: number[]}[]) => {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  let currentAngle = -Math.PI / 2; // Commencer en haut
+  
+  data.forEach((item) => {
+    const sliceAngle = (item.value / total) * 2 * Math.PI;
+    
+    // Dessiner la part
+    doc.setFillColor(item.color[0], item.color[1], item.color[2]);
+    doc.setDrawColor(255);
+    
+    // Créer le chemin de la part
+    const startX = centerX + radius * Math.cos(currentAngle);
+    const startY = centerY + radius * Math.sin(currentAngle);
+    
+    // Approximation avec des lignes pour créer l'arc
+    const segments = 20;
+    doc.moveTo(centerX, centerY);
+    for (let i = 0; i <= segments; i++) {
+      const angle = currentAngle + (sliceAngle * i / segments);
+      const x = centerX + radius * Math.cos(angle);
+      const y = centerY + radius * Math.sin(angle);
+      if (i === 0) {
+        doc.lines([[x - centerX, y - centerY]], centerX, centerY);
+      } else {
+        doc.line(centerX + radius * Math.cos(currentAngle + (sliceAngle * (i-1) / segments)), 
+                 centerY + radius * Math.sin(currentAngle + (sliceAngle * (i-1) / segments)),
+                 x, y);
+      }
+    }
+    
+    // Tracer une version simplifiée avec des triangles
+    const middleAngle = currentAngle + sliceAngle / 2;
+    const x1 = centerX;
+    const y1 = centerY;
+    const x2 = centerX + radius * Math.cos(currentAngle);
+    const y2 = centerY + radius * Math.sin(currentAngle);
+    const x3 = centerX + radius * Math.cos(currentAngle + sliceAngle);
+    const y3 = centerY + radius * Math.sin(currentAngle + sliceAngle);
+    
+    doc.triangle(x1, y1, x2, y2, x3, y3, 'FD');
+    
+    // Ajouter le pourcentage
+    const percentage = ((item.value / total) * 100).toFixed(1);
+    const labelX = centerX + (radius * 0.6) * Math.cos(middleAngle);
+    const labelY = centerY + (radius * 0.6) * Math.sin(middleAngle);
+    doc.setFontSize(8);
+    doc.setTextColor(255);
+    doc.text(percentage + '%', labelX, labelY, { align: 'center' });
+    
+    currentAngle += sliceAngle;
+  });
+};
+
+// Fonction helper pour dessiner une légende
+const drawLegend = (doc: jsPDF, x: number, y: number, data: {label: string, color: number[]}[]) => {
+  doc.setFontSize(9);
+  data.forEach((item, index) => {
+    const legendY = y + (index * 8);
+    
+    // Carré de couleur
+    doc.setFillColor(item.color[0], item.color[1], item.color[2]);
+    doc.rect(x, legendY - 3, 5, 5, 'F');
+    
+    // Label
+    doc.setTextColor(0);
+    doc.text(item.label, x + 8, legendY);
+  });
+};
+
 export const generateISBNMonthlyReport = async () => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -59,6 +167,31 @@ export const generateISBNMonthlyReport = async () => {
     theme: 'striped',
     headStyles: { fillColor: [41, 128, 185] }
   });
+  
+  const tableEndY = (doc as any).lastAutoTable.finalY || yPos + 50;
+  yPos = tableEndY + 15;
+  
+  // Graphique en barres de la répartition
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Visualisation Graphique', 14, yPos);
+  yPos += 10;
+  
+  const barChartData = [
+    { label: 'Livres', value: 856, color: [41, 128, 185] },
+    { label: 'Périodiques', value: 234, color: [52, 152, 219] },
+    { label: 'E-books', value: 89, color: [93, 173, 226] },
+    { label: 'Multimédias', value: 55, color: [133, 193, 233] }
+  ];
+  
+  drawBarChart(doc, 20, yPos, 170, 60, barChartData);
+  yPos += 75;
+  
+  // Nouvelle page pour l'évolution mensuelle
+  if (yPos > 200) {
+    doc.addPage();
+    yPos = 20;
+  }
   
   // Évolution mensuelle
   const finalY = (doc as any).lastAutoTable.finalY || 140;
@@ -149,6 +282,33 @@ export const generateISSNReport = async () => {
     theme: 'striped',
     headStyles: { fillColor: [52, 152, 219] }
   });
+  
+  const tableEndY = (doc as any).lastAutoTable.finalY || yPos + 60;
+  yPos = tableEndY + 15;
+  
+  // Graphique circulaire de la répartition par domaine
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Répartition Visuelle par Domaine', 14, yPos);
+  yPos += 10;
+  
+  const pieChartData = [
+    { label: 'Sciences et Tech', value: 28, color: [52, 152, 219] },
+    { label: 'Sciences Humaines', value: 22, color: [46, 204, 113] },
+    { label: 'Économie', value: 18, color: [241, 196, 15] },
+    { label: 'Arts et Culture', value: 12, color: [155, 89, 182] },
+    { label: 'Autres', value: 7, color: [149, 165, 166] }
+  ];
+  
+  drawPieChart(doc, 70, yPos + 30, 30, pieChartData);
+  drawLegend(doc, 120, yPos + 10, pieChartData.map(d => ({ label: d.label, color: d.color })));
+  yPos += 75;
+  
+  // Nouvelle page si nécessaire
+  if (yPos > 210) {
+    doc.addPage();
+    yPos = 20;
+  }
   
   // Liste des nouvelles publications
   const finalY = (doc as any).lastAutoTable.finalY || 160;
@@ -241,6 +401,33 @@ export const generateDepositTypeStats = async () => {
     theme: 'striped',
     headStyles: { fillColor: [155, 89, 182] }
   });
+  
+  const tableEndY = (doc as any).lastAutoTable.finalY || yPos + 70;
+  yPos = tableEndY + 15;
+  
+  // Graphique en barres comparatif
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Comparaison Visuelle par Type', 14, yPos);
+  yPos += 10;
+  
+  const depositBarData = [
+    { label: 'Livres', value: 1456, color: [155, 89, 182] },
+    { label: 'E-books', value: 567, color: [142, 68, 173] },
+    { label: 'Périodiques', value: 389, color: [125, 60, 152] },
+    { label: 'Thèses', value: 234, color: [108, 52, 131] },
+    { label: 'Audio', value: 123, color: [91, 44, 111] },
+    { label: 'Multi', value: 78, color: [74, 35, 90] }
+  ];
+  
+  drawBarChart(doc, 15, yPos, 180, 55, depositBarData);
+  yPos += 70;
+  
+  // Nouvelle page pour l'évolution
+  if (yPos > 210) {
+    doc.addPage();
+    yPos = 20;
+  }
   
   // Évolution trimestrielle
   const finalY = (doc as any).lastAutoTable.finalY || 180;
