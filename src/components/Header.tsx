@@ -307,14 +307,14 @@ const Header = () => {
                     <div className="space-y-1">
                       <h4 className="text-xs font-bold text-primary mb-1 pb-1">{t('nav.history.missions')}</h4>
                       <NavigationMenuLink asChild>
-                        <Link to="/histoire" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <a href="/histoire" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.library.history')}
-                        </Link>
+                        </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/mot-direction" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <a href="/mot-direction" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.management.message')}
-                        </Link>
+                        </a>
                       </NavigationMenuLink>
                     </div>
                   </div>
@@ -366,14 +366,14 @@ const Header = () => {
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/manuscripts" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <a href="/manuscripts" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.manuscripts')}
-                        </Link>
+                        </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/collections-numerisees" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <a href="/collections-numerisees" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.digitized.collections')}
-                        </Link>
+                        </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <Link to="/news" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
@@ -409,12 +409,12 @@ const Header = () => {
                     <div className="space-y-3">
                       <h4 className="text-sm font-medium text-primary mb-3">{t('nav.news.section')}</h4>
                       <NavigationMenuLink asChild>
-                        <Link to="/news" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
+                        <a href="/news" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
                           <div className="text-sm font-medium leading-none">{t('nav.news.publications')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             {t('nav.news.publications.desc')}
                           </p>
-                        </Link>
+                        </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <a href="/ils-parlent-de-nous" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
@@ -546,25 +546,25 @@ const Header = () => {
                 <span className="font-medium">{t('nav.discover')}</span>
               </Link>
               
-              <Link to="/services" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
+              <a href="/services" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
                 <Users className="w-5 h-5" />
                 <span className="font-medium">{t('nav.services')}</span>
-              </Link>
+              </a>
               
-              <Link to="/collections" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
+              <a href="/collections" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
                 <Book className="w-5 h-5" />
                 <span className="font-medium">{t('nav.explore')}</span>
-              </Link>
+              </a>
               
-              <Link to="/news" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
+              <a href="/news" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
                 <Calendar className="w-5 h-5" />
                 <span className="font-medium">{t('nav.consult.news')}</span>
-              </Link>
+              </a>
               
-              <Link to="/collaboration" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
+              <a href="/collaboration" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 rounded-xl border border-transparent hover:border-primary/20">
                 <Building className="w-5 h-5" />
                 <span className="font-medium">{t('nav.collaborate')}</span>
-              </Link>
+              </a>
             </div>
 
             {/* Outils d'assistance mobile */}

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { useLanguage } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -62,8 +61,7 @@ const CONTENT_TYPES = {
 };
 
 export default function ArchivingManager() {
-  const { user } = useAuth();
-  const { isAdmin, isLibrarian, loading: rolesLoading } = useSecureRoles();
+  const { user, profile } = useAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
   
@@ -74,11 +72,11 @@ export default function ArchivingManager() {
   const [isRunningArchiving, setIsRunningArchiving] = useState(false);
 
   useEffect(() => {
-    if (!rolesLoading && user && (isAdmin || isLibrarian)) {
+    if (user && (profile?.role === 'admin' || profile?.role === 'librarian')) {
       fetchSettings();
       fetchLogs();
     }
-  }, [user, rolesLoading, isAdmin, isLibrarian]);
+  }, [user, profile]);
 
   const fetchSettings = async () => {
     try {
