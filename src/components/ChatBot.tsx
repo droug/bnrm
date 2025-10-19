@@ -102,7 +102,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
     setIsLoading(true);
 
     try {
-      console.log('Sending message to chatbot:', content.trim());
+      // Message content NOT logged for privacy
       const { data, error } = await supabase.functions.invoke('chatbot-ai', {
         body: {
           message: content.trim(),
@@ -111,10 +111,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
         }
       });
 
-      console.log('Chatbot response:', { data, error });
-
       if (error) {
-        console.error('Supabase function error:', error);
         throw error;
       }
 
@@ -489,7 +486,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onClose, isOpen = true }) => {
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              console.log('Form submitted with message:', inputMessage);
+              // Form submission - message NOT logged for privacy
               if (inputMessage.trim()) {
                 sendMessage(inputMessage);
               }

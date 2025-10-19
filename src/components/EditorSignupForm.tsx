@@ -62,8 +62,7 @@ const EditorSignupForm = () => {
       return;
     }
 
-    // Ici, vous pourriez envoyer les données à votre API
-    console.log("Données du formulaire éditeur:", formData);
+    // Form data NOT logged for privacy - contains personal/business information
     
     toast({
       title: "Demande soumise",

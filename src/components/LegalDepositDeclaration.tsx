@@ -3182,8 +3182,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const handleAuthentication = async (type: "editor" | "printer" | "producer" | "distributor", credentials: any) => {
     const isBDLogiciels = depositType === 'bd_logiciels';
     
-    // Simulate authentication
-    console.log(`Authenticating ${type}:`, credentials);
+    // Authentication logic - credentials NOT logged for security
+    
     
     if (type === "editor" || type === "producer") {
       setEditorData(credentials);

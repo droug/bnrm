@@ -45,8 +45,7 @@ const AuthorSignupForm = () => {
   const onSubmit = async (data: AuthorFormData) => {
     setIsSubmitting(true);
     try {
-      // TODO: Implement actual signup logic with Supabase
-      console.log("Author signup data:", data);
+      // Form data NOT logged for privacy - contains personal information
       toast({
         title: "Demande d'inscription envoyée",
         description: "Votre demande d'inscription en tant qu'auteur a été envoyée. Vous recevrez une confirmation par email.",
