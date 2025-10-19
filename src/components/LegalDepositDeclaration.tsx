@@ -56,7 +56,7 @@ interface Producer {
   email: string | null;
 }
 
-interface Producer {
+interface Distributor {
   id: string;
   name: string;
   address: string | null;
@@ -129,6 +129,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [producers, setProducers] = useState<Producer[]>([]);
   const [producerSearch, setProducerSearch] = useState<string>("");
   const [selectedProducer, setSelectedProducer] = useState<Producer | null>(null);
+  const [distributors, setDistributors] = useState<Distributor[]>([]);
+  const [distributorSearch, setDistributorSearch] = useState<string>("");
+  const [selectedDistributor, setSelectedDistributor] = useState<Distributor | null>(null);
 
   // Fetch publication types from database
   useEffect(() => {
@@ -207,9 +210,24 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       }
     };
 
+    const fetchDistributors = async () => {
+      const { data, error } = await supabase
+        .from('distributors')
+        .select('*')
+        .order('name');
+      
+      if (error) {
+        console.error('Error fetching distributors:', error);
+        toast.error('Erreur lors du chargement des distributeurs');
+      } else {
+        setDistributors(data || []);
+      }
+    };
+
     fetchPublishers();
     fetchPrinters();
     fetchProducers();
+    fetchDistributors();
   }, []);
 
   const depositTypeLabels = {
@@ -2137,23 +2155,98 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <h3 className="text-2xl font-semibold mb-4">Identification de distributeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Nom de distributeur</Label>
-                  <Input placeholder="Nom du distributeur" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" placeholder="Email du distributeur" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Téléphone</Label>
-                  <Input placeholder="Téléphone du distributeur" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Adresse</Label>
-                  <Textarea placeholder="Adresse du distributeur" />
+                  <Label>Distributeur</Label>
+                  {!selectedDistributor ? (
+                    <div className="relative">
+                      <Input
+                        placeholder="Rechercher un distributeur..."
+                        value={distributorSearch}
+                        onChange={(e) => setDistributorSearch(e.target.value)}
+                        onFocus={() => setDistributorSearch('')}
+                      />
+                      {distributorSearch && (
+                        <div className="absolute z-50 w-full mt-1 bg-background border rounded-lg shadow-lg max-h-60 overflow-auto">
+                          {distributors
+                            .filter(dist => 
+                              dist.name.toLowerCase().includes(distributorSearch.toLowerCase())
+                            )
+                            .map((dist) => (
+                              <button
+                                key={dist.id}
+                                type="button"
+                                className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                                onClick={() => {
+                                  setSelectedDistributor(dist);
+                                  setDistributorSearch('');
+                                }}
+                              >
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{dist.name}</span>
+                                  {dist.address && (
+                                    <span className="text-sm text-muted-foreground">
+                                      {dist.address}
+                                    </span>
+                                  )}
+                                </div>
+                              </button>
+                            ))}
+                          {distributors.filter(dist => 
+                            dist.name.toLowerCase().includes(distributorSearch.toLowerCase())
+                          ).length === 0 && (
+                            <div className="px-4 py-3">
+                              <div className="text-sm text-muted-foreground mb-2">
+                                Aucun distributeur trouvé
+                              </div>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={async () => {
+                                  const newName = distributorSearch;
+                                  const { data, error } = await supabase
+                                    .from('distributors')
+                                    .insert([{ name: newName }])
+                                    .select()
+                                    .single();
+                                  
+                                  if (error) {
+                                    toast.error('Erreur lors de l\'ajout du distributeur');
+                                  } else {
+                                    setDistributors([...distributors, data]);
+                                    setSelectedDistributor(data);
+                                    setDistributorSearch('');
+                                    toast.success('Distributeur ajouté avec succès');
+                                  }
+                                }}
+                              >
+                                Ajouter "{distributorSearch}"
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 p-3 bg-accent/10 rounded-lg border">
+                      <div className="flex-1">
+                        <div className="font-medium">{selectedDistributor.name}</div>
+                        {selectedDistributor.address && (
+                          <div className="text-sm text-muted-foreground">
+                            {selectedDistributor.address}
+                          </div>
+                        )}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedDistributor(null)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
