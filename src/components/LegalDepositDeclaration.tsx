@@ -2127,11 +2127,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     </Popover>
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label>Mention d'Edition</Label>
-                  <Input placeholder="Mention d'Edition" />
-                </div>
               </div>
             </div>
 
