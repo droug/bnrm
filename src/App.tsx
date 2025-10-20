@@ -75,6 +75,7 @@ const MyLibrarySpace = lazy(() => import("./pages/MyLibrarySpace"));
 const DigitalLibraryBackoffice = lazy(() => import("./pages/DigitalLibraryBackoffice"));
 const Collections = lazy(() => import("./pages/digital-library/Collections"));
 const CollectionDetails = lazy(() => import("./pages/digital-library/CollectionDetails"));
+const DocumentDetails = lazy(() => import("./pages/digital-library/DocumentDetails"));
 const Themes = lazy(() => import("./pages/digital-library/Themes"));
 const ThemeDetails = lazy(() => import("./pages/digital-library/ThemeDetails"));
 const AdvancedSearch = lazy(() => import("./pages/digital-library/AdvancedSearch"));
@@ -188,6 +189,7 @@ const App = () => (
           <Route path="/digital-library" element={<DigitalLibraryHome />} />
           <Route path="/digital-library/collections" element={<Collections />} />
           <Route path="/digital-library/collections/:collectionId" element={<CollectionDetails />} />
+          <Route path="/digital-library/document/:documentId" element={<DocumentDetails />} />
           <Route path="/digital-library/themes" element={<Themes />} />
           <Route path="/digital-library/themes/:themeId" element={<ThemeDetails />} />
           <Route path="/digital-library/search" element={<AdvancedSearch />} />
