@@ -49,8 +49,13 @@ export function GlobalAccessibilityTools() {
     <>
       {/* Boutons flottants fixes en bas à droite */}
       <div 
-        className="fixed bottom-6 right-6 flex flex-col gap-3"
-        style={{ zIndex: 10000 }}
+        className="fixed flex flex-col gap-3"
+        style={{ 
+          bottom: '24px',
+          right: '24px',
+          zIndex: 10000,
+          pointerEvents: 'auto'
+        }}
         role="toolbar"
         aria-label="Outils d'assistance"
       >
@@ -59,6 +64,7 @@ export function GlobalAccessibilityTools() {
           size="lg"
           onClick={() => setShowAccessibility(true)}
           className="rounded-full h-14 w-14 shadow-lg hover:shadow-xl transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90"
+          style={{ pointerEvents: 'auto' }}
           aria-label="Ouvrir les outils d'accessibilité"
           title="Accessibilité"
         >
@@ -71,6 +77,7 @@ export function GlobalAccessibilityTools() {
           variant="default"
           onClick={() => setShowChatbot(!showChatbot)}
           className="rounded-full h-14 w-14 shadow-lg hover:shadow-xl transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          style={{ pointerEvents: 'auto' }}
           aria-label={showChatbot ? "Fermer l'assistant virtuel" : "Ouvrir l'assistant virtuel"}
           title="Assistant virtuel"
         >
