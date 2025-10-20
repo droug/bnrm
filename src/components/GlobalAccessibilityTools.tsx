@@ -5,68 +5,39 @@ import { AccessibilityToolkit } from './AccessibilityToolkit';
 import SmartChatBot from './SmartChatBot';
 
 /**
- * Composant global - Réutilise les outils du portail principal
- * (AccessibilityToolkit et SmartChatBot)
+ * Composant global - Boutons flottants d'accessibilité et chatbot
  */
 export function GlobalAccessibilityTools() {
   const [isChatBotOpen, setIsChatBotOpen] = useState(false);
 
   return (
     <>
-      {/* Boutons flottants fixes en bas à droite */}
+      {/* Conteneur des boutons flottants */}
       <div 
-        style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px',
-          zIndex: 9999
-        }}
-        role="toolbar"
-        aria-label="Outils d'assistance"
+        className="fixed bottom-6 right-6 flex flex-col gap-3"
+        style={{ zIndex: 999999 }}
       >
-        {/* Bouton Accessibilité - Utilise le composant du portail */}
-        <div style={{ 
-          backgroundColor: 'hsl(var(--primary))',
-          borderRadius: '50%',
-          padding: '12px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-        }}>
+        {/* Bouton Accessibilité */}
+        <div className="bg-primary rounded-full p-2 shadow-lg hover:shadow-xl transition-all">
           <AccessibilityToolkit />
         </div>
 
-        {/* Bouton Chatbot - Utilise le composant du portail */}
+        {/* Bouton Chatbot */}
         <Button
           variant="default"
           size="lg"
           onClick={() => setIsChatBotOpen(!isChatBotOpen)}
-          className="rounded-full h-14 w-14 shadow-lg hover:shadow-xl transition-all relative"
-          style={{ padding: 0 }}
+          className="rounded-full h-14 w-14 p-0 shadow-lg hover:shadow-xl transition-all relative"
           title="Assistant IA"
-          aria-label={isChatBotOpen ? "Fermer l'assistant IA" : "Ouvrir l'assistant IA"}
         >
           <Bot className="h-6 w-6" />
           {!isChatBotOpen && (
-            <div 
-              style={{
-                position: 'absolute',
-                top: '-2px',
-                right: '-2px',
-                width: '10px',
-                height: '10px',
-                backgroundColor: '#10b981',
-                borderRadius: '50%',
-                border: '2px solid hsl(var(--background))'
-              }}
-              aria-hidden="true"
-            />
+            <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
           )}
         </Button>
       </div>
 
-      {/* Chatbot intelligent - Composant du portail */}
+      {/* Chatbot */}
       {isChatBotOpen && (
         <SmartChatBot 
           isOpen={isChatBotOpen} 
