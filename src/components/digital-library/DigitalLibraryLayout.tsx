@@ -152,12 +152,12 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
                 {collectionsSubmenu.map((item, index) => (
-                  <Link key={`collection-${index}`} to={item.href}>
-                    <DropdownMenuItem className="gap-2 cursor-pointer">
+                  <DropdownMenuItem key={`collection-${index}`} asChild>
+                    <Link to={item.href} className="gap-2 cursor-pointer flex items-center">
                       {item.icon && <item.icon className="h-4 w-4" />}
                       {item.label}
-                    </DropdownMenuItem>
-                  </Link>
+                    </Link>
+                  </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -180,11 +180,11 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
                 {themesSubmenu.map((item, index) => (
-                  <Link key={`theme-${index}`} to={item.href}>
-                    <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem key={`theme-${index}`} asChild>
+                    <Link to={item.href} className="cursor-pointer">
                       {item.label}
-                    </DropdownMenuItem>
-                  </Link>
+                    </Link>
+                  </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
