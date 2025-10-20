@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,34 +6,74 @@ import { BookOpen, FileText, Image, Music, Calendar, Sparkles } from "lucide-rea
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function DigitalLibraryHome() {
+  const { session } = useAuth();
+  const [showReservationDialog, setShowReservationDialog] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (session?.user) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("first_name, last_name")
+          .eq("user_id", session.user.id)
+          .single();
+        
+        if (data) {
+          setUserProfile({
+            firstName: data.first_name,
+            lastName: data.last_name,
+            email: session.user.email,
+          });
+        }
+      }
+    };
+    loadUserProfile();
+  }, [session]);
+
   const newItems = [
     {
-      id: 1,
+      id: "550e8400-e29b-41d4-a716-446655440001",
       title: "Histoire du Maroc contemporain",
       author: "Mohammed Kenbib",
       type: "Livre",
       date: "2025-01-15",
       cover: "book",
+      cote: "HM-2025-001",
+      isAvailable: false, // Non consultable en ligne
     },
     {
-      id: 2,
+      id: "550e8400-e29b-41d4-a716-446655440002",
       title: "Manuscrit andalou rare - XIIe siècle",
       author: "Collection BNRM",
       type: "Manuscrit",
       date: "2025-01-12",
       cover: "manuscript",
+      cote: "MS-AN-1201",
+      isAvailable: false,
     },
     {
-      id: 3,
+      id: "550e8400-e29b-41d4-a716-446655440003",
       title: "Archives photographiques de Rabat",
       author: "Fonds historique",
       type: "Images",
       date: "2025-01-10",
       cover: "photo",
+      cote: "PH-RAB-2025",
+      isAvailable: false,
     },
   ];
+
+  const handleReservationClick = (item: any) => {
+    setSelectedDocument(item);
+    setShowReservationDialog(true);
+  };
 
   const featuredCollections = [
     {
@@ -105,7 +146,14 @@ export default function DigitalLibraryHome() {
                             <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
                             <p className="text-muted-foreground mb-4">{item.author}</p>
                             <p className="text-sm text-muted-foreground mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
-                            <Button size="lg">Consulter maintenant</Button>
+                            <div className="flex gap-2">
+                              <Button size="lg" variant="outline">Consulter</Button>
+                              {!item.isAvailable && session && userProfile && (
+                                <Button size="lg" onClick={() => handleReservationClick(item)}>
+                                  🗓️ Réserver
+                                </Button>
+                              )}
+                            </div>
                           </div>
                           <div className="w-full md:w-48 h-64 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center hover-scale">
                             <BookOpen className="h-16 w-16 text-primary/40" />
@@ -150,7 +198,14 @@ export default function DigitalLibraryHome() {
                 <CardDescription>{item.author}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">Consulter</Button>
+                <div className="flex flex-col gap-2">
+                  <Button className="w-full" variant="outline">Consulter</Button>
+                  {!item.isAvailable && session && userProfile && (
+                    <Button className="w-full" onClick={() => handleReservationClick(item)}>
+                      🗓️ Réserver
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -272,6 +327,21 @@ export default function DigitalLibraryHome() {
           </CardContent>
         </Card>
       </section>
+
+      {/* Reservation Dialog */}
+      {selectedDocument && userProfile && (
+        <ReservationRequestDialog
+          isOpen={showReservationDialog}
+          onClose={() => {
+            setShowReservationDialog(false);
+            setSelectedDocument(null);
+          }}
+          documentId={selectedDocument.id}
+          documentTitle={selectedDocument.title}
+          documentCote={selectedDocument.cote}
+          userProfile={userProfile}
+        />
+      )}
     </DigitalLibraryLayout>
   );
 }
