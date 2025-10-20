@@ -9,6 +9,7 @@ import GlobalSearchBar from "@/components/GlobalSearchBar";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import Footer from "@/components/Footer";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
+import logoBnrm from "@/assets/logo-bnrm.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -108,18 +109,34 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
       <nav className="bg-card border-b sticky top-0 z-50 shadow-sm" role="navigation" aria-label="Navigation principale">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            {/* Logo and Title */}
-            <Link 
-              to="/digital-library" 
-              className="flex items-center gap-3 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md"
-              aria-label="Retour à l'accueil de la bibliothèque numérique"
-            >
-              <BookOpen className="h-8 w-8 text-primary" aria-hidden="true" />
-              <div>
-                <h1 className="text-lg font-bold text-foreground">Bibliothèque Numérique</h1>
-                <p className="text-xs text-muted-foreground">BNRM - Patrimoine Numérique du Maroc</p>
-              </div>
-            </Link>
+            {/* Logo BNRM + Titre */}
+            <div className="flex items-center gap-6">
+              {/* Logo BNRM cliquable vers le portail */}
+              <Link 
+                to="/" 
+                className="hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md"
+                aria-label="Retour au portail principal BNRM"
+              >
+                <img 
+                  src={logoBnrm} 
+                  alt="Logo BNRM" 
+                  className="h-12 w-auto object-contain"
+                />
+              </Link>
+
+              {/* Titre de la bibliothèque */}
+              <Link 
+                to="/digital-library" 
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md"
+                aria-label="Retour à l'accueil de la bibliothèque numérique"
+              >
+                <BookOpen className="h-8 w-8 text-primary" aria-hidden="true" />
+                <div>
+                  <h1 className="text-lg font-bold text-foreground">Bibliothèque Numérique</h1>
+                  <p className="text-xs text-muted-foreground">BNRM - Patrimoine Numérique du Maroc</p>
+                </div>
+              </Link>
+            </div>
 
             {/* Language Selector & Theme Switcher */}
             <div className="flex items-center gap-2">
