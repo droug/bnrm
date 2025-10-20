@@ -28,20 +28,18 @@ export function ThemeSwitcher() {
       size="sm"
       onClick={toggleTheme}
       aria-label={theme === 'light' ? 'Activer le mode sombre' : 'Activer le mode clair'}
+      aria-pressed={theme === 'dark'}
       title={theme === 'light' ? 'Mode sombre' : 'Mode clair'}
-      className="gap-2"
+      className="gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
     >
       {theme === 'light' ? (
-        <>
-          <Moon className="h-4 w-4" />
-          <span className="sr-only">Mode sombre</span>
-        </>
+        <Moon className="h-4 w-4" aria-hidden="true" />
       ) : (
-        <>
-          <Sun className="h-4 w-4" />
-          <span className="sr-only">Mode clair</span>
-        </>
+        <Sun className="h-4 w-4" aria-hidden="true" />
       )}
+      <span className="sr-only">
+        {theme === 'light' ? 'Mode sombre' : 'Mode clair'}
+      </span>
     </Button>
   );
 }

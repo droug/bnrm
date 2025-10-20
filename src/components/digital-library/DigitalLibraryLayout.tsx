@@ -65,7 +65,11 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Logo and Title */}
-            <Link to="/digital-library" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <Link 
+              to="/digital-library" 
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md"
+              aria-label="Retour à l'accueil de la bibliothèque numérique"
+            >
               <BookOpen className="h-8 w-8 text-primary" aria-hidden="true" />
               <div>
                 <h1 className="text-lg font-bold text-foreground">Bibliothèque Numérique</h1>
@@ -77,24 +81,30 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2 text-sm" aria-label="Sélectionner la langue">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" 
+                    aria-label="Sélectionner la langue"
+                  >
                     <Globe className="h-4 w-4" aria-hidden="true" />
-                    {languages.find(lang => lang.code === language)?.label}
+                    <span className="hidden sm:inline">{languages.find(lang => lang.code === language)?.label}</span>
                     <ChevronDown className="h-3 w-3" aria-hidden="true" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" role="menu" aria-label="Menu des langues">
+                <DropdownMenuContent align="end" className="bg-card z-50" role="menu" aria-label="Menu des langues">
                   <DropdownMenuLabel>Choisir une langue</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {languages.map((lang) => (
                     <DropdownMenuItem
                       key={lang.code}
                       onClick={() => setLanguage(lang.code as Language)}
-                      className="cursor-pointer"
+                      className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
                       aria-label={`Changer la langue en ${lang.label}`}
+                      aria-current={language === lang.code ? 'true' : 'false'}
                     >
                       {lang.label}
-                      {language === lang.code && <span className="ml-auto">✓</span>}
+                      {language === lang.code && <span className="ml-auto text-primary" aria-hidden="true">✓</span>}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -106,7 +116,13 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
           {/* Main Menu */}
           <div className="flex items-center gap-1 mt-3 overflow-x-auto" role="menubar" aria-label="Menu principal">
             <Link to="/digital-library">
-              <Button variant="ghost" size="sm" className="gap-2 text-sm" role="menuitem">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" 
+                role="menuitem"
+                aria-label="Accueil de la bibliothèque numérique"
+              >
                 <Home className="h-4 w-4" aria-hidden="true" />
                 Accueil
               </Button>
@@ -115,17 +131,24 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             {/* Collections Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 text-sm" role="menuitem" aria-haspopup="true">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" 
+                  role="menuitem" 
+                  aria-haspopup="true"
+                  aria-label="Menu des collections"
+                >
                   <BookOpen className="h-4 w-4" aria-hidden="true" />
                   Collections
                   <ChevronDown className="h-3 w-3" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" role="menu" aria-label="Sous-menu Collections">
+              <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label="Sous-menu Collections">
                 {collectionsSubmenu.map((item) => (
                   <Link key={item.href} to={item.href}>
-                    <DropdownMenuItem className="gap-2 cursor-pointer">
-                      <item.icon className="h-4 w-4" />
+                    <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
+                      <item.icon className="h-4 w-4" aria-hidden="true" />
                       {item.label}
                     </DropdownMenuItem>
                   </Link>
@@ -134,8 +157,13 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             </DropdownMenu>
 
             <Link to="/digital-library/search">
-              <Button variant="ghost" size="sm" className="gap-2 text-sm">
-                <Search className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                aria-label="Recherche avancée dans la bibliothèque"
+              >
+                <Search className="h-4 w-4" aria-hidden="true" />
                 Recherche avancée
               </Button>
             </Link>
@@ -143,16 +171,22 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             {/* Themes Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 text-sm">
-                  <Globe className="h-4 w-4" />
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  aria-label="Explorer par thème"
+                  aria-haspopup="true"
+                >
+                  <Globe className="h-4 w-4" aria-hidden="true" />
                   Explorer par thème
-                  <ChevronDown className="h-3 w-3" />
+                  <ChevronDown className="h-3 w-3" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
+              <DropdownMenuContent align="start" className="bg-card z-50">
                 {themesSubmenu.map((item) => (
                   <Link key={item.href} to={item.href}>
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem className="cursor-pointer focus:bg-accent focus:text-accent-foreground">
                       {item.label}
                     </DropdownMenuItem>
                   </Link>
@@ -161,15 +195,25 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             </DropdownMenu>
 
             <Link to="/digital-library/news">
-              <Button variant="ghost" size="sm" className="gap-2 text-sm">
-                <Calendar className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                aria-label="Consulter les actualités et événements"
+              >
+                <Calendar className="h-4 w-4" aria-hidden="true" />
                 Actualités & Événements
               </Button>
             </Link>
 
             <Link to="/digital-library/help">
-              <Button variant="ghost" size="sm" className="gap-2 text-sm">
-                <HelpCircle className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                aria-label="Aide et foire aux questions"
+              >
+                <HelpCircle className="h-4 w-4" aria-hidden="true" />
                 Aide & FAQ
               </Button>
             </Link>
@@ -184,11 +228,16 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
           {(userMenu.length > 0 || adminMenu.length > 0) && (
             <div className="flex items-center gap-2 mt-2 border-t pt-2">
               {userMenu.length > 0 && (
-                <div className="flex items-center gap-1">
-                  <User className="h-4 w-4 text-muted-foreground mr-1" />
+                <div className="flex items-center gap-1" role="navigation" aria-label="Menu utilisateur">
+                  <User className="h-4 w-4 text-muted-foreground mr-1" aria-hidden="true" />
                   {userMenu.map((item) => (
                     <Link key={item.href} to={item.href}>
-                      <Button variant="ghost" size="sm" className="text-xs">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                        aria-label={item.label}
+                      >
                         {item.label}
                       </Button>
                     </Link>
@@ -197,11 +246,16 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               )}
               
               {adminMenu.length > 0 && (
-                <div className="flex items-center gap-1 ml-auto">
-                  <Settings className="h-4 w-4 text-muted-foreground mr-1" />
+                <div className="flex items-center gap-1 ml-auto" role="navigation" aria-label="Menu administration">
+                  <Settings className="h-4 w-4 text-muted-foreground mr-1" aria-hidden="true" />
                   {adminMenu.map((item) => (
                     <Link key={item.href} to={item.href}>
-                      <Button variant="ghost" size="sm" className="text-xs">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                        aria-label={item.label}
+                      >
                         {item.label}
                       </Button>
                     </Link>
@@ -214,7 +268,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1" role="main" id="main-content" tabIndex={-1}>
         {children}
       </main>
 
