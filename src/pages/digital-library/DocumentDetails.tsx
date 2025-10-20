@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
+import { DigitizationRequestDialog } from "@/components/digital-library/DigitizationRequestDialog";
 
 interface DocumentMetadata {
   dc_creator?: string;
@@ -49,6 +50,7 @@ export default function DocumentDetails() {
   const [isManuscript, setIsManuscript] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [showReservationDialog, setShowReservationDialog] = useState(false);
+  const [showDigitizationDialog, setShowDigitizationDialog] = useState(false);
 
 
   useEffect(() => {
@@ -197,6 +199,7 @@ export default function DocumentDetails() {
   const canDownload = document.download_enabled !== false && document.allow_download !== false;
   const canRead = document.file_url || document.digital_copy_url;
   const canReserve = !canRead && user && userProfile;
+  const canRequestDigitization = !document.is_digitized && user && userProfile;
 
   return (
     <DigitalLibraryLayout>
@@ -457,6 +460,17 @@ export default function DocumentDetails() {
                     Réserver ce document
                   </Button>
                 )}
+
+                {canRequestDigitization && (
+                  <Button 
+                    onClick={() => setShowDigitizationDialog(true)} 
+                    variant="outline" 
+                    className="w-full"
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    📜 Demander la numérisation
+                  </Button>
+                )}
               </CardContent>
             </Card>
 
@@ -514,6 +528,18 @@ export default function DocumentDetails() {
           isOpen={showReservationDialog}
           onClose={() => setShowReservationDialog(false)}
           documentId={documentId || ''}
+          documentTitle={document.title}
+          documentCote={document.cote || document.inventory_number}
+          userProfile={userProfile}
+        />
+      )}
+
+      {/* Dialog de demande de numérisation */}
+      {showDigitizationDialog && userProfile && (
+        <DigitizationRequestDialog
+          isOpen={showDigitizationDialog}
+          onClose={() => setShowDigitizationDialog(false)}
+          documentId={documentId}
           documentTitle={document.title}
           documentCote={document.cote || document.inventory_number}
           userProfile={userProfile}

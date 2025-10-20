@@ -1192,6 +1192,69 @@ export type Database = {
           },
         ]
       }
+      digitization_requests: {
+        Row: {
+          admin_notes: string | null
+          attachment_url: string | null
+          copyright_agreement: boolean
+          created_at: string
+          document_cote: string | null
+          document_id: string | null
+          document_title: string
+          id: string
+          justification: string
+          pages_count: number
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          usage_type: string
+          user_email: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          attachment_url?: string | null
+          copyright_agreement?: boolean
+          created_at?: string
+          document_cote?: string | null
+          document_id?: string | null
+          document_title: string
+          id?: string
+          justification: string
+          pages_count: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          usage_type: string
+          user_email: string
+          user_id: string
+          user_name: string
+        }
+        Update: {
+          admin_notes?: string | null
+          attachment_url?: string | null
+          copyright_agreement?: boolean
+          created_at?: string
+          document_cote?: string | null
+          document_id?: string | null
+          document_title?: string
+          id?: string
+          justification?: string
+          pages_count?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          usage_type?: string
+          user_email?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
       distributors: {
         Row: {
           address: string | null
