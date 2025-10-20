@@ -2,13 +2,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface SystemListValue {
-  id?: string;
   value_code: string;
   value_label: string;
   sort_order?: number;
-  metadata?: any;
+  metadata?: any; // JSON type from Supabase
   parent_code?: string | null;
-  is_active?: boolean;
 }
 
 export interface SystemList {
