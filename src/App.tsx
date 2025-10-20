@@ -74,9 +74,12 @@ const BookReader = lazy(() => import("./pages/BookReader"));
 const MyLibrarySpace = lazy(() => import("./pages/MyLibrarySpace"));
 const DigitalLibraryBackoffice = lazy(() => import("./pages/DigitalLibraryBackoffice"));
 const Collections = lazy(() => import("./pages/digital-library/Collections"));
+const CollectionDetails = lazy(() => import("./pages/digital-library/CollectionDetails"));
 const Themes = lazy(() => import("./pages/digital-library/Themes"));
+const ThemeDetails = lazy(() => import("./pages/digital-library/ThemeDetails"));
 const AdvancedSearch = lazy(() => import("./pages/digital-library/AdvancedSearch"));
 const NewsEvents = lazy(() => import("./pages/digital-library/NewsEvents"));
+const NewsDetails = lazy(() => import("./pages/digital-library/NewsDetails"));
 const HelpFAQ = lazy(() => import("./pages/digital-library/HelpFAQ"));
 const MySpace = lazy(() => import("./pages/digital-library/MySpace"));
 const MyLoans = lazy(() => import("./pages/digital-library/MyLoans"));
@@ -183,9 +186,12 @@ const App = () => (
         <Route path="/depot-legal/approbations" element={<LegalDepositApprovals />} />
           <Route path="/digital-library" element={<DigitalLibrary />} />
           <Route path="/digital-library/collections" element={<Collections />} />
+          <Route path="/digital-library/collections/:collectionId" element={<CollectionDetails />} />
           <Route path="/digital-library/themes" element={<Themes />} />
+          <Route path="/digital-library/themes/:themeId" element={<ThemeDetails />} />
           <Route path="/digital-library/search" element={<AdvancedSearch />} />
           <Route path="/digital-library/news" element={<NewsEvents />} />
+          <Route path="/digital-library/news/:newsId" element={<NewsDetails />} />
           <Route path="/digital-library/help" element={<HelpFAQ />} />
           <Route path="/digital-library/my-space" element={<MySpace />} />
           <Route path="/digital-library/my-loans" element={<MyLoans />} />
