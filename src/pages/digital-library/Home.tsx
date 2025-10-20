@@ -56,7 +56,7 @@ export default function DigitalLibraryHome() {
             file_url,
             file_type,
             tags,
-            author:profiles!content_author_id_fkey (
+            author:author_id (
               first_name,
               last_name
             )
@@ -72,12 +72,13 @@ export default function DigitalLibraryHome() {
             author: item.author 
               ? `${item.author.first_name || ''} ${item.author.last_name || ''}`.trim() || 'Auteur inconnu'
               : 'Auteur inconnu',
-            type: item.content_type === 'news' ? 'Article' : item.content_type === 'event' ? 'Événement' : 'Page',
+            type: item.content_type === 'news' ? 'Article' : item.content_type === 'event' ? 'Événement' : item.content_type === 'exhibition' ? 'Exposition' : 'Page',
             date: item.published_at,
             isAvailable: !!item.file_url,
             cote: item.file_type || 'DOC',
           }));
           
+          console.log('Loaded documents:', formattedItems);
           setNewItems(formattedItems);
         } else if (error) {
           console.error('Error loading documents:', error);
