@@ -73,6 +73,11 @@ const DigitalLibrary = lazy(() => import("./pages/DigitalLibrary"));
 const BookReader = lazy(() => import("./pages/BookReader"));
 const MyLibrarySpace = lazy(() => import("./pages/MyLibrarySpace"));
 const DigitalLibraryBackoffice = lazy(() => import("./pages/DigitalLibraryBackoffice"));
+const Collections = lazy(() => import("./pages/digital-library/Collections"));
+const Themes = lazy(() => import("./pages/digital-library/Themes"));
+const AdvancedSearch = lazy(() => import("./pages/digital-library/AdvancedSearch"));
+const NewsEvents = lazy(() => import("./pages/digital-library/NewsEvents"));
+const HelpFAQ = lazy(() => import("./pages/digital-library/HelpFAQ"));
 const DigitalLibraryDocuments = lazy(() => import("./pages/DigitalLibraryDocuments"));
 const DigitalLibraryUsers = lazy(() => import("./pages/DigitalLibraryUsers"));
 const DigitalLibraryAnalytics = lazy(() => import("./pages/DigitalLibraryAnalytics"));
@@ -173,7 +178,12 @@ const App = () => (
         <Route path="/admin/committee" element={<CommitteeDashboard />} />
         <Route path="/legal-deposit/approvals" element={<LegalDepositApprovals />} />
         <Route path="/depot-legal/approbations" element={<LegalDepositApprovals />} />
-        <Route path="/digital-library" element={<DigitalLibrary />} />
+          <Route path="/digital-library" element={<DigitalLibrary />} />
+          <Route path="/digital-library/collections" element={<Collections />} />
+          <Route path="/digital-library/themes" element={<Themes />} />
+          <Route path="/digital-library/search" element={<AdvancedSearch />} />
+          <Route path="/digital-library/news" element={<NewsEvents />} />
+          <Route path="/digital-library/help" element={<HelpFAQ />} />
         <Route path="/digital-library/:category" element={<DigitalLibrary />} />
         <Route path="/book-reader/:id" element={<BookReader />} />
         <Route path="/reproduction" element={<ReproductionPage />} />
