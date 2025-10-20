@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Accessibility, MessageCircle, X } from 'lucide-react';
+import { Accessibility, MessageCircle } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import {
   Dialog,
@@ -9,99 +8,128 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { useLanguage } from '@/hooks/useLanguage';
 import ChatBot from './ChatBot';
 
 /**
- * Composant global qui fournit les outils d'accessibilité et le chatbot
- * sur toutes les interfaces du système
+ * Composant global - Boutons d'accessibilité et chatbot
  */
 export function GlobalAccessibilityTools() {
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false);
   const [fontSize, setFontSize] = useState(100);
-  const [contrast, setContrast] = useState<'normal' | 'high'>('normal');
-  const { t } = useLanguage();
 
   const applyFontSize = (value: number) => {
     setFontSize(value);
     document.documentElement.style.fontSize = `${value}%`;
   };
 
-  const toggleContrast = () => {
-    const newContrast = contrast === 'normal' ? 'high' : 'normal';
-    setContrast(newContrast);
-    if (newContrast === 'high') {
-      document.body.classList.add('contrast-dark');
-    } else {
-      document.body.classList.remove('contrast-dark');
-    }
-  };
-
-  const resetSettings = () => {
-    setFontSize(100);
-    setContrast('normal');
-    document.documentElement.style.fontSize = '100%';
-    document.body.classList.remove('contrast-dark');
-  };
-
   return (
     <>
-      {/* Boutons flottants fixes en bas à droite */}
-      <div 
-        className="fixed flex flex-col gap-3"
-        style={{ 
+      {/* Bouton Accessibilité */}
+      <button
+        onClick={() => setShowAccessibility(true)}
+        style={{
+          position: 'fixed',
+          bottom: '80px',
+          right: '24px',
+          width: '56px',
+          height: '56px',
+          borderRadius: '50%',
+          backgroundColor: 'hsl(var(--primary))',
+          color: 'hsl(var(--primary-foreground))',
+          border: 'none',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          cursor: 'pointer',
+          zIndex: 99999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'all 0.2s'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.05)';
+          e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        }}
+        aria-label="Accessibilité"
+        title="Accessibilité"
+      >
+        <Accessibility size={24} />
+      </button>
+
+      {/* Bouton Chatbot */}
+      <button
+        onClick={() => setShowChatbot(!showChatbot)}
+        style={{
+          position: 'fixed',
           bottom: '24px',
           right: '24px',
-          zIndex: 10000,
-          pointerEvents: 'auto'
+          width: '56px',
+          height: '56px',
+          borderRadius: '50%',
+          backgroundColor: 'hsl(var(--primary))',
+          color: 'hsl(var(--primary-foreground))',
+          border: 'none',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          cursor: 'pointer',
+          zIndex: 99999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'all 0.2s'
         }}
-        role="toolbar"
-        aria-label="Outils d'assistance"
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.05)';
+          e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        }}
+        aria-label="Assistant virtuel"
+        title="Assistant virtuel"
       >
-        {/* Bouton Accessibilité */}
-        <Button
-          size="lg"
-          onClick={() => setShowAccessibility(true)}
-          className="rounded-full h-14 w-14 shadow-lg hover:shadow-xl transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90"
-          style={{ pointerEvents: 'auto' }}
-          aria-label="Ouvrir les outils d'accessibilité"
-          title="Accessibilité"
-        >
-          <Accessibility className="h-6 w-6" aria-hidden="true" />
-        </Button>
+        <MessageCircle size={24} />
+      </button>
 
-        {/* Bouton Chatbot */}
-        <Button
-          size="lg"
-          variant="default"
-          onClick={() => setShowChatbot(!showChatbot)}
-          className="rounded-full h-14 w-14 shadow-lg hover:shadow-xl transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          style={{ pointerEvents: 'auto' }}
-          aria-label={showChatbot ? "Fermer l'assistant virtuel" : "Ouvrir l'assistant virtuel"}
-          title="Assistant virtuel"
+      {/* Dialog Accessibilité */}
+      {showAccessibility && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 100000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)'
+          }}
+          onClick={() => setShowAccessibility(false)}
         >
-          <MessageCircle className="h-6 w-6" aria-hidden="true" />
-        </Button>
-      </div>
-
-      {/* Dialog d'accessibilité */}
-      <Dialog open={showAccessibility} onOpenChange={setShowAccessibility}>
-        <DialogContent className="sm:max-w-md" style={{ zIndex: 10001 }}>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Accessibility className="h-5 w-5" />
+          <div
+            style={{
+              backgroundColor: 'hsl(var(--background))',
+              borderRadius: '8px',
+              padding: '24px',
+              maxWidth: '500px',
+              width: '90%',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Accessibility size={20} />
               Accessibilité
-            </DialogTitle>
-            <DialogDescription>
+            </h2>
+            <p style={{ color: 'hsl(var(--muted-foreground))', marginBottom: '24px', fontSize: '14px' }}>
               Personnalisez l'affichage selon vos besoins
-            </DialogDescription>
-          </DialogHeader>
+            </p>
 
-          <div className="spacing-content">
-            {/* Taille du texte */}
-            <div>
-              <label className="text-sm font-medium mb-2 block">
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>
                 Taille du texte: {fontSize}%
               </label>
               <Slider
@@ -114,39 +142,37 @@ export function GlobalAccessibilityTools() {
               />
             </div>
 
-            {/* Contraste */}
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                Contraste
-              </label>
-              <Button
-                onClick={toggleContrast}
-                variant={contrast === 'high' ? 'default' : 'outline'}
-                className="w-full"
-              >
-                {contrast === 'high' ? 'Contraste élevé activé' : 'Activer contraste élevé'}
-              </Button>
-            </div>
-
-            {/* Réinitialiser */}
-            <Button
-              onClick={resetSettings}
-              variant="outline"
-              className="w-full"
+            <button
+              onClick={() => setShowAccessibility(false)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                backgroundColor: 'hsl(var(--primary))',
+                color: 'hsl(var(--primary-foreground))',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500'
+              }}
             >
-              Réinitialiser
-            </Button>
+              Fermer
+            </button>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
 
       {/* Chatbot */}
       {showChatbot && (
         <div 
-          className="fixed bottom-24 right-6 w-96 max-w-[calc(100vw-3rem)]"
-          style={{ zIndex: 10000 }}
-          role="complementary"
-          aria-label="Assistant virtuel"
+          style={{
+            position: 'fixed',
+            bottom: '90px',
+            right: '24px',
+            width: '384px',
+            maxWidth: 'calc(100vw - 48px)',
+            zIndex: 99999
+          }}
         >
           <ChatBot
             isOpen={showChatbot}
