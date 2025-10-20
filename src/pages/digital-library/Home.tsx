@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { BookOpen, FileText, Image, Music, Calendar, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 
 export default function DigitalLibraryHome() {
@@ -73,7 +72,7 @@ export default function DigitalLibraryHome() {
 
   return (
     <DigitalLibraryLayout>
-      {/* Hero Section with Carousel */}
+      {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary/10 via-accent/5 to-background py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
@@ -85,29 +84,22 @@ export default function DigitalLibraryHome() {
             </p>
           </div>
 
-          <Carousel className="max-w-4xl mx-auto">
-            <CarouselContent>
-              {newItems.map((item) => (
-                <CarouselItem key={item.id}>
-                  <Card className="border-2">
-                    <CardContent className="flex items-center gap-6 p-8">
-                      <div className="flex-1">
-                        <Badge className="mb-3">{item.type}</Badge>
-                        <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
-                        <p className="text-muted-foreground mb-4">{item.author}</p>
-                        <Button>Consulter maintenant</Button>
-                      </div>
-                      <div className="w-48 h-64 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center">
-                        <BookOpen className="h-16 w-16 text-primary/40" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
+          {/* Featured Items Grid - Replacing Carousel */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {newItems.map((item) => (
+              <Card key={item.id} className="border-2 hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg mb-4 flex items-center justify-center">
+                    <BookOpen className="h-16 w-16 text-primary/40" />
+                  </div>
+                  <Badge className="mb-3">{item.type}</Badge>
+                  <h3 className="text-xl font-bold mb-2 line-clamp-2">{item.title}</h3>
+                  <p className="text-muted-foreground mb-4">{item.author}</p>
+                  <Button className="w-full">Consulter maintenant</Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
 
