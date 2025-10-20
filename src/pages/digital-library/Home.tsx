@@ -89,14 +89,14 @@ export default function DigitalLibraryHome() {
           <div className="max-w-5xl mx-auto">
             <Carousel
               opts={{
-                align: "start",
+                align: "center",
                 loop: true,
               }}
               className="w-full"
             >
-              <CarouselContent>
+              <CarouselContent className="-ml-2 md:-ml-4">
                 {newItems.map((item) => (
-                  <CarouselItem key={item.id}>
+                  <CarouselItem key={item.id} className="pl-2 md:pl-4">
                     <div className="p-1">
                       <Card className="border-2 hover:shadow-lg transition-shadow">
                         <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8">

@@ -150,7 +150,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   <ChevronDown className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
+              <DropdownMenuContent align="start" className="bg-card z-50">
                 {collectionsSubmenu.map((item, index) => (
                   <Link key={`collection-${index}`} to={item.href}>
                     <DropdownMenuItem className="gap-2 cursor-pointer">
@@ -178,7 +178,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   <ChevronDown className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
+              <DropdownMenuContent align="start" className="bg-card z-50">
                 {themesSubmenu.map((item, index) => (
                   <Link key={`theme-${index}`} to={item.href}>
                     <DropdownMenuItem className="cursor-pointer">
