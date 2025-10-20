@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { useSystemList } from "@/hooks/useSystemList";
+import * as LucideIcons from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,22 +22,61 @@ interface DigitalLibraryLayoutProps {
 export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const { t, language, setLanguage } = useLanguage();
   const { isAuthenticated, isLibrarian } = useAccessControl();
+  
+  // Charger les menus dynamiques depuis system_lists
+  const { values: collectionsData, loading: collectionsLoading } = useSystemList('digital_library_collections');
+  const { values: themesData, loading: themesLoading } = useSystemList('digital_library_themes');
 
-  const collectionsSubmenu = [
-    { label: "Livres numériques", href: "/digital-library/collections/books", icon: Book },
-    { label: "Revues et périodiques", href: "/digital-library/collections/periodicals", icon: FileText },
-    { label: "Manuscrits numérisés", href: "/digital-library/collections/manuscripts", icon: BookOpen },
-    { label: "Photographies et cartes", href: "/digital-library/collections/photos", icon: Image },
-    { label: "Archives sonores et audiovisuelles", href: "/digital-library/collections/audiovisual", icon: Music },
-  ];
+  // Helper pour obtenir l'icône Lucide
+  const getIcon = (iconName?: string) => {
+    if (!iconName) return BookOpen;
+    const Icon = (LucideIcons as any)[iconName];
+    return Icon || BookOpen;
+  };
 
-  const themesSubmenu = [
-    { label: "Histoire & Patrimoine", href: "/digital-library/themes/history" },
-    { label: "Arts & Culture", href: "/digital-library/themes/arts" },
-    { label: "Sciences & Techniques", href: "/digital-library/themes/sciences" },
-    { label: "Religion & Philosophie", href: "/digital-library/themes/religion" },
-    { label: "Littérature & Poésie", href: "/digital-library/themes/literature" },
-  ];
+  // Helper pour obtenir le label traduit
+  const getTranslatedLabel = (item: any) => {
+    const translations = item.metadata?.translations;
+    if (translations && translations[language]) {
+      return translations[language];
+    }
+    return item.value_label;
+  };
+
+  // Menu Collections dynamique avec fallback
+  const collectionsSubmenu = collectionsLoading || !collectionsData || collectionsData.length === 0 
+    ? [
+        { label: "Livres numériques", href: "/digital-library/collections/books", icon: Book },
+        { label: "Revues et périodiques", href: "/digital-library/collections/periodicals", icon: FileText },
+        { label: "Manuscrits numérisés", href: "/digital-library/collections/manuscripts", icon: BookOpen },
+        { label: "Photographies et cartes", href: "/digital-library/collections/photos", icon: Image },
+        { label: "Archives sonores et audiovisuelles", href: "/digital-library/collections/audiovisual", icon: Music },
+      ]
+    : collectionsData
+        .filter(item => item.is_active)
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+        .map(item => ({
+          label: getTranslatedLabel(item),
+          href: item.metadata?.path || `/digital-library/collections/${item.value_code}`,
+          icon: getIcon(item.metadata?.icon),
+        }));
+
+  // Menu Thèmes dynamique avec fallback
+  const themesSubmenu = themesLoading || !themesData || themesData.length === 0
+    ? [
+        { label: "Histoire & Patrimoine", href: "/digital-library/themes/history" },
+        { label: "Arts & Culture", href: "/digital-library/themes/arts" },
+        { label: "Sciences & Techniques", href: "/digital-library/themes/sciences" },
+        { label: "Religion & Philosophie", href: "/digital-library/themes/religion" },
+        { label: "Littérature & Poésie", href: "/digital-library/themes/literature" },
+      ]
+    : themesData
+        .filter(item => item.is_active)
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+        .map(item => ({
+          label: getTranslatedLabel(item),
+          href: item.metadata?.path || `/digital-library/themes/${item.value_code}`,
+        }));
 
   const userMenu = isAuthenticated ? [
     { label: "Mon espace personnel", href: "/digital-library/my-space" },
@@ -110,10 +151,10 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                {collectionsSubmenu.map((item) => (
-                  <Link key={item.href} to={item.href}>
+                {collectionsSubmenu.map((item, index) => (
+                  <Link key={`collection-${index}`} to={item.href}>
                     <DropdownMenuItem className="gap-2 cursor-pointer">
-                      <item.icon className="h-4 w-4" />
+                      {item.icon && <item.icon className="h-4 w-4" />}
                       {item.label}
                     </DropdownMenuItem>
                   </Link>
@@ -138,8 +179,8 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                {themesSubmenu.map((item) => (
-                  <Link key={item.href} to={item.href}>
+                {themesSubmenu.map((item, index) => (
+                  <Link key={`theme-${index}`} to={item.href}>
                     <DropdownMenuItem className="cursor-pointer">
                       {item.label}
                     </DropdownMenuItem>
