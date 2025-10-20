@@ -1,9 +1,10 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
 import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { useAuth } from "@/hooks/useAuth";
 import GlobalSearchBar from "@/components/GlobalSearchBar";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import Footer from "@/components/Footer";
@@ -16,6 +17,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
+import { DigitizationRequestDialog } from "@/components/digital-library/DigitizationRequestDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DigitalLibraryLayoutProps {
   children: ReactNode;
@@ -24,6 +28,35 @@ interface DigitalLibraryLayoutProps {
 export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const { t, language, setLanguage } = useLanguage();
   const { isAuthenticated, isLibrarian } = useAccessControl();
+  const { session } = useAuth();
+  const [showReservationDialog, setShowReservationDialog] = useState(false);
+  const [showDigitizationDialog, setShowDigitizationDialog] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  // Charger le profil utilisateur
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (!session?.user?.id) return;
+      
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
+
+      if (data && !error) {
+        setUserProfile({
+          firstName: data.first_name || "",
+          lastName: data.last_name || "",
+          email: session.user.email || "",
+        });
+      }
+    };
+
+    if (isAuthenticated && session) {
+      loadUserProfile();
+    }
+  }, [session, isAuthenticated]);
 
   const collectionsSubmenu = [
     { label: "Livres numériques", href: "/digital-library/collections/books", icon: Book },
@@ -39,11 +72,6 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
     { label: "Sciences & Techniques", href: "/digital-library/themes/sciences" },
     { label: "Religion & Philosophie", href: "/digital-library/themes/religion" },
     { label: "Littérature & Poésie", href: "/digital-library/themes/literature" },
-  ];
-
-  const servicesSubmenu = [
-    { label: "Mes demandes de réservation", href: "/digital-library/mes-reservations", icon: BookmarkCheck },
-    { label: "Mes demandes de numérisation", href: "/digital-library/mes-demandes-numerisation", icon: FileDigit },
   ];
 
   const userMenu = isAuthenticated ? [
@@ -191,14 +219,20 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label="Sous-menu Services aux lecteurs">
-                  {servicesSubmenu.map((item) => (
-                    <Link key={item.href} to={item.href}>
-                      <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
-                        <item.icon className="h-4 w-4" aria-hidden="true" />
-                        {item.label}
-                      </DropdownMenuItem>
-                    </Link>
-                  ))}
+                  <DropdownMenuItem 
+                    className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground"
+                    onClick={() => setShowReservationDialog(true)}
+                  >
+                    <BookmarkCheck className="h-4 w-4" aria-hidden="true" />
+                    Demande de Réservation
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground"
+                    onClick={() => setShowDigitizationDialog(true)}
+                  >
+                    <FileDigit className="h-4 w-4" aria-hidden="true" />
+                    Demande de Numérisation
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
@@ -312,6 +346,24 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
 
       {/* Outils globaux d'accessibilité et chatbot */}
       <GlobalAccessibilityTools />
+
+      {/* Dialogs de demandes */}
+      {userProfile && (
+        <>
+          <ReservationRequestDialog
+            isOpen={showReservationDialog}
+            onClose={() => setShowReservationDialog(false)}
+            documentId=""
+            documentTitle=""
+            userProfile={userProfile}
+          />
+          <DigitizationRequestDialog
+            isOpen={showDigitizationDialog}
+            onClose={() => setShowDigitizationDialog(false)}
+            userProfile={userProfile}
+          />
+        </>
+      )}
     </div>
   );
 }
