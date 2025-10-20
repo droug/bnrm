@@ -44,8 +44,8 @@ import { reservationRequestSchema, type ReservationRequestFormData } from "@/sch
 interface ReservationRequestDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  documentId: string;
-  documentTitle: string;
+  documentId?: string;
+  documentTitle?: string;
   documentCote?: string;
   userProfile: {
     firstName: string;
@@ -74,8 +74,8 @@ export function ReservationRequestDialog({
   const form = useForm<ReservationRequestFormData>({
     resolver: zodResolver(reservationRequestSchema),
     defaultValues: {
-      documentId,
-      documentTitle,
+      documentId: documentId || "",
+      documentTitle: documentTitle || "",
       documentCote: documentCote || "",
       userName: `${userProfile.firstName} ${userProfile.lastName}`,
       userEmail: userProfile.email,
@@ -84,6 +84,8 @@ export function ReservationRequestDialog({
       comments: "",
     },
   });
+
+  // Permettre au formulaire de fonctionner même sans document préalablement sélectionné
 
   const onSubmit = async (data: ReservationRequestFormData) => {
     setIsSubmitting(true);
@@ -180,29 +182,37 @@ export function ReservationRequestDialog({
                 <FormItem>
                   <FormLabel>Titre du document</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled className="bg-muted" />
+                    <Input 
+                      {...field} 
+                      disabled={!!documentTitle} 
+                      className={documentTitle ? "bg-muted" : ""}
+                      placeholder="Entrez le titre du document à réserver"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Cote du document */}
-            {documentCote && (
-              <FormField
-                control={form.control}
-                name="documentCote"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cote du document</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled className="bg-muted" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+            {/* Cote du document - facultatif */}
+            <FormField
+              control={form.control}
+              name="documentCote"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cote du document (facultatif)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      {...field} 
+                      disabled={!!documentCote} 
+                      className={documentCote ? "bg-muted" : ""}
+                      placeholder="Entrez la cote du document si connue"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Date souhaitée */}
             <FormField

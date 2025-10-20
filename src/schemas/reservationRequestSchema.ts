@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const reservationRequestSchema = z.object({
-  documentId: z.string().uuid(),
+  documentId: z.string().optional(),
   documentTitle: z.string().min(1, "Le titre du document est requis"),
   documentCote: z.string().optional(),
   userName: z.string().min(1, "Le nom est requis"),

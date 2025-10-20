@@ -348,21 +348,19 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
       <GlobalAccessibilityTools />
 
       {/* Dialogs de demandes */}
-      {userProfile && (
-        <>
-          <ReservationRequestDialog
-            isOpen={showReservationDialog}
-            onClose={() => setShowReservationDialog(false)}
-            documentId=""
-            documentTitle=""
-            userProfile={userProfile}
-          />
-          <DigitizationRequestDialog
-            isOpen={showDigitizationDialog}
-            onClose={() => setShowDigitizationDialog(false)}
-            userProfile={userProfile}
-          />
-        </>
+      {showReservationDialog && userProfile && (
+        <ReservationRequestDialog
+          isOpen={showReservationDialog}
+          onClose={() => setShowReservationDialog(false)}
+          userProfile={userProfile}
+        />
+      )}
+      {showDigitizationDialog && userProfile && (
+        <DigitizationRequestDialog
+          isOpen={showDigitizationDialog}
+          onClose={() => setShowDigitizationDialog(false)}
+          userProfile={userProfile}
+        />
       )}
     </div>
   );
