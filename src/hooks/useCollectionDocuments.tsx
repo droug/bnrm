@@ -162,13 +162,15 @@ export function useCollectionDocuments(collectionType: CollectionType) {
         setDocuments(data || []);
         setTotalCount(count || 0);
       } else {
-        // Pour les livres, afficher directement les données mock
+        // Afficher directement les données mock selon le type de collection
+        let mockData: CollectionDocument[] = [];
+        
         if (collectionType === 'books') {
-          const mockBooks: CollectionDocument[] = [
+          mockData = [
             {
               id: 'mock-1',
               title: 'Histoire du Maroc - De l\'indépendance à nos jours',
-              description: 'Une analyse approfondie de l\'évolution politique, sociale et économique du Maroc depuis l\'indépendance en 1956 jusqu\'à aujourd\'hui. L\'ouvrage explore les grandes transformations sociales, les réformes politiques et le développement économique du royaume.',
+              description: 'Une analyse approfondie de l\'évolution politique, sociale et économique du Maroc depuis l\'indépendance en 1956 jusqu\'à aujourd\'hui.',
               thumbnail_url: '/placeholder.svg',
               file_url: '/placeholder.pdf',
               file_type: 'PDF',
@@ -184,7 +186,7 @@ export function useCollectionDocuments(collectionType: CollectionType) {
             {
               id: 'mock-2',
               title: 'الأدب المغربي المعاصر - رؤية نقدية',
-              description: 'دراسة شاملة للأدب المغربي المعاصر وتطوره عبر العقود الأخيرة، مع التركيز على الأعمال الأدبية البارزة والتيارات الفكرية المؤثرة في المشهد الثقافي المغربي.',
+              description: 'دراسة شاملة للأدب المغربي المعاصر وتطوره عبر العقود الأخيرة، مع التركيز على الأعمال الأدبية البارزة.',
               thumbnail_url: '/placeholder.svg',
               file_url: '/placeholder.pdf',
               file_type: 'PDF',
@@ -199,8 +201,8 @@ export function useCollectionDocuments(collectionType: CollectionType) {
             },
             {
               id: 'mock-3',
-              title: 'Architecture Traditionnelle Marocaine - Patrimoine et Modernité',
-              description: 'Exploration détaillée de l\'architecture traditionnelle marocaine à travers les siècles. L\'ouvrage analyse les médinas, riads, kasbahs et palais, en mettant en lumière les techniques de construction ancestrales et les éléments décoratifs caractéristiques.',
+              title: 'Architecture Traditionnelle Marocaine',
+              description: 'Exploration détaillée de l\'architecture traditionnelle marocaine à travers les siècles.',
               thumbnail_url: '/placeholder.svg',
               file_url: '/placeholder.pdf',
               file_type: 'PDF',
@@ -211,12 +213,12 @@ export function useCollectionDocuments(collectionType: CollectionType) {
               content_type: 'document',
               view_count: 3156,
               download_enabled: true,
-              tags: ['Architecture', 'Patrimoine', 'Artisanat'],
+              tags: ['Architecture', 'Patrimoine'],
             },
             {
               id: 'mock-4',
-              title: 'La Cuisine Marocaine - Traditions et Recettes Authentiques',
-              description: 'Un voyage culinaire à travers les traditions gastronomiques marocaines. Plus de 200 recettes authentiques accompagnées de leurs origines historiques et culturelles. De la cuisine de rue aux plats royaux, découvrez la richesse de la gastronomie marocaine.',
+              title: 'La Cuisine Marocaine - Traditions et Recettes',
+              description: 'Un voyage culinaire à travers les traditions gastronomiques marocaines avec plus de 200 recettes authentiques.',
               thumbnail_url: '/placeholder.svg',
               file_url: '/placeholder.pdf',
               file_type: 'PDF',
@@ -227,12 +229,12 @@ export function useCollectionDocuments(collectionType: CollectionType) {
               content_type: 'document',
               view_count: 4892,
               download_enabled: true,
-              tags: ['Cuisine', 'Culture', 'Traditions'],
+              tags: ['Cuisine', 'Culture'],
             },
             {
               id: 'mock-5',
-              title: 'تاريخ الفن الإسلامي بالمغرب - من العصور الوسطى إلى العصر الحديث',
-              description: 'بحث معمق في تاريخ الفن الإسلامي بالمغرب من العصور الوسطى حتى العصر الحديث. دراسة تفصيلية للمعالم الأثرية، الزخارف، الخط العربي والفنون التطبيقية التي تميز الإبداع الفني المغربي.',
+              title: 'تاريخ الفن الإسلامي بالمغرب',
+              description: 'بحث معمق في تاريخ الفن الإسلامي بالمغرب من العصور الوسطى حتى العصر الحديث.',
               thumbnail_url: '/placeholder.svg',
               file_url: '/placeholder.pdf',
               file_type: 'PDF',
@@ -243,251 +245,318 @@ export function useCollectionDocuments(collectionType: CollectionType) {
               content_type: 'document',
               view_count: 1567,
               download_enabled: true,
-              tags: ['Art', 'Islam', 'Histoire'],
+              tags: ['Art', 'Islam'],
             },
+          ];
+        } else if (collectionType === 'periodicals') {
+          mockData = [
             {
-              id: 'mock-6',
-              title: 'Le Maroc et la Méditerranée - Relations Historiques et Culturelles',
-              description: 'Analyse approfondie des relations historiques du Maroc avec les pays méditerranéens, de l\'antiquité à l\'époque moderne. L\'ouvrage examine les échanges commerciaux, culturels et diplomatiques qui ont façonné l\'identité méditerranéenne du royaume.',
-              thumbnail_url: '/placeholder.svg',
-              file_url: '/placeholder.pdf',
-              file_type: 'PDF',
-              language: 'Français',
-              published_at: '2017-06-30',
-              created_at: new Date(Date.now() - 500 * 24 * 60 * 60 * 1000).toISOString(),
-              status: 'published',
-              content_type: 'document',
-              view_count: 2134,
-              download_enabled: true,
-              tags: ['Histoire', 'Géopolitique', 'Méditerranée'],
-            },
-            {
-              id: 'mock-7',
-              title: 'الموسيقى الأندلسية المغربية - تاريخ وتطور',
-              description: 'دراسة شاملة للموسيقى الأندلسية المغربية، تاريخها، أنواعها (الآلة، الغرناطي، الملحون) وتطورها عبر العصور. يتناول الكتاب المقامات، الإيقاعات والآلات الموسيقية التقليدية.',
+              id: 'mock-per-1',
+              title: 'Al Alam - Archives 1946-1956',
+              description: 'Collection complète du quotidien Al Alam durant la période de lutte pour l\'indépendance. Documents historiques essentiels.',
               thumbnail_url: '/placeholder.svg',
               file_url: '/placeholder.pdf',
               file_type: 'PDF',
               language: 'العربية',
-              published_at: '2021-08-18',
-              created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+              published_at: '1946-01-01',
+              created_at: new Date(Date.now() - 300 * 24 * 60 * 60 * 1000).toISOString(),
               status: 'published',
-              content_type: 'document',
+              content_type: 'journal',
+              view_count: 4521,
+              download_enabled: true,
+              tags: ['Presse', 'Histoire', 'Indépendance'],
+            },
+            {
+              id: 'mock-per-2',
+              title: 'La Vie Économique - Numéros 2020-2023',
+              description: 'Revue économique hebdomadaire couvrant l\'actualité économique et financière du Maroc.',
+              thumbnail_url: '/placeholder.svg',
+              file_url: '/placeholder.pdf',
+              file_type: 'PDF',
+              language: 'Français',
+              published_at: '2023-12-01',
+              created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'published',
+              content_type: 'journal',
+              view_count: 2876,
+              download_enabled: true,
+              tags: ['Économie', 'Finance', 'Actualité'],
+            },
+            {
+              id: 'mock-per-3',
+              title: 'Revue Marocaine des Sciences Politiques et Sociales',
+              description: 'Publication académique semestrielle consacrée aux sciences politiques et sociales.',
+              thumbnail_url: '/placeholder.svg',
+              file_url: '/placeholder.pdf',
+              file_type: 'PDF',
+              language: 'Français',
+              published_at: '2023-06-15',
+              created_at: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'published',
+              content_type: 'journal',
+              view_count: 1543,
+              download_enabled: true,
+              tags: ['Sciences politiques', 'Recherche', 'Académie'],
+            },
+            {
+              id: 'mock-per-4',
+              title: 'مجلة دعوة الحق - أعداد تاريخية',
+              description: 'المجلة الدينية الشهرية الصادرة عن وزارة الأوقاف والشؤون الإسلامية منذ 1957.',
+              thumbnail_url: '/placeholder.svg',
+              file_url: '/placeholder.pdf',
+              file_type: 'PDF',
+              language: 'العربية',
+              published_at: '2022-01-01',
+              created_at: new Date(Date.now() - 200 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'published',
+              content_type: 'journal',
+              view_count: 3234,
+              download_enabled: true,
+              tags: ['Religion', 'Islam', 'Culture'],
+            },
+            {
+              id: 'mock-per-5',
+              title: 'Bulletin de la Société de Géographie du Maroc',
+              description: 'Publication scientifique trimestrielle de géographie et cartographie du territoire marocain.',
+              thumbnail_url: '/placeholder.svg',
+              file_url: '/placeholder.pdf',
+              file_type: 'PDF',
+              language: 'Français',
+              published_at: '2021-09-20',
+              created_at: new Date(Date.now() - 250 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'published',
+              content_type: 'journal',
               view_count: 987,
+              download_enabled: true,
+              tags: ['Géographie', 'Cartographie', 'Science'],
+            },
+            {
+              id: 'mock-per-6',
+              title: 'Maroc Hebdo - Collection 2015-2020',
+              description: 'Magazine hebdomadaire d\'actualité générale, politique et économique.',
+              thumbnail_url: '/placeholder.svg',
+              file_url: '/placeholder.pdf',
+              file_type: 'PDF',
+              language: 'Français',
+              published_at: '2020-12-31',
+              created_at: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'published',
+              content_type: 'journal',
+              view_count: 2145,
+              download_enabled: true,
+              tags: ['Actualité', 'Magazine', 'Politique'],
+            },
+          ];
+        } else if (collectionType === 'photos') {
+          mockData = [
+            {
+              id: 'mock-photo-1',
+              title: 'Marrakech 1920 - Photographies coloniales',
+              description: 'Collection de photographies historiques de Marrakech dans les années 1920. Vue sur la Koutoubia, les souks et la vie quotidienne.',
+              thumbnail_url: '/placeholder.svg',
+              file_url: '/placeholder.jpg',
+              file_type: 'JPEG',
+              language: 'Français',
+              published_at: '1920-01-01',
+              created_at: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'published',
+              content_type: 'image',
+              view_count: 5678,
+              download_enabled: true,
+              tags: ['Photographie', 'Histoire', 'Marrakech'],
+            },
+            {
+              id: 'mock-photo-2',
+              title: 'Cartes anciennes du Maroc - XVIIIe siècle',
+              description: 'Collection de cartes géographiques anciennes du Maroc, gravures et lithographies du 18ème siècle.',
+              thumbnail_url: '/placeholder.svg',
+              file_url: '/placeholder.jpg',
+              file_type: 'JPEG',
+              language: 'Français',
+              published_at: '1750-01-01',
+              created_at: new Date(Date.now() - 350 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'published',
+              content_type: 'image',
+              view_count: 3456,
+              download_enabled: true,
+              tags: ['Cartographie', 'Histoire', 'Patrimoine'],
+            },
+            {
+              id: 'mock-photo-3',
+              title: 'Fès - Architecture et Artisanat',
+              description: 'Photographies contemporaines de l\'architecture traditionnelle et des artisans de Fès.',
+              thumbnail_url: '/placeholder.svg',
+              file_url: '/placeholder.jpg',
+              file_type: 'JPEG',
+              language: 'Français',
+              published_at: '2022-05-10',
+              created_at: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'published',
+              content_type: 'image',
+              view_count: 2341,
+              download_enabled: true,
+              tags: ['Architecture', 'Artisanat', 'Fès'],
+            },
+            {
+              id: 'mock-photo-4',
+              title: 'صور تاريخية للرباط - عاصمة المغرب',
+              description: 'مجموعة من الصور التاريخية لمدينة الرباط: صومعة حسان، باب الرواح، القصبة الأوداية.',
+              thumbnail_url: '/placeholder.svg',
+              file_url: '/placeholder.jpg',
+              file_type: 'JPEG',
+              language: 'العربية',
+              published_at: '1930-01-01',
+              created_at: new Date(Date.now() - 320 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'published',
+              content_type: 'image',
+              view_count: 4123,
+              download_enabled: true,
+              tags: ['Photographie', 'Rabat', 'Monuments'],
+            },
+            {
+              id: 'mock-photo-5',
+              title: 'Atlas Mountains - Paysages et Villages Berbères',
+              description: 'Collection photographique des paysages de l\'Atlas et des villages berbères traditionnels.',
+              thumbnail_url: '/placeholder.svg',
+              file_url: '/placeholder.jpg',
+              file_type: 'JPEG',
+              language: 'Français',
+              published_at: '2023-08-15',
+              created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'published',
+              content_type: 'image',
+              view_count: 3892,
+              download_enabled: true,
+              tags: ['Paysage', 'Atlas', 'Berbère'],
+            },
+          ];
+        } else if (collectionType === 'audiovisual') {
+          mockData = [
+            {
+              id: 'mock-av-1',
+              title: 'Discours historiques de Mohammed V',
+              description: 'Collection d\'enregistrements audio des discours historiques du Roi Mohammed V durant la lutte pour l\'indépendance.',
+              thumbnail_url: '/placeholder.svg',
+              file_url: '/placeholder.mp3',
+              file_type: 'MP3',
+              language: 'العربية',
+              published_at: '1953-08-20',
+              created_at: new Date(Date.now() - 500 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'published',
+              content_type: 'video',
+              view_count: 8934,
+              download_enabled: true,
+              tags: ['Audio', 'Histoire', 'Indépendance'],
+            },
+            {
+              id: 'mock-av-2',
+              title: 'Musique Andalouse - Enregistrements authentiques',
+              description: 'Archives sonores de concerts de musique andalouse marocaine par les grands maîtres.',
+              thumbnail_url: '/placeholder.svg',
+              file_url: '/placeholder.mp3',
+              file_type: 'MP3',
+              language: 'العربية',
+              published_at: '1970-01-01',
+              created_at: new Date(Date.now() - 450 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'published',
+              content_type: 'video',
+              view_count: 5623,
               download_enabled: true,
               tags: ['Musique', 'Andalousie', 'Patrimoine'],
             },
             {
-              id: 'mock-8',
-              title: 'Guide du Patrimoine Culturel Marocain UNESCO',
-              description: 'Guide officiel recensant les sites du patrimoine culturel marocain classés par l\'UNESCO et les monuments historiques nationaux. Fiches détaillées pour chaque site avec photos, historique et informations pratiques pour les visiteurs.',
+              id: 'mock-av-3',
+              title: 'Documentaire: Fès, Ville Impériale',
+              description: 'Film documentaire sur l\'histoire et le patrimoine de Fès, capitale spirituelle du Maroc.',
               thumbnail_url: '/placeholder.svg',
-              file_url: '/placeholder.pdf',
-              file_type: 'PDF',
+              file_url: '/placeholder.mp4',
+              file_type: 'MP4',
               language: 'Français',
-              published_at: '2023-02-14',
-              created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+              published_at: '2018-06-10',
+              created_at: new Date(Date.now() - 200 * 24 * 60 * 60 * 1000).toISOString(),
               status: 'published',
-              content_type: 'document',
-              view_count: 5234,
-              download_enabled: true,
-              tags: ['Patrimoine', 'UNESCO', 'Tourisme'],
+              content_type: 'video',
+              view_count: 12456,
+              download_enabled: false,
+              tags: ['Documentaire', 'Fès', 'Patrimoine'],
             },
             {
-              id: 'mock-9',
-              title: 'الصحافة المغربية - نشأة وتطور',
-              description: 'تاريخ الصحافة المغربية منذ نشأتها في القرن التاسع عشر وحتى العصر الرقمي. دراسة تحليلية للدور الذي لعبته الصحافة في التحولات السياسية والاجتماعية بالمغرب.',
+              id: 'mock-av-4',
+              title: 'التراث الشفوي الأمازيغي - تسجيلات نادرة',
+              description: 'تسجيلات صوتية نادرة للحكايات والأشعار الأمازيغية التقليدية من مختلف مناطق المغرب.',
               thumbnail_url: '/placeholder.svg',
-              file_url: '/placeholder.pdf',
-              file_type: 'PDF',
-              language: 'العربية',
-              published_at: '2020-12-05',
-              created_at: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000).toISOString(),
-              status: 'published',
-              content_type: 'document',
-              view_count: 1456,
-              download_enabled: true,
-              tags: ['Journalisme', 'Médias', 'Histoire'],
-            },
-            {
-              id: 'mock-10',
-              title: 'Les Dynasties Marocaines - Pouvoir et Civilisation',
-              description: 'Panorama complet des grandes dynasties qui ont régné sur le Maroc : Idrissides, Almoravides, Almohades, Mérinides, Saadiens et Alaouites. Analyse de leur contribution à la civilisation marocaine et à l\'histoire du Maghreb.',
-              thumbnail_url: '/placeholder.svg',
-              file_url: '/placeholder.pdf',
-              file_type: 'PDF',
-              language: 'Français',
-              published_at: '2019-04-22',
-              created_at: new Date(Date.now() - 280 * 24 * 60 * 60 * 1000).toISOString(),
-              status: 'published',
-              content_type: 'document',
-              view_count: 3421,
-              download_enabled: true,
-              tags: ['Histoire', 'Dynasties', 'Civilisation'],
-            },
-            {
-              id: 'mock-11',
-              title: 'التراث الشفوي الأمازيغي - حكايات وأساطير',
-              description: 'جمع وتوثيق للتراث الشفوي الأمازيغي من مختلف مناطق المغرب. حكايات، أساطير، أمثال وأشعار شعبية تعكس الثقافة والحكمة الأمازيغية عبر العصور.',
-              thumbnail_url: '/placeholder.svg',
-              file_url: '/placeholder.pdf',
-              file_type: 'PDF',
+              file_url: '/placeholder.mp3',
+              file_type: 'MP3',
               language: 'ⴰⵎⴰⵣⵉⵖ',
-              published_at: '2022-06-15',
-              created_at: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
-              status: 'published',
-              content_type: 'document',
-              view_count: 892,
-              download_enabled: true,
-              tags: ['Amazigh', 'Patrimoine', 'Tradition orale'],
-            },
-            {
-              id: 'mock-12',
-              title: 'L\'Économie Marocaine - Défis et Perspectives',
-              description: 'Analyse économique approfondie du Maroc contemporain. Étude des secteurs clés (agriculture, industrie, services, tourisme), des politiques économiques et des enjeux du développement durable.',
-              thumbnail_url: '/placeholder.svg',
-              file_url: '/placeholder.pdf',
-              file_type: 'PDF',
-              language: 'Français',
-              published_at: '2023-03-20',
-              created_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
-              status: 'published',
-              content_type: 'document',
-              view_count: 2876,
-              download_enabled: true,
-              tags: ['Économie', 'Développement', 'Politique économique'],
-            },
-            {
-              id: 'mock-13',
-              title: 'الخط العربي والزخرفة المغربية',
-              description: 'دراسة فنية شاملة للخط العربي والزخرفة في الفن المغربي. أنواع الخطوط (الكوفي، الثلث، النسخ)، تقنيات الزخرفة الهندسية والنباتية، وتطبيقاتها في العمارة والمخطوطات.',
-              thumbnail_url: '/placeholder.svg',
-              file_url: '/placeholder.pdf',
-              file_type: 'PDF',
-              language: 'العربية',
-              published_at: '2021-11-08',
-              created_at: new Date(Date.now() - 75 * 24 * 60 * 60 * 1000).toISOString(),
-              status: 'published',
-              content_type: 'document',
-              view_count: 1234,
-              download_enabled: true,
-              tags: ['Calligraphie', 'Art', 'Décoration'],
-            },
-            {
-              id: 'mock-14',
-              title: 'Le Soufisme au Maroc - Histoire et Spiritualité',
-              description: 'Exploration de la tradition soufie marocaine, ses grandes figures (Chadiliya, Tijania, Boutchichiya), ses pratiques spirituelles et son influence sur la société marocaine à travers les siècles.',
-              thumbnail_url: '/placeholder.svg',
-              file_url: '/placeholder.pdf',
-              file_type: 'PDF',
-              language: 'Français',
-              published_at: '2018-10-12',
+              published_at: '1980-01-01',
               created_at: new Date(Date.now() - 380 * 24 * 60 * 60 * 1000).toISOString(),
               status: 'published',
-              content_type: 'document',
-              view_count: 1678,
+              content_type: 'video',
+              view_count: 3421,
               download_enabled: true,
-              tags: ['Soufisme', 'Religion', 'Spiritualité'],
+              tags: ['Oral', 'Amazigh', 'Traditions'],
             },
             {
-              id: 'mock-15',
-              title: 'المرأة المغربية - تاريخ وتحديات معاصرة',
-              description: 'دراسة سوسيولوجية وتاريخية لوضع المرأة المغربية عبر العصور. تحليل للتحولات الاجتماعية، المكتسبات القانونية والتحديات المعاصرة في مسار التحرر والمساواة.',
+              id: 'mock-av-5',
+              title: 'Maroc des Années 60 - Archives INA',
+              description: 'Reportages télévisés sur le Maroc des années 1960: développement, culture et société.',
               thumbnail_url: '/placeholder.svg',
-              file_url: '/placeholder.pdf',
-              file_type: 'PDF',
-              language: 'العربية',
-              published_at: '2022-03-08',
-              created_at: new Date(Date.now() - 50 * 24 * 60 * 60 * 1000).toISOString(),
+              file_url: '/placeholder.mp4',
+              file_type: 'MP4',
+              language: 'Français',
+              published_at: '1965-01-01',
+              created_at: new Date(Date.now() - 420 * 24 * 60 * 60 * 1000).toISOString(),
               status: 'published',
-              content_type: 'document',
-              view_count: 2145,
-              download_enabled: true,
-              tags: ['Société', 'Femmes', 'Droits'],
+              content_type: 'video',
+              view_count: 6789,
+              download_enabled: false,
+              tags: ['Archives', 'Années 60', 'Société'],
             },
           ];
+        }
 
-          // Appliquer les filtres sur les mock data
-          let filteredMocks = mockBooks;
-          
-          if (filters.title) {
-            filteredMocks = filteredMocks.filter(book => 
-              book.title.toLowerCase().includes(filters.title!.toLowerCase())
-            );
-          }
-          
-          if (filters.language && filters.language !== 'all') {
-            filteredMocks = filteredMocks.filter(book => book.language === filters.language);
-          }
-
-          if (filters.dateFrom) {
-            filteredMocks = filteredMocks.filter(book => 
-              book.published_at && book.published_at >= filters.dateFrom!
-            );
-          }
-
-          if (filters.dateTo) {
-            filteredMocks = filteredMocks.filter(book => 
-              book.published_at && book.published_at <= filters.dateTo!
-            );
-          }
-
-          // Tri
-          const sortBy = filters.sortBy || 'created_at';
-          const sortOrder = filters.sortOrder || 'desc';
-          filteredMocks.sort((a, b) => {
-            const aVal = a[sortBy] || '';
-            const bVal = b[sortBy] || '';
-            const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-            return sortOrder === 'asc' ? comparison : -comparison;
-          });
-
-          // Pagination
-          const paginatedMocks = filteredMocks.slice(offset, offset + perPage);
-
-          setDocuments(paginatedMocks);
-          setTotalCount(filteredMocks.length);
-          setLoading(false);
-          return;
+        // Appliquer les filtres sur les mock data
+        let filteredMocks = mockData;
+        
+        if (filters.title) {
+          filteredMocks = filteredMocks.filter(book => 
+            book.title.toLowerCase().includes(filters.title!.toLowerCase())
+          );
         }
         
-        // Table content pour les autres types
-        const contentType = COLLECTION_TYPE_MAP[collectionType] as 'event' | 'exhibition' | 'news' | 'page';
-        let query = supabase
-          .from('content')
-          .select('*', { count: 'exact' })
-          .eq('content_type', contentType)
-          .eq('status', 'published')
-          .eq('is_visible', true);
+        if (filters.language && filters.language !== 'all') {
+          filteredMocks = filteredMocks.filter(book => book.language === filters.language);
+        }
 
-        // Filtres
-        if (filters.title) {
-          query = query.ilike('title', `%${filters.title}%`);
-        }
         if (filters.dateFrom) {
-          query = query.gte('published_at', filters.dateFrom);
+          filteredMocks = filteredMocks.filter(book => 
+            book.published_at && book.published_at >= filters.dateFrom!
+          );
         }
+
         if (filters.dateTo) {
-          query = query.lte('published_at', filters.dateTo);
-        }
-        if (filters.documentType && filters.documentType !== 'all') {
-          query = query.eq('file_type', filters.documentType);
+          filteredMocks = filteredMocks.filter(book => 
+            book.published_at && book.published_at <= filters.dateTo!
+          );
         }
 
         // Tri
-        query = query.order(filters.sortBy || 'created_at', { 
-          ascending: filters.sortOrder === 'asc' 
+        const sortBy = filters.sortBy || 'created_at';
+        const sortOrder = filters.sortOrder || 'desc';
+        filteredMocks.sort((a, b) => {
+          const aVal = a[sortBy] || '';
+          const bVal = b[sortBy] || '';
+          const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+          return sortOrder === 'asc' ? comparison : -comparison;
         });
 
         // Pagination
-        query = query.range(offset, offset + perPage - 1);
+        const paginatedMocks = filteredMocks.slice(offset, offset + perPage);
 
-        const { data, error, count } = await query;
-
-        if (error) throw error;
-        
-        setDocuments(data || []);
-        setTotalCount(count || 0);
+        setDocuments(paginatedMocks);
+        setTotalCount(filteredMocks.length);
+        setLoading(false);
+        return;
       }
     } catch (error) {
       console.error('Error loading documents:', error);
