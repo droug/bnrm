@@ -48,7 +48,6 @@ export default function DocumentDetails() {
   const [loading, setLoading] = useState(true);
   const [document, setDocument] = useState<any>(null);
   const [isManuscript, setIsManuscript] = useState(false);
-  const [authorName, setAuthorName] = useState<string>("");
   const [userProfile, setUserProfile] = useState<any>(null);
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [showDigitizationDialog, setShowDigitizationDialog] = useState(false);
@@ -76,28 +75,18 @@ export default function DocumentDetails() {
       if (manuscriptData && !manuscriptError) {
         setDocument(manuscriptData);
         setIsManuscript(true);
-        setAuthorName(manuscriptData.author || '');
         setLoading(false);
         return;
       }
 
-      // Sinon, essayer la table content avec l'auteur
+      // Sinon, essayer la table content
       const { data: contentData, error: contentError } = await supabase
         .from('content')
-        .select(`
-          *,
-          author:author_id(first_name, last_name)
-        `)
+        .select('*')
         .eq('id', documentId)
         .single();
 
       if (contentError) throw contentError;
-      
-      // Construire le nom de l'auteur
-      const author = contentData.author as any;
-      if (author && author.first_name && author.last_name) {
-        setAuthorName(`${author.first_name} ${author.last_name}`);
-      }
       
       setDocument(contentData);
       setIsManuscript(false);
@@ -210,8 +199,7 @@ export default function DocumentDetails() {
   const canDownload = document.download_enabled !== false && document.allow_download !== false;
   const canRead = document.file_url || document.digital_copy_url;
   const canReserve = !canRead && user && userProfile;
-  // Always show digitization button for logged-in users (no file_url means not digitized)
-  const canRequestDigitization = !document.file_url && user && userProfile;
+  const canRequestDigitization = !document.is_digitized && user && userProfile;
 
   return (
     <DigitalLibraryLayout>
@@ -235,10 +223,10 @@ export default function DocumentDetails() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <CardTitle className="text-2xl mb-2">{document.title}</CardTitle>
-                    {(authorName || document.author) && (
+                    {document.author && (
                       <p className="text-lg text-muted-foreground flex items-center gap-2">
                         <User className="h-4 w-4" />
-                        {authorName || document.author}
+                        {document.author}
                       </p>
                     )}
                   </div>
@@ -476,11 +464,11 @@ export default function DocumentDetails() {
                 {canRequestDigitization && (
                   <Button 
                     onClick={() => setShowDigitizationDialog(true)} 
-                    variant="secondary" 
-                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0"
+                    variant="outline" 
+                    className="w-full"
                   >
                     <FileText className="h-4 w-4 mr-2" />
-                    Demander la numérisation
+                    📜 Demander la numérisation
                   </Button>
                 )}
               </CardContent>

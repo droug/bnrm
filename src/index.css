@@ -411,8 +411,8 @@ Enhanced Moroccan Heritage Design System
     --z-popover: 700;
     --z-tooltip: 800;
     --z-notification: 900;
-    --z-overlay: 60;
-    --z-dialog: 61;
+    --z-overlay: 9998;
+    --z-dialog: 9999;
     
     /* Compatibilité ancienne nomenclature */
     --z-dialog-overlay: var(--z-overlay);
@@ -465,12 +465,13 @@ Enhanced Moroccan Heritage Design System
     animation: wiggle 1.5s ease-in-out;
   }
 
-  /* Modales et Dialogs - Radix UI centrage optimisé */
+  /* Modales et Dialogs - Radix UI compliant */
   
-  /* Overlay global - Couvre tout l'écran avec z-index cohérent */
+  /* Overlay global */
   [data-radix-dialog-overlay],
   [data-radix-alert-dialog-overlay],
-  [data-radix-sheet-overlay] {
+  [data-radix-sheet-overlay],
+  .dialog-overlay {
     position: fixed;
     inset: 0;
     background-color: hsl(0 0% 0% / 0.5);
@@ -488,9 +489,10 @@ Enhanced Moroccan Heritage Design System
     }
   }
 
-  /* Content centré - Position fixed avec transform */
+  /* Content centré */
   [data-radix-dialog-content],
-  [data-radix-alert-dialog-content] {
+  [data-radix-alert-dialog-content],
+  .dialog-content {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -520,7 +522,7 @@ Enhanced Moroccan Heritage Design System
   /* Sheet (sidebar) */
   [data-radix-sheet-content] {
     position: fixed;
-    z-index: 9999;
+    z-index: var(--z-dialog);
     background: hsl(var(--background));
     box-shadow: var(--shadow-md);
   }

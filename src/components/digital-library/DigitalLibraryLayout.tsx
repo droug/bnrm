@@ -85,7 +85,6 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
 
   const userMenu = isAuthenticated ? [
     { label: "Mon espace personnel", href: "/digital-library/my-space" },
-    { label: "Mes demandes", href: "/digital-library/mes-demandes" },
     { label: "Mes emprunts numériques", href: "/digital-library/my-loans" },
     { label: "Mes annotations", href: "/digital-library/my-notes" },
     { label: "Paramètres du compte", href: "/digital-library/account-settings" },
