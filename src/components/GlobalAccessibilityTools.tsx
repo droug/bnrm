@@ -26,15 +26,8 @@ export function GlobalAccessibilityTools() {
     <>
       {/* Boutons flottants - Toujours visibles */}
       <div 
-        style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          zIndex: 999999,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px'
-        }}
+        className="fixed bottom-6 right-6 flex flex-col gap-3"
+        style={{ zIndex: 9999 }}
       >
         {/* Bouton Accessibilité */}
         <button
