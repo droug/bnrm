@@ -3,7 +3,7 @@ import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibrar
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, FileText, Image, Music, Calendar, Sparkles } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function DigitalLibraryHome() {
+  const navigate = useNavigate();
   const { session } = useAuth();
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
@@ -147,7 +148,7 @@ export default function DigitalLibraryHome() {
                             <p className="text-muted-foreground mb-4">{item.author}</p>
                             <p className="text-sm text-muted-foreground mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
                             <div className="flex gap-2">
-                              <Button size="lg" variant="outline">Consulter</Button>
+                              <Button size="lg" variant="outline" onClick={() => navigate(`/digital-library/documents/${item.id}`)}>Consulter</Button>
                               {!item.isAvailable && session && userProfile && (
                                 <Button size="lg" onClick={() => handleReservationClick(item)}>
                                   🗓️ Réserver
@@ -199,7 +200,7 @@ export default function DigitalLibraryHome() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-2">
-                  <Button className="w-full" variant="outline">Consulter</Button>
+                  <Button className="w-full" variant="outline" onClick={() => navigate(`/digital-library/documents/${item.id}`)}>Consulter</Button>
                   {!item.isAvailable && session && userProfile && (
                     <Button className="w-full" onClick={() => handleReservationClick(item)}>
                       🗓️ Réserver
