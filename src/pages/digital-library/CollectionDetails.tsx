@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, BookOpen, SlidersHorizontal, Calendar, Languages, FileType, ArrowUpDown } from "lucide-react";
 import { useCollectionDocuments } from "@/hooks/useCollectionDocuments";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
 import {
   Pagination,
   PaginationContent,
@@ -159,16 +160,15 @@ export default function CollectionDetails() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Recherche par titre */}
+            {/* Recherche par titre avec auto-complétion */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Titre</label>
-                <Input
-                  placeholder="Rechercher par titre..."
-                  value={filters.title || ''}
-                  onChange={(e) => updateFilters({ title: e.target.value || undefined })}
-                />
-              </div>
+              <TitleAutocomplete
+                label="Titre"
+                placeholder="Rechercher par titre..."
+                value={filters.title || ''}
+                onChange={(value) => updateFilters({ title: value || undefined })}
+                collectionType={collectionType}
+              />
               
               {collectionType === 'manuscripts' && (
                 <div>
