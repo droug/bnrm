@@ -70,6 +70,8 @@ const ProfessionalSignup = lazy(() => import("./pages/ProfessionalSignup"));
 
 // Digital Library (lazy)
 const DigitalLibraryHome = lazy(() => import("./pages/digital-library/Home"));
+const DigitalLibraryAdminDashboard = lazy(() => import("./pages/digital-library/AdminDashboard"));
+const DigitalLibraryAdminSettings = lazy(() => import("./pages/digital-library/AdminSettings"));
 const BookReader = lazy(() => import("./pages/BookReader"));
 const MyLibrarySpace = lazy(() => import("./pages/MyLibrarySpace"));
 const DigitalLibraryBackoffice = lazy(() => import("./pages/DigitalLibraryBackoffice"));
@@ -210,7 +212,8 @@ const App = () => (
         <Route path="/help" element={<HelpPage />} />
         <Route path="/aide" element={<HelpPage />} />
         <Route path="/admin/preservation" element={<PreservationPage />} />
-          <Route path="/admin/digital-library" element={<DigitalLibraryBackoffice />} />
+          <Route path="/admin/digital-library" element={<DigitalLibraryAdminDashboard />} />
+          <Route path="/admin/digital-library/dashboard" element={<DigitalLibraryAdminDashboard />} />
           <Route path="/admin/digital-library/documents" element={<DigitalLibraryDocuments />} />
           <Route path="/admin/digital-library/users" element={<DigitalLibraryUsers />} />
           <Route path="/admin/digital-library/analytics" element={<DigitalLibraryAnalytics />} />
@@ -219,6 +222,7 @@ const App = () => (
           <Route path="/admin/digital-library/restrictions" element={<DigitalLibraryRestrictions />} />
           <Route path="/admin/digital-library/copyright" element={<DigitalLibraryCopyright />} />
           <Route path="/admin/digital-library/bulk-import" element={<DigitalLibraryBulkImport />} />
+          <Route path="/admin/digital-library/settings" element={<DigitalLibraryAdminSettings />} />
           <Route path="/access-policies" element={<AccessPolicies />} />
           <Route path="/politiques-acces" element={<AccessPolicies />} />
           <Route path="/admin/professional-management" element={<ProfessionalManagement />} />
