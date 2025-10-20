@@ -91,6 +91,7 @@ const MyNotes = lazy(() => import("./pages/digital-library/MyNotes"));
 const AccountSettings = lazy(() => import("./pages/digital-library/AccountSettings"));
 const UserReservations = lazy(() => import("./pages/digital-library/UserReservations"));
 const UserDigitizationRequests = lazy(() => import("./pages/digital-library/UserDigitizationRequests"));
+const RequestsManagement = lazy(() => import("./pages/digital-library/RequestsManagement"));
 const DigitalLibraryDocuments = lazy(() => import("./pages/DigitalLibraryDocuments"));
 const DigitalLibraryUsers = lazy(() => import("./pages/DigitalLibraryUsers"));
 const DigitalLibraryAnalytics = lazy(() => import("./pages/DigitalLibraryAnalytics"));
@@ -229,6 +230,7 @@ const App = () => (
           <Route path="/admin/digital-library/copyright" element={<DigitalLibraryCopyright />} />
           <Route path="/admin/digital-library/bulk-import" element={<DigitalLibraryBulkImport />} />
           <Route path="/admin/digital-library/settings" element={<DigitalLibraryAdminSettings />} />
+          <Route path="/admin/digital-library/requests-management" element={<RequestsManagement />} />
           <Route path="/access-policies" element={<AccessPolicies />} />
           <Route path="/politiques-acces" element={<AccessPolicies />} />
           <Route path="/admin/professional-management" element={<ProfessionalManagement />} />

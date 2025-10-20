@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, Database, Users, Upload, BarChart3, FileImage,
-  Shield, Copyright, Settings, Image
+  Shield, Copyright, Settings, Image, FolderOpen
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -109,6 +109,13 @@ export default function Administration() {
       icon: Copyright,
       path: "/admin/digital-library/copyright",
       color: "bg-orange-100 text-orange-600",
+    },
+    {
+      title: "Gestion des Demandes",
+      description: "Réservations et numérisations",
+      icon: FolderOpen,
+      path: "/admin/digital-library/requests-management",
+      color: "bg-emerald-100 text-emerald-600",
     },
     {
       title: "Paramètres techniques",
