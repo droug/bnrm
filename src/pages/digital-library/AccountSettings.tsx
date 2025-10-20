@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Lock, Bell, Globe, Moon, Sun } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AccountSettings() {
   const { toast } = useToast();
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [notifications, setNotifications] = useState({
     email: true,
@@ -19,20 +24,66 @@ export default function AccountSettings() {
     loanReminders: true,
     newsletter: false,
   });
+  const [profileData, setProfileData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    institution: "",
+    researchField: "",
+  });
 
-  const handleSaveProfile = () => {
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    if (profile) {
+      setProfileData({
+        firstName: profile.first_name || "",
+        lastName: profile.last_name || "",
+        email: user.email || "",
+        institution: profile.institution || "",
+        researchField: profile.research_field || "",
+      });
+    }
+  }, [user, profile, navigate]);
+
+  const handleSaveProfile = async () => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          first_name: profileData.firstName,
+          last_name: profileData.lastName,
+          institution: profileData.institution,
+          research_field: profileData.researchField,
+        })
+        .eq("user_id", user?.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Profil mis à jour",
+        description: "Vos informations ont été enregistrées avec succès",
+      });
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour le profil",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleChangePassword = async () => {
     toast({
-      title: "Profil mis à jour",
-      description: "Vos informations ont été enregistrées avec succès",
+      title: "Fonctionnalité en développement",
+      description: "La modification du mot de passe sera bientôt disponible",
     });
   };
 
-  const handleChangePassword = () => {
-    toast({
-      title: "Mot de passe modifié",
-      description: "Votre mot de passe a été mis à jour",
-    });
-  };
+  if (!user) return null;
 
   return (
     <DigitalLibraryLayout>
@@ -75,27 +126,53 @@ export default function AccountSettings() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">Prénom</Label>
-                    <Input id="firstName" placeholder="Votre prénom" />
+                    <Input 
+                      id="firstName" 
+                      placeholder="Votre prénom" 
+                      value={profileData.firstName}
+                      onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Nom</Label>
-                    <Input id="lastName" placeholder="Votre nom" />
+                    <Input 
+                      id="lastName" 
+                      placeholder="Votre nom" 
+                      value={profileData.lastName}
+                      onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="votre@email.com" />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="votre@email.com" 
+                    value={profileData.email}
+                    disabled
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="institution">Institution</Label>
-                  <Input id="institution" placeholder="Université, école, etc." />
+                  <Input 
+                    id="institution" 
+                    placeholder="Université, école, etc." 
+                    value={profileData.institution}
+                    onChange={(e) => setProfileData({ ...profileData, institution: e.target.value })}
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="research">Domaine de recherche</Label>
-                  <Input id="research" placeholder="Histoire, littérature, etc." />
+                  <Input 
+                    id="research" 
+                    placeholder="Histoire, littérature, etc." 
+                    value={profileData.researchField}
+                    onChange={(e) => setProfileData({ ...profileData, researchField: e.target.value })}
+                  />
                 </div>
 
                 <Button onClick={handleSaveProfile}>Enregistrer les modifications</Button>

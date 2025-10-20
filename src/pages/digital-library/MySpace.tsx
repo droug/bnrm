@@ -1,102 +1,88 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Heart, Download, Clock, TrendingUp, Eye, Calendar, BarChart3 } from "lucide-react";
+import { BookOpen, Heart, Download, Clock, Eye, BarChart3 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export default function MySpace() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
+  
+  const [readingHistory, setReadingHistory] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<any[]>([]);
+  const [downloads, setDownloads] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Redirect if not authenticated
-  if (!user) {
-    navigate("/auth");
-    return null;
-  }
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    loadUserData();
+  }, [user, navigate]);
 
-  const readingHistory = [
-    {
-      id: 1,
-      title: "Al-Muqaddima (Les Prolégomènes)",
-      author: "Ibn Khaldoun",
-      lastRead: "2025-01-18",
-      progress: 75,
-      pages: "245/320",
-      category: "Manuscrit",
-    },
-    {
-      id: 2,
-      title: "Rihla (Voyages)",
-      author: "Ibn Battuta",
-      lastRead: "2025-01-15",
-      progress: 45,
-      pages: "180/400",
-      category: "Manuscrit",
-    },
-    {
-      id: 3,
-      title: "Histoire du Maroc moderne",
-      author: "Archives BNRM",
-      lastRead: "2025-01-10",
-      progress: 100,
-      pages: "150/150",
-      category: "Livre",
-    },
-  ];
+  const loadUserData = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      // Load reading history
+      const { data: historyData, error: historyError } = await supabase
+        .from("reading_history")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(10);
 
-  const favorites = [
-    {
-      id: 1,
-      title: "Al-Kulliyat fi al-Tibb",
-      author: "Ibn Sina",
-      addedDate: "2025-01-12",
-      category: "Manuscrit",
-      available: true,
-    },
-    {
-      id: 2,
-      title: "Kitab al-Shifa",
-      author: "Ibn Sina",
-      addedDate: "2025-01-08",
-      category: "Manuscrit",
-      available: true,
-    },
-    {
-      id: 3,
-      title: "Es-Saada - Journal historique",
-      author: "Archives nationales",
-      addedDate: "2024-12-20",
-      category: "Périodique",
-      available: false,
-    },
-  ];
+      if (historyError) throw historyError;
+      setReadingHistory(historyData || []);
 
-  const downloads = [
-    {
-      id: 1,
-      title: "Histoire du Maroc moderne",
-      format: "PDF",
-      size: "15 MB",
-      downloadDate: "2025-01-10",
-      expiresDate: "2025-02-10",
-    },
-    {
-      id: 2,
-      title: "Photographies du Maroc colonial",
-      format: "ZIP",
-      size: "125 MB",
-      downloadDate: "2025-01-05",
-      expiresDate: "2025-02-05",
-    },
-  ];
+      // Load favorites
+      const { data: favoritesData, error: favoritesError } = await supabase
+        .from("favorites")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (favoritesError) throw favoritesError;
+      setFavorites(favoritesData || []);
+
+      // Load downloads
+      const { data: downloadsData, error: downloadsError } = await supabase
+        .from("reading_history")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("action_type", "download")
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (downloadsError) throw downloadsError;
+      setDownloads(downloadsData || []);
+    } catch (error: any) {
+      console.error("Error loading user data:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger vos données",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!user) return null;
 
   const stats = [
-    { label: "Documents consultés", value: "48", icon: Eye, color: "text-blue-600" },
-    { label: "Heures de lecture", value: "127", icon: Clock, color: "text-green-600" },
+    { label: "Documents consultés", value: readingHistory.length.toString(), icon: Eye, color: "text-blue-600" },
+    { label: "Heures de lecture", value: "N/A", icon: Clock, color: "text-green-600" },
     { label: "Favoris", value: favorites.length.toString(), icon: Heart, color: "text-red-600" },
     { label: "Téléchargements", value: downloads.length.toString(), icon: Download, color: "text-purple-600" },
   ];
@@ -121,7 +107,7 @@ export default function MySpace() {
                     <p className="text-sm text-muted-foreground">{stat.label}</p>
                     <p className="text-3xl font-bold mt-1">{stat.value}</p>
                   </div>
-                  <div className={`p-3 rounded-lg bg-gray-100`}>
+                  <div className="p-3 rounded-lg bg-gray-100">
                     <stat.icon className={`h-6 w-6 ${stat.color}`} />
                   </div>
                 </div>
@@ -129,31 +115,6 @@ export default function MySpace() {
             </Card>
           ))}
         </div>
-
-        {/* Activity Chart */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              Activité de lecture - 30 derniers jours
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-48 flex items-end justify-between gap-2">
-              {[12, 8, 15, 20, 10, 18, 25, 14, 22, 16, 19, 24, 11, 17].map((height, i) => (
-                <div
-                  key={i}
-                  className="flex-1 bg-primary/20 hover:bg-primary/40 transition-colors rounded-t cursor-pointer"
-                  style={{ height: `${height * 4}px` }}
-                  title={`${height} documents`}
-                />
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground mt-4 text-center">
-              Nombre de documents consultés par période de 2 jours
-            </p>
-          </CardContent>
-        </Card>
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="history" className="space-y-4">
@@ -180,39 +141,51 @@ export default function MySpace() {
                 <CardDescription>Documents que vous avez consultés récemment</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {readingHistory.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
-                      onClick={() => navigate(`/book-reader/${item.id}`)}
-                    >
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{item.title}</h3>
-                        <p className="text-sm text-muted-foreground">{item.author}</p>
-                        <div className="flex items-center gap-4 mt-2">
-                          <Badge variant="outline">{item.category}</Badge>
-                          <span className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {new Date(item.lastRead).toLocaleDateString('fr-FR')}
-                          </span>
-                          <span className="text-sm text-muted-foreground">{item.pages} pages</span>
+                {loading ? (
+                  <p className="text-center text-muted-foreground py-8">Chargement...</p>
+                ) : readingHistory.length === 0 ? (
+                  <div className="text-center py-12">
+                    <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Aucune lecture récente</p>
+                    <Button className="mt-4" onClick={() => navigate("/digital-library")}>
+                      Parcourir la bibliothèque
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {readingHistory.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
+                        onClick={() => navigate(item.content_id ? `/digital-library/document/${item.content_id}` : `/manuscripts/${item.manuscript_id}`)}
+                      >
+                        {item.thumbnail_url ? (
+                          <img src={item.thumbnail_url} alt={item.title} className="w-16 h-20 object-cover rounded flex-shrink-0" />
+                        ) : (
+                          <div className="w-16 h-20 bg-muted rounded flex-shrink-0 flex items-center justify-center">
+                            <BookOpen className="h-8 w-8 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{item.title}</h3>
+                          {item.author && <p className="text-sm text-muted-foreground">{item.author}</p>}
+                          <div className="flex items-center gap-4 mt-2">
+                            <Badge variant="outline">{item.content_type}</Badge>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(item.created_at).toLocaleDateString('fr-FR')}
+                            </span>
+                            {item.reading_progress !== null && item.reading_progress > 0 && (
+                              <span className="text-sm text-muted-foreground">
+                                {Math.round(item.reading_progress)}% lu
+                              </span>
+                            )}
+                          </div>
                         </div>
+                        <Button size="sm">Reprendre</Button>
                       </div>
-                      <div className="ml-4 w-32">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium">{item.progress}%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-primary h-2 rounded-full transition-all"
-                            style={{ width: `${item.progress}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -225,41 +198,51 @@ export default function MySpace() {
                 <CardDescription>Documents que vous avez ajoutés à vos favoris</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {favorites.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{item.title}</h3>
-                        <p className="text-sm text-muted-foreground">{item.author}</p>
-                        <div className="flex items-center gap-4 mt-2">
-                          <Badge variant="outline">{item.category}</Badge>
-                          <span className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            Ajouté le {new Date(item.addedDate).toLocaleDateString('fr-FR')}
-                          </span>
-                          {item.available ? (
-                            <Badge variant="default">Disponible</Badge>
-                          ) : (
-                            <Badge variant="destructive">Indisponible</Badge>
-                          )}
+                {loading ? (
+                  <p className="text-center text-muted-foreground py-8">Chargement...</p>
+                ) : favorites.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Aucun favori</p>
+                    <Button className="mt-4" onClick={() => navigate("/digital-library")}>
+                      Parcourir la bibliothèque
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {favorites.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                      >
+                        {item.thumbnail_url ? (
+                          <img src={item.thumbnail_url} alt={item.title} className="w-16 h-20 object-cover rounded flex-shrink-0" />
+                        ) : (
+                          <div className="w-16 h-20 bg-muted rounded flex-shrink-0 flex items-center justify-center">
+                            <BookOpen className="h-8 w-8 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{item.title}</h3>
+                          {item.author && <p className="text-sm text-muted-foreground">{item.author}</p>}
+                          <div className="flex items-center gap-4 mt-2">
+                            <Badge variant="outline">{item.content_type}</Badge>
+                            <span className="text-sm text-muted-foreground">
+                              Ajouté le {new Date(item.created_at).toLocaleDateString('fr-FR')}
+                            </span>
+                          </div>
+                          {item.notes && <p className="text-xs text-muted-foreground italic mt-2">{item.notes}</p>}
                         </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <Heart className="h-4 w-4 mr-1 fill-red-500 text-red-500" />
-                          Retirer
-                        </Button>
-                        <Button size="sm" disabled={!item.available}>
-                          <BookOpen className="h-4 w-4 mr-1" />
+                        <Button
+                          size="sm"
+                          onClick={() => navigate(item.content_id ? `/digital-library/document/${item.content_id}` : `/manuscripts/${item.manuscript_id}`)}
+                        >
                           Consulter
                         </Button>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -272,35 +255,41 @@ export default function MySpace() {
                 <CardDescription>Documents téléchargés disponibles pour consultation hors ligne</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {downloads.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{item.title}</h3>
-                        <div className="flex items-center gap-4 mt-2">
-                          <Badge variant="outline">{item.format}</Badge>
-                          <span className="text-sm text-muted-foreground">{item.size}</span>
-                          <span className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            Téléchargé le {new Date(item.downloadDate).toLocaleDateString('fr-FR')}
-                          </span>
+                {loading ? (
+                  <p className="text-center text-muted-foreground py-8">Chargement...</p>
+                ) : downloads.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Download className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Aucun téléchargement</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {downloads.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                      >
+                        {item.thumbnail_url ? (
+                          <img src={item.thumbnail_url} alt={item.title} className="w-16 h-20 object-cover rounded flex-shrink-0" />
+                        ) : (
+                          <div className="w-16 h-20 bg-muted rounded flex-shrink-0 flex items-center justify-center">
+                            <Download className="h-8 w-8 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{item.title}</h3>
+                          {item.author && <p className="text-sm text-muted-foreground">{item.author}</p>}
+                          <div className="flex items-center gap-4 mt-2">
+                            <Badge variant="outline">{item.content_type}</Badge>
+                            <span className="text-sm text-muted-foreground">
+                              Téléchargé le {new Date(item.created_at).toLocaleDateString('fr-FR')}
+                            </span>
+                          </div>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Expire le {new Date(item.expiresDate).toLocaleDateString('fr-FR')}
-                        </p>
                       </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <Download className="h-4 w-4 mr-1" />
-                          Re-télécharger
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
