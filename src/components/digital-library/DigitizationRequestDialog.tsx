@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileText, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
 import {
   Dialog,
   DialogContent,
@@ -207,7 +208,11 @@ export function DigitizationRequestDialog({
                 <FormItem>
                   <FormLabel>Titre du document *</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Entrez le titre du document" />
+                    <TitleAutocomplete
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Rechercher un titre de document..."
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

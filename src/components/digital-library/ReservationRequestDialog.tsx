@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { CalendarIcon, Calendar as CalendarIconLucide } from "lucide-react";
 import { toast } from "sonner";
+import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
 import {
   Dialog,
   DialogContent,
@@ -182,11 +183,11 @@ export function ReservationRequestDialog({
                 <FormItem>
                   <FormLabel>Titre du document</FormLabel>
                   <FormControl>
-                    <Input 
-                      {...field} 
-                      disabled={!!documentTitle} 
-                      className={documentTitle ? "bg-muted" : ""}
-                      placeholder="Entrez le titre du document à réserver"
+                    <TitleAutocomplete
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Rechercher un titre de document..."
+                      className={documentTitle ? "pointer-events-none opacity-60" : ""}
                     />
                   </FormControl>
                   <FormMessage />
