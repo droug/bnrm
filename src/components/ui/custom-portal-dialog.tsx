@@ -39,14 +39,16 @@ export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialog
       <>
         {/* Overlay */}
         <div 
-          className="dialog-overlay fixed inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in-0"
+          className="dialog-overlay fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm animate-in fade-in-0"
         />
         
         {/* Content */}
         <div
           ref={ref}
+          role="dialog"
+          aria-modal="true"
           className={cn(
-            "dialog-content fixed left-[50%] top-[50%] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 sm:rounded-lg max-h-[90vh] overflow-y-auto",
+            "dialog-content fixed left-[50%] top-[50%] z-[61] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 sm:rounded-lg max-h-[90vh] overflow-y-auto",
             className
           )}
           {...props}
