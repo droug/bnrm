@@ -26,7 +26,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Loader2, Download, ExternalLink, UserPlus } from "lucide-react";
+import { Loader2, Download, ExternalLink, UserPlus, Eye, Check, X } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -63,7 +63,7 @@ export function DigitizationRequestsTable() {
   const [filteredRequests, setFilteredRequests] = useState<DigitizationRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<DigitizationRequest | null>(null);
 
   useEffect(() => {
@@ -319,21 +319,46 @@ export function DigitizationRequestsTable() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Select
-                        value={request.status}
-                        onValueChange={(value) => handleStatusChange(request.id, value)}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedRequest(request);
+                          setShowDetailsDialog(true);
+                        }}
                       >
-                        <SelectTrigger className="w-[140px] h-8">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="en_attente">En attente</SelectItem>
-                          <SelectItem value="en_cours">En cours</SelectItem>
-                          <SelectItem value="approuve">Approuvé</SelectItem>
-                          <SelectItem value="rejete">Rejeté</SelectItem>
-                          <SelectItem value="termine">Terminé</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        <Eye className="h-4 w-4 mr-1" />
+                        Détails
+                      </Button>
+                      {request.status === "en_attente" && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => handleStatusChange(request.id, "en_cours")}
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            Approuver
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleStatusChange(request.id, "rejete")}
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Rejeter
+                          </Button>
+                        </>
+                      )}
+                      {request.status === "en_cours" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleStatusChange(request.id, "termine")}
+                        >
+                          Marquer terminé
+                        </Button>
+                      )}
                       {request.attachment_url && (
                         <Button
                           size="sm"
@@ -351,6 +376,102 @@ export function DigitizationRequestsTable() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Details Dialog */}
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Détails de la demande de numérisation</DialogTitle>
+          </DialogHeader>
+          {selectedRequest && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Lecteur</Label>
+                  <p className="font-medium">{selectedRequest.user_name}</p>
+                  <p className="text-sm text-muted-foreground">{selectedRequest.user_email}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Statut</Label>
+                  <div className="mt-1">
+                    <Badge variant={STATUS_LABELS[selectedRequest.status]?.variant || "default"}>
+                      {STATUS_LABELS[selectedRequest.status]?.label || selectedRequest.status}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <Label className="text-muted-foreground">Document demandé</Label>
+                <p className="font-medium">{selectedRequest.document_title}</p>
+                {selectedRequest.document_cote && (
+                  <p className="text-sm text-muted-foreground">Cote: {selectedRequest.document_cote}</p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Nombre de pages</Label>
+                  <p className="font-medium">{selectedRequest.pages_count} pages</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Type d'utilisation</Label>
+                  <p className="font-medium">
+                    {USAGE_TYPES[selectedRequest.usage_type as keyof typeof USAGE_TYPES] || selectedRequest.usage_type}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-muted-foreground">Justification</Label>
+                <p className="text-sm mt-1">{selectedRequest.justification}</p>
+              </div>
+
+              {selectedRequest.attachment_url && (
+                <div>
+                  <Label className="text-muted-foreground">Pièce jointe</Label>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="mt-2"
+                    onClick={() => window.open(selectedRequest.attachment_url!, "_blank")}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Télécharger la pièce jointe
+                  </Button>
+                </div>
+              )}
+
+              {selectedRequest.admin_notes && (
+                <div>
+                  <Label className="text-muted-foreground">Notes administrateur</Label>
+                  <p className="text-sm mt-1">{selectedRequest.admin_notes}</p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                <div>
+                  <Label className="text-muted-foreground">Date de création</Label>
+                  <p className="text-sm">
+                    {format(new Date(selectedRequest.created_at), "dd/MM/yyyy HH:mm", { locale: fr })}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Dernière modification</Label>
+                  <p className="text-sm">
+                    {format(new Date(selectedRequest.updated_at), "dd/MM/yyyy HH:mm", { locale: fr })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
+              Fermer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

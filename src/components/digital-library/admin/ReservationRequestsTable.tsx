@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Check, X, Archive, Download, Loader2 } from "lucide-react";
+import { Check, X, Archive, Download, Loader2, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -61,6 +61,7 @@ export function ReservationRequestsTable() {
   const [isLoading, setIsLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<ReservationRequest | null>(null);
   const [rejectReason, setRejectReason] = useState("");
 
@@ -358,6 +359,17 @@ export function ReservationRequestsTable() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedRequest(request);
+                          setShowDetailsDialog(true);
+                        }}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        Détails
+                      </Button>
                       {request.status === "en_attente" && (
                         <>
                           <Button
@@ -431,6 +443,89 @@ export function ReservationRequestsTable() {
             </Button>
             <Button variant="destructive" onClick={handleReject}>
               Confirmer le refus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Details Dialog */}
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Détails de la demande de réservation</DialogTitle>
+          </DialogHeader>
+          {selectedRequest && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Lecteur</Label>
+                  <p className="font-medium">{selectedRequest.user_name}</p>
+                  <p className="text-sm text-muted-foreground">{selectedRequest.user_email}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Statut</Label>
+                  <div className="mt-1">
+                    <Badge variant={STATUS_LABELS[selectedRequest.status]?.variant || "default"}>
+                      {STATUS_LABELS[selectedRequest.status]?.label || selectedRequest.status}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <Label className="text-muted-foreground">Document demandé</Label>
+                <p className="font-medium">{selectedRequest.document_title}</p>
+                {selectedRequest.document_cote && (
+                  <p className="text-sm text-muted-foreground">Cote: {selectedRequest.document_cote}</p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Date souhaitée</Label>
+                  <p className="font-medium">
+                    {format(new Date(selectedRequest.requested_date), "dd/MM/yyyy", { locale: fr })}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Heure souhaitée</Label>
+                  <p className="font-medium">{selectedRequest.requested_time}</p>
+                </div>
+              </div>
+
+              {selectedRequest.comments && (
+                <div>
+                  <Label className="text-muted-foreground">Commentaire du lecteur</Label>
+                  <p className="text-sm mt-1">{selectedRequest.comments}</p>
+                </div>
+              )}
+
+              {selectedRequest.admin_comments && (
+                <div>
+                  <Label className="text-muted-foreground">Commentaire administrateur</Label>
+                  <p className="text-sm mt-1">{selectedRequest.admin_comments}</p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                <div>
+                  <Label className="text-muted-foreground">Date de création</Label>
+                  <p className="text-sm">
+                    {format(new Date(selectedRequest.created_at), "dd/MM/yyyy HH:mm", { locale: fr })}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Dernière modification</Label>
+                  <p className="text-sm">
+                    {format(new Date(selectedRequest.updated_at), "dd/MM/yyyy HH:mm", { locale: fr })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
+              Fermer
             </Button>
           </DialogFooter>
         </DialogContent>
