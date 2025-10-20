@@ -5,6 +5,8 @@ import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, Ch
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import GlobalSearchBar from "@/components/GlobalSearchBar";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import Footer from "@/components/Footer";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,39 +61,44 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top Navigation Bar */}
-      <nav className="bg-card border-b sticky top-0 z-50 shadow-sm">
+      <nav className="bg-card border-b sticky top-0 z-50 shadow-sm" role="navigation" aria-label="Navigation principale">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Logo and Title */}
-            <div className="flex items-center gap-3">
-              <BookOpen className="h-8 w-8 text-primary" />
+            <Link to="/digital-library" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <BookOpen className="h-8 w-8 text-primary" aria-hidden="true" />
               <div>
                 <h1 className="text-lg font-bold text-foreground">Bibliothèque Numérique</h1>
                 <p className="text-xs text-muted-foreground">BNRM - Patrimoine Numérique du Maroc</p>
               </div>
-            </div>
+            </Link>
 
-            {/* Language Selector */}
+            {/* Language Selector & Theme Switcher */}
             <div className="flex items-center gap-2">
-              {languages.map((lang) => (
-                <Button
-                  key={lang.code}
-                  variant={language === lang.code ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setLanguage(lang.code as Language)}
-                  className="text-xs"
-                >
-                  {lang.label}
-                </Button>
-              ))}
+              <div className="flex items-center gap-1" role="group" aria-label="Sélection de langue">
+                {languages.map((lang) => (
+                  <Button
+                    key={lang.code}
+                    variant={language === lang.code ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setLanguage(lang.code as Language)}
+                    className="text-xs"
+                    aria-label={`Changer la langue en ${lang.label}`}
+                    aria-pressed={language === lang.code}
+                  >
+                    {lang.label}
+                  </Button>
+                ))}
+              </div>
+              <ThemeSwitcher />
             </div>
           </div>
 
           {/* Main Menu */}
-          <div className="flex items-center gap-1 mt-3 overflow-x-auto">
+          <div className="flex items-center gap-1 mt-3 overflow-x-auto" role="menubar" aria-label="Menu principal">
             <Link to="/digital-library">
-              <Button variant="ghost" size="sm" className="gap-2 text-sm">
-                <Home className="h-4 w-4" />
+              <Button variant="ghost" size="sm" className="gap-2 text-sm" role="menuitem">
+                <Home className="h-4 w-4" aria-hidden="true" />
                 Accueil
               </Button>
             </Link>
@@ -99,13 +106,13 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             {/* Collections Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 text-sm">
-                  <BookOpen className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="gap-2 text-sm" role="menuitem" aria-haspopup="true">
+                  <BookOpen className="h-4 w-4" aria-hidden="true" />
                   Collections
-                  <ChevronDown className="h-3 w-3" />
+                  <ChevronDown className="h-3 w-3" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
+              <DropdownMenuContent align="start" role="menu" aria-label="Sous-menu Collections">
                 {collectionsSubmenu.map((item) => (
                   <Link key={item.href} to={item.href}>
                     <DropdownMenuItem className="gap-2 cursor-pointer">
@@ -203,57 +210,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
       </main>
 
       {/* Footer */}
-      <footer className="bg-card border-t mt-12">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* About BNRM */}
-            <div>
-              <h3 className="font-bold text-foreground mb-3">À propos de la BNRM</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/about" className="hover:text-primary">Mission et historique</Link></li>
-                <li><Link to="/partners" className="hover:text-primary">Nos partenaires</Link></li>
-                <li><Link to="/team" className="hover:text-primary">L'équipe</Link></li>
-              </ul>
-            </div>
-
-            {/* Legal */}
-            <div>
-              <h3 className="font-bold text-foreground mb-3">Mentions légales</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/legal/copyright" className="hover:text-primary">Droits d'auteur</Link></li>
-                <li><Link to="/legal/accessibility" className="hover:text-primary">Accessibilité RGAA</Link></li>
-                <li><Link to="/legal/terms" className="hover:text-primary">Conditions d'utilisation</Link></li>
-                <li><Link to="/legal/privacy" className="hover:text-primary">Politique de confidentialité</Link></li>
-              </ul>
-            </div>
-
-            {/* Support */}
-            <div>
-              <h3 className="font-bold text-foreground mb-3">Contact / Support</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/contact" className="hover:text-primary">Nous contacter</Link></li>
-                <li><Link to="/digital-library/help" className="hover:text-primary">Centre d'aide</Link></li>
-                <li><Link to="/feedback" className="hover:text-primary">Votre avis</Link></li>
-              </ul>
-            </div>
-
-            {/* Social */}
-            <div>
-              <h3 className="font-bold text-foreground mb-3">Suivez-nous</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary">Facebook</a></li>
-                <li><a href="#" className="hover:text-primary">Twitter</a></li>
-                <li><a href="#" className="hover:text-primary">LinkedIn</a></li>
-                <li><a href="#" className="hover:text-primary">YouTube</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-8 pt-6 border-t text-center text-sm text-muted-foreground">
-            <p>© 2025 Bibliothèque Nationale du Royaume du Maroc - Tous droits réservés</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

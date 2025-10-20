@@ -143,8 +143,17 @@ export default function GlobalSearchBar() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="w-full pr-24 pl-10"
+              aria-label="Barre de recherche globale"
+              aria-describedby="search-help"
+              role="searchbox"
+              aria-autocomplete="list"
+              aria-controls="search-suggestions"
+              aria-expanded={open}
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <span id="search-help" className="sr-only">
+              Tapez au moins 2 caractères pour voir les suggestions
+            </span>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
             {loading && (
               <Loader2 className="absolute right-16 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
             )}
@@ -158,15 +167,24 @@ export default function GlobalSearchBar() {
           </div>
         </PopoverTrigger>
         {suggestions.length > 0 && (
-          <PopoverContent className="w-full p-0" align="start" sideOffset={5}>
+          <PopoverContent 
+            className="w-full p-0" 
+            align="start" 
+            sideOffset={5}
+            id="search-suggestions"
+            role="listbox"
+            aria-label="Suggestions de recherche"
+          >
             <Command>
               <CommandList>
-                <CommandGroup heading="Suggestions rapides">
+                <CommandGroup heading="Suggestions rapides" role="group">
                   {suggestions.map((suggestion) => (
                     <CommandItem
                       key={suggestion.id}
                       onSelect={() => handleSuggestionClick(suggestion)}
                       className="flex items-center justify-between cursor-pointer"
+                      role="option"
+                      aria-label={`${suggestion.title} - ${suggestion.typeLabel}`}
                     >
                       <span className="truncate flex-1">{suggestion.title}</span>
                       <Badge variant="outline" className="ml-2 text-xs">
