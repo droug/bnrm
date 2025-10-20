@@ -4139,6 +4139,63 @@ export type Database = {
           },
         ]
       }
+      reservations_requests: {
+        Row: {
+          admin_comments: string | null
+          comments: string | null
+          created_at: string
+          document_cote: string | null
+          document_id: string
+          document_title: string
+          id: string
+          requested_date: string
+          requested_time: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_email: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          admin_comments?: string | null
+          comments?: string | null
+          created_at?: string
+          document_cote?: string | null
+          document_id: string
+          document_title: string
+          id?: string
+          requested_date: string
+          requested_time: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_email: string
+          user_id: string
+          user_name: string
+        }
+        Update: {
+          admin_comments?: string | null
+          comments?: string | null
+          created_at?: string
+          document_cote?: string | null
+          document_id?: string
+          document_title?: string
+          id?: string
+          requested_date?: string
+          requested_time?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_email?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
       reserved_number_ranges: {
         Row: {
           created_at: string | null

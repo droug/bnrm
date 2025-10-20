@@ -22,6 +22,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
 
 interface DocumentMetadata {
   dc_creator?: string;
@@ -41,13 +43,20 @@ interface DocumentMetadata {
 export default function DocumentDetails() {
   const { documentId } = useParams<{ documentId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [document, setDocument] = useState<any>(null);
   const [isManuscript, setIsManuscript] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [showReservationDialog, setShowReservationDialog] = useState(false);
+
 
   useEffect(() => {
     loadDocument();
-  }, [documentId]);
+    if (user) {
+      loadUserProfile();
+    }
+  }, [documentId, user]);
 
   const loadDocument = async () => {
     if (!documentId) return;
@@ -84,6 +93,30 @@ export default function DocumentDetails() {
       toast.error("Erreur lors du chargement du document");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadUserProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      
+      setUserProfile({
+        firstName: data?.first_name || '',
+        lastName: data?.last_name || '',
+        email: authUser?.email || '',
+      });
+    } catch (error) {
+      console.error('Error loading user profile:', error);
     }
   };
 
@@ -163,6 +196,7 @@ export default function DocumentDetails() {
   const metadata: DocumentMetadata = document.metadata || {};
   const canDownload = document.download_enabled !== false && document.allow_download !== false;
   const canRead = document.file_url || document.digital_copy_url;
+  const canReserve = !canRead && user && userProfile;
 
   return (
     <DigitalLibraryLayout>
@@ -412,6 +446,17 @@ export default function DocumentDetails() {
                   <Share2 className="h-4 w-4 mr-2" />
                   Partager
                 </Button>
+
+                {canReserve && (
+                  <Button 
+                    onClick={() => setShowReservationDialog(true)} 
+                    variant="secondary" 
+                    className="w-full"
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Réserver ce document
+                  </Button>
+                )}
               </CardContent>
             </Card>
 
@@ -462,6 +507,18 @@ export default function DocumentDetails() {
           </div>
         </div>
       </div>
+
+      {/* Dialog de réservation */}
+      {showReservationDialog && userProfile && (
+        <ReservationRequestDialog
+          isOpen={showReservationDialog}
+          onClose={() => setShowReservationDialog(false)}
+          documentId={documentId || ''}
+          documentTitle={document.title}
+          documentCote={document.cote || document.inventory_number}
+          userProfile={userProfile}
+        />
+      )}
     </DigitalLibraryLayout>
   );
 }

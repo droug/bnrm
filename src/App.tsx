@@ -89,6 +89,7 @@ const MySpace = lazy(() => import("./pages/digital-library/MySpace"));
 const MyLoans = lazy(() => import("./pages/digital-library/MyLoans"));
 const MyNotes = lazy(() => import("./pages/digital-library/MyNotes"));
 const AccountSettings = lazy(() => import("./pages/digital-library/AccountSettings"));
+const UserReservations = lazy(() => import("./pages/digital-library/UserReservations"));
 const DigitalLibraryDocuments = lazy(() => import("./pages/DigitalLibraryDocuments"));
 const DigitalLibraryUsers = lazy(() => import("./pages/DigitalLibraryUsers"));
 const DigitalLibraryAnalytics = lazy(() => import("./pages/DigitalLibraryAnalytics"));
@@ -202,6 +203,7 @@ const App = () => (
           <Route path="/digital-library/my-space" element={<MySpace />} />
           <Route path="/digital-library/my-loans" element={<MyLoans />} />
           <Route path="/digital-library/my-notes" element={<MyNotes />} />
+          <Route path="/digital-library/mes-reservations" element={<UserReservations />} />
           <Route path="/digital-library/account-settings" element={<AccountSettings />} />
         <Route path="/book-reader/:id" element={<BookReader />} />
         <Route path="/reproduction" element={<ReproductionPage />} />
