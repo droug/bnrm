@@ -1,9 +1,17 @@
 import { ReactNode } from "react";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
-import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings } from "lucide-react";
+import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 
 interface DigitalLibraryLayoutProps {
   children: ReactNode;
@@ -13,29 +21,36 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const { t, language, setLanguage } = useLanguage();
   const { isAuthenticated, isLibrarian } = useAccessControl();
 
-  const mainMenu = [
-    { label: "Accueil", href: "/digital-library", icon: Book },
-    { label: "Collections", href: "/digital-library/collections", icon: BookOpen },
-    { label: "Recherche avancée", href: "/digital-library/search", icon: Search },
-    { label: "Explorer par thème", href: "/digital-library/themes", icon: Globe },
-    { label: "Actualités & Événements", href: "/digital-library/news", icon: Calendar },
-    { label: "Aide & FAQ", href: "/digital-library/help", icon: HelpCircle },
+  const collectionsSubmenu = [
+    { label: "Livres numériques", href: "/digital-library/collections/books", icon: Book },
+    { label: "Revues et périodiques", href: "/digital-library/collections/periodicals", icon: FileText },
+    { label: "Manuscrits numérisés", href: "/digital-library/collections/manuscripts", icon: BookOpen },
+    { label: "Photographies et cartes", href: "/digital-library/collections/photos", icon: Image },
+    { label: "Archives sonores et audiovisuelles", href: "/digital-library/collections/audiovisual", icon: Music },
+  ];
+
+  const themesSubmenu = [
+    { label: "Histoire & Patrimoine", href: "/digital-library/themes/history" },
+    { label: "Arts & Culture", href: "/digital-library/themes/arts" },
+    { label: "Sciences & Techniques", href: "/digital-library/themes/sciences" },
+    { label: "Religion & Philosophie", href: "/digital-library/themes/religion" },
+    { label: "Littérature & Poésie", href: "/digital-library/themes/literature" },
   ];
 
   const userMenu = isAuthenticated ? [
     { label: "Mon espace personnel", href: "/digital-library/my-space" },
     { label: "Mes emprunts numériques", href: "/digital-library/my-loans" },
     { label: "Mes annotations", href: "/digital-library/my-notes" },
-    { label: "Paramètres du compte", href: "/settings" },
+    { label: "Paramètres du compte", href: "/digital-library/account-settings" },
   ] : [];
 
   const adminMenu = isLibrarian ? [
-    { label: "Tableau de bord", href: "/admin/digital-library" },
-    { label: "Gestion des collections", href: "/admin/digital-library/documents" },
-    { label: "Import & Catalogage", href: "/admin/digital-library/bulk-import" },
-    { label: "Utilisateurs & droits", href: "/admin/digital-library/users" },
-    { label: "Statistiques et rapports", href: "/admin/digital-library/analytics" },
-    { label: "Paramètres techniques", href: "/admin/digital-library/settings" },
+    { label: "Tableau de bord", href: "/digital-library-backoffice" },
+    { label: "Gestion des collections", href: "/digital-library-documents" },
+    { label: "Import & Catalogage", href: "/digital-library-bulk-import" },
+    { label: "Utilisateurs & droits", href: "/digital-library-users" },
+    { label: "Statistiques et rapports", href: "/digital-library-analytics" },
+    { label: "Paramètres techniques", href: "/digital-library-backoffice" },
   ] : [];
 
   const languages = [
@@ -78,14 +93,74 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
 
           {/* Main Menu */}
           <div className="flex items-center gap-1 mt-3 overflow-x-auto">
-            {mainMenu.map((item) => (
-              <Link key={item.href} to={item.href}>
+            <Link to="/digital-library">
+              <Button variant="ghost" size="sm" className="gap-2 text-sm">
+                <Home className="h-4 w-4" />
+                Accueil
+              </Button>
+            </Link>
+
+            {/* Collections Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-2 text-sm">
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
+                  <BookOpen className="h-4 w-4" />
+                  Collections
+                  <ChevronDown className="h-3 w-3" />
                 </Button>
-              </Link>
-            ))}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                {collectionsSubmenu.map((item) => (
+                  <Link key={item.href} to={item.href}>
+                    <DropdownMenuItem className="gap-2 cursor-pointer">
+                      <item.icon className="h-4 w-4" />
+                      {item.label}
+                    </DropdownMenuItem>
+                  </Link>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Link to="/digital-library/search">
+              <Button variant="ghost" size="sm" className="gap-2 text-sm">
+                <Search className="h-4 w-4" />
+                Recherche avancée
+              </Button>
+            </Link>
+
+            {/* Themes Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2 text-sm">
+                  <Globe className="h-4 w-4" />
+                  Explorer par thème
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                {themesSubmenu.map((item) => (
+                  <Link key={item.href} to={item.href}>
+                    <DropdownMenuItem className="cursor-pointer">
+                      {item.label}
+                    </DropdownMenuItem>
+                  </Link>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Link to="/digital-library/news">
+              <Button variant="ghost" size="sm" className="gap-2 text-sm">
+                <Calendar className="h-4 w-4" />
+                Actualités & Événements
+              </Button>
+            </Link>
+
+            <Link to="/digital-library/help">
+              <Button variant="ghost" size="sm" className="gap-2 text-sm">
+                <HelpCircle className="h-4 w-4" />
+                Aide & FAQ
+              </Button>
+            </Link>
           </div>
 
           {/* User/Admin Menu */}

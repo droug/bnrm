@@ -69,7 +69,7 @@ const ProfessionalManagement = lazy(() => import("./pages/ProfessionalManagement
 const ProfessionalSignup = lazy(() => import("./pages/ProfessionalSignup"));
 
 // Digital Library (lazy)
-const DigitalLibrary = lazy(() => import("./pages/DigitalLibrary"));
+const DigitalLibraryHome = lazy(() => import("./pages/digital-library/Home"));
 const BookReader = lazy(() => import("./pages/BookReader"));
 const MyLibrarySpace = lazy(() => import("./pages/MyLibrarySpace"));
 const DigitalLibraryBackoffice = lazy(() => import("./pages/DigitalLibraryBackoffice"));
@@ -84,6 +84,7 @@ const HelpFAQ = lazy(() => import("./pages/digital-library/HelpFAQ"));
 const MySpace = lazy(() => import("./pages/digital-library/MySpace"));
 const MyLoans = lazy(() => import("./pages/digital-library/MyLoans"));
 const MyNotes = lazy(() => import("./pages/digital-library/MyNotes"));
+const AccountSettings = lazy(() => import("./pages/digital-library/AccountSettings"));
 const DigitalLibraryDocuments = lazy(() => import("./pages/DigitalLibraryDocuments"));
 const DigitalLibraryUsers = lazy(() => import("./pages/DigitalLibraryUsers"));
 const DigitalLibraryAnalytics = lazy(() => import("./pages/DigitalLibraryAnalytics"));
@@ -184,7 +185,7 @@ const App = () => (
         <Route path="/admin/committee" element={<CommitteeDashboard />} />
         <Route path="/legal-deposit/approvals" element={<LegalDepositApprovals />} />
         <Route path="/depot-legal/approbations" element={<LegalDepositApprovals />} />
-          <Route path="/digital-library" element={<DigitalLibrary />} />
+          <Route path="/digital-library" element={<DigitalLibraryHome />} />
           <Route path="/digital-library/collections" element={<Collections />} />
           <Route path="/digital-library/collections/:collectionId" element={<CollectionDetails />} />
           <Route path="/digital-library/themes" element={<Themes />} />
@@ -196,7 +197,7 @@ const App = () => (
           <Route path="/digital-library/my-space" element={<MySpace />} />
           <Route path="/digital-library/my-loans" element={<MyLoans />} />
           <Route path="/digital-library/my-notes" element={<MyNotes />} />
-        <Route path="/digital-library/:category" element={<DigitalLibrary />} />
+          <Route path="/digital-library/account-settings" element={<AccountSettings />} />
         <Route path="/book-reader/:id" element={<BookReader />} />
         <Route path="/reproduction" element={<ReproductionPage />} />
         <Route path="/reproduction/:action" element={<ReproductionPage />} />
