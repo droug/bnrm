@@ -78,6 +78,9 @@ const Themes = lazy(() => import("./pages/digital-library/Themes"));
 const AdvancedSearch = lazy(() => import("./pages/digital-library/AdvancedSearch"));
 const NewsEvents = lazy(() => import("./pages/digital-library/NewsEvents"));
 const HelpFAQ = lazy(() => import("./pages/digital-library/HelpFAQ"));
+const MySpace = lazy(() => import("./pages/digital-library/MySpace"));
+const MyLoans = lazy(() => import("./pages/digital-library/MyLoans"));
+const MyNotes = lazy(() => import("./pages/digital-library/MyNotes"));
 const DigitalLibraryDocuments = lazy(() => import("./pages/DigitalLibraryDocuments"));
 const DigitalLibraryUsers = lazy(() => import("./pages/DigitalLibraryUsers"));
 const DigitalLibraryAnalytics = lazy(() => import("./pages/DigitalLibraryAnalytics"));
@@ -184,6 +187,9 @@ const App = () => (
           <Route path="/digital-library/search" element={<AdvancedSearch />} />
           <Route path="/digital-library/news" element={<NewsEvents />} />
           <Route path="/digital-library/help" element={<HelpFAQ />} />
+          <Route path="/digital-library/my-space" element={<MySpace />} />
+          <Route path="/digital-library/my-loans" element={<MyLoans />} />
+          <Route path="/digital-library/my-notes" element={<MyNotes />} />
         <Route path="/digital-library/:category" element={<DigitalLibrary />} />
         <Route path="/book-reader/:id" element={<BookReader />} />
         <Route path="/reproduction" element={<ReproductionPage />} />
