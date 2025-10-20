@@ -42,12 +42,21 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
         .from("profiles")
         .select("*")
         .eq("id", session.user.id)
-        .single();
+        .maybeSingle();
 
+      // Utiliser les données du profil ou les métadonnées de l'utilisateur comme fallback
       if (data && !error) {
         setUserProfile({
           firstName: data.first_name || "",
           lastName: data.last_name || "",
+          email: session.user.email || "",
+        });
+      } else {
+        // Fallback sur les métadonnées de l'utilisateur
+        const metadata = session.user.user_metadata;
+        setUserProfile({
+          firstName: metadata?.first_name || "",
+          lastName: metadata?.last_name || "",
           email: session.user.email || "",
         });
       }
