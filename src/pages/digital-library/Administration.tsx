@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, Database, Users, Upload, BarChart3, FileImage,
-  Shield, Copyright, Settings, FileText, BookOpen, Image, Bell
+  Shield, Copyright, Settings, Image
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -119,29 +119,6 @@ export default function Administration() {
     },
   ];
 
-  const otherAdminModules = [
-    {
-      title: "Gestion du contenu",
-      description: "Pages et actualités",
-      icon: FileText,
-      path: "/admin/content-management",
-      color: "bg-teal-100 text-teal-600",
-    },
-    {
-      title: "Dépôt légal",
-      description: "Gestion des demandes",
-      icon: BookOpen,
-      path: "/admin/legal-deposit",
-      color: "bg-violet-100 text-violet-600",
-    },
-    {
-      title: "Gestion des emails",
-      description: "Templates et campagnes",
-      icon: Bell,
-      path: "/admin/email-management",
-      color: "bg-emerald-100 text-emerald-600",
-    },
-  ];
 
   return (
     <DigitalLibraryLayout>
@@ -185,39 +162,6 @@ export default function Administration() {
             ))}
           </div>
         </div>
-
-        {/* Other Admin Modules */}
-        {isAdmin && (
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Autres modules</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {otherAdminModules.map((module, index) => (
-                <Card
-                  key={index}
-                  className="hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => navigate(module.path)}
-                >
-                  <CardHeader>
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-lg ${module.color}`}>
-                        <module.icon className="h-6 w-6" />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-lg">{module.title}</CardTitle>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>{module.description}</CardDescription>
-                    <Button variant="outline" className="w-full mt-4">
-                      Accéder
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </DigitalLibraryLayout>
   );
