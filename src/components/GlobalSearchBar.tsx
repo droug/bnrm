@@ -24,7 +24,7 @@ interface QuickSuggestion {
   typeLabel: string;
 }
 
-export default function SearchBar() {
+export default function GlobalSearchBar() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<QuickSuggestion[]>([]);

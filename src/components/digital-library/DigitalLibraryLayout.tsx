@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import GlobalSearchBar from "@/components/GlobalSearchBar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -161,6 +162,11 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 Aide & FAQ
               </Button>
             </Link>
+          </div>
+
+          {/* Barre de recherche globale */}
+          <div className="mt-4">
+            <GlobalSearchBar />
           </div>
 
           {/* User/Admin Menu */}
