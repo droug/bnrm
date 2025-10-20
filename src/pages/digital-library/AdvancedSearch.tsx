@@ -7,6 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
+import { AuthorAutocomplete } from "@/components/ui/author-autocomplete";
+import { LanguageAutocomplete } from "@/components/ui/language-autocomplete";
 
 export default function AdvancedSearch() {
   const navigate = useNavigate();
@@ -64,27 +67,21 @@ export default function AdvancedSearch() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Author */}
-              <div className="space-y-2">
-                <Label htmlFor="author">Auteur</Label>
-                <Input
-                  id="author"
-                  placeholder="Nom de l'auteur"
-                  value={formData.author}
-                  onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                />
-              </div>
+              {/* Author - with autocomplete */}
+              <AuthorAutocomplete
+                label="Auteur"
+                placeholder="Nom de l'auteur"
+                value={formData.author}
+                onChange={(value) => setFormData({ ...formData, author: value })}
+              />
 
-              {/* Title */}
-              <div className="space-y-2">
-                <Label htmlFor="title">Titre</Label>
-                <Input
-                  id="title"
-                  placeholder="Titre du document"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                />
-              </div>
+              {/* Title - with autocomplete */}
+              <TitleAutocomplete
+                label="Titre"
+                placeholder="Titre du document"
+                value={formData.title}
+                onChange={(value) => setFormData({ ...formData, title: value })}
+              />
 
               {/* Subject */}
               <div className="space-y-2">
@@ -110,25 +107,12 @@ export default function AdvancedSearch() {
 
               {/* Language and Type */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="language">Langue</Label>
-                  <Select
-                    value={formData.language}
-                    onValueChange={(value) => setFormData({ ...formData, language: value })}
-                  >
-                    <SelectTrigger id="language">
-                      <SelectValue placeholder="Sélectionner une langue" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ar">Arabe</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="en">Anglais</SelectItem>
-                      <SelectItem value="ber">Amazigh</SelectItem>
-                      <SelectItem value="es">Espagnol</SelectItem>
-                      <SelectItem value="he">Hébreu</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <LanguageAutocomplete
+                  label="Langue"
+                  placeholder="Sélectionner une langue"
+                  value={formData.language}
+                  onChange={(value) => setFormData({ ...formData, language: value })}
+                />
 
                 <div className="space-y-2">
                   <Label htmlFor="documentType">Type de document</Label>
