@@ -38,7 +38,55 @@ export default function MyNotes() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setNotes(data || []);
+      
+      // Use mock data if no real data exists
+      setNotes(data && data.length > 0 ? data : [
+        {
+          id: "note-1",
+          page_number: 45,
+          note: "Concept fondamental de la civilisation et de l'organisation sociale selon Ibn Khaldoun. À approfondir pour la recherche sur les structures sociales médiévales.",
+          created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          user_id: user.id,
+          content_id: null,
+          manuscript_id: "demo-1",
+        },
+        {
+          id: "note-2",
+          page_number: 78,
+          note: "Analyse intéressante sur les cycles dynastiques. Lien possible avec les théories modernes de sociologie et d'anthropologie.",
+          created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+          user_id: user.id,
+          content_id: null,
+          manuscript_id: "demo-1",
+        },
+        {
+          id: "note-3",
+          page_number: 123,
+          note: "Description détaillée de Tombouctou au XIVe siècle. Source primaire importante pour l'histoire de l'Afrique de l'Ouest.",
+          created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+          user_id: user.id,
+          content_id: null,
+          manuscript_id: "demo-2",
+        },
+        {
+          id: "note-4",
+          page_number: 56,
+          note: "Dates importantes de l'indépendance à vérifier avec d'autres sources historiques.",
+          created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+          user_id: user.id,
+          content_id: "demo-3",
+          manuscript_id: null,
+        },
+        {
+          id: "note-5",
+          page_number: 89,
+          note: null,
+          created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+          user_id: user.id,
+          content_id: null,
+          manuscript_id: "demo-2",
+        },
+      ]);
     } catch (error: any) {
       console.error("Error loading notes:", error);
       toast({

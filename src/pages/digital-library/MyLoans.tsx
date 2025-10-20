@@ -31,10 +31,68 @@ export default function MyLoans() {
     
     setLoading(true);
     try {
-      // Note: Since there's no loans table in the schema, we'll show a message
+      // Note: Using mock data as there's no loans table in the schema
       // In a real implementation, you would create and query a loans table
-      setCurrentLoans([]);
-      setLoanHistory([]);
+      
+      setCurrentLoans([
+        {
+          id: 1,
+          title: "Al-Muqaddima (Les Prolégomènes)",
+          author: "Ibn Khaldoun",
+          loanDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          daysRemaining: 5,
+          renewalsLeft: 2,
+          canRenew: true,
+        },
+        {
+          id: 2,
+          title: "Rihla (Voyages)",
+          author: "Ibn Battuta",
+          loanDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          daysRemaining: 10,
+          renewalsLeft: 3,
+          canRenew: true,
+        },
+        {
+          id: 3,
+          title: "Histoire du Maroc moderne",
+          author: "Archives BNRM",
+          loanDate: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          daysRemaining: 2,
+          renewalsLeft: 0,
+          canRenew: false,
+        },
+      ]);
+
+      setLoanHistory([
+        {
+          id: 10,
+          title: "Kitab al-Shifa",
+          author: "Ibn Sina",
+          loanDate: new Date(Date.now() - 75 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          returnDate: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          status: "returned",
+        },
+        {
+          id: 11,
+          title: "Es-Saada - Journal",
+          author: "Archives nationales",
+          loanDate: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          returnDate: new Date(Date.now() - 70 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          status: "returned",
+        },
+        {
+          id: 12,
+          title: "Al-Kulliyat fi al-Tibb",
+          author: "Ibn Sina",
+          loanDate: new Date(Date.now() - 130 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          returnDate: new Date(Date.now() - 98 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          status: "late_return",
+        },
+      ]);
     } catch (error: any) {
       console.error("Error loading loans:", error);
       toast({
@@ -44,6 +102,46 @@ export default function MyLoans() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRenew = (loanId: number) => {
+    setCurrentLoans(currentLoans.map(loan => {
+      if (loan.id === loanId && loan.canRenew) {
+        const newDueDate = new Date(loan.dueDate);
+        newDueDate.setDate(newDueDate.getDate() + 30);
+        
+        toast({
+          title: "Emprunt renouvelé",
+          description: `Nouvelle date de retour : ${newDueDate.toLocaleDateString('fr-FR')}`,
+        });
+
+        return {
+          ...loan,
+          dueDate: newDueDate.toISOString().split('T')[0],
+          daysRemaining: loan.daysRemaining + 30,
+          renewalsLeft: loan.renewalsLeft - 1,
+          canRenew: loan.renewalsLeft > 1,
+        };
+      }
+      return loan;
+    }));
+  };
+
+  const getDaysRemainingBadge = (days: number) => {
+    if (days <= 3) return <Badge variant="destructive">{days} jours restants</Badge>;
+    if (days <= 7) return <Badge className="bg-amber-100 text-amber-800">{days} jours restants</Badge>;
+    return <Badge variant="default">{days} jours restants</Badge>;
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "returned":
+        return <Badge variant="default" className="gap-1"><CheckCircle className="h-3 w-3" />Retourné</Badge>;
+      case "late_return":
+        return <Badge variant="destructive" className="gap-1"><AlertCircle className="h-3 w-3" />Retour tardif</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
@@ -125,7 +223,55 @@ export default function MyLoans() {
                       Parcourir la bibliothèque
                     </Button>
                   </div>
-                ) : null}
+                ) : (
+                  <div className="space-y-4">
+                    {currentLoans.map((loan) => (
+                      <div
+                        key={loan.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                      >
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{loan.title}</h3>
+                          <p className="text-sm text-muted-foreground">{loan.author}</p>
+                          <div className="flex items-center gap-4 mt-3 flex-wrap">
+                            <span className="text-sm text-muted-foreground flex items-center gap-1">
+                              <BookOpen className="h-3 w-3" />
+                              Emprunté le {new Date(loan.loanDate).toLocaleDateString('fr-FR')}
+                            </span>
+                            <span className="text-sm text-muted-foreground flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              Retour le {new Date(loan.dueDate).toLocaleDateString('fr-FR')}
+                            </span>
+                            {getDaysRemainingBadge(loan.daysRemaining)}
+                          </div>
+                          {loan.renewalsLeft > 0 && (
+                            <p className="text-xs text-muted-foreground mt-2">
+                              {loan.renewalsLeft} renouvellement(s) disponible(s)
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2 ml-4">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => navigate(`/digital-library`)}
+                          >
+                            <BookOpen className="h-4 w-4 mr-1" />
+                            Consulter
+                          </Button>
+                          <Button
+                            size="sm"
+                            disabled={!loan.canRenew}
+                            onClick={() => handleRenew(loan.id)}
+                          >
+                            <RotateCw className="h-4 w-4 mr-1" />
+                            Renouveler
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -145,7 +291,35 @@ export default function MyLoans() {
                     <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <p className="text-muted-foreground">Aucun historique d'emprunt</p>
                   </div>
-                ) : null}
+                ) : (
+                  <div className="space-y-4">
+                    {loanHistory.map((loan) => (
+                      <div
+                        key={loan.id}
+                        className="flex items-center justify-between p-4 border rounded-lg"
+                      >
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{loan.title}</h3>
+                          <p className="text-sm text-muted-foreground">{loan.author}</p>
+                          <div className="flex items-center gap-4 mt-3 flex-wrap">
+                            <span className="text-sm text-muted-foreground flex items-center gap-1">
+                              <BookOpen className="h-3 w-3" />
+                              Du {new Date(loan.loanDate).toLocaleDateString('fr-FR')} au {new Date(loan.returnDate).toLocaleDateString('fr-FR')}
+                            </span>
+                            {getStatusBadge(loan.status)}
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => navigate(`/digital-library`)}
+                        >
+                          Emprunter à nouveau
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

@@ -42,7 +42,6 @@ export default function MySpace() {
         .limit(10);
 
       if (historyError) throw historyError;
-      setReadingHistory(historyData || []);
 
       // Load favorites
       const { data: favoritesData, error: favoritesError } = await supabase
@@ -53,7 +52,6 @@ export default function MySpace() {
         .limit(10);
 
       if (favoritesError) throw favoritesError;
-      setFavorites(favoritesData || []);
 
       // Load downloads
       const { data: downloadsData, error: downloadsError } = await supabase
@@ -65,7 +63,102 @@ export default function MySpace() {
         .limit(10);
 
       if (downloadsError) throw downloadsError;
-      setDownloads(downloadsData || []);
+
+      // Use mock data if no real data exists
+      setReadingHistory(historyData && historyData.length > 0 ? historyData : [
+        {
+          id: "mock-1",
+          title: "Al-Muqaddima (Les Prolégomènes)",
+          author: "Ibn Khaldoun",
+          content_type: "manuscript",
+          thumbnail_url: null,
+          reading_progress: 75,
+          created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          content_id: null,
+          manuscript_id: "demo-1",
+        },
+        {
+          id: "mock-2",
+          title: "Rihla (Voyages)",
+          author: "Ibn Battuta",
+          content_type: "manuscript",
+          thumbnail_url: null,
+          reading_progress: 45,
+          created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          content_id: null,
+          manuscript_id: "demo-2",
+        },
+        {
+          id: "mock-3",
+          title: "Histoire du Maroc moderne",
+          author: "Archives BNRM",
+          content_type: "book",
+          thumbnail_url: null,
+          reading_progress: 100,
+          created_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+          content_id: "demo-3",
+          manuscript_id: null,
+        },
+      ]);
+
+      setFavorites(favoritesData && favoritesData.length > 0 ? favoritesData : [
+        {
+          id: "fav-1",
+          title: "Al-Kulliyat fi al-Tibb",
+          author: "Ibn Sina",
+          content_type: "manuscript",
+          thumbnail_url: null,
+          notes: "Ouvrage médical fondamental, à consulter pour la recherche",
+          created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+          content_id: null,
+          manuscript_id: "demo-4",
+        },
+        {
+          id: "fav-2",
+          title: "Kitab al-Shifa",
+          author: "Ibn Sina",
+          content_type: "manuscript",
+          thumbnail_url: null,
+          notes: null,
+          created_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+          content_id: null,
+          manuscript_id: "demo-5",
+        },
+        {
+          id: "fav-3",
+          title: "Es-Saada - Journal historique",
+          author: "Archives nationales",
+          content_type: "periodical",
+          thumbnail_url: null,
+          notes: "Collection complète du journal",
+          created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          content_id: "demo-6",
+          manuscript_id: null,
+        },
+      ]);
+
+      setDownloads(downloadsData && downloadsData.length > 0 ? downloadsData : [
+        {
+          id: "dl-1",
+          title: "Histoire du Maroc moderne",
+          author: "Archives BNRM",
+          content_type: "PDF",
+          thumbnail_url: null,
+          created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+          content_id: "demo-3",
+          manuscript_id: null,
+        },
+        {
+          id: "dl-2",
+          title: "Photographies du Maroc colonial",
+          author: "Archives photographiques",
+          content_type: "ZIP",
+          thumbnail_url: null,
+          created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          content_id: "demo-7",
+          manuscript_id: null,
+        },
+      ]);
     } catch (error: any) {
       console.error("Error loading user data:", error);
       toast({
