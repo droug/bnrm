@@ -47,36 +47,39 @@ export default function DigitalLibraryHome() {
       try {
         const { data, error } = await supabase
           .from('content')
-          .select(`
-            id,
-            title,
-            excerpt,
-            content_type,
-            published_at,
-            file_url,
-            file_type,
-            tags,
-            author:author_id (
-              first_name,
-              last_name
-            )
-          `)
+          .select('id, title, excerpt, content_type, published_at, file_url, file_type, tags, author_id')
           .eq('status', 'published')
           .order('published_at', { ascending: false })
           .limit(6);
 
         if (data && !error) {
-          const formattedItems = data.map((item: any) => ({
-            id: item.id,
-            title: item.title,
-            author: item.author 
-              ? `${item.author.first_name || ''} ${item.author.last_name || ''}`.trim() || 'Auteur inconnu'
-              : 'Auteur inconnu',
-            type: item.content_type === 'news' ? 'Article' : item.content_type === 'event' ? 'Événement' : item.content_type === 'exhibition' ? 'Exposition' : 'Page',
-            date: item.published_at,
-            isAvailable: !!item.file_url,
-            cote: item.file_type || 'DOC',
-          }));
+          // Charger les informations des auteurs
+          const authorIds = [...new Set(data.map(item => item.author_id).filter(Boolean))];
+          const { data: authorsData } = await supabase
+            .from('profiles')
+            .select('user_id, first_name, last_name')
+            .in('user_id', authorIds);
+
+          const authorsMap = new Map(
+            authorsData?.map(author => [author.user_id, author]) || []
+          );
+
+          const formattedItems = data.map((item: any) => {
+            const author = item.author_id ? authorsMap.get(item.author_id) : null;
+            return {
+              id: item.id,
+              title: item.title,
+              author: author 
+                ? `${author.first_name || ''} ${author.last_name || ''}`.trim() || 'Auteur inconnu'
+                : 'Auteur inconnu',
+              type: item.content_type === 'news' ? 'Article' : 
+                    item.content_type === 'event' ? 'Événement' : 
+                    item.content_type === 'exhibition' ? 'Exposition' : 'Page',
+              date: item.published_at,
+              isAvailable: !!item.file_url,
+              cote: item.file_type || 'DOC',
+            };
+          });
           
           console.log('Loaded documents:', formattedItems);
           setNewItems(formattedItems);
