@@ -46,12 +46,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   ] : [];
 
   const adminMenu = isLibrarian ? [
-    { label: "Tableau de bord", href: "/digital-library-backoffice" },
-    { label: "Gestion des collections", href: "/digital-library-documents" },
-    { label: "Import & Catalogage", href: "/digital-library-bulk-import" },
-    { label: "Utilisateurs & droits", href: "/digital-library-users" },
-    { label: "Statistiques et rapports", href: "/digital-library-analytics" },
-    { label: "Paramètres techniques", href: "/digital-library-backoffice" },
+    { label: "Administration", href: "/admin/digital-library" },
   ] : [];
 
   const languages = [

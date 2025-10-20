@@ -70,6 +70,7 @@ const ProfessionalSignup = lazy(() => import("./pages/ProfessionalSignup"));
 
 // Digital Library (lazy)
 const DigitalLibraryHome = lazy(() => import("./pages/digital-library/Home"));
+const DigitalLibraryAdministration = lazy(() => import("./pages/digital-library/Administration"));
 const DigitalLibraryAdminDashboard = lazy(() => import("./pages/digital-library/AdminDashboard"));
 const DigitalLibraryAdminSettings = lazy(() => import("./pages/digital-library/AdminSettings"));
 const BookReader = lazy(() => import("./pages/BookReader"));
@@ -212,7 +213,8 @@ const App = () => (
         <Route path="/help" element={<HelpPage />} />
         <Route path="/aide" element={<HelpPage />} />
         <Route path="/admin/preservation" element={<PreservationPage />} />
-          <Route path="/admin/digital-library" element={<DigitalLibraryAdminDashboard />} />
+          <Route path="/admin/digital-library" element={<DigitalLibraryAdministration />} />
+          <Route path="/digital-library/admin" element={<DigitalLibraryAdministration />} />
           <Route path="/admin/digital-library/dashboard" element={<DigitalLibraryAdminDashboard />} />
           <Route path="/admin/digital-library/documents" element={<DigitalLibraryDocuments />} />
           <Route path="/admin/digital-library/users" element={<DigitalLibraryUsers />} />
