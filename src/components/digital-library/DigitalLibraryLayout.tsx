@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
-import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles } from "lucide-react";
+import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import GlobalSearchBar from "@/components/GlobalSearchBar";
@@ -39,6 +39,11 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
     { label: "Sciences & Techniques", href: "/digital-library/themes/sciences" },
     { label: "Religion & Philosophie", href: "/digital-library/themes/religion" },
     { label: "Littérature & Poésie", href: "/digital-library/themes/literature" },
+  ];
+
+  const servicesSubmenu = [
+    { label: "Mes demandes de réservation", href: "/digital-library/mes-reservations", icon: BookmarkCheck },
+    { label: "Mes demandes de numérisation", href: "/digital-library/mes-demandes-numerisation", icon: FileDigit },
   ];
 
   const userMenu = isAuthenticated ? [
@@ -168,6 +173,35 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 Recherche avancée
               </Button>
             </Link>
+
+            {/* Services aux lecteurs Dropdown */}
+            {isAuthenticated && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    aria-label="Services aux lecteurs"
+                    aria-haspopup="true"
+                  >
+                    <BookmarkCheck className="h-4 w-4" aria-hidden="true" />
+                    Services aux lecteurs
+                    <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label="Sous-menu Services aux lecteurs">
+                  {servicesSubmenu.map((item) => (
+                    <Link key={item.href} to={item.href}>
+                      <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
+                        <item.icon className="h-4 w-4" aria-hidden="true" />
+                        {item.label}
+                      </DropdownMenuItem>
+                    </Link>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             {/* Themes Dropdown */}
             <DropdownMenu>
