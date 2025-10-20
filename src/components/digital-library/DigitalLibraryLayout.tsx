@@ -75,21 +75,30 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
 
             {/* Language Selector & Theme Switcher */}
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1" role="group" aria-label="Sélection de langue">
-                {languages.map((lang) => (
-                  <Button
-                    key={lang.code}
-                    variant={language === lang.code ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setLanguage(lang.code as Language)}
-                    className="text-xs"
-                    aria-label={`Changer la langue en ${lang.label}`}
-                    aria-pressed={language === lang.code}
-                  >
-                    {lang.label}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2 text-sm" aria-label="Sélectionner la langue">
+                    <Globe className="h-4 w-4" aria-hidden="true" />
+                    {languages.find(lang => lang.code === language)?.label}
+                    <ChevronDown className="h-3 w-3" aria-hidden="true" />
                   </Button>
-                ))}
-              </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" role="menu" aria-label="Menu des langues">
+                  <DropdownMenuLabel>Choisir une langue</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {languages.map((lang) => (
+                    <DropdownMenuItem
+                      key={lang.code}
+                      onClick={() => setLanguage(lang.code as Language)}
+                      className="cursor-pointer"
+                      aria-label={`Changer la langue en ${lang.label}`}
+                    >
+                      {lang.label}
+                      {language === lang.code && <span className="ml-auto">✓</span>}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <ThemeSwitcher />
             </div>
           </div>
