@@ -328,3 +328,5 @@ export const AccessibilityToolkit = () => {
     </TooltipProvider>
   );
 };
+
+export default AccessibilityToolkit;

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -358,6 +359,9 @@ export default function ManuscriptsPlatform() {
         </main>
         
         <Footer />
+        
+        {/* Outils globaux (Accessibilité + Chatbot) */}
+        <GlobalAccessibilityTools />
       </div>
     </WatermarkContainer>
   );

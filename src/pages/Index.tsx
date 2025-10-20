@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Gem, Filter, ChevronDown, X, Network } from "lucide-react";
@@ -577,6 +578,9 @@ const Index = () => {
           </main>
           
           <Footer />
+          
+          {/* Outils globaux (Accessibilité + Chatbot) */}
+          <GlobalAccessibilityTools />
         </div>
       </div>
     </>

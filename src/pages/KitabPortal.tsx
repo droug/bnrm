@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import KitabHeader from "@/components/KitabHeader";
 import Footer from "@/components/Footer";
+import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -276,6 +277,9 @@ export default function KitabPortal() {
       </main>
       
       <Footer />
+      
+      {/* Outils globaux (Accessibilité + Chatbot) */}
+      <GlobalAccessibilityTools />
     </div>
   );
 }

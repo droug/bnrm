@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BNRMServicesPublic } from "@/components/bnrm/BNRMServicesPublic";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,9 @@ export default function BNRMPortal() {
       </main>
       
       <Footer />
+      
+      {/* Outils globaux (Accessibilité + Chatbot) */}
+      <GlobalAccessibilityTools />
     </div>
   );
 }

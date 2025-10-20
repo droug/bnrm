@@ -7,6 +7,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import GlobalSearchBar from "@/components/GlobalSearchBar";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import Footer from "@/components/Footer";
+import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -274,6 +275,9 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
 
       {/* Footer */}
       <Footer />
+
+      {/* Outils globaux d'accessibilité et chatbot */}
+      <GlobalAccessibilityTools />
     </div>
   );
 }
