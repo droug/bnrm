@@ -1,8 +1,32 @@
 # Rapport Technique - Correction du Centrage des Modales Radix UI
 
-**Date**: 2025-01-20  
+**Dernière mise à jour**: 2025-01-20  
 **Auteur**: Lovable AI  
 **Objectif**: Corriger le centrage et la position des modales Radix UI (Dialog, AlertDialog, Sheet)
+
+---
+
+## 🆕 MISE À JOUR 2025-01-20 - Optimisation z-index et accessibilité
+
+### Modifications appliquées
+
+**1. Optimisation du système z-index**
+- Migration de `z-[9998]/z-[9999]` vers `z-[60]/z-[61]`
+- Mise à jour de la variable CSS `--z-overlay: 60` et `--z-dialog: 61`
+- Cohérence avec le système de design du projet
+
+**2. Ajout des attributs ARIA**
+- `role="dialog"` sur DialogContent
+- `role="alertdialog"` sur AlertDialogContent
+- `aria-modal="true"` sur tous les contenus modaux
+
+**3. Fichiers modifiés**
+- ✅ `src/index.css` - Variables z-index et règles globales
+- ✅ `src/components/ui/dialog.tsx` - DialogOverlay (z-[60]) et DialogContent (z-[61] + ARIA)
+- ✅ `src/components/ui/alert-dialog.tsx` - AlertDialogOverlay (z-[60]) et AlertDialogContent (z-[61] + ARIA)
+- ✅ `TECH_VALIDATION_MODAL.md` - Mise à jour de la documentation
+
+---
 
 ---
 

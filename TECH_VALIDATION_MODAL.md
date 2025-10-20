@@ -177,8 +177,11 @@ Toutes les modales utilisent la structure standard :
 Le `DialogContent` hérite automatiquement de :
 ```tsx
 <DialogPortal>
-  <DialogOverlay />
-  <DialogPrimitive.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] ...">
+  <DialogOverlay className="z-[60]" />
+  <DialogPrimitive.Content 
+    role="dialog"
+    aria-modal="true"
+    className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[61] ...">
     {children}
   </DialogPrimitive.Content>
 </DialogPortal>
@@ -194,10 +197,14 @@ Toutes les modales du projet sont correctement structurées et utilisent le syst
 
 ### Points forts
 - ✅ Structure cohérente dans tout le projet
-- ✅ Z-index élevés et fixes (9998/9999)
+- ✅ Z-index cohérents avec le système de design (60/61)
+- ✅ Position `fixed` avec `transform` pour centrage parfait
+- ✅ Rôles ARIA corrects (`role="dialog"`, `aria-modal="true"`)
+- ✅ Transitions Radix avec `data-[state]` pour animations fluides
 - ✅ Centrage responsive avec Tailwind
 - ✅ Overflow géré avec `max-h-[90vh]`
 - ✅ Portal automatique pour isolation du DOM
+- ✅ Aucune règle CSS conflictuelle (!important, position:absolute)
 
 ### Aucune action requise
 Tous les composants sont conformes aux bonnes pratiques Radix UI.
