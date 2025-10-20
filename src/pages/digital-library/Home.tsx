@@ -3,7 +3,7 @@ import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibrar
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, FileText, Image, Music, Calendar, Sparkles } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function DigitalLibraryHome() {
+  const navigate = useNavigate();
   const { session } = useAuth();
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
@@ -37,38 +38,63 @@ export default function DigitalLibraryHome() {
     loadUserProfile();
   }, [session]);
 
-  const newItems = [
-    {
-      id: "550e8400-e29b-41d4-a716-446655440001",
-      title: "Histoire du Maroc contemporain",
-      author: "Mohammed Kenbib",
-      type: "Livre",
-      date: "2025-01-15",
-      cover: "book",
-      cote: "HM-2025-001",
-      isAvailable: false, // Non consultable en ligne
-    },
-    {
-      id: "550e8400-e29b-41d4-a716-446655440002",
-      title: "Manuscrit andalou rare - XIIe siècle",
-      author: "Collection BNRM",
-      type: "Manuscrit",
-      date: "2025-01-12",
-      cover: "manuscript",
-      cote: "MS-AN-1201",
-      isAvailable: false,
-    },
-    {
-      id: "550e8400-e29b-41d4-a716-446655440003",
-      title: "Archives photographiques de Rabat",
-      author: "Fonds historique",
-      type: "Images",
-      date: "2025-01-10",
-      cover: "photo",
-      cote: "PH-RAB-2025",
-      isAvailable: false,
-    },
-  ];
+  const [newItems, setNewItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadRecentDocuments = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('content')
+          .select('id, title, excerpt, content_type, published_at, file_url, file_type, tags, author_id')
+          .eq('status', 'published')
+          .order('published_at', { ascending: false })
+          .limit(6);
+
+        if (data && !error) {
+          // Charger les informations des auteurs
+          const authorIds = [...new Set(data.map(item => item.author_id).filter(Boolean))];
+          const { data: authorsData } = await supabase
+            .from('profiles')
+            .select('user_id, first_name, last_name')
+            .in('user_id', authorIds);
+
+          const authorsMap = new Map(
+            authorsData?.map(author => [author.user_id, author]) || []
+          );
+
+          const formattedItems = data.map((item: any) => {
+            const author = item.author_id ? authorsMap.get(item.author_id) : null;
+            return {
+              id: item.id,
+              title: item.title,
+              author: author 
+                ? `${author.first_name || ''} ${author.last_name || ''}`.trim() || 'Auteur inconnu'
+                : 'Auteur inconnu',
+              type: item.content_type === 'news' ? 'Article' : 
+                    item.content_type === 'event' ? 'Événement' : 
+                    item.content_type === 'exhibition' ? 'Exposition' : 'Page',
+              date: item.published_at,
+              isAvailable: !!item.file_url,
+              cote: item.file_type || 'DOC',
+            };
+          });
+          
+          console.log('Loaded documents:', formattedItems);
+          setNewItems(formattedItems);
+        } else if (error) {
+          console.error('Error loading documents:', error);
+        }
+      } catch (err) {
+        console.error('Exception loading documents:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRecentDocuments();
+  }, []);
 
   const handleReservationClick = (item: any) => {
     setSelectedDocument(item);
@@ -127,47 +153,61 @@ export default function DigitalLibraryHome() {
           </div>
 
           {/* Carousel */}
-          <div className="max-w-5xl mx-auto">
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              className="w-full"
-            >
-              <CarouselContent>
-                {newItems.map((item) => (
-                  <CarouselItem key={item.id}>
-                    <div className="p-1">
-                      <Card className="border-2 hover:shadow-lg transition-shadow">
-                        <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8">
-                          <div className="flex-1">
-                            <Badge className="mb-3">{item.type}</Badge>
-                            <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
-                            <p className="text-muted-foreground mb-4">{item.author}</p>
-                            <p className="text-sm text-muted-foreground mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
-                            <div className="flex gap-2">
-                              <Button size="lg" variant="outline">Consulter</Button>
-                              {!item.isAvailable && session && userProfile && (
-                                <Button size="lg" onClick={() => handleReservationClick(item)}>
-                                  🗓️ Réserver
+          {!loading && newItems.length > 0 && (
+            <div className="max-w-5xl mx-auto">
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent>
+                  {newItems.map((item) => (
+                    <CarouselItem key={item.id}>
+                      <div className="p-1">
+                        <Card className="border-2 hover:shadow-lg transition-shadow">
+                          <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8">
+                            <div className="flex-1">
+                              <Badge className="mb-3">{item.type}</Badge>
+                              <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
+                              <p className="text-muted-foreground mb-4">{item.author}</p>
+                              <p className="text-sm text-muted-foreground mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
+                              <div className="flex gap-2">
+                                <Button size="lg" variant="outline" onClick={() => navigate(`/digital-library/documents/${item.id}`)}>
+                                  Consulter
                                 </Button>
-                              )}
+                                {!item.isAvailable && session && userProfile && (
+                                  <Button size="lg" onClick={() => handleReservationClick(item)}>
+                                    🗓️ Réserver
+                                  </Button>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                          <div className="w-full md:w-48 h-64 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center hover-scale">
-                            <BookOpen className="h-16 w-16 text-primary/40" />
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="hidden md:flex" />
-              <CarouselNext className="hidden md:flex" />
-            </Carousel>
-          </div>
+                            <div className="w-full md:w-48 h-64 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center hover-scale">
+                              <BookOpen className="h-16 w-16 text-primary/40" />
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden md:flex" />
+                <CarouselNext className="hidden md:flex" />
+              </Carousel>
+            </div>
+          )}
+          {loading && (
+            <div className="max-w-5xl mx-auto text-center py-12">
+              <p className="text-muted-foreground">Chargement des documents...</p>
+            </div>
+          )}
+          {!loading && newItems.length === 0 && (
+            <div className="max-w-5xl mx-auto text-center py-12">
+              <p className="text-muted-foreground">Aucun document disponible pour le moment</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -186,30 +226,39 @@ export default function DigitalLibraryHome() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {newItems.map((item) => (
-            <Card key={item.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg mb-4 flex items-center justify-center">
-                  <BookOpen className="h-12 w-12 text-primary/40" />
-                </div>
-                <Badge variant="secondary" className="w-fit mb-2">{item.type}</Badge>
-                <CardTitle className="text-lg line-clamp-2">{item.title}</CardTitle>
-                <CardDescription>{item.author}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col gap-2">
-                  <Button className="w-full" variant="outline">Consulter</Button>
-                  {!item.isAvailable && session && userProfile && (
-                    <Button className="w-full" onClick={() => handleReservationClick(item)}>
-                      🗓️ Réserver
+        {!loading && newItems.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {newItems.map((item) => (
+              <Card key={item.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg mb-4 flex items-center justify-center">
+                    <BookOpen className="h-12 w-12 text-primary/40" />
+                  </div>
+                  <Badge variant="secondary" className="w-fit mb-2">{item.type}</Badge>
+                  <CardTitle className="text-lg line-clamp-2">{item.title}</CardTitle>
+                  <CardDescription>{item.author}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col gap-2">
+                    <Button className="w-full" variant="outline" onClick={() => navigate(`/digital-library/documents/${item.id}`)}>
+                      Consulter
                     </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                    {!item.isAvailable && session && userProfile && (
+                      <Button className="w-full" onClick={() => handleReservationClick(item)}>
+                        🗓️ Réserver
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+        {!loading && newItems.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Aucun document récent disponible</p>
+          </div>
+        )}
       </section>
 
       {/* Featured Collections */}

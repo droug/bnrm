@@ -91,6 +91,7 @@ const MyNotes = lazy(() => import("./pages/digital-library/MyNotes"));
 const AccountSettings = lazy(() => import("./pages/digital-library/AccountSettings"));
 const UserReservations = lazy(() => import("./pages/digital-library/UserReservations"));
 const UserDigitizationRequests = lazy(() => import("./pages/digital-library/UserDigitizationRequests"));
+const MyRequests = lazy(() => import("./pages/digital-library/MyRequests"));
 const RequestsManagement = lazy(() => import("./pages/digital-library/RequestsManagement"));
 const DigitalLibraryDocuments = lazy(() => import("./pages/DigitalLibraryDocuments"));
 const DigitalLibraryUsers = lazy(() => import("./pages/DigitalLibraryUsers"));
@@ -207,6 +208,7 @@ const App = () => (
           <Route path="/digital-library/my-notes" element={<MyNotes />} />
           <Route path="/digital-library/mes-reservations" element={<UserReservations />} />
           <Route path="/digital-library/mes-demandes-numerisation" element={<UserDigitizationRequests />} />
+          <Route path="/digital-library/mes-demandes" element={<MyRequests />} />
           <Route path="/digital-library/account-settings" element={<AccountSettings />} />
         <Route path="/book-reader/:id" element={<BookReader />} />
         <Route path="/reproduction" element={<ReproductionPage />} />
