@@ -58,15 +58,7 @@ export function AuthorAutocomplete({
 
     setLoading(true);
     try {
-      // Rechercher dans content
-      const { data: contentData, error: contentError } = await supabase
-        .from('content')
-        .select('author')
-        .not('author', 'is', null)
-        .ilike('author', `%${query}%`)
-        .limit(20);
-
-      // Rechercher dans manuscripts
+      // Rechercher uniquement dans manuscripts
       const { data: manuscriptData, error: manuscriptError } = await supabase
         .from('manuscripts')
         .select('author')
@@ -74,15 +66,12 @@ export function AuthorAutocomplete({
         .ilike('author', `%${query}%`)
         .limit(20);
 
-      if (contentError || manuscriptError) {
-        console.error('Error fetching author suggestions:', contentError || manuscriptError);
+      if (manuscriptError) {
+        console.error('Error fetching author suggestions:', manuscriptError);
         setSuggestions([]);
       } else {
-        // Combiner et dédupliquer les auteurs
-        const allAuthors = [
-          ...(contentData || []).map(item => item.author),
-          ...(manuscriptData || []).map(item => item.author)
-        ];
+        // Récupérer les auteurs
+        const allAuthors = (manuscriptData || []).map(item => item.author);
 
         // Compter les occurrences et dédupliquer
         const authorCounts = new Map<string, number>();
