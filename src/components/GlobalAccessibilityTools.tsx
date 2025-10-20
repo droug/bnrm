@@ -1,184 +1,77 @@
 import { useState } from 'react';
-import { Accessibility, MessageCircle } from 'lucide-react';
-import { Slider } from '@/components/ui/slider';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import ChatBot from './ChatBot';
+import { Button } from '@/components/ui/button';
+import { Bot } from 'lucide-react';
+import { AccessibilityToolkit } from './AccessibilityToolkit';
+import SmartChatBot from './SmartChatBot';
 
 /**
- * Composant global - Boutons d'accessibilité et chatbot
+ * Composant global - Réutilise les outils du portail principal
+ * (AccessibilityToolkit et SmartChatBot)
  */
 export function GlobalAccessibilityTools() {
-  const [showAccessibility, setShowAccessibility] = useState(false);
-  const [showChatbot, setShowChatbot] = useState(false);
-  const [fontSize, setFontSize] = useState(100);
-
-  const applyFontSize = (value: number) => {
-    setFontSize(value);
-    document.documentElement.style.fontSize = `${value}%`;
-  };
+  const [isChatBotOpen, setIsChatBotOpen] = useState(false);
 
   return (
     <>
-      {/* Bouton Accessibilité */}
-      <button
-        onClick={() => setShowAccessibility(true)}
-        style={{
-          position: 'fixed',
-          bottom: '80px',
-          right: '24px',
-          width: '56px',
-          height: '56px',
-          borderRadius: '50%',
-          backgroundColor: 'hsl(var(--primary))',
-          color: 'hsl(var(--primary-foreground))',
-          border: 'none',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          cursor: 'pointer',
-          zIndex: 99999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'all 0.2s'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.05)';
-          e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-        }}
-        aria-label="Accessibilité"
-        title="Accessibilité"
-      >
-        <Accessibility size={24} />
-      </button>
-
-      {/* Bouton Chatbot */}
-      <button
-        onClick={() => setShowChatbot(!showChatbot)}
+      {/* Boutons flottants fixes en bas à droite */}
+      <div 
         style={{
           position: 'fixed',
           bottom: '24px',
           right: '24px',
-          width: '56px',
-          height: '56px',
-          borderRadius: '50%',
-          backgroundColor: 'hsl(var(--primary))',
-          color: 'hsl(var(--primary-foreground))',
-          border: 'none',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          cursor: 'pointer',
-          zIndex: 99999,
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'all 0.2s'
+          flexDirection: 'column',
+          gap: '12px',
+          zIndex: 9999
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.05)';
-          e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-        }}
-        aria-label="Assistant virtuel"
-        title="Assistant virtuel"
+        role="toolbar"
+        aria-label="Outils d'assistance"
       >
-        <MessageCircle size={24} />
-      </button>
+        {/* Bouton Accessibilité - Utilise le composant du portail */}
+        <div style={{ 
+          backgroundColor: 'hsl(var(--primary))',
+          borderRadius: '50%',
+          padding: '12px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        }}>
+          <AccessibilityToolkit />
+        </div>
 
-      {/* Dialog Accessibilité */}
-      {showAccessibility && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 100000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'rgba(0,0,0,0.5)'
-          }}
-          onClick={() => setShowAccessibility(false)}
+        {/* Bouton Chatbot - Utilise le composant du portail */}
+        <Button
+          variant="default"
+          size="lg"
+          onClick={() => setIsChatBotOpen(!isChatBotOpen)}
+          className="rounded-full h-14 w-14 shadow-lg hover:shadow-xl transition-all relative"
+          style={{ padding: 0 }}
+          title="Assistant IA"
+          aria-label={isChatBotOpen ? "Fermer l'assistant IA" : "Ouvrir l'assistant IA"}
         >
-          <div
-            style={{
-              backgroundColor: 'hsl(var(--background))',
-              borderRadius: '8px',
-              padding: '24px',
-              maxWidth: '500px',
-              width: '90%',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Accessibility size={20} />
-              Accessibilité
-            </h2>
-            <p style={{ color: 'hsl(var(--muted-foreground))', marginBottom: '24px', fontSize: '14px' }}>
-              Personnalisez l'affichage selon vos besoins
-            </p>
-
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>
-                Taille du texte: {fontSize}%
-              </label>
-              <Slider
-                value={[fontSize]}
-                onValueChange={(value) => applyFontSize(value[0])}
-                min={80}
-                max={150}
-                step={10}
-                className="w-full"
-              />
-            </div>
-
-            <button
-              onClick={() => setShowAccessibility(false)}
+          <Bot className="h-6 w-6" />
+          {!isChatBotOpen && (
+            <div 
               style={{
-                width: '100%',
-                padding: '10px',
-                backgroundColor: 'hsl(var(--primary))',
-                color: 'hsl(var(--primary-foreground))',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500'
+                position: 'absolute',
+                top: '-2px',
+                right: '-2px',
+                width: '10px',
+                height: '10px',
+                backgroundColor: '#10b981',
+                borderRadius: '50%',
+                border: '2px solid hsl(var(--background))'
               }}
-            >
-              Fermer
-            </button>
-          </div>
-        </div>
-      )}
+              aria-hidden="true"
+            />
+          )}
+        </Button>
+      </div>
 
-      {/* Chatbot */}
-      {showChatbot && (
-        <div 
-          style={{
-            position: 'fixed',
-            bottom: '90px',
-            right: '24px',
-            width: '384px',
-            maxWidth: 'calc(100vw - 48px)',
-            zIndex: 99999
-          }}
-        >
-          <ChatBot
-            isOpen={showChatbot}
-            onClose={() => setShowChatbot(false)}
-          />
-        </div>
+      {/* Chatbot intelligent - Composant du portail */}
+      {isChatBotOpen && (
+        <SmartChatBot 
+          isOpen={isChatBotOpen} 
+          onClose={() => setIsChatBotOpen(false)} 
+        />
       )}
     </>
   );
