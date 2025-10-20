@@ -51,7 +51,7 @@ export function AuthorAutocomplete({
 
   // Charger les suggestions
   const fetchSuggestions = async (query: string) => {
-    if (query.length < 2) {
+    if (query.length < 1) {
       setSuggestions([]);
       return;
     }
@@ -115,7 +115,7 @@ export function AuthorAutocomplete({
     // Nouveau timeout pour debounce
     timeoutRef.current = setTimeout(() => {
       fetchSuggestions(newValue);
-    }, 300);
+    }, 150);
   };
 
   const handleSelect = (suggestion: AuthorSuggestion) => {
@@ -152,7 +152,7 @@ export function AuthorAutocomplete({
           value={inputValue}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => {
-            if (inputValue.length >= 2) {
+            if (inputValue.length >= 1) {
               setOpen(true);
               fetchSuggestions(inputValue);
             }
@@ -202,7 +202,7 @@ export function AuthorAutocomplete({
         )}
 
         {/* Message si aucun résultat */}
-        {open && !loading && suggestions.length === 0 && inputValue.length >= 2 && (
+        {open && !loading && suggestions.length === 0 && inputValue.length >= 1 && (
           <div className="absolute z-50 w-full mt-1 bg-background border rounded-lg shadow-lg">
             <div className="p-4 text-sm text-muted-foreground text-center">
               Aucun auteur trouvé. Continuez à taper pour rechercher...
