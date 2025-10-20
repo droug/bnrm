@@ -87,8 +87,98 @@ export function DigitizationRequestsTable() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setRequests(data || []);
-      setFilteredRequests(data || []);
+      
+      // Ajouter des exemples si la table est vide
+      const requestsData = data || [];
+      if (requestsData.length === 0) {
+        const mockRequests: DigitizationRequest[] = [
+          {
+            id: "mock-dig-1",
+            user_name: "Mohamed Tazi",
+            user_email: "m.tazi@example.ma",
+            document_title: "Traité de médecine traditionnelle marocaine",
+            document_cote: "MED-TRAD-089",
+            pages_count: 45,
+            justification: "Recherche pour publication scientifique sur les plantes médicinales du Maroc",
+            usage_type: "recherche",
+            attachment_url: null,
+            status: "en_attente",
+            admin_notes: null,
+            reviewed_by: null,
+            created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+          },
+          {
+            id: "mock-dig-2",
+            user_name: "Leila Mansouri",
+            user_email: "l.mansouri@example.ma",
+            document_title: "Recueil de poésie amazigh",
+            document_cote: "POE-AMZ-234",
+            pages_count: 120,
+            justification: "Conservation personnelle et étude linguistique",
+            usage_type: "conservation",
+            attachment_url: null,
+            status: "en_cours",
+            admin_notes: "Assigné à l'équipe de numérisation - Priorité moyenne",
+            reviewed_by: "admin-123",
+            created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+          },
+          {
+            id: "mock-dig-3",
+            user_name: "Rachid Cherki",
+            user_email: "r.cherki@example.ma",
+            document_title: "Plans architecturaux - Médina de Marrakech",
+            document_cote: "ARCH-PLAN-056",
+            pages_count: 28,
+            justification: "Projet de restauration urbaine - Collaboration avec ministère de l'habitat",
+            usage_type: "diffusion",
+            attachment_url: "https://example.com/authorization.pdf",
+            status: "approuve",
+            admin_notes: "Demande approuvée - Usage à des fins patrimoniales",
+            reviewed_by: "admin-456",
+            created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+          },
+          {
+            id: "mock-dig-4",
+            user_name: "Imane El Khatib",
+            user_email: "i.elkhatib@example.ma",
+            document_title: "Journal Al-Maghrib 1950-1955",
+            document_cote: "PRESSE-MAG-1950",
+            pages_count: 180,
+            justification: "Thèse de doctorat en histoire du journalisme marocain",
+            usage_type: "education",
+            attachment_url: null,
+            status: "termine",
+            admin_notes: "Numérisation complétée - Fichiers envoyés au demandeur",
+            reviewed_by: "admin-789",
+            created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          },
+          {
+            id: "mock-dig-5",
+            user_name: "Youssef Berrada",
+            user_email: "y.berrada@example.ma",
+            document_title: "Manuscrit enluminé - Coran du 14ème siècle",
+            document_cote: "COR-MS-014",
+            pages_count: 350,
+            justification: "Usage commercial pour exposition internationale",
+            usage_type: "commercial",
+            attachment_url: null,
+            status: "rejete",
+            admin_notes: "Demande refusée - Document trop fragile. Usage commercial non autorisé pour ce manuscrit classé patrimoine national",
+            reviewed_by: "admin-456",
+            created_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+          },
+        ];
+        setRequests(mockRequests);
+        setFilteredRequests(mockRequests);
+      } else {
+        setRequests(requestsData);
+        setFilteredRequests(requestsData);
+      }
     } catch (error) {
       console.error("Error loading digitization requests:", error);
       toast.error("Erreur lors du chargement des demandes");

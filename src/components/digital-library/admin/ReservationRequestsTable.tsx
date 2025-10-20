@@ -85,8 +85,74 @@ export function ReservationRequestsTable() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setRequests(data || []);
-      setFilteredRequests(data || []);
+      
+      // Ajouter des exemples si la table est vide
+      const requestsData = data || [];
+      if (requestsData.length === 0) {
+        const mockRequests: ReservationRequest[] = [
+          {
+            id: "mock-1",
+            user_name: "Ahmed El Fassi",
+            user_email: "ahmed.elfassi@example.ma",
+            document_title: "Histoire du Maroc - Tome I",
+            document_cote: "MAR-HIST-001",
+            requested_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+            requested_time: "14:00",
+            status: "en_attente",
+            comments: "Je souhaite consulter ce document pour mes recherches universitaires",
+            admin_comments: null,
+            created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          },
+          {
+            id: "mock-2",
+            user_name: "Fatima Zahra Benani",
+            user_email: "f.benani@example.ma",
+            document_title: "Manuscrits arabes du 12ème siècle",
+            document_cote: "ARA-MS-147",
+            requested_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+            requested_time: "10:30",
+            status: "acceptee",
+            comments: "Recherche pour thèse de doctorat",
+            admin_comments: null,
+            created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+          },
+          {
+            id: "mock-3",
+            user_name: "Karim Alaoui",
+            user_email: "k.alaoui@example.ma",
+            document_title: "Archives coloniales 1920-1956",
+            document_cote: "ARCH-COL-032",
+            requested_date: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+            requested_time: "15:00",
+            status: "refusee",
+            comments: "Document nécessaire pour publication",
+            admin_comments: "Document en cours de restauration, non disponible pour consultation",
+            created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          },
+          {
+            id: "mock-4",
+            user_name: "Sarah Benjelloun",
+            user_email: "sarah.b@example.ma",
+            document_title: "Collection photographique - Fès 1900",
+            document_cote: "PHOTO-FES-1900",
+            requested_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            requested_time: "11:00",
+            status: "terminee",
+            comments: "Projet documentaire",
+            admin_comments: null,
+            created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          },
+        ];
+        setRequests(mockRequests);
+        setFilteredRequests(mockRequests);
+      } else {
+        setRequests(requestsData);
+        setFilteredRequests(requestsData);
+      }
     } catch (error) {
       console.error("Error loading reservation requests:", error);
       toast.error("Erreur lors du chargement des demandes");
