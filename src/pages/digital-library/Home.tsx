@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, FileText, Image, Music, Calendar, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 export default function DigitalLibraryHome() {
   const newItems = [
@@ -76,29 +77,48 @@ export default function DigitalLibraryHome() {
       <section className="bg-gradient-to-br from-primary/10 via-accent/5 to-background py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold text-foreground mb-4">
+            <h1 className="text-5xl font-bold text-foreground mb-4 animate-fade-in">
               Bienvenue à la Bibliothèque Numérique
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto animate-fade-in">
               Accédez à plus de 100,000 documents numérisés du patrimoine marocain
             </p>
           </div>
 
-          {/* Featured Items Grid - Replacing Carousel */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {newItems.map((item) => (
-              <Card key={item.id} className="border-2 hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg mb-4 flex items-center justify-center">
-                    <BookOpen className="h-16 w-16 text-primary/40" />
-                  </div>
-                  <Badge className="mb-3">{item.type}</Badge>
-                  <h3 className="text-xl font-bold mb-2 line-clamp-2">{item.title}</h3>
-                  <p className="text-muted-foreground mb-4">{item.author}</p>
-                  <Button className="w-full">Consulter maintenant</Button>
-                </CardContent>
-              </Card>
-            ))}
+          {/* Carousel */}
+          <div className="max-w-5xl mx-auto">
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full"
+            >
+              <CarouselContent>
+                {newItems.map((item) => (
+                  <CarouselItem key={item.id}>
+                    <div className="p-1">
+                      <Card className="border-2 hover:shadow-lg transition-shadow">
+                        <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8">
+                          <div className="flex-1">
+                            <Badge className="mb-3">{item.type}</Badge>
+                            <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
+                            <p className="text-muted-foreground mb-4">{item.author}</p>
+                            <p className="text-sm text-muted-foreground mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
+                            <Button size="lg">Consulter maintenant</Button>
+                          </div>
+                          <div className="w-full md:w-48 h-64 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center hover-scale">
+                            <BookOpen className="h-16 w-16 text-primary/40" />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex" />
+              <CarouselNext className="hidden md:flex" />
+            </Carousel>
           </div>
         </div>
       </section>
