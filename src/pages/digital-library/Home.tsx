@@ -38,38 +38,47 @@ export default function DigitalLibraryHome() {
     loadUserProfile();
   }, [session]);
 
-  const newItems = [
-    {
-      id: "550e8400-e29b-41d4-a716-446655440001",
-      title: "Histoire du Maroc contemporain",
-      author: "Mohammed Kenbib",
-      type: "Livre",
-      date: "2025-01-15",
-      cover: "book",
-      cote: "HM-2025-001",
-      isAvailable: false, // Non consultable en ligne
-    },
-    {
-      id: "550e8400-e29b-41d4-a716-446655440002",
-      title: "Manuscrit andalou rare - XIIe siècle",
-      author: "Collection BNRM",
-      type: "Manuscrit",
-      date: "2025-01-12",
-      cover: "manuscript",
-      cote: "MS-AN-1201",
-      isAvailable: false,
-    },
-    {
-      id: "550e8400-e29b-41d4-a716-446655440003",
-      title: "Archives photographiques de Rabat",
-      author: "Fonds historique",
-      type: "Images",
-      date: "2025-01-10",
-      cover: "photo",
-      cote: "PH-RAB-2025",
-      isAvailable: false,
-    },
-  ];
+  const [newItems, setNewItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadRecentDocuments = async () => {
+      const { data, error } = await supabase
+        .from('content')
+        .select(`
+          id,
+          title,
+          excerpt,
+          content_type,
+          published_at,
+          file_url,
+          file_type,
+          tags,
+          profiles!content_author_id_fkey (
+            first_name,
+            last_name
+          )
+        `)
+        .eq('status', 'published')
+        .order('published_at', { ascending: false })
+        .limit(6);
+
+      if (data && !error) {
+        setNewItems(data.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          author: item.profiles 
+            ? `${item.profiles.first_name} ${item.profiles.last_name}`.trim() || 'Auteur inconnu'
+            : 'Auteur inconnu',
+          type: item.content_type === 'news' ? 'Article' : item.content_type === 'event' ? 'Événement' : 'Page',
+          date: item.published_at,
+          isAvailable: !!item.file_url,
+          cote: item.file_type || 'DOC',
+        })));
+      }
+    };
+
+    loadRecentDocuments();
+  }, []);
 
   const handleReservationClick = (item: any) => {
     setSelectedDocument(item);

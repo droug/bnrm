@@ -199,7 +199,8 @@ export default function DocumentDetails() {
   const canDownload = document.download_enabled !== false && document.allow_download !== false;
   const canRead = document.file_url || document.digital_copy_url;
   const canReserve = !canRead && user && userProfile;
-  const canRequestDigitization = !document.is_digitized && user && userProfile;
+  // Always show digitization button for logged-in users (no file_url means not digitized)
+  const canRequestDigitization = !document.file_url && user && userProfile;
 
   return (
     <DigitalLibraryLayout>
@@ -464,11 +465,11 @@ export default function DocumentDetails() {
                 {canRequestDigitization && (
                   <Button 
                     onClick={() => setShowDigitizationDialog(true)} 
-                    variant="outline" 
-                    className="w-full"
+                    variant="secondary" 
+                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0"
                   >
                     <FileText className="h-4 w-4 mr-2" />
-                    📜 Demander la numérisation
+                    Demander la numérisation
                   </Button>
                 )}
               </CardContent>
