@@ -166,26 +166,26 @@ export function BNRMServicesPublic() {
 
       {/* Tabs for Subscriptions and One-Time Services */}
       <Tabs defaultValue="abonnements" className="w-full">
-        <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-          <TabsTrigger value="abonnements">Abonnements</TabsTrigger>
-          <TabsTrigger value="services">Services</TabsTrigger>
+        <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 h-11">
+          <TabsTrigger value="abonnements" className="text-base font-medium">Abonnements</TabsTrigger>
+          <TabsTrigger value="services" className="text-base font-medium">Services</TabsTrigger>
         </TabsList>
 
         {/* Subscriptions Tab */}
         <TabsContent value="abonnements" className="space-y-6 mt-6">
           <div className="flex gap-4 items-center">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-[200px] h-11 text-base font-medium">
                 <SelectValue placeholder="Catégorie" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Toutes les catégories</SelectItem>
-                <SelectItem value="Dépôt légal">Dépôt légal</SelectItem>
-                <SelectItem value="Reproduction">Reproduction</SelectItem>
-                <SelectItem value="Recherche">Recherche</SelectItem>
-                <SelectItem value="Numérisation">Numérisation</SelectItem>
-                <SelectItem value="Formation">Formation</SelectItem>
-                <SelectItem value="Inscription">Inscription</SelectItem>
+              <SelectContent className="bg-popover">
+                <SelectItem value="all" className="text-base">Toutes les catégories</SelectItem>
+                <SelectItem value="Dépôt légal" className="text-base">Dépôt légal</SelectItem>
+                <SelectItem value="Reproduction" className="text-base">Reproduction</SelectItem>
+                <SelectItem value="Recherche" className="text-base">Recherche</SelectItem>
+                <SelectItem value="Numérisation" className="text-base">Numérisation</SelectItem>
+                <SelectItem value="Formation" className="text-base">Formation</SelectItem>
+                <SelectItem value="Inscription" className="text-base">Inscription</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -278,16 +278,16 @@ export function BNRMServicesPublic() {
         <TabsContent value="services" className="space-y-6 mt-6">
           <div className="flex gap-4 items-center">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-[200px] h-11 text-base font-medium">
                 <SelectValue placeholder="Catégorie" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Toutes les catégories</SelectItem>
-                <SelectItem value="Dépôt légal">Dépôt légal</SelectItem>
-                <SelectItem value="Reproduction">Reproduction</SelectItem>
-                <SelectItem value="Recherche">Recherche</SelectItem>
-                <SelectItem value="Numérisation">Numérisation</SelectItem>
-                <SelectItem value="Formation">Formation</SelectItem>
+              <SelectContent className="bg-popover">
+                <SelectItem value="all" className="text-base">Toutes les catégories</SelectItem>
+                <SelectItem value="Dépôt légal" className="text-base">Dépôt légal</SelectItem>
+                <SelectItem value="Reproduction" className="text-base">Reproduction</SelectItem>
+                <SelectItem value="Recherche" className="text-base">Recherche</SelectItem>
+                <SelectItem value="Numérisation" className="text-base">Numérisation</SelectItem>
+                <SelectItem value="Formation" className="text-base">Formation</SelectItem>
               </SelectContent>
             </Select>
           </div>
