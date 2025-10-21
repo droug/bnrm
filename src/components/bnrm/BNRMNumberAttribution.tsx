@@ -553,10 +553,10 @@ export const BNRMNumberAttribution = () => {
       </div>
 
       <Tabs defaultValue="attributions" className="w-full">
-        <TabsList>
-          <TabsTrigger value="attributions">Attributions</TabsTrigger>
-          <TabsTrigger value="reserved">Tranches réservées</TabsTrigger>
-          <TabsTrigger value="statistics">Statistiques</TabsTrigger>
+        <TabsList className="h-11">
+          <TabsTrigger value="attributions" className="text-base font-medium">Attributions</TabsTrigger>
+          <TabsTrigger value="reserved" className="text-base font-medium">Tranches réservées</TabsTrigger>
+          <TabsTrigger value="statistics" className="text-base font-medium">Statistiques</TabsTrigger>
         </TabsList>
 
         {/* Attributions History */}

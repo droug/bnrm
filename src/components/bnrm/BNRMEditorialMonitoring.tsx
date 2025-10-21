@@ -719,9 +719,9 @@ export default function BNRMEditorialMonitoring() {
       </div>
 
       <Tabs defaultValue="monitoring" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="monitoring">Suivi</TabsTrigger>
-          <TabsTrigger value="statistics">Statistiques</TabsTrigger>
+        <TabsList className="h-11">
+          <TabsTrigger value="monitoring" className="text-base font-medium">Suivi</TabsTrigger>
+          <TabsTrigger value="statistics" className="text-base font-medium">Statistiques</TabsTrigger>
         </TabsList>
 
         <TabsContent value="monitoring" className="space-y-4">

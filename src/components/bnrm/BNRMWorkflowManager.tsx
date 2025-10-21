@@ -974,10 +974,10 @@ export function BNRMWorkflowManager() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="definitions" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="definitions">Définitions</TabsTrigger>
-          <TabsTrigger value="instances">Instances Actives</TabsTrigger>
-          <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
+        <TabsList className="h-11">
+          <TabsTrigger value="definitions" className="text-base font-medium">Définitions</TabsTrigger>
+          <TabsTrigger value="instances" className="text-base font-medium">Instances Actives</TabsTrigger>
+          <TabsTrigger value="monitoring" className="text-base font-medium">Monitoring</TabsTrigger>
         </TabsList>
 
         {/* Workflow Definitions */}

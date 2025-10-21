@@ -1250,10 +1250,10 @@ export const BNRMRequestManager = () => {
           
           {selectedRequest && (
             <Tabs defaultValue="details" className="w-full">
-              <TabsList>
-                <TabsTrigger value="details">Détails</TabsTrigger>
-                <TabsTrigger value="validation">Validation</TabsTrigger>
-                <TabsTrigger value="workflow">Workflow</TabsTrigger>
+              <TabsList className="h-11">
+                <TabsTrigger value="details" className="text-base font-medium">Détails</TabsTrigger>
+                <TabsTrigger value="validation" className="text-base font-medium">Validation</TabsTrigger>
+                <TabsTrigger value="workflow" className="text-base font-medium">Workflow</TabsTrigger>
               </TabsList>
               
               <TabsContent value="details" className="space-y-4">

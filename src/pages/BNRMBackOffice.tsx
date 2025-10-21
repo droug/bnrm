@@ -129,35 +129,35 @@ export default function BNRMBackOffice() {
             {/* Navigation Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto p-2 bg-muted">
-                <TabsTrigger value="dashboard" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                <TabsTrigger value="dashboard" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium">
                   <BarChart3 className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Tableau de bord</span>
                 </TabsTrigger>
-                <TabsTrigger value="requests" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                <TabsTrigger value="requests" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium">
                   <FileText className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Demandes en Attente</span>
                 </TabsTrigger>
-                <TabsTrigger value="attribution" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                <TabsTrigger value="attribution" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium">
                   <Hash className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Attributions</span>
                 </TabsTrigger>
-                <TabsTrigger value="deposits" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                <TabsTrigger value="deposits" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium">
                   <Archive className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Dépôts</span>
                 </TabsTrigger>
-                <TabsTrigger value="editorial-monitoring" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                <TabsTrigger value="editorial-monitoring" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium">
                   <Search className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Veille</span>
                 </TabsTrigger>
-                <TabsTrigger value="notifications" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                <TabsTrigger value="notifications" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium">
                   <Bell className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Notifications</span>
                 </TabsTrigger>
-                <TabsTrigger value="statistics" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                <TabsTrigger value="statistics" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium">
                   <BarChart3 className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Statistiques</span>
                 </TabsTrigger>
-                <TabsTrigger value="reports" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap">
+                <TabsTrigger value="reports" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium">
                   <Database className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Rapports</span>
                 </TabsTrigger>
