@@ -5,12 +5,14 @@ import { FileText, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ScrollableDialog,
+  ScrollableDialogContent,
+  ScrollableDialogDescription,
+  ScrollableDialogHeader,
+  ScrollableDialogTitle,
+  ScrollableDialogBody,
+  ScrollableDialogFooter,
+} from "@/components/ui/scrollable-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -156,228 +158,230 @@ export function DigitizationRequestDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+    <ScrollableDialog open={isOpen} onOpenChange={onClose}>
+      <ScrollableDialogContent className="sm:max-w-[650px]">
+        <ScrollableDialogHeader>
+          <ScrollableDialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
             Demande de Numérisation
-          </DialogTitle>
-          <DialogDescription>
+          </ScrollableDialogTitle>
+          <ScrollableDialogDescription>
             Remplissez le formulaire pour demander la numérisation d'un document
-          </DialogDescription>
-        </DialogHeader>
+          </ScrollableDialogDescription>
+        </ScrollableDialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Nom et prénom */}
-            <FormField
-              control={form.control}
-              name="userName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nom et prénom</FormLabel>
-                  <FormControl>
-                    <Input {...field} disabled className="bg-muted" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Email */}
-            <FormField
-              control={form.control}
-              name="userEmail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="email" disabled className="bg-muted" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Titre du document */}
-            <FormField
-              control={form.control}
-              name="documentTitle"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Titre du document *</FormLabel>
-                  <FormControl>
-                    <TitleAutocomplete
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder="Rechercher un titre de document..."
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Cote du document */}
-            <FormField
-              control={form.control}
-              name="documentCote"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cote du document (si connue)</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Ex: MS-2024-001" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Nombre de pages */}
-            <FormField
-              control={form.control}
-              name="pagesCount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre de pages à numériser *</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="number"
-                      min="1"
-                      max="1000"
-                      onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                    />
-                  </FormControl>
-                  <FormDescription>Maximum 1000 pages</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Justification */}
-            <FormField
-              control={form.control}
-              name="justification"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Justification de la demande *</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Expliquez pourquoi vous avez besoin de numériser ce document..."
-                      className="resize-none min-h-[100px]"
-                      rows={5}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Minimum 20 caractères, maximum 2000 caractères
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Type d'utilisation */}
-            <FormField
-              control={form.control}
-              name="usageType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Type d'utilisation *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+        <ScrollableDialogBody>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Nom et prénom */}
+              <FormField
+                control={form.control}
+                name="userName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nom et prénom</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionnez le type d'utilisation" />
-                      </SelectTrigger>
+                      <Input {...field} disabled className="bg-muted" />
                     </FormControl>
-                    <SelectContent>
-                      {Object.entries(USAGE_TYPES).map(([value, label]) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Pièce jointe */}
-            <FormField
-              control={form.control}
-              name="attachmentFile"
-              render={() => (
-                <FormItem>
-                  <FormLabel>Pièce jointe (facultatif)</FormLabel>
-                  <FormControl>
-                    <div className="flex items-center gap-4">
-                      <Input
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={handleFileChange}
-                        className="cursor-pointer"
+              {/* Email */}
+              <FormField
+                control={form.control}
+                name="userEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="email" disabled className="bg-muted" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Titre du document */}
+              <FormField
+                control={form.control}
+                name="documentTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Titre du document *</FormLabel>
+                    <FormControl>
+                      <TitleAutocomplete
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Rechercher un titre de document..."
                       />
-                      {selectedFile && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Upload className="h-4 w-4" />
-                          {selectedFile.name}
-                        </div>
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormDescription>
-                    PDF ou image (JPEG, PNG) - Maximum 10MB
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Accord droits d'auteur */}
-            <FormField
-              control={form.control}
-              name="copyrightAgreement"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>
-                      Je m'engage à respecter les droits d'auteur et d'usage *
-                    </FormLabel>
+              {/* Cote du document */}
+              <FormField
+                control={form.control}
+                name="documentCote"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cote du document (si connue)</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Ex: MS-2024-001" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Nombre de pages */}
+              <FormField
+                control={form.control}
+                name="pagesCount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre de pages à numériser *</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        min="1"
+                        max="1000"
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                      />
+                    </FormControl>
+                    <FormDescription>Maximum 1000 pages</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Justification */}
+              <FormField
+                control={form.control}
+                name="justification"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Justification de la demande *</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        placeholder="Expliquez pourquoi vous avez besoin de numériser ce document..."
+                        className="resize-none min-h-[100px]"
+                        rows={5}
+                      />
+                    </FormControl>
                     <FormDescription>
-                      Vous certifiez que l'utilisation de ce document respectera les droits d'auteur
-                      et la propriété intellectuelle
+                      Minimum 20 caractères, maximum 2000 caractères
                     </FormDescription>
                     <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
+                  </FormItem>
+                )}
+              />
 
-            <div className="flex justify-end gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                disabled={isSubmitting}
-              >
-                Annuler
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Envoi en cours..." : "Envoyer la demande"}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+              {/* Type d'utilisation */}
+              <FormField
+                control={form.control}
+                name="usageType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type d'utilisation *</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionnez le type d'utilisation" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.entries(USAGE_TYPES).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Pièce jointe */}
+              <FormField
+                control={form.control}
+                name="attachmentFile"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Pièce jointe (facultatif)</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center gap-4">
+                        <Input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={handleFileChange}
+                          className="cursor-pointer"
+                        />
+                        {selectedFile && (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Upload className="h-4 w-4" />
+                            {selectedFile.name}
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      PDF ou image (JPEG, PNG) - Maximum 10MB
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Accord droits d'auteur */}
+              <FormField
+                control={form.control}
+                name="copyrightAgreement"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>
+                        Je m'engage à respecter les droits d'auteur et d'usage *
+                      </FormLabel>
+                      <FormDescription>
+                        Vous certifiez que l'utilisation de ce document respectera les droits d'auteur
+                        et la propriété intellectuelle
+                      </FormDescription>
+                      <FormMessage />
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </ScrollableDialogBody>
+
+        <ScrollableDialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            Annuler
+          </Button>
+          <Button onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
+            {isSubmitting ? "Envoi en cours..." : "Envoyer la demande"}
+          </Button>
+        </ScrollableDialogFooter>
+      </ScrollableDialogContent>
+    </ScrollableDialog>
   );
 }

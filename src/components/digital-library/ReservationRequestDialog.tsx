@@ -7,12 +7,14 @@ import { CalendarIcon, Calendar as CalendarIconLucide } from "lucide-react";
 import { toast } from "sonner";
 import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ScrollableDialog,
+  ScrollableDialogContent,
+  ScrollableDialogDescription,
+  ScrollableDialogHeader,
+  ScrollableDialogTitle,
+  ScrollableDialogBody,
+  ScrollableDialogFooter,
+} from "@/components/ui/scrollable-dialog";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -131,202 +133,204 @@ export function ReservationRequestDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+    <ScrollableDialog open={isOpen} onOpenChange={onClose}>
+      <ScrollableDialogContent className="sm:max-w-[600px]">
+        <ScrollableDialogHeader>
+          <ScrollableDialogTitle className="flex items-center gap-2">
             <CalendarIconLucide className="h-5 w-5" />
             Demande de Réservation
-          </DialogTitle>
-          <DialogDescription>
+          </ScrollableDialogTitle>
+          <ScrollableDialogDescription>
             Remplissez le formulaire pour réserver ce document pour consultation sur place
-          </DialogDescription>
-        </DialogHeader>
+          </ScrollableDialogDescription>
+        </ScrollableDialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Nom et prénom */}
-            <FormField
-              control={form.control}
-              name="userName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nom et prénom</FormLabel>
-                  <FormControl>
-                    <Input {...field} disabled className="bg-muted" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Email */}
-            <FormField
-              control={form.control}
-              name="userEmail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="email" disabled className="bg-muted" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Titre du document */}
-            <FormField
-              control={form.control}
-              name="documentTitle"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Titre du document</FormLabel>
-                  <FormControl>
-                    <TitleAutocomplete
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder="Rechercher un titre de document..."
-                      className={documentTitle ? "pointer-events-none opacity-60" : ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Cote du document - facultatif */}
-            <FormField
-              control={form.control}
-              name="documentCote"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cote du document (facultatif)</FormLabel>
-                  <FormControl>
-                    <Input 
-                      {...field} 
-                      disabled={!!documentCote} 
-                      className={documentCote ? "bg-muted" : ""}
-                      placeholder="Entrez la cote du document si connue"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Date souhaitée */}
-            <FormField
-              control={form.control}
-              name="requestedDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Date souhaitée de réservation</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP", { locale: fr })
-                          ) : (
-                            <span>Sélectionner une date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => 
-                          date < new Date(new Date().setHours(0, 0, 0, 0))
-                        }
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormDescription>
-                    Sélectionnez la date à laquelle vous souhaitez consulter le document
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Heure souhaitée */}
-            <FormField
-              control={form.control}
-              name="requestedTime"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Heure souhaitée</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+        <ScrollableDialogBody>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Nom et prénom */}
+              <FormField
+                control={form.control}
+                name="userName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nom et prénom</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner une heure" />
-                      </SelectTrigger>
+                      <Input {...field} disabled className="bg-muted" />
                     </FormControl>
-                    <SelectContent>
-                      {AVAILABLE_HOURS.map((hour) => (
-                        <SelectItem key={hour} value={hour}>
-                          {hour}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Horaires d'ouverture : 09:00 - 17:00
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Commentaires */}
-            <FormField
-              control={form.control}
-              name="comments"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Commentaire (facultatif)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Ajoutez un commentaire ou des informations complémentaires..."
-                      className="resize-none"
-                      rows={4}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              {/* Email */}
+              <FormField
+                control={form.control}
+                name="userEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="email" disabled className="bg-muted" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="flex justify-end gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                disabled={isSubmitting}
-              >
-                Annuler
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Envoi en cours..." : "Envoyer la demande"}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+              {/* Titre du document */}
+              <FormField
+                control={form.control}
+                name="documentTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Titre du document</FormLabel>
+                    <FormControl>
+                      <TitleAutocomplete
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Rechercher un titre de document..."
+                        className={documentTitle ? "pointer-events-none opacity-60" : ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Cote du document - facultatif */}
+              <FormField
+                control={form.control}
+                name="documentCote"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cote du document (facultatif)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        {...field} 
+                        disabled={!!documentCote} 
+                        className={documentCote ? "bg-muted" : ""}
+                        placeholder="Entrez la cote du document si connue"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Date souhaitée */}
+              <FormField
+                control={form.control}
+                name="requestedDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Date souhaitée de réservation</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP", { locale: fr })
+                            ) : (
+                              <span>Sélectionner une date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => 
+                            date < new Date(new Date().setHours(0, 0, 0, 0))
+                          }
+                          initialFocus
+                          className={cn("p-3 pointer-events-auto")}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>
+                      Sélectionnez la date à laquelle vous souhaitez consulter le document
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Heure souhaitée */}
+              <FormField
+                control={form.control}
+                name="requestedTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Heure souhaitée</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner une heure" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {AVAILABLE_HOURS.map((hour) => (
+                          <SelectItem key={hour} value={hour}>
+                            {hour}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Horaires d'ouverture : 09:00 - 17:00
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Commentaires */}
+              <FormField
+                control={form.control}
+                name="comments"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Commentaire (facultatif)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        placeholder="Ajoutez un commentaire ou des informations complémentaires..."
+                        className="resize-none"
+                        rows={4}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </ScrollableDialogBody>
+
+        <ScrollableDialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            Annuler
+          </Button>
+          <Button onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
+            {isSubmitting ? "Envoi en cours..." : "Envoyer la demande"}
+          </Button>
+        </ScrollableDialogFooter>
+      </ScrollableDialogContent>
+    </ScrollableDialog>
   );
 }
