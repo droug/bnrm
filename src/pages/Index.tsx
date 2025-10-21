@@ -231,29 +231,29 @@ const Index = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-12 px-3 bg-white/95 border-2 border-gold/30 hover:bg-primary/5 hover:border-primary/40"
+                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-11 px-3 bg-white/95 border-2 border-gold/30 hover:bg-primary/5 hover:border-primary/40 text-base font-medium"
                           >
                             <Filter className="h-4 w-4 mr-2" />
                             <ChevronDown className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-56">
-                          <DropdownMenuItem onClick={() => addFilter('author')}>
+                        <DropdownMenuContent align="start" className="w-56 bg-popover">
+                          <DropdownMenuItem onClick={() => addFilter('author')} className="text-base font-medium">
                             Auteur
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => addFilter('publisher')}>
+                          <DropdownMenuItem onClick={() => addFilter('publisher')} className="text-base font-medium">
                             Éditeur
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => addFilter('genre')}>
+                          <DropdownMenuItem onClick={() => addFilter('genre')} className="text-base font-medium">
                             Genre
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => addFilter('publication_year')}>
+                          <DropdownMenuItem onClick={() => addFilter('publication_year')} className="text-base font-medium">
                             Année de publication
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => addFilter('language')}>
+                          <DropdownMenuItem onClick={() => addFilter('language')} className="text-base font-medium">
                             Langue
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => addFilter('content_type')}>
+                          <DropdownMenuItem onClick={() => addFilter('content_type')} className="text-base font-medium">
                             Type de contenu
                           </DropdownMenuItem>
                         </DropdownMenuContent>
