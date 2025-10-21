@@ -138,7 +138,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </Link>
             </div>
 
-            {/* Language Selector & Theme Switcher */}
+            {/* Language Selector, Theme Switcher & User Menu */}
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -171,6 +171,51 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
               <ThemeSwitcher />
+              
+              {/* Menu Utilisateur */}
+              {isAuthenticated && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" 
+                      aria-label="Menu utilisateur"
+                    >
+                      <User className="h-4 w-4" aria-hidden="true" />
+                      <span className="hidden sm:inline">
+                        {userProfile?.firstName || session?.user?.email?.split('@')[0] || 'Mon compte'}
+                      </span>
+                      <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-card z-50 w-56" role="menu" aria-label="Menu utilisateur">
+                    <DropdownMenuLabel>Mon espace</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {userMenu.map((item) => (
+                      <Link key={item.href} to={item.href}>
+                        <DropdownMenuItem className="cursor-pointer focus:bg-accent focus:text-accent-foreground">
+                          {item.label}
+                        </DropdownMenuItem>
+                      </Link>
+                    ))}
+                    {isLibrarian && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Administration</DropdownMenuLabel>
+                        {adminMenu.map((item) => (
+                          <Link key={item.href} to={item.href}>
+                            <DropdownMenuItem className="cursor-pointer focus:bg-accent focus:text-accent-foreground">
+                              <Settings className="h-4 w-4 mr-2" aria-hidden="true" />
+                              {item.label}
+                            </DropdownMenuItem>
+                          </Link>
+                        ))}
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
 
@@ -319,47 +364,6 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
           <div className="mt-4">
             <GlobalSearchBar />
           </div>
-
-          {/* User/Admin Menu */}
-          {(userMenu.length > 0 || adminMenu.length > 0) && (
-            <div className="flex items-center gap-2 mt-2 border-t pt-2">
-              {userMenu.length > 0 && (
-                <div className="flex items-center gap-1" role="navigation" aria-label="Menu utilisateur">
-                  <User className="h-4 w-4 text-muted-foreground mr-1" aria-hidden="true" />
-                  {userMenu.map((item) => (
-                    <Link key={item.href} to={item.href}>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                        aria-label={item.label}
-                      >
-                        {item.label}
-                      </Button>
-                    </Link>
-                  ))}
-                </div>
-              )}
-              
-              {adminMenu.length > 0 && (
-                <div className="flex items-center gap-1 ml-auto" role="navigation" aria-label="Menu administration">
-                  <Settings className="h-4 w-4 text-muted-foreground mr-1" aria-hidden="true" />
-                  {adminMenu.map((item) => (
-                    <Link key={item.href} to={item.href}>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                        aria-label={item.label}
-                      >
-                        {item.label}
-                      </Button>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </nav>
 
