@@ -101,32 +101,32 @@ const Header = () => {
             {/* Navigation Portails */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className={`gap-2 ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
+                <Button variant="ghost" size="sm" className={`gap-2 h-11 text-base font-medium ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
                   <Building className="h-4 w-4" />
                   <span className="hidden md:inline">Portails</span>
                   <ChevronDown className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64">
-                <DropdownMenuItem asChild>
+              <DropdownMenuContent align="end" className="w-64 bg-popover z-50">
+                <DropdownMenuItem asChild className="text-base font-medium">
                   <Link to="/" className="cursor-pointer">
                     <BookOpen className="h-4 w-4 mr-2" />
                     Portail Principal
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild className="text-base font-medium">
                   <Link to="/digital-library" className="cursor-pointer">
                     <BookOpen className="h-4 w-4 mr-2" />
                     Bibliothèque Numérique
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild className="text-base font-medium">
                   <Link to="/plateforme-manuscrits" className="cursor-pointer">
                     <FileText className="h-4 w-4 mr-2" />
                     Manuscrits Numérisés
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild className="text-base font-medium">
                   <Link to="/cbm" className="cursor-pointer">
                     <Network className="h-4 w-4 mr-2" />
                     Portail CBM
@@ -138,9 +138,9 @@ const Header = () => {
             {/* Langue - icône seulement sur mobile */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className={`gap-1 px-2 ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
+                <Button variant="ghost" size="sm" className={`gap-1 px-2 h-11 text-base font-medium ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
                   <Globe className="h-4 w-4" />
-                  <span className="hidden sm:inline text-xs">
+                  <span className="hidden sm:inline">
                     {language === 'ar' && 'ع'}
                     {language === 'ber' && 'ⵣ'}
                     {language === 'fr' && 'FR'}
@@ -148,17 +148,17 @@ const Header = () => {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-background border border-primary/20 z-50">
-                <DropdownMenuItem onClick={() => setLanguage('ar')} className="cursor-pointer text-sm">
+              <DropdownMenuContent className="bg-popover border border-primary/20 z-50">
+                <DropdownMenuItem onClick={() => setLanguage('ar')} className="cursor-pointer text-base font-medium">
                   🇲🇦 العربية
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage('ber')} className="cursor-pointer text-sm">
+                <DropdownMenuItem onClick={() => setLanguage('ber')} className="cursor-pointer text-base font-medium">
                   ⵣ ⵜⴰⵎⴰⵣⵉⵖⵜ
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage('fr')} className="cursor-pointer text-sm">
+                <DropdownMenuItem onClick={() => setLanguage('fr')} className="cursor-pointer text-base font-medium">
                   🇫🇷 Français
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage('en')} className="cursor-pointer text-sm">
+                <DropdownMenuItem onClick={() => setLanguage('en')} className="cursor-pointer text-base font-medium">
                   🇺🇸 English
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -186,21 +186,21 @@ const Header = () => {
               <div className="flex items-center gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className={`gap-1 px-2 ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
+                    <Button variant="ghost" size="sm" className={`gap-1 px-2 h-11 text-base font-medium ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
                       <User className="h-4 w-4" />
-                      <span className="hidden md:inline text-xs max-w-[80px] truncate">
+                      <span className="hidden md:inline max-w-[80px] truncate">
                         {profile?.first_name || 'Compte'}
                       </span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="bg-background border border-primary/20 z-50">
-                    <DropdownMenuItem asChild className="cursor-pointer">
+                  <DropdownMenuContent align="end" className="bg-popover border border-primary/20 z-50">
+                    <DropdownMenuItem asChild className="cursor-pointer text-base font-medium">
                       <Link to="/my-library-space" className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4" />
                         Mon Espace
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer">
+                    <DropdownMenuItem asChild className="cursor-pointer text-base font-medium">
                       <Link to="/wallet" className="flex items-center gap-2">
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -208,20 +208,20 @@ const Header = () => {
                         e-Wallet
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer">
+                    <DropdownMenuItem asChild className="cursor-pointer text-base font-medium">
                       <Link to="/profile" className="flex items-center gap-2">
                         <User className="h-4 w-4" />
                         Mon Profil
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer">
+                    <DropdownMenuItem asChild className="cursor-pointer text-base font-medium">
                       <Link to="/dashboard" className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4" />
                         Tableau de bord
                       </Link>
                     </DropdownMenuItem>
                     {(profile?.role === 'admin' || profile?.role === 'librarian') && (
-                      <DropdownMenuItem asChild className="cursor-pointer">
+                      <DropdownMenuItem asChild className="cursor-pointer text-base font-medium">
                         <Link to="/admin/settings" className="flex items-center gap-2">
                           <Shield className="h-4 w-4" />
                           Administration
@@ -280,39 +280,39 @@ const Header = () => {
             <NavigationMenuList className="space-x-1">
               {/* Découvrir */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 text-sm px-3 py-2 ${isHomePage ? 'text-white hover:text-white' : ''}`} title={t('nav.discover')}>
+                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3 ${isHomePage ? 'text-white hover:text-white' : ''}`} title={t('nav.discover')}>
                   <BookOpen className="w-4 h-4 mr-1" />
                   <span className="hidden lg:inline">{t('nav.discover')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[500px] lg:grid-cols-2 bg-background border border-primary/20 shadow-xl">
+                  <div className="grid gap-2 p-4 w-[500px] lg:grid-cols-2 bg-popover border border-primary/20 shadow-xl">
                     <div className="space-y-1">
-                      <h4 className="text-xs font-bold text-primary mb-1 pb-1">{t('nav.practical.info')}</h4>
+                      <h4 className="text-base font-bold text-primary mb-1 pb-1">{t('nav.practical.info')}</h4>
                       <NavigationMenuLink asChild>
-                        <Link to="/practical-info" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <Link to="/practical-info" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.schedules.access')}
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/services-tarifs" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <Link to="/services-tarifs" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.services.catalog')}
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/help" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <Link to="/help" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {language === 'ar' ? 'مركز المساعدة' : 'Centre d\'Aide'}
                         </Link>
                       </NavigationMenuLink>
                     </div>
                     <div className="space-y-1">
-                      <h4 className="text-xs font-bold text-primary mb-1 pb-1">{t('nav.history.missions')}</h4>
+                      <h4 className="text-base font-bold text-primary mb-1 pb-1">{t('nav.history.missions')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/histoire" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <a href="/histoire" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.library.history')}
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/mot-direction" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <a href="/mot-direction" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.management.message')}
                         </a>
                       </NavigationMenuLink>
@@ -323,25 +323,25 @@ const Header = () => {
 
               {/* Services */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 text-sm px-3 py-2 ${isHomePage ? 'text-white hover:text-white' : ''}`} title={t('nav.services')}>
+                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3 ${isHomePage ? 'text-white hover:text-white' : ''}`} title={t('nav.services')}>
                   <Users className="w-4 h-4 mr-1" />
                   <span className="hidden lg:inline">{t('nav.services')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[400px] bg-background border border-primary/20 shadow-xl">
+                  <div className="grid gap-2 p-4 w-[400px] bg-popover border border-primary/20 shadow-xl">
                     <div className="space-y-1">
                       <NavigationMenuLink asChild>
-                        <Link to="/digital-library" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <Link to="/digital-library" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.consult.national.library')}
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/legal-deposit" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <Link to="/legal-deposit" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.legal.deposit')}
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/demande-reproduction" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <Link to="/demande-reproduction" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.reproduction.request')}
                         </Link>
                       </NavigationMenuLink>
@@ -352,44 +352,44 @@ const Header = () => {
 
               {/* Explorer */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 text-sm px-3 py-2 ${isHomePage ? 'text-white hover:text-white' : ''}`} title={t('nav.explore')}>
+                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3 ${isHomePage ? 'text-white hover:text-white' : ''}`} title={t('nav.explore')}>
                   <Book className="w-4 h-4 mr-1" />
                   <span className="hidden lg:inline">{t('nav.explore')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[450px] lg:grid-cols-2 bg-background border border-primary/20 shadow-xl">
+                  <div className="grid gap-2 p-4 w-[450px] lg:grid-cols-2 bg-popover border border-primary/20 shadow-xl">
                     <div className="space-y-1">
-                      <h4 className="text-xs font-bold text-primary mb-1">{t('nav.collections')}</h4>
+                      <h4 className="text-base font-bold text-primary mb-1">{t('nav.collections')}</h4>
                       <NavigationMenuLink asChild>
-                        <Link to="/plateforme-manuscrits" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded bg-accent/50 font-semibold">
+                        <Link to="/plateforme-manuscrits" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded bg-accent/50">
                           📜 Plateforme Manuscrits (BNRM & Partenaires)
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/manuscripts" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <a href="/manuscripts" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.manuscripts')}
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/collections-numerisees" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <a href="/collections-numerisees" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.digitized.collections')}
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/news" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <Link to="/news" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           {t('nav.news.events')}
                         </Link>
                       </NavigationMenuLink>
                     </div>
                     <div className="space-y-1">
-                      <h4 className="text-xs font-bold text-primary mb-1">Ressources</h4>
+                      <h4 className="text-base font-bold text-primary mb-1">Ressources</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/catalogue-general" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <a href="/catalogue-general" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           Catalogue général
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/bibliographies" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <a href="/bibliographies" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           Bibliographies
                         </a>
                       </NavigationMenuLink>
@@ -400,37 +400,37 @@ const Header = () => {
 
               {/* Consulter nos actualités */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 font-semibold text-lg px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-primary/20 ${isHomePage ? 'text-white hover:text-white' : 'text-foreground hover:text-primary'}`}>
-                  <Calendar className="w-5 h-5 mr-3" />
-                  {t('nav.consult.news')}
+                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3 ${isHomePage ? 'text-white hover:text-white' : ''}`}>
+                  <Calendar className="w-4 h-4 mr-1" />
+                  <span className="hidden lg:inline">{t('nav.consult.news')}</span>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="grid gap-4 p-8 w-[600px] md:w-[700px] lg:grid-cols-2 bg-background/95 backdrop-blur-lg border-2 border-primary/20 rounded-2xl shadow-2xl">
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">{t('nav.news.section')}</h4>
+                <NavigationMenuContent className="z-50">
+                  <div className="grid gap-2 p-4 w-[600px] md:w-[700px] lg:grid-cols-2 bg-popover border border-primary/20 shadow-xl">
+                    <div className="space-y-1">
+                      <h4 className="text-base font-bold text-primary mb-1">{t('nav.news.section')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/news" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.news.publications')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        <a href="/news" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                          <div className="font-medium">{t('nav.news.publications')}</div>
+                          <p className="text-sm text-muted-foreground">
                             {t('nav.news.publications.desc')}
                           </p>
                         </a>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/ils-parlent-de-nous" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.they.talk.about.us')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        <a href="/ils-parlent-de-nous" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                          <div className="font-medium">{t('nav.they.talk.about.us')}</div>
+                          <p className="text-sm text-muted-foreground">
                             {t('nav.they.talk.about.us.desc')}
                           </p>
                         </a>
                       </NavigationMenuLink>
                     </div>
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-primary mb-3">{t('nav.culture.section')}</h4>
+                    <div className="space-y-1">
+                      <h4 className="text-base font-bold text-primary mb-1">{t('nav.culture.section')}</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/programmation-culturelle" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
-                          <div className="text-sm font-medium leading-none">{t('nav.cultural.programming')}</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        <a href="/programmation-culturelle" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                          <div className="font-medium">{t('nav.cultural.programming')}</div>
+                          <p className="text-sm text-muted-foreground">
                             {t('nav.cultural.programming.desc')}
                           </p>
                         </a>
@@ -442,24 +442,24 @@ const Header = () => {
 
               {/* Collaborer avec nous */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 font-semibold text-lg px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-primary/20 ${isHomePage ? 'text-white hover:text-white' : 'text-foreground hover:text-primary'}`}>
-                  <Building className="w-5 h-5 mr-3" />
-                  {t('nav.collaborate')}
+                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3 ${isHomePage ? 'text-white hover:text-white' : ''}`}>
+                  <Building className="w-4 h-4 mr-1" />
+                  <span className="hidden lg:inline">{t('nav.collaborate')}</span>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="grid gap-4 p-8 w-[500px] bg-background/95 backdrop-blur-lg border-2 border-primary/20 rounded-2xl shadow-2xl">
+                <NavigationMenuContent className="z-50">
+                  <div className="grid gap-2 p-4 w-[500px] bg-popover border border-primary/20 shadow-xl">
                     <NavigationMenuLink asChild>
-                      <a href="/collaborations-nationales" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
-                        <div className="text-sm font-medium leading-none">{t('nav.national.collaborations')}</div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      <a href="/collaborations-nationales" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <div className="font-medium">{t('nav.national.collaborations')}</div>
+                        <p className="text-sm text-muted-foreground">
                           {t('nav.national.collaborations.desc')}
                         </p>
                       </a>
                     </NavigationMenuLink>
                     <NavigationMenuLink asChild>
-                      <a href="/collaborations-internationales" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-foreground">
-                        <div className="text-sm font-medium leading-none">{t('nav.international.collaborations')}</div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      <a href="/collaborations-internationales" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                        <div className="font-medium">{t('nav.international.collaborations')}</div>
+                        <p className="text-sm text-muted-foreground">
                           {t('nav.international.collaborations.desc')}
                         </p>
                       </a>
