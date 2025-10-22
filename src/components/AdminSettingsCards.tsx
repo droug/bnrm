@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, Edit, Library, UserCog } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, Edit, Library, UserCog, MapPin } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useNavigate } from "react-router-dom";
@@ -72,6 +72,13 @@ export function AdminSettingsCards() {
       description: "Inviter et valider les inscriptions des professionnels",
       href: "/admin/professional-management",
       permission: "users.manage"
+    },
+    {
+      icon: MapPin,
+      title: "Gestion des Visites Guidées",
+      description: "Gérer les créneaux et réservations de visites guidées",
+      href: "/admin/guided-tours",
+      permission: "content.manage"
     }
   ];
 

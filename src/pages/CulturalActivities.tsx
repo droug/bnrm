@@ -86,7 +86,7 @@ const CulturalActivities = () => {
             </Link>
 
             {/* Card 2: Visites guidées */}
-            <Link to="/cultural-activities/guided-tours">
+            <Link to="/activites-culturelles/visites">
               <Card className="h-full hover:shadow-xl transition-all duration-300 group border-2 hover:border-[#D4AF37] rounded-2xl">
                 <CardContent className="p-6 text-center space-y-4">
                   <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
