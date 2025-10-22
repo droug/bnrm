@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { generateProgramContributionPDF } from "@/utils/pdfGenerator";
 
 import StepDemandeur from "./program-steps/StepDemandeur";
 import StepProposition from "./program-steps/StepProposition";
@@ -141,13 +142,18 @@ const ProgramContributionWizard = () => {
         console.error("Erreur lors de l'envoi de l'email:", emailError);
       }
 
+      // Générer le PDF avec le vrai numéro de référence
+      generateProgramContributionPDF(data, contribution.numero_reference);
+
       toast({
         title: "Proposition soumise avec succès",
-        description: "Vous recevrez un email de confirmation sous peu",
+        description: "Vous recevrez un email de confirmation sous peu. Le PDF a été téléchargé.",
       });
 
-      // Rediriger vers la page de confirmation
-      window.location.href = `/activites-culturelles/participation/confirmation?id=${contribution.id}`;
+      // Rediriger vers la page de confirmation après un délai
+      setTimeout(() => {
+        window.location.href = `/activites-culturelles/participation/confirmation?id=${contribution.id}`;
+      }, 2000);
     } catch (error: any) {
       console.error("Erreur lors de la soumission:", error);
       

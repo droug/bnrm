@@ -4,9 +4,11 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
-import { FileCheck, Info, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { FileCheck, Info, CheckCircle2, Download } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { generateProgramContributionPDF } from "@/utils/pdfGenerator";
 
 interface StepConfirmationProgProps {
   form: UseFormReturn<ProgramContributionFormData>;
@@ -14,6 +16,11 @@ interface StepConfirmationProgProps {
 
 const StepConfirmationProg = ({ form }: StepConfirmationProgProps) => {
   const formData = form.watch();
+
+  const handleDownloadPDF = () => {
+    const tempReference = `TEMP-${Date.now()}`;
+    generateProgramContributionPDF(formData, tempReference);
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -133,6 +140,16 @@ const StepConfirmationProg = ({ form }: StepConfirmationProgProps) => {
           Votre proposition sera examinée par le Département des Activités Culturelles dans les meilleurs délais.
         </AlertDescription>
       </Alert>
+
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handleDownloadPDF}
+        className="w-full rounded-xl border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
+      >
+        <Download className="mr-2 h-4 w-4" />
+        Télécharger un récapitulatif PDF
+      </Button>
     </div>
   );
 };

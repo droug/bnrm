@@ -62,3 +62,6 @@ verify_jwt = true
 
 [functions.inject-professional-data]
 verify_jwt = true
+
+[functions.send-program-contribution-confirmation]
+verify_jwt = false
