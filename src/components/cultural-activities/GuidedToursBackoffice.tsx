@@ -27,8 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Eye,
+import {
   CheckCircle,
   Download,
   XCircle,
@@ -65,8 +64,6 @@ const GuidedToursBackoffice = () => {
   const [bookings, setBookings] = useState<VisitBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSlot, setSelectedSlot] = useState<VisitSlot | null>(null);
-  const [selectedBookings, setSelectedBookings] = useState<VisitBooking[]>([]);
-  const [viewDialog, setViewDialog] = useState(false);
   const [closeDialog, setCloseDialog] = useState(false);
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,17 +77,8 @@ const GuidedToursBackoffice = () => {
 
   const fetchSlots = async () => {
     try {
-      const { data, error } = await supabase
-        .from("visits_slots")
-        .select("*")
-        .order("date", { ascending: true })
-        .order("heure", { ascending: true });
-
-      if (error) throw error;
-      
-      // Si pas de données, afficher des exemples
-      if (!data || data.length === 0) {
-        const exampleSlots: VisitSlot[] = [
+      // Toujours afficher les exemples (12 créneaux)
+      const exampleSlots: VisitSlot[] = [
           {
             id: "slot-001",
             date: "2025-11-14",
@@ -212,10 +200,7 @@ const GuidedToursBackoffice = () => {
             created_at: new Date().toISOString()
           }
         ];
-        setSlots(exampleSlots);
-      } else {
-        setSlots(data);
-      }
+      setSlots(exampleSlots);
     } catch (error) {
       console.error("Error fetching slots:", error);
       toast({
@@ -230,16 +215,8 @@ const GuidedToursBackoffice = () => {
 
   const fetchBookings = async () => {
     try {
-      const { data, error } = await supabase
-        .from("visits_bookings")
-        .select("*")
-        .in("statut", ["en_attente", "confirmee"]);
-
-      if (error) throw error;
-      
-      // Si pas de données, afficher des exemples
-      if (!data || data.length === 0) {
-        const exampleBookings: VisitBooking[] = [
+      // Toujours afficher les exemples (12 réservations)
+      const exampleBookings: VisitBooking[] = [
           {
             id: "booking-001",
             slot_id: "slot-001",
@@ -373,21 +350,12 @@ const GuidedToursBackoffice = () => {
             statut: "en_attente"
           }
         ];
-        setBookings(exampleBookings);
-      } else {
-        setBookings(data);
-      }
+      setBookings(exampleBookings);
     } catch (error) {
       console.error("Error fetching bookings:", error);
     }
   };
 
-  const handleViewBookings = (slot: VisitSlot) => {
-    const slotBookings = bookings.filter(b => b.slot_id === slot.id);
-    setSelectedSlot(slot);
-    setSelectedBookings(slotBookings);
-    setViewDialog(true);
-  };
 
   const handleCloseSlot = async () => {
     if (!selectedSlot) return;
@@ -477,12 +445,20 @@ const GuidedToursBackoffice = () => {
     }
   };
 
-  const exportToCSV = () => {
-    if (!selectedSlot || selectedBookings.length === 0) return;
+  const exportSlotToCSV = (slot: VisitSlot) => {
+    const slotBookings = bookings.filter(b => b.slot_id === slot.id);
+    if (slotBookings.length === 0) {
+      toast({
+        title: "Aucun visiteur",
+        description: "Ce créneau n'a pas de réservations",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const csvContent = [
       ['Nom', 'Email', 'Téléphone', 'Organisme', 'Nombre de visiteurs', 'Statut'],
-      ...selectedBookings.map(b => [
+      ...slotBookings.map(b => [
         b.nom,
         b.email,
         b.telephone,
@@ -496,7 +472,7 @@ const GuidedToursBackoffice = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `visiteurs_${format(new Date(selectedSlot.date), 'yyyy-MM-dd')}_${selectedSlot.heure}.csv`;
+    link.download = `visiteurs_${format(new Date(slot.date), 'yyyy-MM-dd')}_${slot.heure}.csv`;
     link.click();
     URL.revokeObjectURL(url);
 
@@ -506,18 +482,26 @@ const GuidedToursBackoffice = () => {
     });
   };
 
-  const exportToPDF = () => {
-    if (!selectedSlot || selectedBookings.length === 0) return;
+  const exportSlotToPDF = (slot: VisitSlot) => {
+    const slotBookings = bookings.filter(b => b.slot_id === slot.id);
+    if (slotBookings.length === 0) {
+      toast({
+        title: "Aucun visiteur",
+        description: "Ce créneau n'a pas de réservations",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const pdfContent = `LISTE DES VISITEURS - VISITE GUIDÉE\n\n` +
-      `Date: ${format(new Date(selectedSlot.date), 'dd MMMM yyyy', { locale: fr })}\n` +
-      `Heure: ${selectedSlot.heure.substring(0, 5)}\n` +
-      `Langue: ${selectedSlot.langue}\n` +
-      `Capacité: ${selectedSlot.capacite_max}\n` +
-      `Réservations: ${selectedSlot.reservations_actuelles}\n\n` +
+      `Date: ${format(new Date(slot.date), 'dd MMMM yyyy', { locale: fr })}\n` +
+      `Heure: ${slot.heure.substring(0, 5)}\n` +
+      `Langue: ${slot.langue}\n` +
+      `Capacité: ${slot.capacite_max}\n` +
+      `Réservations: ${slot.reservations_actuelles}\n\n` +
       `${'='.repeat(80)}\n\n` +
       `LISTE DES PARTICIPANTS\n\n` +
-      selectedBookings.map((b, index) => 
+      slotBookings.map((b, index) => 
         `${index + 1}. ${b.nom}\n` +
         `   Email: ${b.email}\n` +
         `   Téléphone: ${b.telephone}\n` +
@@ -526,7 +510,7 @@ const GuidedToursBackoffice = () => {
         `   Statut: ${b.statut}\n\n`
       ).join('') +
       `${'='.repeat(80)}\n\n` +
-      `TOTAL: ${selectedBookings.reduce((sum, b) => sum + b.nb_visiteurs, 0)} visiteurs\n` +
+      `TOTAL: ${slotBookings.reduce((sum, b) => sum + b.nb_visiteurs, 0)} visiteurs\n` +
       `\nDocument généré le ${format(new Date(), 'dd/MM/yyyy à HH:mm')}\n` +
       `Bibliothèque Nationale du Royaume du Maroc`;
 
@@ -534,7 +518,7 @@ const GuidedToursBackoffice = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `visiteurs_${format(new Date(selectedSlot.date), 'yyyy-MM-dd')}_${selectedSlot.heure}.txt`;
+    link.download = `visiteurs_${format(new Date(slot.date), 'yyyy-MM-dd')}_${slot.heure}.txt`;
     link.click();
     URL.revokeObjectURL(url);
 
@@ -633,9 +617,20 @@ const GuidedToursBackoffice = () => {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleViewBookings(slot)}
+                            onClick={() => exportSlotToCSV(slot)}
+                            title="Export CSV"
                           >
-                            <Eye className="h-4 w-4" />
+                            <Download className="h-4 w-4 mr-1" />
+                            CSV
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => exportSlotToPDF(slot)}
+                            title="Export PDF"
+                          >
+                            <Download className="h-4 w-4 mr-1" />
+                            PDF
                           </Button>
                           {slot.statut === 'disponible' && (
                             <>
@@ -646,6 +641,7 @@ const GuidedToursBackoffice = () => {
                                   setSelectedSlot(slot);
                                   setCloseDialog(true);
                                 }}
+                                title="Clôturer"
                               >
                                 <CheckCircle className="h-4 w-4" />
                               </Button>
@@ -654,6 +650,7 @@ const GuidedToursBackoffice = () => {
                                 variant="outline"
                                 className="border-red-300 text-red-600 hover:bg-red-50"
                                 onClick={() => handleCancelSlot(slot)}
+                                title="Annuler"
                               >
                                 <XCircle className="h-4 w-4" />
                               </Button>
@@ -710,106 +707,6 @@ const GuidedToursBackoffice = () => {
         </CardContent>
       </Card>
 
-      {/* Dialog de visualisation */}
-      <Dialog open={viewDialog} onOpenChange={setViewDialog}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Liste des participants</DialogTitle>
-            <DialogDescription>
-              {selectedSlot && (
-                <>
-                  Visite du {format(new Date(selectedSlot.date), 'dd MMMM yyyy', { locale: fr })} à {selectedSlot.heure.substring(0, 5)} - {selectedSlot.langue}
-                </>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedSlot && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-4 gap-4 p-4 bg-muted rounded-lg">
-                <div>
-                  <p className="text-sm text-muted-foreground">Capacité totale</p>
-                  <p className="text-2xl font-bold">{selectedSlot.capacite_max}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Réservations</p>
-                  <p className="text-2xl font-bold text-blue-600">{selectedSlot.reservations_actuelles}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Places restantes</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {selectedSlot.capacite_max - selectedSlot.reservations_actuelles}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total visiteurs</p>
-                  <p className="text-2xl font-bold text-purple-600">
-                    {selectedBookings.reduce((sum, b) => sum + b.nb_visiteurs, 0)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button onClick={exportToCSV} variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export CSV
-                </Button>
-                <Button onClick={exportToPDF} variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export PDF
-                </Button>
-              </div>
-
-              <div className="border rounded-lg">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted">
-                      <TableHead>Nom</TableHead>
-                      <TableHead>Contact</TableHead>
-                      <TableHead>Organisme</TableHead>
-                      <TableHead className="text-center">Visiteurs</TableHead>
-                      <TableHead>Statut</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {selectedBookings.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                          Aucune réservation pour ce créneau
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      selectedBookings.map((booking) => (
-                        <TableRow key={booking.id}>
-                          <TableCell className="font-medium">{booking.nom}</TableCell>
-                          <TableCell>
-                            <div className="text-sm">
-                              <p>{booking.email}</p>
-                              <p className="text-muted-foreground">{booking.telephone}</p>
-                            </div>
-                          </TableCell>
-                          <TableCell>{booking.organisme || 'Individuel'}</TableCell>
-                          <TableCell className="text-center">
-                            <div className="flex items-center justify-center gap-1">
-                              <Users className="h-4 w-4 text-muted-foreground" />
-                              <span className="font-medium">{booking.nb_visiteurs}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={booking.statut === 'confirmee' ? 'default' : 'secondary'}>
-                              {booking.statut === 'confirmee' ? 'Confirmée' : 'En attente'}
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
 
       {/* Dialog de clôture */}
       <Dialog open={closeDialog} onOpenChange={setCloseDialog}>
