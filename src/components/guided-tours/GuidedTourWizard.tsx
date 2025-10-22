@@ -52,27 +52,42 @@ const GuidedTourWizard = () => {
   };
 
   const handleUpdateData = (data: Partial<BookingData>) => {
-    setBookingData((prev) => ({ ...prev, ...data }));
+    setBookingData((prev) => {
+      const updated = { ...prev, ...data };
+      console.log("Booking data updated:", updated);
+      return updated;
+    });
   };
 
   const isStepValid = (): boolean => {
-    switch (currentStep) {
-      case 1:
-        return !!bookingData.slotId && !!bookingData.selectedSlot;
-      case 2:
-        return !!(
-          bookingData.nom &&
-          bookingData.email &&
-          bookingData.telephone &&
-          bookingData.nbVisiteurs &&
-          bookingData.langue &&
-          bookingData.nbVisiteurs <= (bookingData.selectedSlot?.capacite_max || 0) - (bookingData.selectedSlot?.reservations_actuelles || 0)
-        );
-      case 3:
-        return !!bookingData.confirmation;
-      default:
-        return false;
-    }
+    const valid = (() => {
+      switch (currentStep) {
+        case 1:
+          const hasSlot = !!bookingData.slotId && !!bookingData.selectedSlot;
+          console.log("Step 1 validation:", { slotId: bookingData.slotId, hasSlot });
+          return hasSlot;
+        case 2:
+          const hasBasicInfo = !!(
+            bookingData.nom &&
+            bookingData.email &&
+            bookingData.telephone &&
+            bookingData.nbVisiteurs &&
+            bookingData.langue
+          );
+          const capacityCheck = bookingData.nbVisiteurs! <= (bookingData.selectedSlot?.capacite_max || 0) - (bookingData.selectedSlot?.reservations_actuelles || 0);
+          console.log("Step 2 validation:", { hasBasicInfo, capacityCheck, bookingData });
+          return hasBasicInfo && capacityCheck;
+        case 3:
+          const hasConfirmation = !!bookingData.confirmation;
+          console.log("Step 3 validation:", { hasConfirmation });
+          return hasConfirmation;
+        default:
+          return false;
+      }
+    })();
+    
+    console.log(`Step ${currentStep} is ${valid ? 'valid' : 'invalid'}`);
+    return valid;
   };
 
   const CurrentStepComponent = STEPS[currentStep - 1].component;

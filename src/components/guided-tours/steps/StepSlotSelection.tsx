@@ -64,11 +64,16 @@ const StepSlotSelection = ({ data, onUpdate }: StepSlotSelectionProps) => {
       return;
     }
 
+    console.log("Slot selected:", slot);
+    
     onUpdate({
       slotId: slot.id,
       selectedSlot: slot,
       langue: slot.langue,
+      nbVisiteurs: 1, // Initialiser avec 1 visiteur par défaut
     });
+
+    toast.success("Créneau sélectionné avec succès");
   };
 
   const getLangueColor = (langue: string) => {
@@ -95,6 +100,14 @@ const StepSlotSelection = ({ data, onUpdate }: StepSlotSelectionProps) => {
         <p className="text-muted-foreground">
           Choisissez une date puis un horaire disponible
         </p>
+        {data.slotId && (
+          <Alert className="mt-4 bg-green-50 border-green-200">
+            <Info className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-900">
+              ✓ Créneau sélectionné - Cliquez sur "Suivant" pour continuer
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
 
       <Alert>

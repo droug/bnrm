@@ -4,10 +4,15 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import GuidedTourWizard from "@/components/guided-tours/GuidedTourWizard";
+import SeedVisitSlotsButton from "@/components/admin/SeedVisitSlotsButton";
+import { useAuth } from "@/hooks/useAuth";
 
 const CulturalActivitiesGuidedTours = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.email?.includes("admin"); // Vérification simple pour les admins
+
   return (
-    <div className="min-h-screen bg-[#FAF9F5]">
+    <div className="min-h-screen bg-background">
       <Header />
       
       <div className="container mx-auto px-4 py-12">
@@ -26,6 +31,11 @@ const CulturalActivitiesGuidedTours = () => {
             Découvrez les trésors de la Bibliothèque Nationale du Royaume du Maroc 
             lors d'une visite guidée personnalisée
           </p>
+          {isAdmin && (
+            <div className="mt-4 flex justify-center">
+              <SeedVisitSlotsButton />
+            </div>
+          )}
         </div>
 
         <GuidedTourWizard />
