@@ -1,9 +1,34 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent } from "@/components/ui/card";
-import { Building2, Users, GraduationCap, Briefcase, Upload, CheckCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Upload, CheckCircle, Loader2, Users, Square, ChevronsUpDown, Check } from "lucide-react";
 import { toast } from "sonner";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 import type { BookingData } from "../BookingWizard";
 
 interface StepOrganizerTypeProps {
@@ -12,45 +37,34 @@ interface StepOrganizerTypeProps {
   onNext: () => void;
 }
 
-const ORGANIZER_TYPES = [
-  { 
-    value: "association", 
-    label: "Association",
-    icon: Users,
-    description: "Association culturelle ou artistique" 
-  },
-  { 
-    value: "institution", 
-    label: "Institution publique",
-    icon: Building2,
-    description: "Ministère, collectivité territoriale, etc." 
-  },
-  { 
-    value: "educational", 
-    label: "Établissement d'enseignement",
-    icon: GraduationCap,
-    description: "Université, école, centre de formation" 
-  },
-  { 
-    value: "company", 
-    label: "Entreprise privée",
-    icon: Briefcase,
-    description: "Société, start-up, etc." 
-  }
-];
-
 export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeProps) {
+  const [open, setOpen] = useState(false);
+  
+  const { data: spaces, isLoading } = useQuery({
+    queryKey: ['cultural-spaces'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cultural_spaces')
+        .select('*')
+        .eq('is_active', true)
+        .order('name');
+      
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const selectedSpace = spaces?.find(s => s.id === data.spaceId);
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Vérifier que c'est un PDF
       if (file.type !== 'application/pdf') {
         toast.error("Veuillez sélectionner un fichier PDF");
         e.target.value = '';
         return;
       }
       
-      // Vérifier la taille (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         toast.error("Le fichier ne doit pas dépasser 10 MB");
         e.target.value = '';
@@ -62,64 +76,42 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Type d'organisme</h2>
+        <h2 className="text-2xl font-bold mb-2">Type d'organisme & sélection de l'espace</h2>
         <p className="text-muted-foreground">
-          Sélectionnez le type d'organisation qui souhaite réserver un espace
+          Renseignez les informations de votre organisme et choisissez l'espace souhaité
         </p>
       </div>
 
-      <div className="space-y-4">
-        <Label>Type d'organisation *</Label>
-        <RadioGroup
+      {/* Type d'organisme */}
+      <div className="space-y-2">
+        <Label htmlFor="organizerType">Type d'organisme *</Label>
+        <Select
           value={data.organizerType}
           onValueChange={(value) => onUpdate({ organizerType: value })}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
-          {ORGANIZER_TYPES.map((type) => {
-            const Icon = type.icon;
-            return (
-              <Card
-                key={type.value}
-                className={`relative cursor-pointer transition-all hover:shadow-md ${
-                  data.organizerType === type.value
-                    ? 'ring-2 ring-primary bg-primary/5'
-                    : 'hover:border-primary/50'
-                }`}
-              >
-                <label
-                  htmlFor={type.value}
-                  className="flex items-start gap-4 p-4 cursor-pointer"
-                >
-                  <RadioGroupItem value={type.value} id={type.value} className="mt-1" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Icon className="h-5 w-5 text-primary" />
-                      <span className="font-semibold">{type.label}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{type.description}</p>
-                  </div>
-                </label>
-              </Card>
-            );
-          })}
-        </RadioGroup>
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionner le type d'organisme" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="public">Public</SelectItem>
+            <SelectItem value="private">Privé</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="organizationName">Nom de l'organisation *</Label>
-        <Input
-          id="organizationName"
-          placeholder="Ex: Association Culturelle Al Amal"
-          value={data.organizationName || ""}
-          onChange={(e) => onUpdate({ organizationName: e.target.value })}
-        />
-      </div>
-
-      {/* Champ upload PDF si institution publique */}
-      {data.organizerType === 'institution' && (
+      {/* Upload PDF si organisme public */}
+      {data.organizerType === 'public' && (
         <Card className="border-2 border-primary/20 bg-primary/5">
           <CardContent className="p-6 space-y-4">
             <div>
@@ -148,6 +140,129 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
             )}
           </CardContent>
         </Card>
+      )}
+
+      {/* Sélection de l'espace */}
+      <div className="space-y-2">
+        <Label>Espace *</Label>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full justify-between h-auto min-h-[2.5rem]"
+            >
+              {selectedSpace ? (
+                <span className="text-left">{selectedSpace.name}</span>
+              ) : (
+                <span className="text-muted-foreground">Sélectionner un espace...</span>
+              )}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0" align="start">
+            <Command>
+              <CommandInput placeholder="Rechercher un espace..." />
+              <CommandEmpty>Aucun espace trouvé.</CommandEmpty>
+              <CommandGroup className="max-h-[300px] overflow-auto">
+                {spaces?.map((space) => (
+                  <CommandItem
+                    key={space.id}
+                    value={space.name}
+                    onSelect={() => {
+                      onUpdate({ spaceId: space.id });
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        data.spaceId === space.id ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {space.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {/* Détails de l'espace sélectionné */}
+      {selectedSpace && (
+        <Card className="border-2 border-primary/20 bg-primary/5">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <h3 className="font-semibold text-lg">{selectedSpace.name}</h3>
+                {selectedSpace.floor_level && (
+                  <p className="text-sm text-muted-foreground">{selectedSpace.floor_level}</p>
+                )}
+              </div>
+              <Badge className="gap-1">
+                <CheckCircle className="h-3 w-3" />
+                Sélectionné
+              </Badge>
+            </div>
+
+            {selectedSpace.description && (
+              <p className="text-sm text-muted-foreground mb-4">
+                {selectedSpace.description}
+              </p>
+            )}
+
+            <div className="flex flex-wrap gap-4 text-sm mb-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Users className="h-4 w-4" />
+                <span>Capacité: {selectedSpace.capacity} personnes</span>
+              </div>
+              {selectedSpace.surface_m2 && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Square className="h-4 w-4" />
+                  <span>Surface: {selectedSpace.surface_m2} m²</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {selectedSpace.has_stage && (
+                <Badge variant="secondary" className="text-xs">Scène</Badge>
+              )}
+              {selectedSpace.has_sound_system && (
+                <Badge variant="secondary" className="text-xs">Sonorisation</Badge>
+              )}
+              {selectedSpace.has_lighting && (
+                <Badge variant="secondary" className="text-xs">Éclairage</Badge>
+              )}
+              {selectedSpace.has_projection && (
+                <Badge variant="secondary" className="text-xs">Projection</Badge>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Calendrier des disponibilités */}
+      {data.spaceId && (
+        <div className="space-y-2">
+          <Label>Disponibilités de l'espace</Label>
+          <Card>
+            <CardContent className="p-6">
+              <Calendar
+                mode="single"
+                selected={data.eventDate}
+                onSelect={(date) => onUpdate({ eventDate: date })}
+                className="rounded-md border"
+                disabled={(date) => date < new Date()}
+              />
+              <p className="text-sm text-muted-foreground mt-3">
+                Sélectionnez une date pour vérifier la disponibilité
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );

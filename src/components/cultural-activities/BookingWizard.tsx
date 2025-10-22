@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import StepOrganizerType from "./steps/StepOrganizerType";
-import StepSpaceSelection from "./steps/StepSpaceSelection";
 import StepDateTime from "./steps/StepDateTime";
 import StepEquipment from "./steps/StepEquipment";
 import StepServices from "./steps/StepServices";
@@ -27,12 +26,11 @@ export interface BookingData {
 }
 
 const STEPS = [
-  { id: 1, title: "Type d'organisme", component: StepOrganizerType },
-  { id: 2, title: "Sélection de l'espace", component: StepSpaceSelection },
-  { id: 3, title: "Date et horaires", component: StepDateTime },
-  { id: 4, title: "Équipements", component: StepEquipment },
-  { id: 5, title: "Services complémentaires", component: StepServices },
-  { id: 6, title: "Récapitulatif", component: StepSummary }
+  { id: 1, title: "Type d'organisme & sélection de l'espace", component: StepOrganizerType },
+  { id: 2, title: "Date et horaires", component: StepDateTime },
+  { id: 3, title: "Équipements", component: StepEquipment },
+  { id: 4, title: "Services complémentaires", component: StepServices },
+  { id: 5, title: "Récapitulatif", component: StepSummary }
 ];
 
 export default function BookingWizard() {
