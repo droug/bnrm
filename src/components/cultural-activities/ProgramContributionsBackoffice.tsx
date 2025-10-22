@@ -57,6 +57,7 @@ interface ProgramContribution {
   langue: string;
   objectifs: string;
   numero_reference: string;
+  commentaires_comite: string | null;
 }
 
 const ProgramContributionsBackoffice = () => {
@@ -70,6 +71,8 @@ const ProgramContributionsBackoffice = () => {
   const [rejectReason, setRejectReason] = useState("");
   const [requestInfoMessage, setRequestInfoMessage] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [editingComments, setEditingComments] = useState<string | null>(null);
+  const [commentsText, setCommentsText] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -103,6 +106,30 @@ const ProgramContributionsBackoffice = () => {
     }
   };
 
+  const handleSaveComments = async (contributionId: string) => {
+    const { error } = await supabase
+      .from("program_contributions")
+      .update({ commentaires_comite: commentsText })
+      .eq("id", contributionId);
+
+    if (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les commentaires",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Commentaires sauvegardés",
+      description: "Les commentaires du comité ont été mis à jour",
+    });
+
+    setEditingComments(null);
+    fetchContributions();
+  };
+
   const handleApprove = async () => {
     if (!selectedContribution) return;
 
@@ -110,7 +137,7 @@ const ProgramContributionsBackoffice = () => {
       const { error } = await supabase
         .from("program_contributions")
         .update({ 
-          statut: "accepte",
+          statut: "acceptee",
           date_examen: new Date().toISOString()
         })
         .eq("id", selectedContribution.id);
@@ -148,7 +175,7 @@ const ProgramContributionsBackoffice = () => {
       const { error } = await supabase
         .from("program_contributions")
         .update({ 
-          statut: "refuse",
+          statut: "rejetee",
           motif_refus: rejectReason,
           date_examen: new Date().toISOString()
         })
@@ -264,9 +291,9 @@ const ProgramContributionsBackoffice = () => {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       en_attente: { label: "En attente", className: "bg-yellow-100 text-yellow-800" },
-      en_examen: { label: "En examen", className: "bg-blue-100 text-blue-800" },
-      accepte: { label: "Accepté", className: "bg-green-100 text-green-800" },
-      refuse: { label: "Refusé", className: "bg-red-100 text-red-800" },
+      en_evaluation: { label: "En évaluation", className: "bg-blue-100 text-blue-800" },
+      acceptee: { label: "Acceptée", className: "bg-green-100 text-green-800" },
+      rejetee: { label: "Rejetée", className: "bg-red-100 text-red-800" },
       info_demandee: { label: "Info demandée", className: "bg-orange-100 text-orange-800" },
     };
 
@@ -297,10 +324,9 @@ const ProgramContributionsBackoffice = () => {
               <SelectContent>
                 <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="en_attente">En attente</SelectItem>
-                <SelectItem value="en_examen">En examen</SelectItem>
-                <SelectItem value="accepte">Accepté</SelectItem>
-                <SelectItem value="refuse">Refusé</SelectItem>
-                <SelectItem value="info_demandee">Info demandée</SelectItem>
+                <SelectItem value="en_evaluation">En évaluation</SelectItem>
+                <SelectItem value="acceptee">Acceptée</SelectItem>
+                <SelectItem value="rejetee">Rejetée</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -315,13 +341,14 @@ const ProgramContributionsBackoffice = () => {
                   <TableHead className="text-[#333333] font-semibold">Titre</TableHead>
                   <TableHead className="text-[#333333] font-semibold">Date proposée</TableHead>
                   <TableHead className="text-[#333333] font-semibold">Statut</TableHead>
+                  <TableHead className="text-[#333333] font-semibold">Commentaires</TableHead>
                   <TableHead className="text-[#333333] font-semibold text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {contributions.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-[#333333]/60 py-8">
+                    <TableCell colSpan={7} className="text-center text-[#333333]/60 py-8">
                       Aucune proposition de programmation
                     </TableCell>
                   </TableRow>
@@ -341,6 +368,52 @@ const ProgramContributionsBackoffice = () => {
                         {format(new Date(contribution.date_proposee), 'dd/MM/yyyy', { locale: fr })}
                       </TableCell>
                       <TableCell>{getStatusBadge(contribution.statut)}</TableCell>
+                      <TableCell>
+                        {editingComments === contribution.id ? (
+                          <div className="flex items-center gap-2">
+                            <Textarea
+                              value={commentsText}
+                              onChange={(e) => setCommentsText(e.target.value)}
+                              placeholder="Commentaires du comité..."
+                              className="min-h-[60px] text-sm rounded-xl"
+                            />
+                            <div className="flex flex-col gap-1">
+                              <Button
+                                size="sm"
+                                onClick={() => handleSaveComments(contribution.id)}
+                                className="shrink-0 rounded-xl"
+                              >
+                                Sauvegarder
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setEditingComments(null)}
+                                className="shrink-0 rounded-xl"
+                              >
+                                Annuler
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm text-[#333333]/70 max-w-[150px] truncate">
+                              {contribution.commentaires_comite || "Aucun commentaire"}
+                            </p>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setEditingComments(contribution.id);
+                                setCommentsText(contribution.commentaires_comite || "");
+                              }}
+                              className="rounded-xl"
+                            >
+                              Éditer
+                            </Button>
+                          </div>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button

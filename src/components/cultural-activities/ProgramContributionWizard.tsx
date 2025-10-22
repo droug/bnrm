@@ -90,27 +90,7 @@ const ProgramContributionWizard = () => {
   const onSubmit = async (data: ProgramContributionFormData) => {
     setIsSubmitting(true);
     try {
-      // Vérifier qu'il n'y a pas déjà une demande active pour cet email
-      const { data: existingRequests, error: checkError } = await supabase
-        .from("program_contributions")
-        .select("id")
-        .eq("email", data.email)
-        .eq("statut", "en_attente")
-        .maybeSingle();
-
-      if (checkError) throw checkError;
-
-      if (existingRequests) {
-        toast({
-          title: "Demande existante",
-          description: "Vous avez déjà une demande active en cours d'examen",
-          variant: "destructive",
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Insérer la demande
+      // Insérer la demande (le trigger vérifiera automatiquement la limite de 3 propositions actives)
       const { data: contribution, error: insertError } = await supabase
         .from("program_contributions")
         .insert({
@@ -167,13 +147,23 @@ const ProgramContributionWizard = () => {
 
       // Rediriger vers la page de confirmation
       window.location.href = `/activites-culturelles/participation/confirmation?id=${contribution.id}`;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erreur lors de la soumission:", error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la soumission",
-        variant: "destructive",
-      });
+      
+      // Gérer l'erreur de limite de propositions actives
+      if (error.message && error.message.includes("propositions actives")) {
+        toast({
+          title: "Limite atteinte",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erreur",
+          description: "Une erreur est survenue lors de la soumission",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
