@@ -35,7 +35,9 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    console.log("Received booking confirmation request");
     const bookingData: BookingConfirmationRequest = await req.json();
+    console.log("Booking data:", JSON.stringify(bookingData, null, 2));
 
     // Email HTML template
     const emailHtml = `
@@ -137,7 +139,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Envoyer l'email au client
     const clientEmailResponse = await resend.emails.send({
-      from: "BNRM Réservations <useryouness@gmail.com>",
+      from: "BNRM Réservations <onboarding@resend.dev>",
       to: [bookingData.userEmail],
       subject: `Confirmation de réservation - ${bookingData.eventTitle}`,
       html: emailHtml,
@@ -206,7 +208,7 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const adminEmailResponse = await resend.emails.send({
-      from: "BNRM Système <useryouness@gmail.com>",
+      from: "BNRM Système <onboarding@resend.dev>",
       to: ["useryouness@gmail.com"],
       subject: `[BNRM] Nouvelle réservation - ${bookingData.eventTitle}`,
       html: adminEmailHtml,
