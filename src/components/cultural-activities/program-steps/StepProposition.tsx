@@ -18,6 +18,15 @@ const StepProposition = ({ form }: StepPropositionProps) => {
   const [uploadingDossier, setUploadingDossier] = useState(false);
   const { toast } = useToast();
 
+  const sanitizeFileName = (fileName: string): string => {
+    return fileName
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9.-]/g, "-")
+      .replace(/-+/g, "-")
+      .toLowerCase();
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -34,7 +43,8 @@ const StepProposition = ({ form }: StepPropositionProps) => {
     setUploadingDossier(true);
 
     try {
-      const fileName = `${Date.now()}-${file.name}`;
+      const sanitizedFileName = sanitizeFileName(file.name);
+      const fileName = `${Date.now()}-${sanitizedFileName}`;
       const filePath = `program-contributions/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -47,17 +57,17 @@ const StepProposition = ({ form }: StepPropositionProps) => {
         .from("documents")
         .getPublicUrl(filePath);
 
-      form.setValue("dossier_projet_url", urlData.publicUrl);
+      form.setValue("dossier_projet_url", urlData.publicUrl, { shouldValidate: true });
 
       toast({
         title: "Dossier uploadé",
         description: "Le dossier de projet a été uploadé avec succès",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading file:", error);
       toast({
         title: "Erreur",
-        description: "Impossible d'uploader le dossier",
+        description: error?.message || "Impossible d'uploader le dossier",
         variant: "destructive",
       });
     } finally {
