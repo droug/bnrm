@@ -141,6 +141,7 @@ const CulturalActivitiesPartnership = lazy(() => import("./pages/CulturalActivit
 const CulturalActivitiesProgramming = lazy(() => import("./pages/CulturalActivitiesProgramming"));
 const CancelBooking = lazy(() => import("./pages/CancelBooking"));
 const GuidedToursBackoffice = lazy(() => import("./pages/GuidedToursBackoffice"));
+const CulturalActivitiesBackoffice = lazy(() => import("./pages/CulturalActivitiesBackoffice"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -294,6 +295,8 @@ const App = () => (
           {/* Guided Tours Backoffice */}
           <Route path="/admin/guided-tours" element={<GuidedToursBackoffice />} />
           <Route path="/admin/visites-guidees" element={<GuidedToursBackoffice />} />
+          <Route path="/admin/activites-culturelles" element={<CulturalActivitiesBackoffice />} />
+          <Route path="/admin/cultural-activities" element={<CulturalActivitiesBackoffice />} />
 
           {/* Translation Management */}
           <Route path="/admin/translations" element={<TranslationManagementPage />} />
