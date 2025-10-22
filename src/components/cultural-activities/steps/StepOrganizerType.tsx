@@ -151,7 +151,7 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
               variant="outline"
               role="combobox"
               aria-expanded={open}
-              className="w-full justify-between h-auto min-h-[2.5rem]"
+              className="w-full justify-between h-auto min-h-[2.75rem] font-normal"
             >
               {selectedSpace ? (
                 <span className="text-left">{selectedSpace.name}</span>
@@ -161,11 +161,13 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-full p-0" align="start">
-            <Command>
-              <CommandInput placeholder="Rechercher un espace..." />
-              <CommandEmpty>Aucun espace trouvé.</CommandEmpty>
-              <CommandGroup className="max-h-[300px] overflow-auto">
+          <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+            <Command className="bg-popover">
+              <CommandInput placeholder="Rechercher un espace..." className="h-10" />
+              <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
+                Aucun espace trouvé.
+              </CommandEmpty>
+              <CommandGroup className="max-h-[300px] overflow-auto p-1">
                 {spaces?.map((space) => (
                   <CommandItem
                     key={space.id}
@@ -174,6 +176,7 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
                       onUpdate({ spaceId: space.id });
                       setOpen(false);
                     }}
+                    className="cursor-pointer"
                   >
                     <Check
                       className={cn(
