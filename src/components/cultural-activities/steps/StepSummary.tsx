@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, CheckCircle, AlertCircle, Building2, Calendar, Clock, Users, Package, Sparkles, DollarSign, FileText, User, Mail, Phone, MapPin } from "lucide-react";
+import { Loader2, CheckCircle, AlertCircle, Building2, Calendar, Clock, Users, Package, Sparkles, Calculator, FileText, User, Mail, Phone, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -337,8 +337,8 @@ export default function StepSummary({ data }: StepSummaryProps) {
           <Card className="bg-primary/5 border-primary/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
-                Tarification
+                <Calculator className="h-5 w-5" />
+                Tarification calculée
               </CardTitle>
             </CardHeader>
             <CardContent>
