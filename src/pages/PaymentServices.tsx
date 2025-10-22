@@ -14,6 +14,7 @@ import {
   Book,
   Building,
   CheckCircle,
+  Theater,
   ArrowRight,
   Shield,
   Lock,
@@ -84,6 +85,21 @@ export default function PaymentServices() {
         "Support client"
       ],
       action: () => navigate("/bnrm"),
+      available: true
+    },
+    {
+      id: "cultural-activities",
+      title: "Réservation des espaces culturels",
+      description: "Réservez nos espaces pour vos événements culturels",
+      icon: Theater,
+      color: "from-pink-500 to-pink-600",
+      features: [
+        "Espaces modulables",
+        "Équipements professionnels",
+        "Services complémentaires",
+        "Tarification adaptée"
+      ],
+      action: () => navigate("/cultural-activities-booking"),
       available: true
     }
   ];
