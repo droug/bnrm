@@ -98,7 +98,7 @@ export type Database = {
           created_at: string | null
           details: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           resource_id: string | null
           resource_type: string
           user_agent: string | null
@@ -109,7 +109,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource_id?: string | null
           resource_type: string
           user_agent?: string | null
@@ -120,7 +120,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource_id?: string | null
           resource_type?: string
           user_agent?: string | null
@@ -381,6 +381,218 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      booking_equipment: {
+        Row: {
+          booking_id: string
+          created_at: string | null
+          equipment_id: string
+          id: string
+          quantity: number | null
+          total_cost: number | null
+          unit_cost: number | null
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string | null
+          equipment_id: string
+          id?: string
+          quantity?: number | null
+          total_cost?: number | null
+          unit_cost?: number | null
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string | null
+          equipment_id?: string
+          id?: string
+          quantity?: number | null
+          total_cost?: number | null
+          unit_cost?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_equipment_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_equipment_equipment_id_fkey"
+            columns: ["equipment_id"]
+            isOneToOne: false
+            referencedRelation: "space_equipment"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booking_services: {
+        Row: {
+          booking_id: string
+          created_at: string | null
+          id: string
+          quantity: number | null
+          service_id: string
+          total_cost: number | null
+          unit_cost: number | null
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string | null
+          id?: string
+          quantity?: number | null
+          service_id: string
+          total_cost?: number | null
+          unit_cost?: number | null
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string | null
+          id?: string
+          quantity?: number | null
+          service_id?: string
+          total_cost?: number | null
+          unit_cost?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_services_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "space_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          admin_notes: string | null
+          authorization_document_url: string | null
+          base_tariff_amount: number | null
+          city: string | null
+          contact_email: string
+          contact_person: string
+          contact_phone: string
+          country: string | null
+          created_at: string | null
+          currency: string | null
+          end_date: string
+          equipment_total_amount: number | null
+          event_description: string | null
+          event_title: string
+          has_accepted_conditions: boolean | null
+          has_read_rules: boolean | null
+          id: string
+          justification_document_url: string | null
+          organization_address: string | null
+          organization_name: string
+          organization_type: string
+          participants_count: number
+          program_document_url: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          services_total_amount: number | null
+          space_id: string
+          start_date: string
+          status: string | null
+          status_document_url: string | null
+          total_amount: number | null
+          updated_at: string | null
+          user_id: string | null
+          website: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          authorization_document_url?: string | null
+          base_tariff_amount?: number | null
+          city?: string | null
+          contact_email: string
+          contact_person: string
+          contact_phone: string
+          country?: string | null
+          created_at?: string | null
+          currency?: string | null
+          end_date: string
+          equipment_total_amount?: number | null
+          event_description?: string | null
+          event_title: string
+          has_accepted_conditions?: boolean | null
+          has_read_rules?: boolean | null
+          id?: string
+          justification_document_url?: string | null
+          organization_address?: string | null
+          organization_name: string
+          organization_type: string
+          participants_count: number
+          program_document_url?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          services_total_amount?: number | null
+          space_id: string
+          start_date: string
+          status?: string | null
+          status_document_url?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          authorization_document_url?: string | null
+          base_tariff_amount?: number | null
+          city?: string | null
+          contact_email?: string
+          contact_person?: string
+          contact_phone?: string
+          country?: string | null
+          created_at?: string | null
+          currency?: string | null
+          end_date?: string
+          equipment_total_amount?: number | null
+          event_description?: string | null
+          event_title?: string
+          has_accepted_conditions?: boolean | null
+          has_read_rules?: boolean | null
+          id?: string
+          justification_document_url?: string | null
+          organization_address?: string | null
+          organization_name?: string
+          organization_type?: string
+          participants_count?: number
+          program_document_url?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          services_total_amount?: number | null
+          space_id?: string
+          start_date?: string
+          status?: string | null
+          status_document_url?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "cultural_spaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       catalog_metadata: {
         Row: {
@@ -1060,13 +1272,64 @@ export type Database = {
           },
         ]
       }
+      cultural_spaces: {
+        Row: {
+          capacity: number
+          created_at: string | null
+          description: string | null
+          floor_level: string | null
+          has_lighting: boolean | null
+          has_projection: boolean | null
+          has_sound_system: boolean | null
+          has_stage: boolean | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          surface_m2: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          capacity: number
+          created_at?: string | null
+          description?: string | null
+          floor_level?: string | null
+          has_lighting?: boolean | null
+          has_projection?: boolean | null
+          has_sound_system?: boolean | null
+          has_stage?: boolean | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          surface_m2?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          capacity?: number
+          created_at?: string | null
+          description?: string | null
+          floor_level?: string | null
+          has_lighting?: boolean | null
+          has_projection?: boolean | null
+          has_sound_system?: boolean | null
+          has_stage?: boolean | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          surface_m2?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       deposit_activity_log: {
         Row: {
           action_type: string
           created_at: string | null
           details: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           new_status: Database["public"]["Enums"]["deposit_status"] | null
           old_status: Database["public"]["Enums"]["deposit_status"] | null
           request_id: string | null
@@ -1078,7 +1341,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           new_status?: Database["public"]["Enums"]["deposit_status"] | null
           old_status?: Database["public"]["Enums"]["deposit_status"] | null
           request_id?: string | null
@@ -1090,7 +1353,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           new_status?: Database["public"]["Enums"]["deposit_status"] | null
           old_status?: Database["public"]["Enums"]["deposit_status"] | null
           request_id?: string | null
@@ -1290,7 +1553,7 @@ export type Database = {
           content_id: string
           downloaded_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
           user_id: string | null
         }
@@ -1298,7 +1561,7 @@ export type Database = {
           content_id: string
           downloaded_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
         }
@@ -1306,7 +1569,7 @@ export type Database = {
           content_id?: string
           downloaded_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
         }
@@ -1570,7 +1833,7 @@ export type Database = {
         Row: {
           exhibition_id: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
           user_id: string | null
           visited_at: string | null
@@ -1578,7 +1841,7 @@ export type Database = {
         Insert: {
           exhibition_id?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
           visited_at?: string | null
@@ -1586,7 +1849,7 @@ export type Database = {
         Update: {
           exhibition_id?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
           visited_at?: string | null
@@ -3080,7 +3343,7 @@ export type Database = {
           error_message: string | null
           fraud_score: number | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           is_3d_secure: boolean | null
           legal_deposit_id: string | null
           metadata: Json | null
@@ -3105,7 +3368,7 @@ export type Database = {
           error_message?: string | null
           fraud_score?: number | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           is_3d_secure?: boolean | null
           legal_deposit_id?: string | null
           metadata?: Json | null
@@ -3130,7 +3393,7 @@ export type Database = {
           error_message?: string | null
           fraud_score?: number | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           is_3d_secure?: boolean | null
           legal_deposit_id?: string | null
           metadata?: Json | null
@@ -3705,7 +3968,7 @@ export type Database = {
           accessed_profile_id: string
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
         }
         Insert: {
@@ -3715,7 +3978,7 @@ export type Database = {
           accessed_profile_id: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
         }
         Update: {
@@ -3725,7 +3988,7 @@ export type Database = {
           accessed_profile_id?: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
         }
         Relationships: []
@@ -4647,6 +4910,176 @@ export type Database = {
             columns: ["config_id"]
             isOneToOne: false
             referencedRelation: "sigb_configuration"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      space_availability: {
+        Row: {
+          booking_id: string | null
+          created_at: string | null
+          created_by: string | null
+          end_date: string
+          id: string
+          is_blocked: boolean | null
+          reason: string | null
+          space_id: string
+          start_date: string
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          end_date: string
+          id?: string
+          is_blocked?: boolean | null
+          reason?: string | null
+          space_id: string
+          start_date: string
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          end_date?: string
+          id?: string
+          is_blocked?: boolean | null
+          reason?: string | null
+          space_id?: string
+          start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_availability_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "space_availability_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "cultural_spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      space_equipment: {
+        Row: {
+          additional_cost: number | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_included: boolean | null
+          name: string
+        }
+        Insert: {
+          additional_cost?: number | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_included?: boolean | null
+          name: string
+        }
+        Update: {
+          additional_cost?: number | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_included?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
+      space_services: {
+        Row: {
+          base_cost: number
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          service_type: string
+          unit_type: string | null
+        }
+        Insert: {
+          base_cost: number
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          service_type: string
+          unit_type?: string | null
+        }
+        Update: {
+          base_cost?: number
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          service_type?: string
+          unit_type?: string | null
+        }
+        Relationships: []
+      }
+      space_tariffs: {
+        Row: {
+          base_price: number
+          cleaning_cost: number | null
+          created_at: string | null
+          currency: string | null
+          duration_type: string
+          electricity_cost: number | null
+          id: string
+          is_active: boolean | null
+          organization_type: string
+          space_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          base_price: number
+          cleaning_cost?: number | null
+          created_at?: string | null
+          currency?: string | null
+          duration_type: string
+          electricity_cost?: number | null
+          id?: string
+          is_active?: boolean | null
+          organization_type: string
+          space_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          base_price?: number
+          cleaning_cost?: number | null
+          created_at?: string | null
+          currency?: string | null
+          duration_type?: string
+          electricity_cost?: number | null
+          id?: string
+          is_active?: boolean | null
+          organization_type?: string
+          space_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_tariffs_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "cultural_spaces"
             referencedColumns: ["id"]
           },
         ]
@@ -6045,10 +6478,7 @@ export type Database = {
       }
     }
     Functions: {
-      anonymize_ip: {
-        Args: { ip_addr: unknown }
-        Returns: unknown
-      }
+      anonymize_ip: { Args: { ip_addr: unknown }; Returns: unknown }
       anonymize_user_agent: {
         Args: { user_agent_str: string }
         Returns: string
@@ -6057,10 +6487,7 @@ export type Database = {
         Args: { p_request_id: string; p_role: string }
         Returns: boolean
       }
-      calculate_checksum: {
-        Args: { content_data: string }
-        Returns: string
-      }
+      calculate_checksum: { Args: { content_data: string }; Returns: string }
       calculate_reproduction_total: {
         Args: { request_uuid: string }
         Returns: number
@@ -6081,34 +6508,13 @@ export type Database = {
         Args: { request_uuid: string }
         Returns: boolean
       }
-      cleanup_old_activity_logs: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      generate_content_slug: {
-        Args: { title: string }
-        Returns: string
-      }
-      generate_deposit_number: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_reproduction_request_number: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_request_number: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_transaction_number: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_validation_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      cleanup_old_activity_logs: { Args: never; Returns: number }
+      generate_content_slug: { Args: { title: string }; Returns: string }
+      generate_deposit_number: { Args: never; Returns: string }
+      generate_reproduction_request_number: { Args: never; Returns: string }
+      generate_request_number: { Args: never; Returns: string }
+      generate_transaction_number: { Args: never; Returns: string }
+      generate_validation_code: { Args: never; Returns: string }
       generate_workflow_instance_number: {
         Args: { workflow_type: string }
         Returns: string
@@ -6126,14 +6532,8 @@ export type Database = {
           user_id: string
         }[]
       }
-      get_professional_role: {
-        Args: { p_user_id: string }
-        Returns: string
-      }
-      get_profile_permissions: {
-        Args: { user_uuid: string }
-        Returns: Json
-      }
+      get_professional_role: { Args: { p_user_id: string }; Returns: string }
+      get_profile_permissions: { Args: { user_uuid: string }; Returns: Json }
       get_profile_with_contact: {
         Args: { access_reason?: string; profile_user_id: string }
         Returns: {
@@ -6149,10 +6549,7 @@ export type Database = {
           user_id: string
         }[]
       }
-      get_user_permissions: {
-        Args: { user_uuid: string }
-        Returns: Json
-      }
+      get_user_permissions: { Args: { user_uuid: string }; Returns: Json }
       get_user_primary_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["user_role"]
@@ -6160,26 +6557,6 @@ export type Database = {
       get_user_role: {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["user_role"]
-      }
-      gtrgm_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_decompress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_options: {
-        Args: { "": unknown }
-        Returns: undefined
-      }
-      gtrgm_out: {
-        Args: { "": unknown }
-        Returns: unknown
       }
       has_manuscript_role: {
         Args: {
@@ -6218,14 +6595,8 @@ export type Database = {
         }
         Returns: string
       }
-      is_admin_or_librarian: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
-      is_manuscript_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
+      is_admin_or_librarian: { Args: { user_uuid: string }; Returns: boolean }
+      is_manuscript_admin: { Args: { _user_id: string }; Returns: boolean }
       log_search: {
         Args: {
           p_filters?: Json
@@ -6235,10 +6606,7 @@ export type Database = {
         }
         Returns: string
       }
-      perform_automatic_archiving: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      perform_automatic_archiving: { Args: never; Returns: Json }
       search_knowledge_base: {
         Args: {
           limit_results?: number
@@ -6265,10 +6633,6 @@ export type Database = {
           page_number: number
         }[]
       }
-      set_limit: {
-        Args: { "": number }
-        Returns: number
-      }
       should_content_be_archived: {
         Args: {
           content_row: Record<string, unknown>
@@ -6276,14 +6640,8 @@ export type Database = {
         }
         Returns: boolean
       }
-      show_limit: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      show_trgm: {
-        Args: { "": string }
-        Returns: string[]
-      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       update_wallet_balance: {
         Args: {
           p_amount: number
@@ -6298,10 +6656,7 @@ export type Database = {
         Args: { permission_name: string; user_uuid: string }
         Returns: boolean
       }
-      verify_backup_integrity: {
-        Args: { backup_id: string }
-        Returns: boolean
-      }
+      verify_backup_integrity: { Args: { backup_id: string }; Returns: boolean }
       verify_professional_deposit_number: {
         Args: {
           p_deposit_number: string
