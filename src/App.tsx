@@ -140,10 +140,12 @@ const CulturalActivitiesGuidedTours = lazy(() => import("./pages/CulturalActivit
 const CulturalActivitiesPartnership = lazy(() => import("./pages/CulturalActivitiesPartnership"));
 const CulturalActivitiesPartnershipConfirmation = lazy(() => import("./pages/CulturalActivitiesPartnershipConfirmation"));
 const CulturalActivitiesProgramming = lazy(() => import("./pages/CulturalActivitiesProgramming"));
+const ProgramContributionConfirmation = lazy(() => import("./pages/ProgramContributionConfirmation"));
 const CancelBooking = lazy(() => import("./pages/CancelBooking"));
 const GuidedToursBackoffice = lazy(() => import("./pages/GuidedToursBackoffice"));
 const CulturalActivitiesBackoffice = lazy(() => import("./pages/CulturalActivitiesBackoffice"));
 const PartnershipsBackofficePage = lazy(() => import("./pages/PartnershipsBackoffice"));
+const ProgramContributionsBackofficePage = lazy(() => import("./pages/ProgramContributionsBackoffice"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -295,6 +297,7 @@ const App = () => (
           <Route path="/activites-culturelles/partenariats/confirmation" element={<CulturalActivitiesPartnershipConfirmation />} />
           <Route path="/cultural-activities/programming" element={<CulturalActivitiesProgramming />} />
           <Route path="/activites-culturelles/participation" element={<CulturalActivitiesProgramming />} />
+          <Route path="/activites-culturelles/participation/confirmation" element={<ProgramContributionConfirmation />} />
           <Route path="/cancel-booking" element={<CancelBooking />} />
           <Route path="/annuler-reservation" element={<CancelBooking />} />
           
@@ -305,6 +308,8 @@ const App = () => (
           <Route path="/admin/cultural-activities" element={<CulturalActivitiesBackoffice />} />
           <Route path="/admin/partenariats" element={<PartnershipsBackofficePage />} />
           <Route path="/admin/partnerships" element={<PartnershipsBackofficePage />} />
+          <Route path="/admin/propositions-programmation" element={<ProgramContributionsBackofficePage />} />
+          <Route path="/admin/program-contributions" element={<ProgramContributionsBackofficePage />} />
 
           {/* Translation Management */}
           <Route path="/admin/translations" element={<TranslationManagementPage />} />

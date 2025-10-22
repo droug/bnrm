@@ -25,11 +25,12 @@ const CulturalActivitiesBackoffice = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-            <TabsTrigger value="guided-tours">Visites guidées</TabsTrigger>
+            <TabsTrigger value="guided-tours">Visites</TabsTrigger>
             <TabsTrigger value="partnerships">Partenariats</TabsTrigger>
-            <TabsTrigger value="spaces">Espaces culturels</TabsTrigger>
+            <TabsTrigger value="programming">Programmation</TabsTrigger>
+            <TabsTrigger value="spaces">Espaces</TabsTrigger>
             <TabsTrigger value="calendar">Calendrier</TabsTrigger>
             <TabsTrigger value="settings">Paramètres</TabsTrigger>
           </TabsList>
@@ -122,7 +123,25 @@ const CulturalActivitiesBackoffice = () => {
                       <CardTitle className="text-lg font-light">Rapports</CardTitle>
                       <CardDescription>Statistiques et analyses</CardDescription>
                     </div>
+              <Card className="border-border hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/admin/propositions-programmation")}>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-lg bg-primary/10">
+                      <FileText className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-light">Propositions de programmation</CardTitle>
+                      <CardDescription>Gestion des propositions d'activités</CardDescription>
+                    </div>
                   </div>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full">
+                    Accéder
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
                 </CardHeader>
                 <CardContent>
                   <Button variant="outline" className="w-full" disabled>
@@ -179,6 +198,22 @@ const CulturalActivitiesBackoffice = () => {
               <CardContent>
                 <Button onClick={() => navigate("/admin/partenariats")}>
                   Ouvrir la gestion des partenariats
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="programming">
+            <Card className="border-border">
+              <CardHeader>
+                <CardTitle className="text-2xl font-light">Propositions de programmation</CardTitle>
+                <CardDescription>
+                  Accédez à la page complète de gestion des propositions d'activités
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => navigate("/admin/propositions-programmation")}>
+                  Ouvrir la gestion des propositions
                 </Button>
               </CardContent>
             </Card>
