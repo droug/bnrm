@@ -736,38 +736,6 @@ const GuidedToursBackoffice = () => {
                       <TableCell className="text-right">
                         <TooltipProvider>
                           <div className="flex justify-end gap-2">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => exportSlotToCSV(slot)}
-                                >
-                                  <Download className="h-4 w-4 mr-1" />
-                                  CSV
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Exporter la liste des visiteurs en CSV</p>
-                              </TooltipContent>
-                            </Tooltip>
-
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => exportSlotToPDF(slot)}
-                                >
-                                  <Download className="h-4 w-4 mr-1" />
-                                  PDF
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Exporter la liste des visiteurs en PDF</p>
-                              </TooltipContent>
-                            </Tooltip>
-
                             {slot.statut === 'disponible' && (
                               <>
                                 <Tooltip>
