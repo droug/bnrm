@@ -68,8 +68,8 @@ export default function StepContactInfo({ data, onUpdate }: StepContactInfoProps
         <Input
           id="organizationName"
           placeholder="Ex: Association culturelle de Rabat"
-          value={data.contactOrganizationName || ""}
-          onChange={(e) => onUpdate({ contactOrganizationName: e.target.value })}
+          value={data.organizationName || ""}
+          onChange={(e) => onUpdate({ organizationName: e.target.value })}
           required
         />
       </div>

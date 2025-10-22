@@ -97,7 +97,7 @@ export default function StepConfirmation({ data, bookingId }: StepConfirmationPr
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-muted-foreground">Organisme</p>
-              <p className="font-medium">{data.contactOrganizationName}</p>
+              <p className="font-medium">{data.organizationName}</p>
             </div>
             <div>
               <p className="text-muted-foreground">Contact</p>

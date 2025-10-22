@@ -26,7 +26,6 @@ export interface BookingData {
   equipment: string[];
   services: string[];
   // Informations du demandeur
-  contactOrganizationName?: string;
   contactPerson?: string;
   contactEmail?: string;
   contactPhone?: string;
@@ -110,7 +109,6 @@ export default function BookingWizard() {
         const isPhoneValid = bookingData.contactPhone ? phoneRegex.test(bookingData.contactPhone) : false;
         
         const baseFieldsValid = !!(
-          bookingData.contactOrganizationName &&
           bookingData.contactPerson &&
           bookingData.contactEmail &&
           isEmailValid &&
@@ -156,18 +154,20 @@ export default function BookingWizard() {
           
           <div className="flex flex-wrap gap-2">
             {STEPS.map((step) => (
-              <div
+              <button
                 key={step.id}
+                onClick={() => setCurrentStep(step.id)}
+                disabled={step.id > currentStep && !isStepValid(step.id - 1)}
                 className={`flex-1 min-w-[120px] text-center py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                   step.id === currentStep
                     ? 'bg-primary text-primary-foreground'
                     : step.id < currentStep
-                    ? 'bg-primary/20 text-primary'
-                    : 'bg-muted text-muted-foreground'
+                    ? 'bg-primary/20 text-primary cursor-pointer hover:bg-primary/30'
+                    : 'bg-muted text-muted-foreground cursor-not-allowed opacity-60'
                 }`}
               >
                 {step.title}
-              </div>
+              </button>
             ))}
           </div>
         </CardContent>

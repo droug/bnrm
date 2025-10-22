@@ -173,7 +173,7 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
                      data.startDate && data.endDate && data.startTime && data.endTime && 
                      data.eventTitle && data.eventDescription && 
                      data.expectedAttendees &&
-                     data.contactOrganizationName && data.contactPerson &&
+                     data.contactPerson &&
                      data.contactEmail && data.contactPhone;
 
   const canSubmit = isComplete && hasReadRegulations && acceptsConditions;
@@ -367,10 +367,10 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Organisme</p>
-                <p className="font-medium">{data.contactOrganizationName}</p>
+                <p className="font-medium">{data.organizationName}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Personne de contact</p>
@@ -526,7 +526,6 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
               Titre événement: {data.eventTitle ? '✓' : '✗'}<br/>
               Description: {data.eventDescription ? '✓' : '✗'}<br/>
               Participants: {data.expectedAttendees ? '✓' : '✗'}<br/>
-              Nom organisme (étape 4): {data.contactOrganizationName ? '✓' : '✗'}<br/>
               Personne contact: {data.contactPerson ? '✓' : '✗'}<br/>
               Email: {data.contactEmail ? '✓' : '✗'}<br/>
               Téléphone: {data.contactPhone ? '✓' : '✗'}
