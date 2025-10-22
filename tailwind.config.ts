@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        'sans': ['"Segoe UI"', 'Noto Sans', 'system-ui', 'sans-serif'],
         'serif': ['Playfair Display', 'Crimson Text', 'serif'],
+        'sans': ['Inter', 'Noto Sans Arabic', 'sans-serif'],
         'arabic': ['Amiri', 'Noto Sans Arabic', 'serif'],
         'moroccan': ['Playfair Display', 'Amiri', 'serif'],
         'elegant': ['Crimson Text', 'Playfair Display', 'serif'],
@@ -58,12 +58,6 @@ export default {
           DEFAULT: "hsl(var(--gold))",
           foreground: "hsl(var(--gold-foreground))",
           bright: "hsl(var(--gold-bright))",
-        },
-        btnGold: {
-          DEFAULT: "hsl(var(--btn-gold))",
-          foreground: "hsl(var(--btn-gold-foreground))",
-          hover: "hsl(var(--btn-gold-hover))",
-          hoverForeground: "hsl(var(--btn-gold-hover-foreground))",
         },
         coral: {
           DEFAULT: "hsl(var(--coral))",
@@ -118,9 +112,6 @@ export default {
         'zellige': 'var(--shadow-zellige)',
         'royal': 'var(--shadow-royal)',
         'mosaique': 'var(--shadow-mosaique)',
-        'soft': '0 2px 8px rgba(0, 0, 0, 0.08)',
-        'medium': '0 4px 16px rgba(0, 0, 0, 0.1)',
-        'card': '0 2px 12px rgba(0, 0, 0, 0.06)',
       },
       keyframes: {
         "accordion-down": {
