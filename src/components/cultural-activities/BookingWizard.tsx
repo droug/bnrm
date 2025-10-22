@@ -6,7 +6,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import StepOrganizerType from "./steps/StepOrganizerType";
 import StepDateTime from "./steps/StepDateTime";
 import StepEquipment from "./steps/StepEquipment";
-import StepServices from "./steps/StepServices";
 import StepSummary from "./steps/StepSummary";
 
 export interface BookingData {
@@ -29,9 +28,8 @@ export interface BookingData {
 const STEPS = [
   { id: 1, title: "Type d'organisme & sélection de l'espace", component: StepOrganizerType },
   { id: 2, title: "Détails de l'événement", component: StepDateTime },
-  { id: 3, title: "Équipements", component: StepEquipment },
-  { id: 4, title: "Services complémentaires", component: StepServices },
-  { id: 5, title: "Récapitulatif", component: StepSummary }
+  { id: 3, title: "Équipements & Services", component: StepEquipment },
+  { id: 4, title: "Récapitulatif", component: StepSummary }
 ];
 
 export default function BookingWizard() {
@@ -82,11 +80,10 @@ export default function BookingWizard() {
           bookingData.expectedAttendees > 0
         );
       
-      case 3: // Équipements
-      case 4: // Services complémentaires
-        return true; // Ces étapes sont optionnelles
+      case 3: // Équipements & Services
+        return true; // Cette étape est optionnelle
       
-      case 5: // Récapitulatif
+      case 4: // Récapitulatif
         return true;
       
       default:
