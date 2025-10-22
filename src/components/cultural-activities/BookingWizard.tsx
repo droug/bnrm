@@ -157,13 +157,10 @@ export default function BookingWizard() {
               <button
                 key={step.id}
                 onClick={() => setCurrentStep(step.id)}
-                disabled={step.id > currentStep && !isStepValid(step.id - 1)}
-                className={`flex-1 min-w-[120px] text-center py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                className={`flex-1 min-w-[120px] text-center py-2 px-3 rounded-md text-sm font-medium transition-colors cursor-pointer ${
                   step.id === currentStep
                     ? 'bg-primary text-primary-foreground'
-                    : step.id < currentStep
-                    ? 'bg-primary/20 text-primary cursor-pointer hover:bg-primary/30'
-                    : 'bg-muted text-muted-foreground cursor-not-allowed opacity-60'
+                    : 'bg-primary/10 text-primary hover:bg-primary/20'
                 }`}
               >
                 {step.title}
@@ -197,7 +194,7 @@ export default function BookingWizard() {
               </Button>
 
               {currentStep < STEPS.length - 1 ? (
-                <Button onClick={handleNext} className="gap-2" disabled={!canProceed}>
+                <Button onClick={handleNext} className="gap-2">
                   Suivant
                   <ChevronRight className="h-4 w-4" />
                 </Button>
