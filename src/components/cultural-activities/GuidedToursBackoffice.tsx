@@ -534,6 +534,84 @@ const GuidedToursBackoffice = () => {
     });
   };
 
+  const exportAllToCSV = () => {
+    if (slots.length === 0) {
+      toast({
+        title: "Aucun créneau",
+        description: "Il n'y a aucun créneau à exporter",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const csvContent = [
+      ['Date', 'Heure', 'Langue', 'Capacité', 'Réservés', 'Restants', 'Statut'],
+      ...slots.map(s => [
+        format(new Date(s.date), 'dd/MM/yyyy', { locale: fr }),
+        s.heure.substring(0, 5),
+        s.langue,
+        s.capacite_max.toString(),
+        s.reservations_actuelles.toString(),
+        (s.capacite_max - s.reservations_actuelles).toString(),
+        s.statut
+      ])
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `visites_guidees_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Export réussi",
+      description: `${slots.length} créneaux exportés en CSV`,
+    });
+  };
+
+  const exportAllToPDF = () => {
+    if (slots.length === 0) {
+      toast({
+        title: "Aucun créneau",
+        description: "Il n'y a aucun créneau à exporter",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const pdfContent = `LISTE DES VISITES GUIDÉES\n\n` +
+      `Date d'export: ${format(new Date(), 'dd MMMM yyyy à HH:mm', { locale: fr })}\n` +
+      `Bibliothèque Nationale du Royaume du Maroc\n\n` +
+      `${'='.repeat(80)}\n\n` +
+      slots.map((slot, index) => 
+        `${index + 1}. ${format(new Date(slot.date), 'dd/MM/yyyy', { locale: fr })} à ${slot.heure.substring(0, 5)}\n` +
+        `   Langue: ${slot.langue}\n` +
+        `   Capacité: ${slot.capacite_max} places\n` +
+        `   Réservés: ${slot.reservations_actuelles}\n` +
+        `   Restants: ${slot.capacite_max - slot.reservations_actuelles}\n` +
+        `   Statut: ${slot.statut}\n\n`
+      ).join('') +
+      `${'='.repeat(80)}\n\n` +
+      `TOTAL: ${slots.length} créneaux\n` +
+      `Total places: ${slots.reduce((sum, s) => sum + s.capacite_max, 0)}\n` +
+      `Total réservations: ${slots.reduce((sum, s) => sum + s.reservations_actuelles, 0)}\n`;
+
+    const blob = new Blob([pdfContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `visites_guidees_${format(new Date(), 'yyyy-MM-dd')}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Export réussi",
+      description: `${slots.length} créneaux exportés en PDF`,
+    });
+  };
+
   const getStatusBadge = (statut: string) => {
     const statusConfig = {
       disponible: { label: "Ouverte", className: "bg-green-100 text-green-800" },
@@ -579,6 +657,43 @@ const GuidedToursBackoffice = () => {
           </div>
         </CardHeader>
         <CardContent>
+          {/* Boutons d'export global */}
+          <div className="flex justify-end gap-2 mb-4">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    onClick={exportAllToCSV}
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Export CSV
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Exporter tous les créneaux en CSV</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    onClick={exportAllToPDF}
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Export PDF
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Exporter tous les créneaux en PDF</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+
           <div className="rounded-xl border overflow-hidden">
             <Table>
               <TableHeader>
