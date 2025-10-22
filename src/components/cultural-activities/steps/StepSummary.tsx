@@ -7,8 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, CheckCircle, AlertCircle, Building2, Calendar, Clock, Users, Package, Sparkles } from "lucide-react";
+import { Loader2, CheckCircle, AlertCircle, Building2, Calendar, Clock, Users, Package, Sparkles, DollarSign, FileText, User, Mail, Phone, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -24,6 +26,8 @@ export default function StepSummary({ data }: StepSummaryProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasReadRegulations, setHasReadRegulations] = useState(false);
+  const [acceptsConditions, setAcceptsConditions] = useState(false);
 
   const { data: space } = useQuery({
     queryKey: ['space', data.spaceId],
@@ -77,15 +81,6 @@ export default function StepSummary({ data }: StepSummaryProps) {
         throw new Error("Vous devez être connecté pour effectuer une réservation");
       }
 
-      // Get user profile for contact info
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, phone')
-        .eq('user_id', user.id)
-        .single();
-
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      
       const startDateTime = `${data.startDate?.toISOString().split('T')[0]} ${data.startTime}:00`;
       const endDateTime = `${data.endDate?.toISOString().split('T')[0]} ${data.endTime}:00`;
 
@@ -101,9 +96,9 @@ export default function StepSummary({ data }: StepSummaryProps) {
           event_title: data.eventTitle,
           event_description: data.eventDescription,
           participants_count: data.expectedAttendees || 0,
-          contact_person: profile ? `${profile.first_name} ${profile.last_name}` : 'Non renseigné',
-          contact_email: authUser?.email || 'non-renseigne@example.com',
-          contact_phone: profile?.phone || 'Non renseigné',
+          contact_person: data.contactPerson,
+          contact_email: data.contactEmail,
+          contact_phone: data.contactPhone,
           status: 'pending'
         })
         .select()
@@ -172,14 +167,45 @@ export default function StepSummary({ data }: StepSummaryProps) {
   const isComplete = data.organizerType && data.organizationName && data.spaceId && 
                      data.startDate && data.endDate && data.startTime && data.endTime && 
                      data.eventTitle && data.eventDescription && 
-                     data.expectedAttendees;
+                     data.expectedAttendees &&
+                     data.contactOrganizationName && data.contactPerson &&
+                     data.contactEmail && data.contactPhone;
+
+  const canSubmit = isComplete && hasReadRegulations && acceptsConditions;
+
+  // Calcul du coût total
+  const calculateTotalCost = () => {
+    let total = 0;
+    
+    // Coût des équipements
+    if (equipment) {
+      equipment.forEach(item => {
+        if (!item.is_included && item.additional_cost) {
+          total += Number(item.additional_cost);
+        }
+      });
+    }
+    
+    // Coût des services
+    if (services) {
+      services.forEach(service => {
+        if (service.base_cost) {
+          total += Number(service.base_cost);
+        }
+      });
+    }
+    
+    return total;
+  };
+
+  const totalCost = calculateTotalCost();
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Récapitulatif</h2>
+        <h2 className="text-2xl font-bold mb-2">Validation & Acceptation</h2>
         <p className="text-muted-foreground">
-          Vérifiez les informations de votre réservation avant de confirmer
+          Vérifiez les informations de votre réservation et acceptez les conditions avant de confirmer
         </p>
       </div>
 
@@ -193,118 +219,239 @@ export default function StepSummary({ data }: StepSummaryProps) {
       )}
 
       <div className="grid gap-4">
+        {/* Espace sélectionné */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5" />
-              Informations de l'organisateur
+              Espace sélectionné
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Type:</span>
-              <Badge>{data.organizerType}</Badge>
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-semibold text-lg">{space?.name}</p>
+                {space?.description && (
+                  <p className="text-sm text-muted-foreground mt-1">{space.description}</p>
+                )}
+              </div>
+              <Badge variant="secondary">Capacité: {space?.capacity} pers.</Badge>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Organisation:</span>
-              <span className="font-medium">{data.organizationName}</span>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Type: {data.organizerType}</span>
+              <span>•</span>
+              <span>{data.organizationName}</span>
             </div>
           </CardContent>
         </Card>
 
+        {/* Dates et horaires */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              Espace et Date
+              Dates & Horaires
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Espace:</span>
-              <span className="font-medium">{space?.name}</span>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Date de début</p>
+                <p className="font-medium">
+                  {data.startDate && format(data.startDate, "PPP", { locale: fr })}
+                </p>
+                <p className="text-sm text-primary">{data.startTime}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Date de fin</p>
+                <p className="font-medium">
+                  {data.endDate && format(data.endDate, "PPP", { locale: fr })}
+                </p>
+                <p className="text-sm text-primary">{data.endTime}</p>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Date:</span>
-              <span className="font-medium">
-                {data.startDate && format(data.startDate, "PPP", { locale: fr })}
-                {data.endDate && data.startDate !== data.endDate && ` - ${format(data.endDate, "PPP", { locale: fr })}`}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Horaires:</span>
-              <span className="font-medium">{data.startTime} - {data.endTime}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Participants:</span>
-              <span className="font-medium">{data.expectedAttendees} personnes</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Détails de l'événement
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div>
-              <span className="text-muted-foreground">Titre:</span>
-              <p className="font-medium mt-1">{data.eventTitle}</p>
+            <Separator />
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">{data.expectedAttendees} participants attendus</span>
             </div>
             <div>
-              <span className="text-muted-foreground">Description:</span>
+              <p className="text-sm text-muted-foreground mb-1">Événement</p>
+              <p className="font-semibold">{data.eventTitle}</p>
               <p className="text-sm mt-1">{data.eventDescription}</p>
             </div>
           </CardContent>
         </Card>
 
-        {equipment && equipment.length > 0 && (
+        {/* Équipements & Services */}
+        {((equipment && equipment.length > 0) || (services && services.length > 0)) && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Package className="h-5 w-5" />
-                Équipements ({equipment.length})
+                Équipements & Services
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {equipment.map((item) => (
-                  <li key={item.id} className="flex justify-between text-sm">
-                    <span>{item.name}</span>
-                    <span className="text-muted-foreground">
-                      {item.is_included ? 'Inclus' : `+${item.additional_cost} ${item.currency || 'MAD'}`}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+            <CardContent className="space-y-4">
+              {equipment && equipment.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-2">Équipements ({equipment.length})</p>
+                  <ul className="space-y-2">
+                    {equipment.map((item) => (
+                      <li key={item.id} className="flex justify-between text-sm">
+                        <span>{item.name}</span>
+                        <span className="text-muted-foreground">
+                          {item.is_included ? (
+                            <Badge variant="secondary" className="text-xs">Inclus</Badge>
+                          ) : (
+                            `+${item.additional_cost} ${item.currency || 'MAD'}`
+                          )}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {services && services.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-2">Services additionnels ({services.length})</p>
+                  <ul className="space-y-2">
+                    {services.map((service) => (
+                      <li key={service.id} className="flex justify-between text-sm">
+                        <span>{service.name}</span>
+                        <span className="text-muted-foreground">
+                          {service.base_cost} {service.currency}/{service.unit_type}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
 
-        {services && services.length > 0 && (
-          <Card>
+        {/* Tarification calculée */}
+        {totalCost > 0 && (
+          <Card className="bg-primary/5 border-primary/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5" />
-                Services complémentaires ({services.length})
+                <DollarSign className="h-5 w-5" />
+                Tarification
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
-                {services.map((service) => (
-                  <li key={service.id} className="flex justify-between text-sm">
-                    <span>{service.name}</span>
-                    <span className="text-muted-foreground">
-                      {service.base_cost} {service.currency}/{service.unit_type}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <div className="flex items-center justify-between">
+                <span className="text-lg font-semibold">Total estimé</span>
+                <span className="text-2xl font-bold text-primary">{totalCost.toFixed(2)} MAD</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                * Ce montant est une estimation. Le coût définitif sera confirmé après validation de votre demande.
+              </p>
             </CardContent>
           </Card>
+        )}
+
+        {/* Détails du demandeur */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Détails du demandeur
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Organisme</p>
+                <p className="font-medium">{data.contactOrganizationName}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Personne de contact</p>
+                <p className="font-medium">{data.contactPerson}</p>
+              </div>
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <span>{data.contactEmail}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <span>{data.contactPhone}</span>
+              </div>
+              <div className="flex items-start gap-2 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <p>{data.contactAddress}</p>
+                  <p className="text-muted-foreground">{data.contactCity}, {data.contactCountry}</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Separator />
+
+      {/* Règlement et conditions */}
+      <div className="space-y-4">
+        <Alert>
+          <FileText className="h-4 w-4" />
+          <AlertDescription>
+            Veuillez prendre connaissance du règlement d'utilisation des salles avant de confirmer votre demande.
+            <a 
+              href="/documents/reglement-salles.pdf" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block mt-2 text-primary hover:underline font-medium"
+            >
+              📄 Télécharger le Règlement d'utilisation des salles (PDF)
+            </a>
+          </AlertDescription>
+        </Alert>
+
+        <Card>
+          <CardContent className="pt-6 space-y-4">
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="read-regulations"
+                checked={hasReadRegulations}
+                onCheckedChange={(checked) => setHasReadRegulations(checked === true)}
+              />
+              <Label 
+                htmlFor="read-regulations" 
+                className="text-sm font-medium leading-relaxed cursor-pointer"
+              >
+                J'ai lu et compris le règlement d'utilisation des salles *
+              </Label>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="accept-conditions"
+                checked={acceptsConditions}
+                onCheckedChange={(checked) => setAcceptsConditions(checked === true)}
+              />
+              <Label 
+                htmlFor="accept-conditions" 
+                className="text-sm font-medium leading-relaxed cursor-pointer"
+              >
+                J'accepte toutes les conditions d'utilisation et m'engage à respecter le règlement intérieur *
+              </Label>
+            </div>
+          </CardContent>
+        </Card>
+
+        {(!hasReadRegulations || !acceptsConditions) && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Vous devez accepter les conditions ci-dessus pour pouvoir soumettre votre demande.
+            </AlertDescription>
+          </Alert>
         )}
       </div>
 
@@ -319,7 +466,7 @@ export default function StepSummary({ data }: StepSummaryProps) {
 
       <Button
         onClick={handleSubmit}
-        disabled={!isComplete || isSubmitting}
+        disabled={!canSubmit || isSubmitting}
         size="lg"
         className="w-full"
       >
@@ -331,7 +478,7 @@ export default function StepSummary({ data }: StepSummaryProps) {
         ) : (
           <>
             <CheckCircle className="h-5 w-5 mr-2" />
-            Confirmer la réservation
+            Valider la demande
           </>
         )}
       </Button>
