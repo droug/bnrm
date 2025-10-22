@@ -431,7 +431,7 @@ const Index = () => {
                   </Link>
 
                   {/* Carte Réservation des services des activités culturelles */}
-                  <Link to="/payment-services">
+                  <Link to="/cultural-activities-booking">
                     <Card className="relative overflow-hidden group border-3 border-highlight/30 shadow-berber hover:shadow-mosaique transition-all duration-700 cursor-pointer">
                       <div 
                         className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-700"
