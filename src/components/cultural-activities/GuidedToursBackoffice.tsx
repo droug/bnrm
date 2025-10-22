@@ -294,6 +294,83 @@ const GuidedToursBackoffice = () => {
             nb_visiteurs: 12,
             langue: "Anglais",
             statut: "confirmee"
+          },
+          {
+            id: "booking-006",
+            slot_id: "slot-004",
+            nom: "Youssef Alami",
+            email: "y.alami@exemple.ma",
+            telephone: "+212 6 77 88 99 00",
+            organisme: "École Supérieure de Commerce",
+            nb_visiteurs: 18,
+            langue: "Français",
+            statut: "confirmee"
+          },
+          {
+            id: "booking-007",
+            slot_id: "slot-005",
+            nom: "Maria Garcia",
+            email: "m.garcia@exemple.es",
+            telephone: "+34 600 111 222",
+            organisme: "Instituto Cervantes",
+            nb_visiteurs: 15,
+            langue: "Espagnol",
+            statut: "confirmee"
+          },
+          {
+            id: "booking-008",
+            slot_id: "slot-007",
+            nom: "Hassan Idrissi",
+            email: "h.idrissi@exemple.ma",
+            telephone: "+212 6 33 44 55 66",
+            organisme: null,
+            nb_visiteurs: 3,
+            langue: "Arabe",
+            statut: "en_attente"
+          },
+          {
+            id: "booking-009",
+            slot_id: "slot-009",
+            nom: "Laila Cherif",
+            email: "l.cherif@exemple.ma",
+            telephone: "+212 6 99 00 11 22",
+            organisme: "Lycée Descartes",
+            nb_visiteurs: 14,
+            langue: "Français",
+            statut: "confirmee"
+          },
+          {
+            id: "booking-010",
+            slot_id: "slot-010",
+            nom: "David Smith",
+            email: "d.smith@exemple.com",
+            telephone: "+44 7700 900123",
+            organisme: null,
+            nb_visiteurs: 2,
+            langue: "Anglais",
+            statut: "confirmee"
+          },
+          {
+            id: "booking-011",
+            slot_id: "slot-011",
+            nom: "Amina Benali",
+            email: "a.benali@exemple.ma",
+            telephone: "+212 6 44 55 66 77",
+            organisme: "Centre Culturel Mohamed VI",
+            nb_visiteurs: 19,
+            langue: "Français",
+            statut: "confirmee"
+          },
+          {
+            id: "booking-012",
+            slot_id: "slot-012",
+            nom: "Omar Sefrioui",
+            email: "o.sefrioui@exemple.ma",
+            telephone: "+212 6 22 33 44 55",
+            organisme: "Université Al Akhawayn",
+            nb_visiteurs: 22,
+            langue: "Arabe",
+            statut: "en_attente"
           }
         ];
         setBookings(exampleBookings);
