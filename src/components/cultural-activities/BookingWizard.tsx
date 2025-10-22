@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import StepOrganizerType from "./steps/StepOrganizerType";
 import StepDateTime from "./steps/StepDateTime";
 import StepEquipment from "./steps/StepEquipment";
+import StepContactInfo from "./steps/StepContactInfo";
 import StepSummary from "./steps/StepSummary";
 
 export interface BookingData {
@@ -23,13 +24,25 @@ export interface BookingData {
   programDocument?: File;
   equipment: string[];
   services: string[];
+  // Informations du demandeur
+  contactOrganizationName?: string;
+  contactPerson?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  contactAddress?: string;
+  contactCity?: string;
+  contactCountry?: string;
+  contactWebsite?: string;
+  statusDocument?: File;
+  authorizationDocument?: File;
 }
 
 const STEPS = [
   { id: 1, title: "Type d'organisme & sélection de l'espace", component: StepOrganizerType },
   { id: 2, title: "Détails de l'événement", component: StepDateTime },
   { id: 3, title: "Équipements & Services", component: StepEquipment },
-  { id: 4, title: "Récapitulatif", component: StepSummary }
+  { id: 4, title: "Informations du demandeur", component: StepContactInfo },
+  { id: 5, title: "Récapitulatif", component: StepSummary }
 ];
 
 export default function BookingWizard() {
@@ -83,7 +96,35 @@ export default function BookingWizard() {
       case 3: // Équipements & Services
         return true; // Cette étape est optionnelle
       
-      case 4: // Récapitulatif
+      case 4: // Informations du demandeur
+        // Validation du format email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isEmailValid = bookingData.contactEmail ? emailRegex.test(bookingData.contactEmail) : false;
+        
+        // Validation du format téléphone
+        const phoneRegex = /^(\+?\d{1,3}[-.\s]?)?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
+        const isPhoneValid = bookingData.contactPhone ? phoneRegex.test(bookingData.contactPhone) : false;
+        
+        const baseFieldsValid = !!(
+          bookingData.contactOrganizationName &&
+          bookingData.contactPerson &&
+          bookingData.contactEmail &&
+          isEmailValid &&
+          bookingData.contactPhone &&
+          isPhoneValid &&
+          bookingData.contactAddress &&
+          bookingData.contactCity &&
+          bookingData.contactCountry
+        );
+        
+        // Si organisme public, vérifier le document de statut
+        if (bookingData.organizerType === 'public') {
+          return baseFieldsValid && !!bookingData.statusDocument;
+        }
+        
+        return baseFieldsValid;
+      
+      case 5: // Récapitulatif
         return true;
       
       default:
