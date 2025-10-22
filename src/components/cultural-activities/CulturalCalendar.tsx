@@ -4,13 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 interface CalendarEvent {
   id: number;
@@ -219,21 +213,20 @@ const CulturalCalendar = () => {
               </h3>
               
               {/* Filter Dropdown */}
-              <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="w-[220px] border-2 border-[#D4AF37]/30">
-                  <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-[#D4AF37]" />
-                    <SelectValue placeholder="Filtrer par type" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les événements</SelectItem>
-                  <SelectItem value="cultural">Activité culturelle</SelectItem>
-                  <SelectItem value="exhibition">Exposition</SelectItem>
-                  <SelectItem value="conference">Conférence</SelectItem>
-                  <SelectItem value="workshop">Atelier</SelectItem>
-                </SelectContent>
-              </Select>
+              <CustomSelect
+                value={filterType}
+                onValueChange={setFilterType}
+                options={[
+                  { value: "all", label: "Tous les événements" },
+                  { value: "cultural", label: "Activité culturelle" },
+                  { value: "exhibition", label: "Exposition" },
+                  { value: "conference", label: "Conférence" },
+                  { value: "workshop", label: "Atelier" },
+                ]}
+                placeholder="Filtrer par type"
+                icon={<Filter className="h-4 w-4 text-[#D4AF37]" />}
+                className="w-[220px]"
+              />
             </div>
             
             <Button
