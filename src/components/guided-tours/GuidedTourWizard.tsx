@@ -173,6 +173,16 @@ const GuidedTourWizard = () => {
             Précédent
           </Button>
         )}
+        {currentStep < 3 && (
+          <Button
+            onClick={handleNext}
+            disabled={!isStepValid()}
+            className="ml-auto bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white border-0 shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Suivant
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
+        )}
       </div>
     </div>
   );
