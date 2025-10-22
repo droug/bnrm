@@ -99,7 +99,7 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
           contact_person: data.contactPerson,
           contact_email: data.contactEmail,
           contact_phone: data.contactPhone,
-          status: 'pending'
+          status: 'en_attente'
         })
         .select()
         .single();
