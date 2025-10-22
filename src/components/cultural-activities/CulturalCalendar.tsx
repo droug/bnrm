@@ -220,13 +220,13 @@ const CulturalCalendar = () => {
               
               {/* Filter Dropdown */}
               <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="w-[220px] bg-white border-2 border-[#D4AF37]/30">
+                <SelectTrigger className="w-[220px] border-2 border-[#D4AF37]/30">
                   <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4 text-[#D4AF37]" />
                     <SelectValue placeholder="Filtrer par type" />
                   </div>
                 </SelectTrigger>
-                <SelectContent className="bg-white z-50">
+                <SelectContent>
                   <SelectItem value="all">Tous les événements</SelectItem>
                   <SelectItem value="cultural">Activité culturelle</SelectItem>
                   <SelectItem value="exhibition">Exposition</SelectItem>
