@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Handshake } from "lucide-react";
 import PartnershipWizard from "@/components/cultural-activities/PartnershipWizard";
 
 const CulturalActivitiesPartnership = () => {
@@ -12,11 +12,19 @@ const CulturalActivitiesPartnership = () => {
       
       <div className="container mx-auto px-4 py-12">
         <Link to="/cultural-activities">
-          <Button variant="ghost" className="mb-6">
+          <Button variant="ghost" className="mb-6 transition-all duration-300">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Retour aux activités culturelles
           </Button>
         </Link>
+
+        <div className="text-center mb-8 animate-fade-in">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+            <Handshake className="w-8 h-8 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold text-[#333333] mb-2">Demande de partenariat</h1>
+          <p className="text-muted-foreground">Collaborons pour promouvoir la culture marocaine</p>
+        </div>
 
         <PartnershipWizard />
       </div>

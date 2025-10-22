@@ -3,7 +3,7 @@ import { PartnershipRequestFormData } from "@/schemas/partnershipRequestSchema";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { Info, CheckCircle2, FileCheck } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface StepValidationProps {
@@ -15,19 +15,22 @@ const StepValidation = ({ form }: StepValidationProps) => {
 
   return (
     <div className="space-y-6">
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Veuillez vérifier toutes les informations avant de soumettre votre demande.
+      <div className="flex items-center gap-2 mb-6 pb-4 border-b border-border/50">
+        <FileCheck className="w-5 h-5 text-primary" />
+        <h3 className="text-lg font-semibold text-[#333333]">Validation et confirmation</h3>
+      </div>
+
+      <Alert className="border-primary/30 bg-primary/5 rounded-xl">
+        <Info className="h-4 w-4 text-primary" />
+        <AlertDescription className="text-[#333333]">
+          Veuillez vérifier attentivement les informations suivantes avant de soumettre votre demande.
         </AlertDescription>
       </Alert>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Récapitulatif de votre demande</CardTitle>
-          <CardDescription>
-            Vérifiez que toutes les informations sont correctes
-          </CardDescription>
+      <Card className="rounded-xl transition-all duration-300">
+        <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10">
+          <CardTitle className="text-[#333333]">Récapitulatif de votre demande</CardTitle>
+          <CardDescription>Informations à valider</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
@@ -81,15 +84,17 @@ const StepValidation = ({ form }: StepValidationProps) => {
           control={form.control}
           name="confirmation_exactitude"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-xl border-2 border-primary/20 p-4 bg-white transition-all duration-300 hover:border-primary/40">
               <FormControl>
                 <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
+                  className="mt-1"
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel className="font-normal">
+                <FormLabel className="text-[#333333] flex items-center gap-2 cursor-pointer">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
                   Je confirme que les informations fournies sont exactes *
                 </FormLabel>
                 <FormMessage />
@@ -102,15 +107,17 @@ const StepValidation = ({ form }: StepValidationProps) => {
           control={form.control}
           name="confirmation_reglement"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-xl border-2 border-primary/20 p-4 bg-white transition-all duration-300 hover:border-primary/40">
               <FormControl>
                 <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
+                  className="mt-1"
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel className="font-normal">
+                <FormLabel className="text-[#333333] flex items-center gap-2 cursor-pointer">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
                   J'ai pris connaissance du règlement d'utilisation des espaces culturels *
                 </FormLabel>
                 <FormMessage />
@@ -120,11 +127,11 @@ const StepValidation = ({ form }: StepValidationProps) => {
         />
       </div>
 
-      <Alert>
-        <CheckCircle2 className="h-4 w-4" />
-        <AlertDescription>
-          Une fois votre demande soumise, vous recevrez un accusé de réception par email.
-          Votre demande sera examinée par le Département des Activités Culturelles de la BNRM.
+      <Alert className="border-primary/30 bg-primary/5 rounded-xl">
+        <Info className="h-4 w-4 text-primary" />
+        <AlertDescription className="text-[#333333]">
+          Après soumission, votre demande sera examinée par le Département des Activités Culturelles de la BNRM. 
+          Vous recevrez un email de confirmation avec la référence de votre demande.
         </AlertDescription>
       </Alert>
     </div>

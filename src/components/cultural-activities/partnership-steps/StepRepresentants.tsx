@@ -4,7 +4,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2, Upload } from "lucide-react";
+import { Plus, Trash2, Upload, User, FileText } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -65,12 +65,15 @@ const StepRepresentants = ({ form }: StepRepresentantsProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-lg font-semibold">Représentants de l'organisme</h3>
-          <p className="text-sm text-muted-foreground">
-            Ajoutez au moins un représentant
-          </p>
+      <div className="flex justify-between items-center mb-6 pb-4 border-b border-border/50">
+        <div className="flex items-center gap-2">
+          <User className="w-5 h-5 text-primary" />
+          <div>
+            <h3 className="text-lg font-semibold text-[#333333]">Représentants de l'organisme</h3>
+            <p className="text-sm text-muted-foreground">
+              Ajoutez au moins un représentant
+            </p>
+          </div>
         </div>
         <Button
           type="button"
@@ -84,6 +87,7 @@ const StepRepresentants = ({ form }: StepRepresentantsProps) => {
               piece_identite_url: "",
             })
           }
+          className="transition-all duration-300 hover:scale-105"
         >
           <Plus className="mr-2 h-4 w-4" />
           Ajouter un représentant
@@ -91,8 +95,9 @@ const StepRepresentants = ({ form }: StepRepresentantsProps) => {
       </div>
 
       {fields.length === 0 && (
-        <Card className="border-dashed">
+        <Card className="border-dashed rounded-xl transition-all duration-300">
           <CardContent className="flex flex-col items-center justify-center py-12">
+            <User className="w-12 h-12 text-muted-foreground/30 mb-4" />
             <p className="text-muted-foreground text-center">
               Aucun représentant ajouté. Cliquez sur "Ajouter un représentant" pour commencer.
             </p>
@@ -101,9 +106,10 @@ const StepRepresentants = ({ form }: StepRepresentantsProps) => {
       )}
 
       {fields.map((field, index) => (
-        <Card key={field.id}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-base">
+        <Card key={field.id} className="rounded-xl transition-all duration-300 hover:shadow-md">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 bg-muted/30">
+            <CardTitle className="text-base flex items-center gap-2">
+              <User className="w-4 h-4 text-primary" />
               Représentant {index + 1}
             </CardTitle>
             <Button
@@ -180,7 +186,10 @@ const StepRepresentants = ({ form }: StepRepresentantsProps) => {
               name={`representants.${index}.piece_identite_url`}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Pièce d'identité (facultatif)</FormLabel>
+                  <FormLabel className="flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Pièce d'identité (facultatif)
+                  </FormLabel>
                   <FormControl>
                     <div className="flex gap-2">
                       <Input
@@ -191,6 +200,7 @@ const StepRepresentants = ({ form }: StepRepresentantsProps) => {
                           if (file) handleFileUpload(file, index);
                         }}
                         disabled={uploadingIndex === index}
+                        className="transition-all duration-300"
                       />
                       <Button
                         type="button"
@@ -202,7 +212,10 @@ const StepRepresentants = ({ form }: StepRepresentantsProps) => {
                     </div>
                   </FormControl>
                   {field.value && (
-                    <p className="text-sm text-green-600">✓ Document téléchargé</p>
+                    <p className="text-sm text-green-600 flex items-center gap-1">
+                      <FileText className="w-4 h-4" />
+                      ✓ Document téléchargé
+                    </p>
                   )}
                   <FormMessage />
                 </FormItem>

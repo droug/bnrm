@@ -179,35 +179,52 @@ const PartnershipWizard = () => {
   const progress = (currentStep / STEPS.length) * 100;
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Demande de partenariat</CardTitle>
-          <CardDescription>
-            Étape {currentStep} sur {STEPS.length}: {STEPS[currentStep - 1].title}
+    <div className="max-w-4xl mx-auto animate-fade-in">
+      <Card className="rounded-2xl shadow-lg border-border/50 overflow-hidden transition-all duration-300">
+        <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10">
+          <CardTitle className="text-xl font-semibold text-[#333333]">
+            Étape {currentStep} sur {STEPS.length}
+          </CardTitle>
+          <CardDescription className="text-base text-muted-foreground">
+            {STEPS[currentStep - 1].title}
           </CardDescription>
-          <Progress value={progress} className="mt-4" />
+          <Progress value={progress} className="mt-4 h-2" />
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <CurrentStepComponent form={form} />
+              <div className="transition-all duration-300 ease-in-out">
+                <CurrentStepComponent form={form} />
+              </div>
 
-              <div className="flex justify-between pt-6">
+              <div className="flex justify-between pt-8 border-t border-border/50">
                 {currentStep > 1 && (
-                  <Button type="button" variant="outline" onClick={handlePrevious}>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handlePrevious}
+                    className="transition-all duration-300 hover:scale-105"
+                  >
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Précédent
                   </Button>
                 )}
 
                 {currentStep < STEPS.length ? (
-                  <Button type="button" onClick={handleNext} className="ml-auto">
+                  <Button 
+                    type="button" 
+                    onClick={handleNext} 
+                    className="ml-auto transition-all duration-300 hover:scale-105"
+                  >
                     Suivant
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
-                  <Button type="submit" disabled={isSubmitting} className="ml-auto">
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting} 
+                    className="ml-auto transition-all duration-300 hover:scale-105"
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     {isSubmitting ? "Envoi en cours..." : "Soumettre la demande"}
                   </Button>

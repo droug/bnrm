@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, Building2, FileText } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -63,6 +63,11 @@ const StepOrganismeIdentification = ({ form }: StepOrganismeIdentificationProps)
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-2 mb-6 pb-4 border-b border-border/50">
+        <Building2 className="w-5 h-5 text-primary" />
+        <h3 className="text-lg font-semibold text-[#333333]">Informations sur l'organisme</h3>
+      </div>
+
       <FormField
         control={form.control}
         name="nom_organisme"
@@ -227,38 +232,47 @@ const StepOrganismeIdentification = ({ form }: StepOrganismeIdentificationProps)
       />
 
       {statutJuridique === "association" && (
-        <FormField
-          control={form.control}
-          name="statut_document_url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Statut juridique (obligatoire pour les associations) *</FormLabel>
-              <FormDescription>
-                Téléchargez le statut de votre association (PDF ou DOCX, max 10 Mo)
-              </FormDescription>
-              <FormControl>
-                <div className="flex gap-2">
-                  <Input
-                    type="file"
-                    accept=".pdf,.docx"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileUpload(file, "statut_document_url");
-                    }}
-                    disabled={isUploading}
-                  />
-                  <Button type="button" variant="outline" disabled={isUploading}>
-                    <Upload className="h-4 w-4" />
-                  </Button>
-                </div>
-              </FormControl>
-              {field.value && (
-                <p className="text-sm text-green-600">✓ Document téléchargé</p>
-              )}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 transition-all duration-300">
+          <FormField
+            control={form.control}
+            name="statut_document_url"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Statut juridique (obligatoire pour les associations) *
+                </FormLabel>
+                <FormDescription>
+                  Téléchargez le statut de votre association (PDF ou DOCX, max 10 Mo)
+                </FormDescription>
+                <FormControl>
+                  <div className="flex gap-2">
+                    <Input
+                      type="file"
+                      accept=".pdf,.docx"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileUpload(file, "statut_document_url");
+                      }}
+                      disabled={isUploading}
+                      className="transition-all duration-300"
+                    />
+                    <Button type="button" variant="outline" disabled={isUploading}>
+                      <Upload className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </FormControl>
+                {field.value && (
+                  <p className="text-sm text-green-600 flex items-center gap-1">
+                    <FileText className="w-4 h-4" />
+                    ✓ Document téléchargé
+                  </p>
+                )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       )}
     </div>
   );
