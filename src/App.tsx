@@ -134,6 +134,7 @@ const PaymentServices = lazy(() => import("./pages/PaymentServices"));
 const Wallet = lazy(() => import("./pages/Wallet"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const PaymentCanceled = lazy(() => import("./pages/PaymentCanceled"));
+const CulturalActivities = lazy(() => import("./pages/CulturalActivities"));
 const CulturalActivitiesBooking = lazy(() => import("./pages/CulturalActivitiesBooking"));
 
 // Loading fallback component
@@ -268,6 +269,9 @@ const App = () => (
           <Route path="/e-wallet" element={<Wallet />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-canceled" element={<PaymentCanceled />} />
+          <Route path="/cultural-activities" element={<CulturalActivities />} />
+          <Route path="/activites-culturelles" element={<CulturalActivities />} />
+          <Route path="/cultural-activities/booking" element={<CulturalActivitiesBooking />} />
           <Route path="/cultural-activities-booking" element={<CulturalActivitiesBooking />} />
           <Route path="/reservation-activites-culturelles" element={<CulturalActivitiesBooking />} />
 
