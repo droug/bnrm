@@ -143,10 +143,10 @@ export default function BookingWizard() {
   return (
     <div className="max-w-5xl mx-auto">
       {/* Progress */}
-      <Card className="mb-6 rounded-2xl shadow-lg">
+      <Card className="mb-6">
         <CardContent className="pt-6">
           <div className="mb-4">
-            <div className="flex justify-between text-sm font-medium mb-2 text-foreground">
+            <div className="flex justify-between text-sm font-medium mb-2">
               <span>Étape {currentStep} sur {STEPS.length}</span>
               <span>{Math.round(progress)}%</span>
             </div>
@@ -158,10 +158,10 @@ export default function BookingWizard() {
               <button
                 key={step.id}
                 onClick={() => setCurrentStep(step.id)}
-                className={`flex-1 min-w-[120px] text-center py-2 px-3 rounded-2xl text-sm font-medium transition-all duration-300 cursor-pointer ${
+                className={`flex-1 min-w-[120px] text-center py-2 px-3 rounded-md text-sm font-medium transition-colors cursor-pointer ${
                   step.id === currentStep
-                    ? 'bg-accent text-accent-foreground shadow-md'
-                    : 'bg-muted text-muted-foreground hover:bg-accent/20'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-primary/10 text-primary hover:bg-primary/20'
                 }`}
               >
                 {step.title}
@@ -172,7 +172,7 @@ export default function BookingWizard() {
       </Card>
 
       {/* Current Step */}
-      <Card className="rounded-2xl shadow-lg">
+      <Card>
         <CardContent className="pt-6">
           <CurrentStepComponent
             data={bookingData}
@@ -188,14 +188,14 @@ export default function BookingWizard() {
                 variant="outline"
                 onClick={handlePrevious}
                 disabled={currentStep === 1}
-                className="gap-2 rounded-2xl transition-all duration-300"
+                className="gap-2"
               >
                 <ChevronLeft className="h-4 w-4" />
                 Précédent
               </Button>
 
               {currentStep < STEPS.length - 1 ? (
-                <Button onClick={handleNext} className="gap-2 rounded-2xl transition-all duration-300">
+                <Button onClick={handleNext} className="gap-2">
                   Suivant
                   <ChevronRight className="h-4 w-4" />
                 </Button>
