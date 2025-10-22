@@ -233,6 +233,17 @@ const handler = async (req: Request): Promise<Response> => {
               </p>
             </div>
             
+            <!-- Bouton d'annulation -->
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="https://1ae914e2-2780-444f-9fa4-6e404c335c35.lovableproject.com/cancel-booking?token=${requestData.bookingId}&email=${encodeURIComponent(requestData.email)}" 
+                 style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">
+                Annuler cette réservation
+              </a>
+              <p style="margin: 10px 0 0 0; font-size: 12px; color: #6b7280;">
+                Vous pouvez annuler votre réservation jusqu'à 24h avant la date prévue
+              </p>
+            </div>
+            
             <!-- Informations pratiques -->
             <div style="background-color: #e0f2fe; padding: 20px; border-radius: 8px; margin: 25px 0;">
               <h3 style="margin: 0 0 12px 0; color: #075985; font-size: 15px;">ℹ️ Informations pratiques</h3>

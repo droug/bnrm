@@ -43,7 +43,16 @@ const StepConfirmation = ({ data }: StepConfirmationProps) => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        // Messages d'erreur personnalisés
+        if (error.message?.includes("capacité maximale")) {
+          throw new Error("CAPACITY_EXCEEDED");
+        }
+        if (error.message?.includes("2 réservations actives")) {
+          throw new Error("MAX_BOOKINGS_REACHED");
+        }
+        throw error;
+      }
 
       // Appeler l'edge function pour envoyer l'email de confirmation
       const { error: emailError } = await supabase.functions.invoke(
@@ -75,8 +84,10 @@ const StepConfirmation = ({ data }: StepConfirmationProps) => {
     onError: (error: any) => {
       console.error("Erreur lors de la réservation:", error);
       
-      if (error.message?.includes("2 réservations actives")) {
-        toast.error("Vous avez déjà 2 réservations actives. Veuillez annuler une réservation existante.");
+      if (error.message === "CAPACITY_EXCEEDED") {
+        toast.error("Le nombre de visiteurs demandé dépasse la capacité restante du créneau. Veuillez choisir un autre créneau ou réduire le nombre de visiteurs.");
+      } else if (error.message === "MAX_BOOKINGS_REACHED") {
+        toast.error("Vous avez déjà 2 réservations actives. Veuillez annuler une réservation existante avant d'en créer une nouvelle.");
       } else {
         toast.error("Une erreur est survenue lors de la réservation. Veuillez réessayer.");
       }
