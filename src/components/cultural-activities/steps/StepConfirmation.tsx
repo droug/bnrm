@@ -1,10 +1,16 @@
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2, Download, Printer, Home, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import jsPDF from "jspdf";
 import type { BookingData } from "../BookingWizard";
+import logoHeader from "@/assets/logo-header-report.png";
 
 interface StepConfirmationProps {
   data: BookingData;
@@ -14,16 +20,213 @@ interface StepConfirmationProps {
 export default function StepConfirmation({ data, bookingId }: StepConfirmationProps) {
   const navigate = useNavigate();
 
-  const handleDownloadPDF = () => {
-    // TODO: Implémenter la génération du PDF récapitulatif
-    toast.info("Génération du PDF en cours...", {
-      description: "Le téléchargement démarrera dans quelques instants"
-    });
-    
-    // Simulation pour l'instant
-    setTimeout(() => {
+  // Récupérer les informations de l'espace
+  const { data: space } = useQuery({
+    queryKey: ['space', data.spaceId],
+    queryFn: async () => {
+      if (!data.spaceId) return null;
+      const { data: space, error } = await supabase
+        .from('cultural_spaces')
+        .select('*')
+        .eq('id', data.spaceId)
+        .single();
+      
+      if (error) throw error;
+      return space;
+    },
+    enabled: !!data.spaceId
+  });
+
+  const { data: equipment } = useQuery({
+    queryKey: ['selected-equipment', data.equipment],
+    queryFn: async () => {
+      if (!data.equipment?.length) return [];
+      const { data: equipment, error } = await supabase
+        .from('space_equipment')
+        .select('*')
+        .in('id', data.equipment);
+      
+      if (error) throw error;
+      return equipment;
+    },
+    enabled: !!data.equipment?.length
+  });
+
+  const { data: services } = useQuery({
+    queryKey: ['selected-services', data.services],
+    queryFn: async () => {
+      if (!data.services?.length) return [];
+      const { data: services, error } = await supabase
+        .from('space_services')
+        .select('*')
+        .in('id', data.services);
+      
+      if (error) throw error;
+      return services;
+    },
+    enabled: !!data.services?.length
+  });
+
+  const handleDownloadPDF = async () => {
+    try {
+      toast.info("Génération du PDF en cours...");
+
+      const pdf = new jsPDF();
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      
+      // Couleurs du thème (en format RGB)
+      const primaryColor: [number, number, number] = [139, 92, 246]; // violet primaire
+      const textColor: [number, number, number] = [31, 41, 55]; // gris foncé
+      const lightGray: [number, number, number] = [243, 244, 246];
+      
+      let yPosition = 20;
+
+      // En-tête avec logo
+      try {
+        const img = new Image();
+        img.src = logoHeader;
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+        pdf.addImage(img, 'PNG', 15, yPosition, 50, 20);
+      } catch (error) {
+        console.error('Erreur chargement logo:', error);
+      }
+      
+      yPosition += 35;
+
+      // Titre principal
+      pdf.setFontSize(22);
+      pdf.setTextColor(...primaryColor);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("RÉCAPITULATIF DE RÉSERVATION", pageWidth / 2, yPosition, { align: "center" });
+      
+      yPosition += 15;
+
+      // Numéro de référence
+      if (bookingId) {
+        pdf.setFontSize(11);
+        pdf.setTextColor(...textColor);
+        pdf.setFont("helvetica", "normal");
+        pdf.text(`Référence: ${bookingId.slice(0, 8).toUpperCase()}`, pageWidth / 2, yPosition, { align: "center" });
+        yPosition += 5;
+      }
+
+      // Date de génération
+      pdf.setFontSize(9);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Généré le ${format(new Date(), "PPP 'à' HH:mm", { locale: fr })}`, pageWidth / 2, yPosition, { align: "center" });
+      
+      yPosition += 15;
+
+      // Fonction pour créer une section
+      const addSection = (title: string, content: Array<{ label: string; value: string }>) => {
+        // Titre de section
+        pdf.setFillColor(...lightGray);
+        pdf.rect(15, yPosition, pageWidth - 30, 8, "F");
+        pdf.setFontSize(12);
+        pdf.setTextColor(...primaryColor);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(title, 20, yPosition + 5.5);
+        yPosition += 12;
+
+        // Contenu
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "normal");
+        content.forEach(({ label, value }) => {
+          if (yPosition > pageHeight - 20) {
+            pdf.addPage();
+            yPosition = 20;
+          }
+          pdf.setTextColor(100, 100, 100);
+          pdf.text(label + ":", 20, yPosition);
+          pdf.setTextColor(...textColor);
+          pdf.setFont("helvetica", "bold");
+          pdf.text(value, 80, yPosition);
+          pdf.setFont("helvetica", "normal");
+          yPosition += 7;
+        });
+        
+        yPosition += 5;
+      };
+
+      // Section Informations de l'événement
+      addSection("INFORMATIONS DE L'ÉVÉNEMENT", [
+        { label: "Titre", value: data.eventTitle || "N/A" },
+        { label: "Description", value: data.eventDescription || "N/A" },
+        { label: "Type d'organisme", value: data.organizerType === 'public' ? 'Public' : 'Privé' },
+        { label: "Nom de l'organisme", value: data.organizationName || "N/A" },
+        { label: "Espace", value: space?.name || "N/A" },
+        { label: "Capacité", value: space?.capacity ? `${space.capacity} personnes` : "N/A" },
+        { label: "Participants attendus", value: data.expectedAttendees ? `${data.expectedAttendees} personnes` : "N/A" }
+      ]);
+
+      // Section Dates et horaires
+      addSection("DATES ET HORAIRES", [
+        { label: "Date de début", value: data.startDate ? format(data.startDate, "PPP", { locale: fr }) : "N/A" },
+        { label: "Heure de début", value: data.startTime || "N/A" },
+        { label: "Date de fin", value: data.endDate ? format(data.endDate, "PPP", { locale: fr }) : "N/A" },
+        { label: "Heure de fin", value: data.endTime || "N/A" }
+      ]);
+
+      // Section Équipements et services
+      if ((equipment && equipment.length > 0) || (services && services.length > 0)) {
+        const equipServContent: Array<{ label: string; value: string }> = [];
+        
+        if (equipment && equipment.length > 0) {
+          equipServContent.push({ 
+            label: "Équipements", 
+            value: equipment.map(e => e.name).join(", ") 
+          });
+        }
+        
+        if (services && services.length > 0) {
+          equipServContent.push({ 
+            label: "Services", 
+            value: services.map(s => s.name).join(", ") 
+          });
+        }
+        
+        addSection("ÉQUIPEMENTS & SERVICES", equipServContent);
+      }
+
+      // Section Coordonnées du demandeur
+      addSection("COORDONNÉES DU DEMANDEUR", [
+        { label: "Personne de contact", value: data.contactPerson || "N/A" },
+        { label: "Email", value: data.contactEmail || "N/A" },
+        { label: "Téléphone", value: data.contactPhone || "N/A" },
+        { label: "Adresse", value: data.contactAddress || "N/A" },
+        { label: "Ville", value: data.contactCity || "N/A" },
+        { label: "Pays", value: data.contactCountry || "N/A" }
+      ]);
+
+      // Pied de page
+      yPosition = pageHeight - 25;
+      pdf.setDrawColor(...primaryColor);
+      pdf.setLineWidth(0.5);
+      pdf.line(15, yPosition, pageWidth - 15, yPosition);
+      yPosition += 5;
+      
+      pdf.setFontSize(9);
+      pdf.setTextColor(100, 100, 100);
+      pdf.setFont("helvetica", "italic");
+      pdf.text("Bibliothèque Nationale du Royaume du Maroc", pageWidth / 2, yPosition, { align: "center" });
+      yPosition += 5;
+      pdf.text("Avenue Ibn Batouta - Rabat", pageWidth / 2, yPosition, { align: "center" });
+      yPosition += 4;
+      pdf.text("Tél: +212 5XX XX XX XX | Email: reservations@bnrm.ma", pageWidth / 2, yPosition, { align: "center" });
+
+      // Télécharger le PDF
+      const fileName = `Reservation_${bookingId?.slice(0, 8).toUpperCase() || 'BNRM'}_${format(new Date(), "yyyyMMdd")}.pdf`;
+      pdf.save(fileName);
+      
       toast.success("PDF généré avec succès");
-    }, 1500);
+    } catch (error) {
+      console.error('Erreur génération PDF:', error);
+      toast.error("Erreur lors de la génération du PDF");
+    }
   };
 
   const handlePrint = () => {

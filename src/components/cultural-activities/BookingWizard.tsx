@@ -45,7 +45,7 @@ const STEPS = [
   { id: 3, title: "Équipements & Services", component: StepEquipment },
   { id: 4, title: "Informations du demandeur", component: StepContactInfo },
   { id: 5, title: "Validation & Acceptation", component: StepSummary },
-  { id: 6, title: "Confirmation", component: StepConfirmation }
+  { id: 6, title: "Confirmation & notification", component: StepConfirmation }
 ];
 
 export default function BookingWizard() {
