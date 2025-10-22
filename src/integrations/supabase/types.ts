@@ -4181,6 +4181,7 @@ export type Database = {
           adresse: string | null
           besoins_specifiques: string | null
           certification_exactitude: boolean
+          commentaires_comite: string | null
           consentement_diffusion: boolean
           created_at: string
           cv_url: string
@@ -4216,6 +4217,7 @@ export type Database = {
           adresse?: string | null
           besoins_specifiques?: string | null
           certification_exactitude?: boolean
+          commentaires_comite?: string | null
           consentement_diffusion?: boolean
           created_at?: string
           cv_url: string
@@ -4251,6 +4253,7 @@ export type Database = {
           adresse?: string | null
           besoins_specifiques?: string | null
           certification_exactitude?: boolean
+          commentaires_comite?: string | null
           consentement_diffusion?: boolean
           created_at?: string
           cv_url?: string
