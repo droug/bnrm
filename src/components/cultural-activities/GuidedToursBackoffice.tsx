@@ -317,15 +317,33 @@ const GuidedToursBackoffice = () => {
 
       if (bookingsError) throw bookingsError;
 
-      // TODO: Envoyer des emails de notification
+      // Envoyer des emails de notification à tous les participants
       const slotBookings = bookings.filter(b => b.slot_id === slot.id);
-      slotBookings.forEach(booking => {
-        console.log(`Sending cancellation email to ${booking.email}`);
-      });
+      
+      for (const booking of slotBookings) {
+        try {
+          await supabase.functions.invoke('send-cultural-activity-notification', {
+            body: {
+              type: 'visit_cancellation',
+              recipient_email: booking.email,
+              recipient_name: booking.nom,
+              data: {
+                visit_date: format(new Date(slot.date), 'dd MMMM yyyy', { locale: fr }),
+                visit_time: slot.heure.substring(0, 5),
+                visit_language: slot.langue,
+                nb_visiteurs: booking.nb_visiteurs,
+                cancellation_reason: "Suite à des circonstances imprévues, nous sommes contraints d'annuler cette visite."
+              }
+            }
+          });
+        } catch (emailError) {
+          console.error(`Failed to send email to ${booking.email}:`, emailError);
+        }
+      }
 
       toast({
         title: "Visite annulée",
-        description: "Le créneau a été annulé et les participants ont été notifiés",
+        description: `Le créneau a été annulé et ${slotBookings.length} participants ont été notifiés par email`,
       });
 
       fetchSlots();

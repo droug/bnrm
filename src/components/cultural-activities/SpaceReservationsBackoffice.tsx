@@ -516,13 +516,41 @@ const SpaceReservationsBackoffice = () => {
   };
 
   const sendNotificationEmail = async (type: 'approval' | 'rejection') => {
-    // TODO: Implémenter l'envoi d'email via edge function
-    console.log(`Sending ${type} email to ${selectedBooking?.contact_email}`);
+    if (!selectedBooking) return;
     
-    toast({
-      title: "Email envoyé",
-      description: `Un email de notification a été envoyé à ${selectedBooking?.contact_email}`,
-    });
+    try {
+      const notificationType = type === 'approval' ? 'booking_approval' : 'booking_rejection';
+      
+      const { error } = await supabase.functions.invoke('send-cultural-activity-notification', {
+        body: {
+          type: notificationType,
+          recipient_email: selectedBooking.contact_email,
+          recipient_name: selectedBooking.contact_person,
+          data: {
+            space_name: selectedBooking.cultural_spaces?.name,
+            organization_name: selectedBooking.organization_name,
+            start_date: format(new Date(selectedBooking.start_date), 'dd/MM/yyyy à HH:mm', { locale: fr }),
+            end_date: format(new Date(selectedBooking.end_date), 'dd/MM/yyyy à HH:mm', { locale: fr }),
+            booking_id: selectedBooking.id.substring(0, 8).toUpperCase(),
+            rejection_reason: type === 'rejection' ? rejectionReason : undefined
+          }
+        }
+      });
+
+      if (error) throw error;
+      
+      toast({
+        title: "Email envoyé",
+        description: `Un email de ${type === 'approval' ? 'confirmation' : 'notification'} a été envoyé à ${selectedBooking.contact_email}`,
+      });
+    } catch (error) {
+      console.error('Error sending email:', error);
+      toast({
+        title: "Erreur d'envoi",
+        description: "L'email n'a pas pu être envoyé, mais l'action a été enregistrée",
+        variant: "destructive"
+      });
+    }
   };
 
   const closeDialog = () => {

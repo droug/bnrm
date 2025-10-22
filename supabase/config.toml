@@ -65,3 +65,6 @@ verify_jwt = true
 
 [functions.send-program-contribution-confirmation]
 verify_jwt = false
+
+[functions.send-cultural-activity-notification]
+verify_jwt = false
