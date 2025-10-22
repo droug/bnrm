@@ -20,7 +20,6 @@ interface StepOrganizerTypeProps {
 
 export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeProps) {
   const [organizerTypeOpen, setOrganizerTypeOpen] = useState(false);
-  const [spaceOpen, setSpaceOpen] = useState(false);
   const [spaceSearch, setSpaceSearch] = useState("");
   const organizerTypeRef = useRef<HTMLDivElement>(null);
   const spaceRef = useRef<HTMLDivElement>(null);
@@ -60,21 +59,16 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
         setOrganizerTypeOpen(false);
       }
       if (spaceRef.current && !spaceRef.current.contains(event.target as Node)) {
-        setSpaceOpen(false);
-        setSpaceSearch("");
+        // Clear search if no space is selected
+        if (!data.spaceId) {
+          setSpaceSearch("");
+        }
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Auto-focus search input when dropdown opens
-  useEffect(() => {
-    if (spaceOpen && searchInputRef.current) {
-      setTimeout(() => searchInputRef.current?.focus(), 50);
-    }
-  }, [spaceOpen]);
+  }, [data.spaceId]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -187,32 +181,18 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
       {/* Sélection de l'espace */}
       <div className="space-y-2 relative" ref={spaceRef}>
         <Label>Espace *</Label>
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full justify-between h-auto min-h-[2.75rem] font-normal"
-          onClick={() => setSpaceOpen(!spaceOpen)}
-        >
-          {selectedSpace ? (
-            <span className="text-left">{selectedSpace.name}</span>
-          ) : (
-            <span className="text-muted-foreground">Sélectionner un espace...</span>
-          )}
-          <ChevronDown className="h-4 w-4 opacity-50" />
-        </Button>
-        {spaceOpen && (
+        <Input
+          ref={searchInputRef}
+          type="text"
+          placeholder="Rechercher un espace..."
+          value={spaceSearch || (selectedSpace?.name || "")}
+          onChange={(e) => setSpaceSearch(e.target.value)}
+          onFocus={() => setSpaceSearch("")}
+          className="h-11"
+          autoComplete="off"
+        />
+        {(spaceSearch || !data.spaceId) && (
           <div className="absolute z-[9999] w-full mt-1 bg-background border-2 border-primary/20 rounded-lg shadow-xl overflow-hidden">
-            <div className="p-3 border-b border-border bg-muted/30">
-              <Input
-                ref={searchInputRef}
-                type="text"
-                placeholder="Rechercher un espace..."
-                value={spaceSearch}
-                onChange={(e) => setSpaceSearch(e.target.value)}
-                className="h-10 bg-background"
-                autoComplete="off"
-              />
-            </div>
             <div className="max-h-[300px] overflow-auto bg-background">
               {filteredSpaces && filteredSpaces.length > 0 ? (
                 filteredSpaces.map((space) => (
@@ -225,7 +205,6 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
                     )}
                     onClick={() => {
                       onUpdate({ spaceId: space.id });
-                      setSpaceOpen(false);
                       setSpaceSearch("");
                     }}
                   >
