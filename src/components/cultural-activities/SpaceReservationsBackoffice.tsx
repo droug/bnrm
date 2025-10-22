@@ -139,7 +139,154 @@ const SpaceReservationsBackoffice = () => {
       const { data, error } = await query;
 
       if (error) throw error;
-      setBookings(data || []);
+      
+      // Si pas de données, afficher des exemples
+      if (!data || data.length === 0) {
+        const exampleBookings: Booking[] = [
+          {
+            id: "245-EXEMPLE-001",
+            organization_name: "Association Culturelle Atlas",
+            organization_type: "public",
+            space_id: "space-1",
+            start_date: "2025-11-12T09:00:00Z",
+            end_date: "2025-11-13T18:00:00Z",
+            status: "en_attente",
+            created_at: "2025-10-15T10:30:00Z",
+            contact_person: "Ahmed Benali",
+            contact_email: "a.benali@atlas-culture.ma",
+            contact_phone: "+212 6 12 34 56 78",
+            event_title: "Conférence sur le patrimoine marocain",
+            event_description: "Une conférence internationale sur la préservation du patrimoine culturel marocain avec des experts nationaux et internationaux.",
+            participants_count: 150,
+            total_amount: 5000,
+            rejection_reason: null,
+            admin_notes: null,
+            duration_type: "journee_complete",
+            cultural_spaces: {
+              name: "Salle de Conférence Principale"
+            }
+          },
+          {
+            id: "246-EXEMPLE-002",
+            organization_name: "Fondation Mohammed VI",
+            organization_type: "public",
+            space_id: "space-2",
+            start_date: "2025-11-20T14:00:00Z",
+            end_date: "2025-11-20T18:00:00Z",
+            status: "validee",
+            created_at: "2025-10-18T14:20:00Z",
+            contact_person: "Fatima Zahra Alami",
+            contact_email: "fz.alami@fondation.ma",
+            contact_phone: "+212 5 37 12 34 56",
+            event_title: "Exposition d'art contemporain",
+            event_description: "Exposition d'œuvres d'artistes marocains contemporains.",
+            participants_count: 80,
+            total_amount: 2500,
+            rejection_reason: null,
+            admin_notes: "Demande approuvée - paiement reçu",
+            duration_type: "demi_journee",
+            cultural_spaces: {
+              name: "Galerie d'exposition"
+            }
+          },
+          {
+            id: "247-EXEMPLE-003",
+            organization_name: "Club Littéraire Rabat",
+            organization_type: "association",
+            space_id: "space-1",
+            start_date: "2025-11-25T10:00:00Z",
+            end_date: "2025-11-25T13:00:00Z",
+            status: "en_attente",
+            created_at: "2025-10-20T09:15:00Z",
+            contact_person: "Karim Benjelloun",
+            contact_email: "k.benjelloun@clr.ma",
+            contact_phone: "+212 6 98 76 54 32",
+            event_title: "Rencontre avec un écrivain",
+            event_description: "Séance de dédicace et discussion avec un auteur primé.",
+            participants_count: 50,
+            total_amount: 1200,
+            rejection_reason: null,
+            admin_notes: null,
+            duration_type: "demi_journee",
+            cultural_spaces: {
+              name: "Salle de Conférence Principale"
+            }
+          },
+          {
+            id: "248-EXEMPLE-004",
+            organization_name: "Institut Français de Rabat",
+            organization_type: "international",
+            space_id: "space-3",
+            start_date: "2025-12-05T09:00:00Z",
+            end_date: "2025-12-05T17:00:00Z",
+            status: "en_attente",
+            created_at: "2025-10-22T16:45:00Z",
+            contact_person: "Sophie Martin",
+            contact_email: "s.martin@if-maroc.ma",
+            contact_phone: "+212 5 37 89 12 34",
+            event_title: "Journée de la francophonie",
+            event_description: "Célébration de la journée internationale de la francophonie avec projections et débats.",
+            participants_count: 120,
+            total_amount: 3800,
+            rejection_reason: null,
+            admin_notes: null,
+            duration_type: "journee_complete",
+            cultural_spaces: {
+              name: "Auditorium"
+            }
+          },
+          {
+            id: "249-EXEMPLE-005",
+            organization_name: "Société Tech Innovations",
+            organization_type: "prive",
+            space_id: "space-2",
+            start_date: "2025-11-15T09:00:00Z",
+            end_date: "2025-11-15T12:00:00Z",
+            status: "rejetee",
+            created_at: "2025-10-10T11:20:00Z",
+            contact_person: "Youssef Tazi",
+            contact_email: "y.tazi@techinnovations.ma",
+            contact_phone: "+212 6 55 44 33 22",
+            event_title: "Lancement de produit technologique",
+            event_description: "Présentation d'un nouveau produit technologique à la presse.",
+            participants_count: 40,
+            total_amount: 1800,
+            rejection_reason: "L'événement proposé ne correspond pas à la vocation culturelle de nos espaces.",
+            admin_notes: "Demande commerciale - hors champ d'activité",
+            duration_type: "demi_journee",
+            cultural_spaces: {
+              name: "Galerie d'exposition"
+            }
+          },
+          {
+            id: "250-EXEMPLE-006",
+            organization_name: "Université Mohammed V",
+            organization_type: "public",
+            space_id: "space-1",
+            start_date: "2025-12-10T14:00:00Z",
+            end_date: "2025-12-11T17:00:00Z",
+            status: "validee",
+            created_at: "2025-10-25T08:30:00Z",
+            contact_person: "Dr. Amina El Mansouri",
+            contact_email: "a.elmansouri@um5.ac.ma",
+            contact_phone: "+212 5 37 77 88 99",
+            event_title: "Colloque scientifique - Histoire du livre au Maroc",
+            event_description: "Colloque académique sur l'histoire du livre et des bibliothèques au Maroc.",
+            participants_count: 200,
+            total_amount: 6500,
+            rejection_reason: null,
+            admin_notes: "Convention cadre - tarif préférentiel appliqué",
+            duration_type: "journee_complete",
+            cultural_spaces: {
+              name: "Salle de Conférence Principale"
+            }
+          }
+        ];
+        
+        setBookings(exampleBookings);
+      } else {
+        setBookings(data);
+      }
     } catch (error) {
       console.error("Error fetching bookings:", error);
       toast({
