@@ -462,6 +462,27 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
 
       <Separator />
 
+      {/* Informations de validation */}
+      {!canSubmit && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <p className="font-semibold mb-2">Le bouton de validation est désactivé car :</p>
+            <ul className="list-disc ml-5 space-y-1 text-sm">
+              {!isComplete && (
+                <li>Certaines informations obligatoires sont manquantes dans les étapes précédentes</li>
+              )}
+              {!hasReadRegulations && (
+                <li>Vous devez confirmer avoir lu le règlement d'utilisation</li>
+              )}
+              {!acceptsConditions && (
+                <li>Vous devez accepter les conditions d'utilisation</li>
+              )}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Alert>
         <CheckCircle className="h-4 w-4" />
         <AlertDescription>
@@ -487,6 +508,32 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
           </>
         )}
       </Button>
+
+      {/* Debug info (à retirer en production) */}
+      {!isComplete && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <p className="text-xs text-muted-foreground">
+              <strong>Informations de débogage :</strong><br/>
+              Type d'organisme: {data.organizerType ? '✓' : '✗'}<br/>
+              Nom organisation (étape 1): {data.organizationName ? '✓' : '✗'}<br/>
+              Espace sélectionné: {data.spaceId ? '✓' : '✗'}<br/>
+              Date début: {data.startDate ? '✓' : '✗'}<br/>
+              Date fin: {data.endDate ? '✓' : '✗'}<br/>
+              Heure début: {data.startTime ? '✓' : '✗'}<br/>
+              Heure fin: {data.endTime ? '✓' : '✗'}<br/>
+              Titre événement: {data.eventTitle ? '✓' : '✗'}<br/>
+              Description: {data.eventDescription ? '✓' : '✗'}<br/>
+              Participants: {data.expectedAttendees ? '✓' : '✗'}<br/>
+              Nom organisme (étape 4): {data.contactOrganizationName ? '✓' : '✗'}<br/>
+              Personne contact: {data.contactPerson ? '✓' : '✗'}<br/>
+              Email: {data.contactEmail ? '✓' : '✗'}<br/>
+              Téléphone: {data.contactPhone ? '✓' : '✗'}
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 }
