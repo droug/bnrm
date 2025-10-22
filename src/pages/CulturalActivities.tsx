@@ -1,17 +1,41 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, MapPin, Users, FileText, Download } from "lucide-react";
+import { Calendar, MapPin, Users, FileText, Download, Settings } from "lucide-react";
 import CulturalCalendar from "@/components/cultural-activities/CulturalCalendar";
 import EventsCarousel from "@/components/cultural-activities/EventsCarousel";
 import logoBnrm from "@/assets/logo-bnrm-officiel.png";
+import { usePermissions } from "@/hooks/usePermissions";
 
 const CulturalActivities = () => {
+  const navigate = useNavigate();
+  const { hasPermission } = usePermissions();
+  const isAdmin = hasPermission("content.manage");
+
   return (
     <div className="min-h-screen bg-[#FAF9F5]">
       <Header />
+      
+      {/* Admin Quick Access Bar */}
+      {isAdmin && (
+        <div className="bg-primary/5 border-b border-primary/20">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex justify-end">
+              <Button
+                onClick={() => navigate("/admin/activites-culturelles")}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                Administration AC
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-[#002B45] to-[#004d7a] text-white py-16 overflow-hidden">
