@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import PartnershipWizard from "@/components/cultural-activities/PartnershipWizard";
 
 const CulturalActivitiesPartnership = () => {
   return (
@@ -17,16 +18,7 @@ const CulturalActivitiesPartnership = () => {
           </Button>
         </Link>
 
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-[#002B45] mb-6">
-            Demande de partenariat
-          </h1>
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <p className="text-lg text-[#333333] mb-6">
-              Formulaire de demande de partenariat à venir...
-            </p>
-          </div>
-        </div>
+        <PartnershipWizard />
       </div>
 
       <Footer />
