@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { 
+  generateConfirmationLetter as generateConfirmationPDF, 
+  generateContract as generateContractPDF, 
+  generateInvoice as generateInvoicePDF, 
+  generateInventoryReport as generateInventoryPDF 
+} from "@/utils/culturalSpacePdfGenerator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -379,128 +385,189 @@ const SpaceReservationsBackoffice = () => {
   const generateConfirmationLetter = async () => {
     if (!selectedBooking) return;
 
-    const letterContent = `LETTRE DE CONFIRMATION DE RÉSERVATION D'ESPACE\n\n` +
-      `Référence: ${selectedBooking.id.substring(0, 8).toUpperCase()}\n` +
-      `Date: ${format(new Date(), 'dd MMMM yyyy', { locale: fr })}\n\n` +
-      `À l'attention de ${selectedBooking.contact_person}\n` +
-      `${selectedBooking.organization_name}\n\n` +
-      `Madame, Monsieur,\n\n` +
-      `Nous avons le plaisir de vous confirmer la réservation de l'espace suivant :\n\n` +
-      `Espace : ${selectedBooking.cultural_spaces?.name}\n` +
-      `Événement : ${selectedBooking.event_title}\n` +
-      `Date de début : ${format(new Date(selectedBooking.start_date), 'dd/MM/yyyy HH:mm', { locale: fr })}\n` +
-      `Date de fin : ${format(new Date(selectedBooking.end_date), 'dd/MM/yyyy HH:mm', { locale: fr })}\n` +
-      `Nombre de participants : ${selectedBooking.participants_count}\n` +
-      `Type de durée : ${selectedBooking.duration_type === 'journee_complete' ? 'Journée complète' : 'Demi-journée'}\n` +
-      `Montant total : ${selectedBooking.total_amount} MAD\n\n` +
-      `Merci de nous contacter pour finaliser les modalités pratiques.\n\n` +
-      `Cordialement,\n` +
-      `Le Département des Activités Culturelles\n` +
-      `Bibliothèque Nationale du Royaume du Maroc`;
+    try {
+      const space = {
+        name: selectedBooking.cultural_spaces?.name || "Espace non spécifié",
+        capacity: selectedBooking.participants_count,
+        description: selectedBooking.event_description,
+        location: ""
+      };
 
-    downloadDocument(letterContent, `confirmation_${selectedBooking.id.substring(0, 8)}.txt`);
+      const bookingData = {
+        id: selectedBooking.id,
+        booking_number: selectedBooking.id.substring(0, 8).toUpperCase(),
+        organization_name: selectedBooking.organization_name,
+        organization_type: selectedBooking.organization_type,
+        contact_person: selectedBooking.contact_person,
+        phone: selectedBooking.contact_phone,
+        email: selectedBooking.contact_email,
+        activity_type: selectedBooking.event_title,
+        activity_description: selectedBooking.event_description,
+        start_date: selectedBooking.start_date,
+        end_date: selectedBooking.end_date,
+        duration_type: selectedBooking.duration_type,
+        expected_attendees: selectedBooking.participants_count,
+        special_requirements: selectedBooking.admin_notes || "",
+        total_amount: selectedBooking.total_amount,
+        status: selectedBooking.status,
+        space_id: selectedBooking.space_id
+      };
+
+      await generateConfirmationPDF(bookingData, space);
+      
+      toast({
+        title: "Document généré",
+        description: "Lettre de confirmation générée en PDF avec succès",
+      });
+    } catch (error) {
+      console.error("Error generating confirmation letter:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer la lettre de confirmation",
+        variant: "destructive",
+      });
+    }
   };
 
   const generateContract = async () => {
     if (!selectedBooking) return;
 
-    const contractContent = `CONTRAT DE RÉSERVATION D'ESPACE CULTUREL\n\n` +
-      `Entre :\n` +
-      `La Bibliothèque Nationale du Royaume du Maroc (BNRM)\n` +
-      `Et :\n` +
-      `${selectedBooking.organization_name} (${selectedBooking.organization_type})\n` +
-      `Représentée par : ${selectedBooking.contact_person}\n\n` +
-      `Article 1 - Objet\n` +
-      `Le présent contrat a pour objet la mise à disposition de l'espace "${selectedBooking.cultural_spaces?.name}" pour l'événement "${selectedBooking.event_title}".\n\n` +
-      `Article 2 - Durée\n` +
-      `Du ${format(new Date(selectedBooking.start_date), 'dd/MM/yyyy HH:mm')} au ${format(new Date(selectedBooking.end_date), 'dd/MM/yyyy HH:mm')}\n\n` +
-      `Article 3 - Tarification\n` +
-      `Montant total : ${selectedBooking.total_amount} MAD\n\n` +
-      `Article 4 - Obligations du locataire\n` +
-      `- Respecter les règles de la BNRM\n` +
-      `- Maintenir l'espace en bon état\n` +
-      `- Respecter les horaires convenus\n\n` +
-      `Article 5 - Assurances\n` +
-      `Le locataire s'engage à souscrire une assurance responsabilité civile.\n\n` +
-      `Fait à Rabat, le ${format(new Date(), 'dd MMMM yyyy', { locale: fr })}\n\n` +
-      `Pour la BNRM                    Pour ${selectedBooking.organization_name}\n\n\n` +
-      `_________________                _________________`;
+    try {
+      const space = {
+        name: selectedBooking.cultural_spaces?.name || "Espace non spécifié",
+        capacity: selectedBooking.participants_count,
+        description: selectedBooking.event_description,
+        location: ""
+      };
 
-    downloadDocument(contractContent, `contrat_${selectedBooking.id.substring(0, 8)}.txt`);
+      const bookingData = {
+        id: selectedBooking.id,
+        booking_number: selectedBooking.id.substring(0, 8).toUpperCase(),
+        organization_name: selectedBooking.organization_name,
+        organization_type: selectedBooking.organization_type,
+        contact_person: selectedBooking.contact_person,
+        phone: selectedBooking.contact_phone,
+        email: selectedBooking.contact_email,
+        activity_type: selectedBooking.event_title,
+        activity_description: selectedBooking.event_description,
+        start_date: selectedBooking.start_date,
+        end_date: selectedBooking.end_date,
+        duration_type: selectedBooking.duration_type,
+        expected_attendees: selectedBooking.participants_count,
+        special_requirements: selectedBooking.admin_notes || "",
+        total_amount: selectedBooking.total_amount,
+        status: selectedBooking.status,
+        space_id: selectedBooking.space_id
+      };
+
+      await generateContractPDF(bookingData, space);
+      
+      toast({
+        title: "Document généré",
+        description: "Contrat généré en PDF avec succès",
+      });
+    } catch (error) {
+      console.error("Error generating contract:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le contrat",
+        variant: "destructive",
+      });
+    }
   };
 
   const generateInvoice = async () => {
     if (!selectedBooking) return;
 
-    const invoiceContent = `FACTURE\n\n` +
-      `Bibliothèque Nationale du Royaume du Maroc\n` +
-      `Avenue Al Hadyquiya, Secteur Ryad, Rabat\n\n` +
-      `FACTURE N° : ${selectedBooking.id.substring(0, 8).toUpperCase()}\n` +
-      `Date : ${format(new Date(), 'dd/MM/yyyy')}\n\n` +
-      `Client :\n` +
-      `${selectedBooking.organization_name}\n` +
-      `Contact : ${selectedBooking.contact_person}\n` +
-      `Email : ${selectedBooking.contact_email}\n` +
-      `Tél : ${selectedBooking.contact_phone}\n\n` +
-      `DÉTAIL DE LA PRESTATION\n` +
-      `${'='.repeat(70)}\n` +
-      `Description                                    Prix Unitaire    Total\n` +
-      `${'='.repeat(70)}\n` +
-      `Réservation ${selectedBooking.cultural_spaces?.name}\n` +
-      `  Événement : ${selectedBooking.event_title}\n` +
-      `  Du ${format(new Date(selectedBooking.start_date), 'dd/MM/yyyy')} au ${format(new Date(selectedBooking.end_date), 'dd/MM/yyyy')}\n` +
-      `  Type : ${selectedBooking.duration_type === 'journee_complete' ? 'Journée complète' : 'Demi-journée'}\n` +
-      `                                                              ${selectedBooking.total_amount} MAD\n` +
-      `${'='.repeat(70)}\n\n` +
-      `TOTAL TTC : ${selectedBooking.total_amount} MAD\n\n` +
-      `Modalités de paiement : À régler avant l'événement\n` +
-      `Coordonnées bancaires disponibles sur demande`;
+    try {
+      const space = {
+        name: selectedBooking.cultural_spaces?.name || "Espace non spécifié",
+        capacity: selectedBooking.participants_count,
+        description: selectedBooking.event_description,
+        location: ""
+      };
 
-    downloadDocument(invoiceContent, `facture_${selectedBooking.id.substring(0, 8)}.txt`);
+      const bookingData = {
+        id: selectedBooking.id,
+        booking_number: selectedBooking.id.substring(0, 8).toUpperCase(),
+        organization_name: selectedBooking.organization_name,
+        organization_type: selectedBooking.organization_type,
+        contact_person: selectedBooking.contact_person,
+        phone: selectedBooking.contact_phone,
+        email: selectedBooking.contact_email,
+        activity_type: selectedBooking.event_title,
+        activity_description: selectedBooking.event_description,
+        start_date: selectedBooking.start_date,
+        end_date: selectedBooking.end_date,
+        duration_type: selectedBooking.duration_type,
+        expected_attendees: selectedBooking.participants_count,
+        special_requirements: selectedBooking.admin_notes || "",
+        total_amount: selectedBooking.total_amount,
+        status: selectedBooking.status,
+        space_id: selectedBooking.space_id
+      };
+
+      await generateInvoicePDF(bookingData, space);
+      
+      toast({
+        title: "Document généré",
+        description: "Facture générée en PDF avec succès",
+      });
+    } catch (error) {
+      console.error("Error generating invoice:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer la facture",
+        variant: "destructive",
+      });
+    }
   };
 
   const generateInventory = async () => {
     if (!selectedBooking) return;
 
-    const inventoryContent = `ÉTAT DES LIEUX\n\n` +
-      `Espace : ${selectedBooking.cultural_spaces?.name}\n` +
-      `Événement : ${selectedBooking.event_title}\n` +
-      `Organisation : ${selectedBooking.organization_name}\n` +
-      `Date : ${format(new Date(), 'dd/MM/yyyy HH:mm')}\n\n` +
-      `ÉTAT DES LIEUX D'ENTRÉE\n` +
-      `${'='.repeat(70)}\n\n` +
-      `☐ Sol en bon état\n` +
-      `☐ Murs en bon état\n` +
-      `☐ Éclairage fonctionnel\n` +
-      `☐ Système audio fonctionnel\n` +
-      `☐ Chaises en bon état (nombre : ___)\n` +
-      `☐ Tables en bon état (nombre : ___)\n` +
-      `☐ Scène en bon état\n` +
-      `☐ Système de projection fonctionnel\n\n` +
-      `Observations complémentaires :\n` +
-      `_________________________________________________________________\n` +
-      `_________________________________________________________________\n` +
-      `_________________________________________________________________\n\n` +
-      `Signature du responsable BNRM :              Signature du locataire :\n\n\n` +
-      `_________________________                    _________________________\n\n\n` +
-      `ÉTAT DES LIEUX DE SORTIE (à compléter après l'événement)\n` +
-      `${'='.repeat(70)}\n\n` +
-      `☐ Sol en bon état\n` +
-      `☐ Murs en bon état\n` +
-      `☐ Éclairage fonctionnel\n` +
-      `☐ Système audio fonctionnel\n` +
-      `☐ Chaises en bon état\n` +
-      `☐ Tables en bon état\n` +
-      `☐ Scène en bon état\n` +
-      `☐ Système de projection fonctionnel\n\n` +
-      `Observations complémentaires :\n` +
-      `_________________________________________________________________\n` +
-      `_________________________________________________________________\n` +
-      `_________________________________________________________________\n\n` +
-      `Signature du responsable BNRM :              Signature du locataire :\n\n\n` +
-      `_________________________                    _________________________`;
+    try {
+      const space = {
+        name: selectedBooking.cultural_spaces?.name || "Espace non spécifié",
+        capacity: selectedBooking.participants_count,
+        description: selectedBooking.event_description,
+        location: ""
+      };
 
-    downloadDocument(inventoryContent, `etat_lieux_${selectedBooking.id.substring(0, 8)}.txt`);
+      const bookingData = {
+        id: selectedBooking.id,
+        booking_number: selectedBooking.id.substring(0, 8).toUpperCase(),
+        organization_name: selectedBooking.organization_name,
+        organization_type: selectedBooking.organization_type,
+        contact_person: selectedBooking.contact_person,
+        phone: selectedBooking.contact_phone,
+        email: selectedBooking.contact_email,
+        activity_type: selectedBooking.event_title,
+        activity_description: selectedBooking.event_description,
+        start_date: selectedBooking.start_date,
+        end_date: selectedBooking.end_date,
+        duration_type: selectedBooking.duration_type,
+        expected_attendees: selectedBooking.participants_count,
+        special_requirements: selectedBooking.admin_notes || "",
+        total_amount: selectedBooking.total_amount,
+        status: selectedBooking.status,
+        space_id: selectedBooking.space_id
+      };
+
+      await generateInventoryPDF(bookingData, space);
+      
+      toast({
+        title: "Document généré",
+        description: "État des lieux généré en PDF avec succès",
+      });
+    } catch (error) {
+      console.error("Error generating inventory:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer l'état des lieux",
+        variant: "destructive",
+      });
+    }
   };
 
   const downloadDocument = (content: string, filename: string) => {
