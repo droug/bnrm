@@ -141,7 +141,7 @@ const handler = async (req: Request): Promise<Response> => {
     const clientEmailResponse = await resend.emails.send({
       from: "BNRM Réservations <onboarding@resend.dev>",
       to: [bookingData.userEmail],
-      subject: `Confirmation de réservation - ${bookingData.eventTitle}`,
+      subject: `Demande de réservation – Activités culturelles BNRM`,
       html: emailHtml,
     });
 

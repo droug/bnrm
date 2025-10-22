@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Upload, CheckCircle, AlertCircle } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Calendar as CalendarIcon, Upload, CheckCircle, AlertCircle, Info } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ interface StepDateTimeProps {
 export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
+  const [availabilityStatus, setAvailabilityStatus] = useState<'checking' | 'available' | 'unavailable' | null>(null);
 
   // Récupérer les infos de l'espace sélectionné
   const { data: selectedSpace } = useQuery({
@@ -41,6 +43,37 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
     },
     enabled: !!data.spaceId
   });
+
+  // Vérifier la disponibilité lorsque les dates changent
+  useEffect(() => {
+    const checkAvailability = async () => {
+      if (!data.spaceId || !data.startDate || !data.endDate || !data.startTime || !data.endTime) {
+        setAvailabilityStatus(null);
+        return;
+      }
+
+      setAvailabilityStatus('checking');
+
+      const startDateTime = `${data.startDate.toISOString().split('T')[0]} ${data.startTime}:00`;
+      const endDateTime = `${data.endDate.toISOString().split('T')[0]} ${data.endTime}:00`;
+
+      try {
+        const { data: result, error } = await supabase.rpc('check_space_availability', {
+          p_space_id: data.spaceId,
+          p_start_date: startDateTime,
+          p_end_date: endDateTime
+        });
+
+        if (error) throw error;
+        setAvailabilityStatus(result ? 'available' : 'unavailable');
+      } catch (error) {
+        console.error('Erreur vérification disponibilité:', error);
+        setAvailabilityStatus(null);
+      }
+    };
+
+    checkAvailability();
+  }, [data.spaceId, data.startDate, data.endDate, data.startTime, data.endTime]);
 
   const handleProgramUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -232,6 +265,48 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
           />
         </div>
       </div>
+
+      {/* Vérification de disponibilité */}
+      {availabilityStatus && (
+        <Alert variant={availabilityStatus === 'available' ? 'default' : 'destructive'}>
+          {availabilityStatus === 'checking' ? (
+            <Info className="h-4 w-4" />
+          ) : availabilityStatus === 'available' ? (
+            <CheckCircle className="h-4 w-4" />
+          ) : (
+            <AlertCircle className="h-4 w-4" />
+          )}
+          <AlertDescription>
+            {availabilityStatus === 'checking' && 'Vérification de la disponibilité...'}
+            {availabilityStatus === 'available' && 'L\'espace est disponible pour ce créneau'}
+            {availabilityStatus === 'unavailable' && 'Cet espace n\'est pas disponible pour ce créneau. Veuillez choisir d\'autres dates.'}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Type de durée (pour les esplanades) */}
+      {selectedSpace?.allows_half_day && (
+        <div className="space-y-2">
+          <Label>Type de durée *</Label>
+          <RadioGroup
+            value={data.durationType || 'journee_complete'}
+            onValueChange={(value) => onUpdate({ durationType: value as 'demi_journee' | 'journee_complete' })}
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="demi_journee" id="demi_journee" />
+              <Label htmlFor="demi_journee" className="font-normal cursor-pointer">
+                Demi-journée
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="journee_complete" id="journee_complete" />
+              <Label htmlFor="journee_complete" className="font-normal cursor-pointer">
+                Journée complète
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+      )}
 
       {/* Nombre de participants */}
       <div className="space-y-2">

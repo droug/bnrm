@@ -25,6 +25,7 @@ export interface BookingData {
   programDocument?: File;
   equipment: string[];
   services: string[];
+  durationType?: 'demi_journee' | 'journee_complete';
   // Informations du demandeur
   contactPerson?: string;
   contactEmail?: string;

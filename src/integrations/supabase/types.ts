@@ -484,6 +484,7 @@ export type Database = {
           country: string | null
           created_at: string | null
           currency: string | null
+          duration_type: string | null
           end_date: string
           equipment_total_amount: number | null
           event_description: string | null
@@ -521,6 +522,7 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           currency?: string | null
+          duration_type?: string | null
           end_date: string
           equipment_total_amount?: number | null
           event_description?: string | null
@@ -558,6 +560,7 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           currency?: string | null
+          duration_type?: string | null
           end_date?: string
           equipment_total_amount?: number | null
           event_description?: string | null
@@ -1274,9 +1277,12 @@ export type Database = {
       }
       cultural_spaces: {
         Row: {
+          allows_half_day: boolean | null
           capacity: number
+          cleaning_charge: number | null
           created_at: string | null
           description: string | null
+          electricity_charge: number | null
           floor_level: string | null
           has_lighting: boolean | null
           has_projection: boolean | null
@@ -1286,13 +1292,21 @@ export type Database = {
           image_url: string | null
           is_active: boolean | null
           name: string
+          space_type: string | null
           surface_m2: number | null
+          tariff_private_full_day: number | null
+          tariff_private_half_day: number | null
+          tariff_public_full_day: number | null
+          tariff_public_half_day: number | null
           updated_at: string | null
         }
         Insert: {
+          allows_half_day?: boolean | null
           capacity: number
+          cleaning_charge?: number | null
           created_at?: string | null
           description?: string | null
+          electricity_charge?: number | null
           floor_level?: string | null
           has_lighting?: boolean | null
           has_projection?: boolean | null
@@ -1302,13 +1316,21 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean | null
           name: string
+          space_type?: string | null
           surface_m2?: number | null
+          tariff_private_full_day?: number | null
+          tariff_private_half_day?: number | null
+          tariff_public_full_day?: number | null
+          tariff_public_half_day?: number | null
           updated_at?: string | null
         }
         Update: {
+          allows_half_day?: boolean | null
           capacity?: number
+          cleaning_charge?: number | null
           created_at?: string | null
           description?: string | null
+          electricity_charge?: number | null
           floor_level?: string | null
           has_lighting?: boolean | null
           has_projection?: boolean | null
@@ -1318,7 +1340,12 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean | null
           name?: string
+          space_type?: string | null
           surface_m2?: number | null
+          tariff_private_full_day?: number | null
+          tariff_private_half_day?: number | null
+          tariff_public_full_day?: number | null
+          tariff_public_half_day?: number | null
           updated_at?: string | null
         }
         Relationships: []
@@ -6487,6 +6514,16 @@ export type Database = {
         Args: { p_request_id: string; p_role: string }
         Returns: boolean
       }
+      calculate_booking_tariff: {
+        Args: {
+          p_duration_type: string
+          p_end_date: string
+          p_organization_type: string
+          p_space_id: string
+          p_start_date: string
+        }
+        Returns: number
+      }
       calculate_checksum: { Args: { content_data: string }; Returns: string }
       calculate_reproduction_total: {
         Args: { request_uuid: string }
@@ -6506,6 +6543,15 @@ export type Database = {
       }
       check_committee_approval: {
         Args: { request_uuid: string }
+        Returns: boolean
+      }
+      check_space_availability: {
+        Args: {
+          p_end_date: string
+          p_exclude_booking_id?: string
+          p_space_id: string
+          p_start_date: string
+        }
         Returns: boolean
       }
       cleanup_old_activity_logs: { Args: never; Returns: number }

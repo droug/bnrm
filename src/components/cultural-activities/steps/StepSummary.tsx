@@ -75,6 +75,33 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
     enabled: !!data.services?.length
   });
 
+  // Calculer la tarification dynamique
+  const { data: calculatedTariff } = useQuery({
+    queryKey: ['booking-tariff', data.spaceId, data.organizerType, data.durationType, data.startDate, data.endDate],
+    queryFn: async () => {
+      if (!data.spaceId || !data.organizerType || !data.startDate || !data.endDate) return null;
+      
+      const startDateTime = `${data.startDate.toISOString().split('T')[0]} ${data.startTime || '00:00'}:00`;
+      const endDateTime = `${data.endDate.toISOString().split('T')[0]} ${data.endTime || '23:59'}:00`;
+      
+      const { data: tariff, error } = await supabase.rpc('calculate_booking_tariff', {
+        p_space_id: data.spaceId,
+        p_organization_type: data.organizerType,
+        p_duration_type: data.durationType || 'journee_complete',
+        p_start_date: startDateTime,
+        p_end_date: endDateTime
+      });
+      
+      if (error) {
+        console.error('Erreur calcul tarif:', error);
+        return null;
+      }
+      
+      return tariff;
+    },
+    enabled: !!(data.spaceId && data.organizerType && data.startDate && data.endDate)
+  });
+
   const submitBooking = useMutation({
     mutationFn: async () => {
       if (!user) {
@@ -93,6 +120,7 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
           organization_name: data.organizationName,
           start_date: startDateTime,
           end_date: endDateTime,
+          duration_type: data.durationType || 'journee_complete',
           event_title: data.eventTitle,
           event_description: data.eventDescription,
           participants_count: data.expectedAttendees || 0,
@@ -212,7 +240,7 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
 
   // Calcul du coût total
   const calculateTotalCost = () => {
-    let total = 0;
+    let total = Number(calculatedTariff) || 0; // Tarif de base incluant les charges automatiques
     
     // Coût des équipements
     if (equipment) {
@@ -236,6 +264,7 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
   };
 
   const totalCost = calculateTotalCost();
+  const baseTariff = Number(calculatedTariff) || 0;
 
   return (
     <div className="space-y-6">
@@ -378,12 +407,57 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
                 Tarification calculée
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
+            <CardContent className="space-y-4">
+              {/* Détail de la tarification */}
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Tarif de base ({data.durationType === 'demi_journee' ? 'demi-journée' : 'journée complète'})</span>
+                  <span className="font-medium">{baseTariff.toFixed(2)} MAD</span>
+                </div>
+                <p className="text-xs text-muted-foreground italic">
+                  Inclut : location de l'espace + électricité + nettoyage
+                </p>
+                
+                {equipment && equipment.some(item => !item.is_included && item.additional_cost) && (
+                  <>
+                    <Separator className="my-2" />
+                    <div>
+                      <p className="font-medium mb-1">Équipements additionnels :</p>
+                      {equipment.map((item) => (
+                        !item.is_included && item.additional_cost && (
+                          <div key={item.id} className="flex justify-between text-xs ml-4">
+                            <span>{item.name}</span>
+                            <span>{Number(item.additional_cost).toFixed(2)} MAD</span>
+                          </div>
+                        )
+                      ))}
+                    </div>
+                  </>
+                )}
+                
+                {services && services.length > 0 && (
+                  <>
+                    <Separator className="my-2" />
+                    <div>
+                      <p className="font-medium mb-1">Services additionnels :</p>
+                      {services.map((service) => (
+                        <div key={service.id} className="flex justify-between text-xs ml-4">
+                          <span>{service.name}</span>
+                          <span>{Number(service.base_cost).toFixed(2)} MAD</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <Separator />
+              
+              <div className="flex items-center justify-between pt-2">
                 <span className="text-lg font-semibold">Total estimé</span>
                 <span className="text-2xl font-bold text-primary">{totalCost.toFixed(2)} MAD</span>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-xs text-muted-foreground">
                 * Ce montant est une estimation. Le coût définitif sera confirmé après validation de votre demande.
               </p>
             </CardContent>
