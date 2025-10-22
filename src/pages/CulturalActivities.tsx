@@ -92,17 +92,17 @@ const CulturalActivities = () => {
             {/* Card 1: Réservation des espaces */}
             <Link to="/cultural-activities/booking">
               <Card className="h-full hover:shadow-xl transition-all duration-300 group border-2 hover:border-[#D4AF37] rounded-2xl">
-                <CardContent className="p-6 text-center space-y-4">
+                <CardContent className="p-6 text-center space-y-4 h-full flex flex-col">
                   <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                     <Calendar className="h-8 w-8 text-[#D4AF37]" />
                   </div>
                   <h3 className="text-xl font-bold text-[#002B45]">
                     Demande de réservation des espaces
                   </h3>
-                  <p className="text-sm text-[#333333]">
+                  <p className="text-sm text-[#333333] flex-grow">
                     Louer une salle, un espace d'exposition ou un auditorium pour un événement culturel.
                   </p>
-                  <Button className="w-full bg-[#D4AF37] hover:bg-[#b8941f] text-white rounded-2xl">
+                  <Button className="w-full bg-[#D4AF37] hover:bg-[#b8941f] text-white rounded-2xl mt-auto">
                     Réserver un espace →
                   </Button>
                 </CardContent>
@@ -112,17 +112,17 @@ const CulturalActivities = () => {
             {/* Card 2: Visites guidées */}
             <Link to="/activites-culturelles/visites">
               <Card className="h-full hover:shadow-xl transition-all duration-300 group border-2 hover:border-[#D4AF37] rounded-2xl">
-                <CardContent className="p-6 text-center space-y-4">
+                <CardContent className="p-6 text-center space-y-4 h-full flex flex-col">
                   <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                     <MapPin className="h-8 w-8 text-[#D4AF37]" />
                   </div>
                   <h3 className="text-xl font-bold text-[#002B45]">
                     Réservation de visites guidées
                   </h3>
-                  <p className="text-sm text-[#333333]">
+                  <p className="text-sm text-[#333333] flex-grow">
                     Planifier une visite individuelle ou de groupe des espaces de la BNRM.
                   </p>
-                  <Button className="w-full bg-[#D4AF37] hover:bg-[#b8941f] text-white rounded-2xl">
+                  <Button className="w-full bg-[#D4AF37] hover:bg-[#b8941f] text-white rounded-2xl mt-auto">
                     Réserver une visite →
                   </Button>
                 </CardContent>
@@ -132,17 +132,17 @@ const CulturalActivities = () => {
             {/* Card 3: Partenariat */}
             <Link to="/activites-culturelles/partenariat">
               <Card className="h-full hover:shadow-xl transition-all duration-300 group border-2 hover:border-[#D4AF37] rounded-2xl">
-                <CardContent className="p-6 text-center space-y-4">
+                <CardContent className="p-6 text-center space-y-4 h-full flex flex-col">
                   <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                     <Users className="h-8 w-8 text-[#D4AF37]" />
                   </div>
                   <h3 className="text-xl font-bold text-[#002B45]">
                     Demande de partenariat
                   </h3>
-                  <p className="text-sm text-[#333333]">
+                  <p className="text-sm text-[#333333] flex-grow">
                     Proposer une collaboration culturelle, artistique ou éducative avec la BNRM.
                   </p>
-                  <Button className="w-full bg-[#D4AF37] hover:bg-[#b8941f] text-white rounded-2xl">
+                  <Button className="w-full bg-[#D4AF37] hover:bg-[#b8941f] text-white rounded-2xl mt-auto">
                     Soumettre un partenariat →
                   </Button>
                 </CardContent>
@@ -152,17 +152,17 @@ const CulturalActivities = () => {
             {/* Card 4: Participation à la programmation */}
             <Link to="/activites-culturelles/participation">
               <Card className="h-full hover:shadow-xl transition-all duration-300 group border-2 hover:border-[#D4AF37] rounded-2xl">
-                <CardContent className="p-6 text-center space-y-4">
+                <CardContent className="p-6 text-center space-y-4 h-full flex flex-col">
                   <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                     <FileText className="h-8 w-8 text-[#D4AF37]" />
                   </div>
                   <h3 className="text-xl font-bold text-[#002B45]">
                     Participation à la programmation
                   </h3>
-                  <p className="text-sm text-[#333333]">
+                  <p className="text-sm text-[#333333] flex-grow">
                     Soumettre une proposition d'activité pour enrichir la programmation culturelle.
                   </p>
-                  <Button className="w-full bg-[#D4AF37] hover:bg-[#b8941f] text-white rounded-2xl">
+                  <Button className="w-full bg-[#D4AF37] hover:bg-[#b8941f] text-white rounded-2xl mt-auto">
                     Proposer une activité →
                   </Button>
                 </CardContent>
