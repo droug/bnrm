@@ -198,8 +198,7 @@ const CulturalActivities = () => {
 
               <a 
                 href="/documents/reglement-utilisation-espaces-bnrm.pdf" 
-                target="_blank" 
-                rel="noopener noreferrer"
+                download="Reglement_utilisation_espaces_BNRM.pdf"
                 className="flex items-center justify-between p-4 border-2 border-[#D4AF37]/30 rounded-xl hover:bg-[#D4AF37]/5 transition-colors"
               >
                 <div className="flex items-center gap-3">

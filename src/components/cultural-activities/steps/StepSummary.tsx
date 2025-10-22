@@ -515,8 +515,7 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
             Veuillez prendre connaissance du règlement d'utilisation des salles avant de confirmer votre demande.
             <a 
               href="/documents/reglement-utilisation-espaces-bnrm.pdf" 
-              target="_blank" 
-              rel="noopener noreferrer"
+              download="Reglement_utilisation_espaces_BNRM.pdf"
               className="block mt-2 text-primary hover:underline font-medium"
             >
               📄 Réglement d'utilisation des espaces et des salles de la BNRM
