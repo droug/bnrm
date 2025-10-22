@@ -197,7 +197,7 @@ const CulturalActivities = () => {
               </a>
 
               <a 
-                href="/uploads/reglement_utilisation.pdf" 
+                href="/documents/reglement-utilisation-espaces-bnrm.pdf" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-4 border-2 border-[#D4AF37]/30 rounded-xl hover:bg-[#D4AF37]/5 transition-colors"
@@ -205,7 +205,7 @@ const CulturalActivities = () => {
                 <div className="flex items-center gap-3">
                   <Download className="h-6 w-6 text-[#D4AF37]" />
                   <span className="font-semibold text-[#002B45]">
-                    Télécharger le règlement d'utilisation
+                    Réglement d'utilisation des espaces et des salles de la BNRM
                   </span>
                 </div>
                 <span className="text-[#D4AF37]">→</span>

@@ -514,12 +514,12 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
           <AlertDescription>
             Veuillez prendre connaissance du règlement d'utilisation des salles avant de confirmer votre demande.
             <a 
-              href="/documents/reglement-salles.pdf" 
+              href="/documents/reglement-utilisation-espaces-bnrm.pdf" 
               target="_blank" 
               rel="noopener noreferrer"
               className="block mt-2 text-primary hover:underline font-medium"
             >
-              📄 Télécharger le Règlement d'utilisation des salles (PDF)
+              📄 Réglement d'utilisation des espaces et des salles de la BNRM
             </a>
           </AlertDescription>
         </Alert>
