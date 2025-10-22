@@ -47,19 +47,19 @@ const StepBookingForm = ({ data, onUpdate }: StepBookingFormProps) => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">
+      <div className="text-center">
+        <h2 className="text-3xl font-light text-[#002B45] mb-2">
           Vos informations
         </h2>
-        <p className="text-muted-foreground">
+        <p className="text-[#002B45]/70 font-light">
           Remplissez le formulaire pour finaliser votre réservation
         </p>
       </div>
 
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Les visites sont guidées par les équipes de la BNRM et durent environ 45 minutes.
+      <Alert className="bg-white/80 border-[#D4AF37]/30">
+        <AlertCircle className="h-4 w-4 text-[#D4AF37] stroke-1" />
+        <AlertDescription className="text-[#002B45]/70 font-light">
+          Places disponibles : {capaciteRestante}
         </AlertDescription>
       </Alert>
 
@@ -71,11 +71,11 @@ const StepBookingForm = ({ data, onUpdate }: StepBookingFormProps) => {
               name="nom"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nom complet *</FormLabel>
+                  <FormLabel className="text-[#002B45] font-light">Nom complet *</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="Ex: Ahmed Benali" 
-                      className="rounded-xl"
+                      placeholder="Ahmed Benali" 
+                      className="border-[#002B45]/20 focus:border-[#D4AF37] font-light"
                       {...field} 
                     />
                   </FormControl>
@@ -89,12 +89,12 @@ const StepBookingForm = ({ data, onUpdate }: StepBookingFormProps) => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email *</FormLabel>
+                  <FormLabel className="text-[#002B45] font-light">Email *</FormLabel>
                   <FormControl>
                     <Input 
                       type="email" 
                       placeholder="exemple@email.com" 
-                      className="rounded-xl"
+                      className="border-[#002B45]/20 focus:border-[#D4AF37] font-light"
                       {...field} 
                     />
                   </FormControl>
@@ -110,11 +110,11 @@ const StepBookingForm = ({ data, onUpdate }: StepBookingFormProps) => {
               name="telephone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Téléphone *</FormLabel>
+                  <FormLabel className="text-[#002B45] font-light">Téléphone *</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="+212612345678" 
-                      className="rounded-xl"
+                      className="border-[#002B45]/20 focus:border-[#D4AF37] font-light"
                       {...field} 
                     />
                   </FormControl>
@@ -128,11 +128,11 @@ const StepBookingForm = ({ data, onUpdate }: StepBookingFormProps) => {
               name="organisme"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Organisme / École</FormLabel>
+                  <FormLabel className="text-[#002B45] font-light">Organisme / École</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="Nom de votre organisme (optionnel)" 
-                      className="rounded-xl"
+                      placeholder="Optionnel" 
+                      className="border-[#002B45]/20 focus:border-[#D4AF37] font-light"
                       {...field} 
                     />
                   </FormControl>
@@ -148,17 +148,17 @@ const StepBookingForm = ({ data, onUpdate }: StepBookingFormProps) => {
               name="nbVisiteurs"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nombre de visiteurs *</FormLabel>
+                  <FormLabel className="text-[#002B45] font-light">Nombre de visiteurs *</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
                       min={1} 
                       max={capaciteRestante}
-                      className="rounded-xl"
+                      className="border-[#002B45]/20 focus:border-[#D4AF37] font-light"
                       {...field} 
                     />
                   </FormControl>
-                  <FormDescription>
+                  <FormDescription className="text-[#002B45]/50 font-light">
                     Maximum {capaciteRestante} places disponibles
                   </FormDescription>
                   <FormMessage />
@@ -171,18 +171,18 @@ const StepBookingForm = ({ data, onUpdate }: StepBookingFormProps) => {
               name="langue"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Langue souhaitée *</FormLabel>
+                  <FormLabel className="text-[#002B45] font-light">Langue souhaitée *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger className="rounded-xl">
-                        <SelectValue placeholder="Sélectionnez une langue" />
+                      <SelectTrigger className="border-[#002B45]/20 focus:border-[#D4AF37] font-light">
+                        <SelectValue placeholder="Sélectionnez" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="arabe">العربية (Arabe)</SelectItem>
-                      <SelectItem value="français">Français</SelectItem>
-                      <SelectItem value="anglais">English (Anglais)</SelectItem>
-                      <SelectItem value="amazigh">ⵜⴰⵎⴰⵣⵉⵖⵜ (Amazigh)</SelectItem>
+                    <SelectContent className="bg-white border-[#D4AF37]/20">
+                      <SelectItem value="arabe" className="font-light">العربية (Arabe)</SelectItem>
+                      <SelectItem value="français" className="font-light">Français</SelectItem>
+                      <SelectItem value="anglais" className="font-light">English (Anglais)</SelectItem>
+                      <SelectItem value="amazigh" className="font-light">ⵜⴰⵎⴰⵣⵉⵖⵜ (Amazigh)</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -196,16 +196,16 @@ const StepBookingForm = ({ data, onUpdate }: StepBookingFormProps) => {
             name="commentaire"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Commentaire</FormLabel>
+                <FormLabel className="text-[#002B45] font-light">Commentaire</FormLabel>
                 <FormControl>
                   <Textarea 
                     placeholder="Informations complémentaires (optionnel)"
-                    className="rounded-xl resize-none"
+                    className="border-[#002B45]/20 focus:border-[#D4AF37] resize-none font-light"
                     rows={4}
                     {...field} 
                   />
                 </FormControl>
-                <FormDescription>
+                <FormDescription className="text-[#002B45]/50 font-light">
                   Maximum 500 caractères
                 </FormDescription>
                 <FormMessage />

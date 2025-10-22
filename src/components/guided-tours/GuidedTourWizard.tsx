@@ -94,59 +94,83 @@ const GuidedTourWizard = () => {
   const progressValue = (currentStep / STEPS.length) * 100;
 
   return (
-    <div className="max-w-5xl mx-auto">
-      {/* Progress Bar */}
-      <Card className="mb-6 p-6 bg-white rounded-2xl shadow-lg">
-        <div className="mb-4">
-          <div className="flex justify-between mb-2">
-            {STEPS.map((step) => (
+    <div className="animate-fade-in">
+      {/* Progress indicator */}
+      <div className="mb-10 bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#D4AF37]/20 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          {STEPS.map((step, index) => {
+            const stepNumber = index + 1;
+            return (
               <div
-                key={step.id}
-                className={`text-sm font-medium ${
-                  step.id === currentStep
-                    ? "text-primary"
-                    : step.id < currentStep
-                    ? "text-green-600"
-                    : "text-muted-foreground"
+                key={index}
+                className={`flex items-center ${
+                  index < STEPS.length - 1 ? "flex-1" : ""
                 }`}
               >
-                {step.title}
+                <div
+                  className={`flex items-center justify-center w-12 h-12 rounded-full border transition-all duration-200 ${
+                    stepNumber === currentStep
+                      ? "border-[#D4AF37] bg-[#D4AF37] text-white shadow-md"
+                      : stepNumber < currentStep
+                      ? "border-[#D4AF37] bg-[#D4AF37]/10 text-[#D4AF37]"
+                      : "border-[#002B45]/20 text-[#002B45]/40"
+                  }`}
+                >
+                  {stepNumber < currentStep ? (
+                    <ChevronRight className="h-5 w-5" />
+                  ) : (
+                    <span className="text-sm font-light">{stepNumber}</span>
+                  )}
+                </div>
+                {index < STEPS.length - 1 && (
+                  <div
+                    className={`h-px flex-1 mx-3 transition-all duration-200 ${
+                      stepNumber < currentStep ? "bg-[#D4AF37]" : "bg-[#002B45]/10"
+                    }`}
+                  />
+                )}
               </div>
-            ))}
-          </div>
-          <Progress value={progressValue} className="h-2" />
+            );
+          })}
         </div>
-      </Card>
+        <div className="flex justify-between mt-4">
+          {STEPS.map((step, index) => (
+            <div
+              key={index}
+              className={`text-xs font-light transition-colors duration-200 ${
+                index + 1 === currentStep
+                  ? "text-[#D4AF37]"
+                  : index + 1 < currentStep
+                  ? "text-[#D4AF37]/70"
+                  : "text-[#002B45]/40"
+              }`}
+              style={{ width: `${100 / STEPS.length}%` }}
+            >
+              <div className="text-center">{step.title}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Current Step Content */}
-      <Card className="p-8 bg-white rounded-2xl shadow-lg">
+      <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 border border-[#D4AF37]/20 shadow-sm mb-6 transition-all duration-200 animate-fade-in max-w-[800px] mx-auto">
         <CurrentStepComponent
           data={bookingData}
           onUpdate={handleUpdateData}
           onNext={handleNext}
         />
-      </Card>
+      </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between mt-6">
+      <div className="flex justify-between max-w-[800px] mx-auto">
         {currentStep > 1 && (
           <Button
             variant="outline"
             onClick={handlePrevious}
-            className="rounded-2xl"
+            className="border-[#D4AF37]/30 hover:bg-[#D4AF37]/10 hover:border-[#D4AF37] transition-all duration-200"
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
             Précédent
-          </Button>
-        )}
-        {currentStep < STEPS.length && (
-          <Button
-            onClick={handleNext}
-            disabled={!isStepValid()}
-            className="ml-auto rounded-2xl"
-          >
-            Suivant
-            <ChevronRight className="ml-2 h-4 w-4" />
           </Button>
         )}
       </div>

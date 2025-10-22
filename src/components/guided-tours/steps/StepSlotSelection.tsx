@@ -103,43 +103,39 @@ const StepSlotSelection = ({ data, onUpdate }: StepSlotSelectionProps) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">
-          Sélectionnez un créneau de visite
+    <div className="space-y-8">
+      <div className="text-center">
+        <h2 className="text-3xl font-light text-[#002B45] mb-2">
+          Choisissez votre créneau
         </h2>
-        <p className="text-muted-foreground">
-          Choisissez une date puis un horaire disponible
+        <p className="text-[#002B45]/70 font-light">
+          Sélectionnez la date et l'heure de votre visite
         </p>
-        {data.slotId && (
-          <Alert className="mt-4 bg-green-50 border-green-200">
-            <Info className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-900">
-              ✓ Créneau sélectionné - Cliquez sur "Suivant" pour continuer
-            </AlertDescription>
-          </Alert>
-        )}
       </div>
 
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertDescription>
+      <Alert className="bg-white/80 border-[#D4AF37]/30">
+        <Info className="h-4 w-4 text-[#D4AF37] stroke-1" />
+        <AlertDescription className="text-[#002B45]/70 font-light">
           Les visites sont guidées par les équipes de la BNRM et durent environ 45 minutes.
         </AlertDescription>
       </Alert>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Calendrier */}
-        <Card className="p-4 rounded-2xl">
+      <div className="grid md:grid-cols-2 gap-8">
+        {/* Calendar */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-[#D4AF37]/30 shadow-sm hover:shadow-md transition-all duration-200">
+          <h3 className="font-light text-lg mb-6 text-[#002B45] flex items-center gap-2">
+            <Clock className="h-5 w-5 text-[#D4AF37] stroke-1" />
+            Date de la visite
+          </h3>
           <Calendar
             mode="single"
             selected={selectedDate}
             onSelect={setSelectedDate}
             locale={fr}
             disabled={isDateDisabled}
-            className="rounded-md"
+            className="rounded-md [&_.rdp-day_selected]:bg-[#D4AF37] [&_.rdp-day_selected]:text-white [&_.rdp-day]:hover:bg-[#D4AF37]/10 [&_.rdp-day]:transition-colors [&_.rdp-day]:font-light"
           />
-        </Card>
+        </div>
 
         {/* Créneaux disponibles */}
         <div className="space-y-4">

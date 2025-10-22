@@ -104,75 +104,75 @@ const StepConfirmation = ({ data }: StepConfirmationProps) => {
 
   if (isSuccess) {
     return (
-      <div className="text-center space-y-6 py-8">
+      <div className="text-center space-y-6 py-8 animate-fade-in">
         <div className="flex justify-center">
-          <div className="bg-green-100 rounded-full p-6">
-            <CheckCircle2 className="h-16 w-16 text-green-600" />
+          <div className="bg-green-50 border-2 border-green-200 rounded-full p-6">
+            <CheckCircle2 className="h-16 w-16 text-green-500 stroke-1" />
           </div>
         </div>
         
         <div>
-          <h2 className="text-3xl font-bold text-foreground mb-3">
+          <h2 className="text-3xl font-light text-[#002B45] mb-3">
             Votre réservation de visite guidée a été enregistrée
           </h2>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-[#002B45]/70 text-lg font-light">
             Vous recevrez un email de confirmation sous peu.
           </p>
         </div>
 
-        <Card className="p-6 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-          <h3 className="font-semibold text-lg mb-4 flex items-center justify-center gap-2">
-            <Calendar className="h-5 w-5 text-primary" />
+        <Card className="p-6 bg-white/80 border-[#D4AF37]/30 text-left max-w-xl mx-auto">
+          <h3 className="font-light text-lg mb-4 flex items-center justify-center gap-2 text-[#002B45]">
+            <Clock className="h-5 w-5 text-[#D4AF37] stroke-1" />
             Détails de votre visite
           </h3>
-          <div className="grid md:grid-cols-2 gap-4 text-left">
+          <div className="grid md:grid-cols-2 gap-4">
             <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-primary" />
+              <Clock className="h-5 w-5 text-[#D4AF37]/60 stroke-1" />
               <div>
-                <p className="text-sm text-muted-foreground">Date</p>
-                <p className="font-semibold">
+                <p className="text-xs text-[#002B45]/50 font-light">Date</p>
+                <p className="font-light text-[#002B45]">
                   {format(new Date(data.selectedSlot.date), "dd MMMM yyyy", { locale: fr })}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Clock className="h-5 w-5 text-primary" />
+              <Clock className="h-5 w-5 text-[#D4AF37]/60 stroke-1" />
               <div>
-                <p className="text-sm text-muted-foreground">Heure</p>
-                <p className="font-semibold">{data.selectedSlot.heure.substring(0, 5)}</p>
+                <p className="text-xs text-[#002B45]/50 font-light">Heure</p>
+                <p className="font-light text-[#002B45]">{data.selectedSlot.heure.substring(0, 5)}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Globe className="h-5 w-5 text-primary" />
+              <Globe className="h-5 w-5 text-[#D4AF37]/60 stroke-1" />
               <div>
-                <p className="text-sm text-muted-foreground">Langue</p>
-                <p className="font-semibold capitalize">{data.langue}</p>
+                <p className="text-xs text-[#002B45]/50 font-light">Langue</p>
+                <p className="font-light text-[#002B45] capitalize">{data.langue}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Users className="h-5 w-5 text-primary" />
+              <Users className="h-5 w-5 text-[#D4AF37]/60 stroke-1" />
               <div>
-                <p className="text-sm text-muted-foreground">Visiteurs</p>
-                <p className="font-semibold">{data.nbVisiteurs}</p>
+                <p className="text-xs text-[#002B45]/50 font-light">Visiteurs</p>
+                <p className="font-light text-[#002B45]">{data.nbVisiteurs}</p>
               </div>
             </div>
           </div>
         </Card>
 
-        <Alert className="bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-200">
-          <Mail className="h-5 w-5 text-amber-600" />
-          <AlertDescription className="text-amber-900">
-            <p className="font-medium mb-1">📧 Email de confirmation en cours d'envoi</p>
+        <Alert className="bg-[#D4AF37]/5 border-[#D4AF37]/30 max-w-xl mx-auto animate-fade-in">
+          <Mail className="h-5 w-5 text-[#D4AF37]" />
+          <AlertDescription className="text-[#002B45] font-light">
+            <p className="font-normal mb-1">📧 Email de confirmation en cours d'envoi</p>
             <p className="text-sm">
-              Un email contenant un <strong>fichier PDF récapitulatif avec le logo BNRM</strong> et toutes les informations de votre visite sera envoyé à : <strong>{data.email}</strong>
+              Un email contenant un <strong>fichier PDF récapitulatif avec le logo BNRM</strong> vous sera envoyé à : <strong>{data.email}</strong>
             </p>
           </AlertDescription>
         </Alert>
 
-        <div className="bg-muted/50 rounded-lg p-4 text-sm text-left">
-          <p className="font-medium mb-2">📋 Rappel :</p>
-          <ul className="space-y-1 text-muted-foreground ml-4">
-            <li>• Présentez le PDF de confirmation à l'accueil le jour de votre visite</li>
+        <div className="bg-white/50 rounded-xl p-4 text-sm text-left max-w-xl mx-auto border border-[#D4AF37]/20">
+          <p className="font-normal mb-2 text-[#002B45]">📋 Rappel :</p>
+          <ul className="space-y-1 text-[#002B45]/60 font-light ml-4">
+            <li>• Présentez le PDF à l'accueil le jour de votre visite</li>
             <li>• Arrivez 10 minutes avant l'heure prévue</li>
             <li>• Durée de la visite : environ 45 minutes</li>
           </ul>
@@ -181,7 +181,7 @@ const StepConfirmation = ({ data }: StepConfirmationProps) => {
         <Button 
           onClick={() => navigate("/cultural-activities")}
           size="lg"
-          className="w-full rounded-2xl"
+          className="w-full max-w-md mx-auto bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white border-0 shadow-sm hover:shadow-md transition-all duration-200 font-light"
         >
           Retour aux activités culturelles
         </Button>
@@ -191,90 +191,90 @@ const StepConfirmation = ({ data }: StepConfirmationProps) => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">
+      <div className="text-center">
+        <h2 className="text-3xl font-light text-[#002B45] mb-2">
           Récapitulatif de votre réservation
         </h2>
-        <p className="text-muted-foreground">
+        <p className="text-[#002B45]/70 font-light">
           Veuillez vérifier les informations avant de confirmer
         </p>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-4 max-w-2xl mx-auto">
         {/* Informations du créneau */}
-        <Card className="p-6 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/10">
-          <h3 className="font-semibold text-lg mb-4 text-primary">
+        <Card className="p-6 bg-white/80 border-[#D4AF37]/30">
+          <h3 className="font-light text-lg mb-4 text-[#002B45]">
             Détails de la visite
           </h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-muted-foreground" />
+              <Clock className="h-5 w-5 text-[#002B45]/40 stroke-1" />
               <div>
-                <p className="text-sm text-muted-foreground">Date</p>
-                <p className="font-semibold">
+                <p className="text-sm text-[#002B45]/50 font-light">Date</p>
+                <p className="font-light text-[#002B45]">
                   {format(new Date(data.selectedSlot.date), "dd MMMM yyyy", { locale: fr })}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Clock className="h-5 w-5 text-muted-foreground" />
+              <Clock className="h-5 w-5 text-[#002B45]/40 stroke-1" />
               <div>
-                <p className="text-sm text-muted-foreground">Heure</p>
-                <p className="font-semibold">
+                <p className="text-sm text-[#002B45]/50 font-light">Heure</p>
+                <p className="font-light text-[#002B45]">
                   {data.selectedSlot.heure.substring(0, 5)}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Globe className="h-5 w-5 text-muted-foreground" />
+              <Globe className="h-5 w-5 text-[#002B45]/40 stroke-1" />
               <div>
-                <p className="text-sm text-muted-foreground">Langue</p>
-                <p className="font-semibold capitalize">{data.langue}</p>
+                <p className="text-sm text-[#002B45]/50 font-light">Langue</p>
+                <p className="font-light text-[#002B45] capitalize">{data.langue}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Users className="h-5 w-5 text-muted-foreground" />
+              <Users className="h-5 w-5 text-[#002B45]/40 stroke-1" />
               <div>
-                <p className="text-sm text-muted-foreground">Nombre de visiteurs</p>
-                <p className="font-semibold">{data.nbVisiteurs}</p>
+                <p className="text-sm text-[#002B45]/50 font-light">Nombre de visiteurs</p>
+                <p className="font-light text-[#002B45]">{data.nbVisiteurs}</p>
               </div>
             </div>
           </div>
         </Card>
 
         {/* Informations du visiteur */}
-        <Card className="p-6 rounded-2xl">
-          <h3 className="font-semibold text-lg mb-4">Vos informations</h3>
+        <Card className="p-6 bg-white/80 border-[#002B45]/10">
+          <h3 className="font-light text-lg mb-4 text-[#002B45]">Vos informations</h3>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <div className="w-5 h-5 flex items-center justify-center">
-                <div className="w-2 h-2 bg-primary rounded-full" />
+                <div className="w-2 h-2 bg-[#D4AF37] rounded-full" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Nom</p>
-                <p className="font-medium">{data.nom}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">Email</p>
-                <p className="font-medium">{data.email}</p>
+                <p className="text-sm text-[#002B45]/50 font-light">Nom</p>
+                <p className="font-light text-[#002B45]">{data.nom}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Phone className="h-5 w-5 text-muted-foreground" />
+              <Mail className="h-5 w-5 text-[#002B45]/40 stroke-1" />
               <div>
-                <p className="text-sm text-muted-foreground">Téléphone</p>
-                <p className="font-medium">{data.telephone}</p>
+                <p className="text-sm text-[#002B45]/50 font-light">Email</p>
+                <p className="font-light text-[#002B45]">{data.email}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Phone className="h-5 w-5 text-[#002B45]/40 stroke-1" />
+              <div>
+                <p className="text-sm text-[#002B45]/50 font-light">Téléphone</p>
+                <p className="font-light text-[#002B45]">{data.telephone}</p>
               </div>
             </div>
             {data.organisme && (
               <div className="flex items-center gap-3">
-                <Building className="h-5 w-5 text-muted-foreground" />
+                <Building className="h-5 w-5 text-[#002B45]/40 stroke-1" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Organisme</p>
-                  <p className="font-medium">{data.organisme}</p>
+                  <p className="text-sm text-[#002B45]/50 font-light">Organisme</p>
+                  <p className="font-light text-[#002B45]">{data.organisme}</p>
                 </div>
               </div>
             )}
@@ -283,15 +283,15 @@ const StepConfirmation = ({ data }: StepConfirmationProps) => {
       </div>
 
       {/* Confirmation */}
-      <Card className="p-6 rounded-2xl bg-amber-50 border-amber-200">
+      <Card className="p-6 bg-[#D4AF37]/5 border-[#D4AF37]/30 max-w-2xl mx-auto">
         <div className="flex items-start gap-3">
           <Checkbox 
             id="confirmation"
             checked={isConfirmed}
             onCheckedChange={(checked) => setIsConfirmed(checked as boolean)}
-            className="mt-1"
+            className="mt-1 border-[#D4AF37] data-[state=checked]:bg-[#D4AF37]"
           />
-          <label htmlFor="confirmation" className="text-sm cursor-pointer">
+          <label htmlFor="confirmation" className="text-sm cursor-pointer font-light text-[#002B45]">
             Je confirme ma participation à cette visite guidée et j'ai pris connaissance que les visites durent environ 45 minutes.
           </label>
         </div>
@@ -301,7 +301,7 @@ const StepConfirmation = ({ data }: StepConfirmationProps) => {
         onClick={handleConfirm}
         disabled={!isConfirmed || createBookingMutation.isPending}
         size="lg"
-        className="w-full rounded-2xl"
+        className="w-full max-w-md mx-auto bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white border-0 shadow-sm hover:shadow-md transition-all duration-200 font-light"
       >
         {createBookingMutation.isPending ? (
           <>
