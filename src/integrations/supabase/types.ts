@@ -4176,6 +4176,114 @@ export type Database = {
         }
         Relationships: []
       }
+      program_contributions: {
+        Row: {
+          adresse: string | null
+          besoins_specifiques: string | null
+          certification_exactitude: boolean
+          consentement_diffusion: boolean
+          created_at: string
+          cv_url: string
+          date_examen: string | null
+          date_proposee: string
+          description: string
+          dossier_projet_url: string
+          duree_minutes: number
+          email: string
+          espace_souhaite: string
+          examine_par: string | null
+          heure_proposee: string
+          id: string
+          langue: string
+          message_info: string | null
+          motif_refus: string | null
+          moyens_techniques: Json | null
+          nb_participants_estime: number | null
+          nom_complet: string
+          numero_reference: string | null
+          objectifs: string
+          organisme: string | null
+          public_cible: string
+          statut: string
+          statut_juridique_url: string | null
+          telephone: string
+          titre: string
+          type_activite: string
+          type_demandeur: string
+          updated_at: string
+        }
+        Insert: {
+          adresse?: string | null
+          besoins_specifiques?: string | null
+          certification_exactitude?: boolean
+          consentement_diffusion?: boolean
+          created_at?: string
+          cv_url: string
+          date_examen?: string | null
+          date_proposee: string
+          description: string
+          dossier_projet_url: string
+          duree_minutes: number
+          email: string
+          espace_souhaite: string
+          examine_par?: string | null
+          heure_proposee: string
+          id?: string
+          langue: string
+          message_info?: string | null
+          motif_refus?: string | null
+          moyens_techniques?: Json | null
+          nb_participants_estime?: number | null
+          nom_complet: string
+          numero_reference?: string | null
+          objectifs: string
+          organisme?: string | null
+          public_cible: string
+          statut?: string
+          statut_juridique_url?: string | null
+          telephone: string
+          titre: string
+          type_activite: string
+          type_demandeur: string
+          updated_at?: string
+        }
+        Update: {
+          adresse?: string | null
+          besoins_specifiques?: string | null
+          certification_exactitude?: boolean
+          consentement_diffusion?: boolean
+          created_at?: string
+          cv_url?: string
+          date_examen?: string | null
+          date_proposee?: string
+          description?: string
+          dossier_projet_url?: string
+          duree_minutes?: number
+          email?: string
+          espace_souhaite?: string
+          examine_par?: string | null
+          heure_proposee?: string
+          id?: string
+          langue?: string
+          message_info?: string | null
+          motif_refus?: string | null
+          moyens_techniques?: Json | null
+          nb_participants_estime?: number | null
+          nom_complet?: string
+          numero_reference?: string | null
+          objectifs?: string
+          organisme?: string | null
+          public_cible?: string
+          statut?: string
+          statut_juridique_url?: string | null
+          telephone?: string
+          titre?: string
+          type_activite?: string
+          type_demandeur?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       publishers: {
         Row: {
           address: string | null
@@ -6748,6 +6856,7 @@ export type Database = {
       cleanup_old_activity_logs: { Args: never; Returns: number }
       generate_content_slug: { Args: { title: string }; Returns: string }
       generate_deposit_number: { Args: never; Returns: string }
+      generate_program_contribution_reference: { Args: never; Returns: string }
       generate_reproduction_request_number: { Args: never; Returns: string }
       generate_request_number: { Args: never; Returns: string }
       generate_transaction_number: { Args: never; Returns: string }
