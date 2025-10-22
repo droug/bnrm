@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Package, Sparkles } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Loader2, Package, Sparkles, DollarSign } from "lucide-react";
+import { SimpleMultiSelect } from "@/components/ui/simple-multi-select";
 import type { BookingData } from "../BookingWizard";
 
 interface StepEquipmentProps {
@@ -42,25 +43,36 @@ export default function StepEquipment({ data, onUpdate }: StepEquipmentProps) {
     }
   });
 
-  const toggleEquipment = (equipmentId: string) => {
-    const currentEquipment = data.equipment || [];
-    const newEquipment = currentEquipment.includes(equipmentId)
-      ? currentEquipment.filter(id => id !== equipmentId)
-      : [...currentEquipment, equipmentId];
-    
-    onUpdate({ equipment: newEquipment });
-  };
-
-  const toggleService = (serviceId: string) => {
-    const currentServices = data.services || [];
-    const newServices = currentServices.includes(serviceId)
-      ? currentServices.filter(id => id !== serviceId)
-      : [...currentServices, serviceId];
-    
-    onUpdate({ services: newServices });
-  };
-
   const isLoading = isLoadingEquipment || isLoadingServices;
+
+  // Calcul du total
+  const calculateTotal = () => {
+    let total = 0;
+    
+    // Coût des équipements
+    if (equipment && data.equipment) {
+      data.equipment.forEach(equipmentId => {
+        const item = equipment.find(e => e.id === equipmentId);
+        if (item && !item.is_included && item.additional_cost) {
+          total += Number(item.additional_cost);
+        }
+      });
+    }
+    
+    // Coût des services
+    if (services && data.services) {
+      data.services.forEach(serviceId => {
+        const service = services.find(s => s.id === serviceId);
+        if (service && service.base_cost) {
+          total += Number(service.base_cost);
+        }
+      });
+    }
+    
+    return total;
+  };
+
+  const total = calculateTotal();
 
   if (isLoading) {
     return (
@@ -80,129 +92,78 @@ export default function StepEquipment({ data, onUpdate }: StepEquipmentProps) {
       </div>
 
       {/* Section Équipements */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
+      <div className="space-y-3">
+        <Label className="flex items-center gap-2 text-base font-semibold">
           <Package className="h-5 w-5 text-primary" />
-          <h3 className="text-xl font-semibold">Équipements disponibles</h3>
-        </div>
+          Équipements disponibles
+        </Label>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {equipment?.map((item) => (
-            <Card
-              key={item.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                data.equipment?.includes(item.id)
-                  ? 'ring-2 ring-primary bg-primary/5'
-                  : 'hover:border-primary/50'
-              }`}
-            >
-              <label
-                htmlFor={item.id}
-                className="flex items-start gap-3 p-4 cursor-pointer"
-              >
-                <Checkbox
-                  id={item.id}
-                  checked={data.equipment?.includes(item.id)}
-                  onCheckedChange={() => toggleEquipment(item.id)}
-                  className="mt-1"
-                />
-                
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-1">
-                    <span className="font-semibold">{item.name}</span>
-                    {!item.is_included && item.additional_cost && (
-                      <Badge variant="outline" className="text-xs">
-                        +{item.additional_cost} {item.currency || 'MAD'}
-                      </Badge>
-                    )}
-                    {item.is_included && (
-                      <Badge variant="secondary" className="text-xs">
-                        Inclus
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  {item.description && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {item.description}
-                    </p>
-                  )}
-                </div>
-              </label>
-            </Card>
-          ))}
-        </div>
-
-        {equipment?.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            <Package className="h-10 w-10 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">Aucun équipement disponible</p>
-          </div>
-        )}
+        <SimpleMultiSelect
+          placeholder="Sélectionnez les équipements..."
+          options={equipment?.map(item => ({
+            value: item.id,
+            label: item.name,
+            badge: item.is_included 
+              ? { text: 'Inclus', variant: 'secondary' as const }
+              : item.additional_cost 
+                ? { text: `+${item.additional_cost} ${item.currency || 'MAD'}`, variant: 'outline' as const }
+                : undefined,
+            description: item.description || undefined
+          })) || []}
+          selected={data.equipment || []}
+          onChange={(values) => onUpdate({ equipment: values })}
+        />
       </div>
 
-      <Separator className="my-6" />
+      <Separator />
 
       {/* Section Services additionnels */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
+      <div className="space-y-3">
+        <Label className="flex items-center gap-2 text-base font-semibold">
           <Sparkles className="h-5 w-5 text-primary" />
-          <h3 className="text-xl font-semibold">Services additionnels</h3>
-        </div>
+          Services additionnels
+        </Label>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {services?.map((service) => (
-            <Card
-              key={service.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                data.services?.includes(service.id)
-                  ? 'ring-2 ring-primary bg-primary/5'
-                  : 'hover:border-primary/50'
-              }`}
-            >
-              <label
-                htmlFor={service.id}
-                className="flex items-start gap-3 p-4 cursor-pointer"
-              >
-                <Checkbox
-                  id={service.id}
-                  checked={data.services?.includes(service.id)}
-                  onCheckedChange={() => toggleService(service.id)}
-                  className="mt-1"
-                />
-                
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-1">
-                    <span className="font-semibold">{service.name}</span>
-                    <Badge variant="outline" className="text-xs">
-                      {service.base_cost} {service.currency}/{service.unit_type}
-                    </Badge>
-                  </div>
-                  
-                  {service.description && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {service.description}
-                    </p>
-                  )}
-                  
-                  {service.service_type && (
-                    <Badge variant="secondary" className="text-xs mt-2">
-                      {service.service_type}
-                    </Badge>
-                  )}
-                </div>
-              </label>
-            </Card>
-          ))}
-        </div>
-
-        {services?.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            <Sparkles className="h-10 w-10 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">Aucun service disponible</p>
-          </div>
-        )}
+        <SimpleMultiSelect
+          placeholder="Sélectionnez les services..."
+          options={services?.map(service => ({
+            value: service.id,
+            label: service.name,
+            badge: { 
+              text: `${service.base_cost} ${service.currency}/${service.unit_type}`, 
+              variant: 'outline' as const 
+            },
+            description: service.description || undefined
+          })) || []}
+          selected={data.services || []}
+          onChange={(values) => onUpdate({ services: values })}
+        />
       </div>
+
+      {/* Total à payer */}
+      {total > 0 && (
+        <>
+          <Separator />
+          <Card className="bg-primary/5 border-primary/20">
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-primary" />
+                  <span className="text-lg font-semibold">Total estimé</span>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-primary">
+                    {total.toFixed(2)} MAD
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Équipements et services sélectionnés
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </>
+      )}
     </div>
   );
 }
