@@ -2,9 +2,23 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Loader2, Users, Square, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { 
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Loader2, Users, Square, Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 import type { BookingData } from "../BookingWizard";
 
 interface StepSpaceSelectionProps {
@@ -14,6 +28,8 @@ interface StepSpaceSelectionProps {
 }
 
 export default function StepSpaceSelection({ data, onUpdate }: StepSpaceSelectionProps) {
+  const [open, setOpen] = useState(false);
+  
   const { data: spaces, isLoading } = useQuery({
     queryKey: ['cultural-spaces'],
     queryFn: async () => {
@@ -27,6 +43,8 @@ export default function StepSpaceSelection({ data, onUpdate }: StepSpaceSelectio
       return data;
     }
   });
+
+  const selectedSpace = spaces?.find(s => s.id === data.spaceId);
 
   if (isLoading) {
     return (
@@ -45,79 +63,106 @@ export default function StepSpaceSelection({ data, onUpdate }: StepSpaceSelectio
         </p>
       </div>
 
-      <RadioGroup
-        value={data.spaceId}
-        onValueChange={(value) => onUpdate({ spaceId: value })}
-        className="space-y-4"
-      >
-        {spaces?.map((space) => (
-          <Card
-            key={space.id}
-            className={`relative cursor-pointer transition-all hover:shadow-md ${
-              data.spaceId === space.id
-                ? 'ring-2 ring-primary bg-primary/5'
-                : 'hover:border-primary/50'
-            }`}
-          >
-            <label htmlFor={space.id} className="cursor-pointer">
-              <div className="flex gap-4 p-4">
-                <RadioGroupItem value={space.id} id={space.id} className="mt-1" />
-                
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="font-semibold text-lg">{space.name}</h3>
-                      {space.floor_level && (
-                        <p className="text-sm text-muted-foreground">{space.floor_level}</p>
+      <div className="space-y-2">
+        <Label>Espace *</Label>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full justify-between h-auto min-h-[2.5rem]"
+            >
+              {selectedSpace ? (
+                <span className="text-left">{selectedSpace.name}</span>
+              ) : (
+                <span className="text-muted-foreground">Sélectionner un espace...</span>
+              )}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0" align="start">
+            <Command>
+              <CommandInput placeholder="Rechercher un espace..." />
+              <CommandEmpty>Aucun espace trouvé.</CommandEmpty>
+              <CommandGroup className="max-h-[300px] overflow-auto">
+                {spaces?.map((space) => (
+                  <CommandItem
+                    key={space.id}
+                    value={space.name}
+                    onSelect={() => {
+                      onUpdate({ spaceId: space.id });
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        data.spaceId === space.id ? "opacity-100" : "opacity-0"
                       )}
-                    </div>
-                    {data.spaceId === space.id && (
-                      <Badge className="gap-1">
-                        <Check className="h-3 w-3" />
-                        Sélectionné
-                      </Badge>
-                    )}
-                  </div>
+                    />
+                    {space.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
 
-                  {space.description && (
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {space.description}
-                    </p>
-                  )}
-
-                  <div className="flex flex-wrap gap-3 text-sm">
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      <Users className="h-4 w-4" />
-                      <span>Capacité: {space.capacity} personnes</span>
-                    </div>
-                    {space.surface_m2 && (
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Square className="h-4 w-4" />
-                        <span>Surface: {space.surface_m2} m²</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {space.has_stage && (
-                      <Badge variant="secondary" className="text-xs">Scène</Badge>
-                    )}
-                    {space.has_sound_system && (
-                      <Badge variant="secondary" className="text-xs">Sonorisation</Badge>
-                    )}
-                    {space.has_lighting && (
-                      <Badge variant="secondary" className="text-xs">Éclairage</Badge>
-                    )}
-                    {space.has_projection && (
-                      <Badge variant="secondary" className="text-xs">Projection</Badge>
-                    )}
-                  </div>
-                </div>
+      {/* Affichage des détails de l'espace sélectionné */}
+      {selectedSpace && (
+        <Card className="border-2 border-primary/20 bg-primary/5">
+          <div className="p-6">
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <h3 className="font-semibold text-lg">{selectedSpace.name}</h3>
+                {selectedSpace.floor_level && (
+                  <p className="text-sm text-muted-foreground">{selectedSpace.floor_level}</p>
+                )}
               </div>
-            </label>
-          </Card>
-        ))}
-      </RadioGroup>
+              <Badge className="gap-1">
+                <Check className="h-3 w-3" />
+                Sélectionné
+              </Badge>
+            </div>
+
+            {selectedSpace.description && (
+              <p className="text-sm text-muted-foreground mb-4">
+                {selectedSpace.description}
+              </p>
+            )}
+
+            <div className="flex flex-wrap gap-4 text-sm mb-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Users className="h-4 w-4" />
+                <span>Capacité: {selectedSpace.capacity} personnes</span>
+              </div>
+              {selectedSpace.surface_m2 && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Square className="h-4 w-4" />
+                  <span>Surface: {selectedSpace.surface_m2} m²</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {selectedSpace.has_stage && (
+                <Badge variant="secondary" className="text-xs">Scène</Badge>
+              )}
+              {selectedSpace.has_sound_system && (
+                <Badge variant="secondary" className="text-xs">Sonorisation</Badge>
+              )}
+              {selectedSpace.has_lighting && (
+                <Badge variant="secondary" className="text-xs">Éclairage</Badge>
+              )}
+              {selectedSpace.has_projection && (
+                <Badge variant="secondary" className="text-xs">Projection</Badge>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
