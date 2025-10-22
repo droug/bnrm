@@ -24,6 +24,7 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
   const [spaceSearch, setSpaceSearch] = useState("");
   const organizerTypeRef = useRef<HTMLDivElement>(null);
   const spaceRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   
   const { data: spaces, isLoading } = useQuery({
     queryKey: ['cultural-spaces'],
@@ -60,12 +61,20 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
       }
       if (spaceRef.current && !spaceRef.current.contains(event.target as Node)) {
         setSpaceOpen(false);
+        setSpaceSearch("");
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Auto-focus search input when dropdown opens
+  useEffect(() => {
+    if (spaceOpen && searchInputRef.current) {
+      setTimeout(() => searchInputRef.current?.focus(), 50);
+    }
+  }, [spaceOpen]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -192,24 +201,27 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
         {spaceOpen && (
-          <div className="absolute z-[9999] w-full mt-1 bg-popover border rounded-lg shadow-lg overflow-hidden">
-            <div className="p-2 border-b bg-popover">
+          <div className="absolute z-[9999] w-full mt-1 bg-background border-2 border-primary/20 rounded-lg shadow-xl overflow-hidden">
+            <div className="p-3 border-b border-border bg-muted/30">
               <Input
+                ref={searchInputRef}
+                type="text"
                 placeholder="Rechercher un espace..."
                 value={spaceSearch}
                 onChange={(e) => setSpaceSearch(e.target.value)}
-                className="h-9"
+                className="h-10 bg-background"
+                autoComplete="off"
               />
             </div>
-            <div className="max-h-[300px] overflow-auto bg-popover">
+            <div className="max-h-[300px] overflow-auto bg-background">
               {filteredSpaces && filteredSpaces.length > 0 ? (
                 filteredSpaces.map((space) => (
                   <button
                     key={space.id}
                     type="button"
                     className={cn(
-                      "w-full text-left px-4 py-2.5 hover:bg-accent transition-colors",
-                      data.spaceId === space.id && "bg-accent"
+                      "w-full text-left px-4 py-3 hover:bg-accent transition-colors border-b border-border/50 last:border-0",
+                      data.spaceId === space.id && "bg-accent font-medium"
                     )}
                     onClick={() => {
                       onUpdate({ spaceId: space.id });
@@ -221,7 +233,7 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
                   </button>
                 ))
               ) : (
-                <div className="px-4 py-6 text-center text-sm text-muted-foreground">
+                <div className="px-4 py-8 text-center text-sm text-muted-foreground">
                   Aucun espace trouvé.
                 </div>
               )}
