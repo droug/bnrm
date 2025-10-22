@@ -65,7 +65,7 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Type d'organisateur</h2>
+        <h2 className="text-2xl font-bold mb-2">Type d'organisme</h2>
         <p className="text-muted-foreground">
           Sélectionnez le type d'organisation qui souhaite réserver un espace
         </p>

@@ -27,7 +27,7 @@ export interface BookingData {
 }
 
 const STEPS = [
-  { id: 1, title: "Type d'organisateur", component: StepOrganizerType },
+  { id: 1, title: "Type d'organisme", component: StepOrganizerType },
   { id: 2, title: "Sélection de l'espace", component: StepSpaceSelection },
   { id: 3, title: "Date et horaires", component: StepDateTime },
   { id: 4, title: "Équipements", component: StepEquipment },
