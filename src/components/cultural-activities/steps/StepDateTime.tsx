@@ -132,7 +132,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-50" align="start" side="bottom" sideOffset={4}>
+            <PopoverContent className="w-auto p-0 z-[var(--z-popover)]" align="start" side="bottom" sideOffset={4}>
               <Calendar
                 mode="single"
                 selected={data.startDate}
@@ -143,7 +143,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                 disabled={(date) => date < today}
                 initialFocus
                 locale={fr}
-                className="pointer-events-auto"
+                className="p-3 pointer-events-auto"
               />
             </PopoverContent>
           </Popover>
@@ -183,7 +183,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-50" align="start" side="bottom" sideOffset={4}>
+            <PopoverContent className="w-auto p-0 z-[var(--z-popover)]" align="start" side="bottom" sideOffset={4}>
               <Calendar
                 mode="single"
                 selected={data.endDate}
@@ -198,7 +198,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                 }}
                 initialFocus
                 locale={fr}
-                className="pointer-events-auto"
+                className="p-3 pointer-events-auto"
               />
             </PopoverContent>
           </Popover>
