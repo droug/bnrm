@@ -3319,6 +3319,102 @@ export type Database = {
           },
         ]
       }
+      partnerships: {
+        Row: {
+          adresse: string
+          created_at: string | null
+          date_debut: string
+          date_fin: string
+          description_organisme: string | null
+          description_projet: string
+          email_officiel: string
+          id: string
+          lieu_concerne: string | null
+          moyens_bnrm: string
+          moyens_organisme: string
+          nationalite: string
+          nom_organisme: string
+          notes_admin: string | null
+          objectifs: string
+          objet_partenariat: string
+          programme_url: string
+          public_cible: string
+          representants: Json
+          reviewed_at: string | null
+          reviewed_by: string | null
+          site_web: string | null
+          statut: string
+          statut_document_url: string | null
+          statut_juridique: string
+          telephone: string
+          type_organisation: string
+          type_partenariat: string
+          updated_at: string | null
+        }
+        Insert: {
+          adresse: string
+          created_at?: string | null
+          date_debut: string
+          date_fin: string
+          description_organisme?: string | null
+          description_projet: string
+          email_officiel: string
+          id?: string
+          lieu_concerne?: string | null
+          moyens_bnrm: string
+          moyens_organisme: string
+          nationalite: string
+          nom_organisme: string
+          notes_admin?: string | null
+          objectifs: string
+          objet_partenariat: string
+          programme_url: string
+          public_cible: string
+          representants?: Json
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          site_web?: string | null
+          statut?: string
+          statut_document_url?: string | null
+          statut_juridique: string
+          telephone: string
+          type_organisation: string
+          type_partenariat: string
+          updated_at?: string | null
+        }
+        Update: {
+          adresse?: string
+          created_at?: string | null
+          date_debut?: string
+          date_fin?: string
+          description_organisme?: string | null
+          description_projet?: string
+          email_officiel?: string
+          id?: string
+          lieu_concerne?: string | null
+          moyens_bnrm?: string
+          moyens_organisme?: string
+          nationalite?: string
+          nom_organisme?: string
+          notes_admin?: string | null
+          objectifs?: string
+          objet_partenariat?: string
+          programme_url?: string
+          public_cible?: string
+          representants?: Json
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          site_web?: string | null
+          statut?: string
+          statut_document_url?: string | null
+          statut_juridique?: string
+          telephone?: string
+          type_organisation?: string
+          type_partenariat?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       payment_reminders: {
         Row: {
           created_at: string | null

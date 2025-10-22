@@ -138,6 +138,7 @@ const CulturalActivitiesBooking = lazy(() => import("./pages/CulturalActivitiesB
 const CulturalActivities = lazy(() => import("./pages/CulturalActivities"));
 const CulturalActivitiesGuidedTours = lazy(() => import("./pages/CulturalActivitiesGuidedTours"));
 const CulturalActivitiesPartnership = lazy(() => import("./pages/CulturalActivitiesPartnership"));
+const CulturalActivitiesPartnershipConfirmation = lazy(() => import("./pages/CulturalActivitiesPartnershipConfirmation"));
 const CulturalActivitiesProgramming = lazy(() => import("./pages/CulturalActivitiesProgramming"));
 const CancelBooking = lazy(() => import("./pages/CancelBooking"));
 const GuidedToursBackoffice = lazy(() => import("./pages/GuidedToursBackoffice"));
@@ -287,6 +288,8 @@ const App = () => (
           <Route path="/activites-culturelles/visites" element={<CulturalActivitiesGuidedTours />} />
           <Route path="/cultural-activities/partnership" element={<CulturalActivitiesPartnership />} />
           <Route path="/activites-culturelles/partenariats" element={<CulturalActivitiesPartnership />} />
+          <Route path="/cultural-activities/partnership/confirmation" element={<CulturalActivitiesPartnershipConfirmation />} />
+          <Route path="/activites-culturelles/partenariats/confirmation" element={<CulturalActivitiesPartnershipConfirmation />} />
           <Route path="/cultural-activities/programming" element={<CulturalActivitiesProgramming />} />
           <Route path="/activites-culturelles/participation" element={<CulturalActivitiesProgramming />} />
           <Route path="/cancel-booking" element={<CancelBooking />} />
