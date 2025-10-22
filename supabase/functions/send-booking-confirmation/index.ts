@@ -137,7 +137,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Envoyer l'email au client
     const clientEmailResponse = await resend.emails.send({
-      from: "BNRM Réservations <elfaddi@digiup.ma>",
+      from: "BNRM Réservations <useryouness@gmail.com>",
       to: [bookingData.userEmail],
       subject: `Confirmation de réservation - ${bookingData.eventTitle}`,
       html: emailHtml,
@@ -206,8 +206,8 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const adminEmailResponse = await resend.emails.send({
-      from: "BNRM Système <elfaddi@digiup.ma>",
-      to: ["elfaddi@digiup.ma"],
+      from: "BNRM Système <useryouness@gmail.com>",
+      to: ["useryouness@gmail.com"],
       subject: `[BNRM] Nouvelle réservation - ${bookingData.eventTitle}`,
       html: adminEmailHtml,
     });
