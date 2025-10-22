@@ -16,54 +16,67 @@ Enhanced Moroccan Heritage Design System
 
 @layer base {
   :root {
-    /* Palette Neutres - Style filaire épuré */
-    --background: 0 0% 98%; /* Blanc cassé */
-    --foreground: 0 0% 20%;
+    /* === Design System BNRM - Activités Culturelles === */
+    /* Arrière-plan blanc cassé style carnet */
+    --background: 45 30% 97%; /* Blanc cassé légèrement beige */
+    --foreground: 0 0% 15%; /* Texte anthracite foncé */
 
-    --card: 40 20% 94%;
-    --card-foreground: 30 15% 20%;
+    /* Cards avec arrondis et ombres douces */
+    --card: 0 0% 100%; /* Blanc pur pour les cards */
+    --card-foreground: 0 0% 15%;
 
-    --popover: 40 20% 94%;
-    --popover-foreground: 30 15% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 15%;
 
-    /* Bleu Zellige Subtil */
-    --primary: 220 30% 45%;
-    --primary-foreground: 44 15% 98%;
-    --primary-glow: 220 25% 55%;
-    --primary-deep: 220 35% 35%;
+    /* Boutons dorés clair */
+    --btn-gold: 45 80% 70%; /* Doré clair */
+    --btn-gold-foreground: 0 0% 100%; /* Texte blanc */
+    --btn-gold-hover: 0 0% 25%; /* Gris anthracite au hover */
+    --btn-gold-hover-foreground: 0 0% 100%;
 
-    /* Terre Cuite et Sable - Tons Neutres */
-    --secondary: 35 25% 85%;
-    --secondary-foreground: 30 15% 20%;
-    --secondary-warm: 30 30% 80%;
+    /* Palette principale - tons neutres et élégants */
+    --primary: 45 70% 65%; /* Doré pour éléments principaux */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 45 65% 75%;
+    --primary-deep: 45 75% 55%;
+
+    /* Secondary - gris anthracite */
+    --secondary: 0 0% 25%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-warm: 0 0% 35%;
 
     /* Tons neutres doux */
-    --muted: 40 15% 90%;
-    --muted-foreground: 35 10% 40%;
+    --muted: 45 15% 94%;
+    --muted-foreground: 0 0% 40%;
 
-    /* Vert Olive Subtil */
-    --accent: 155 25% 45%;
-    --accent-foreground: 44 15% 98%;
-    --accent-glow: 155 20% 55%;
-    --accent-bright: 155 30% 50%;
+    --accent: 200 15% 45%;
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 200 10% 55%;
+    --accent-bright: 200 20% 50%;
 
-    /* Brique Douce */
-    --highlight: 12 35% 65%;
-    --highlight-foreground: 44 15% 98%;
-    --highlight-deep: 8 40% 55%;
+    /* Or ancien pour accents */
+    --gold: 45 80% 70%;
+    --gold-foreground: 0 0% 15%;
+    --gold-bright: 48 85% 65%;
 
-    /* Or Ancien - Mosaïque */
-    --gold: 48 40% 65%;
-    --gold-foreground: 30 15% 20%;
-    --gold-bright: 50 45% 60%;
+    /* Bordures et inputs */
+    --border: 45 20% 88%;
+    --input: 45 20% 88%;
+    --ring: 45 70% 65%;
 
-    /* Corail Doux */
-    --coral: 15 30% 70%;
-    --coral-foreground: 44 15% 98%;
+    /* Radius pour cards arrondies */
+    --radius: 1rem;
 
-    /* Violet Mosaïque */
-    --royal: 280 25% 60%;
-    --royal-foreground: 44 15% 98%;
+    /* Ombres douces */
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.1);
+    --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.06);
+
+    /* États */
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* === Palette Existante - Conservée === */
 
     /* === CBM Portal Specific Colors === */
     /* Palette distinctive pour le Catalogue des Bibliothèques Marocaines */
