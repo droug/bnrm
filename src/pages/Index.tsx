@@ -430,7 +430,7 @@ const Index = () => {
                     </Card>
                   </Link>
 
-                  {/* Carte Services avec mosaïques traditionnelles */}
+                  {/* Carte Réservation des services des activités culturelles */}
                   <Link to="/payment-services">
                     <Card className="relative overflow-hidden group border-3 border-highlight/30 shadow-berber hover:shadow-mosaique transition-all duration-700 cursor-pointer">
                       <div 
@@ -441,15 +441,15 @@ const Index = () => {
                       <CardContent className="p-8 h-[280px] flex flex-col justify-center items-center text-center space-y-4 relative z-10">
                         <div className="relative">
                           <div className="w-20 h-20 bg-highlight/70 rounded-3xl flex items-center justify-center mb-4 shadow-zellige transform group-hover:scale-110 transition-all duration-500 border-2 border-highlight/30">
-                            <Users className="h-10 w-10 text-white" />
+                            <Calendar className="h-10 w-10 text-white" />
                           </div>
                           <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-pulse" />
                         </div>
                         <h3 className="text-xl font-moroccan font-bold text-foreground">
-                          {t('nav.services')}
+                          Réservation des services des activités culturelles
                         </h3>
                         <p className="text-muted-foreground font-elegant text-sm">
-                          Inscription, réservation, dépôt légal et services numériques
+                          Réservez vos places pour les événements, conférences et activités culturelles
                         </p>
                       </CardContent>
                     </Card>
