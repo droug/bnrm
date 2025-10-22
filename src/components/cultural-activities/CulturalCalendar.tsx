@@ -20,7 +20,7 @@ const mockEvents: CalendarEvent[] = [
     id: 1,
     title: "Exposition manuscrits andalous",
     type: "exhibition",
-    date: new Date(2025, 0, 15),
+    date: new Date(2025, 9, 15),
     time: "10:00 - 18:00",
     location: "Salle d'exposition principale",
     link: "#"
@@ -29,7 +29,7 @@ const mockEvents: CalendarEvent[] = [
     id: 2,
     title: "Conférence: Patrimoine numérique",
     type: "conference",
-    date: new Date(2025, 0, 22),
+    date: new Date(2025, 9, 22),
     time: "14:00 - 17:00",
     location: "Auditorium",
     link: "#"
@@ -38,7 +38,7 @@ const mockEvents: CalendarEvent[] = [
     id: 3,
     title: "Atelier calligraphie arabe",
     type: "workshop",
-    date: new Date(2025, 0, 28),
+    date: new Date(2025, 9, 28),
     time: "15:00 - 18:00",
     location: "Salle de formation",
     link: "#"
@@ -47,7 +47,7 @@ const mockEvents: CalendarEvent[] = [
     id: 4,
     title: "Concert de musique andalouse",
     type: "cultural",
-    date: new Date(2025, 0, 8),
+    date: new Date(2025, 9, 8),
     time: "19:00 - 21:00",
     location: "Auditorium",
     link: "#"
@@ -56,7 +56,7 @@ const mockEvents: CalendarEvent[] = [
     id: 5,
     title: "Exposition photographie historique",
     type: "exhibition",
-    date: new Date(2025, 0, 12),
+    date: new Date(2025, 9, 12),
     time: "09:00 - 17:00",
     location: "Galerie Est",
     link: "#"
@@ -65,7 +65,7 @@ const mockEvents: CalendarEvent[] = [
     id: 6,
     title: "Conférence: Architecture marocaine",
     type: "conference",
-    date: new Date(2025, 0, 18),
+    date: new Date(2025, 9, 18),
     time: "16:00 - 18:00",
     location: "Salle de conférence",
     link: "#"
@@ -74,7 +74,7 @@ const mockEvents: CalendarEvent[] = [
     id: 7,
     title: "Atelier enluminure",
     type: "workshop",
-    date: new Date(2025, 0, 25),
+    date: new Date(2025, 9, 25),
     time: "10:00 - 13:00",
     location: "Atelier d'art",
     link: "#"
@@ -83,7 +83,7 @@ const mockEvents: CalendarEvent[] = [
     id: 8,
     title: "Lecture poétique",
     type: "cultural",
-    date: new Date(2025, 0, 20),
+    date: new Date(2025, 9, 20),
     time: "18:00 - 20:00",
     location: "Salon littéraire",
     link: "#"
@@ -92,7 +92,7 @@ const mockEvents: CalendarEvent[] = [
     id: 9,
     title: "Exposition: Trésors de la BNRM",
     type: "exhibition",
-    date: new Date(2025, 0, 5),
+    date: new Date(2025, 9, 5),
     time: "10:00 - 18:00",
     location: "Salle des trésors",
     link: "#"
@@ -101,7 +101,7 @@ const mockEvents: CalendarEvent[] = [
     id: 10,
     title: "Conférence: Préservation des livres anciens",
     type: "conference",
-    date: new Date(2025, 0, 30),
+    date: new Date(2025, 9, 30),
     time: "14:00 - 16:00",
     location: "Auditorium",
     link: "#"
@@ -110,7 +110,7 @@ const mockEvents: CalendarEvent[] = [
     id: 11,
     title: "Atelier reliure traditionnelle",
     type: "workshop",
-    date: new Date(2025, 0, 10),
+    date: new Date(2025, 9, 10),
     time: "14:00 - 17:00",
     location: "Atelier de restauration",
     link: "#"
@@ -119,7 +119,7 @@ const mockEvents: CalendarEvent[] = [
     id: 12,
     title: "Spectacle de conteurs marocains",
     type: "cultural",
-    date: new Date(2025, 0, 17),
+    date: new Date(2025, 9, 17),
     time: "19:00 - 21:00",
     location: "Espace culturel",
     link: "#"
