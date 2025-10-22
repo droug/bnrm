@@ -132,7 +132,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 z-50" align="start" side="bottom" sideOffset={4}>
               <Calendar
                 mode="single"
                 selected={data.startDate}
@@ -183,7 +183,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 z-50" align="start" side="bottom" sideOffset={4}>
               <Calendar
                 mode="single"
                 selected={data.endDate}
