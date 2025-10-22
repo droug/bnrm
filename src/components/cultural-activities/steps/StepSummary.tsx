@@ -22,7 +22,7 @@ interface StepSummaryProps {
   onNext: () => void;
 }
 
-export default function StepSummary({ data }: StepSummaryProps) {
+export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -137,11 +137,16 @@ export default function StepSummary({ data }: StepSummaryProps) {
 
       return booking;
     },
-    onSuccess: () => {
+    onSuccess: (booking) => {
+      // Stocker l'ID de la réservation
+      onUpdate({ submittedBookingId: booking.id });
+      
       toast.success("Réservation créée avec succès", {
         description: "Votre demande de réservation a été envoyée. Vous recevrez une confirmation par email."
       });
-      navigate("/profile");
+      
+      // Passer à l'étape de confirmation
+      onNext();
     },
     onError: (error: Error) => {
       toast.error("Erreur", {

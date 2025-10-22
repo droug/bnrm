@@ -8,6 +8,7 @@ import StepDateTime from "./steps/StepDateTime";
 import StepEquipment from "./steps/StepEquipment";
 import StepContactInfo from "./steps/StepContactInfo";
 import StepSummary from "./steps/StepSummary";
+import StepConfirmation from "./steps/StepConfirmation";
 
 export interface BookingData {
   organizerType?: string;
@@ -35,6 +36,8 @@ export interface BookingData {
   contactWebsite?: string;
   statusDocument?: File;
   authorizationDocument?: File;
+  // État de soumission
+  submittedBookingId?: string;
 }
 
 const STEPS = [
@@ -42,7 +45,8 @@ const STEPS = [
   { id: 2, title: "Détails de l'événement", component: StepDateTime },
   { id: 3, title: "Équipements & Services", component: StepEquipment },
   { id: 4, title: "Informations du demandeur", component: StepContactInfo },
-  { id: 5, title: "Récapitulatif", component: StepSummary }
+  { id: 5, title: "Validation & Acceptation", component: StepSummary },
+  { id: 6, title: "Confirmation", component: StepConfirmation }
 ];
 
 export default function BookingWizard() {
@@ -124,8 +128,11 @@ export default function BookingWizard() {
         
         return baseFieldsValid;
       
-      case 5: // Récapitulatif
+      case 5: // Validation & Acceptation
         return true;
+      
+      case 6: // Confirmation
+        return true; // Toujours accessible une fois que la soumission est faite
       
       default:
         return false;
@@ -173,27 +180,30 @@ export default function BookingWizard() {
             data={bookingData}
             onUpdate={handleUpdateData}
             onNext={handleNext}
+            bookingId={bookingData.submittedBookingId}
           />
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8 pt-6 border-t">
-            <Button
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={currentStep === 1}
-              className="gap-2"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Précédent
-            </Button>
-
-            {currentStep < STEPS.length ? (
-              <Button onClick={handleNext} className="gap-2" disabled={!canProceed}>
-                Suivant
-                <ChevronRight className="h-4 w-4" />
+          {currentStep < STEPS.length && (
+            <div className="flex justify-between mt-8 pt-6 border-t">
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentStep === 1}
+                className="gap-2"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Précédent
               </Button>
-            ) : null}
-          </div>
+
+              {currentStep < STEPS.length - 1 ? (
+                <Button onClick={handleNext} className="gap-2" disabled={!canProceed}>
+                  Suivant
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              ) : null}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
