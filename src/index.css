@@ -17,8 +17,8 @@ Enhanced Moroccan Heritage Design System
 @layer base {
   :root {
     /* Palette Neutres - Style filaire épuré */
-    --background: 0 0% 98%; /* Blanc cassé */
-    --foreground: 0 0% 20%;
+    --background: 40 33% 97%; /* #FAF9F5 - blanc cassé papier croquis */
+    --foreground: 210 100% 13%; /* #002B45 - bleu profond */
 
     --card: 40 20% 94%;
     --card-foreground: 30 15% 20%;
@@ -38,14 +38,14 @@ Enhanced Moroccan Heritage Design System
     --secondary-warm: 30 30% 80%;
 
     /* Tons neutres doux */
-    --muted: 40 15% 90%;
+    --muted: 40 15% 92%;
     --muted-foreground: 35 10% 40%;
 
-    /* Vert Olive Subtil */
-    --accent: 155 25% 45%;
-    --accent-foreground: 44 15% 98%;
-    --accent-glow: 155 20% 55%;
-    --accent-bright: 155 30% 50%;
+    /* Doré clair - Activités culturelles */
+    --accent: 45 77% 52%; /* #D4AF37 - doré clair */
+    --accent-foreground: 0 0% 20%; /* #333333 - gris anthracite */
+    --accent-glow: 45 82% 62%;
+    --accent-bright: 45 85% 48%;
 
     /* Brique Douce */
     --highlight: 12 35% 65%;

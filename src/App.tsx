@@ -136,6 +136,9 @@ const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const PaymentCanceled = lazy(() => import("./pages/PaymentCanceled"));
 const CulturalActivities = lazy(() => import("./pages/CulturalActivities"));
 const CulturalActivitiesBooking = lazy(() => import("./pages/CulturalActivitiesBooking"));
+const CulturalActivitiesGuidedTours = lazy(() => import("./pages/CulturalActivitiesGuidedTours"));
+const CulturalActivitiesPartnership = lazy(() => import("./pages/CulturalActivitiesPartnership"));
+const CulturalActivitiesProgramming = lazy(() => import("./pages/CulturalActivitiesProgramming"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -272,6 +275,13 @@ const App = () => (
           <Route path="/cultural-activities" element={<CulturalActivities />} />
           <Route path="/activites-culturelles" element={<CulturalActivities />} />
           <Route path="/cultural-activities/booking" element={<CulturalActivitiesBooking />} />
+          <Route path="/activites-culturelles/reservation-espaces" element={<CulturalActivitiesBooking />} />
+          <Route path="/cultural-activities/guided-tours" element={<CulturalActivitiesGuidedTours />} />
+          <Route path="/activites-culturelles/visites" element={<CulturalActivitiesGuidedTours />} />
+          <Route path="/cultural-activities/partnership" element={<CulturalActivitiesPartnership />} />
+          <Route path="/activites-culturelles/partenariats" element={<CulturalActivitiesPartnership />} />
+          <Route path="/cultural-activities/programming" element={<CulturalActivitiesProgramming />} />
+          <Route path="/activites-culturelles/participation" element={<CulturalActivitiesProgramming />} />
           <Route path="/cultural-activities-booking" element={<CulturalActivitiesBooking />} />
           <Route path="/reservation-activites-culturelles" element={<CulturalActivitiesBooking />} />
 
