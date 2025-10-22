@@ -5620,6 +5620,101 @@ export type Database = {
         }
         Relationships: []
       }
+      visits_bookings: {
+        Row: {
+          commentaire: string | null
+          confirmation_token: string | null
+          created_at: string | null
+          email: string
+          id: string
+          langue: string
+          nb_visiteurs: number
+          nom: string
+          organisme: string | null
+          slot_id: string
+          statut: string
+          telephone: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          commentaire?: string | null
+          confirmation_token?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          langue: string
+          nb_visiteurs: number
+          nom: string
+          organisme?: string | null
+          slot_id: string
+          statut?: string
+          telephone: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          commentaire?: string | null
+          confirmation_token?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          langue?: string
+          nb_visiteurs?: number
+          nom?: string
+          organisme?: string | null
+          slot_id?: string
+          statut?: string
+          telephone?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visits_bookings_slot_id_fkey"
+            columns: ["slot_id"]
+            isOneToOne: false
+            referencedRelation: "visits_slots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visits_slots: {
+        Row: {
+          capacite_max: number
+          created_at: string | null
+          date: string
+          heure: string
+          id: string
+          langue: string
+          reservations_actuelles: number
+          statut: string
+          updated_at: string | null
+        }
+        Insert: {
+          capacite_max?: number
+          created_at?: string | null
+          date: string
+          heure: string
+          id?: string
+          langue: string
+          reservations_actuelles?: number
+          statut?: string
+          updated_at?: string | null
+        }
+        Update: {
+          capacite_max?: number
+          created_at?: string | null
+          date?: string
+          heure?: string
+          id?: string
+          langue?: string
+          reservations_actuelles?: number
+          statut?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       wallet_recharges: {
         Row: {
           amount: number
