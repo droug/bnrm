@@ -69,6 +69,8 @@ const GuidedToursBackoffice = () => {
   const [viewDialog, setViewDialog] = useState(false);
   const [closeDialog, setCloseDialog] = useState(false);
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const { toast } = useToast();
 
   useEffect(() => {
@@ -167,6 +169,26 @@ const GuidedToursBackoffice = () => {
             capacite_max: 25,
             reservations_actuelles: 25,
             statut: "terminee",
+            created_at: new Date().toISOString()
+          },
+          {
+            id: "slot-009",
+            date: "2025-11-22",
+            heure: "09:30:00",
+            langue: "Français",
+            capacite_max: 20,
+            reservations_actuelles: 14,
+            statut: "disponible",
+            created_at: new Date().toISOString()
+          },
+          {
+            id: "slot-010",
+            date: "2025-11-25",
+            heure: "14:30:00",
+            langue: "Anglais",
+            capacite_max: 15,
+            reservations_actuelles: 6,
+            statut: "disponible",
             created_at: new Date().toISOString()
           }
         ];
@@ -445,6 +467,12 @@ const GuidedToursBackoffice = () => {
     );
   }
 
+  // Calcul de la pagination
+  const totalPages = Math.ceil(slots.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentSlots = slots.slice(startIndex, endIndex);
+
   return (
     <div className="space-y-6">
       <Card>
@@ -479,14 +507,14 @@ const GuidedToursBackoffice = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {slots.length === 0 ? (
+                {currentSlots.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                       Aucun créneau de visite
                     </TableCell>
                   </TableRow>
                 ) : (
-                  slots.map((slot) => (
+                  currentSlots.map((slot) => (
                     <TableRow key={slot.id} className="hover:bg-muted/50 transition-colors">
                       <TableCell className="font-medium">
                         {format(new Date(slot.date), 'dd/MM/yyyy', { locale: fr })}
@@ -542,6 +570,46 @@ const GuidedToursBackoffice = () => {
               </TableBody>
             </Table>
           </div>
+
+          {/* Pagination */}
+          {slots.length > itemsPerPage && (
+            <div className="flex items-center justify-between mt-4 px-2">
+              <p className="text-sm text-muted-foreground">
+                Affichage de {startIndex + 1} à {Math.min(endIndex, slots.length)} sur {slots.length} créneaux
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  Précédent
+                </Button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      className="w-8"
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Suivant
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
