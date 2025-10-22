@@ -135,6 +135,38 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
         if (serviceError) throw serviceError;
       }
 
+      // Envoyer l'email de confirmation
+      try {
+        const { error: emailError } = await supabase.functions.invoke('send-booking-confirmation', {
+          body: {
+            bookingId: booking.id,
+            userEmail: data.contactEmail,
+            userName: data.contactPerson,
+            organizationName: data.organizationName || '',
+            eventTitle: data.eventTitle || '',
+            eventDescription: data.eventDescription || '',
+            spaceName: space?.name || '',
+            startDate: startDateTime,
+            endDate: endDateTime,
+            startTime: data.startTime || '',
+            endTime: data.endTime || '',
+            expectedAttendees: data.expectedAttendees || 0,
+            contactPhone: data.contactPhone || '',
+            contactAddress: data.contactAddress || '',
+            contactCity: data.contactCity || '',
+            contactCountry: data.contactCountry || ''
+          }
+        });
+
+        if (emailError) {
+          console.error('Erreur envoi email:', emailError);
+          // Ne pas bloquer la réservation si l'email échoue
+        }
+      } catch (emailError) {
+        console.error('Erreur envoi email:', emailError);
+        // Ne pas bloquer la réservation si l'email échoue
+      }
+
       return booking;
     },
     onSuccess: (booking) => {
