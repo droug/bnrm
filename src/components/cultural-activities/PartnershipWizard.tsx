@@ -180,30 +180,35 @@ const PartnershipWizard = () => {
 
   return (
     <div className="max-w-4xl mx-auto animate-fade-in">
-      <Card className="rounded-2xl shadow-lg border-border/50 overflow-hidden transition-all duration-300">
-        <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10">
-          <CardTitle className="text-xl font-semibold text-[#333333]">
+      <Card className="rounded-2xl shadow-lg border-[#333333]/10 overflow-hidden transition-all duration-300">
+        <CardHeader className="bg-gradient-to-r from-[#FAF9F5] to-white border-b border-[#333333]/10">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-10 w-10 rounded-xl bg-[#D4AF37] flex items-center justify-center shadow-md transition-all duration-300">
+              <span className="text-white font-bold text-lg">{currentStep}</span>
+            </div>
+            <CardTitle className="text-xl font-semibold text-[#333333]">
+              {STEPS[currentStep - 1].title}
+            </CardTitle>
+          </div>
+          <CardDescription className="text-base text-[#333333]/70 ml-13">
             Étape {currentStep} sur {STEPS.length}
-          </CardTitle>
-          <CardDescription className="text-base text-muted-foreground">
-            {STEPS[currentStep - 1].title}
           </CardDescription>
-          <Progress value={progress} className="mt-4 h-2" />
+          <Progress value={progress} className="mt-4 h-2 bg-[#333333]/10" />
         </CardHeader>
-        <CardContent className="pt-8">
+        <CardContent className="pt-8 bg-white">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="transition-all duration-300 ease-in-out">
+              <div className="transition-all duration-300 ease-in-out animate-fade-in">
                 <CurrentStepComponent form={form} />
               </div>
 
-              <div className="flex justify-between pt-8 border-t border-border/50">
+              <div className="flex justify-between pt-8 border-t border-[#333333]/10">
                 {currentStep > 1 && (
                   <Button 
                     type="button" 
                     variant="outline" 
                     onClick={handlePrevious}
-                    className="transition-all duration-300 hover:scale-105"
+                    className="transition-all duration-300 text-[#333333] border-[#333333]/20 hover:bg-[#333333]/5"
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Précédent
@@ -214,7 +219,7 @@ const PartnershipWizard = () => {
                   <Button 
                     type="button" 
                     onClick={handleNext} 
-                    className="ml-auto transition-all duration-300 hover:scale-105"
+                    className="ml-auto transition-all duration-300 bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white shadow-md"
                   >
                     Suivant
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -223,7 +228,7 @@ const PartnershipWizard = () => {
                   <Button 
                     type="submit" 
                     disabled={isSubmitting} 
-                    className="ml-auto transition-all duration-300 hover:scale-105"
+                    className="ml-auto transition-all duration-300 bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white shadow-md disabled:opacity-50"
                   >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     {isSubmitting ? "Envoi en cours..." : "Soumettre la demande"}
