@@ -29,13 +29,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { CustomSelect } from "@/components/ui/custom-select";
 import {
   Lock,
   Download,
@@ -704,16 +698,16 @@ const GuidedToursBackoffice = () => {
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="text-2xl font-light">Gestion des visites guidées</CardTitle>
-            <Select value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="day">Vue par jour</SelectItem>
-                <SelectItem value="week">Vue par semaine</SelectItem>
-                <SelectItem value="month">Vue par mois</SelectItem>
-              </SelectContent>
-            </Select>
+            <CustomSelect
+              value={viewMode}
+              onValueChange={(v) => setViewMode(v as any)}
+              options={[
+                { value: "day", label: "Vue par jour" },
+                { value: "week", label: "Vue par semaine" },
+                { value: "month", label: "Vue par mois" },
+              ]}
+              className="w-[180px]"
+            />
           </div>
         </CardHeader>
         <CardContent>

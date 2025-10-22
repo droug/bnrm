@@ -20,13 +20,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { CustomSelect } from "@/components/ui/custom-select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { 
@@ -317,18 +311,19 @@ const ProgramContributionsBackoffice = () => {
             <CardTitle className="text-2xl text-[#333333]">
               Gestion des propositions de programmation
             </CardTitle>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-[200px] rounded-xl border-[#333333]/20">
-                <SelectValue placeholder="Filtrer par statut" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="en_attente">En attente</SelectItem>
-                <SelectItem value="en_evaluation">En évaluation</SelectItem>
-                <SelectItem value="acceptee">Acceptée</SelectItem>
-                <SelectItem value="rejetee">Rejetée</SelectItem>
-              </SelectContent>
-            </Select>
+            <CustomSelect
+              value={filterStatus}
+              onValueChange={setFilterStatus}
+              options={[
+                { value: "all", label: "Tous les statuts" },
+                { value: "en_attente", label: "En attente" },
+                { value: "en_evaluation", label: "En évaluation" },
+                { value: "acceptee", label: "Acceptée" },
+                { value: "rejetee", label: "Rejetée" },
+              ]}
+              placeholder="Filtrer par statut"
+              className="w-[200px]"
+            />
           </div>
         </CardHeader>
         <CardContent className="p-6">

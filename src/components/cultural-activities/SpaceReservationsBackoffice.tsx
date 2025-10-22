@@ -26,13 +26,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { CustomSelect } from "@/components/ui/custom-select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -654,56 +648,55 @@ const SpaceReservationsBackoffice = () => {
         <CardContent>
           {/* Filtres */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <Select value={filterSpace} onValueChange={setFilterSpace}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filtrer par espace" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les espaces</SelectItem>
-                {spaces.map((space) => (
-                  <SelectItem key={space.id} value={space.id}>
-                    {space.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CustomSelect
+              value={filterSpace}
+              onValueChange={setFilterSpace}
+              options={[
+                { value: "all", label: "Tous les espaces" },
+                ...spaces.map(space => ({
+                  value: space.id,
+                  label: space.name
+                }))
+              ]}
+              placeholder="Filtrer par espace"
+            />
 
-            <Select value={filterOrgType} onValueChange={setFilterOrgType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Type d'organisme" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les types</SelectItem>
-                <SelectItem value="public">Public</SelectItem>
-                <SelectItem value="prive">Privé</SelectItem>
-                <SelectItem value="association">Association</SelectItem>
-                <SelectItem value="international">International</SelectItem>
-              </SelectContent>
-            </Select>
+            <CustomSelect
+              value={filterOrgType}
+              onValueChange={setFilterOrgType}
+              options={[
+                { value: "all", label: "Tous les types" },
+                { value: "public", label: "Public" },
+                { value: "prive", label: "Privé" },
+                { value: "association", label: "Association" },
+                { value: "international", label: "International" },
+              ]}
+              placeholder="Type d'organisme"
+            />
 
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="Statut" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="en_attente">En attente</SelectItem>
-                <SelectItem value="validee">Validée</SelectItem>
-                <SelectItem value="rejetee">Rejetée</SelectItem>
-              </SelectContent>
-            </Select>
+            <CustomSelect
+              value={filterStatus}
+              onValueChange={setFilterStatus}
+              options={[
+                { value: "all", label: "Tous les statuts" },
+                { value: "en_attente", label: "En attente" },
+                { value: "validee", label: "Validée" },
+                { value: "rejetee", label: "Rejetée" },
+              ]}
+              placeholder="Statut"
+            />
 
-            <Select value={filterPeriod} onValueChange={setFilterPeriod}>
-              <SelectTrigger>
-                <SelectValue placeholder="Période" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Toutes les périodes</SelectItem>
-                <SelectItem value="week">Dernière semaine</SelectItem>
-                <SelectItem value="month">Dernier mois</SelectItem>
-                <SelectItem value="quarter">Dernier trimestre</SelectItem>
-              </SelectContent>
-            </Select>
+            <CustomSelect
+              value={filterPeriod}
+              onValueChange={setFilterPeriod}
+              options={[
+                { value: "all", label: "Toutes les périodes" },
+                { value: "week", label: "Dernière semaine" },
+                { value: "month", label: "Dernier mois" },
+                { value: "quarter", label: "Dernier trimestre" },
+              ]}
+              placeholder="Période"
+            />
           </div>
 
           {/* Tableau */}

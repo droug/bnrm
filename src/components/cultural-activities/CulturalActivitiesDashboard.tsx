@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CustomSelect } from "@/components/ui/custom-select";
 import { Calendar, Users, Handshake, FileText, TrendingUp } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 
@@ -115,16 +115,17 @@ const CulturalActivitiesDashboard = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-light text-foreground">Tableau de bord</h2>
-        <Select value={period} onValueChange={(v) => setPeriod(v as any)}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="month">Dernier mois</SelectItem>
-            <SelectItem value="quarter">Dernier trimestre</SelectItem>
-            <SelectItem value="year">Dernière année</SelectItem>
-          </SelectContent>
-        </Select>
+        <CustomSelect
+          value={period}
+          onValueChange={(v) => setPeriod(v as any)}
+          options={[
+            { value: "month", label: "Dernier mois" },
+            { value: "quarter", label: "Dernier trimestre" },
+            { value: "year", label: "Dernière année" },
+          ]}
+          icon={<Calendar className="h-4 w-4" />}
+          className="w-[200px]"
+        />
       </div>
 
       {/* Stats Cards */}
