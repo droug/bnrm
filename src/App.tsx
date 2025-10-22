@@ -143,6 +143,7 @@ const CulturalActivitiesProgramming = lazy(() => import("./pages/CulturalActivit
 const CancelBooking = lazy(() => import("./pages/CancelBooking"));
 const GuidedToursBackoffice = lazy(() => import("./pages/GuidedToursBackoffice"));
 const CulturalActivitiesBackoffice = lazy(() => import("./pages/CulturalActivitiesBackoffice"));
+const PartnershipsBackofficePage = lazy(() => import("./pages/PartnershipsBackoffice"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -287,8 +288,10 @@ const App = () => (
           <Route path="/cultural-activities/guided-tours" element={<CulturalActivitiesGuidedTours />} />
           <Route path="/activites-culturelles/visites" element={<CulturalActivitiesGuidedTours />} />
           <Route path="/cultural-activities/partnership" element={<CulturalActivitiesPartnership />} />
+          <Route path="/activites-culturelles/partenariat" element={<CulturalActivitiesPartnership />} />
           <Route path="/activites-culturelles/partenariats" element={<CulturalActivitiesPartnership />} />
           <Route path="/cultural-activities/partnership/confirmation" element={<CulturalActivitiesPartnershipConfirmation />} />
+          <Route path="/activites-culturelles/partenariat/confirmation" element={<CulturalActivitiesPartnershipConfirmation />} />
           <Route path="/activites-culturelles/partenariats/confirmation" element={<CulturalActivitiesPartnershipConfirmation />} />
           <Route path="/cultural-activities/programming" element={<CulturalActivitiesProgramming />} />
           <Route path="/activites-culturelles/participation" element={<CulturalActivitiesProgramming />} />
@@ -300,6 +303,8 @@ const App = () => (
           <Route path="/admin/visites-guidees" element={<GuidedToursBackoffice />} />
           <Route path="/admin/activites-culturelles" element={<CulturalActivitiesBackoffice />} />
           <Route path="/admin/cultural-activities" element={<CulturalActivitiesBackoffice />} />
+          <Route path="/admin/partenariats" element={<PartnershipsBackofficePage />} />
+          <Route path="/admin/partnerships" element={<PartnershipsBackofficePage />} />
 
           {/* Translation Management */}
           <Route path="/admin/translations" element={<TranslationManagementPage />} />

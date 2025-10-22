@@ -130,7 +130,7 @@ const CulturalActivities = () => {
             </Link>
 
             {/* Card 3: Partenariat */}
-            <Link to="/cultural-activities/partnership">
+            <Link to="/activites-culturelles/partenariat">
               <Card className="h-full hover:shadow-xl transition-all duration-300 group border-2 hover:border-[#D4AF37] rounded-2xl">
                 <CardContent className="p-6 text-center space-y-4">
                   <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">

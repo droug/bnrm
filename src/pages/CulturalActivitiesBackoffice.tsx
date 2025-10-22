@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, MapPin, Users, FileText, Settings } from "lucide-react";
+import { Calendar, MapPin, Users, FileText, Settings, Handshake } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -25,9 +25,10 @@ const CulturalActivitiesBackoffice = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="guided-tours">Visites guidées</TabsTrigger>
+            <TabsTrigger value="partnerships">Partenariats</TabsTrigger>
             <TabsTrigger value="spaces">Espaces culturels</TabsTrigger>
             <TabsTrigger value="calendar">Calendrier</TabsTrigger>
             <TabsTrigger value="settings">Paramètres</TabsTrigger>
@@ -44,6 +45,25 @@ const CulturalActivitiesBackoffice = () => {
                     <div>
                       <CardTitle className="text-lg font-light">Visites guidées</CardTitle>
                       <CardDescription>Gestion des créneaux et réservations</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full">
+                    Accéder
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/admin/partenariats")}>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-lg bg-primary/10">
+                      <Handshake className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-light">Partenariats</CardTitle>
+                      <CardDescription>Gestion des demandes de partenariat</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -143,6 +163,22 @@ const CulturalActivitiesBackoffice = () => {
               <CardContent>
                 <Button onClick={() => navigate("/admin/guided-tours")}>
                   Ouvrir la gestion des visites guidées
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="partnerships">
+            <Card className="border-border">
+              <CardHeader>
+                <CardTitle className="text-2xl font-light">Gestion des partenariats</CardTitle>
+                <CardDescription>
+                  Accédez à la page complète de gestion des demandes de partenariat
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => navigate("/admin/partenariats")}>
+                  Ouvrir la gestion des partenariats
                 </Button>
               </CardContent>
             </Card>
