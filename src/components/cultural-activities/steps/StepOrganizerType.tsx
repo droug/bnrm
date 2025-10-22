@@ -179,7 +179,7 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
       )}
 
       {/* Sélection de l'espace */}
-      <div className="space-y-2 relative" ref={spaceRef}>
+      <div className="space-y-2 relative z-50" ref={spaceRef}>
         <Label>Espace *</Label>
         <Input
           ref={searchInputRef}
@@ -188,7 +188,7 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
           value={spaceSearch || (selectedSpace?.name || "")}
           onChange={(e) => setSpaceSearch(e.target.value)}
           onFocus={() => setSpaceSearch("")}
-          className="h-11"
+          className="h-11 relative z-10"
           autoComplete="off"
         />
         {(spaceSearch || !data.spaceId) && (
