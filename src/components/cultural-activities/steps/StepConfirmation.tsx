@@ -80,9 +80,9 @@ export default function StepConfirmation({ data, bookingId }: StepConfirmationPr
       const textColor: [number, number, number] = [31, 41, 55]; // gris foncé
       const lightGray: [number, number, number] = [243, 244, 246];
       
-      let yPosition = 20;
+      let yPosition = 10;
 
-      // En-tête avec logo
+      // En-tête sur toute la largeur
       try {
         const img = new Image();
         img.src = logoHeader;
@@ -90,12 +90,14 @@ export default function StepConfirmation({ data, bookingId }: StepConfirmationPr
           img.onload = resolve;
           img.onerror = reject;
         });
-        pdf.addImage(img, 'PNG', 15, yPosition, 50, 20);
+        // Afficher l'en-tête sur toute la largeur de la page
+        const headerHeight = 25;
+        pdf.addImage(img, 'PNG', 0, 0, pageWidth, headerHeight);
+        yPosition = headerHeight + 10;
       } catch (error) {
-        console.error('Erreur chargement logo:', error);
+        console.error('Erreur chargement en-tête:', error);
+        yPosition = 20;
       }
-      
-      yPosition += 35;
 
       // Titre principal
       pdf.setFontSize(22);
