@@ -101,27 +101,78 @@ const StepConfirmation = ({ data }: StepConfirmationProps) => {
         </div>
         
         <div>
-          <h2 className="text-3xl font-bold text-foreground mb-2">
-            Réservation confirmée !
+          <h2 className="text-3xl font-bold text-foreground mb-3">
+            Votre réservation de visite guidée a été enregistrée
           </h2>
           <p className="text-muted-foreground text-lg">
-            Votre réservation de visite guidée a été enregistrée avec succès.
+            Vous recevrez un email de confirmation sous peu.
           </p>
         </div>
 
-        <Alert className="bg-blue-50 border-blue-200">
-          <Mail className="h-4 w-4 text-blue-600" />
-          <AlertDescription className="text-blue-900">
-            Un email de confirmation contenant tous les détails de votre visite vous a été envoyé à l'adresse : <strong>{data.email}</strong>
+        <Card className="p-6 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+          <h3 className="font-semibold text-lg mb-4 flex items-center justify-center gap-2">
+            <Calendar className="h-5 w-5 text-primary" />
+            Détails de votre visite
+          </h3>
+          <div className="grid md:grid-cols-2 gap-4 text-left">
+            <div className="flex items-center gap-3">
+              <Calendar className="h-5 w-5 text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Date</p>
+                <p className="font-semibold">
+                  {format(new Date(data.selectedSlot.date), "dd MMMM yyyy", { locale: fr })}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Clock className="h-5 w-5 text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Heure</p>
+                <p className="font-semibold">{data.selectedSlot.heure.substring(0, 5)}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Globe className="h-5 w-5 text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Langue</p>
+                <p className="font-semibold capitalize">{data.langue}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Users className="h-5 w-5 text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Visiteurs</p>
+                <p className="font-semibold">{data.nbVisiteurs}</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <Alert className="bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-200">
+          <Mail className="h-5 w-5 text-amber-600" />
+          <AlertDescription className="text-amber-900">
+            <p className="font-medium mb-1">📧 Email de confirmation en cours d'envoi</p>
+            <p className="text-sm">
+              Un email contenant un <strong>fichier PDF récapitulatif avec le logo BNRM</strong> et toutes les informations de votre visite sera envoyé à : <strong>{data.email}</strong>
+            </p>
           </AlertDescription>
         </Alert>
+
+        <div className="bg-muted/50 rounded-lg p-4 text-sm text-left">
+          <p className="font-medium mb-2">📋 Rappel :</p>
+          <ul className="space-y-1 text-muted-foreground ml-4">
+            <li>• Présentez le PDF de confirmation à l'accueil le jour de votre visite</li>
+            <li>• Arrivez 10 minutes avant l'heure prévue</li>
+            <li>• Durée de la visite : environ 45 minutes</li>
+          </ul>
+        </div>
 
         <Button 
           onClick={() => navigate("/cultural-activities")}
           size="lg"
-          className="rounded-2xl"
+          className="w-full rounded-2xl"
         >
-          Retour à l'accueil
+          Retour aux activités culturelles
         </Button>
       </div>
     );
