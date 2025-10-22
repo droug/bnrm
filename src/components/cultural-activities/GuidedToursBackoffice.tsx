@@ -190,6 +190,26 @@ const GuidedToursBackoffice = () => {
             reservations_actuelles: 6,
             statut: "disponible",
             created_at: new Date().toISOString()
+          },
+          {
+            id: "slot-011",
+            date: "2025-11-26",
+            heure: "10:00:00",
+            langue: "Français",
+            capacite_max: 25,
+            reservations_actuelles: 19,
+            statut: "disponible",
+            created_at: new Date().toISOString()
+          },
+          {
+            id: "slot-012",
+            date: "2025-11-28",
+            heure: "15:00:00",
+            langue: "Arabe",
+            capacite_max: 30,
+            reservations_actuelles: 22,
+            statut: "disponible",
+            created_at: new Date().toISOString()
           }
         ];
         setSlots(exampleSlots);
