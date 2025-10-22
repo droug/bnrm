@@ -23,13 +23,18 @@ const StepSlotSelection = ({ data, onUpdate }: StepSlotSelectionProps) => {
   );
 
   // Récupérer les créneaux disponibles pour le mois sélectionné
-  const { data: slots, isLoading } = useQuery({
+  const { data: slots, isLoading, error: queryError } = useQuery({
     queryKey: ["visit-slots", selectedDate?.getMonth(), selectedDate?.getFullYear()],
     queryFn: async () => {
-      if (!selectedDate) return [];
+      if (!selectedDate) {
+        console.log("No date selected");
+        return [];
+      }
       
       const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
       const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+
+      console.log("Fetching slots from", format(startOfMonth, "yyyy-MM-dd"), "to", format(endOfMonth, "yyyy-MM-dd"));
 
       const { data, error } = await supabase
         .from("visits_slots")
@@ -40,11 +45,13 @@ const StepSlotSelection = ({ data, onUpdate }: StepSlotSelectionProps) => {
         .order("heure", { ascending: true });
 
       if (error) {
-        toast.error("Erreur lors du chargement des créneaux");
+        console.error("Error fetching slots:", error);
+        toast.error("Erreur lors du chargement des créneaux: " + error.message);
         throw error;
       }
 
-      return data;
+      console.log("Slots fetched:", data?.length, "slots", data);
+      return data || [];
     },
     enabled: !!selectedDate,
   });
@@ -55,6 +62,10 @@ const StepSlotSelection = ({ data, onUpdate }: StepSlotSelectionProps) => {
       format(new Date(slot.date), "yyyy-MM-dd") ===
       format(selectedDate || new Date(), "yyyy-MM-dd")
   );
+
+  console.log("Selected date:", selectedDate ? format(selectedDate, "yyyy-MM-dd") : "none");
+  console.log("Total slots:", slots?.length);
+  console.log("Slots for selected date:", slotsForSelectedDate?.length, slotsForSelectedDate);
 
   const handleSlotSelect = (slot: any) => {
     const capaciteRestante = slot.capacite_max - slot.reservations_actuelles;
@@ -139,21 +150,54 @@ const StepSlotSelection = ({ data, onUpdate }: StepSlotSelectionProps) => {
           </h3>
 
           {isLoading && (
-            <p className="text-muted-foreground">Chargement des créneaux...</p>
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Chargement des créneaux disponibles...
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {queryError && (
+            <Alert variant="destructive">
+              <AlertDescription>
+                Erreur lors du chargement des créneaux. Veuillez réessayer.
+              </AlertDescription>
+            </Alert>
           )}
 
           {!isLoading && !selectedDate && (
-            <p className="text-muted-foreground">
-              Veuillez sélectionner une date dans le calendrier
-            </p>
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Veuillez sélectionner une date dans le calendrier pour voir les créneaux disponibles
+              </AlertDescription>
+            </Alert>
           )}
 
           {!isLoading &&
             selectedDate &&
+            !queryError &&
+            slots?.length === 0 && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Aucun créneau n'a été créé. Contactez l'administrateur.
+                </AlertDescription>
+              </Alert>
+            )}
+
+          {!isLoading &&
+            selectedDate &&
+            !queryError &&
+            slots &&
+            slots.length > 0 &&
             slotsForSelectedDate?.length === 0 && (
-              <p className="text-muted-foreground">
-                Aucun créneau disponible pour cette date
-              </p>
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Aucun créneau disponible pour cette date. Veuillez choisir une autre date.
+                </AlertDescription>
+              </Alert>
             )}
 
           <div className="space-y-3">

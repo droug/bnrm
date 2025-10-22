@@ -9,7 +9,9 @@ import { useAuth } from "@/hooks/useAuth";
 
 const CulturalActivitiesGuidedTours = () => {
   const { user } = useAuth();
-  const isAdmin = user?.email?.includes("admin"); // Vérification simple pour les admins
+  
+  // Afficher le bouton pour tous les utilisateurs connectés en mode développement
+  const showSeedButton = user !== null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -31,9 +33,12 @@ const CulturalActivitiesGuidedTours = () => {
             Découvrez les trésors de la Bibliothèque Nationale du Royaume du Maroc 
             lors d'une visite guidée personnalisée
           </p>
-          {isAdmin && (
-            <div className="mt-4 flex justify-center">
+          {showSeedButton && (
+            <div className="mt-4 flex flex-col items-center gap-2">
               <SeedVisitSlotsButton />
+              <p className="text-xs text-muted-foreground">
+                Aucun créneau disponible ? Générez des créneaux de test ci-dessus
+              </p>
             </div>
           )}
         </div>
