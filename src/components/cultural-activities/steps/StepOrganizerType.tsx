@@ -274,27 +274,6 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
           </CardContent>
         </Card>
       )}
-
-      {/* Calendrier des disponibilités */}
-      {data.spaceId && (
-        <div className="space-y-2">
-          <Label>Disponibilités de l'espace</Label>
-          <Card>
-            <CardContent className="p-6">
-              <Calendar
-                mode="single"
-                selected={data.eventDate}
-                onSelect={(date) => onUpdate({ eventDate: date })}
-                className="rounded-md border"
-                disabled={(date) => date < new Date()}
-              />
-              <p className="text-sm text-muted-foreground mt-3">
-                Sélectionnez une date pour vérifier la disponibilité
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
   );
 }

@@ -86,8 +86,8 @@ export default function StepSummary({ data }: StepSummaryProps) {
 
       const { data: { user: authUser } } = await supabase.auth.getUser();
       
-      const startDateTime = `${data.eventDate?.toISOString().split('T')[0]} ${data.startTime}:00`;
-      const endDateTime = `${data.eventDate?.toISOString().split('T')[0]} ${data.endTime}:00`;
+      const startDateTime = `${data.startDate?.toISOString().split('T')[0]} ${data.startTime}:00`;
+      const endDateTime = `${data.endDate?.toISOString().split('T')[0]} ${data.endTime}:00`;
 
       const { data: booking, error } = await supabase
         .from('bookings')
@@ -99,7 +99,7 @@ export default function StepSummary({ data }: StepSummaryProps) {
           start_date: startDateTime,
           end_date: endDateTime,
           event_title: data.eventTitle,
-          event_description: `Type: ${data.eventType || 'Non spécifié'}\n\n${data.eventDescription}`,
+          event_description: data.eventDescription,
           participants_count: data.expectedAttendees || 0,
           contact_person: profile ? `${profile.first_name} ${profile.last_name}` : 'Non renseigné',
           contact_email: authUser?.email || 'non-renseigne@example.com',
@@ -170,8 +170,8 @@ export default function StepSummary({ data }: StepSummaryProps) {
   };
 
   const isComplete = data.organizerType && data.organizationName && data.spaceId && 
-                     data.eventDate && data.startTime && data.endTime && 
-                     data.eventType && data.eventTitle && data.eventDescription && 
+                     data.startDate && data.endDate && data.startTime && data.endTime && 
+                     data.eventTitle && data.eventDescription && 
                      data.expectedAttendees;
 
   return (
@@ -227,7 +227,8 @@ export default function StepSummary({ data }: StepSummaryProps) {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Date:</span>
               <span className="font-medium">
-                {data.eventDate && format(data.eventDate, "PPP", { locale: fr })}
+                {data.startDate && format(data.startDate, "PPP", { locale: fr })}
+                {data.endDate && data.startDate !== data.endDate && ` - ${format(data.endDate, "PPP", { locale: fr })}`}
               </span>
             </div>
             <div className="flex justify-between">
@@ -249,10 +250,6 @@ export default function StepSummary({ data }: StepSummaryProps) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Type:</span>
-              <Badge variant="secondary">{data.eventType}</Badge>
-            </div>
             <div>
               <span className="text-muted-foreground">Titre:</span>
               <p className="font-medium mt-1">{data.eventTitle}</p>

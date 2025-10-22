@@ -14,20 +14,21 @@ export interface BookingData {
   organizationName?: string;
   justificationDocument?: File;
   spaceId?: string;
-  eventDate?: Date;
+  startDate?: Date;
+  endDate?: Date;
   startTime?: string;
   endTime?: string;
-  eventType?: string;
   eventTitle?: string;
   eventDescription?: string;
   expectedAttendees?: number;
+  programDocument?: File;
   equipment: string[];
   services: string[];
 }
 
 const STEPS = [
   { id: 1, title: "Type d'organisme & sélection de l'espace", component: StepOrganizerType },
-  { id: 2, title: "Date et horaires", component: StepDateTime },
+  { id: 2, title: "Détails de l'événement", component: StepDateTime },
   { id: 3, title: "Équipements", component: StepEquipment },
   { id: 4, title: "Services complémentaires", component: StepServices },
   { id: 5, title: "Récapitulatif", component: StepSummary }
@@ -60,6 +61,40 @@ export default function BookingWizard() {
   const handleUpdateData = (data: Partial<BookingData>) => {
     setBookingData(prev => ({ ...prev, ...data }));
   };
+
+  // Validation pour chaque étape
+  const isStepValid = (step: number): boolean => {
+    switch (step) {
+      case 1: // Type d'organisme & sélection de l'espace
+        if (!bookingData.organizerType || !bookingData.spaceId) return false;
+        if (bookingData.organizerType === 'public' && !bookingData.justificationDocument) return false;
+        return true;
+      
+      case 2: // Détails de l'événement
+        return !!(
+          bookingData.eventTitle &&
+          bookingData.eventDescription &&
+          bookingData.startDate &&
+          bookingData.endDate &&
+          bookingData.startTime &&
+          bookingData.endTime &&
+          bookingData.expectedAttendees &&
+          bookingData.expectedAttendees > 0
+        );
+      
+      case 3: // Équipements
+      case 4: // Services complémentaires
+        return true; // Ces étapes sont optionnelles
+      
+      case 5: // Récapitulatif
+        return true;
+      
+      default:
+        return false;
+    }
+  };
+
+  const canProceed = isStepValid(currentStep);
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -115,7 +150,7 @@ export default function BookingWizard() {
             </Button>
 
             {currentStep < STEPS.length ? (
-              <Button onClick={handleNext} className="gap-2">
+              <Button onClick={handleNext} className="gap-2" disabled={!canProceed}>
                 Suivant
                 <ChevronRight className="h-4 w-4" />
               </Button>
