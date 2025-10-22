@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
 import {
   Table,
   TableBody,
@@ -571,7 +574,7 @@ const GuidedToursBackoffice = () => {
     });
   };
 
-  const exportAllToPDF = () => {
+  const exportAllToPDF = async () => {
     if (slots.length === 0) {
       toast({
         title: "Aucun créneau",
@@ -581,35 +584,92 @@ const GuidedToursBackoffice = () => {
       return;
     }
 
-    const pdfContent = `LISTE DES VISITES GUIDÉES\n\n` +
-      `Date d'export: ${format(new Date(), 'dd MMMM yyyy à HH:mm', { locale: fr })}\n` +
-      `Bibliothèque Nationale du Royaume du Maroc\n\n` +
-      `${'='.repeat(80)}\n\n` +
-      slots.map((slot, index) => 
-        `${index + 1}. ${format(new Date(slot.date), 'dd/MM/yyyy', { locale: fr })} à ${slot.heure.substring(0, 5)}\n` +
-        `   Langue: ${slot.langue}\n` +
-        `   Capacité: ${slot.capacite_max} places\n` +
-        `   Réservés: ${slot.reservations_actuelles}\n` +
-        `   Restants: ${slot.capacite_max - slot.reservations_actuelles}\n` +
-        `   Statut: ${slot.statut}\n\n`
-      ).join('') +
-      `${'='.repeat(80)}\n\n` +
-      `TOTAL: ${slots.length} créneaux\n` +
-      `Total places: ${slots.reduce((sum, s) => sum + s.capacite_max, 0)}\n` +
-      `Total réservations: ${slots.reduce((sum, s) => sum + s.reservations_actuelles, 0)}\n`;
-
-    const blob = new Blob([pdfContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `visites_guidees_${format(new Date(), 'yyyy-MM-dd')}.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
-
-    toast({
-      title: "Export réussi",
-      description: `${slots.length} créneaux exportés en PDF`,
-    });
+    try {
+      const doc = new jsPDF();
+      
+      // Ajouter l'en-tête BNRM
+      const yAfterHeader = await addBNRMHeader(doc);
+      let yPos = yAfterHeader + 10;
+      
+      // Titre
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('LISTE DES VISITES GUIDÉES', 105, yPos, { align: 'center' });
+      yPos += 10;
+      
+      // Date d'export
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Date d'export: ${format(new Date(), 'dd MMMM yyyy à HH:mm', { locale: fr })}`, 105, yPos, { align: 'center' });
+      yPos += 15;
+      
+      // Tableau des créneaux
+      const tableData = slots.map(slot => [
+        format(new Date(slot.date), 'dd/MM/yyyy', { locale: fr }),
+        slot.heure.substring(0, 5),
+        slot.langue,
+        slot.capacite_max.toString(),
+        slot.reservations_actuelles.toString(),
+        (slot.capacite_max - slot.reservations_actuelles).toString(),
+        slot.statut === 'disponible' ? 'Ouverte' : 
+        slot.statut === 'complet' ? 'Complète' :
+        slot.statut === 'terminee' ? 'Terminée' : 'Annulée'
+      ]);
+      
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Date', 'Heure', 'Langue', 'Capacité', 'Réservés', 'Restants', 'Statut']],
+        body: tableData,
+        styles: {
+          fontSize: 9,
+          cellPadding: 3,
+        },
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+          fontStyle: 'bold',
+        },
+        alternateRowStyles: {
+          fillColor: [245, 245, 245],
+        },
+        margin: { top: 10, left: 15, right: 15 },
+      });
+      
+      // Statistiques
+      const finalY = (doc as any).lastAutoTable.finalY || yPos + 50;
+      yPos = finalY + 15;
+      
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('STATISTIQUES', 20, yPos);
+      yPos += 8;
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`Total de créneaux: ${slots.length}`, 20, yPos);
+      yPos += 6;
+      doc.text(`Total places disponibles: ${slots.reduce((sum, s) => sum + s.capacite_max, 0)}`, 20, yPos);
+      yPos += 6;
+      doc.text(`Total réservations: ${slots.reduce((sum, s) => sum + s.reservations_actuelles, 0)}`, 20, yPos);
+      
+      // Ajouter le pied de page
+      await addBNRMFooter(doc, 1);
+      
+      // Télécharger le PDF
+      doc.save(`visites_guidees_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+      
+      toast({
+        title: "Export réussi",
+        description: `${slots.length} créneaux exportés en PDF`,
+      });
+    } catch (error) {
+      console.error('Erreur lors de la génération du PDF:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le PDF",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusBadge = (statut: string) => {
