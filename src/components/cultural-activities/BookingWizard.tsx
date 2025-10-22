@@ -13,6 +13,7 @@ import StepSummary from "./steps/StepSummary";
 export interface BookingData {
   organizerType?: string;
   organizationName?: string;
+  justificationDocument?: File;
   spaceId?: string;
   eventDate?: Date;
   startTime?: string;
