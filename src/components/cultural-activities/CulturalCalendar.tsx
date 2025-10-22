@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CalendarEvent {
   id: number;
@@ -149,6 +156,7 @@ const getEventLabel = (type: CalendarEvent["type"]) => {
 const CulturalCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [filterType, setFilterType] = useState<string>("all");
 
   const monthNames = [
     "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
@@ -172,11 +180,17 @@ const CulturalCalendar = () => {
   };
 
   const getEventsForDay = (day: number) => {
-    return mockEvents.filter(event => 
+    const dayEvents = mockEvents.filter(event => 
       event.date.getDate() === day &&
       event.date.getMonth() === currentDate.getMonth() &&
       event.date.getFullYear() === currentDate.getFullYear()
     );
+    
+    // Appliquer le filtre si un type spécifique est sélectionné
+    if (filterType === "all") {
+      return dayEvents;
+    }
+    return dayEvents.filter(event => event.type === filterType);
   };
 
   const daysInMonth = getDaysInMonth(currentDate);
@@ -188,8 +202,8 @@ const CulturalCalendar = () => {
     <>
       <Card className="max-w-5xl mx-auto rounded-2xl shadow-lg">
         <CardContent className="p-6">
-          {/* Calendar Header */}
-          <div className="flex items-center justify-between mb-6">
+          {/* Calendar Header with Filter */}
+          <div className="flex items-center justify-between mb-6 gap-4">
             <Button
               onClick={goToPreviousMonth}
               variant="outline"
@@ -198,9 +212,30 @@ const CulturalCalendar = () => {
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <h3 className="text-2xl font-bold text-[#002B45]">
-              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-            </h3>
+            
+            <div className="flex items-center gap-4">
+              <h3 className="text-2xl font-bold text-[#002B45]">
+                {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+              </h3>
+              
+              {/* Filter Dropdown */}
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="w-[220px] bg-white border-2 border-[#D4AF37]/30">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-[#D4AF37]" />
+                    <SelectValue placeholder="Filtrer par type" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="bg-white z-50">
+                  <SelectItem value="all">Tous les événements</SelectItem>
+                  <SelectItem value="cultural">Activité culturelle</SelectItem>
+                  <SelectItem value="exhibition">Exposition</SelectItem>
+                  <SelectItem value="conference">Conférence</SelectItem>
+                  <SelectItem value="workshop">Atelier</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
             <Button
               onClick={goToNextMonth}
               variant="outline"
