@@ -21,6 +21,12 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -28,7 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  CheckCircle,
+  Lock,
   Download,
   XCircle,
   Users
@@ -613,50 +619,79 @@ const GuidedToursBackoffice = () => {
                       </TableCell>
                       <TableCell>{getStatusBadge(slot.statut)}</TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => exportSlotToCSV(slot)}
-                            title="Export CSV"
-                          >
-                            <Download className="h-4 w-4 mr-1" />
-                            CSV
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => exportSlotToPDF(slot)}
-                            title="Export PDF"
-                          >
-                            <Download className="h-4 w-4 mr-1" />
-                            PDF
-                          </Button>
-                          {slot.statut === 'disponible' && (
-                            <>
-                              <Button
-                                size="sm"
-                                className="bg-green-600 hover:bg-green-700 text-white"
-                                onClick={() => {
-                                  setSelectedSlot(slot);
-                                  setCloseDialog(true);
-                                }}
-                                title="Clôturer"
-                              >
-                                <CheckCircle className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-red-300 text-red-600 hover:bg-red-50"
-                                onClick={() => handleCancelSlot(slot)}
-                                title="Annuler"
-                              >
-                                <XCircle className="h-4 w-4" />
-                              </Button>
-                            </>
-                          )}
-                        </div>
+                        <TooltipProvider>
+                          <div className="flex justify-end gap-2">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => exportSlotToCSV(slot)}
+                                >
+                                  <Download className="h-4 w-4 mr-1" />
+                                  CSV
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Exporter la liste des visiteurs en CSV</p>
+                              </TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => exportSlotToPDF(slot)}
+                                >
+                                  <Download className="h-4 w-4 mr-1" />
+                                  PDF
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Exporter la liste des visiteurs en PDF</p>
+                              </TooltipContent>
+                            </Tooltip>
+
+                            {slot.statut === 'disponible' && (
+                              <>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                                      onClick={() => {
+                                        setSelectedSlot(slot);
+                                        setCloseDialog(true);
+                                      }}
+                                    >
+                                      <Lock className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Clôturer cette visite</p>
+                                  </TooltipContent>
+                                </Tooltip>
+
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="border-red-300 text-red-600 hover:bg-red-50"
+                                      onClick={() => handleCancelSlot(slot)}
+                                    >
+                                      <XCircle className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Annuler cette visite et notifier les participants</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </>
+                            )}
+                          </div>
+                        </TooltipProvider>
                       </TableCell>
                     </TableRow>
                   ))
