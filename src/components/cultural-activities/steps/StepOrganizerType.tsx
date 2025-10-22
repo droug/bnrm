@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Label } from "@/components/ui/label";
@@ -6,26 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { 
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Upload, CheckCircle, Loader2, Users, Square, ChevronsUpDown, Check } from "lucide-react";
+import { Upload, CheckCircle, Loader2, Users, Square, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -38,7 +19,11 @@ interface StepOrganizerTypeProps {
 }
 
 export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeProps) {
-  const [open, setOpen] = useState(false);
+  const [organizerTypeOpen, setOrganizerTypeOpen] = useState(false);
+  const [spaceOpen, setSpaceOpen] = useState(false);
+  const [spaceSearch, setSpaceSearch] = useState("");
+  const organizerTypeRef = useRef<HTMLDivElement>(null);
+  const spaceRef = useRef<HTMLDivElement>(null);
   
   const { data: spaces, isLoading } = useQuery({
     queryKey: ['cultural-spaces'],
@@ -55,6 +40,32 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
   });
 
   const selectedSpace = spaces?.find(s => s.id === data.spaceId);
+
+  const filteredSpaces = spaces?.filter(space =>
+    space.name.toLowerCase().includes(spaceSearch.toLowerCase())
+  );
+
+  const organizerTypes = [
+    { value: "public", label: "Public" },
+    { value: "private", label: "Privé" }
+  ];
+
+  const selectedOrganizerType = organizerTypes.find(t => t.value === data.organizerType);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (organizerTypeRef.current && !organizerTypeRef.current.contains(event.target as Node)) {
+        setOrganizerTypeOpen(false);
+      }
+      if (spaceRef.current && !spaceRef.current.contains(event.target as Node)) {
+        setSpaceOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -94,20 +105,42 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
       </div>
 
       {/* Type d'organisme */}
-      <div className="space-y-2">
-        <Label htmlFor="organizerType">Type d'organisme *</Label>
-        <Select
-          value={data.organizerType}
-          onValueChange={(value) => onUpdate({ organizerType: value })}
+      <div className="space-y-2 relative" ref={organizerTypeRef}>
+        <Label>Type d'organisme *</Label>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full justify-between h-11 font-normal"
+          onClick={() => setOrganizerTypeOpen(!organizerTypeOpen)}
         >
-          <SelectTrigger>
-            <SelectValue placeholder="Sélectionner le type d'organisme" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="public">Public</SelectItem>
-            <SelectItem value="private">Privé</SelectItem>
-          </SelectContent>
-        </Select>
+          {selectedOrganizerType ? (
+            <span>{selectedOrganizerType.label}</span>
+          ) : (
+            <span className="text-muted-foreground">Sélectionner le type d'organisme</span>
+          )}
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </Button>
+        {organizerTypeOpen && (
+          <div className="absolute z-50 w-full mt-1 bg-popover border rounded-lg shadow-lg">
+            {organizerTypes.map((type) => (
+              <button
+                key={type.value}
+                type="button"
+                className={cn(
+                  "w-full text-left px-4 py-2.5 hover:bg-accent transition-colors",
+                  "first:rounded-t-lg last:rounded-b-lg",
+                  data.organizerType === type.value && "bg-accent"
+                )}
+                onClick={() => {
+                  onUpdate({ organizerType: type.value });
+                  setOrganizerTypeOpen(false);
+                }}
+              >
+                {type.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Upload PDF si organisme public */}
@@ -143,54 +176,58 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
       )}
 
       {/* Sélection de l'espace */}
-      <div className="space-y-2">
+      <div className="space-y-2 relative" ref={spaceRef}>
         <Label>Espace *</Label>
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              aria-expanded={open}
-              className="w-full justify-between h-auto min-h-[2.75rem] font-normal"
-            >
-              {selectedSpace ? (
-                <span className="text-left">{selectedSpace.name}</span>
-              ) : (
-                <span className="text-muted-foreground">Sélectionner un espace...</span>
-              )}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-            <Command className="bg-popover">
-              <CommandInput placeholder="Rechercher un espace..." className="h-10" />
-              <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
-                Aucun espace trouvé.
-              </CommandEmpty>
-              <CommandGroup className="max-h-[300px] overflow-auto p-1">
-                {spaces?.map((space) => (
-                  <CommandItem
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full justify-between h-auto min-h-[2.75rem] font-normal"
+          onClick={() => setSpaceOpen(!spaceOpen)}
+        >
+          {selectedSpace ? (
+            <span className="text-left">{selectedSpace.name}</span>
+          ) : (
+            <span className="text-muted-foreground">Sélectionner un espace...</span>
+          )}
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </Button>
+        {spaceOpen && (
+          <div className="absolute z-50 w-full mt-1 bg-popover border rounded-lg shadow-lg overflow-hidden">
+            <div className="p-2 border-b">
+              <Input
+                placeholder="Rechercher un espace..."
+                value={spaceSearch}
+                onChange={(e) => setSpaceSearch(e.target.value)}
+                className="h-9"
+              />
+            </div>
+            <div className="max-h-[300px] overflow-auto">
+              {filteredSpaces && filteredSpaces.length > 0 ? (
+                filteredSpaces.map((space) => (
+                  <button
                     key={space.id}
-                    value={space.name}
-                    onSelect={() => {
+                    type="button"
+                    className={cn(
+                      "w-full text-left px-4 py-2.5 hover:bg-accent transition-colors",
+                      data.spaceId === space.id && "bg-accent"
+                    )}
+                    onClick={() => {
                       onUpdate({ spaceId: space.id });
-                      setOpen(false);
+                      setSpaceOpen(false);
+                      setSpaceSearch("");
                     }}
-                    className="cursor-pointer"
                   >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        data.spaceId === space.id ? "opacity-100" : "opacity-0"
-                      )}
-                    />
                     {space.name}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
-          </PopoverContent>
-        </Popover>
+                  </button>
+                ))
+              ) : (
+                <div className="px-4 py-6 text-center text-sm text-muted-foreground">
+                  Aucun espace trouvé.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Détails de l'espace sélectionné */}
