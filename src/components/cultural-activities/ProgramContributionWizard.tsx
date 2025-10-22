@@ -88,6 +88,7 @@ const ProgramContributionWizard = () => {
   };
 
   const onSubmit = async (data: ProgramContributionFormData) => {
+    console.log('Form submission started', data);
     setIsSubmitting(true);
     try {
       // Insérer la demande (le trigger vérifiera automatiquement la limite de 3 propositions actives)
@@ -221,7 +222,19 @@ const ProgramContributionWizard = () => {
                 ) : (
                   <Button 
                     type="submit" 
-                    disabled={isSubmitting} 
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      console.log('Submit button clicked');
+                      const errors = form.formState.errors;
+                      if (Object.keys(errors).length > 0) {
+                        console.log('Form validation errors:', errors);
+                        toast({
+                          title: "Erreur de validation",
+                          description: "Veuillez cocher les cases de certification obligatoires",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
                     className="ml-auto transition-all duration-300 bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white shadow-md rounded-xl disabled:opacity-50"
                   >
                     <CheckCircle className="mr-2 h-4 w-4" />
