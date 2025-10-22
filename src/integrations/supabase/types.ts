@@ -6898,6 +6898,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_user_email: { Args: never; Returns: string }
       get_user_permissions: { Args: { user_uuid: string }; Returns: Json }
       get_user_primary_role: {
         Args: { _user_id: string }
