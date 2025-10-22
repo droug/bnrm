@@ -27,6 +27,8 @@ const StepDemandeur = ({ form }: StepDemandeurProps) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    console.log('Starting file upload:', file.name, 'Size:', file.size);
+
     if (file.size > 10 * 1024 * 1024) {
       toast({
         title: "Fichier trop volumineux",
@@ -42,9 +44,13 @@ const StepDemandeur = ({ form }: StepDemandeurProps) => {
       const fileName = `${Date.now()}-${file.name}`;
       const filePath = `program-contributions/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
+      console.log('Uploading to:', filePath);
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from("documents")
         .upload(filePath, file);
+
+      console.log('Upload result:', { data: uploadData, error: uploadError });
 
       if (uploadError) throw uploadError;
 
@@ -52,17 +58,21 @@ const StepDemandeur = ({ form }: StepDemandeurProps) => {
         .from("documents")
         .getPublicUrl(filePath);
 
-      form.setValue(fieldName, urlData.publicUrl);
+      console.log('Public URL:', urlData.publicUrl);
+
+      form.setValue(fieldName, urlData.publicUrl, { shouldValidate: true });
+      
+      console.log('Form value set for', fieldName, ':', urlData.publicUrl);
 
       toast({
         title: "Fichier uploadé",
         description: "Le fichier a été uploadé avec succès",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading file:", error);
       toast({
         title: "Erreur",
-        description: "Impossible d'uploader le fichier",
+        description: error?.message || "Impossible d'uploader le fichier",
         variant: "destructive",
       });
     } finally {
