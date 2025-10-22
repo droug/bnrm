@@ -192,7 +192,14 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
           autoComplete="off"
         />
         {(spaceSearch || !data.spaceId) && (
-          <div className="absolute z-[9999] w-full mt-1 bg-background border-2 border-primary/20 rounded-lg shadow-xl overflow-hidden">
+          <div 
+            className="fixed z-[9999] bg-background border-2 border-primary/20 rounded-lg shadow-xl overflow-hidden"
+            style={{
+              top: searchInputRef.current ? searchInputRef.current.getBoundingClientRect().bottom + 4 : 0,
+              left: searchInputRef.current ? searchInputRef.current.getBoundingClientRect().left : 0,
+              width: searchInputRef.current ? searchInputRef.current.getBoundingClientRect().width : 'auto'
+            }}
+          >
             <div className="max-h-[300px] overflow-auto bg-background">
               {filteredSpaces && filteredSpaces.length > 0 ? (
                 filteredSpaces.map((space) => (
