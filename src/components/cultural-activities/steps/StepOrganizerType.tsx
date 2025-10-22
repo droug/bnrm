@@ -121,7 +121,7 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
         {organizerTypeOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-popover border rounded-lg shadow-lg">
+          <div className="absolute z-[9999] w-full mt-1 bg-popover border rounded-lg shadow-lg">
             {organizerTypes.map((type) => (
               <button
                 key={type.value}
@@ -192,8 +192,8 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
         {spaceOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-popover border rounded-lg shadow-lg overflow-hidden">
-            <div className="p-2 border-b">
+          <div className="absolute z-[9999] w-full mt-1 bg-popover border rounded-lg shadow-lg overflow-hidden">
+            <div className="p-2 border-b bg-popover">
               <Input
                 placeholder="Rechercher un espace..."
                 value={spaceSearch}
@@ -201,7 +201,7 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
                 className="h-9"
               />
             </div>
-            <div className="max-h-[300px] overflow-auto">
+            <div className="max-h-[300px] overflow-auto bg-popover">
               {filteredSpaces && filteredSpaces.length > 0 ? (
                 filteredSpaces.map((space) => (
                   <button
