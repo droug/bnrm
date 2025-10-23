@@ -100,7 +100,7 @@ export function PermissionsManager() {
           *,
           permission:permissions(*)
         `).order('created_at', { ascending: false }),
-        supabase.from('profiles').select('user_id, first_name, last_name, role').order('first_name')
+        supabase.from('profiles').select('user_id, first_name, last_name').order('first_name')
       ]);
 
       if (permissionsRes.data) setPermissions(permissionsRes.data);
