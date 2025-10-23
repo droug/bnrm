@@ -1275,6 +1275,54 @@ export type Database = {
           },
         ]
       }
+      cultural_activity_tariffs: {
+        Row: {
+          amount_ht: number
+          amount_ttc: number | null
+          applies_to_private: boolean | null
+          applies_to_public: boolean | null
+          calculation_base: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          space_type: string | null
+          tariff_name: string
+          tva_rate: number
+          updated_at: string | null
+        }
+        Insert: {
+          amount_ht?: number
+          amount_ttc?: number | null
+          applies_to_private?: boolean | null
+          applies_to_public?: boolean | null
+          calculation_base: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          space_type?: string | null
+          tariff_name: string
+          tva_rate?: number
+          updated_at?: string | null
+        }
+        Update: {
+          amount_ht?: number
+          amount_ttc?: number | null
+          applies_to_private?: boolean | null
+          applies_to_public?: boolean | null
+          calculation_base?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          space_type?: string | null
+          tariff_name?: string
+          tva_rate?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       cultural_program_proposals: {
         Row: {
           activity_type: string
@@ -5636,6 +5684,53 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      tariff_conditional_rules: {
+        Row: {
+          condition_type: string
+          condition_value: Json
+          created_at: string | null
+          discount_type: string | null
+          discount_value: number
+          id: string
+          is_active: boolean | null
+          priority: number | null
+          rule_name: string
+          tariff_id: string
+        }
+        Insert: {
+          condition_type: string
+          condition_value?: Json
+          created_at?: string | null
+          discount_type?: string | null
+          discount_value?: number
+          id?: string
+          is_active?: boolean | null
+          priority?: number | null
+          rule_name: string
+          tariff_id: string
+        }
+        Update: {
+          condition_type?: string
+          condition_value?: Json
+          created_at?: string | null
+          discount_type?: string | null
+          discount_value?: number
+          id?: string
+          is_active?: boolean | null
+          priority?: number | null
+          rule_name?: string
+          tariff_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tariff_conditional_rules_tariff_id_fkey"
+            columns: ["tariff_id"]
+            isOneToOne: false
+            referencedRelation: "cultural_activity_tariffs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       translation_keys: {
         Row: {
