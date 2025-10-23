@@ -82,6 +82,13 @@ const CulturalTariffsManagement = () => {
     priority: 0
   });
 
+  // État pour les valeurs conditionnelles spécifiques
+  const [conditionDetails, setConditionDetails] = useState({
+    organisme_type: "etatique",
+    min_jours: 1,
+    recurrence_type: "mensuel"
+  });
+
   useEffect(() => {
     if (!authLoading && isAuthorized) {
       fetchTariffs();
@@ -222,6 +229,7 @@ const CulturalTariffsManagement = () => {
         .from('tariff_conditional_rules')
         .insert({
           ...ruleFormData,
+          condition_value: buildConditionValue(),
           tariff_id: selectedTariffForRule
         });
 
@@ -311,6 +319,27 @@ const CulturalTariffsManagement = () => {
       is_active: true,
       priority: 0
     });
+    setConditionDetails({
+      organisme_type: "etatique",
+      min_jours: 1,
+      recurrence_type: "mensuel"
+    });
+  };
+
+  // Construire condition_value selon le type
+  const buildConditionValue = () => {
+    switch (ruleFormData.condition_type) {
+      case "organisme_type":
+        return { type: conditionDetails.organisme_type };
+      case "nombre_jours":
+        return { min_jours: conditionDetails.min_jours };
+      case "recurrence":
+        return { type: conditionDetails.recurrence_type };
+      case "date_range":
+        return {}; // Peut être étendu avec des dates spécifiques
+      default:
+        return {};
+    }
   };
 
   const calculateTTC = (ht: number, tva: number) => {
@@ -935,6 +964,58 @@ const CulturalTariffsManagement = () => {
                 { value: "recurrence", label: "Réservation récurrente" }
               ]}
             />
+
+            {/* Champs conditionnels selon le type de condition */}
+            {ruleFormData.condition_type === "organisme_type" && (
+              <SelectField
+                label="Type d'organisme"
+                required
+                value={conditionDetails.organisme_type}
+                onChange={(value) => setConditionDetails({ ...conditionDetails, organisme_type: value })}
+                options={[
+                  { value: "etatique", label: "Organisme étatique" },
+                  { value: "association", label: "Association à but non lucratif" },
+                  { value: "entreprise_privee", label: "Entreprise privée" },
+                  { value: "etablissement_enseignement", label: "Établissement d'enseignement" },
+                  { value: "collectivite_locale", label: "Collectivité locale" }
+                ]}
+                helpText="Sélectionnez le type d'organisme qui bénéficiera de cette règle"
+              />
+            )}
+
+            {ruleFormData.condition_type === "nombre_jours" && (
+              <TextField
+                label="Nombre minimum de jours"
+                required
+                type="number"
+                value={conditionDetails.min_jours}
+                onChange={(value) => setConditionDetails({ ...conditionDetails, min_jours: parseInt(value) || 1 })}
+                placeholder="3"
+                min={1}
+                helpText="Nombre minimum de jours de réservation pour appliquer cette règle"
+              />
+            )}
+
+            {ruleFormData.condition_type === "recurrence" && (
+              <SelectField
+                label="Type de récurrence"
+                required
+                value={conditionDetails.recurrence_type}
+                onChange={(value) => setConditionDetails({ ...conditionDetails, recurrence_type: value })}
+                options={[
+                  { value: "mensuel", label: "Mensuel" },
+                  { value: "trimestriel", label: "Trimestriel" },
+                  { value: "annuel", label: "Annuel" }
+                ]}
+                helpText="Type de récurrence pour les réservations régulières"
+              />
+            )}
+
+            {ruleFormData.condition_type === "date_range" && (
+              <div className="p-4 bg-muted rounded-lg text-sm text-muted-foreground">
+                <p>Les périodes de dates peuvent être configurées ultérieurement dans les paramètres avancés de la règle.</p>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <SelectField
