@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail, GitBranch, List, Sliders } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail, GitBranch, List, Sliders, FolderTree } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -137,6 +137,14 @@ export default function AdminSettings() {
       href: "/admin/activites-culturelles/regles-systeme",
       permission: "content.manage",
       gradient: "from-amber-500 to-amber-600"
+    },
+    {
+      icon: FolderTree,
+      title: "Catégories générales",
+      description: "Gestion des catégories transversales utilisées dans toutes les plateformes",
+      href: "/admin/activites-culturelles/categories",
+      permission: "content.manage",
+      gradient: "from-rose-500 to-rose-600"
     }
   ];
 

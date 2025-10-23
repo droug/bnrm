@@ -213,9 +213,9 @@ const GeneralCategories = () => {
       <main className="container mx-auto px-4 py-8">
         <PageHeader
           title="Catégories générales"
-          description="Gestion des catégories transversales utilisées dans toute la plateforme"
+          description="Gestion des catégories transversales utilisées dans toutes les plateformes"
           icon={<FolderTree className="h-7 w-7" />}
-          backTo="/admin/activites-culturelles"
+          backTo="/admin"
         />
 
         <Card>

@@ -109,13 +109,6 @@ const CulturalActivitiesBackoffice = () => {
       icon: Wrench,
       path: "/admin/activites-culturelles/types-activites",
       color: "bg-gradient-to-br from-violet-500 to-violet-600"
-    },
-    {
-      title: "Catégories générales",
-      description: "Gestion des catégories transversales",
-      icon: FolderTree,
-      path: "/admin/activites-culturelles/categories",
-      color: "bg-gradient-to-br from-rose-500 to-rose-600"
     }
   ];
 
