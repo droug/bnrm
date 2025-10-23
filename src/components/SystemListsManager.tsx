@@ -70,6 +70,7 @@ export const SystemListsManager = () => {
     )
   ).sort();
   const [filterOpen, setFilterOpen] = useState(false);
+  const [createModuleOpen, setCreateModuleOpen] = useState(false);
   const [uniqueModuleForms, setUniqueModuleForms] = useState<Array<{ value: string; label: string; module: string; form: string }>>([]);
 
   useEffect(() => {
@@ -506,23 +507,61 @@ export const SystemListsManager = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Module</Label>
-                    <Input
-                      value={newListData.module}
-                      onChange={(e) => setNewListData({ ...newListData, module: e.target.value })}
-                      placeholder="Ex: Activités Culturelles"
-                    />
-                  </div>
-                  <div>
-                    <Label>Formulaire</Label>
-                    <Input
-                      value={newListData.form_name}
-                      onChange={(e) => setNewListData({ ...newListData, form_name: e.target.value })}
-                      placeholder="Ex: Réservation d'espaces"
-                    />
-                  </div>
+                <div>
+                  <Label>Module à rattacher</Label>
+                  <Popover open={createModuleOpen} onOpenChange={setCreateModuleOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={createModuleOpen}
+                        className="w-full justify-between mt-2 bg-background"
+                      >
+                        {newListData.module && newListData.form_name
+                          ? `${newListData.module} - ${newListData.form_name}`
+                          : "Sélectionner un module et formulaire..."}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[500px] p-0 bg-background" align="start">
+                      <Command>
+                        <CommandInput placeholder="Rechercher un module ou formulaire..." />
+                        <CommandList>
+                          <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
+                          <CommandGroup>
+                            {uniqueModuleForms.map((item) => (
+                              <CommandItem
+                                key={item.value}
+                                value={item.label}
+                                onSelect={() => {
+                                  setNewListData({
+                                    ...newListData,
+                                    module: item.module,
+                                    form_name: item.form
+                                  });
+                                  setCreateModuleOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    newListData.module === item.module && 
+                                    newListData.form_name === item.form
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                                {item.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Recherchez et sélectionnez le module et le formulaire associés
+                  </p>
                 </div>
 
                 <div>
