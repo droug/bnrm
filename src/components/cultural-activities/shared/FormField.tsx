@@ -1,10 +1,10 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useRef, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { ChevronDown, Check } from "lucide-react";
 
 interface BaseFieldProps {
   label: string;
@@ -160,6 +160,25 @@ export const SelectField = ({
   placeholder,
   disabled
 }: SelectFieldProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Fermer le dropdown quand on clique à l'extérieur
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen]);
+
+  const selectedOption = options.find(opt => opt.value === value);
+
   return (
     <FieldWrapper
       label={label}
@@ -168,23 +187,54 @@ export const SelectField = ({
       error={error}
       className={className}
     >
-      <Select value={value} onValueChange={onChange} disabled={disabled}>
-        <SelectTrigger 
+      <div ref={containerRef} className="relative">
+        {/* Bouton de sélection */}
+        <button
+          type="button"
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          disabled={disabled}
           className={cn(
-            "bg-background",
-            error && "border-destructive"
+            "w-full flex items-center justify-between rounded-md border bg-background px-3 py-2 text-sm",
+            "hover:bg-accent/50 transition-colors",
+            "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+            error && "border-destructive",
+            disabled && "opacity-50 cursor-not-allowed",
+            !selectedOption && "text-muted-foreground"
           )}
         >
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent className="bg-background">
-          {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+          <span>{selectedOption ? selectedOption.label : placeholder}</span>
+          <ChevronDown className={cn(
+            "h-4 w-4 transition-transform",
+            isOpen && "transform rotate-180"
+          )} />
+        </button>
+
+        {/* Liste des options */}
+        {isOpen && !disabled && (
+          <div className="absolute top-full mt-1 w-full bg-background border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+            {options.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  onChange(option.value);
+                  setIsOpen(false);
+                }}
+                className={cn(
+                  "w-full flex items-center justify-between px-3 py-2 text-sm text-left",
+                  "hover:bg-accent transition-colors",
+                  value === option.value && "bg-accent/50 font-medium"
+                )}
+              >
+                <span>{option.label}</span>
+                {value === option.value && (
+                  <Check className="h-4 w-4" />
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </FieldWrapper>
   );
 };
