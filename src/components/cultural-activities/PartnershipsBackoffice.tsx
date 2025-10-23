@@ -35,6 +35,8 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import jsPDF from "jspdf";
+import { addBNRMHeader, addBNRMFooter } from "@/lib/pdfHeaderUtils";
 
 interface Partnership {
   id: string;
@@ -215,40 +217,111 @@ const PartnershipsBackoffice = () => {
   const generateLetter = async (type: 'approval' | 'rejection') => {
     if (!selectedPartnership) return;
 
-    const letterContent = type === 'approval'
-      ? `LETTRE DE CONFIRMATION DE PARTENARIAT\n\n` +
-        `Date: ${format(new Date(), 'dd MMMM yyyy', { locale: fr })}\n\n` +
-        `Madame, Monsieur,\n\n` +
-        `Nous avons le plaisir de vous informer que votre demande de partenariat avec la Bibliothèque Nationale du Royaume du Maroc a été approuvée.\n\n` +
-        `Organisme: ${selectedPartnership.nom_organisme}\n` +
-        `Objet du partenariat: ${selectedPartnership.objet_partenariat}\n` +
-        `Type: ${selectedPartnership.type_partenariat}\n\n` +
-        `Nous vous contacterons prochainement pour finaliser les détails de notre collaboration.\n\n` +
-        `Cordialement,\n` +
-        `La Direction de la BNRM`
-      : `LETTRE DE REJET DE DEMANDE DE PARTENARIAT\n\n` +
-        `Date: ${format(new Date(), 'dd MMMM yyyy', { locale: fr })}\n\n` +
-        `Madame, Monsieur,\n\n` +
-        `Nous accusons réception de votre demande de partenariat. Malheureusement, nous ne pouvons donner suite à votre demande pour la raison suivante:\n\n` +
-        `${rejectReason}\n\n` +
-        `Nous vous remercions de l'intérêt que vous portez à la Bibliothèque Nationale du Royaume du Maroc.\n\n` +
-        `Cordialement,\n` +
-        `La Direction de la BNRM`;
+    const doc = new jsPDF();
+    
+    try {
+      // Ajouter l'en-tête BNRM
+      const startY = await addBNRMHeader(doc);
+      let currentY = startY + 10;
 
-    const blob = new Blob([letterContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `lettre_${type}_${selectedPartnership.nom_organisme.replace(/\s+/g, '_')}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      // Titre du document
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      const title = type === 'approval' 
+        ? "LETTRE DE CONFIRMATION DE PARTENARIAT"
+        : "LETTRE DE REJET DE DEMANDE DE PARTENARIAT";
+      doc.text(title, 105, currentY, { align: 'center' });
+      currentY += 15;
 
-    toast({
-      title: "Lettre générée",
-      description: "La lettre a été téléchargée avec succès",
-    });
+      // Date
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Rabat, le ${format(new Date(), 'dd MMMM yyyy', { locale: fr })}`, 20, currentY);
+      currentY += 15;
+
+      // Destinataire
+      doc.setFont("helvetica", "bold");
+      doc.text(`À l'attention de : ${selectedPartnership.nom_organisme}`, 20, currentY);
+      currentY += 10;
+
+      // Corps de la lettre
+      doc.setFont("helvetica", "normal");
+      doc.text("Madame, Monsieur,", 20, currentY);
+      currentY += 10;
+
+      const maxWidth = 170;
+      
+      if (type === 'approval') {
+        const text1 = "Nous avons le plaisir de vous informer que votre demande de partenariat avec la Bibliothèque Nationale du Royaume du Maroc a été approuvée.";
+        const lines1 = doc.splitTextToSize(text1, maxWidth);
+        doc.text(lines1, 20, currentY);
+        currentY += lines1.length * 7 + 10;
+
+        // Détails du partenariat
+        doc.setFont("helvetica", "bold");
+        doc.text("Détails du partenariat :", 20, currentY);
+        currentY += 7;
+        
+        doc.setFont("helvetica", "normal");
+        doc.text(`• Organisme : ${selectedPartnership.nom_organisme}`, 20, currentY);
+        currentY += 7;
+        doc.text(`• Objet : ${selectedPartnership.objet_partenariat}`, 20, currentY);
+        currentY += 7;
+        doc.text(`• Type : ${selectedPartnership.type_partenariat}`, 20, currentY);
+        currentY += 7;
+        doc.text(`• Période : du ${format(new Date(selectedPartnership.date_debut), 'dd/MM/yyyy')} au ${format(new Date(selectedPartnership.date_fin), 'dd/MM/yyyy')}`, 20, currentY);
+        currentY += 12;
+
+        const text2 = "Nous vous contacterons prochainement pour finaliser les détails de notre collaboration et organiser une réunion de lancement.";
+        const lines2 = doc.splitTextToSize(text2, maxWidth);
+        doc.text(lines2, 20, currentY);
+        currentY += lines2.length * 7;
+      } else {
+        const text1 = "Nous accusons réception de votre demande de partenariat. Après étude approfondie de votre dossier, nous sommes au regret de vous informer que nous ne pouvons donner suite à votre demande pour la raison suivante :";
+        const lines1 = doc.splitTextToSize(text1, maxWidth);
+        doc.text(lines1, 20, currentY);
+        currentY += lines1.length * 7 + 10;
+
+        doc.setFont("helvetica", "italic");
+        const reasonLines = doc.splitTextToSize(rejectReason, maxWidth - 10);
+        doc.text(reasonLines, 25, currentY);
+        currentY += reasonLines.length * 7 + 10;
+
+        doc.setFont("helvetica", "normal");
+        const text2 = "Nous vous remercions de l'intérêt que vous portez à la Bibliothèque Nationale du Royaume du Maroc et restons ouverts à d'autres opportunités de collaboration.";
+        const lines2 = doc.splitTextToSize(text2, maxWidth);
+        doc.text(lines2, 20, currentY);
+        currentY += lines2.length * 7;
+      }
+
+      currentY += 15;
+      doc.text("Nous vous prions d'agréer, Madame, Monsieur, l'expression de nos salutations distinguées.", 20, currentY);
+      currentY += 15;
+
+      // Signature
+      doc.setFont("helvetica", "bold");
+      doc.text("Le Directeur de la BNRM", 20, currentY);
+      doc.text("Département des Activités Culturelles", 20, currentY + 7);
+
+      // Pied de page
+      addBNRMFooter(doc, 1);
+
+      // Télécharger le PDF
+      const fileName = `Lettre_${type === 'approval' ? 'Acceptation' : 'Refus'}_Partenariat_${selectedPartnership.nom_organisme.replace(/\s+/g, '_')}.pdf`;
+      doc.save(fileName);
+
+      toast({
+        title: "Lettre générée",
+        description: "La lettre PDF a été téléchargée avec succès",
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer la lettre PDF",
+        variant: "destructive",
+      });
+    }
   };
 
   const closeDialog = () => {
