@@ -5,7 +5,7 @@ import CulturalActivitiesDashboard from "@/components/cultural-activities/Cultur
 import SpaceReservationsBackoffice from "@/components/cultural-activities/SpaceReservationsBackoffice";
 import GuidedToursBackoffice from "@/components/cultural-activities/GuidedToursBackoffice";
 import PartnershipsBackoffice from "@/components/cultural-activities/PartnershipsBackoffice";
-import ProgramContributionsBackoffice from "@/components/cultural-activities/ProgramContributionsBackoffice";
+import { CulturalProgrammingTab } from "@/components/cultural-activities/CulturalProgrammingTab";
 
 const CulturalActivitiesBackoffice = () => {
   return (
@@ -48,7 +48,7 @@ const CulturalActivitiesBackoffice = () => {
           </TabsContent>
 
           <TabsContent value="programming">
-            <ProgramContributionsBackoffice />
+            <CulturalProgrammingTab />
           </TabsContent>
         </Tabs>
       </div>

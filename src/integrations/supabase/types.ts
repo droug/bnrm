@@ -1275,6 +1275,90 @@ export type Database = {
           },
         ]
       }
+      cultural_program_proposals: {
+        Row: {
+          activity_type: string
+          budget_estimate: number | null
+          committee_comments: string | null
+          committee_signature: string | null
+          created_at: string
+          description: string | null
+          duration_hours: number | null
+          equipment_needs: string | null
+          expected_attendees: number | null
+          id: string
+          proposal_number: string
+          proposed_date: string
+          proposed_time: string | null
+          requester_email: string
+          requester_id: string
+          requester_name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          signed_at: string | null
+          signed_by: string | null
+          space_requirements: string | null
+          status: string
+          title: string
+          updated_at: string
+          validation_notes: string | null
+        }
+        Insert: {
+          activity_type: string
+          budget_estimate?: number | null
+          committee_comments?: string | null
+          committee_signature?: string | null
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          equipment_needs?: string | null
+          expected_attendees?: number | null
+          id?: string
+          proposal_number: string
+          proposed_date: string
+          proposed_time?: string | null
+          requester_email: string
+          requester_id: string
+          requester_name: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          signed_at?: string | null
+          signed_by?: string | null
+          space_requirements?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          validation_notes?: string | null
+        }
+        Update: {
+          activity_type?: string
+          budget_estimate?: number | null
+          committee_comments?: string | null
+          committee_signature?: string | null
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          equipment_needs?: string | null
+          expected_attendees?: number | null
+          id?: string
+          proposal_number?: string
+          proposed_date?: string
+          proposed_time?: string | null
+          requester_email?: string
+          requester_id?: string
+          requester_name?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          signed_at?: string | null
+          signed_by?: string | null
+          space_requirements?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          validation_notes?: string | null
+        }
+        Relationships: []
+      }
       cultural_spaces: {
         Row: {
           allows_half_day: boolean | null
@@ -6860,6 +6944,7 @@ export type Database = {
       generate_content_slug: { Args: { title: string }; Returns: string }
       generate_deposit_number: { Args: never; Returns: string }
       generate_program_contribution_reference: { Args: never; Returns: string }
+      generate_proposal_number: { Args: never; Returns: string }
       generate_reproduction_request_number: { Args: never; Returns: string }
       generate_request_number: { Args: never; Returns: string }
       generate_transaction_number: { Args: never; Returns: string }
