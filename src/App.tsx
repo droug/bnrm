@@ -152,6 +152,7 @@ const CulturalActivitiesVisites = lazy(() => import("./pages/cultural-activities
 const CulturalActivitiesPartenariats = lazy(() => import("./pages/cultural-activities/Partenariats"));
 const CulturalActivitiesProgrammation = lazy(() => import("./pages/cultural-activities/Programmation"));
 const CulturalActivitiesTemplates = lazy(() => import("./pages/cultural-activities/Templates"));
+const CulturalSpacesManagement = lazy(() => import("./pages/CulturalSpacesManagement"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -317,6 +318,7 @@ const App = () => (
           <Route path="/admin/activites-culturelles/partenariats" element={<CulturalActivitiesPartenariats />} />
           <Route path="/admin/activites-culturelles/programmation" element={<CulturalActivitiesProgrammation />} />
           <Route path="/admin/activites-culturelles/templates" element={<CulturalActivitiesTemplates />} />
+          <Route path="/admin/activites-culturelles/espaces" element={<CulturalSpacesManagement />} />
           <Route path="/admin/cultural-activities" element={<CulturalActivitiesBackoffice />} />
           <Route path="/admin/partenariats" element={<PartnershipsBackofficePage />} />
           <Route path="/admin/partnerships" element={<PartnershipsBackofficePage />} />
