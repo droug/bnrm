@@ -6,12 +6,14 @@ import { Separator } from "@/components/ui/separator";
 import { 
   Settings as SettingsIcon, 
   ArrowLeft,
-  Key
+  Key,
+  Users
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { PermissionsManager } from "@/components/PermissionsManager";
+import { WorkflowRolesManager } from "@/components/workflow/WorkflowRolesManager";
 
 const SettingsPage = () => {
   const { profile } = useAuth();
@@ -69,9 +71,28 @@ const SettingsPage = () => {
                 </div>
               </div>
 
-              {/* Permissions Management */}
+              {/* Permissions & Roles Management */}
               <Card className="shadow-soft">
-                <PermissionsManager />
+                <Tabs defaultValue="permissions" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-6">
+                    <TabsTrigger value="permissions" className="flex items-center gap-2">
+                      <Key className="h-4 w-4" />
+                      Permissions
+                    </TabsTrigger>
+                    <TabsTrigger value="roles" className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      Rôles Utilisateurs
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="permissions">
+                    <PermissionsManager />
+                  </TabsContent>
+                  
+                  <TabsContent value="roles">
+                    <WorkflowRolesManager />
+                  </TabsContent>
+                </Tabs>
               </Card>
 
             </div>
