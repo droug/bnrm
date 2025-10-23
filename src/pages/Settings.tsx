@@ -7,13 +7,15 @@ import {
   Settings as SettingsIcon, 
   ArrowLeft,
   Key,
-  Users
+  Users,
+  Plus
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { PermissionsManager } from "@/components/PermissionsManager";
 import { WorkflowRolesManager } from "@/components/workflow/WorkflowRolesManager";
+import { RoleCreator } from "@/components/workflow/RoleCreator";
 
 const SettingsPage = () => {
   const { profile } = useAuth();
@@ -74,19 +76,27 @@ const SettingsPage = () => {
               {/* Permissions & Roles Management */}
               <Card className="shadow-soft">
                 <Tabs defaultValue="permissions" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsList className="grid w-full grid-cols-3 mb-6">
                     <TabsTrigger value="permissions" className="flex items-center gap-2">
                       <Key className="h-4 w-4" />
                       Permissions
                     </TabsTrigger>
+                    <TabsTrigger value="create-role" className="flex items-center gap-2">
+                      <Plus className="h-4 w-4" />
+                      Créer un Rôle
+                    </TabsTrigger>
                     <TabsTrigger value="roles" className="flex items-center gap-2">
                       <Users className="h-4 w-4" />
-                      Rôles Utilisateurs
+                      Attribuer Rôles
                     </TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="permissions">
                     <PermissionsManager />
+                  </TabsContent>
+                  
+                  <TabsContent value="create-role">
+                    <RoleCreator />
                   </TabsContent>
                   
                   <TabsContent value="roles">
