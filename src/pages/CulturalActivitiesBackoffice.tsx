@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Users, Handshake, FileText, BarChart3, FileType, ArrowRight } from "lucide-react";
+import { Calendar, Users, Handshake, FileText, BarChart3, FileType, ArrowRight, List, Building2, DollarSign, Globe, Wrench, UserCog, FolderTree, Settings } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const CulturalActivitiesBackoffice = () => {
@@ -79,9 +79,64 @@ const CulturalActivitiesBackoffice = () => {
       title: "Modèles de documents",
       description: "Génération automatique de documents",
       icon: FileType,
-      path: "/admin/activites-culturelles",
-      color: "bg-gradient-to-br from-indigo-500 to-indigo-600",
-      isTab: true
+      path: "/admin/activites-culturelles/templates",
+      color: "bg-gradient-to-br from-indigo-500 to-indigo-600"
+    },
+    {
+      title: "Systèmes de listes",
+      description: "Gestion des listes déroulantes et options",
+      icon: List,
+      path: "/admin/activites-culturelles/listes",
+      color: "bg-gradient-to-br from-cyan-500 to-cyan-600"
+    },
+    {
+      title: "Espaces et salles",
+      description: "Configuration des espaces disponibles",
+      icon: Building2,
+      path: "/admin/activites-culturelles/espaces",
+      color: "bg-gradient-to-br from-teal-500 to-teal-600"
+    },
+    {
+      title: "Tarifications et charges",
+      description: "Gestion des tarifs et frais",
+      icon: DollarSign,
+      path: "/admin/activites-culturelles/tarifications",
+      color: "bg-gradient-to-br from-emerald-500 to-emerald-600"
+    },
+    {
+      title: "Langues",
+      description: "Configuration des langues disponibles",
+      icon: Globe,
+      path: "/admin/activites-culturelles/langues",
+      color: "bg-gradient-to-br from-sky-500 to-sky-600"
+    },
+    {
+      title: "Types d'activités",
+      description: "Gestion des types d'activités et équipements",
+      icon: Wrench,
+      path: "/admin/activites-culturelles/types-activites",
+      color: "bg-gradient-to-br from-violet-500 to-violet-600"
+    },
+    {
+      title: "Profils et rôles",
+      description: "Configuration des profils utilisateurs",
+      icon: UserCog,
+      path: "/admin/activites-culturelles/profils-roles",
+      color: "bg-gradient-to-br from-fuchsia-500 to-fuchsia-600"
+    },
+    {
+      title: "Catégories générales",
+      description: "Gestion des catégories transversales",
+      icon: FolderTree,
+      path: "/admin/activites-culturelles/categories",
+      color: "bg-gradient-to-br from-rose-500 to-rose-600"
+    },
+    {
+      title: "Règles système",
+      description: "Variables et règles de fonctionnement",
+      icon: Settings,
+      path: "/admin/activites-culturelles/regles-systeme",
+      color: "bg-gradient-to-br from-amber-500 to-amber-600"
     }
   ];
 

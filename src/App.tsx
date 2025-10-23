@@ -53,7 +53,6 @@ const AccessRequestsManagement = lazy(() => import("./pages/AccessRequestsManage
 const EmailManagement = lazy(() => import("./pages/EmailManagement"));
 const SystemListsPage = lazy(() => import("./pages/SystemListsPage"));
 const WorkflowBPM = lazy(() => import("./pages/WorkflowBPM"));
-const ParametragePage = lazy(() => import("./pages/ParametragePage"));
 
 // BNRM Portal (lazy)
 const BNRMPortal = lazy(() => import("./pages/BNRMPortal"));
@@ -343,10 +342,6 @@ const App = () => (
         {/* System Lists Management */}
         <Route path="/admin/system-lists" element={<SystemListsPage />} />
         <Route path="/admin/listes-systeme" element={<SystemListsPage />} />
-
-        {/* Configuration & Paramétrage */}
-        <Route path="/admin/parametrage" element={<ParametragePage />} />
-        <Route path="/admin/configuration" element={<ParametragePage />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
