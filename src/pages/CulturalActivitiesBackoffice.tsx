@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Users, Handshake, FileText, BarChart3, FileType, ArrowRight, List, Building2, DollarSign, Globe, Wrench, UserCog, FolderTree, Settings } from "lucide-react";
+import { Calendar, Users, Handshake, FileText, BarChart3, FileType, ArrowRight, Building2, DollarSign, Globe, Wrench, UserCog, FolderTree, Settings } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const CulturalActivitiesBackoffice = () => {
@@ -81,13 +81,6 @@ const CulturalActivitiesBackoffice = () => {
       icon: FileType,
       path: "/admin/activites-culturelles/templates",
       color: "bg-gradient-to-br from-indigo-500 to-indigo-600"
-    },
-    {
-      title: "Systèmes de listes",
-      description: "Gestion des listes déroulantes et options",
-      icon: List,
-      path: "/admin/activites-culturelles/listes",
-      color: "bg-gradient-to-br from-cyan-500 to-cyan-600"
     },
     {
       title: "Espaces et salles",
