@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Edit, Trash2, DollarSign, Tag, Settings } from "lucide-react";
+import { Plus, Edit, Trash2, DollarSign, Tag, Settings, Lightbulb } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/cultural-activities/shared/PageHeader";
 import { FormDialog } from "@/components/cultural-activities/shared/FormDialog";
@@ -317,6 +317,162 @@ const CulturalTariffsManagement = () => {
     return (ht * (1 + tva / 100)).toFixed(2);
   };
 
+  const loadExampleTariffs = async () => {
+    const examples = [
+      {
+        tariff_name: "Tarif location salle conférence journée complète",
+        space_type: "salle",
+        calculation_base: "jour",
+        amount_ht: 3000,
+        tva_rate: 20,
+        is_active: true,
+        applies_to_public: true,
+        applies_to_private: true,
+        description: "Tarif pour une journée complète (8h-20h) incluant l'accès à la salle et l'équipement de base"
+      },
+      {
+        tariff_name: "Tarif location salle conférence demi-journée",
+        space_type: "salle",
+        calculation_base: "demi_jour",
+        amount_ht: 1800,
+        tva_rate: 20,
+        is_active: true,
+        applies_to_public: true,
+        applies_to_private: true,
+        description: "Tarif pour une demi-journée (4h) incluant l'accès à la salle et l'équipement de base"
+      },
+      {
+        tariff_name: "Tarif exposition événementiel - Jour",
+        space_type: "exposition",
+        calculation_base: "jour",
+        amount_ht: 2500,
+        tva_rate: 20,
+        is_active: true,
+        applies_to_public: false,
+        applies_to_private: true,
+        description: "Tarif journalier pour événement dans l'espace exposition"
+      },
+      {
+        tariff_name: "Tarif location auditorium - Heure",
+        space_type: "salle",
+        calculation_base: "heure",
+        amount_ht: 500,
+        tva_rate: 20,
+        is_active: true,
+        applies_to_public: true,
+        applies_to_private: true,
+        description: "Tarif horaire pour l'auditorium avec système de sonorisation"
+      },
+      {
+        tariff_name: "Tarif location espace extérieur - Événement",
+        space_type: "autre",
+        calculation_base: "événement",
+        amount_ht: 5000,
+        tva_rate: 20,
+        is_active: true,
+        applies_to_public: false,
+        applies_to_private: true,
+        description: "Forfait pour événement dans l'espace extérieur"
+      }
+    ];
+
+    try {
+      const { error } = await supabase
+        .from('cultural_activity_tariffs')
+        .insert(examples);
+
+      if (error) throw error;
+
+      toast({
+        title: "Exemples chargés",
+        description: `${examples.length} tarifications d'exemple ont été ajoutées`,
+      });
+
+      fetchTariffs();
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const loadExampleRules = async () => {
+    if (tariffs.length === 0) {
+      toast({
+        title: "Information",
+        description: "Veuillez d'abord créer ou charger des tarifications",
+        variant: "default",
+      });
+      return;
+    }
+
+    const examples = [
+      {
+        tariff_id: tariffs[0].id,
+        rule_name: "Réduction organismes étatiques",
+        condition_type: "organisme_type",
+        condition_value: { type: "etatique" },
+        discount_type: "percentage",
+        discount_value: 30,
+        is_active: true,
+        priority: 10
+      },
+      {
+        tariff_id: tariffs[0].id,
+        rule_name: "Réduction associations à but non lucratif",
+        condition_type: "organisme_type",
+        condition_value: { type: "association" },
+        discount_type: "percentage",
+        discount_value: 20,
+        is_active: true,
+        priority: 8
+      },
+      {
+        tariff_id: tariffs[0].id,
+        rule_name: "Supplément week-end",
+        condition_type: "periode",
+        condition_value: { jours: ["samedi", "dimanche"] },
+        discount_type: "percentage",
+        discount_value: -15,
+        is_active: true,
+        priority: 5
+      },
+      {
+        tariff_id: tariffs[0].id,
+        rule_name: "Réduction réservation longue durée (>3 jours)",
+        condition_type: "duree",
+        condition_value: { min_jours: 3 },
+        discount_type: "percentage",
+        discount_value: 25,
+        is_active: true,
+        priority: 7
+      }
+    ];
+
+    try {
+      const { error } = await supabase
+        .from('tariff_conditional_rules')
+        .insert(examples);
+
+      if (error) throw error;
+
+      toast({
+        title: "Exemples chargés",
+        description: `${examples.length} règles conditionnelles d'exemple ont été ajoutées`,
+      });
+
+      fetchRules();
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -360,10 +516,16 @@ const CulturalTariffsManagement = () => {
                       Gérez les tarifs pour les espaces et services
                     </p>
                   </div>
-                  <Button onClick={() => { resetTariffForm(); setIsAddTariffDialogOpen(true); }}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Ajouter une tarification
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={loadExampleTariffs}>
+                      <Lightbulb className="w-4 h-4 mr-2" />
+                      Charger des exemples
+                    </Button>
+                    <Button onClick={() => { resetTariffForm(); setIsAddTariffDialogOpen(true); }}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Ajouter une tarification
+                    </Button>
+                  </div>
                 </div>
 
                 {loading ? (
@@ -464,6 +626,10 @@ const CulturalTariffsManagement = () => {
                       Définissez des réductions selon des critères spécifiques
                     </p>
                   </div>
+                  <Button variant="outline" onClick={loadExampleRules}>
+                    <Lightbulb className="w-4 h-4 mr-2" />
+                    Charger des exemples
+                  </Button>
                 </div>
 
                 {rules.length === 0 ? (
