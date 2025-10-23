@@ -23,6 +23,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { addBNRMHeaderToPDF } from "@/utils/pdfHeader";
 
 interface CulturalSpace {
   id: string;
@@ -347,13 +348,14 @@ const CulturalSpacesManagement = () => {
   };
 
   const exportSpacePDF = (space: CulturalSpace) => {
-    const doc = new jsPDF();
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
     
-    doc.setFontSize(18);
-    doc.text(`Fiche Espace - ${space.name}`, 14, 20);
-    
-    doc.setFontSize(11);
-    let y = 35;
+    // Ajouter l'en-tête professionnel BNRM
+    let y = addBNRMHeaderToPDF(doc, `Fiche Espace - ${space.name}`);
 
     const addLine = (label: string, value: string) => {
       doc.text(`${label}: ${value}`, 14, y);
