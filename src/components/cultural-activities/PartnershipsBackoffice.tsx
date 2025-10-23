@@ -56,6 +56,8 @@ interface Partnership {
   moyens_organisme: string;
   moyens_bnrm: string;
   representants: any;
+  statut_document_url?: string;
+  programme_url?: string;
 }
 
 const PartnershipsBackoffice = () => {
@@ -552,6 +554,48 @@ const PartnershipsBackoffice = () => {
                   </div>
                 </div>
               )}
+
+              {/* Documents joints */}
+              <div>
+                <Label className="text-[#333333]/70 mb-2 block">Documents joints</Label>
+                <div className="space-y-2">
+                  {selectedPartnership.statut_document_url ? (
+                    <a 
+                      href={selectedPartnership.statut_document_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 p-3 bg-[#FAF9F5] border border-[#333333]/10 rounded-lg hover:bg-[#D4AF37]/5 transition-colors"
+                    >
+                      <FileText className="h-5 w-5 text-[#D4AF37]" />
+                      <span className="text-sm font-medium text-[#333333]">Statut juridique</span>
+                      <Download className="h-4 w-4 ml-auto text-[#333333]/60" />
+                    </a>
+                  ) : (
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                      <FileText className="h-5 w-5 text-gray-400" />
+                      <span className="text-sm text-gray-500">Statut juridique - Non fourni</span>
+                    </div>
+                  )}
+
+                  {selectedPartnership.programme_url ? (
+                    <a 
+                      href={selectedPartnership.programme_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 p-3 bg-[#FAF9F5] border border-[#333333]/10 rounded-lg hover:bg-[#D4AF37]/5 transition-colors"
+                    >
+                      <FileText className="h-5 w-5 text-[#D4AF37]" />
+                      <span className="text-sm font-medium text-[#333333]">Programme détaillé</span>
+                      <Download className="h-4 w-4 ml-auto text-[#333333]/60" />
+                    </a>
+                  ) : (
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                      <FileText className="h-5 w-5 text-gray-400" />
+                      <span className="text-sm text-gray-500">Programme - Non fourni</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </DialogContent>
