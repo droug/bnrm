@@ -70,8 +70,32 @@ export const SystemListsManager = () => {
   }, [selectedList]);
 
   useEffect(() => {
-    // Extraire les combinaisons uniques de module + formulaire
+    // Définir les modules disponibles (même sans listes existantes)
+    const predefinedModules = [
+      { module: "Activités Culturelles", form: "Réservation d'espaces" },
+      { module: "Activités Culturelles", form: "Visites guidées" },
+      { module: "Activités Culturelles", form: "Partenariats" },
+      { module: "Activités Culturelles", form: "Programmation culturelle" },
+      { module: "CBM", form: "Gestion adhésions" },
+      { module: "CBM", form: "Plan d'actions" },
+      { module: "Dépôt Légal", form: "Demande dépôt" },
+      { module: "Bibliothèque Numérique", form: "Réservation documents" },
+      { module: "Bibliothèque Numérique", form: "Demande numérisation" },
+      { module: "Manuscrits", form: "Demande d'accès" },
+      { module: "Reproduction", form: "Demande reproduction" },
+      { module: "BNRM", form: "Services généraux" }
+    ];
+
+    // Extraire les combinaisons uniques de module + formulaire depuis les listes existantes
     const uniqueCombinations = new Map<string, { module: string; form: string }>();
+    
+    // Ajouter d'abord les modules prédéfinis
+    predefinedModules.forEach(({ module, form }) => {
+      const key = `${module}|${form}`;
+      uniqueCombinations.set(key, { module, form });
+    });
+    
+    // Ajouter ensuite les combinaisons depuis les listes existantes
     lists.forEach(list => {
       if (list.module && list.form_name) {
         const key = `${list.module}|${list.form_name}`;
