@@ -120,7 +120,7 @@ export const DocumentTemplatesManagement = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setTemplates((data || []).map(t => ({
+      setTemplates((data as any || []).map((t: any) => ({
         ...t,
         file_url: t.file_url || null,
         workflow_id: t.workflow_id || null,
@@ -581,6 +581,136 @@ export const DocumentTemplatesManagement = () => {
                     { value: "programmation", label: "Programmation" },
                   ]}
                 />
+              </div>
+            </div>
+
+            {/* Upload de fichier modèle */}
+            <div className="border rounded-lg p-4 bg-muted/20">
+              <div className="flex items-center gap-2 mb-3">
+                <Upload className="h-5 w-5 text-primary" />
+                <Label className="text-base font-semibold">Fichier modèle (optionnel)</Label>
+              </div>
+              <div className="space-y-2">
+                <Input
+                  type="file"
+                  accept=".docx,.pdf,.odt,.txt"
+                  onChange={handleFileUpload}
+                  disabled={uploading}
+                  className="cursor-pointer"
+                />
+                {uploading && <p className="text-sm text-muted-foreground">Upload en cours...</p>}
+                {formData.file_url && (
+                  <div className="flex items-center gap-2 text-sm text-green-600">
+                    <FileText className="h-4 w-4" />
+                    <span>Fichier uploadé avec succès</span>
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Formats acceptés : DOCX, PDF, ODT, TXT
+                </p>
+              </div>
+            </div>
+
+            {/* Association au workflow */}
+            <div>
+              <Label>Association au workflow (optionnel)</Label>
+              <CustomSelect
+                value={formData.workflow_id || "none"}
+                onValueChange={(value) => setFormData({ ...formData, workflow_id: value === "none" ? null : value })}
+                options={[
+                  { value: "none", label: "Aucun workflow" },
+                  ...workflows.map((w) => ({
+                    value: w.workflow_id,
+                    label: w.step_name
+                  }))
+                ]}
+              />
+              <p className="text-sm text-muted-foreground mt-2">
+                Exemple : "Lettre de confirmation – Réservation d'espace"
+              </p>
+            </div>
+
+            {/* Gestion des variables dynamiques */}
+            <div className="border rounded-lg p-4 space-y-4 bg-muted/20">
+              <div className="flex items-center gap-2">
+                <Tag className="h-5 w-5 text-primary" />
+                <Label className="text-base font-semibold">Variables dynamiques (placeholders)</Label>
+              </div>
+              
+              {/* Liste des variables existantes */}
+              {variables.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Variables définies :</p>
+                  <div className="space-y-2">
+                    {variables.map((v, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-3 bg-background rounded-md border">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
+                              {`{{${v.name}}}`}
+                            </code>
+                            {v.required && <Badge variant="secondary">Requis</Badge>}
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => insertVariable(v.name)}
+                              className="h-6"
+                            >
+                              Insérer
+                            </Button>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">{v.description}</p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => removeVariable(idx)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Ajouter une nouvelle variable */}
+              <div className="space-y-3 pt-3 border-t">
+                <p className="text-sm font-medium">Ajouter une variable :</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Input
+                      placeholder="Nom (ex: date_reservation)"
+                      value={newVariable.name}
+                      onChange={(e) => setNewVariable({ ...newVariable, name: e.target.value })}
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Description (ex: Date de la réservation)"
+                      value={newVariable.description}
+                      onChange={(e) => setNewVariable({ ...newVariable, description: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="variable_required"
+                      checked={newVariable.required}
+                      onChange={(e) => setNewVariable({ ...newVariable, required: e.target.checked })}
+                      className="rounded"
+                    />
+                    <Label htmlFor="variable_required" className="text-sm">Variable requise</Label>
+                  </div>
+                  <Button onClick={addVariable} size="sm">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Ajouter
+                  </Button>
+                </div>
               </div>
             </div>
 

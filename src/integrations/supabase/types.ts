@@ -1713,6 +1713,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           document_type: string
+          file_url: string | null
           footer_content: string | null
           header_content: string | null
           id: string
@@ -1723,12 +1724,14 @@ export type Database = {
           template_name: string
           updated_at: string
           variables: Json | null
+          workflow_id: string | null
         }
         Insert: {
           content_template: string
           created_at?: string
           created_by?: string | null
           document_type: string
+          file_url?: string | null
           footer_content?: string | null
           header_content?: string | null
           id?: string
@@ -1739,12 +1742,14 @@ export type Database = {
           template_name: string
           updated_at?: string
           variables?: Json | null
+          workflow_id?: string | null
         }
         Update: {
           content_template?: string
           created_at?: string
           created_by?: string | null
           document_type?: string
+          file_url?: string | null
           footer_content?: string | null
           header_content?: string | null
           id?: string
@@ -1755,6 +1760,7 @@ export type Database = {
           template_name?: string
           updated_at?: string
           variables?: Json | null
+          workflow_id?: string | null
         }
         Relationships: []
       }
