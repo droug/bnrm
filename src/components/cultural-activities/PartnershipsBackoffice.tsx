@@ -383,7 +383,7 @@ const PartnershipsBackoffice = () => {
                   <TableHead className="text-[#333333] font-semibold">Type</TableHead>
                   <TableHead className="text-[#333333] font-semibold">Objet</TableHead>
                   <TableHead className="text-[#333333] font-semibold">Statut</TableHead>
-                  <TableHead className="text-[#333333] font-semibold">Date</TableHead>
+                  <TableHead className="text-[#333333] font-semibold">Période</TableHead>
                   <TableHead className="text-[#333333] font-semibold text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -407,8 +407,8 @@ const PartnershipsBackoffice = () => {
                         {partnership.objet_partenariat}
                       </TableCell>
                       <TableCell>{getStatusBadge(partnership.statut)}</TableCell>
-                      <TableCell className="text-[#333333]/80">
-                        {format(new Date(partnership.created_at), 'dd/MM/yyyy', { locale: fr })}
+                      <TableCell className="text-[#333333]/80 text-sm">
+                        {format(new Date(partnership.date_debut), 'dd/MM/yyyy', { locale: fr })} - {format(new Date(partnership.date_fin), 'dd/MM/yyyy', { locale: fr })}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
