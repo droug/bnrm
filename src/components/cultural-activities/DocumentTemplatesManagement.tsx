@@ -28,7 +28,11 @@ import {
   Edit, 
   Eye,
   Plus,
-  Trash2
+  Trash2,
+  Upload,
+  Tag,
+  FileText,
+  X
 } from "lucide-react";
 
 interface DocumentTemplate {
@@ -45,15 +49,25 @@ interface DocumentTemplate {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  file_url: string | null;
+  workflow_id: string | null;
+}
+
+interface TemplateVariable {
+  name: string;
+  description: string;
+  required: boolean;
 }
 
 export const DocumentTemplatesManagement = () => {
   const [templates, setTemplates] = useState<DocumentTemplate[]>([]);
+  const [workflows, setWorkflows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState<DocumentTemplate | null>(null);
   const [editDialog, setEditDialog] = useState(false);
   const [viewDialog, setViewDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
 
   // Form state
@@ -67,11 +81,36 @@ export const DocumentTemplatesManagement = () => {
     footer_content: "",
     signature_required: true,
     is_active: true,
+    workflow_id: null as string | null,
+    file_url: null as string | null,
+  });
+
+  // Variables state
+  const [variables, setVariables] = useState<TemplateVariable[]>([]);
+  const [newVariable, setNewVariable] = useState<TemplateVariable>({
+    name: "",
+    description: "",
+    required: false
   });
 
   useEffect(() => {
     fetchTemplates();
+    fetchWorkflows();
   }, []);
+
+  const fetchWorkflows = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("workflow_steps_new")
+        .select("workflow_id, step_name")
+        .order("step_name");
+
+      if (error) throw error;
+      setWorkflows(data || []);
+    } catch (error) {
+      console.error("Error fetching workflows:", error);
+    }
+  };
 
   const fetchTemplates = async () => {
     try {
@@ -81,7 +120,11 @@ export const DocumentTemplatesManagement = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setTemplates(data || []);
+      setTemplates((data || []).map(t => ({
+        ...t,
+        file_url: t.file_url || null,
+        workflow_id: t.workflow_id || null,
+      })));
     } catch (error) {
       console.error("Error fetching templates:", error);
       toast({
@@ -106,7 +149,10 @@ export const DocumentTemplatesManagement = () => {
       footer_content: template.footer_content || "",
       signature_required: template.signature_required,
       is_active: template.is_active,
+      workflow_id: template.workflow_id,
+      file_url: template.file_url,
     });
+    setVariables(template.variables ? JSON.parse(JSON.stringify(template.variables)) : []);
     setEditDialog(true);
   };
 
@@ -122,8 +168,88 @@ export const DocumentTemplatesManagement = () => {
       footer_content: "",
       signature_required: true,
       is_active: true,
+      workflow_id: null,
+      file_url: null,
     });
+    setVariables([]);
     setEditDialog(true);
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Vérifier le type de fichier
+    const allowedTypes = ['.docx', '.pdf', '.odt', '.txt'];
+    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+    
+    if (!allowedTypes.includes(fileExtension)) {
+      toast({
+        title: "Format non supporté",
+        description: "Formats acceptés : DOCX, PDF, ODT, TXT",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `templates/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('document-templates')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('document-templates')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, file_url: publicUrl });
+
+      toast({
+        title: "Fichier uploadé",
+        description: "Le fichier modèle a été uploadé avec succès",
+      });
+    } catch (error: any) {
+      console.error("Error uploading file:", error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible d'uploader le fichier",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const addVariable = () => {
+    if (!newVariable.name.trim()) {
+      toast({
+        title: "Attention",
+        description: "Le nom de la variable est requis",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setVariables([...variables, { ...newVariable }]);
+    setNewVariable({ name: "", description: "", required: false });
+  };
+
+  const removeVariable = (index: number) => {
+    setVariables(variables.filter((_, i) => i !== index));
+  };
+
+  const insertVariable = (varName: string) => {
+    const placeholder = `{{${varName}}}`;
+    setFormData({
+      ...formData,
+      content_template: formData.content_template + placeholder
+    });
   };
 
   const handleSave = async () => {
@@ -139,12 +265,17 @@ export const DocumentTemplatesManagement = () => {
 
       const { data: { user } } = await supabase.auth.getUser();
 
+      const templateData = {
+        ...formData,
+        variables: variables.length > 0 ? (variables as any) : null,
+      };
+
       if (selectedTemplate) {
         // Update existing template
         const { error } = await supabase
           .from("document_templates")
           .update({
-            ...formData,
+            ...templateData,
             updated_at: new Date().toISOString(),
           })
           .eq("id", selectedTemplate.id);
@@ -160,7 +291,7 @@ export const DocumentTemplatesManagement = () => {
         const { error } = await supabase
           .from("document_templates")
           .insert({
-            ...formData,
+            ...templateData,
             created_by: user?.id,
           } as any);
 
@@ -174,6 +305,7 @@ export const DocumentTemplatesManagement = () => {
 
       fetchTemplates();
       setEditDialog(false);
+      setVariables([]);
     } catch (error: any) {
       console.error("Error saving template:", error);
       toast({
