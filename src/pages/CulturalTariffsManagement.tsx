@@ -432,7 +432,7 @@ const CulturalTariffsManagement = () => {
       {
         tariff_id: tariffs[0].id,
         rule_name: "Supplément week-end",
-        condition_type: "periode",
+        condition_type: "date_range",
         condition_value: { jours: ["samedi", "dimanche"] },
         discount_type: "percentage",
         discount_value: -15,
@@ -442,7 +442,7 @@ const CulturalTariffsManagement = () => {
       {
         tariff_id: tariffs[0].id,
         rule_name: "Réduction réservation longue durée (>3 jours)",
-        condition_type: "duree",
+        condition_type: "nombre_jours",
         condition_value: { min_jours: 3 },
         discount_type: "percentage",
         discount_value: 25,
