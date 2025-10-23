@@ -44,9 +44,22 @@ export const SystemListsManager = () => {
   const [editingValue, setEditingValue] = useState<SystemListValue | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCreateListDialogOpen, setIsCreateListDialogOpen] = useState(false);
   const [moduleFilter, setModuleFilter] = useState<string>("");
   const [filteredLists, setFilteredLists] = useState<SystemList[]>([]);
   const [openModuleCombo, setOpenModuleCombo] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredValues, setFilteredValues] = useState<SystemListValue[]>([]);
+  const [inlineEditId, setInlineEditId] = useState<string | null>(null);
+  const [inlineEditValue, setInlineEditValue] = useState({ code: "", label: "", order: 0 });
+  const [newListData, setNewListData] = useState({
+    list_name: "",
+    list_code: "",
+    module: "",
+    form_name: "",
+    field_type: "simple",
+    description: ""
+  });
 
   // Créer une liste unique de modules/formulaires
   const moduleFormOptions = Array.from(
@@ -68,6 +81,19 @@ export const SystemListsManager = () => {
       fetchListValues(selectedList);
     }
   }, [selectedList]);
+
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredValues(listValues);
+    } else {
+      const filtered = listValues.filter(
+        (v) =>
+          v.value_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          v.value_label.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredValues(filtered);
+    }
+  }, [searchTerm, listValues]);
 
   useEffect(() => {
     // Définir les modules disponibles (même sans listes existantes)
@@ -263,6 +289,97 @@ export const SystemListsManager = () => {
     }
   };
 
+  const handleCreateList = async () => {
+    if (!newListData.list_name || !newListData.list_code) {
+      toast({
+        title: "Erreur",
+        description: "Le nom et le code interne sont obligatoires",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('system_lists')
+        .insert({
+          list_name: newListData.list_name,
+          list_code: newListData.list_code,
+          module: newListData.module,
+          form_name: newListData.form_name,
+          field_type: newListData.field_type,
+          description: newListData.description,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "Liste créée avec succès",
+      });
+
+      setIsCreateListDialogOpen(false);
+      setNewListData({
+        list_name: "",
+        list_code: "",
+        module: "",
+        form_name: "",
+        field_type: "simple",
+        description: ""
+      });
+      fetchLists();
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const startInlineEdit = (value: SystemListValue) => {
+    setInlineEditId(value.id);
+    setInlineEditValue({
+      code: value.value_code,
+      label: value.value_label,
+      order: value.sort_order
+    });
+  };
+
+  const saveInlineEdit = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('system_list_values')
+        .update({
+          value_code: inlineEditValue.code,
+          value_label: inlineEditValue.label,
+          sort_order: inlineEditValue.order,
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "Valeur modifiée avec succès",
+      });
+
+      setInlineEditId(null);
+      if (selectedList) fetchListValues(selectedList);
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const cancelInlineEdit = () => {
+    setInlineEditId(null);
+    setInlineEditValue({ code: "", label: "", order: 0 });
+  };
+
   const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!selectedList) {
       toast({
@@ -345,12 +462,104 @@ export const SystemListsManager = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>🗂️ Gestion des Systèmes de listes</CardTitle>
-        <CardDescription>
-          Gérez toutes les listes déroulantes du système
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>🗂️ Gestion des Systèmes de listes</CardTitle>
+            <CardDescription>
+              Gérez toutes les listes déroulantes du système
+            </CardDescription>
+          </div>
+          <Dialog open={isCreateListDialogOpen} onOpenChange={setIsCreateListDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Créer une nouvelle liste
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-background max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Créer une nouvelle liste système</DialogTitle>
+                <DialogDescription>
+                  Créez une nouvelle liste déroulante paramétrable
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Nom de la liste *</Label>
+                    <Input
+                      value={newListData.list_name}
+                      onChange={(e) => setNewListData({ ...newListData, list_name: e.target.value })}
+                      placeholder="Ex: Type de publication"
+                    />
+                  </div>
+                  <div>
+                    <Label>Code interne (API) *</Label>
+                    <Input
+                      value={newListData.list_code}
+                      onChange={(e) => setNewListData({ ...newListData, list_code: e.target.value })}
+                      placeholder="Ex: type_publication"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Code unique pour la liaison API
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Module</Label>
+                    <Input
+                      value={newListData.module}
+                      onChange={(e) => setNewListData({ ...newListData, module: e.target.value })}
+                      placeholder="Ex: Activités Culturelles"
+                    />
+                  </div>
+                  <div>
+                    <Label>Formulaire</Label>
+                    <Input
+                      value={newListData.form_name}
+                      onChange={(e) => setNewListData({ ...newListData, form_name: e.target.value })}
+                      placeholder="Ex: Réservation d'espaces"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Type de liste</Label>
+                  <Select
+                    value={newListData.field_type}
+                    onValueChange={(value) => setNewListData({ ...newListData, field_type: value })}
+                  >
+                    <SelectTrigger className="bg-background">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background">
+                      <SelectItem value="simple">Liste simple</SelectItem>
+                      <SelectItem value="auto_select">Auto-complétion (Combobox)</SelectItem>
+                      <SelectItem value="hierarchical">Liste hiérarchique</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Description</Label>
+                  <Input
+                    value={newListData.description || ""}
+                    onChange={(e) => setNewListData({ ...newListData, description: e.target.value })}
+                    placeholder="Description de la liste"
+                  />
+                </div>
+
+                <Button onClick={handleCreateList} className="w-full">
+                  Créer la liste
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6">`
         <div className="space-y-4">
           <div>
             <Label>Filtrer les listes par module / formulaire</Label>
@@ -481,69 +690,86 @@ export const SystemListsManager = () => {
 
         {selectedList && (
           <>
-            <div className="flex gap-2">
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Ajouter une valeur
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Ajouter une nouvelle valeur</DialogTitle>
-                    <DialogDescription>
-                      Ajoutez une nouvelle valeur à la liste sélectionnée
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <Label>Code</Label>
-                      <Input
-                        value={newValue.code}
-                        onChange={(e) => setNewValue({ ...newValue, code: e.target.value })}
-                        placeholder="Ex: COR"
-                      />
-                    </div>
-                    <div>
-                      <Label>Libellé</Label>
-                      <Input
-                        value={newValue.label}
-                        onChange={(e) => setNewValue({ ...newValue, label: e.target.value })}
-                        placeholder="Ex: Coran"
-                      />
-                    </div>
-                    <div>
-                      <Label>Ordre d'affichage</Label>
-                      <Input
-                        type="number"
-                        value={newValue.order}
-                        onChange={(e) => setNewValue({ ...newValue, order: parseInt(e.target.value) || 0 })}
-                      />
-                    </div>
-                    <Button onClick={handleAddValue} className="w-full">
-                      Ajouter
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Ajouter une valeur
                     </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                  </DialogTrigger>
+                  <DialogContent className="bg-background">
+                    <DialogHeader>
+                      <DialogTitle>Ajouter une nouvelle valeur</DialogTitle>
+                      <DialogDescription>
+                        Ajoutez une nouvelle valeur à la liste sélectionnée
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label>Code</Label>
+                        <Input
+                          value={newValue.code}
+                          onChange={(e) => setNewValue({ ...newValue, code: e.target.value })}
+                          placeholder="Ex: COR"
+                        />
+                      </div>
+                      <div>
+                        <Label>Libellé</Label>
+                        <Input
+                          value={newValue.label}
+                          onChange={(e) => setNewValue({ ...newValue, label: e.target.value })}
+                          placeholder="Ex: Coran"
+                        />
+                      </div>
+                      <div>
+                        <Label>Ordre d'affichage</Label>
+                        <Input
+                          type="number"
+                          value={newValue.order}
+                          onChange={(e) => setNewValue({ ...newValue, order: parseInt(e.target.value) || 0 })}
+                        />
+                      </div>
+                      <Button onClick={handleAddValue} className="w-full">
+                        Ajouter
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
 
-              <Button variant="outline" onClick={() => document.getElementById('excel-import')?.click()}>
-                <Upload className="w-4 h-4 mr-2" />
-                Importer Excel
-              </Button>
-              <input
-                id="excel-import"
-                type="file"
-                accept=".xlsx,.xls"
-                className="hidden"
-                onChange={handleImportExcel}
-              />
+                <Button variant="outline" onClick={() => document.getElementById('excel-import')?.click()}>
+                  <Upload className="w-4 h-4 mr-2" />
+                  Importer Excel
+                </Button>
+                <input
+                  id="excel-import"
+                  type="file"
+                  accept=".xlsx,.xls"
+                  className="hidden"
+                  onChange={handleImportExcel}
+                />
 
-              <Button variant="outline" onClick={handleExportExcel}>
-                <Download className="w-4 h-4 mr-2" />
-                Exporter Excel
-              </Button>
+                <Button variant="outline" onClick={handleExportExcel}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Exporter Excel
+                </Button>
+              </div>
+
+              <div>
+                <Label>Rechercher dans les valeurs</Label>
+                <Input
+                  placeholder="Rechercher par code ou libellé..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="mt-2"
+                />
+                {searchTerm && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {filteredValues.length} résultat(s) trouvé(s)
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="border rounded-lg">
@@ -557,30 +783,81 @@ export const SystemListsManager = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {listValues.map((value) => (
+                  {filteredValues.map((value) => (
                     <TableRow key={value.id}>
-                      <TableCell>{value.value_code}</TableCell>
-                      <TableCell>{value.value_label}</TableCell>
-                      <TableCell>{value.sort_order}</TableCell>
+                      <TableCell>
+                        {inlineEditId === value.id ? (
+                          <Input
+                            value={inlineEditValue.code}
+                            onChange={(e) => setInlineEditValue({ ...inlineEditValue, code: e.target.value })}
+                            className="h-8"
+                          />
+                        ) : (
+                          value.value_code
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {inlineEditId === value.id ? (
+                          <Input
+                            value={inlineEditValue.label}
+                            onChange={(e) => setInlineEditValue({ ...inlineEditValue, label: e.target.value })}
+                            className="h-8"
+                          />
+                        ) : (
+                          value.value_label
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {inlineEditId === value.id ? (
+                          <Input
+                            type="number"
+                            value={inlineEditValue.order}
+                            onChange={(e) => setInlineEditValue({ ...inlineEditValue, order: parseInt(e.target.value) || 0 })}
+                            className="h-8 w-20"
+                          />
+                        ) : (
+                          value.sort_order
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setEditingValue(value);
-                              setIsEditDialogOpen(true);
-                            }}
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteValue(value.id)}
-                          >
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
+                          {inlineEditId === value.id ? (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => saveInlineEdit(value.id)}
+                              >
+                                <Check className="w-4 h-4 text-green-600" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={cancelInlineEdit}
+                              >
+                                ✕
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => startInlineEdit(value)}
+                                title="Éditer inline"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteValue(value.id)}
+                                title="Supprimer"
+                              >
+                                <Trash2 className="w-4 h-4 text-destructive" />
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
