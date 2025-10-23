@@ -333,7 +333,7 @@ const CulturalTariffsManagement = () => {
       {
         tariff_name: "Tarif location salle conférence demi-journée",
         space_type: "salle",
-        calculation_base: "demi_jour",
+        calculation_base: "demi_journee",
         amount_ht: 1800,
         tva_rate: 20,
         is_active: true,
@@ -366,7 +366,7 @@ const CulturalTariffsManagement = () => {
       {
         tariff_name: "Tarif location espace extérieur - Événement",
         space_type: "autre",
-        calculation_base: "événement",
+        calculation_base: "evenement",
         amount_ht: 5000,
         tva_rate: 20,
         is_active: true,
