@@ -116,13 +116,6 @@ const CulturalActivitiesBackoffice = () => {
       icon: FolderTree,
       path: "/admin/activites-culturelles/categories",
       color: "bg-gradient-to-br from-rose-500 to-rose-600"
-    },
-    {
-      title: "Règles et variables système",
-      description: "Paramètres globaux et règles de fonctionnement",
-      icon: Settings,
-      path: "/admin/activites-culturelles/regles-systeme",
-      color: "bg-gradient-to-br from-amber-500 to-amber-600"
     }
   ];
 

@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PageHeader } from "@/components/cultural-activities/shared/PageHeader";
-import { Settings, Save, Mail, FileText, Clock, HardDrive, Building } from "lucide-react";
+import { Settings, Save, Mail, FileText, Clock, HardDrive, Building, Calendar, BookOpen, Library } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -25,6 +25,19 @@ interface SystemSettings {
   email_sender: string;
   email_signature: string;
   email_default_subject: string;
+  // Paramètres du portail principal
+  maintenance_mode: boolean;
+  max_upload_size_mb: number;
+  allowed_file_types: string;
+  // Paramètres Activités Culturelles
+  ac_max_booking_days_advance: number;
+  ac_cancellation_deadline_hours: number;
+  // Paramètres Manuscrits
+  manuscripts_watermark_opacity: number;
+  manuscripts_download_enabled: boolean;
+  // Paramètres Bibliothèque Numérique
+  library_loan_duration_days: number;
+  library_max_simultaneous_loans: number;
 }
 
 const SystemSettingsPage = () => {
@@ -40,7 +53,16 @@ const SystemSettingsPage = () => {
     legal_notice: "",
     email_sender: "noreply@bnrm.ma",
     email_signature: "L'équipe de la Bibliothèque Nationale du Royaume du Maroc",
-    email_default_subject: "BNRM - Activités Culturelles"
+    email_default_subject: "BNRM - Activités Culturelles",
+    maintenance_mode: false,
+    max_upload_size_mb: 50,
+    allowed_file_types: "pdf,jpg,jpeg,png,doc,docx",
+    ac_max_booking_days_advance: 90,
+    ac_cancellation_deadline_hours: 48,
+    manuscripts_watermark_opacity: 0.3,
+    manuscripts_download_enabled: false,
+    library_loan_duration_days: 14,
+    library_max_simultaneous_loans: 3
   });
   
   const [loading, setLoading] = useState(true);
@@ -68,7 +90,16 @@ const SystemSettingsPage = () => {
           "legal_notice",
           "email_sender",
           "email_signature",
-          "email_default_subject"
+          "email_default_subject",
+          "system_maintenance_mode",
+          "system_max_upload_size_mb",
+          "system_allowed_file_types",
+          "ac_max_booking_days_advance",
+          "ac_cancellation_deadline_hours",
+          "manuscripts_watermark_opacity",
+          "manuscripts_download_enabled",
+          "library_loan_duration_days",
+          "library_max_simultaneous_loans"
         ]);
 
       if (error) throw error;
@@ -100,6 +131,33 @@ const SystemSettingsPage = () => {
               break;
             case "email_default_subject":
               loadedSettings.email_default_subject = param.valeur;
+              break;
+            case "system_maintenance_mode":
+              loadedSettings.maintenance_mode = param.valeur === "true";
+              break;
+            case "system_max_upload_size_mb":
+              loadedSettings.max_upload_size_mb = parseFloat(param.valeur);
+              break;
+            case "system_allowed_file_types":
+              loadedSettings.allowed_file_types = param.valeur;
+              break;
+            case "ac_max_booking_days_advance":
+              loadedSettings.ac_max_booking_days_advance = parseInt(param.valeur);
+              break;
+            case "ac_cancellation_deadline_hours":
+              loadedSettings.ac_cancellation_deadline_hours = parseInt(param.valeur);
+              break;
+            case "manuscripts_watermark_opacity":
+              loadedSettings.manuscripts_watermark_opacity = parseFloat(param.valeur);
+              break;
+            case "manuscripts_download_enabled":
+              loadedSettings.manuscripts_download_enabled = param.valeur === "true";
+              break;
+            case "library_loan_duration_days":
+              loadedSettings.library_loan_duration_days = parseInt(param.valeur);
+              break;
+            case "library_max_simultaneous_loans":
+              loadedSettings.library_max_simultaneous_loans = parseInt(param.valeur);
               break;
           }
         });
@@ -150,7 +208,16 @@ const SystemSettingsPage = () => {
       legal_notice: "legal_notice",
       email_sender: "email_sender",
       email_signature: "email_signature",
-      email_default_subject: "email_default_subject"
+      email_default_subject: "email_default_subject",
+      maintenance_mode: "system_maintenance_mode",
+      max_upload_size_mb: "system_max_upload_size_mb",
+      allowed_file_types: "system_allowed_file_types",
+      ac_max_booking_days_advance: "ac_max_booking_days_advance",
+      ac_cancellation_deadline_hours: "ac_cancellation_deadline_hours",
+      manuscripts_watermark_opacity: "manuscripts_watermark_opacity",
+      manuscripts_download_enabled: "manuscripts_download_enabled",
+      library_loan_duration_days: "library_loan_duration_days",
+      library_max_simultaneous_loans: "library_max_simultaneous_loans"
     };
     
     // Auto-save after a short delay
@@ -189,12 +256,68 @@ const SystemSettingsPage = () => {
       <main className="container mx-auto px-4 py-8">
         <PageHeader
           title="Règles et variables système"
-          description="Configuration des paramètres globaux de la plateforme"
+          description="Configuration des paramètres globaux de toutes les plateformes"
           icon={<Settings className="h-7 w-7" />}
-          backTo="/admin/activites-culturelles"
+          backTo="/admin"
         />
 
         <div className="grid gap-6 max-w-4xl">
+          {/* General Portal Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Paramètres généraux du portail
+              </CardTitle>
+              <CardDescription>
+                Configuration globale applicable à toutes les plateformes
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="maxUploadSize">
+                  Taille maximale de téléchargement (MB)
+                </Label>
+                <Input
+                  id="maxUploadSize"
+                  type="number"
+                  min="1"
+                  max="200"
+                  value={settings.max_upload_size_mb}
+                  onChange={(e) => handleInputChange("max_upload_size_mb", parseFloat(e.target.value))}
+                  disabled={saving}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="allowedFileTypes">
+                  Types de fichiers autorisés
+                </Label>
+                <Input
+                  id="allowedFileTypes"
+                  value={settings.allowed_file_types}
+                  onChange={(e) => handleInputChange("allowed_file_types", e.target.value)}
+                  disabled={saving}
+                  placeholder="pdf,jpg,jpeg,png,doc,docx"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Extensions séparées par des virgules
+                </p>
+              </div>
+              
+              <Button
+                onClick={async () => {
+                  await saveSetting("system_maintenance_mode", String(!settings.maintenance_mode));
+                  setSettings(prev => ({ ...prev, maintenance_mode: !prev.maintenance_mode }));
+                }}
+                variant={settings.maintenance_mode ? "destructive" : "outline"}
+                disabled={saving}
+              >
+                {settings.maintenance_mode ? "Désactiver" : "Activer"} le mode maintenance
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* File and Session Settings */}
           <Card>
             <CardHeader>
@@ -371,6 +494,141 @@ const SystemSettingsPage = () => {
                 <p className="text-xs text-muted-foreground">
                   Signature ajoutée automatiquement aux emails
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Cultural Activities Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Paramètres Activités Culturelles
+              </CardTitle>
+              <CardDescription>
+                Configuration spécifique aux réservations et activités culturelles
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="maxBookingDays">
+                  Délai maximum de réservation (jours)
+                </Label>
+                <Input
+                  id="maxBookingDays"
+                  type="number"
+                  min="1"
+                  max="365"
+                  value={settings.ac_max_booking_days_advance}
+                  onChange={(e) => handleInputChange("ac_max_booking_days_advance", parseInt(e.target.value))}
+                  disabled={saving}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Combien de jours à l'avance peut-on réserver
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cancellationDeadline">
+                  Délai d'annulation (heures)
+                </Label>
+                <Input
+                  id="cancellationDeadline"
+                  type="number"
+                  min="1"
+                  max="168"
+                  value={settings.ac_cancellation_deadline_hours}
+                  onChange={(e) => handleInputChange("ac_cancellation_deadline_hours", parseInt(e.target.value))}
+                  disabled={saving}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Nombre d'heures avant l'événement pour pouvoir annuler
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Manuscripts Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Paramètres Manuscrits
+              </CardTitle>
+              <CardDescription>
+                Configuration de la plateforme des manuscrits
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="watermarkOpacity">
+                  Opacité du filigrane (0.1 - 1.0)
+                </Label>
+                <Input
+                  id="watermarkOpacity"
+                  type="number"
+                  min="0.1"
+                  max="1"
+                  step="0.1"
+                  value={settings.manuscripts_watermark_opacity}
+                  onChange={(e) => handleInputChange("manuscripts_watermark_opacity", parseFloat(e.target.value))}
+                  disabled={saving}
+                />
+              </div>
+
+              <Button
+                onClick={async () => {
+                  await saveSetting("manuscripts_download_enabled", String(!settings.manuscripts_download_enabled));
+                  setSettings(prev => ({ ...prev, manuscripts_download_enabled: !prev.manuscripts_download_enabled }));
+                }}
+                variant={settings.manuscripts_download_enabled ? "default" : "outline"}
+                disabled={saving}
+              >
+                {settings.manuscripts_download_enabled ? "Désactiver" : "Activer"} le téléchargement
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Digital Library Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Library className="h-5 w-5" />
+                Paramètres Bibliothèque Numérique
+              </CardTitle>
+              <CardDescription>
+                Configuration des prêts et emprunts numériques
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="loanDuration">
+                  Durée de prêt (jours)
+                </Label>
+                <Input
+                  id="loanDuration"
+                  type="number"
+                  min="1"
+                  max="90"
+                  value={settings.library_loan_duration_days}
+                  onChange={(e) => handleInputChange("library_loan_duration_days", parseInt(e.target.value))}
+                  disabled={saving}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="maxLoans">
+                  Nombre maximum de prêts simultanés
+                </Label>
+                <Input
+                  id="maxLoans"
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={settings.library_max_simultaneous_loans}
+                  onChange={(e) => handleInputChange("library_max_simultaneous_loans", parseInt(e.target.value))}
+                  disabled={saving}
+                />
               </div>
             </CardContent>
           </Card>
