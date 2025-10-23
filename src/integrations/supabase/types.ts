@@ -7466,6 +7466,10 @@ export type Database = {
         | "printer"
         | "distributor"
         | "author"
+        | "dac"
+        | "comptable"
+        | "direction"
+        | "read_only"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -7680,6 +7684,10 @@ export const Constants = {
         "printer",
         "distributor",
         "author",
+        "dac",
+        "comptable",
+        "direction",
+        "read_only",
       ],
     },
   },
