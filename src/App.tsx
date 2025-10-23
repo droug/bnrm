@@ -157,6 +157,7 @@ const CulturalTariffsManagement = lazy(() => import("./pages/CulturalTariffsMana
 const LanguagesManagement = lazy(() => import("./pages/LanguagesManagement"));
 const ActivityTypesManagement = lazy(() => import("./pages/ActivityTypesManagementPage"));
 const SystemSettings = lazy(() => import("./pages/cultural-activities/SystemSettings"));
+const GeneralCategories = lazy(() => import("./pages/cultural-activities/GeneralCategories"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -327,6 +328,7 @@ const App = () => (
           <Route path="/admin/activites-culturelles/langues" element={<LanguagesManagement />} />
           <Route path="/admin/activites-culturelles/types-activites" element={<ActivityTypesManagement />} />
           <Route path="/admin/activites-culturelles/regles-systeme" element={<SystemSettings />} />
+          <Route path="/admin/activites-culturelles/categories" element={<GeneralCategories />} />
           <Route path="/admin/cultural-activities" element={<CulturalActivitiesBackoffice />} />
           <Route path="/admin/partenariats" element={<PartnershipsBackofficePage />} />
           <Route path="/admin/partnerships" element={<PartnershipsBackofficePage />} />

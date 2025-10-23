@@ -254,6 +254,33 @@ export type Database = {
         }
         Relationships: []
       }
+      bnrm_categories_generales: {
+        Row: {
+          code: string
+          created_at: string | null
+          description: string | null
+          id: string
+          libelle: string
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          libelle: string
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          libelle?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       bnrm_parametres: {
         Row: {
           commentaire: string | null

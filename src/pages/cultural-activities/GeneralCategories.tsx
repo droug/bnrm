@@ -79,12 +79,12 @@ const GeneralCategories = () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from("bnrm_categories_generales")
+        .from("bnrm_categories_generales" as any)
         .select("*")
         .order("libelle", { ascending: true });
 
       if (error) throw error;
-      setCategories(data || []);
+      setCategories((data as any) || []);
     } catch (error: any) {
       console.error("Error loading categories:", error);
       toast.error("Erreur lors du chargement des catégories");
@@ -124,13 +124,13 @@ const GeneralCategories = () => {
       if (selectedCategory) {
         // Update existing category
         const { error } = await supabase
-          .from("bnrm_categories_generales")
+          .from("bnrm_categories_generales" as any)
           .update({
             code: formData.code.trim(),
             libelle: formData.libelle.trim(),
             description: formData.description.trim() || null,
             updated_at: new Date().toISOString()
-          })
+          } as any)
           .eq("id", selectedCategory.id);
 
         if (error) throw error;
@@ -138,12 +138,12 @@ const GeneralCategories = () => {
       } else {
         // Create new category
         const { error } = await supabase
-          .from("bnrm_categories_generales")
+          .from("bnrm_categories_generales" as any)
           .insert({
             code: formData.code.trim(),
             libelle: formData.libelle.trim(),
             description: formData.description.trim() || null
-          });
+          } as any);
 
         if (error) throw error;
         toast.success("Catégorie créée avec succès");
@@ -165,7 +165,7 @@ const GeneralCategories = () => {
     try {
       setSaving(true);
       const { error } = await supabase
-        .from("bnrm_categories_generales")
+        .from("bnrm_categories_generales" as any)
         .delete()
         .eq("id", selectedCategory.id);
 
