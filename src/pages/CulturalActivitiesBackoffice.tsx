@@ -104,8 +104,8 @@ const CulturalActivitiesBackoffice = () => {
       color: "bg-gradient-to-br from-sky-500 to-sky-600"
     },
     {
-      title: "Types d'activités",
-      description: "Gestion des types d'activités et équipements",
+      title: "Types d'activités et équipements",
+      description: "Gestion des types d'activités et équipements standards",
       icon: Wrench,
       path: "/admin/activites-culturelles/types-activites",
       color: "bg-gradient-to-br from-violet-500 to-violet-600"
