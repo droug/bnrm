@@ -57,18 +57,78 @@ export function PermissionsManager() {
   });
   const { toast } = useToast();
 
-  const roles = [
-    { value: 'admin', label: 'Administrateur' },
-    { value: 'librarian', label: 'Bibliothécaire' },
-    { value: 'researcher', label: 'Chercheur' },
-    { value: 'partner', label: 'Partenaire' },
-    { value: 'subscriber', label: 'Abonné' },
-    { value: 'public_user', label: 'Utilisateur public' },
-    { value: 'visitor', label: 'Visiteur' },
-    { value: 'dac', label: 'DAC (Direction Activités Culturelles)' },
-    { value: 'comptable', label: 'Comptable' },
-    { value: 'direction', label: 'Direction' },
-    { value: 'read_only', label: 'Lecture seule' }
+  // Groupes de rôles pour une meilleure organisation
+  const roleGroups = [
+    {
+      title: 'Rôles Administratifs',
+      roles: [
+        { value: 'admin', label: 'Administrateur', color: 'text-red-600', description: 'Accès complet au système' },
+        { value: 'direction', label: 'Direction', color: 'text-purple-600', description: 'Vue d\'ensemble et validation' }
+      ]
+    },
+    {
+      title: 'Rôles Bibliothèque & Collections',
+      roles: [
+        { value: 'librarian', label: 'Bibliothécaire', color: 'text-blue-600', description: 'Gestion des collections' },
+      ]
+    },
+    {
+      title: 'Rôles Activités Culturelles',
+      roles: [
+        { value: 'dac', label: 'DAC', color: 'text-green-600', description: 'Direction Activités Culturelles' },
+        { value: 'comptable', label: 'Comptable', color: 'text-yellow-600', description: 'Gestion financière' },
+      ]
+    },
+    {
+      title: 'Rôles Utilisateurs',
+      roles: [
+        { value: 'researcher', label: 'Chercheur', color: 'text-indigo-600', description: 'Accès recherche académique' },
+        { value: 'partner', label: 'Partenaire', color: 'text-teal-600', description: 'Partenariats institutionnels' },
+        { value: 'subscriber', label: 'Abonné', color: 'text-cyan-600', description: 'Services premium' },
+        { value: 'public_user', label: 'Utilisateur public', color: 'text-gray-600', description: 'Accès de base' },
+        { value: 'visitor', label: 'Visiteur', color: 'text-gray-400', description: 'Consultation publique' },
+        { value: 'read_only', label: 'Lecture seule', color: 'text-slate-600', description: 'Consultation uniquement' }
+      ]
+    }
+  ];
+
+  // Toutes les catégories de permissions organisées par module
+  const categoryGroups = [
+    {
+      title: 'Bibliothèque & Collections',
+      categories: [
+        { key: 'collections', label: 'Collections', icon: '📚' },
+        { key: 'manuscripts', label: 'Manuscrits', icon: '📜' },
+        { key: 'content', label: 'Contenu', icon: '📄' },
+        { key: 'legal_deposit', label: 'Dépôt Légal', icon: '⚖️' },
+      ]
+    },
+    {
+      title: 'Services & Demandes',
+      categories: [
+        { key: 'requests', label: 'Demandes', icon: '📥' },
+        { key: 'reproductions', label: 'Reproductions', icon: '🖨️' },
+        { key: 'digitization', label: 'Numérisation', icon: '💾' },
+        { key: 'subscriptions', label: 'Abonnements', icon: '💳' },
+      ]
+    },
+    {
+      title: 'Activités Culturelles',
+      categories: [
+        { key: 'cultural_activities', label: 'Activités Culturelles', icon: '🎭' },
+        { key: 'exhibitions', label: 'Expositions', icon: '🖼️' },
+      ]
+    },
+    {
+      title: 'Gestion & Administration',
+      categories: [
+        { key: 'users', label: 'Utilisateurs', icon: '👥' },
+        { key: 'payments', label: 'Paiements', icon: '💰' },
+        { key: 'workflows', label: 'Workflows', icon: '⚙️' },
+        { key: 'templates', label: 'Modèles', icon: '📋' },
+        { key: 'system', label: 'Système', icon: '🔧' },
+      ]
+    }
   ];
 
   const categoryLabels: Record<string, string> = {
@@ -80,7 +140,13 @@ export function PermissionsManager() {
     subscriptions: 'Abonnements',
     system: 'Système',
     users: 'Utilisateurs',
-    cultural_activities: 'Activités Culturelles'
+    cultural_activities: 'Activités Culturelles',
+    reproductions: 'Reproductions',
+    digitization: 'Numérisation',
+    exhibitions: 'Expositions',
+    payments: 'Paiements',
+    workflows: 'Workflows',
+    templates: 'Modèles'
   };
 
   useEffect(() => {
@@ -264,90 +330,111 @@ export function PermissionsManager() {
 
         {/* Role Permissions Tab */}
         <TabsContent value="roles" className="space-y-6">
+          {/* Sélecteur de rôle avec groupes */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Shield className="h-5 w-5" />
-                <span>Permissions par Rôle</span>
+                <span>Sélectionner un Rôle</span>
               </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {roleGroups.map((group) => (
+                  <div key={group.title} className="space-y-3">
+                    <h4 className="text-sm font-semibold text-muted-foreground">{group.title}</h4>
+                    {group.roles.map((role) => (
+                      <button
+                        key={role.value}
+                        onClick={() => setSelectedRole(role.value)}
+                        className={`w-full text-left p-3 rounded-lg border-2 transition-all ${
+                          selectedRole === role.value
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                      >
+                        <div className={`font-semibold ${role.color}`}>{role.label}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{role.description}</div>
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Permissions organisées par modules */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Permissions pour : {roleGroups.flatMap(g => g.roles).find(r => r.value === selectedRole)?.label}</CardTitle>
               <CardDescription>
-                Gérez les permissions attribuées à chaque rôle système par catégorie
+                Configurez les permissions par module fonctionnel
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <Label htmlFor="role-select">Sélectionner un rôle</Label>
-                <Select value={selectedRole} onValueChange={setSelectedRole}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choisir un rôle" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role.value} value={role.value}>
-                        {role.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <CardContent className="space-y-8">
+              {categoryGroups.map((group) => (
+                <div key={group.title} className="space-y-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <span className="text-2xl">{group.categories[0].icon}</span>
+                    {group.title}
+                  </h3>
+                  <Separator />
+                  <div className="grid gap-4">
+                    {group.categories.map((category) => {
+                      const categoryPermissions = permissions.filter(p => p.category === category.key);
+                      if (categoryPermissions.length === 0) return null;
 
-              <Separator />
-
-              {/* Category Tabs for Permissions */}
-              <Tabs defaultValue="collections" className="w-full">
-                <TabsList className="grid w-full grid-cols-5 lg:grid-cols-9">
-                  <TabsTrigger value="collections">Collections</TabsTrigger>
-                  <TabsTrigger value="content">Contenu</TabsTrigger>
-                  <TabsTrigger value="legal_deposit">Dépôt Légal</TabsTrigger>
-                  <TabsTrigger value="manuscripts">Manuscrits</TabsTrigger>
-                  <TabsTrigger value="requests">Demandes</TabsTrigger>
-                  <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
-                  <TabsTrigger value="system">Système</TabsTrigger>
-                  <TabsTrigger value="users">Utilisateurs</TabsTrigger>
-                  <TabsTrigger value="cultural_activities">Activités Culturelles</TabsTrigger>
-                </TabsList>
-
-                {['collections', 'content', 'legal_deposit', 'manuscripts', 'requests', 'subscriptions', 'system', 'users', 'cultural_activities'].map((category) => (
-                  <TabsContent key={category} value={category} className="mt-6">
-                    <div className="space-y-3">
-                      <h3 className="text-lg font-semibold">{categoryLabels[category]}</h3>
-                      <div className="grid gap-3">
-                        {permissions
-                          .filter(p => p.category === category)
-                          .map((permission) => {
-                            const rolePermission = getRolePermissions(selectedRole).find(
-                              rp => rp.permission_id === permission.id
-                            );
-                            
-                            return (
-                              <div key={permission.id} className="flex items-center justify-between p-4 border rounded-lg bg-card hover:shadow-sm transition-shadow">
-                                <div className="space-y-1 flex-1">
-                                  <div className="flex items-center space-x-2">
-                                    <span className="font-medium">{permission.name}</span>
-                                    <Badge variant="outline" className="text-xs">
-                                      {categoryLabels[permission.category]}
-                                    </Badge>
+                      return (
+                        <div key={category.key} className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold flex items-center gap-2">
+                              <span>{category.icon}</span>
+                              {category.label}
+                              <Badge variant="secondary" className="text-xs">
+                                {categoryPermissions.length} permissions
+                              </Badge>
+                            </h4>
+                          </div>
+                          <div className="grid gap-2 pl-8">
+                            {categoryPermissions.map((permission) => {
+                              const rolePermission = getRolePermissions(selectedRole).find(
+                                rp => rp.permission_id === permission.id
+                              );
+                              
+                              return (
+                                <div 
+                                  key={permission.id} 
+                                  className="flex items-center justify-between p-3 rounded-lg border bg-card hover:shadow-sm transition-all"
+                                >
+                                  <div className="space-y-1 flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-medium text-sm">{permission.name}</span>
+                                      {rolePermission?.granted && (
+                                        <Badge variant="default" className="text-xs">Actif</Badge>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                      {permission.description}
+                                    </p>
                                   </div>
-                                  <p className="text-sm text-muted-foreground">
-                                    {permission.description}
-                                  </p>
+                                  <Switch
+                                    checked={rolePermission?.granted || false}
+                                    onCheckedChange={(checked) => {
+                                      if (rolePermission) {
+                                        updateRolePermission(rolePermission.id, checked);
+                                      }
+                                    }}
+                                  />
                                 </div>
-                                <Switch
-                                  checked={rolePermission?.granted || false}
-                                  onCheckedChange={(checked) => {
-                                    if (rolePermission) {
-                                      updateRolePermission(rolePermission.id, checked);
-                                    }
-                                  }}
-                                />
-                              </div>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  </TabsContent>
-                ))}
-              </Tabs>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </TabsContent>
@@ -518,7 +605,7 @@ export function PermissionsManager() {
                 </div>
                 <div className="flex items-center justify-between p-3 border rounded">
                   <span className="font-medium">Rôles système</span>
-                  <Badge variant="secondary">{roles.length}</Badge>
+                  <Badge variant="secondary">{roleGroups.flatMap(g => g.roles).length}</Badge>
                 </div>
               </CardContent>
             </Card>
