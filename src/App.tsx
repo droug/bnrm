@@ -146,6 +146,11 @@ const GuidedToursBackoffice = lazy(() => import("./pages/GuidedToursBackoffice")
 const CulturalActivitiesBackoffice = lazy(() => import("./pages/CulturalActivitiesBackoffice"));
 const PartnershipsBackofficePage = lazy(() => import("./pages/PartnershipsBackoffice"));
 const ProgramContributionsBackofficePage = lazy(() => import("./pages/ProgramContributionsBackoffice"));
+const CulturalActivitiesDashboard = lazy(() => import("./pages/cultural-activities/Dashboard"));
+const CulturalActivitiesReservations = lazy(() => import("./pages/cultural-activities/Reservations"));
+const CulturalActivitiesVisites = lazy(() => import("./pages/cultural-activities/Visites"));
+const CulturalActivitiesPartenariats = lazy(() => import("./pages/cultural-activities/Partenariats"));
+const CulturalActivitiesProgrammation = lazy(() => import("./pages/cultural-activities/Programmation"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -305,6 +310,11 @@ const App = () => (
           <Route path="/admin/guided-tours" element={<GuidedToursBackoffice />} />
           <Route path="/admin/visites-guidees" element={<GuidedToursBackoffice />} />
           <Route path="/admin/activites-culturelles" element={<CulturalActivitiesBackoffice />} />
+          <Route path="/admin/activites-culturelles/dashboard" element={<CulturalActivitiesDashboard />} />
+          <Route path="/admin/activites-culturelles/reservations" element={<CulturalActivitiesReservations />} />
+          <Route path="/admin/activites-culturelles/visites" element={<CulturalActivitiesVisites />} />
+          <Route path="/admin/activites-culturelles/partenariats" element={<CulturalActivitiesPartenariats />} />
+          <Route path="/admin/activites-culturelles/programmation" element={<CulturalActivitiesProgrammation />} />
           <Route path="/admin/cultural-activities" element={<CulturalActivitiesBackoffice />} />
           <Route path="/admin/partenariats" element={<PartnershipsBackofficePage />} />
           <Route path="/admin/partnerships" element={<PartnershipsBackofficePage />} />

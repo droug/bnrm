@@ -2,14 +2,18 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomSelect } from "@/components/ui/custom-select";
-import { Calendar, Users, Handshake, FileText, TrendingUp } from "lucide-react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { Calendar, Users, Handshake, FileText, TrendingUp, MapPin, Activity } from "lucide-react";
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend, Tooltip } from "recharts";
 
 interface DashboardStats {
   reservations: { total: number; enAttente: number; validees: number; rejetees: number; realisees: number };
   guidedTours: { total: number; enAttente: number; validees: number; rejetees: number; realisees: number };
   partnerships: { total: number; enAttente: number; validees: number; rejetees: number; realisees: number };
   programming: { total: number; enAttente: number; validees: number; rejetees: number; realisees: number };
+  validationRate: number;
+  averageProcessingTime: number;
+  mostReservedSpace: string;
+  mostFrequentActivity: string;
 }
 
 const COLORS = ['#FBBF24', '#10B981', '#EF4444', '#3B82F6'];
@@ -19,7 +23,11 @@ const CulturalActivitiesDashboard = () => {
     reservations: { total: 0, enAttente: 0, validees: 0, rejetees: 0, realisees: 0 },
     guidedTours: { total: 0, enAttente: 0, validees: 0, rejetees: 0, realisees: 0 },
     partnerships: { total: 0, enAttente: 0, validees: 0, rejetees: 0, realisees: 0 },
-    programming: { total: 0, enAttente: 0, validees: 0, rejetees: 0, realisees: 0 }
+    programming: { total: 0, enAttente: 0, validees: 0, rejetees: 0, realisees: 0 },
+    validationRate: 0,
+    averageProcessingTime: 0,
+    mostReservedSpace: 'Aucune donnée',
+    mostFrequentActivity: 'Aucune donnée'
   });
   const [period, setPeriod] = useState<'month' | 'quarter' | 'year'>('month');
   const [loading, setLoading] = useState(true);
@@ -54,8 +62,20 @@ const CulturalActivitiesDashboard = () => {
 
       // Fetch program contributions
       const { data: programmingData } = await supabase
-        .from('program_contributions')
-        .select('statut')
+        .from('cultural_program_proposals')
+        .select('statut, type_activite, date_creation, date_traitement')
+        .gte('date_creation', startDate.toISOString());
+
+      // Fetch bookings
+      const { data: bookingsData } = await supabase
+        .from('bookings')
+        .select('status, created_at, updated_at, cultural_spaces(name)')
+        .gte('created_at', startDate.toISOString());
+
+      // Fetch visits
+      const { data: visitsData } = await supabase
+        .from('visits_bookings')
+        .select('statut, created_at, updated_at')
         .gte('created_at', startDate.toISOString());
 
       // Calculate stats
@@ -63,18 +83,67 @@ const CulturalActivitiesDashboard = () => {
         if (!data) return { total: 0, enAttente: 0, validees: 0, rejetees: 0, realisees: 0 };
         return {
           total: data.length,
-          enAttente: data.filter(d => d.statut === 'en_attente').length,
-          validees: data.filter(d => ['approuve', 'acceptee', 'confirmee'].includes(d.statut)).length,
-          rejetees: data.filter(d => ['rejete', 'rejetee'].includes(d.statut)).length,
-          realisees: data.filter(d => d.statut === 'realisee').length
+          enAttente: data.filter(d => ['en_attente', 'pending'].includes(d.statut || d.status)).length,
+          validees: data.filter(d => ['approuve', 'acceptee', 'confirmee', 'validee', 'confirmée'].includes(d.statut || d.status)).length,
+          rejetees: data.filter(d => ['rejete', 'rejetee', 'rejetée'].includes(d.statut || d.status)).length,
+          realisees: data.filter(d => ['realisee', 'terminee', 'completee', 'réalisée'].includes(d.statut || d.status)).length
         };
       };
 
+      const reservationsStats = calculateStats(bookingsData?.map(b => ({ statut: b.status })));
+      const toursStats = calculateStats(visitsData);
+      const partnershipsStats = calculateStats(partnershipsData);
+      const programmingStats = calculateStats(programmingData);
+
+      // Calculate validation rate
+      const allData = [...(bookingsData || []).map(b => ({ status: b.status })), ...(visitsData || []), ...(partnershipsData || []), ...(programmingData || [])];
+      const validatedCount = allData.filter((d: any) => 
+        ['confirmée', 'confirmee', 'validee', 'approuve', 'acceptee'].includes((d.statut || d.status)?.toLowerCase() || '')
+      ).length;
+      const validationRate = allData.length > 0 ? Math.round((validatedCount / allData.length) * 100) : 0;
+
+      // Calculate average processing time
+      const processedBookings = bookingsData?.filter(b => 
+        b.created_at && b.updated_at && b.status !== 'en_attente'
+      ) || [];
+      const totalProcessingTime = processedBookings.reduce((sum, b) => {
+        const created = new Date(b.created_at).getTime();
+        const updated = new Date(b.updated_at).getTime();
+        return sum + (updated - created);
+      }, 0);
+      const averageProcessingTime = processedBookings.length > 0
+        ? Math.round(totalProcessingTime / processedBookings.length / (1000 * 60 * 60 * 24))
+        : 0;
+
+      // Most reserved space
+      const spaceCounts = bookingsData?.reduce((acc: Record<string, number>, b) => {
+        const spaceName = b.cultural_spaces?.name || 'Inconnu';
+        acc[spaceName] = (acc[spaceName] || 0) + 1;
+        return acc;
+      }, {});
+      const mostReservedSpace = spaceCounts && Object.keys(spaceCounts).length > 0
+        ? Object.entries(spaceCounts).sort(([, a], [, b]) => b - a)[0][0]
+        : 'Aucune donnée';
+
+      // Most frequent activity
+      const activityCounts = programmingData?.reduce((acc: Record<string, number>, p: any) => {
+        const type = p.type_activite || 'Non spécifié';
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
+      }, {});
+      const mostFrequentActivity = activityCounts && Object.keys(activityCounts).length > 0
+        ? Object.entries(activityCounts).sort(([, a], [, b]) => b - a)[0][0]
+        : 'Aucune donnée';
+
       setStats({
-        reservations: { total: 0, enAttente: 0, validees: 0, rejetees: 0, realisees: 0 }, // TODO: Add when table exists
-        guidedTours: { total: 0, enAttente: 0, validees: 0, rejetees: 0, realisees: 0 }, // TODO: Add when table exists
-        partnerships: calculateStats(partnershipsData),
-        programming: calculateStats(programmingData)
+        reservations: reservationsStats,
+        guidedTours: toursStats,
+        partnerships: partnershipsStats,
+        programming: programmingStats,
+        validationRate,
+        averageProcessingTime,
+        mostReservedSpace,
+        mostFrequentActivity
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -88,6 +157,13 @@ const CulturalActivitiesDashboard = () => {
     stats.guidedTours.total + 
     stats.partnerships.total + 
     stats.programming.total;
+
+  const barData = [
+    { name: 'Réservations', value: stats.reservations.total },
+    { name: 'Visites', value: stats.guidedTours.total },
+    { name: 'Partenariats', value: stats.partnerships.total },
+    { name: 'Programmation', value: stats.programming.total }
+  ];
 
   const pieData = [
     { name: 'Réservations d\'espaces', value: stats.reservations.total },
@@ -126,6 +202,53 @@ const CulturalActivitiesDashboard = () => {
           icon={<Calendar className="h-4 w-4" />}
           className="w-[200px]"
         />
+      </div>
+
+      {/* KPIs */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Taux de validation</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.validationRate}%</div>
+            <p className="text-xs text-muted-foreground">Demandes validées</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Délai moyen</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.averageProcessingTime} jours</div>
+            <p className="text-xs text-muted-foreground">Temps de traitement</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Espace populaire</CardTitle>
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-lg font-bold truncate">{stats.mostReservedSpace}</div>
+            <p className="text-xs text-muted-foreground">Espace le plus réservé</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Activité populaire</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-lg font-bold truncate">{stats.mostFrequentActivity}</div>
+            <p className="text-xs text-muted-foreground">Type le plus fréquent</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Stats Cards */}
@@ -232,6 +355,29 @@ const CulturalActivitiesDashboard = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-light">Demandes par type (mois en cours)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {barData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={barData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="value" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                Aucune donnée disponible
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-light">Répartition par type</CardTitle>
