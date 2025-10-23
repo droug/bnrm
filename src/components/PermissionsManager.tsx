@@ -64,7 +64,11 @@ export function PermissionsManager() {
     { value: 'partner', label: 'Partenaire' },
     { value: 'subscriber', label: 'Abonné' },
     { value: 'public_user', label: 'Utilisateur public' },
-    { value: 'visitor', label: 'Visiteur' }
+    { value: 'visitor', label: 'Visiteur' },
+    { value: 'dac', label: 'DAC (Direction Activités Culturelles)' },
+    { value: 'comptable', label: 'Comptable' },
+    { value: 'direction', label: 'Direction' },
+    { value: 'read_only', label: 'Lecture seule' }
   ];
 
   const categoryLabels: Record<string, string> = {
@@ -75,7 +79,8 @@ export function PermissionsManager() {
     requests: 'Demandes',
     subscriptions: 'Abonnements',
     system: 'Système',
-    users: 'Utilisateurs'
+    users: 'Utilisateurs',
+    cultural_activities: 'Activités Culturelles'
   };
 
   useEffect(() => {
@@ -290,7 +295,7 @@ export function PermissionsManager() {
 
               {/* Category Tabs for Permissions */}
               <Tabs defaultValue="collections" className="w-full">
-                <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+                <TabsList className="grid w-full grid-cols-5 lg:grid-cols-9">
                   <TabsTrigger value="collections">Collections</TabsTrigger>
                   <TabsTrigger value="content">Contenu</TabsTrigger>
                   <TabsTrigger value="legal_deposit">Dépôt Légal</TabsTrigger>
@@ -299,9 +304,10 @@ export function PermissionsManager() {
                   <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
                   <TabsTrigger value="system">Système</TabsTrigger>
                   <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+                  <TabsTrigger value="cultural_activities">Activités Culturelles</TabsTrigger>
                 </TabsList>
 
-                {['collections', 'content', 'legal_deposit', 'manuscripts', 'requests', 'subscriptions', 'system', 'users'].map((category) => (
+                {['collections', 'content', 'legal_deposit', 'manuscripts', 'requests', 'subscriptions', 'system', 'users', 'cultural_activities'].map((category) => (
                   <TabsContent key={category} value={category} className="mt-6">
                     <div className="space-y-3">
                       <h3 className="text-lg font-semibold">{categoryLabels[category]}</h3>

@@ -111,13 +111,6 @@ const CulturalActivitiesBackoffice = () => {
       color: "bg-gradient-to-br from-violet-500 to-violet-600"
     },
     {
-      title: "Profils et rôles",
-      description: "Configuration des profils utilisateurs",
-      icon: UserCog,
-      path: "/admin/activites-culturelles/profils-roles",
-      color: "bg-gradient-to-br from-fuchsia-500 to-fuchsia-600"
-    },
-    {
       title: "Catégories générales",
       description: "Gestion des catégories transversales",
       icon: FolderTree,
