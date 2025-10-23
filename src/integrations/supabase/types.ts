@@ -2418,30 +2418,33 @@ export type Database = {
           created_at: string | null
           id: string
           is_active: boolean | null
-          is_rtl: boolean | null
           name: string
           native_name: string
+          orientation: string
           sort_order: number | null
+          updated_at: string | null
         }
         Insert: {
           code: string
           created_at?: string | null
           id?: string
           is_active?: boolean | null
-          is_rtl?: boolean | null
           name: string
           native_name: string
+          orientation?: string
           sort_order?: number | null
+          updated_at?: string | null
         }
         Update: {
           code?: string
           created_at?: string | null
           id?: string
           is_active?: boolean | null
-          is_rtl?: boolean | null
           name?: string
           native_name?: string
+          orientation?: string
           sort_order?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
