@@ -1659,6 +1659,57 @@ export type Database = {
         }
         Relationships: []
       }
+      document_templates: {
+        Row: {
+          content_template: string
+          created_at: string
+          created_by: string | null
+          document_type: string
+          footer_content: string | null
+          header_content: string | null
+          id: string
+          is_active: boolean | null
+          module: string
+          signature_required: boolean | null
+          template_code: string
+          template_name: string
+          updated_at: string
+          variables: Json | null
+        }
+        Insert: {
+          content_template: string
+          created_at?: string
+          created_by?: string | null
+          document_type: string
+          footer_content?: string | null
+          header_content?: string | null
+          id?: string
+          is_active?: boolean | null
+          module: string
+          signature_required?: boolean | null
+          template_code: string
+          template_name: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Update: {
+          content_template?: string
+          created_at?: string
+          created_by?: string | null
+          document_type?: string
+          footer_content?: string | null
+          header_content?: string | null
+          id?: string
+          is_active?: boolean | null
+          module?: string
+          signature_required?: boolean | null
+          template_code?: string
+          template_name?: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Relationships: []
+      }
       download_logs: {
         Row: {
           content_id: string
@@ -2119,6 +2170,59 @@ export type Database = {
             columns: ["transaction_id"]
             isOneToOne: false
             referencedRelation: "payment_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generated_documents: {
+        Row: {
+          document_data: Json
+          document_number: string
+          document_type: string
+          file_url: string | null
+          generated_at: string
+          generated_by: string
+          id: string
+          module: string
+          reference_id: string
+          reference_type: string
+          signature_data: Json | null
+          template_id: string
+        }
+        Insert: {
+          document_data: Json
+          document_number: string
+          document_type: string
+          file_url?: string | null
+          generated_at?: string
+          generated_by: string
+          id?: string
+          module: string
+          reference_id: string
+          reference_type: string
+          signature_data?: Json | null
+          template_id: string
+        }
+        Update: {
+          document_data?: Json
+          document_number?: string
+          document_type?: string
+          file_url?: string | null
+          generated_at?: string
+          generated_by?: string
+          id?: string
+          module?: string
+          reference_id?: string
+          reference_type?: string
+          signature_data?: Json | null
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_documents_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "document_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -6943,6 +7047,7 @@ export type Database = {
       cleanup_old_activity_logs: { Args: never; Returns: number }
       generate_content_slug: { Args: { title: string }; Returns: string }
       generate_deposit_number: { Args: never; Returns: string }
+      generate_document_number: { Args: { doc_type: string }; Returns: string }
       generate_program_contribution_reference: { Args: never; Returns: string }
       generate_proposal_number: { Args: never; Returns: string }
       generate_reproduction_request_number: { Args: never; Returns: string }

@@ -6,6 +6,7 @@ import SpaceReservationsBackoffice from "@/components/cultural-activities/SpaceR
 import GuidedToursBackoffice from "@/components/cultural-activities/GuidedToursBackoffice";
 import PartnershipsBackoffice from "@/components/cultural-activities/PartnershipsBackoffice";
 import { CulturalProgrammingTab } from "@/components/cultural-activities/CulturalProgrammingTab";
+import { DocumentTemplatesManagement } from "@/components/cultural-activities/DocumentTemplatesManagement";
 
 const CulturalActivitiesBackoffice = () => {
   return (
@@ -23,12 +24,13 @@ const CulturalActivitiesBackoffice = () => {
         </div>
 
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="dashboard">Tableau de bord</TabsTrigger>
             <TabsTrigger value="reservations">Réservations d'espaces</TabsTrigger>
             <TabsTrigger value="guided-tours">Visites guidées</TabsTrigger>
             <TabsTrigger value="partnerships">Partenariats</TabsTrigger>
             <TabsTrigger value="programming">Programmation culturelle</TabsTrigger>
+            <TabsTrigger value="templates">Modèles de documents</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-6">
@@ -49,6 +51,10 @@ const CulturalActivitiesBackoffice = () => {
 
           <TabsContent value="programming">
             <CulturalProgrammingTab />
+          </TabsContent>
+
+          <TabsContent value="templates">
+            <DocumentTemplatesManagement />
           </TabsContent>
         </Tabs>
       </div>

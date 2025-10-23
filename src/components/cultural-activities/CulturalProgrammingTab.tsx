@@ -34,6 +34,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import jsPDF from "jspdf";
 import { addBNRMHeader, addBNRMFooter } from "@/lib/pdfHeaderUtils";
+import { DocumentGenerator } from "./DocumentGenerator";
 
 interface CulturalProposal {
   id: string;
@@ -612,6 +613,36 @@ export const CulturalProgrammingTab = () => {
             </div>
           )}
           <DialogFooter>
+            {selectedProposal && (
+              <DocumentGenerator
+                module="programmation"
+                referenceType="cultural_program_proposal"
+                referenceId={selectedProposal.id}
+                data={{
+                  proposal_number: selectedProposal.proposal_number,
+                  activity_title: selectedProposal.title,
+                  activity_type: selectedProposal.activity_type,
+                  activity_date: format(new Date(selectedProposal.proposed_date), 'dd/MM/yyyy', { locale: fr }),
+                  duration: `${selectedProposal.duration_hours || 0} heures`,
+                  requester_name: selectedProposal.requester_name,
+                  requester_email: selectedProposal.requester_email,
+                  event_description: selectedProposal.description || '',
+                  expected_participants: selectedProposal.expected_attendees || 0,
+                  actual_participants: '',
+                  participation_rate: '',
+                  space_requirements: selectedProposal.space_requirements || '',
+                  equipment_needs: selectedProposal.equipment_needs || '',
+                  planned_budget: selectedProposal.budget_estimate?.toLocaleString('fr-MA') || '0',
+                  actual_budget: '',
+                  budget_variance: '',
+                  positive_points: '',
+                  improvement_points: '',
+                  impact_description: '',
+                  recommendations: '',
+                  conclusion: '',
+                }}
+              />
+            )}
             <Button variant="outline" onClick={closeDialogs}>Fermer</Button>
           </DialogFooter>
         </DialogContent>
