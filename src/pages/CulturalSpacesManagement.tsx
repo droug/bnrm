@@ -17,13 +17,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Plus, Edit, Trash2, Download, Upload, CalendarDays, ArrowLeft } from "lucide-react";
+import { Plus, Edit, Trash2, Download, Upload, CalendarDays, ArrowLeft, Building2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { addBNRMHeaderToPDF } from "@/utils/pdfHeader";
+import { PageHeader } from "@/components/cultural-activities/shared/PageHeader";
+import { FormDialog } from "@/components/cultural-activities/shared/FormDialog";
+import { FormSection } from "@/components/cultural-activities/shared/FormSection";
+import { TextField, TextAreaField, SelectField, SwitchField } from "@/components/cultural-activities/shared/FormField";
 
 interface CulturalSpace {
   id: string;
@@ -418,23 +422,11 @@ const CulturalSpacesManagement = () => {
       <Header />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-4 mb-8">
-          <Button
-            variant="outline"
-            onClick={() => navigate("/admin/activites-culturelles")}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour
-          </Button>
-          <div>
-            <h1 className="text-4xl font-bold text-foreground">
-              Gestion des Espaces et Salles
-            </h1>
-            <p className="text-muted-foreground text-lg mt-2">
-              Configuration et gestion des espaces culturels disponibles
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          title="Gestion des Espaces et Salles"
+          description="Configuration et gestion des espaces culturels disponibles"
+          icon={<Building2 className="h-8 w-8" />}
+        />
 
         <Card>
           <CardHeader>
