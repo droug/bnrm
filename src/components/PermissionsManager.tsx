@@ -11,8 +11,10 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, User, Clock, Plus, Edit, Trash2, Save, Calendar } from "lucide-react";
+import { Shield, User, Clock, Plus, Edit, Trash2, Save, Calendar, CheckCircle2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Permission {
   id: string;
@@ -55,6 +57,13 @@ export function PermissionsManager() {
     expires_at: '',
     reason: ''
   });
+  const [isCreateRoleDialogOpen, setIsCreateRoleDialogOpen] = useState(false);
+  const [newRole, setNewRole] = useState({
+    name: '',
+    code: '',
+    description: ''
+  });
+  const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   // Groupes de rôles pour une meilleure organisation
@@ -301,6 +310,68 @@ export function PermissionsManager() {
     return rolePermissions.filter(rp => rp.role === role);
   };
 
+  const handleCreateRole = async () => {
+    if (!newRole.name.trim() || !newRole.code.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez remplir le nom et le code du rôle",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (selectedPermissions.size === 0) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner au moins une permission",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    toast({
+      title: "Information",
+      description: `Pour créer le rôle "${newRole.name}" (${newRole.code}), vous devez d'abord l'ajouter à l'enum user_role via une migration SQL. Ensuite, les permissions pourront être assignées.`,
+      duration: 10000
+    });
+
+    console.log("Configuration du nouveau rôle:", {
+      name: newRole.name,
+      code: newRole.code,
+      description: newRole.description,
+      permissions: Array.from(selectedPermissions)
+    });
+
+    toast({
+      title: "Configuration enregistrée",
+      description: "Les détails du rôle ont été enregistrés dans la console. Un administrateur système doit créer la migration SQL."
+    });
+
+    setIsCreateRoleDialogOpen(false);
+    setNewRole({ name: '', code: '', description: '' });
+    setSelectedPermissions(new Set());
+  };
+
+  const handlePermissionToggle = (permissionId: string) => {
+    const newSelected = new Set(selectedPermissions);
+    if (newSelected.has(permissionId)) {
+      newSelected.delete(permissionId);
+    } else {
+      newSelected.add(permissionId);
+    }
+    setSelectedPermissions(newSelected);
+  };
+
+  const groupPermissionsByCategory = () => {
+    return permissions.reduce((acc, permission) => {
+      if (!acc[permission.category]) {
+        acc[permission.category] = [];
+      }
+      acc[permission.category].push(permission);
+      return acc;
+    }, {} as Record<string, Permission[]>);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -328,17 +399,153 @@ export function PermissionsManager() {
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
         </TabsList>
 
-        {/* Role Permissions Tab */}
-        <TabsContent value="roles" className="space-y-6">
-          {/* Sélecteur de rôle avec groupes */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Shield className="h-5 w-5" />
-                <span>Sélectionner un Rôle</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+          {/* Role Permissions Tab */}
+          <TabsContent value="roles" className="space-y-6">
+            {/* Sélecteur de rôle avec groupes */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center space-x-2">
+                    <Shield className="h-5 w-5" />
+                    <span>Sélectionner un Rôle</span>
+                  </CardTitle>
+                  <Dialog open={isCreateRoleDialogOpen} onOpenChange={setIsCreateRoleDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Créer un nouveau rôle
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-3xl max-h-[90vh]">
+                      <DialogHeader>
+                        <DialogTitle>Créer un nouveau rôle</DialogTitle>
+                        <DialogDescription>
+                          Définissez un nouveau rôle et sélectionnez les permissions associées
+                        </DialogDescription>
+                      </DialogHeader>
+                      <ScrollArea className="max-h-[70vh] pr-4">
+                        <div className="space-y-6 py-4">
+                          {/* Basic Role Information */}
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                              <Label htmlFor="roleName">Nom du rôle *</Label>
+                              <Input
+                                id="roleName"
+                                placeholder="Ex: Gestionnaire de contenu"
+                                value={newRole.name}
+                                onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="roleCode">Code du rôle * (snake_case)</Label>
+                              <Input
+                                id="roleCode"
+                                placeholder="Ex: content_manager"
+                                value={newRole.code}
+                                onChange={(e) => setNewRole({ ...newRole, code: e.target.value.toLowerCase().replace(/\s+/g, '_') })}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="roleDescription">Description</Label>
+                            <Textarea
+                              id="roleDescription"
+                              placeholder="Décrivez les responsabilités et le niveau d'accès de ce rôle..."
+                              value={newRole.description}
+                              onChange={(e) => setNewRole({ ...newRole, description: e.target.value })}
+                              rows={3}
+                            />
+                          </div>
+
+                          <Separator />
+
+                          {/* Permissions Selection */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="text-lg font-semibold">Permissions</h3>
+                                <p className="text-sm text-muted-foreground">
+                                  Sélectionnez les permissions pour ce rôle
+                                </p>
+                              </div>
+                              <Badge variant="secondary">
+                                {selectedPermissions.size} sélectionnée(s)
+                              </Badge>
+                            </div>
+
+                            <div className="space-y-4">
+                              {Object.entries(groupPermissionsByCategory()).map(([category, perms]) => (
+                                <div key={category} className="space-y-2 p-3 border rounded-lg">
+                                  <h4 className="font-semibold text-sm">
+                                    {categoryLabels[category] || category}
+                                    <Badge variant="outline" className="ml-2 text-xs">
+                                      {perms.filter(p => selectedPermissions.has(p.id)).length}/{perms.length}
+                                    </Badge>
+                                  </h4>
+                                  <div className="space-y-2">
+                                    {perms.map(permission => (
+                                      <div key={permission.id} className="flex items-start gap-3 py-1">
+                                        <Checkbox
+                                          checked={selectedPermissions.has(permission.id)}
+                                          onCheckedChange={() => handlePermissionToggle(permission.id)}
+                                          className="mt-0.5"
+                                        />
+                                        <div className="flex-1">
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-sm font-medium">
+                                              {permission.name}
+                                            </span>
+                                            {selectedPermissions.has(permission.id) && (
+                                              <CheckCircle2 className="h-3 w-3 text-green-500" />
+                                            )}
+                                          </div>
+                                          {permission.description && (
+                                            <p className="text-xs text-muted-foreground">
+                                              {permission.description}
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Instructions */}
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h4 className="text-sm font-semibold mb-2">ℹ️ Instructions importantes</h4>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              La création d'un nouveau rôle nécessite une migration SQL pour l'ajouter à l'enum <code className="bg-blue-100 px-1 rounded">user_role</code>.
+                            </p>
+                            <p className="text-sm font-medium mb-1">Étapes requises :</p>
+                            <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
+                              <li>Créez une migration SQL pour ajouter le rôle à l'enum</li>
+                              <li>Insérez les permissions dans la table <code className="bg-blue-100 px-1 rounded">role_permissions</code></li>
+                              <li>Le rôle sera ensuite disponible pour attribution aux utilisateurs</li>
+                            </ol>
+                          </div>
+                        </div>
+                      </ScrollArea>
+                      <div className="flex justify-end gap-2 pt-4 border-t">
+                        <Button variant="outline" onClick={() => setIsCreateRoleDialogOpen(false)}>
+                          Annuler
+                        </Button>
+                        <Button
+                          onClick={handleCreateRole}
+                          disabled={!newRole.name.trim() || !newRole.code.trim() || selectedPermissions.size === 0}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Créer le rôle
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardHeader>
+              <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {roleGroups.map((group) => (
                   <div key={group.title} className="space-y-3">
