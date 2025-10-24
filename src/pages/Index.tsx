@@ -446,7 +446,7 @@ const Index = () => {
                           <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-pulse" />
                         </div>
                         <h3 className="text-xl font-moroccan font-bold text-foreground">
-                          Réservation des services des activités culturelles
+                          Services des Activités Culturelles
                         </h3>
                         <p className="text-muted-foreground font-elegant text-sm">
                           Réservez vos places pour les événements, conférences et activités culturelles
