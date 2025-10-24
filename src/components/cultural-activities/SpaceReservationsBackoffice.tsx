@@ -435,7 +435,7 @@ const SpaceReservationsBackoffice = () => {
     try {
       setLoading(true);
       
-      // Réinitialiser toutes les réservations avec statut "en_attente"
+      // Réinitialiser TOUTES les réservations à l'étape 1 pour permettre les tests
       const { data, error } = await supabase
         .from("bookings")
         .update({ 
@@ -445,14 +445,13 @@ const SpaceReservationsBackoffice = () => {
           workflow_completed_at: null,
           status: 'en_attente'
         })
-        .eq("status", "en_attente")
         .select();
 
       if (error) throw error;
 
       toast({
         title: "Réinitialisé",
-        description: `${data?.length || 0} réservation(s) en attente ont été réinitialisées à l'étape 1`,
+        description: `${data?.length || 0} réservation(s) ont été réinitialisées à l'étape 1 avec statut "en attente"`,
       });
 
       // Recharger les données
