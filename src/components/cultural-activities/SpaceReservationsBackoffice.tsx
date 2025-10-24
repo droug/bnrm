@@ -365,6 +365,38 @@ const SpaceReservationsBackoffice = () => {
     }
   };
 
+  const handleArchive = async () => {
+    if (!selectedBooking) return;
+
+    try {
+      const { error } = await supabase
+        .from("bookings")
+        .update({ 
+          status: "archivee",
+          reviewed_at: new Date().toISOString(),
+          admin_notes: (selectedBooking.admin_notes || "") + "\n[Archivée sans suite le " + new Date().toLocaleDateString('fr-FR') + "]"
+        })
+        .eq("id", selectedBooking.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Demande archivée",
+        description: "La demande a été archivée sans suite.",
+      });
+
+      fetchBookings();
+      closeDialog();
+    } catch (error) {
+      console.error("Error archiving booking:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'archiver la demande",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleReject = async () => {
     if (!selectedBooking || !rejectionReason.trim()) {
       toast({
@@ -657,6 +689,7 @@ const SpaceReservationsBackoffice = () => {
       validee: { label: "Validée", className: "bg-green-100 text-green-800" },
       rejetee: { label: "Rejetée", className: "bg-red-100 text-red-800" },
       annulee: { label: "Annulée", className: "bg-gray-100 text-gray-800" },
+      archivee: { label: "Archivée sans suite", className: "bg-gray-200 text-gray-600" },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.en_attente;
@@ -715,6 +748,7 @@ const SpaceReservationsBackoffice = () => {
                 { value: "verification_en_cours", label: "Vérification en cours" },
                 { value: "validee", label: "Validée" },
                 { value: "rejetee", label: "Rejetée" },
+                { value: "archivee", label: "Archivée sans suite" },
               ]}
               placeholder="Statut"
             />
@@ -825,21 +859,38 @@ const SpaceReservationsBackoffice = () => {
       <Dialog open={actionDialog.open && actionDialog.type === 'approve'} onOpenChange={closeDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Valider la demande</DialogTitle>
+            <DialogTitle>
+              {selectedBooking?.status === 'verification_en_cours' 
+                ? 'Décision sur la demande en vérification' 
+                : 'Valider la demande'}
+            </DialogTitle>
             <DialogDescription>
-              Souhaitez-vous valider cette demande ? Une lettre de confirmation sera générée et envoyée au demandeur.
+              {selectedBooking?.status === 'verification_en_cours'
+                ? 'Cette demande est en vérification. Vous pouvez maintenant l\'accepter, la refuser, ou l\'archiver sans suite.'
+                : 'Souhaitez-vous valider cette demande ? Une lettre de confirmation sera générée et envoyée au demandeur.'}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-2 flex-wrap">
             <Button variant="outline" onClick={closeDialog}>Annuler</Button>
-            <Button 
-              onClick={handleVerificationInProgress} 
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Vérification en cours
-            </Button>
+            {selectedBooking?.status !== 'verification_en_cours' && (
+              <Button 
+                onClick={handleVerificationInProgress} 
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Vérification en cours
+              </Button>
+            )}
+            {selectedBooking?.status === 'verification_en_cours' && (
+              <Button 
+                onClick={handleArchive} 
+                variant="outline"
+                className="border-gray-400 text-gray-700 hover:bg-gray-100"
+              >
+                Archiver sans suite
+              </Button>
+            )}
             <Button onClick={handleApprove} className="bg-green-600 hover:bg-green-700">
-              Valider
+              Accepter
             </Button>
           </DialogFooter>
         </DialogContent>
