@@ -62,6 +62,15 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
       const lastSlot = sortedSlots[sortedSlots.length - 1];
       const totalParticipants = slots.reduce((sum, slot) => sum + (slot.participants || 0), 0);
       
+      console.log('🔄 Synchronisation des créneaux:', {
+        slots: slots.length,
+        startDate: firstSlot.date,
+        endDate: lastSlot.date,
+        startTime: firstSlot.startTime,
+        endTime: lastSlot.endTime,
+        expectedAttendees: totalParticipants
+      });
+      
       // Synchroniser avec les champs attendus par StepSummary
       onUpdate({ 
         eventSlots: slots,
@@ -74,7 +83,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
     } else {
       onUpdate({ eventSlots: slots });
     }
-  }, [slots]);
+  }, [slots, onUpdate]);
 
   // Ouvrir la modale pour ajouter un créneau
   const openAddSlotDialog = () => {

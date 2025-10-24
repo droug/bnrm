@@ -280,6 +280,19 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Certaines informations obligatoires sont manquantes. Veuillez compléter toutes les étapes.
+            <div className="mt-2 text-xs">
+              <strong>Données reçues :</strong>
+              <pre className="mt-1 p-2 bg-destructive/10 rounded text-xs overflow-auto">
+                {JSON.stringify({
+                  startDate: data.startDate ? 'OUI' : 'NON',
+                  endDate: data.endDate ? 'OUI' : 'NON',
+                  startTime: data.startTime || 'manquant',
+                  endTime: data.endTime || 'manquant',
+                  expectedAttendees: data.expectedAttendees || 'manquant',
+                  eventSlots: data.eventSlots?.length || 0
+                }, null, 2)}
+              </pre>
+            </div>
           </AlertDescription>
         </Alert>
       )}
