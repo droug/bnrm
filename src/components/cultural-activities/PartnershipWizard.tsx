@@ -6,7 +6,7 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -182,15 +182,34 @@ const PartnershipWizard = () => {
     <div className="max-w-4xl mx-auto animate-fade-in">
       <Card className="rounded-2xl shadow-lg border-[#333333]/10 overflow-hidden transition-all duration-300">
         <CardHeader className="bg-gradient-to-r from-[#FAF9F5] to-white border-b border-[#333333]/10">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-10 w-10 rounded-xl bg-[#D4AF37] flex items-center justify-center shadow-md transition-all duration-300">
-              <span className="text-white font-bold text-lg">{currentStep}</span>
-            </div>
-            <CardTitle className="text-xl font-semibold text-[#333333]">
-              {STEPS[currentStep - 1].title}
-            </CardTitle>
+          <div className="flex items-center justify-center gap-4 mb-6">
+            {STEPS.map((step, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentStep(index + 1)}
+                className={`flex items-center gap-2 transition-all duration-200 hover:scale-105 cursor-pointer ${
+                  index + 1 === currentStep ? 'opacity-100' : 'opacity-40 hover:opacity-70'
+                }`}
+              >
+                <div className={`h-10 w-10 rounded-xl flex items-center justify-center shadow-md transition-all duration-300 ${
+                  index + 1 === currentStep 
+                    ? 'bg-[#D4AF37]' 
+                    : 'bg-[#D4AF37]/20'
+                }`}>
+                  <span className={`font-bold text-lg ${
+                    index + 1 === currentStep ? 'text-white' : 'text-[#D4AF37]'
+                  }`}>{index + 1}</span>
+                </div>
+                {index < STEPS.length - 1 && (
+                  <ChevronRight className="h-4 w-4 text-[#333333]/30" />
+                )}
+              </button>
+            ))}
           </div>
-          <CardDescription className="text-base text-[#333333]/70 ml-13">
+          <CardTitle className="text-xl font-semibold text-[#333333] text-center">
+            {STEPS[currentStep - 1].title}
+          </CardTitle>
+          <CardDescription className="text-base text-[#333333]/70 text-center">
             Étape {currentStep} sur {STEPS.length}
           </CardDescription>
           <Progress value={progress} className="mt-4 h-2 bg-[#333333]/10" />
@@ -218,7 +237,7 @@ const PartnershipWizard = () => {
                 {currentStep < STEPS.length ? (
                   <Button 
                     type="button" 
-                    onClick={handleNext} 
+                    onClick={() => setCurrentStep(currentStep + 1)}
                     className="ml-auto transition-all duration-300 bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white shadow-md"
                   >
                     Suivant

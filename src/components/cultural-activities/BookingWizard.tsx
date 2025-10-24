@@ -154,13 +154,14 @@ export default function BookingWizard() {
                   index < STEPS.length - 1 ? "flex-1" : ""
                 }`}
               >
-                <div
-                  className={`flex items-center justify-center w-12 h-12 rounded-full border transition-all duration-200 ${
+                <button
+                  onClick={() => setCurrentStep(stepNumber)}
+                  className={`flex items-center justify-center w-12 h-12 rounded-full border transition-all duration-200 cursor-pointer hover:scale-110 ${
                     stepNumber === currentStep
                       ? "border-[#D4AF37] bg-[#D4AF37] text-white shadow-md"
                       : stepNumber < currentStep
                       ? "border-[#D4AF37] bg-[#D4AF37]/10 text-[#D4AF37]"
-                      : "border-[#002B45]/20 text-[#002B45]/40"
+                      : "border-[#002B45]/20 text-[#002B45]/40 hover:border-[#D4AF37]/40"
                   }`}
                 >
                   {stepNumber < currentStep ? (
@@ -168,7 +169,7 @@ export default function BookingWizard() {
                   ) : (
                     <span className="text-sm font-light">{stepNumber}</span>
                   )}
-                </div>
+                </button>
                 {index < STEPS.length - 1 && (
                   <div
                     className={`h-px flex-1 mx-3 transition-all duration-200 ${
@@ -182,9 +183,10 @@ export default function BookingWizard() {
         </div>
         <div className="flex justify-between mt-4">
           {STEPS.map((step, index) => (
-            <div
+            <button
               key={index}
-              className={`text-xs font-light transition-colors duration-200 ${
+              onClick={() => setCurrentStep(index + 1)}
+              className={`text-xs font-light transition-colors duration-200 cursor-pointer hover:text-[#D4AF37] ${
                 index + 1 === currentStep
                   ? "text-[#D4AF37]"
                   : index + 1 < currentStep
@@ -194,7 +196,7 @@ export default function BookingWizard() {
               style={{ width: `${100 / STEPS.length}%` }}
             >
               <div className="text-center">{step.title}</div>
-            </div>
+            </button>
           ))}
         </div>
       </div>
