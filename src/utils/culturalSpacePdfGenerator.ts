@@ -156,8 +156,190 @@ export const generateConfirmationLetter = async (booking: Booking, space?: Space
   doc.setTextColor(100);
   doc.text('Notre règlement d\'utilisation des espaces est consultable sur le site BNRM : www.bnrm.ma', 105, yPos, { align: 'center' });
   
-  // Pied de page
+  // Pied de page page 1
   addBNRMFooter(doc, 1);
+  
+  // ========== PAGE 2 : FORMULAIRE DE RENSEIGNEMENTS ==========
+  doc.addPage();
+  yPos = 20;
+  
+  // En-tête page 2
+  await addBNRMHeader(doc);
+  yPos = 50;
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(0, 0, 0);
+  
+  const introText = [
+    'Veuillez aussi compléter les renseignements concernant l\'événement dans la partie réservée à cet effet,',
+    'et apporter le justificatif correspondant à votre catégorie.'
+  ];
+  
+  introText.forEach(line => {
+    doc.text(line, 20, yPos);
+    yPos += 5;
+  });
+  yPos += 10;
+  
+  // Section Informations de l'organisme
+  doc.setFont('helvetica', 'bold');
+  doc.text('Nom ou raison sociale :', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(booking.organization_name, 80, yPos);
+  yPos += 7;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Secteur :', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  const secteur = booking.organization_type === 'public' ? '☑ public    ☐ privé' : '☐ public    ☑ privé';
+  doc.text(secteur, 45, yPos);
+  yPos += 10;
+  
+  // Catégories
+  doc.setFont('helvetica', 'bold');
+  doc.text('Catégorie :', 20, yPos);
+  yPos += 7;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  const categories = [
+    '☐ ONG non gouvernementale nationale ou internationale œuvrant dans des domaines d\'intérêt public',
+    '☐ Associations à but non lucratif',
+    '☐ Représentations diplomatiques accréditées au Maroc',
+    '☐ Organisations internationales',
+    '☐ Ministères et établissements publics',
+    '☐ Autres (précisez) : _______________________'
+  ];
+  
+  categories.forEach(cat => {
+    doc.text(cat, 25, yPos);
+    yPos += 5;
+  });
+  yPos += 5;
+  
+  // Contact
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Adresse :', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text('_________________________________________________________________', 45, yPos);
+  yPos += 7;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('N° téléphone :', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(booking.phone, 50, yPos);
+  doc.setFont('helvetica', 'bold');
+  doc.text('E-mail :', 100, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(booking.email, 120, yPos);
+  yPos += 10;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Nom et qualité du représentant légal :', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(booking.contact_person, 95, yPos);
+  yPos += 10;
+  
+  // Détails de la manifestation
+  doc.setFont('helvetica', 'bold');
+  doc.text('Désignation de la manifestation :', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(booking.activity_type, 85, yPos);
+  yPos += 7;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Thématique :', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(booking.activity_description || '', 50, yPos);
+  yPos += 7;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Date de manifestation :', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Du ${new Date(booking.start_date).toLocaleDateString('fr-FR')} au ${new Date(booking.end_date).toLocaleDateString('fr-FR')}`, 70, yPos);
+  yPos += 10;
+  
+  // Tableau des espaces
+  doc.setFont('helvetica', 'bold');
+  doc.text('Espace(s) mis à la disposition :', 20, yPos);
+  yPos += 7;
+  
+  autoTable(doc, {
+    startY: yPos,
+    head: [['ESPACES', 'CAPACITÉ MAXIMALE', 'Choix']],
+    body: [
+      ['AUDITORIUM', '289 places', space?.name === 'Auditorium' ? '☑' : '☐'],
+      ['SALLE DE CONFÉRENCES', '100 places', space?.name === 'Salle de Conférences' ? '☑' : '☐'],
+      ['ATELIER DE FORMATION', '40 places', space?.name === 'Atelier de Formation' ? '☑' : '☐'],
+      ['SALLE DE SÉMINAIRES', '40 places', space?.name === 'Salle de Séminaires' ? '☑' : '☐'],
+      ['SALLE DE RÉUNION DE L\'ANNEXE', '80 places', space?.name === 'Salle de Réunion' ? '☑' : '☐'],
+      ['ESPLANADE', 'Ouvert', space?.name === 'Esplanade' ? '☑' : '☐'],
+      ['ESPACE D\'EXPOSITIONS', '---', space?.name === 'Espace d\'Expositions' ? '☑' : '☐']
+    ],
+    theme: 'grid',
+    headStyles: { 
+      fillColor: [240, 240, 240],
+      textColor: [0, 0, 0],
+      fontStyle: 'bold',
+      fontSize: 9
+    },
+    bodyStyles: {
+      fontSize: 9
+    },
+    margin: { left: 20, right: 20 }
+  });
+  
+  yPos = (doc as any).lastAutoTable.finalY + 7;
+  
+  // Informations complémentaires
+  doc.setFont('helvetica', 'bold');
+  doc.text('Nombre de personnes attendues :', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(booking.expected_attendees?.toString() || '___', 85, yPos);
+  yPos += 7;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Type de manifestation :', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('Conférence - Congrès - Colloque - Séminaire - Formation - Exposition - Activité artistiques', 20, yPos + 5);
+  yPos += 12;
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Pause Café :', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text('☐ Oui    ☐ Non', 45, yPos);
+  yPos += 7;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Couverture médiatique :', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text('☐ Oui    ☐ Non', 70, yPos);
+  yPos += 10;
+  
+  // Signatures
+  doc.setFont('helvetica', 'normal');
+  doc.text('Signature du demandeur', 20, yPos);
+  doc.text('M. Brahim IGHLANE', 130, yPos);
+  yPos += 5;
+  doc.text('ou de son représentant légal', 20, yPos);
+  doc.text('Département des Activités Culturelles', 130, yPos);
+  yPos += 5;
+  doc.text('', 20, yPos);
+  doc.text('et de la Communication', 130, yPos);
+  
+  // Note en bas page 2
+  yPos = 270;
+  doc.setFontSize(8);
+  doc.setTextColor(100);
+  doc.text('¹ Pour ce secteur, toute dérogation de paiement différé doit faire l\'objet d\'une demande justifiée.', 20, yPos);
+  yPos += 5;
+  doc.text('Notre règlement d\'utilisation des espaces est consultable sur le site BNRM : www.bnrm.ma', 105, yPos, { align: 'center' });
+  
+  // Pied de page page 2
+  addBNRMFooter(doc, 2);
   
   doc.save(`confirmation_${booking.booking_number}.pdf`);
 };
