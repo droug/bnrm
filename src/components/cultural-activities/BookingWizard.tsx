@@ -10,6 +10,14 @@ import StepContactInfo from "./steps/StepContactInfo";
 import StepSummary from "./steps/StepSummary";
 import StepConfirmation from "./steps/StepConfirmation";
 
+export interface EventSlot {
+  id: string;
+  date: Date;
+  startTime: string;
+  endTime: string;
+  participants: number;
+}
+
 export interface BookingData {
   organizerType?: string;
   organizationName?: string;
@@ -22,6 +30,7 @@ export interface BookingData {
   eventTitle?: string;
   eventDescription?: string;
   expectedAttendees?: number;
+  eventSlots?: EventSlot[];
   programDocument?: File;
   equipment: string[];
   services: string[];
@@ -53,7 +62,14 @@ export default function BookingWizard() {
   const [currentStep, setCurrentStep] = useState(1);
   const [bookingData, setBookingData] = useState<BookingData>({
     equipment: [],
-    services: []
+    services: [],
+    eventSlots: [{
+      id: `slot-${Date.now()}`,
+      date: new Date(),
+      startTime: "",
+      endTime: "",
+      participants: 1
+    }]
   });
 
   const CurrentStepComponent = STEPS[currentStep - 1].component;
@@ -89,12 +105,8 @@ export default function BookingWizard() {
         return !!(
           bookingData.eventTitle &&
           bookingData.eventDescription &&
-          bookingData.startDate &&
-          bookingData.endDate &&
-          bookingData.startTime &&
-          bookingData.endTime &&
-          bookingData.expectedAttendees &&
-          bookingData.expectedAttendees > 0
+          bookingData.eventSlots &&
+          bookingData.eventSlots.length > 0
         );
       
       case 3: // Équipements & Services

@@ -7,14 +7,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Calendar as CalendarIcon, Upload, CheckCircle, AlertCircle, Info } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Calendar as CalendarIcon, Clock, Users, Trash2, Plus, CheckCircle, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import type { BookingData } from "../BookingWizard";
+import type { BookingData, EventSlot } from "../BookingWizard";
 
 interface StepDateTimeProps {
   data: BookingData;
@@ -23,9 +23,7 @@ interface StepDateTimeProps {
 }
 
 export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
-  const [startDateOpen, setStartDateOpen] = useState(false);
-  const [endDateOpen, setEndDateOpen] = useState(false);
-  const [availabilityStatus, setAvailabilityStatus] = useState<'checking' | 'available' | 'unavailable' | null>(null);
+  const [slots, setSlots] = useState<EventSlot[]>(data.eventSlots || []);
 
   // Récupérer les infos de l'espace sélectionné
   const { data: selectedSpace } = useQuery({
@@ -44,70 +42,88 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
     enabled: !!data.spaceId
   });
 
-  // Vérifier la disponibilité lorsque les dates changent
+  // Synchroniser les slots avec les données du formulaire
   useEffect(() => {
-    const checkAvailability = async () => {
-      if (!data.spaceId || !data.startDate || !data.endDate || !data.startTime || !data.endTime) {
-        setAvailabilityStatus(null);
-        return;
-      }
+    onUpdate({ eventSlots: slots });
+  }, [slots]);
 
-      setAvailabilityStatus('checking');
+  // Ajouter un nouveau créneau
+  const addSlot = () => {
+    if (slots.length >= 10) {
+      toast.error("Maximum 10 créneaux autorisés");
+      return;
+    }
 
-      const startDateTime = `${data.startDate.toISOString().split('T')[0]} ${data.startTime}:00`;
-      const endDateTime = `${data.endDate.toISOString().split('T')[0]} ${data.endTime}:00`;
-
-      try {
-        const { data: result, error } = await supabase.rpc('check_space_availability', {
-          p_space_id: data.spaceId,
-          p_start_date: startDateTime,
-          p_end_date: endDateTime
-        });
-
-        if (error) throw error;
-        setAvailabilityStatus(result ? 'available' : 'unavailable');
-      } catch (error) {
-        console.error('Erreur vérification disponibilité:', error);
-        setAvailabilityStatus(null);
-      }
+    const newSlot: EventSlot = {
+      id: `slot-${Date.now()}`,
+      date: new Date(),
+      startTime: "",
+      endTime: "",
+      participants: 1
     };
 
-    checkAvailability();
-  }, [data.spaceId, data.startDate, data.endDate, data.startTime, data.endTime]);
-
-  const handleProgramUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const validTypes = [
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      ];
-      
-      if (!validTypes.includes(file.type)) {
-        toast.error("Format non supporté. Veuillez utiliser PDF ou Word");
-        e.target.value = '';
-        return;
-      }
-      
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error("Le fichier ne doit pas dépasser 10 MB");
-        e.target.value = '';
-        return;
-      }
-      
-      onUpdate({ programDocument: file });
-      toast.success("Programme ajouté");
-    }
+    setSlots([...slots, newSlot]);
+    toast.success("Créneau ajouté");
   };
 
+  // Supprimer un créneau
+  const removeSlot = (id: string) => {
+    if (slots.length === 1) {
+      toast.error("Au moins un créneau est requis");
+      return;
+    }
+
+    setSlots(slots.filter(slot => slot.id !== id));
+    toast.success("Créneau supprimé");
+  };
+
+  // Mettre à jour un créneau
+  const updateSlot = (id: string, updates: Partial<EventSlot>) => {
+    setSlots(slots.map(slot => 
+      slot.id === id ? { ...slot, ...updates } : slot
+    ));
+  };
+
+  // Vérifier les chevauchements
+  const checkOverlaps = (currentSlot: EventSlot): boolean => {
+    for (const slot of slots) {
+      if (slot.id === currentSlot.id) continue;
+      
+      // Même date
+      if (format(slot.date, 'yyyy-MM-dd') === format(currentSlot.date, 'yyyy-MM-dd')) {
+        const slotStart = slot.startTime;
+        const slotEnd = slot.endTime;
+        const currentStart = currentSlot.startTime;
+        const currentEnd = currentSlot.endTime;
+        
+        // Vérifier le chevauchement
+        if (
+          (currentStart < slotEnd && currentEnd > slotStart) ||
+          (slotStart < currentEnd && slotEnd > currentStart)
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  // Calculer le total de participants
+  const totalParticipants = slots.reduce((sum, slot) => sum + (slot.participants || 0), 0);
+
   // Validation de la capacité
-  const capacityError = selectedSpace && data.expectedAttendees && 
-    data.expectedAttendees > selectedSpace.capacity;
+  const capacityError = selectedSpace && totalParticipants > selectedSpace.capacity;
 
   // Validation des dates
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  // Trier les créneaux par date et heure
+  const sortedSlots = [...slots].sort((a, b) => {
+    const dateCompare = a.date.getTime() - b.date.getTime();
+    if (dateCompare !== 0) return dateCompare;
+    return a.startTime.localeCompare(b.startTime);
+  });
 
   return (
     <div className="space-y-6">
@@ -143,196 +159,191 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
         />
       </div>
 
-      {/* Dates de début et fin */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Date de début */}
-        <div className="space-y-2">
-          <Label>Date de début *</Label>
-          <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal h-11",
-                  !data.startDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {data.startDate ? (
-                  format(data.startDate, "PPP", { locale: fr })
-                ) : (
-                  <span>Sélectionner une date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent 
-              className="w-auto p-0" 
-              align="start" 
-              side="bottom" 
-              sideOffset={8}
-              avoidCollisions={true}
-              collisionPadding={20}
-              style={{ zIndex: 9999 }}
-            >
-              <Calendar
-                mode="single"
-                selected={data.startDate}
-                onSelect={(date) => {
-                  onUpdate({ startDate: date });
-                  setStartDateOpen(false);
-                }}
-                disabled={(date) => date < today}
-                initialFocus
-                locale={fr}
-                className="p-3 pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        {/* Heure de début */}
-        <div className="space-y-2">
-          <Label htmlFor="startTime">Heure de début *</Label>
-          <Input
-            id="startTime"
-            type="time"
-            value={data.startTime || ""}
-            onChange={(e) => onUpdate({ startTime: e.target.value })}
-            required
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Date de fin */}
-        <div className="space-y-2">
-          <Label>Date de fin *</Label>
-          <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal h-11",
-                  !data.endDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {data.endDate ? (
-                  format(data.endDate, "PPP", { locale: fr })
-                ) : (
-                  <span>Sélectionner une date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent 
-              className="w-auto p-0" 
-              align="start" 
-              side="bottom" 
-              sideOffset={8}
-              avoidCollisions={true}
-              collisionPadding={20}
-              style={{ zIndex: 9999 }}
-            >
-              <Calendar
-                mode="single"
-                selected={data.endDate}
-                onSelect={(date) => {
-                  onUpdate({ endDate: date });
-                  setEndDateOpen(false);
-                }}
-                disabled={(date) => {
-                  if (date < today) return true;
-                  if (data.startDate && date < data.startDate) return true;
-                  return false;
-                }}
-                initialFocus
-                locale={fr}
-                className="p-3 pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        {/* Heure de fin */}
-        <div className="space-y-2">
-          <Label htmlFor="endTime">Heure de fin *</Label>
-          <Input
-            id="endTime"
-            type="time"
-            value={data.endTime || ""}
-            onChange={(e) => onUpdate({ endTime: e.target.value })}
-            required
-          />
-        </div>
-      </div>
-
-      {/* Vérification de disponibilité */}
-      {availabilityStatus && (
-        <Alert variant={availabilityStatus === 'available' ? 'default' : 'destructive'}>
-          {availabilityStatus === 'checking' ? (
-            <Info className="h-4 w-4" />
-          ) : availabilityStatus === 'available' ? (
-            <CheckCircle className="h-4 w-4" />
-          ) : (
-            <AlertCircle className="h-4 w-4" />
-          )}
-          <AlertDescription>
-            {availabilityStatus === 'checking' && 'Vérification de la disponibilité...'}
-            {availabilityStatus === 'available' && 'L\'espace est disponible pour ce créneau'}
-            {availabilityStatus === 'unavailable' && 'Cet espace n\'est pas disponible pour ce créneau. Veuillez choisir d\'autres dates.'}
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Type de durée (pour les esplanades) */}
-      {selectedSpace?.allows_half_day && (
-        <div className="space-y-2">
-          <Label>Type de durée *</Label>
-          <RadioGroup
-            value={data.durationType || 'journee_complete'}
-            onValueChange={(value) => onUpdate({ durationType: value as 'demi_journee' | 'journee_complete' })}
+      {/* Section Créneaux */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Clock className="h-5 w-5 text-[#D4AF37]" />
+              Créneaux de l'événement
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Ajoutez les différents créneaux prévus pour votre événement
+            </p>
+          </div>
+          <Button
+            type="button"
+            onClick={addSlot}
+            disabled={slots.length >= 10}
+            className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white"
           >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="demi_journee" id="demi_journee" />
-              <Label htmlFor="demi_journee" className="font-normal cursor-pointer">
-                Demi-journée
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="journee_complete" id="journee_complete" />
-              <Label htmlFor="journee_complete" className="font-normal cursor-pointer">
-                Journée complète
-              </Label>
-            </div>
-          </RadioGroup>
+            <Plus className="mr-2 h-4 w-4" />
+            Ajouter un créneau
+          </Button>
         </div>
-      )}
 
-      {/* Nombre de participants */}
-      <div className="space-y-2">
-        <Label htmlFor="expectedAttendees">Nombre de participants *</Label>
-        <Input
-          id="expectedAttendees"
-          type="number"
-          min="1"
-          placeholder="Ex: 50"
-          value={data.expectedAttendees || ""}
-          onChange={(e) => onUpdate({ expectedAttendees: parseInt(e.target.value) || 0 })}
-          required
-          className={capacityError ? "border-destructive" : ""}
-        />
-        {selectedSpace && (
-          <p className="text-sm text-muted-foreground">
-            Capacité de l'espace : {selectedSpace.capacity} personnes
-          </p>
-        )}
-        {capacityError && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Le nombre de participants ({data.expectedAttendees}) dépasse la capacité de l'espace sélectionné ({selectedSpace?.capacity} personnes).
-            </AlertDescription>
-          </Alert>
+        {/* Liste des créneaux */}
+        <div className="space-y-4">
+          {sortedSlots.map((slot, index) => {
+            const hasOverlap = checkOverlaps(slot);
+            const isIncomplete = !slot.date || !slot.startTime || !slot.endTime;
+            
+            return (
+              <Card key={slot.id} className="p-4 bg-[#FAFAFA] border-[#DDD]">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-[#002B45]">Créneau {index + 1}</h4>
+                    {slots.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeSlot(slot.id)}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Date */}
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <CalendarIcon className="h-4 w-4" />
+                        Date *
+                      </Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal h-11",
+                              !slot.date && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {slot.date ? (
+                              format(slot.date, "PPP", { locale: fr })
+                            ) : (
+                              <span>Sélectionner</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent 
+                          className="w-auto p-0" 
+                          align="start"
+                          style={{ zIndex: 9999 }}
+                        >
+                          <Calendar
+                            mode="single"
+                            selected={slot.date}
+                            onSelect={(date) => date && updateSlot(slot.id, { date })}
+                            disabled={(date) => date < today}
+                            initialFocus
+                            locale={fr}
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {/* Heure de début */}
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Heure de début *
+                      </Label>
+                      <Input
+                        type="time"
+                        value={slot.startTime}
+                        onChange={(e) => updateSlot(slot.id, { startTime: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    {/* Heure de fin */}
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Heure de fin *
+                      </Label>
+                      <Input
+                        type="time"
+                        value={slot.endTime}
+                        onChange={(e) => updateSlot(slot.id, { endTime: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Nombre de participants */}
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      Nombre de participants *
+                    </Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="500"
+                      value={slot.participants}
+                      onChange={(e) => updateSlot(slot.id, { participants: parseInt(e.target.value) || 1 })}
+                      placeholder="Ex: 50"
+                      required
+                    />
+                  </div>
+
+                  {/* Alertes */}
+                  {isIncomplete && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        Veuillez compléter toutes les informations du créneau.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {hasOverlap && !isIncomplete && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        Deux créneaux ne peuvent pas se superposer dans le temps.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Total de participants */}
+        {slots.length > 0 && (
+          <Card className="p-4 bg-[#D4AF37]/5 border-[#D4AF37]/20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-[#D4AF37]" />
+                <span className="font-semibold text-[#002B45]">Total prévu :</span>
+              </div>
+              <span className="text-2xl font-bold text-[#D4AF37]">
+                {totalParticipants} {totalParticipants > 1 ? "personnes" : "personne"}
+              </span>
+            </div>
+            {selectedSpace && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Capacité de l'espace : {selectedSpace.capacity} personnes
+              </p>
+            )}
+            {capacityError && (
+              <Alert variant="destructive" className="mt-3">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Le nombre total de participants ({totalParticipants}) dépasse la capacité de l'espace sélectionné ({selectedSpace?.capacity} personnes).
+                </AlertDescription>
+              </Alert>
+            )}
+          </Card>
         )}
       </div>
 
@@ -343,7 +354,31 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
           id="program"
           type="file"
           accept=".pdf,.doc,.docx"
-          onChange={handleProgramUpload}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              const validTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+              ];
+              
+              if (!validTypes.includes(file.type)) {
+                toast.error("Format non supporté. Veuillez utiliser PDF ou Word");
+                e.target.value = '';
+                return;
+              }
+              
+              if (file.size > 10 * 1024 * 1024) {
+                toast.error("Le fichier ne doit pas dépasser 10 MB");
+                e.target.value = '';
+                return;
+              }
+              
+              onUpdate({ programDocument: file });
+              toast.success("Programme ajouté");
+            }
+          }}
           className="cursor-pointer"
         />
         {data.programDocument && (
