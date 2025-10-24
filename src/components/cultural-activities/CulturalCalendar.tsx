@@ -5,6 +5,12 @@ import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { CustomSelect } from "@/components/ui/custom-select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface CalendarEvent {
   id: number;
@@ -240,51 +246,80 @@ const CulturalCalendar = () => {
           </div>
 
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-2">
-            {/* Day Headers */}
-            {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map(day => (
-              <div key={day} className="text-center font-semibold text-[#333333] py-2">
-                {day}
-              </div>
-            ))}
+          <TooltipProvider>
+            <div className="grid grid-cols-7 gap-2">
+              {/* Day Headers */}
+              {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map(day => (
+                <div key={day} className="text-center font-semibold text-[#333333] py-2">
+                  {day}
+                </div>
+              ))}
 
-            {/* Empty Days */}
-            {emptyDays.map(i => (
-              <div key={`empty-${i}`} className="aspect-square" />
-            ))}
+              {/* Empty Days */}
+              {emptyDays.map(i => (
+                <div key={`empty-${i}`} className="aspect-square" />
+              ))}
 
-            {/* Calendar Days */}
-            {days.map(day => {
-              const events = getEventsForDay(day);
-              const hasEvents = events.length > 0;
+              {/* Calendar Days */}
+              {days.map(day => {
+                const events = getEventsForDay(day);
+                const hasEvents = events.length > 0;
 
-              return (
-                <button
-                  key={day}
-                  onClick={() => hasEvents && setSelectedEvent(events[0])}
-                  className={`
-                    aspect-square p-2 rounded-xl border-2 transition-all
-                    ${hasEvents 
-                      ? 'border-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 cursor-pointer' 
-                      : 'border-gray-200 hover:border-gray-300'
-                    }
-                  `}
-                >
-                  <div className="text-[#002B45] font-semibold">{day}</div>
-                  {hasEvents && (
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {events.slice(0, 2).map(event => (
-                        <div
-                          key={event.id}
-                          className={`w-2 h-2 rounded-full ${getEventColor(event.type)}`}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+                const dayButton = (
+                  <button
+                    key={day}
+                    onClick={() => hasEvents && setSelectedEvent(events[0])}
+                    className={`
+                      aspect-square p-2 rounded-xl border-2 transition-all
+                      ${hasEvents 
+                        ? 'border-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 cursor-pointer' 
+                        : 'border-gray-200 hover:border-gray-300'
+                      }
+                    `}
+                  >
+                    <div className="text-[#002B45] font-semibold">{day}</div>
+                    {hasEvents && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {events.slice(0, 2).map(event => (
+                          <div
+                            key={event.id}
+                            className={`w-2 h-2 rounded-full ${getEventColor(event.type)}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </button>
+                );
+
+                if (hasEvents) {
+                  return (
+                    <Tooltip key={day}>
+                      <TooltipTrigger asChild>
+                        {dayButton}
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs p-3" side="top">
+                        <div className="space-y-2">
+                          {events.map((event, idx) => (
+                            <div key={event.id} className={idx > 0 ? "pt-2 border-t" : ""}>
+                              <div className="flex items-center gap-2 mb-1">
+                                <div className={`w-2 h-2 rounded-full ${getEventColor(event.type)}`} />
+                                <span className="font-semibold text-sm">{getEventLabel(event.type)}</span>
+                              </div>
+                              <p className="font-medium">{event.title}</p>
+                              <p className="text-xs text-muted-foreground">🕐 {event.time}</p>
+                              <p className="text-xs text-muted-foreground">📍 {event.location}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                }
+
+                return dayButton;
+              })}
+            </div>
+          </TooltipProvider>
 
           {/* Legend */}
           <div className="mt-6 pt-6 border-t">
