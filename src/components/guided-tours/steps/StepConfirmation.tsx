@@ -22,6 +22,17 @@ const StepConfirmation = ({ data }: StepConfirmationProps) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
 
+  // Vérification de sécurité
+  if (!data?.selectedSlot) {
+    return (
+      <Alert className="bg-red-50 border-red-200">
+        <AlertDescription className="text-red-800">
+          Erreur : Aucun créneau sélectionné. Veuillez retourner à l'étape précédente.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   const createBookingMutation = useMutation({
     mutationFn: async () => {
       const { data: userData } = await supabase.auth.getUser();
