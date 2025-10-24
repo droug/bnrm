@@ -397,7 +397,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                 <CalendarIcon className="h-4 w-4" />
                 Date *
               </Label>
-              <Popover>
+              <Popover modal={true}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -417,7 +417,6 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                 <PopoverContent 
                   className="w-auto p-0 bg-white" 
                   align="start"
-                  style={{ zIndex: 10001 }}
                 >
                   <Calendar
                     mode="single"
