@@ -246,7 +246,7 @@ const CulturalCalendar = () => {
           </div>
 
           {/* Calendar Grid */}
-          <TooltipProvider>
+          <TooltipProvider delayDuration={200}>
             <div className="grid grid-cols-7 gap-2">
               {/* Day Headers */}
               {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map(day => (
@@ -265,42 +265,29 @@ const CulturalCalendar = () => {
                 const events = getEventsForDay(day);
                 const hasEvents = events.length > 0;
 
-                const dayButton = (
-                  <button
-                    key={day}
-                    onClick={() => hasEvents && setSelectedEvent(events[0])}
-                    className={`
-                      aspect-square p-2 rounded-xl border-2 transition-all
-                      ${hasEvents 
-                        ? 'border-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 cursor-pointer' 
-                        : 'border-gray-200 hover:border-gray-300'
-                      }
-                    `}
-                  >
-                    <div className="text-[#002B45] font-semibold">{day}</div>
-                    {hasEvents && (
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {events.slice(0, 2).map(event => (
-                          <div
-                            key={event.id}
-                            className={`w-2 h-2 rounded-full ${getEventColor(event.type)}`}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </button>
-                );
-
                 if (hasEvents) {
                   return (
                     <Tooltip key={day}>
                       <TooltipTrigger asChild>
-                        {dayButton}
+                        <button
+                          onClick={() => setSelectedEvent(events[0])}
+                          className="aspect-square p-2 rounded-xl border-2 transition-all border-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 cursor-pointer"
+                        >
+                          <div className="text-[#002B45] font-semibold">{day}</div>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {events.slice(0, 2).map(event => (
+                              <div
+                                key={event.id}
+                                className={`w-2 h-2 rounded-full ${getEventColor(event.type)}`}
+                              />
+                            ))}
+                          </div>
+                        </button>
                       </TooltipTrigger>
-                      <TooltipContent className="max-w-xs p-3" side="top">
+                      <TooltipContent className="max-w-xs p-3 bg-popover border-border" side="top">
                         <div className="space-y-2">
                           {events.map((event, idx) => (
-                            <div key={event.id} className={idx > 0 ? "pt-2 border-t" : ""}>
+                            <div key={event.id} className={idx > 0 ? "pt-2 border-t border-border" : ""}>
                               <div className="flex items-center gap-2 mb-1">
                                 <div className={`w-2 h-2 rounded-full ${getEventColor(event.type)}`} />
                                 <span className="font-semibold text-sm">{getEventLabel(event.type)}</span>
@@ -316,7 +303,16 @@ const CulturalCalendar = () => {
                   );
                 }
 
-                return dayButton;
+                return (
+                  <button
+                    key={day}
+                    className="aspect-square p-2 rounded-xl border-2 transition-all border-gray-200 hover:border-red-400 hover:bg-red-50 cursor-not-allowed relative"
+                    disabled
+                  >
+                    <div className="text-[#002B45] font-semibold">{day}</div>
+                    <div className="absolute top-1 right-1 text-red-500 text-xs">🚩</div>
+                  </button>
+                );
               })}
             </div>
           </TooltipProvider>
