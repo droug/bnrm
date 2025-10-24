@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Users, Handshake, FileText, BarChart3, FileType, ArrowRight, Building2, DollarSign, Globe, Wrench, UserCog, FolderTree, Settings } from "lucide-react";
+import { Calendar, Users, Handshake, FileText, BarChart3, FileType, ArrowRight, Building2, DollarSign, Globe, Wrench, UserCog, FolderTree, Settings, Workflow } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const CulturalActivitiesBackoffice = () => {
@@ -109,6 +109,13 @@ const CulturalActivitiesBackoffice = () => {
       icon: Wrench,
       path: "/admin/activites-culturelles/types-activites",
       color: "bg-gradient-to-br from-violet-500 to-violet-600"
+    },
+    {
+      title: "Workflow & BPM",
+      description: "Configuration et suivi du workflow de réservation",
+      icon: Workflow,
+      path: "/admin/workflow-bpm?tab=cultural-activities",
+      color: "bg-gradient-to-br from-rose-500 to-rose-600"
     }
   ];
 

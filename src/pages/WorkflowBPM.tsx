@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +18,16 @@ import { BookingWorkflowStepsManager } from "@/components/workflow/BookingWorkfl
 export default function WorkflowBPM() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState("predefined");
+
+  // Gérer l'onglet actif depuis l'URL
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
   if (!user) {
     return <Navigate to="/auth" replace />;
@@ -51,7 +62,7 @@ export default function WorkflowBPM() {
           </p>
         </div>
 
-        <Tabs defaultValue="predefined" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-9 mb-6">
             <TabsTrigger value="predefined">
               <Package className="w-4 h-4 mr-2" />

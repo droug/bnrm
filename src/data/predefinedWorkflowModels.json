@@ -548,5 +548,194 @@
       {"name": "Direction BNRM", "level": "admin"},
       {"name": "Administrateur Reporting", "level": "system"}
     ]
+  },
+  {
+    "code": "WF_CULT_01",
+    "name": "Workflow Réservation Espaces Culturels",
+    "module": "cultural_activities",
+    "workflow_type": "booking",
+    "version": "1.0",
+    "description": "Gestion complète des demandes de réservation d'espaces culturels avec validation multi-niveaux.",
+    "color": "emerald",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Réception et validation initiale",
+        "type": "creation",
+        "required_role": "Gestionnaire Activités Culturelles",
+        "description": "Réception de la demande et vérification de la complétude du dossier"
+      },
+      {
+        "order": 2,
+        "name": "Décision de la Direction",
+        "type": "validation",
+        "required_role": "Directeur BNRM",
+        "description": "Validation ou refus de la demande par la Direction"
+      },
+      {
+        "order": 3,
+        "name": "Traitement par le DAC",
+        "type": "validation",
+        "required_role": "Département Action Culturelle",
+        "description": "Vérification disponibilité et confirmation du créneau"
+      },
+      {
+        "order": 4,
+        "name": "Contractualisation",
+        "type": "validation",
+        "required_role": "Service Juridique",
+        "description": "Préparation et signature du contrat de location"
+      },
+      {
+        "order": 5,
+        "name": "Facturation",
+        "type": "validation",
+        "required_role": "Service Financier",
+        "description": "Émission de la facture et suivi du paiement"
+      },
+      {
+        "order": 6,
+        "name": "Mise à disposition",
+        "type": "transmission",
+        "required_role": "Gestionnaire Espaces",
+        "description": "Remise des clés et états des lieux d'entrée/sortie"
+      },
+      {
+        "order": 7,
+        "name": "Facturation complémentaire",
+        "type": "validation",
+        "required_role": "Service Financier",
+        "description": "Facturation des dégâts éventuels constatés"
+      },
+      {
+        "order": 8,
+        "name": "Clôture",
+        "type": "archivage",
+        "required_role": "Gestionnaire Activités Culturelles",
+        "description": "Clôture du dossier et archivage"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Démarrer le workflow",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Démarrer"
+      },
+      {
+        "name": "Transmettre au Directeur",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Transmettre"
+      },
+      {
+        "name": "Approuver par la Direction",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Approuver"
+      },
+      {
+        "name": "Confirmer disponibilité",
+        "from_step": 3,
+        "to_step": 4,
+        "trigger_type": "manual",
+        "action": "Confirmer"
+      },
+      {
+        "name": "Contrat signé",
+        "from_step": 4,
+        "to_step": 5,
+        "trigger_type": "manual",
+        "action": "Signer"
+      },
+      {
+        "name": "Facture émise",
+        "from_step": 5,
+        "to_step": 6,
+        "trigger_type": "manual",
+        "action": "Facturer"
+      },
+      {
+        "name": "États des lieux signés",
+        "from_step": 6,
+        "to_step": 8,
+        "trigger_type": "manual",
+        "action": "Valider"
+      },
+      {
+        "name": "Dégâts constatés",
+        "from_step": 6,
+        "to_step": 7,
+        "trigger_type": "manual",
+        "action": "Constater"
+      },
+      {
+        "name": "Facture complémentaire émise",
+        "from_step": 7,
+        "to_step": 8,
+        "trigger_type": "manual",
+        "action": "Facturer"
+      },
+      {
+        "name": "Clôturer le dossier",
+        "from_step": 8,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Clôturer"
+      },
+      {
+        "name": "Refuser la demande",
+        "from_step": 1,
+        "to_step": 8,
+        "trigger_type": "manual",
+        "action": "Refuser"
+      },
+      {
+        "name": "Refus de la Direction",
+        "from_step": 2,
+        "to_step": 8,
+        "trigger_type": "manual",
+        "action": "Refuser"
+      },
+      {
+        "name": "Indisponibilité",
+        "from_step": 3,
+        "to_step": 8,
+        "trigger_type": "manual",
+        "action": "Refuser"
+      },
+      {
+        "name": "Mettre en vérification",
+        "from_step": 1,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Vérifier"
+      },
+      {
+        "name": "Cas sensible",
+        "from_step": 2,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Vérifier"
+      },
+      {
+        "name": "Archiver sans suite",
+        "from_step": 8,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Archiver"
+      }
+    ],
+    "roles": [
+      {"name": "Gestionnaire Activités Culturelles", "level": "module"},
+      {"name": "Directeur BNRM", "level": "admin"},
+      {"name": "Département Action Culturelle", "level": "module"},
+      {"name": "Service Juridique", "level": "module"},
+      {"name": "Service Financier", "level": "module"},
+      {"name": "Gestionnaire Espaces", "level": "module"}
+    ]
   }
 ]
