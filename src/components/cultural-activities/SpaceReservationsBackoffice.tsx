@@ -431,6 +431,38 @@ const SpaceReservationsBackoffice = () => {
     }
   };
 
+  const handleResetToStep1 = async () => {
+    try {
+      // Réinitialiser toutes les réservations avec statut "en_attente"
+      const { error } = await supabase
+        .from("bookings")
+        .update({ 
+          current_step_code: 'e01_reception',
+          current_step_order: 1,
+          workflow_started_at: new Date().toISOString(),
+          workflow_completed_at: null,
+          status: 'en_attente'
+        })
+        .eq("status", "en_attente");
+
+      if (error) throw error;
+
+      toast({
+        title: "Réinitialisé",
+        description: "Les réservations en attente ont été réinitialisées à l'étape 1",
+      });
+
+      fetchBookings();
+    } catch (error) {
+      console.error("Error resetting bookings:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de réinitialiser les réservations",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleReject = async () => {
     if (!selectedBooking || !rejectionReason.trim()) {
       toast({
@@ -752,7 +784,18 @@ const SpaceReservationsBackoffice = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-light">Gestion des réservations d'espaces</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl font-light">Gestion des réservations d'espaces</CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetToStep1}
+              className="gap-2"
+            >
+              <ArrowRight className="h-4 w-4" />
+              Réinitialiser à l'étape 1
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {/* Filtres */}
