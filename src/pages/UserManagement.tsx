@@ -86,10 +86,31 @@ const ROLE_PERMISSIONS = {
     maxRequests: 200,
     accessLevel: 'institutional'
   },
+  editor: {
+    name: 'Éditeur',
+    permissions: ['Dépôt légal éditions', 'Gestion catalogue éditions', 'Services dédiés'],
+    description: 'Accès pour les éditeurs de contenus éditoriaux',
+    maxRequests: 150,
+    accessLevel: 'professional'
+  },
+  printer: {
+    name: 'Imprimeur',
+    permissions: ['Dépôt légal impressions', 'Gestion catalogue impressions', 'Services dédiés'],
+    description: 'Accès pour les imprimeurs',
+    maxRequests: 150,
+    accessLevel: 'professional'
+  },
   producer: {
     name: 'Producteur',
     permissions: ['Dépôt légal productions', 'Gestion catalogue productions', 'Services dédiés'],
     description: 'Accès pour les producteurs de contenus éditoriaux',
+    maxRequests: 150,
+    accessLevel: 'professional'
+  },
+  distributor: {
+    name: 'Distributeur',
+    permissions: ['Dépôt légal distributions', 'Gestion catalogue distributions', 'Services dédiés'],
+    description: 'Accès pour les distributeurs',
     maxRequests: 150,
     accessLevel: 'professional'
   },
@@ -99,6 +120,34 @@ const ROLE_PERMISSIONS = {
     description: 'Gestion des ressources et approbation des accès',
     maxRequests: 999,
     accessLevel: 'extended'
+  },
+  dac: {
+    name: 'DAC',
+    permissions: ['Gestion activités culturelles', 'Validation événements', 'Gestion espaces'],
+    description: 'Direction des Activités Culturelles',
+    maxRequests: 999,
+    accessLevel: 'extended'
+  },
+  comptable: {
+    name: 'Comptable',
+    permissions: ['Gestion financière', 'Validation paiements', 'Rapports comptables'],
+    description: 'Gestion comptable et financière',
+    maxRequests: 999,
+    accessLevel: 'extended'
+  },
+  direction: {
+    name: 'Direction',
+    permissions: ['Supervision générale', 'Validation stratégique', 'Rapports direction'],
+    description: 'Direction générale',
+    maxRequests: 999,
+    accessLevel: 'extended'
+  },
+  read_only: {
+    name: 'Lecture seule',
+    permissions: ['Consultation uniquement', 'Pas de modifications'],
+    description: 'Accès en lecture seule',
+    maxRequests: 0,
+    accessLevel: 'basic'
   },
   admin: {
     name: 'Administrateur',

@@ -32,8 +32,17 @@ const ROLE_OPTIONS = [
   { value: 'subscriber', label: 'Abonné Premium', color: 'secondary' },
   { value: 'researcher', label: 'Chercheur', color: 'default' },
   { value: 'partner', label: 'Partenaire Institutionnel', color: 'secondary' },
+  { value: 'editor', label: 'Éditeur', color: 'default' },
+  { value: 'printer', label: 'Imprimeur', color: 'default' },
+  { value: 'producer', label: 'Producteur', color: 'default' },
+  { value: 'distributor', label: 'Distributeur', color: 'default' },
   { value: 'librarian', label: 'Bibliothécaire', color: 'default' },
+  { value: 'dac', label: 'DAC', color: 'default' },
+  { value: 'comptable', label: 'Comptable', color: 'default' },
+  { value: 'direction', label: 'Direction', color: 'default' },
+  { value: 'read_only', label: 'Lecture seule', color: 'outline' },
   { value: 'admin', label: 'Administrateur', color: 'destructive' },
+  { value: 'visitor', label: 'Visiteur', color: 'outline' },
 ];
 
 export default function UsersManager() {
