@@ -433,8 +433,10 @@ const SpaceReservationsBackoffice = () => {
 
   const handleResetToStep1 = async () => {
     try {
+      setLoading(true);
+      
       // Réinitialiser toutes les réservations avec statut "en_attente"
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("bookings")
         .update({ 
           current_step_code: 'e01_reception',
@@ -443,16 +445,18 @@ const SpaceReservationsBackoffice = () => {
           workflow_completed_at: null,
           status: 'en_attente'
         })
-        .eq("status", "en_attente");
+        .eq("status", "en_attente")
+        .select();
 
       if (error) throw error;
 
       toast({
         title: "Réinitialisé",
-        description: "Les réservations en attente ont été réinitialisées à l'étape 1",
+        description: `${data?.length || 0} réservation(s) en attente ont été réinitialisées à l'étape 1`,
       });
 
-      fetchBookings();
+      // Recharger les données
+      await fetchBookings();
     } catch (error) {
       console.error("Error resetting bookings:", error);
       toast({
@@ -460,6 +464,7 @@ const SpaceReservationsBackoffice = () => {
         description: "Impossible de réinitialiser les réservations",
         variant: "destructive",
       });
+      setLoading(false);
     }
   };
 
