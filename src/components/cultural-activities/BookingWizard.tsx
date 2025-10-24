@@ -81,18 +81,52 @@ export default function BookingWizard() {
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
+        
         // Reconvertir les dates
         if (parsed.eventSlots) {
           parsed.eventSlots = parsed.eventSlots.map((slot: any) => ({
             ...slot,
             date: new Date(slot.date)
           }));
+          
+          // MIGRATION: Synchroniser les champs simples depuis eventSlots si manquants
+          if (parsed.eventSlots.length > 0) {
+            const sortedSlots = [...parsed.eventSlots].sort((a: any, b: any) => 
+              new Date(a.date).getTime() - new Date(b.date).getTime()
+            );
+            const firstSlot = sortedSlots[0];
+            const lastSlot = sortedSlots[sortedSlots.length - 1];
+            const totalParticipants = parsed.eventSlots.reduce(
+              (sum: number, slot: any) => sum + (slot.participants || 0), 0
+            );
+            
+            // Migrer les données si les champs simples sont manquants
+            if (!parsed.startDate) parsed.startDate = new Date(firstSlot.date);
+            if (!parsed.endDate) parsed.endDate = new Date(lastSlot.date);
+            if (!parsed.startTime) parsed.startTime = firstSlot.startTime;
+            if (!parsed.endTime) parsed.endTime = lastSlot.endTime;
+            if (!parsed.expectedAttendees) parsed.expectedAttendees = totalParticipants;
+            
+            console.log('📦 Migration brouillon:', {
+              slots: parsed.eventSlots.length,
+              startDate: parsed.startDate,
+              endDate: parsed.endDate,
+              startTime: parsed.startTime,
+              endTime: parsed.endTime,
+              expectedAttendees: parsed.expectedAttendees
+            });
+          }
         }
-        if (parsed.startDate) parsed.startDate = new Date(parsed.startDate);
-        if (parsed.endDate) parsed.endDate = new Date(parsed.endDate);
+        
+        if (parsed.startDate && typeof parsed.startDate === 'string') {
+          parsed.startDate = new Date(parsed.startDate);
+        }
+        if (parsed.endDate && typeof parsed.endDate === 'string') {
+          parsed.endDate = new Date(parsed.endDate);
+        }
         
         setBookingData(parsed);
-        toast.success("Brouillon chargé");
+        toast.success("Brouillon chargé et migré");
       } catch (error) {
         console.error("Erreur lors du chargement du brouillon:", error);
       }
@@ -124,7 +158,29 @@ export default function BookingWizard() {
   };
 
   const handleUpdateData = (data: Partial<BookingData>) => {
-    setBookingData(prev => ({ ...prev, ...data }));
+    setBookingData(prev => {
+      const updated = { ...prev, ...data };
+      
+      // Si eventSlots est mis à jour, synchroniser automatiquement les champs simples
+      if (data.eventSlots && data.eventSlots.length > 0) {
+        const sortedSlots = [...data.eventSlots].sort((a, b) => 
+          a.date.getTime() - b.date.getTime()
+        );
+        const firstSlot = sortedSlots[0];
+        const lastSlot = sortedSlots[sortedSlots.length - 1];
+        const totalParticipants = data.eventSlots.reduce(
+          (sum, slot) => sum + (slot.participants || 0), 0
+        );
+        
+        updated.startDate = firstSlot.date;
+        updated.endDate = lastSlot.date;
+        updated.startTime = firstSlot.startTime;
+        updated.endTime = lastSlot.endTime;
+        updated.expectedAttendees = totalParticipants;
+      }
+      
+      return updated;
+    });
   };
 
   // Validation pour chaque étape

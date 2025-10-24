@@ -56,34 +56,16 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
   // Synchroniser les slots avec les données du formulaire
   useEffect(() => {
     if (slots.length > 0) {
-      // Trier les slots par date
-      const sortedSlots = [...slots].sort((a, b) => a.date.getTime() - b.date.getTime());
-      const firstSlot = sortedSlots[0];
-      const lastSlot = sortedSlots[sortedSlots.length - 1];
-      const totalParticipants = slots.reduce((sum, slot) => sum + (slot.participants || 0), 0);
-      
       console.log('🔄 Synchronisation des créneaux:', {
         slots: slots.length,
-        startDate: firstSlot.date,
-        endDate: lastSlot.date,
-        startTime: firstSlot.startTime,
-        endTime: lastSlot.endTime,
-        expectedAttendees: totalParticipants
+        firstDate: slots[0]?.date,
+        firstTime: slots[0]?.startTime
       });
       
-      // Synchroniser avec les champs attendus par StepSummary
-      onUpdate({ 
-        eventSlots: slots,
-        startDate: firstSlot.date,
-        endDate: lastSlot.date,
-        startTime: firstSlot.startTime,
-        endTime: lastSlot.endTime,
-        expectedAttendees: totalParticipants
-      });
-    } else {
+      // Mise à jour simple sans re-synchroniser
       onUpdate({ eventSlots: slots });
     }
-  }, [slots, onUpdate]);
+  }, [slots]);
 
   // Ouvrir la modale pour ajouter un créneau
   const openAddSlotDialog = () => {
