@@ -435,7 +435,23 @@ const SpaceReservationsBackoffice = () => {
     try {
       setLoading(true);
       
-      // Réinitialiser TOUTES les réservations à l'étape 1 pour permettre les tests
+      // Récupérer toutes les réservations d'abord
+      const { data: allBookings, error: fetchError } = await supabase
+        .from("bookings")
+        .select("id");
+
+      if (fetchError) throw fetchError;
+
+      if (!allBookings || allBookings.length === 0) {
+        toast({
+          title: "Aucune réservation",
+          description: "Il n'y a aucune réservation à réinitialiser",
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Réinitialiser toutes les réservations
       const { data, error } = await supabase
         .from("bookings")
         .update({ 
@@ -445,13 +461,14 @@ const SpaceReservationsBackoffice = () => {
           workflow_completed_at: null,
           status: 'en_attente'
         })
+        .in('id', allBookings.map(b => b.id))
         .select();
 
       if (error) throw error;
 
       toast({
         title: "Réinitialisé",
-        description: `${data?.length || 0} réservation(s) ont été réinitialisées à l'étape 1 avec statut "en attente"`,
+        description: `${data?.length || 0} réservation(s) ont été réinitialisées à l'étape 1`,
       });
 
       // Recharger les données
