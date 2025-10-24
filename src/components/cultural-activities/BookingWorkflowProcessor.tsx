@@ -432,16 +432,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
               disabled={generatingDoc}
             >
               <FileText className="h-4 w-4 mr-2" />
-              État des lieux entrant
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => generateDocument('inventory_exit')}
-              disabled={generatingDoc}
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              État des lieux sortant
+              État des lieux
             </Button>
           </div>
         </div>
