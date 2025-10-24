@@ -1,6 +1,19 @@
-import * as React from "react";
-import { ChevronDown, Check } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState, useRef, useEffect } from 'react';
+import { Check, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface SimpleDropdownOption {
   value: string;
@@ -8,95 +21,56 @@ interface SimpleDropdownOption {
 }
 
 interface SimpleDropdownProps {
-  options: SimpleDropdownOption[];
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
-  className?: string;
+  options: SimpleDropdownOption[];
   disabled?: boolean;
 }
 
-export function SimpleDropdown({
-  options,
-  value,
-  onChange,
-  placeholder = "Sélectionner",
-  className,
-  disabled = false,
-}: SimpleDropdownProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const dropdownRef = React.useRef<HTMLDivElement>(null);
-
-  const selectedOption = options.find((opt) => opt.value === value);
-
-  React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
-
-  const handleSelect = (optionValue: string) => {
-    onChange?.(optionValue);
-    setIsOpen(false);
-  };
+export function SimpleDropdown({ value, onChange, placeholder = "Sélectionnez...", options, disabled = false }: SimpleDropdownProps) {
+  const [open, setOpen] = useState(false);
 
   return (
-    <div ref={dropdownRef} className={cn("relative w-full", className)}>
-      {/* Trigger Button */}
-      <button
-        type="button"
-        onClick={() => !disabled && setIsOpen(!isOpen)}
-        disabled={disabled}
-        className={cn(
-          "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
-          "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-          "disabled:cursor-not-allowed disabled:opacity-50",
-          !selectedOption && "text-muted-foreground"
-        )}
-      >
-        <span>{selectedOption ? selectedOption.label : placeholder}</span>
-        <ChevronDown className={cn("h-4 w-4 opacity-50 transition-transform", isOpen && "rotate-180")} />
-      </button>
-
-      {/* Dropdown Menu */}
-      {isOpen && (
-        <div
-          className={cn(
-            "absolute top-full left-0 z-50 mt-1 w-full",
-            "max-h-60 overflow-auto rounded-md border bg-popover shadow-lg",
-            "animate-in fade-in-0 zoom-in-95"
-          )}
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+          disabled={disabled}
         >
-          <div className="p-1">
+          {value ? options.find((option) => option.value === value)?.label : placeholder}
+          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-full p-0 bg-background text-foreground border shadow-lg" style={{ zIndex: 9999 }}>
+        <Command>
+          <CommandInput placeholder="Rechercher..." />
+          <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
+          <CommandGroup className="max-h-64 overflow-auto">
             {options.map((option) => (
-              <button
+              <CommandItem
                 key={option.value}
-                type="button"
-                onClick={() => handleSelect(option.value)}
-                className={cn(
-                  "relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
-                  "hover:bg-accent hover:text-accent-foreground",
-                  "focus:bg-accent focus:text-accent-foreground",
-                  value === option.value && "bg-accent/50"
-                )}
+                value={option.value}
+                onSelect={(currentValue) => {
+                  onChange?.(currentValue === value ? "" : currentValue);
+                  setOpen(false);
+                }}
               >
-                <span className="flex-1 text-left">{option.label}</span>
-                {value === option.value && <Check className="h-4 w-4 ml-2" />}
-              </button>
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    value === option.value ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {option.label}
+              </CommandItem>
             ))}
-          </div>
-        </div>
-      )}
-    </div>
+          </CommandGroup>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }

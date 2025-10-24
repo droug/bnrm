@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Loader2, Package, Sparkles, Coins } from "lucide-react";
-import { SimpleMultiSelect } from "@/components/ui/simple-multi-select";
+import { InlineMultiSelect } from "@/components/ui/inline-multi-select";
 import type { BookingData } from "../BookingWizard";
 
 interface StepEquipmentProps {
@@ -98,7 +98,7 @@ export default function StepEquipment({ data, onUpdate }: StepEquipmentProps) {
           Équipements disponibles
         </Label>
         
-        <SimpleMultiSelect
+        <InlineMultiSelect
           placeholder="Sélectionnez les équipements..."
           options={equipment?.map(item => ({
             value: item.id,
@@ -124,7 +124,7 @@ export default function StepEquipment({ data, onUpdate }: StepEquipmentProps) {
           Services additionnels
         </Label>
         
-        <SimpleMultiSelect
+        <InlineMultiSelect
           placeholder="Sélectionnez les services..."
           options={services?.map(service => ({
             value: service.id,
