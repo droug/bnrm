@@ -718,15 +718,25 @@ const SpaceReservationsBackoffice = () => {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      en_attente: { label: "En attente", className: "bg-yellow-100 text-yellow-800" },
-      verification_en_cours: { label: "Vérification en cours", className: "bg-blue-100 text-blue-800" },
-      validee: { label: "Validée", className: "bg-green-100 text-green-800" },
+      // Statuts selon le tableau fourni
+      a_verifier: { label: "À vérifier", className: "bg-yellow-100 text-yellow-800" },
+      en_attente: { label: "À vérifier", className: "bg-yellow-100 text-yellow-800" }, // Alias
+      confirmee: { label: "Confirmée", className: "bg-green-100 text-green-800" },
+      validee: { label: "Confirmée", className: "bg-green-100 text-green-800" }, // Alias
       rejetee: { label: "Rejetée", className: "bg-red-100 text-red-800" },
+      refusee: { label: "Rejetée", className: "bg-red-100 text-red-800" }, // Alias
+      verification_en_cours: { label: "Vérification en cours", className: "bg-orange-100 text-orange-800" },
+      contractualisee: { label: "Contractualisée", className: "bg-purple-100 text-purple-800" },
+      facturee: { label: "Facturée", className: "bg-indigo-100 text-indigo-800" },
+      en_attente_paiement: { label: "Facturée", className: "bg-indigo-100 text-indigo-800" }, // Alias
+      en_cours_execution: { label: "En cours d'exécution", className: "bg-cyan-100 text-cyan-800" },
+      archivee: { label: "Archivée", className: "bg-gray-200 text-gray-600" },
+      archivee_sans_suite: { label: "Archivée", className: "bg-gray-200 text-gray-600" }, // Alias
+      cloturee: { label: "Clôturée", className: "bg-gray-300 text-gray-700" },
       annulee: { label: "Annulée", className: "bg-gray-100 text-gray-800" },
-      archivee: { label: "Archivée sans suite", className: "bg-gray-200 text-gray-600" },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.en_attente;
+    const config = statusConfig[status as keyof typeof statusConfig] || { label: status, className: "bg-gray-100 text-gray-800" };
     return <Badge className={config.className}>{config.label}</Badge>;
   };
 
@@ -778,11 +788,18 @@ const SpaceReservationsBackoffice = () => {
               onValueChange={setFilterStatus}
               options={[
                 { value: "all", label: "Tous les statuts" },
-                { value: "en_attente", label: "En attente" },
+                { value: "a_verifier", label: "À vérifier" },
+                { value: "en_attente", label: "À vérifier" },
                 { value: "verification_en_cours", label: "Vérification en cours" },
-                { value: "validee", label: "Validée" },
+                { value: "confirmee", label: "Confirmée" },
+                { value: "validee", label: "Confirmée" },
                 { value: "rejetee", label: "Rejetée" },
-                { value: "archivee", label: "Archivée sans suite" },
+                { value: "refusee", label: "Rejetée" },
+                { value: "contractualisee", label: "Contractualisée" },
+                { value: "facturee", label: "Facturée" },
+                { value: "en_cours_execution", label: "En cours d'exécution" },
+                { value: "archivee", label: "Archivée" },
+                { value: "cloturee", label: "Clôturée" },
               ]}
               placeholder="Statut"
             />

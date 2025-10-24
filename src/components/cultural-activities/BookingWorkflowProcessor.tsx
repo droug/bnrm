@@ -147,8 +147,8 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
   const getDecisionBadge = (decision: string) => {
     const config = {
       demarrage: { label: "Démarrage", className: "bg-blue-100 text-blue-800" },
-      validee: { label: "Validée", className: "bg-green-100 text-green-800" },
-      refusee: { label: "Refusée", className: "bg-red-100 text-red-800" },
+      validee: { label: "Validée → Confirmée", className: "bg-green-100 text-green-800" },
+      refusee: { label: "Refusée → Rejetée", className: "bg-red-100 text-red-800" },
       verification_en_cours: { label: "Vérification en cours", className: "bg-orange-100 text-orange-800" },
       confirmee: { label: "Confirmée", className: "bg-teal-100 text-teal-800" },
       contractualisee: { label: "Contractualisée", className: "bg-purple-100 text-purple-800" },
