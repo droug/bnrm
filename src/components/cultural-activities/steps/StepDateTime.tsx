@@ -213,7 +213,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Date */}
                     <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
+                      <Label className="flex items-center gap-2 h-5">
                         <CalendarIcon className="h-4 w-4" />
                         Date *
                       </Label>
@@ -254,7 +254,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
 
                     {/* Heure de début */}
                     <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
+                      <Label className="flex items-center gap-2 h-5">
                         <Clock className="h-4 w-4" />
                         Heure de début *
                       </Label>
@@ -269,7 +269,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
 
                     {/* Heure de fin */}
                     <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
+                      <Label className="flex items-center gap-2 h-5">
                         <Clock className="h-4 w-4" />
                         Heure de fin *
                       </Label>
