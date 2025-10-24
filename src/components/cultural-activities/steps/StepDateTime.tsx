@@ -9,7 +9,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Calendar as CalendarIcon, Clock, Users, Trash2, Plus, CheckCircle, AlertCircle } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Calendar as CalendarIcon, Clock, Users, Trash2, Plus, CheckCircle, AlertCircle, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ interface StepDateTimeProps {
 export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
   const [slots, setSlots] = useState<EventSlot[]>(data.eventSlots || []);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingSlot, setEditingSlot] = useState<EventSlot | null>(null);
   const [newSlot, setNewSlot] = useState<EventSlot>({
     id: '',
     date: new Date(),
@@ -62,6 +64,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
       toast.error("Maximum 10 créneaux autorisés");
       return;
     }
+    setEditingSlot(null);
     setNewSlot({
       id: `slot-${Date.now()}`,
       date: new Date(),
@@ -72,16 +75,32 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
     setIsDialogOpen(true);
   };
 
-  // Confirmer l'ajout du créneau
-  const confirmAddSlot = () => {
+  // Ouvrir la modale pour modifier un créneau
+  const openEditSlotDialog = (slot: EventSlot) => {
+    setEditingSlot(slot);
+    setNewSlot({ ...slot });
+    setIsDialogOpen(true);
+  };
+
+  // Confirmer l'ajout ou la modification du créneau
+  const confirmSlot = () => {
     if (!newSlot.date || !newSlot.startTime || !newSlot.endTime || !newSlot.participants) {
       toast.error("Veuillez compléter tous les champs");
       return;
     }
 
-    setSlots([...slots, newSlot]);
+    if (editingSlot) {
+      // Modification
+      setSlots(slots.map(slot => slot.id === editingSlot.id ? newSlot : slot));
+      toast.success("Créneau modifié");
+    } else {
+      // Ajout
+      setSlots([...slots, newSlot]);
+      toast.success("Créneau ajouté");
+    }
+    
     setIsDialogOpen(false);
-    toast.success("Créneau ajouté");
+    setEditingSlot(null);
   };
 
   // Supprimer un créneau
@@ -200,147 +219,90 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
           </Button>
         </div>
 
-        {/* Liste des créneaux */}
-        <div className="space-y-4">
-          {sortedSlots.map((slot, index) => {
-            const hasOverlap = checkOverlaps(slot);
-            const isIncomplete = !slot.date || !slot.startTime || !slot.endTime;
-            
-            return (
-              <Card key={slot.id} className="p-4 bg-[#FAFAFA] border-[#DDD]">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-semibold text-[#002B45]">Créneau {index + 1}</h4>
-                    {slots.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          removeSlot(slot.id);
-                        }}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Date */}
-                    <div className="flex flex-col">
-                      <Label className="flex items-center gap-2 mb-2 min-h-[20px]">
-                        <CalendarIcon className="h-4 w-4" />
-                        Date *
-                      </Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
+        {/* Tableau des créneaux */}
+        <Card className="overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-[#FAFAFA]">
+                <TableHead className="font-semibold text-[#002B45]">Date</TableHead>
+                <TableHead className="font-semibold text-[#002B45]">Heure début</TableHead>
+                <TableHead className="font-semibold text-[#002B45]">Heure fin</TableHead>
+                <TableHead className="font-semibold text-[#002B45]">Participants</TableHead>
+                <TableHead className="font-semibold text-[#002B45] text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sortedSlots.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                    Aucun créneau ajouté. Cliquez sur "Ajouter un créneau" pour commencer.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                sortedSlots.map((slot, index) => {
+                  const hasOverlap = checkOverlaps(slot);
+                  const isIncomplete = !slot.date || !slot.startTime || !slot.endTime;
+                  
+                  return (
+                    <TableRow 
+                      key={slot.id}
+                      className={cn(
+                        "hover:bg-[#FAFAFA]/50",
+                        (hasOverlap || isIncomplete) && "bg-destructive/5"
+                      )}
+                    >
+                      <TableCell className="font-medium">
+                        {slot.date ? format(slot.date, "PPP", { locale: fr }) : "-"}
+                        {(hasOverlap || isIncomplete) && (
+                          <div className="text-xs text-destructive mt-1">
+                            {isIncomplete && "Incomplet"}
+                            {hasOverlap && !isIncomplete && "Chevauchement"}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>{slot.startTime || "-"}</TableCell>
+                      <TableCell>{slot.endTime || "-"}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-[#D4AF37]" />
+                          {slot.participants}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
                           <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal h-11",
-                              !slot.date && "text-muted-foreground"
-                            )}
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openEditSlotDialog(slot)}
+                            className="text-[#D4AF37] hover:text-[#D4AF37] hover:bg-[#D4AF37]/10"
                           >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {slot.date ? (
-                              format(slot.date, "PPP", { locale: fr })
-                            ) : (
-                              <span>Sélectionner</span>
-                            )}
+                            <Pencil className="h-4 w-4" />
                           </Button>
-                        </PopoverTrigger>
-                        <PopoverContent 
-                          className="w-auto p-0" 
-                          align="start"
-                          style={{ zIndex: 9999 }}
-                        >
-                          <Calendar
-                            mode="single"
-                            selected={slot.date}
-                            onSelect={(date) => date && updateSlot(slot.id, { date })}
-                            disabled={(date) => date < today}
-                            initialFocus
-                            locale={fr}
-                            className="p-3 pointer-events-auto"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-
-                    {/* Heure de début */}
-                    <div className="flex flex-col">
-                      <Label className="flex items-center gap-2 mb-2 min-h-[20px]">
-                        <Clock className="h-4 w-4" />
-                        Heure de début *
-                      </Label>
-                      <Input
-                        type="time"
-                        value={slot.startTime}
-                        onChange={(e) => updateSlot(slot.id, { startTime: e.target.value })}
-                        className="h-11"
-                        required
-                      />
-                    </div>
-
-                    {/* Heure de fin */}
-                    <div className="flex flex-col">
-                      <Label className="flex items-center gap-2 mb-2 min-h-[20px]">
-                        <Clock className="h-4 w-4" />
-                        Heure de fin *
-                      </Label>
-                      <Input
-                        type="time"
-                        value={slot.endTime}
-                        onChange={(e) => updateSlot(slot.id, { endTime: e.target.value })}
-                        className="h-11"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* Nombre de participants */}
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      Nombre de participants *
-                    </Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="500"
-                      value={slot.participants}
-                      onChange={(e) => updateSlot(slot.id, { participants: parseInt(e.target.value) || 1 })}
-                      placeholder="Ex: 50"
-                      required
-                    />
-                  </div>
-
-                  {/* Alertes */}
-                  {isIncomplete && (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        Veuillez compléter toutes les informations du créneau.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  {hasOverlap && !isIncomplete && (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        Deux créneaux ne peuvent pas se superposer dans le temps.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </div>
-              </Card>
-            );
-          })}
-        </div>
+                          {slots.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                removeSlot(slot.id);
+                              }}
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </Card>
 
         {/* Total de participants */}
         {slots.length > 0 && (
@@ -419,12 +381,12 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
         )}
       </div>
 
-      {/* Modale d'ajout de créneau */}
+      {/* Modale d'ajout/modification de créneau */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-[#002B45]">
-              Ajouter un créneau
+              {editingSlot ? "Modifier le créneau" : "Ajouter un créneau"}
             </DialogTitle>
           </DialogHeader>
 
@@ -521,16 +483,19 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setIsDialogOpen(false)}
+              onClick={() => {
+                setIsDialogOpen(false);
+                setEditingSlot(null);
+              }}
             >
               Annuler
             </Button>
             <Button
               type="button"
-              onClick={confirmAddSlot}
+              onClick={confirmSlot}
               className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white"
             >
-              Ajouter
+              {editingSlot ? "Modifier" : "Ajouter"}
             </Button>
           </DialogFooter>
         </DialogContent>
