@@ -30,120 +30,131 @@ interface Space {
 }
 
 /**
- * Génère une lettre de confirmation de réservation en PDF
+ * Génère une lettre de confirmation de réservation en PDF selon le modèle officiel BNRM
  */
 export const generateConfirmationLetter = async (booking: Booking, space?: Space) => {
   const doc = new jsPDF();
   
   // Ajouter l'en-tête BNRM
   const yAfterHeader = await addBNRMHeader(doc);
-  let yPos = yAfterHeader + 10;
+  let yPos = yAfterHeader + 5;
   
-  // Titre
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text('LETTRE DE CONFIRMATION DE RÉSERVATION', 105, yPos, { align: 'center' });
-  yPos += 15;
-  
-  // Numéro de réservation
+  // Département et Date/Lieu
   doc.setFontSize(11);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`Référence: ${booking.booking_number}`, 20, yPos);
-  yPos += 7;
-  doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 20, yPos);
-  yPos += 15;
-  
-  // Informations de l'organisme
   doc.setFont('helvetica', 'bold');
-  doc.text('Organisme demandeur:', 20, yPos);
-  yPos += 7;
+  doc.text('Département des activités Culturelles et de la Communication', 105, yPos, { align: 'center' });
+  yPos += 10;
+  
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Rabat, le ${new Date().toLocaleDateString('fr-FR')}`, 20, yPos);
+  yPos += 10;
+  
+  // Destinataire
+  doc.setFont('helvetica', 'bold');
+  doc.text(`A l'Attention de ${booking.contact_person}`, 20, yPos);
+  yPos += 5;
   doc.setFont('helvetica', 'normal');
   doc.text(booking.organization_name, 20, yPos);
-  yPos += 5;
-  doc.text(`Contact: ${booking.contact_person}`, 20, yPos);
-  yPos += 5;
-  doc.text(`Email: ${booking.email}`, 20, yPos);
-  yPos += 5;
-  doc.text(`Téléphone: ${booking.phone}`, 20, yPos);
-  yPos += 12;
+  yPos += 10;
   
   // Objet
   doc.setFont('helvetica', 'bold');
-  doc.text('Objet:', 20, yPos);
-  yPos += 7;
+  doc.text(`Objet : Confirmation d'occupation de ${space?.name || 'l\'espace'}`, 20, yPos);
+  yPos += 10;
+  
+  // Référence
+  const refMonth = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
   doc.setFont('helvetica', 'normal');
-  const objectText = `Confirmation de réservation d'espace pour ${booking.activity_type}`;
-  doc.text(objectText, 20, yPos);
-  yPos += 12;
+  doc.text(`Réf DR: ${booking.booking_number}/suite/${refMonth}`, 20, yPos);
+  yPos += 15;
   
   // Corps de la lettre
-  const bodyText = [
-    'Madame, Monsieur,',
+  doc.text('Madame/Monsieur,', 20, yPos);
+  yPos += 10;
+  
+  const startDate = new Date(booking.start_date).toLocaleDateString('fr-FR');
+  const endDate = new Date(booking.end_date).toLocaleDateString('fr-FR');
+  
+  const bodyLines = [
+    `En réponse à votre demande datée du ${startDate}, la Bibliothèque Nationale du Royaume du Maroc`,
+    `met à votre disposition ${space?.name || 'l\'espace'} pour la période du ${startDate} au ${endDate}.`,
     '',
-    `Nous avons le plaisir de vous confirmer la réservation de l'espace "${space?.name || 'Non spécifié'}"`,
-    'pour votre activité dans les conditions suivantes:'
+    'Nous vous prions de bien vouloir vous présenter au siège de la BNRM – Département des Activités',
+    'culturelles et de la Communication, muni de cette confirmation et de la fiche de renseignement',
+    'dûment remplie pour la signature du contrat, au plus tard, 72h avant la date de la manifestation.',
+    'A défaut, votre réservation sera annulée.'
   ];
   
-  doc.setFontSize(11);
-  bodyText.forEach(line => {
+  bodyLines.forEach(line => {
     doc.text(line, 20, yPos);
-    yPos += 6;
+    yPos += 5;
   });
-  yPos += 5;
+  yPos += 10;
   
-  // Tableau des détails
+  // Section Devis
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('Devis :', 20, yPos);
+  yPos += 10;
+  
+  // Calcul des valeurs
+  const days = Math.ceil((new Date(booking.end_date).getTime() - new Date(booking.start_date).getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  const unitPrice = booking.total_amount / days;
+  
+  // Tableau du devis
   autoTable(doc, {
     startY: yPos,
-    head: [['Détail', 'Information']],
+    head: [['Désignation', 'Prix unitaire', 'Nombre de jours', 'Montant']],
     body: [
-      ['Espace réservé', space?.name || 'Non spécifié'],
-      ['Type d\'activité', booking.activity_type],
-      ['Date de début', new Date(booking.start_date).toLocaleDateString('fr-FR')],
-      ['Date de fin', new Date(booking.end_date).toLocaleDateString('fr-FR')],
-      ['Durée', booking.duration_type === 'demi_journee' ? 'Demi-journée' : 'Journée complète'],
-      ['Participants attendus', booking.expected_attendees?.toString() || 'Non précisé'],
-      ['Montant total', `${booking.total_amount.toFixed(2)} MAD`]
+      [
+        `${space?.name || 'Espace'} / ${booking.duration_type === 'demi_journee' ? 'Demi-journée' : 'Journée'}`,
+        `${unitPrice.toFixed(2)} MAD`,
+        days.toString(),
+        `${booking.total_amount.toFixed(2)} MAD`
+      ]
     ],
     theme: 'grid',
-    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+    headStyles: { 
+      fillColor: [240, 240, 240],
+      textColor: [0, 0, 0],
+      fontStyle: 'bold',
+      lineWidth: 0.5,
+      lineColor: [0, 0, 0]
+    },
+    bodyStyles: {
+      lineWidth: 0.5,
+      lineColor: [0, 0, 0]
+    },
     margin: { left: 20, right: 20 }
   });
   
-  yPos = (doc as any).lastAutoTable.finalY + 15;
+  yPos = (doc as any).lastAutoTable.finalY + 10;
   
-  // Besoins spéciaux
-  if (booking.special_requirements) {
-    doc.setFont('helvetica', 'bold');
-    doc.text('Besoins spéciaux:', 20, yPos);
-    yPos += 7;
-    doc.setFont('helvetica', 'normal');
-    const splitRequirements = doc.splitTextToSize(booking.special_requirements, 170);
-    doc.text(splitRequirements, 20, yPos);
-    yPos += splitRequirements.length * 5 + 10;
-  }
+  // Charges et frais annexes
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Charges et frais annexes', 20, yPos);
+  yPos += 10;
   
-  // Formule de politesse
-  if (yPos > 250) {
-    doc.addPage();
-    yPos = 20;
-  }
-  
-  const closingText = [
-    'Nous restons à votre disposition pour toute information complémentaire.',
-    '',
-    'Veuillez agréer, Madame, Monsieur, nos salutations distinguées.'
-  ];
-  
-  closingText.forEach(line => {
-    doc.text(line, 20, yPos);
-    yPos += 6;
-  });
+  // TOTAL A PAYER
+  doc.setFontSize(13);
+  doc.text(`TOTAL A PAYER : ${booking.total_amount.toFixed(2)} MAD`, 20, yPos);
+  yPos += 15;
   
   // Signature
-  yPos += 10;
-  doc.setFont('helvetica', 'bold');
-  doc.text('La Direction', 20, yPos);
-  doc.text('Bibliothèque Nationale du Royaume du Maroc', 20, yPos + 6);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text('M. Brahim IGHLANE', 130, yPos);
+  yPos += 5;
+  doc.text('Département des Activités Culturelles', 130, yPos);
+  yPos += 5;
+  doc.text('et de la Communication', 130, yPos);
+  
+  // Note en bas
+  yPos = 270;
+  doc.setFontSize(9);
+  doc.setTextColor(100);
+  doc.text('Notre règlement d\'utilisation des espaces est consultable sur le site BNRM : www.bnrm.ma', 105, yPos, { align: 'center' });
   
   // Pied de page
   addBNRMFooter(doc, 1);
