@@ -541,6 +541,10 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     if (stepCode === 'e03_traitement_dac') {
       return (
         <>
+          <Button variant="outline" onClick={() => openConfirmDialog('verification_en_cours', 'Mettre en vérification', 'Cette demande nécessite une vérification approfondie. Voulez-vous la mettre en vérification ?')} disabled={processing}>
+            <Clock className="h-4 w-4 mr-2" />
+            Vérification en cours
+          </Button>
           <Button variant="outline" onClick={() => openConfirmDialog('refusee', 'Refuser (indisponibilité)', 'Confirmez-vous que l\'espace n\'est pas disponible aux dates demandées ?', 'destructive')} disabled={processing}>
             <XCircle className="h-4 w-4 mr-2" />
             Refuser (indisponibilité)
