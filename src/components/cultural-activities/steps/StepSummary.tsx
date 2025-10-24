@@ -232,7 +232,7 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
   const isComplete = data.organizerType && data.organizationName && data.spaceId && 
                      data.startDate && data.endDate && data.startTime && data.endTime && 
                      data.eventTitle && data.eventDescription && 
-                     (data.expectedAttendees !== undefined && data.expectedAttendees !== null) &&
+                     (data.expectedAttendees && data.expectedAttendees >= 1) &&
                      data.contactPerson &&
                      data.contactEmail && data.contactPhone;
 
@@ -630,7 +630,7 @@ export default function StepSummary({ data, onUpdate, onNext }: StepSummaryProps
               Heure fin: {data.endTime ? '✓' : '✗'}<br/>
               Titre événement: {data.eventTitle ? '✓' : '✗'}<br/>
               Description: {data.eventDescription ? '✓' : '✗'}<br/>
-              Participants: {(data.expectedAttendees !== undefined && data.expectedAttendees !== null) ? '✓' : '✗'}<br/>
+              Participants: {(data.expectedAttendees && data.expectedAttendees >= 1) ? '✓' : '✗'}<br/>
               Personne contact: {data.contactPerson ? '✓' : '✗'}<br/>
               Email: {data.contactEmail ? '✓' : '✗'}<br/>
               Téléphone: {data.contactPhone ? '✓' : '✗'}
