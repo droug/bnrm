@@ -141,69 +141,108 @@ export default function BookingWizard() {
   const canProceed = isStepValid(currentStep);
 
   return (
-    <div className="max-w-5xl mx-auto">
-      {/* Progress */}
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="mb-4">
-            <div className="flex justify-between text-sm font-medium mb-2">
-              <span>Étape {currentStep} sur {STEPS.length}</span>
-              <span>{Math.round(progress)}%</span>
-            </div>
-            <Progress value={progress} className="h-2" />
-          </div>
-          
-          <div className="flex flex-wrap gap-2">
-            {STEPS.map((step) => (
-              <button
-                key={step.id}
-                onClick={() => setCurrentStep(step.id)}
-                className={`flex-1 min-w-[120px] text-center py-2 px-3 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                  step.id === currentStep
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-primary/10 text-primary hover:bg-primary/20'
+    <div className="max-w-5xl mx-auto animate-fade-in">
+      {/* Progress indicator - Style identique à GuidedTourWizard */}
+      <div className="mb-10 bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#D4AF37]/20 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          {STEPS.map((step, index) => {
+            const stepNumber = index + 1;
+            return (
+              <div
+                key={index}
+                className={`flex items-center ${
+                  index < STEPS.length - 1 ? "flex-1" : ""
                 }`}
               >
-                {step.title}
-              </button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Current Step */}
-      <Card>
-        <CardContent className="pt-6">
-          <CurrentStepComponent
-            data={bookingData}
-            onUpdate={handleUpdateData}
-            onNext={handleNext}
-            bookingId={bookingData.submittedBookingId}
-          />
-
-          {/* Navigation Buttons */}
-          {currentStep < STEPS.length && (
-            <div className="flex justify-between mt-8 pt-6 border-t">
-              <Button
-                variant="outline"
-                onClick={handlePrevious}
-                disabled={currentStep === 1}
-                className="gap-2"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Précédent
-              </Button>
-
-              {currentStep < STEPS.length - 1 ? (
-                <Button onClick={handleNext} className="gap-2">
-                  Suivant
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              ) : null}
+                <div
+                  className={`flex items-center justify-center w-12 h-12 rounded-full border transition-all duration-200 ${
+                    stepNumber === currentStep
+                      ? "border-[#D4AF37] bg-[#D4AF37] text-white shadow-md"
+                      : stepNumber < currentStep
+                      ? "border-[#D4AF37] bg-[#D4AF37]/10 text-[#D4AF37]"
+                      : "border-[#002B45]/20 text-[#002B45]/40"
+                  }`}
+                >
+                  {stepNumber < currentStep ? (
+                    <ChevronRight className="h-5 w-5" />
+                  ) : (
+                    <span className="text-sm font-light">{stepNumber}</span>
+                  )}
+                </div>
+                {index < STEPS.length - 1 && (
+                  <div
+                    className={`h-px flex-1 mx-3 transition-all duration-200 ${
+                      stepNumber < currentStep ? "bg-[#D4AF37]" : "bg-[#002B45]/10"
+                    }`}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex justify-between mt-4">
+          {STEPS.map((step, index) => (
+            <div
+              key={index}
+              className={`text-xs font-light transition-colors duration-200 ${
+                index + 1 === currentStep
+                  ? "text-[#D4AF37]"
+                  : index + 1 < currentStep
+                  ? "text-[#D4AF37]/70"
+                  : "text-[#002B45]/40"
+              }`}
+              style={{ width: `${100 / STEPS.length}%` }}
+            >
+              <div className="text-center">{step.title}</div>
             </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Current Step Content */}
+      <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 border border-[#D4AF37]/20 shadow-sm mb-6 transition-all duration-200 animate-fade-in">
+        <CurrentStepComponent
+          data={bookingData}
+          onUpdate={handleUpdateData}
+          onNext={handleNext}
+          bookingId={bookingData.submittedBookingId}
+        />
+      </div>
+
+      {/* Navigation Buttons */}
+      {currentStep < STEPS.length && (
+        <div className="flex justify-between">
+          {currentStep > 1 && (
+            <Button
+              variant="outline"
+              onClick={handlePrevious}
+              className="border-[#D4AF37]/30 hover:bg-[#D4AF37]/10 hover:border-[#D4AF37] transition-all duration-200"
+            >
+              <ChevronLeft className="mr-2 h-4 w-4" />
+              Précédent
+            </Button>
           )}
-        </CardContent>
-      </Card>
+          {currentStep < STEPS.length - 1 ? (
+            <Button
+              onClick={handleNext}
+              disabled={!canProceed}
+              className="ml-auto bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white border-0 shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Suivant
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              onClick={handleNext}
+              disabled={!canProceed}
+              className="ml-auto bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white border-0 shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Valider
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
