@@ -238,7 +238,7 @@ const ProgramContributionWizard = () => {
                 {currentStep < STEPS.length ? (
                   <Button 
                     type="button" 
-                    onClick={() => setCurrentStep(currentStep + 1)}
+                    onClick={handleNext}
                     className="ml-auto transition-all duration-300 bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white shadow-md"
                   >
                     Suivant
