@@ -417,39 +417,71 @@ export const generateInventoryReport = async (booking: Booking, space?: Space) =
   doc.text(`Contact: ${booking.contact_person}`, 20, yPos);
   yPos += 15;
   
-  // Introduction
-  doc.setFont('helvetica', 'bold');
-  doc.text('TYPE D\'ÉTAT DES LIEUX:', 20, yPos);
-  yPos += 7;
-  doc.setFont('helvetica', 'normal');
-  doc.text('☐ État des lieux d\'entrée', 30, yPos);
-  yPos += 6;
-  doc.text('☐ État des lieux de sortie', 30, yPos);
-  yPos += 15;
+  // Éléments communs pour les deux tableaux
+  const elements = [
+    'Sols et revêtements',
+    'Murs et peintures',
+    'Plafonds',
+    'Éclairage',
+    'Climatisation/Chauffage',
+    'Mobilier',
+    'Équipements audiovisuels',
+    'Sanitaires',
+    'Issues de secours',
+    'Propreté générale'
+  ];
   
-  // Tableau d'état des lieux
+  // Tableau État des lieux d'entrée
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('ÉTAT DES LIEUX D\'ENTRÉE', 20, yPos);
+  yPos += 7;
+  
   autoTable(doc, {
     startY: yPos,
-    head: [['Élément', 'État', 'Observations']],
-    body: [
-      ['Sols et revêtements', '☐ Bon ☐ Moyen ☐ Mauvais', ''],
-      ['Murs et peintures', '☐ Bon ☐ Moyen ☐ Mauvais', ''],
-      ['Plafonds', '☐ Bon ☐ Moyen ☐ Mauvais', ''],
-      ['Éclairage', '☐ Bon ☐ Moyen ☐ Mauvais', ''],
-      ['Climatisation/Chauffage', '☐ Bon ☐ Moyen ☐ Mauvais', ''],
-      ['Mobilier', '☐ Bon ☐ Moyen ☐ Mauvais', ''],
-      ['Équipements audiovisuels', '☐ Bon ☐ Moyen ☐ Mauvais', ''],
-      ['Sanitaires', '☐ Bon ☐ Moyen ☐ Mauvais', ''],
-      ['Issues de secours', '☐ Bon ☐ Moyen ☐ Mauvais', ''],
-      ['Propreté générale', '☐ Bon ☐ Moyen ☐ Mauvais', '']
-    ],
+    head: [['Élément', 'Bon', 'Moyen', 'Mauvais', 'Observations']],
+    body: elements.map(element => [element, '☐', '☐', '☐', '']),
     theme: 'grid',
-    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+    headStyles: { fillColor: [41, 128, 185], textColor: 255, halign: 'center' },
     margin: { left: 20, right: 20 },
     columnStyles: {
       0: { cellWidth: 60 },
-      1: { cellWidth: 50 },
-      2: { cellWidth: 60 }
+      1: { cellWidth: 15, halign: 'center' },
+      2: { cellWidth: 15, halign: 'center' },
+      3: { cellWidth: 20, halign: 'center' },
+      4: { cellWidth: 60 }
+    }
+  });
+  
+  yPos = (doc as any).lastAutoTable.finalY + 15;
+  
+  // Vérifier si on doit ajouter une nouvelle page
+  if (yPos > 200) {
+    addBNRMFooter(doc, 1);
+    doc.addPage();
+    const yAfterHeader2 = await addBNRMHeader(doc);
+    yPos = yAfterHeader2 + 10;
+  }
+  
+  // Tableau État des lieux de sortie
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('ÉTAT DES LIEUX DE SORTIE', 20, yPos);
+  yPos += 7;
+  
+  autoTable(doc, {
+    startY: yPos,
+    head: [['Élément', 'Bon', 'Moyen', 'Mauvais', 'Observations']],
+    body: elements.map(element => [element, '☐', '☐', '☐', '']),
+    theme: 'grid',
+    headStyles: { fillColor: [41, 128, 185], textColor: 255, halign: 'center' },
+    margin: { left: 20, right: 20 },
+    columnStyles: {
+      0: { cellWidth: 60 },
+      1: { cellWidth: 15, halign: 'center' },
+      2: { cellWidth: 15, halign: 'center' },
+      3: { cellWidth: 20, halign: 'center' },
+      4: { cellWidth: 60 }
     }
   });
   
