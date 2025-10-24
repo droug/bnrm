@@ -6,11 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Upload, CheckCircle, Loader2, Users, Square, ChevronDown } from "lucide-react";
+import { Upload, CheckCircle, Loader2, Users, Square, ChevronDown, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import type { BookingData } from "../BookingWizard";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface StepOrganizerTypeProps {
   data: BookingData;
@@ -41,6 +43,25 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
   });
 
   const selectedSpace = spaces?.find(s => s.id === data.spaceId);
+
+  // Fetch blocked dates for the selected space
+  const { data: blockedDates } = useQuery({
+    queryKey: ['space-availability', data.spaceId],
+    queryFn: async () => {
+      if (!data.spaceId) return [];
+      
+      const { data: availabilityData, error } = await supabase
+        .from('space_availability')
+        .select('start_date, end_date')
+        .eq('space_id', data.spaceId)
+        .eq('is_blocked', true)
+        .gte('end_date', new Date().toISOString());
+      
+      if (error) throw error;
+      return availabilityData || [];
+    },
+    enabled: !!data.spaceId
+  });
 
   const filteredSpaces = spaces?.filter(space =>
     space.name.toLowerCase().includes(spaceSearch.toLowerCase())
@@ -293,6 +314,104 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Calendrier des disponibilités et prix */}
+      {selectedSpace && data.organizerType && (
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Calendrier */}
+          <Card className="border-2 border-primary/20">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <CalendarDays className="h-5 w-5 text-primary" />
+                <h3 className="font-semibold text-lg">Disponibilités</h3>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Les dates en rouge sont déjà réservées ou indisponibles
+              </p>
+              <Calendar
+                mode="single"
+                locale={fr}
+                disabled={(date) => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  if (date < today) return true;
+                  
+                  return blockedDates?.some(blocked => {
+                    const start = new Date(blocked.start_date);
+                    const end = new Date(blocked.end_date);
+                    return date >= start && date <= end;
+                  }) || false;
+                }}
+                className="rounded-md border"
+              />
+            </CardContent>
+          </Card>
+
+          {/* Tarifs */}
+          <Card className="border-2 border-primary/20">
+            <CardContent className="p-6">
+              <h3 className="font-semibold text-lg mb-4">Tarification</h3>
+              <div className="space-y-4">
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">Journée complète</span>
+                    <span className="text-xl font-bold text-primary">
+                      {data.organizerType === 'public' 
+                        ? `${selectedSpace.tariff_public_full_day} MAD`
+                        : `${selectedSpace.tariff_private_full_day} MAD`
+                      }
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Location pour une journée entière
+                  </p>
+                </div>
+
+                {selectedSpace.allows_half_day && (
+                  <div className="bg-muted/50 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium">Demi-journée</span>
+                      <span className="text-xl font-bold text-primary">
+                        {data.organizerType === 'public' 
+                          ? `${selectedSpace.tariff_public_half_day} MAD`
+                          : `${selectedSpace.tariff_private_half_day} MAD`
+                        }
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Location pour une demi-journée
+                    </p>
+                  </div>
+                )}
+
+                {(selectedSpace.electricity_charge > 0 || selectedSpace.cleaning_charge > 0) && (
+                  <div className="border-t pt-4 space-y-2">
+                    <p className="text-sm font-medium mb-2">Frais supplémentaires :</p>
+                    {selectedSpace.electricity_charge > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Électricité</span>
+                        <span className="font-medium">{selectedSpace.electricity_charge} MAD</span>
+                      </div>
+                    )}
+                    {selectedSpace.cleaning_charge > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Nettoyage</span>
+                        <span className="font-medium">{selectedSpace.cleaning_charge} MAD</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+                  <p className="text-xs text-blue-900">
+                    💡 Les tarifs affichés correspondent au type d'organisme <strong>{data.organizerType === 'public' ? 'Public' : 'Privé'}</strong>
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Texte descriptif tarifs réduits */}
