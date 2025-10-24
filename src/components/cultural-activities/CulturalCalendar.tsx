@@ -246,7 +246,7 @@ const CulturalCalendar = () => {
           </div>
 
           {/* Calendar Grid */}
-          <TooltipProvider delayDuration={200}>
+          <TooltipProvider delayDuration={0} skipDelayDuration={0}>
             <div className="grid grid-cols-7 gap-2">
               {/* Day Headers */}
               {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map(day => (
@@ -267,9 +267,10 @@ const CulturalCalendar = () => {
 
                 if (hasEvents) {
                   return (
-                    <Tooltip key={day}>
+                    <Tooltip key={day} delayDuration={0}>
                       <TooltipTrigger asChild>
                         <button
+                          type="button"
                           onClick={() => setSelectedEvent(events[0])}
                           className="aspect-square p-2 rounded-xl border-2 transition-all border-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 cursor-pointer"
                         >
@@ -284,7 +285,11 @@ const CulturalCalendar = () => {
                           </div>
                         </button>
                       </TooltipTrigger>
-                      <TooltipContent className="max-w-xs p-3 bg-popover border-border" side="top">
+                      <TooltipContent 
+                        className="max-w-xs p-3 bg-popover text-popover-foreground border-border z-50" 
+                        side="top"
+                        sideOffset={5}
+                      >
                         <div className="space-y-2">
                           {events.map((event, idx) => (
                             <div key={event.id} className={idx > 0 ? "pt-2 border-t border-border" : ""}>
@@ -306,6 +311,7 @@ const CulturalCalendar = () => {
                 return (
                   <button
                     key={day}
+                    type="button"
                     className="aspect-square p-2 rounded-xl border-2 transition-all border-gray-200 hover:border-red-400 hover:bg-red-50 cursor-not-allowed relative"
                     disabled
                   >
