@@ -4,11 +4,13 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import BookingWizard from "@/components/cultural-activities/BookingWizard";
+import { BookingCartProvider } from "@/contexts/BookingCartContext";
 
 export default function CulturalActivitiesBooking() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FAF9F5' }}>
-      <Header />
+    <BookingCartProvider>
+      <div className="min-h-screen" style={{ backgroundColor: '#FAF9F5' }}>
+        <Header />
       
       <div className="container mx-auto px-4 py-12">
         <Link to="/cultural-activities">
@@ -35,7 +37,8 @@ export default function CulturalActivitiesBooking() {
         </div>
       </div>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </BookingCartProvider>
   );
 }

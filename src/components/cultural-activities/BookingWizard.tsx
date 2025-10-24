@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShoppingCart, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { useBookingCart } from "@/contexts/BookingCartContext";
+import BookingCart from "./BookingCart";
 import StepOrganizerType from "./steps/StepOrganizerType";
 import StepDateTime from "./steps/StepDateTime";
 import StepEquipment from "./steps/StepEquipment";
@@ -63,6 +65,8 @@ const STORAGE_KEY = 'cultural_activities_booking_draft';
 
 export default function BookingWizard() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [showCart, setShowCart] = useState(false);
+  const { addToCart, totalItems } = useBookingCart();
   const [bookingData, setBookingData] = useState<BookingData>({
     equipment: [],
     services: [],
@@ -183,6 +187,32 @@ export default function BookingWizard() {
     });
   };
 
+  const handleAddToCart = () => {
+    if (!isStepValid(1)) {
+      toast.error("Veuillez sélectionner un type d'organisme et un espace");
+      return;
+    }
+    
+    addToCart(bookingData);
+    toast.success("Espace ajouté au panier");
+    
+    // Réinitialiser le wizard pour une nouvelle sélection
+    setBookingData({
+      equipment: [],
+      services: [],
+      eventSlots: [{
+        id: `slot-${Date.now()}`,
+        date: new Date(),
+        startTime: "09:00",
+        endTime: "18:00",
+        participants: 1
+      }]
+    });
+    setCurrentStep(1);
+    localStorage.removeItem(STORAGE_KEY);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Validation pour chaque étape
   const isStepValid = (step: number): boolean => {
     switch (step) {
@@ -245,8 +275,36 @@ export default function BookingWizard() {
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
-      {/* Progress indicator - Style identique à GuidedTourWizard */}
-      <div className="mb-10 bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#D4AF37]/20 shadow-sm">
+      {/* Bouton panier et affichage */}
+      <div className="mb-6 flex justify-end">
+        <Button
+          variant="outline"
+          onClick={() => setShowCart(!showCart)}
+          className="gap-2 border-[#D4AF37]/30 hover:bg-[#D4AF37]/10"
+        >
+          <ShoppingCart className="h-4 w-4" />
+          Panier {totalItems > 0 && `(${totalItems})`}
+        </Button>
+      </div>
+
+      {showCart ? (
+        <div className="space-y-6">
+          <BookingCart />
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setShowCart(false)}
+              className="gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Ajouter un autre espace
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Progress indicator - Style identique à GuidedTourWizard */}
+          <div className="mb-10 bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#D4AF37]/20 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           {STEPS.map((step, index) => {
             const stepNumber = index + 1;
@@ -316,7 +374,7 @@ export default function BookingWizard() {
 
       {/* Navigation Buttons */}
       {currentStep < STEPS.length && (
-        <div className="flex justify-between">
+        <div className="flex justify-between gap-3">
           {currentStep > 1 && (
             <Button
               variant="outline"
@@ -327,6 +385,19 @@ export default function BookingWizard() {
               Précédent
             </Button>
           )}
+          
+          {currentStep === 1 && (
+            <Button
+              variant="outline"
+              onClick={handleAddToCart}
+              disabled={!isStepValid(1)}
+              className="gap-2 border-[#D4AF37]/30 hover:bg-[#D4AF37]/10"
+            >
+              <Plus className="h-4 w-4" />
+              Ajouter au panier
+            </Button>
+          )}
+
           {currentStep < STEPS.length - 1 ? (
             <Button
               onClick={handleNext}
@@ -347,6 +418,8 @@ export default function BookingWizard() {
             </Button>
           )}
         </div>
+      )}
+        </>
       )}
     </div>
   );
