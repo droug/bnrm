@@ -1,0 +1,290 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, XCircle, Clock, GitBranch, ArrowRight } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+
+interface WorkflowStep {
+  step_order: number;
+  step_name: string;
+  step_code: string;
+  assigned_role: string;
+  description: string;
+}
+
+interface WorkflowHistoryEntry {
+  step_name: string;
+  decision: string;
+  comment: string | null;
+  processed_by_email: string;
+  processed_at: string;
+}
+
+interface BookingWorkflowProcessorProps {
+  booking: any;
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: BookingWorkflowProcessorProps) {
+  const [workflowSteps, setWorkflowSteps] = useState<WorkflowStep[]>([]);
+  const [workflowHistory, setWorkflowHistory] = useState<WorkflowHistoryEntry[]>([]);
+  const [comment, setComment] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (open && booking) {
+      loadWorkflowData();
+    }
+  }, [open, booking]);
+
+  const loadWorkflowData = async () => {
+    try {
+      // Charger les étapes du workflow
+      const { data: steps } = await supabase
+        .from('booking_workflow_steps')
+        .select('*')
+        .order('step_order', { ascending: true });
+      
+      if (steps) setWorkflowSteps(steps);
+
+      // Charger l'historique
+      const { data: history } = await supabase
+        .rpc('get_booking_workflow_history', {
+          p_booking_id: booking.id
+        });
+      
+      if (history) setWorkflowHistory(history);
+    } catch (error) {
+      console.error('Error loading workflow data:', error);
+    }
+  };
+
+  const handleWorkflowAction = async (decision: 'validee' | 'refusee' | 'verification_en_cours') => {
+    if (decision === 'refusee' && !comment.trim()) {
+      toast({
+        title: "Attention",
+        description: "Un commentaire est requis pour un refus",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      const { data, error } = await supabase.rpc('advance_booking_workflow', {
+        p_booking_id: booking.id,
+        p_decision: decision,
+        p_comment: comment.trim() || null
+      });
+
+      if (error) throw error;
+
+      const result = data as any;
+      if (result?.success) {
+        if (result.workflow_completed) {
+          toast({
+            title: "Workflow terminé",
+            description: `Statut final: ${decision === 'validee' ? 'Validée' : decision === 'refusee' ? 'Rejetée' : 'En vérification'}`,
+          });
+        } else {
+          toast({
+            title: "Étape suivante",
+            description: `Demande passée à: ${result.next_step}`,
+          });
+        }
+        onSuccess();
+        onClose();
+        setComment("");
+      } else {
+        toast({
+          title: "Erreur",
+          description: result?.error || "Erreur lors du traitement",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error processing workflow:', error);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors du traitement du workflow",
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const getStepStatus = (stepOrder: number) => {
+    const currentStepOrder = booking?.current_step_order || 1;
+    if (stepOrder < currentStepOrder) return 'completed';
+    if (stepOrder === currentStepOrder) return 'current';
+    return 'pending';
+  };
+
+  const getDecisionBadge = (decision: string) => {
+    const config = {
+      validee: { label: "Validée", className: "bg-green-100 text-green-800" },
+      refusee: { label: "Refusée", className: "bg-red-100 text-red-800" },
+      verification_en_cours: { label: "Vérification en cours", className: "bg-orange-100 text-orange-800" },
+    };
+    const c = config[decision as keyof typeof config] || config.verification_en_cours;
+    return <Badge className={c.className}>{c.label}</Badge>;
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-2xl">
+            <GitBranch className="h-6 w-6 text-primary" />
+            Traitement de la demande - Workflow
+          </DialogTitle>
+          <DialogDescription>
+            {booking && (
+              <div className="space-y-2 mt-2">
+                <p className="text-base">
+                  <span className="font-semibold">Organisation:</span> {booking.organization_name}
+                </p>
+                <p className="text-base">
+                  <span className="font-semibold">Espace:</span> {booking.cultural_spaces?.name}
+                </p>
+                <p className="text-base">
+                  <span className="font-semibold">Dates:</span>{' '}
+                  {format(new Date(booking.start_date), 'dd/MM/yyyy', { locale: fr })} -{' '}
+                  {format(new Date(booking.end_date), 'dd/MM/yyyy', { locale: fr })}
+                </p>
+              </div>
+            )}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6 py-4">
+          {/* Étape actuelle */}
+          <div className="bg-primary/10 p-4 rounded-lg border-2 border-primary">
+            <p className="text-lg font-semibold text-primary">
+              Étape actuelle: {booking?.current_step_order}. {
+                workflowSteps.find(s => s.step_code === booking?.current_step_code)?.step_name || 'Chargement...'
+              }
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Responsable: {workflowSteps.find(s => s.step_code === booking?.current_step_code)?.assigned_role}
+            </p>
+          </div>
+
+          {/* Visualisation du workflow */}
+          <div className="space-y-3">
+            <h3 className="font-semibold text-lg">Progression du workflow</h3>
+            {workflowSteps.map((step, index) => {
+              const status = getStepStatus(step.step_order);
+              const historyEntry = workflowHistory.find(h => h.step_name === step.step_name);
+
+              return (
+                <div key={step.step_code}>
+                  <div className={`flex items-start gap-4 p-4 border rounded-lg ${
+                    status === 'completed' ? 'bg-green-50 border-green-200' :
+                    status === 'current' ? 'bg-blue-50 border-blue-300 border-2' :
+                    'bg-gray-50 border-gray-200'
+                  }`}>
+                    <div className="flex-shrink-0">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                        status === 'completed' ? 'bg-green-600 text-white' :
+                        status === 'current' ? 'bg-blue-600 text-white' :
+                        'bg-gray-300 text-gray-600'
+                      }`}>
+                        {status === 'completed' ? '✓' : step.step_order}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold">{step.step_name}</h4>
+                      <p className="text-sm text-muted-foreground">{step.description}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Responsable: {step.assigned_role}
+                      </p>
+                      {historyEntry && (
+                        <div className="mt-2 p-2 bg-white/50 rounded text-sm">
+                          <div className="flex items-center gap-2">
+                            <span>Décision:</span>
+                            {getDecisionBadge(historyEntry.decision)}
+                          </div>
+                          {historyEntry.comment && (
+                            <p className="text-xs mt-1">Commentaire: {historyEntry.comment}</p>
+                          )}
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Par {historyEntry.processed_by_email} le{' '}
+                            {format(new Date(historyEntry.processed_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {index < workflowSteps.length - 1 && (
+                    <div className="flex justify-center py-2">
+                      <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Actions */}
+          <div className="space-y-4 border-t pt-4">
+            <div>
+              <Label htmlFor="workflow-comment">Commentaire {booking?.current_step_order === workflowSteps.length && '(optionnel)'}</Label>
+              <Textarea
+                id="workflow-comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Ajouter un commentaire sur cette étape..."
+                rows={3}
+                className="mt-2"
+              />
+            </div>
+
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={onClose}
+                disabled={processing}
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleWorkflowAction('verification_en_cours')}
+                disabled={processing}
+              >
+                <Clock className="h-4 w-4 mr-2" />
+                Vérification en cours
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => handleWorkflowAction('refusee')}
+                disabled={processing}
+              >
+                <XCircle className="h-4 w-4 mr-2" />
+                Refuser
+              </Button>
+              <Button
+                onClick={() => handleWorkflowAction('validee')}
+                disabled={processing}
+              >
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Valider
+              </Button>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

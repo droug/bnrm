@@ -535,6 +535,77 @@ export type Database = {
           },
         ]
       }
+      booking_workflow_history: {
+        Row: {
+          booking_id: string
+          comment: string | null
+          decision: string
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          step_code: string
+          step_name: string
+        }
+        Insert: {
+          booking_id: string
+          comment?: string | null
+          decision: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          step_code: string
+          step_name: string
+        }
+        Update: {
+          booking_id?: string
+          comment?: string | null
+          decision?: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          step_code?: string
+          step_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_workflow_history_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booking_workflow_steps: {
+        Row: {
+          assigned_role: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          step_code: string
+          step_name: string
+          step_order: number
+        }
+        Insert: {
+          assigned_role?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          step_code: string
+          step_name: string
+          step_order: number
+        }
+        Update: {
+          assigned_role?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          step_code?: string
+          step_name?: string
+          step_order?: number
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           admin_notes: string | null
@@ -547,6 +618,8 @@ export type Database = {
           country: string | null
           created_at: string | null
           currency: string | null
+          current_step_code: string | null
+          current_step_order: number | null
           duration_type: string | null
           end_date: string
           equipment_total_amount: number | null
@@ -573,6 +646,8 @@ export type Database = {
           updated_at: string | null
           user_id: string | null
           website: string | null
+          workflow_completed_at: string | null
+          workflow_started_at: string | null
         }
         Insert: {
           admin_notes?: string | null
@@ -585,6 +660,8 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           currency?: string | null
+          current_step_code?: string | null
+          current_step_order?: number | null
           duration_type?: string | null
           end_date: string
           equipment_total_amount?: number | null
@@ -611,6 +688,8 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
           website?: string | null
+          workflow_completed_at?: string | null
+          workflow_started_at?: string | null
         }
         Update: {
           admin_notes?: string | null
@@ -623,6 +702,8 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           currency?: string | null
+          current_step_code?: string | null
+          current_step_order?: number | null
           duration_type?: string | null
           end_date?: string
           equipment_total_amount?: number | null
@@ -649,6 +730,8 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
           website?: string | null
+          workflow_completed_at?: string | null
+          workflow_started_at?: string | null
         }
         Relationships: [
           {
@@ -7201,6 +7284,10 @@ export type Database = {
       }
     }
     Functions: {
+      advance_booking_workflow: {
+        Args: { p_booking_id: string; p_comment?: string; p_decision: string }
+        Returns: Json
+      }
       anonymize_ip: { Args: { ip_addr: unknown }; Returns: unknown }
       anonymize_user_agent: {
         Args: { user_agent_str: string }
@@ -7275,6 +7362,16 @@ export type Database = {
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
           user_id: string
+        }[]
+      }
+      get_booking_workflow_history: {
+        Args: { p_booking_id: string }
+        Returns: {
+          comment: string
+          decision: string
+          processed_at: string
+          processed_by_email: string
+          step_name: string
         }[]
       }
       get_professional_role: { Args: { p_user_id: string }; Returns: string }

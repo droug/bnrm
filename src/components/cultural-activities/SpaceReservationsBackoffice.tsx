@@ -42,6 +42,7 @@ import {
   Clock,
   Archive
 } from "lucide-react";
+import { BookingWorkflowProcessor } from "./BookingWorkflowProcessor";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -824,19 +825,17 @@ const SpaceReservationsBackoffice = () => {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          {(booking.status === 'en_attente' || booking.status === 'verification_en_cours') && (
-                            <Button
-                              size="sm"
-                              className="bg-primary hover:bg-primary/90 text-white"
-                              onClick={() => {
-                                setSelectedBooking(booking);
-                                setActionDialog({ open: true, type: 'approve' });
-                              }}
-                              title="Traiter la demande"
-                            >
-                              <GitBranch className="h-4 w-4" />
-                            </Button>
-                          )}
+                          <Button
+                            size="sm"
+                            className="bg-primary hover:bg-primary/90 text-white"
+                            onClick={() => {
+                              setSelectedBooking(booking);
+                              setActionDialog({ open: true, type: 'approve' });
+                            }}
+                            title="Traiter la demande"
+                          >
+                            <GitBranch className="h-4 w-4" />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -848,8 +847,16 @@ const SpaceReservationsBackoffice = () => {
         </CardContent>
       </Card>
 
+      {/* Workflow Processor */}
+      <BookingWorkflowProcessor
+        booking={selectedBooking}
+        open={actionDialog.open && actionDialog.type === 'approve'}
+        onClose={closeDialog}
+        onSuccess={fetchBookings}
+      />
+
       {/* Dialog de traitement (workflow) */}
-      <Dialog open={actionDialog.open && actionDialog.type === 'approve'} onOpenChange={closeDialog}>
+      <Dialog open={false} onOpenChange={closeDialog}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-2xl">
