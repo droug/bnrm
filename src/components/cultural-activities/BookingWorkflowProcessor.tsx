@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, Clock, GitBranch, ArrowRight, Archive, FileText, Download } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, ArrowRight, Archive, FileText, Download, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -16,6 +16,16 @@ import {
   generateInvoice as generateInvoicePDF, 
   generateInventoryReport as generateInventoryPDF 
 } from "@/utils/culturalSpacePdfGenerator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface WorkflowStep {
   step_order: number;
@@ -53,6 +63,21 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
   const [damageAmount, setDamageAmount] = useState("");
   const [damageDescription, setDamageDescription] = useState("");
   
+  // Confirmation dialog
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+    action: string;
+    variant?: 'default' | 'destructive';
+  }>({
+    open: false,
+    title: '',
+    description: '',
+    action: '',
+    variant: 'default'
+  });
+  
   const { toast } = useToast();
 
   useEffect(() => {
@@ -83,6 +108,16 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     }
   };
 
+  const openConfirmDialog = (action: string, title: string, description: string, variant: 'default' | 'destructive' = 'default') => {
+    setConfirmDialog({
+      open: true,
+      title,
+      description,
+      action,
+      variant
+    });
+  };
+
   const handleWorkflowAction = async (decision: string) => {
     // Validation des commentaires requis
     if ((decision === 'refusee' || decision === 'verification_en_cours') && !comment.trim()) {
@@ -95,6 +130,8 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     }
 
     setProcessing(true);
+    setConfirmDialog({ ...confirmDialog, open: false });
+    
     try {
       const { data, error } = await supabase.rpc('advance_booking_workflow', {
         p_booking_id: booking.id,
@@ -111,10 +148,9 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
           'refusee': 'Demande refusée',
           'verification_en_cours': 'Mise en vérification',
           'confirmee': 'Demande confirmée',
-          'contractualisee': 'Contrat signé',
+          'en_contrat': 'Contrat signé',
           'facturee': 'Facture émise',
-          'mise_a_disposition': 'Mise à disposition effectuée',
-          'facture_complementaire': 'Facture complémentaire émise',
+          'degats_constates': 'Dégâts constatés',
           'cloturee': 'Dossier clôturé',
           'archivee_sans_suite': 'Dossier archivé sans suite'
         };
@@ -162,14 +198,13 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
   const getDecisionBadge = (decision: string) => {
     const config = {
       demarrage: { label: "Démarrage", className: "bg-blue-100 text-blue-800" },
-      validee: { label: "Validée → Confirmée", className: "bg-green-100 text-green-800" },
-      refusee: { label: "Refusée → Rejetée", className: "bg-red-100 text-red-800" },
+      validee: { label: "Validée", className: "bg-green-100 text-green-800" },
+      refusee: { label: "Refusée", className: "bg-red-100 text-red-800" },
       verification_en_cours: { label: "Vérification en cours", className: "bg-orange-100 text-orange-800" },
       confirmee: { label: "Confirmée", className: "bg-teal-100 text-teal-800" },
-      contractualisee: { label: "Contractualisée", className: "bg-purple-100 text-purple-800" },
+      en_contrat: { label: "En contrat", className: "bg-purple-100 text-purple-800" },
       facturee: { label: "Facturée", className: "bg-indigo-100 text-indigo-800" },
-      mise_a_disposition: { label: "Mise à disposition", className: "bg-cyan-100 text-cyan-800" },
-      facture_complementaire: { label: "Facture complémentaire", className: "bg-yellow-100 text-yellow-800" },
+      degats_constates: { label: "Dégâts constatés", className: "bg-yellow-100 text-yellow-800" },
       cloturee: { label: "Clôturée", className: "bg-gray-100 text-gray-800" },
       archivee_sans_suite: { label: "Archivée sans suite", className: "bg-gray-200 text-gray-600" },
     };
@@ -215,7 +250,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
           toast({ title: "✓ Lettre de confirmation générée" });
           break;
         case 'rejection':
-          await generateConfirmationPDF(bookingData, space); // Même PDF avec statut différent
+          await generateConfirmationPDF(bookingData, space);
           toast({ title: "✓ Lettre de rejet générée" });
           break;
         case 'contract':
@@ -261,7 +296,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
 
     const stepCode = booking.current_step_code;
     
-    // E02 - Décision de la Direction : Lettres de confirmation/rejet
+    // E02 - Décision de la Direction
     if (stepCode === 'e02_decision_direction') {
       return (
         <div className="space-y-2">
@@ -290,7 +325,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
       );
     }
 
-    // E03 - Traitement par le DAC : Lettres
+    // E03 - Traitement par le DAC
     if (stepCode === 'e03_traitement_dac') {
       return (
         <div className="space-y-2">
@@ -319,7 +354,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
       );
     }
 
-    // E04 - Contractualisation : Contrat
+    // E04 - Contractualisation
     if (stepCode === 'e04_contractualisation') {
       return (
         <div className="space-y-3">
@@ -351,7 +386,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
       );
     }
 
-    // E05 - Facturation : Facture
+    // E05 - Facturation
     if (stepCode === 'e05_facturation') {
       return (
         <div className="space-y-3">
@@ -383,7 +418,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
       );
     }
 
-    // E06 - Mise à disposition : États des lieux
+    // E06 - Mise à disposition
     if (stepCode === 'e06_mise_a_disposition') {
       return (
         <div className="space-y-2">
@@ -412,7 +447,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
       );
     }
 
-    // E07 - Facturation complémentaire : Facture pour dégâts
+    // E07 - Facturation complémentaire
     if (stepCode === 'e07_facturation_complementaire') {
       return (
         <div className="space-y-3">
@@ -461,7 +496,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
   const getActionsForCurrentStep = () => {
     if (!booking?.current_step_code) {
       return (
-        <Button onClick={() => handleWorkflowAction('demarrage')} disabled={processing}>
+        <Button onClick={() => openConfirmDialog('demarrage', 'Démarrer le workflow', 'Voulez-vous démarrer le traitement de cette réservation ?')} disabled={processing}>
           <CheckCircle2 className="h-4 w-4 mr-2" />
           Démarrer le workflow
         </Button>
@@ -474,15 +509,15 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     if (stepCode === 'e01_reception') {
       return (
         <>
-          <Button variant="outline" onClick={() => handleWorkflowAction('verification_en_cours')} disabled={processing}>
+          <Button variant="outline" onClick={() => openConfirmDialog('verification_en_cours', 'Mettre en vérification', 'Cette demande nécessite une vérification approfondie. Voulez-vous la mettre en vérification ?')} disabled={processing}>
             <Clock className="h-4 w-4 mr-2" />
             Mettre en vérification
           </Button>
-          <Button variant="destructive" onClick={() => handleWorkflowAction('refusee')} disabled={processing}>
+          <Button variant="destructive" onClick={() => openConfirmDialog('refusee', 'Refuser la demande', 'Êtes-vous sûr de vouloir refuser cette demande de réservation ?', 'destructive')} disabled={processing}>
             <XCircle className="h-4 w-4 mr-2" />
             Refuser
           </Button>
-          <Button onClick={() => handleWorkflowAction('validee')} disabled={processing}>
+          <Button onClick={() => openConfirmDialog('validee', 'Transmettre au Directeur', 'Voulez-vous transmettre cette demande au Directeur pour décision ?')} disabled={processing}>
             <CheckCircle2 className="h-4 w-4 mr-2" />
             Transmettre au Directeur
           </Button>
@@ -494,15 +529,15 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     if (stepCode === 'e02_decision_direction') {
       return (
         <>
-          <Button variant="outline" className="bg-orange-50" onClick={() => handleWorkflowAction('verification_en_cours')} disabled={processing}>
+          <Button variant="outline" className="bg-orange-50" onClick={() => openConfirmDialog('verification_en_cours', 'Cas sensible', 'Marquer cette demande comme cas sensible nécessitant une vérification en cours ?')} disabled={processing}>
             <Clock className="h-4 w-4 mr-2" />
             Cas sensible - Vérification
           </Button>
-          <Button variant="destructive" onClick={() => handleWorkflowAction('refusee')} disabled={processing}>
+          <Button variant="destructive" onClick={() => openConfirmDialog('refusee', 'Refuser la demande', 'Confirmez-vous le refus de cette demande par la Direction ?', 'destructive')} disabled={processing}>
             <XCircle className="h-4 w-4 mr-2" />
             Refuser
           </Button>
-          <Button onClick={() => handleWorkflowAction('validee')} disabled={processing}>
+          <Button onClick={() => openConfirmDialog('validee', 'Approuver', 'Confirmez-vous l\'approbation de cette demande par la Direction ?')} disabled={processing}>
             <CheckCircle2 className="h-4 w-4 mr-2" />
             Approuver
           </Button>
@@ -514,11 +549,11 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     if (stepCode === 'e03_traitement_dac') {
       return (
         <>
-          <Button variant="outline" onClick={() => handleWorkflowAction('refusee')} disabled={processing}>
+          <Button variant="outline" onClick={() => openConfirmDialog('refusee', 'Refuser (indisponibilité)', 'Confirmez-vous que l\'espace n\'est pas disponible aux dates demandées ?', 'destructive')} disabled={processing}>
             <XCircle className="h-4 w-4 mr-2" />
             Refuser (indisponibilité)
           </Button>
-          <Button onClick={() => handleWorkflowAction('confirmee')} disabled={processing}>
+          <Button onClick={() => openConfirmDialog('confirmee', 'Confirmer disponibilité', 'Confirmez-vous la disponibilité de l\'espace pour cette réservation ?')} disabled={processing}>
             <CheckCircle2 className="h-4 w-4 mr-2" />
             Confirmer disponibilité
           </Button>
@@ -530,7 +565,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     if (stepCode === 'e04_contractualisation') {
       return (
         <>
-          <Button onClick={() => handleWorkflowAction('contractualisee')} disabled={processing}>
+          <Button onClick={() => openConfirmDialog('en_contrat', 'Contrat signé', 'Confirmez-vous que le contrat a été signé par toutes les parties ?')} disabled={processing}>
             <CheckCircle2 className="h-4 w-4 mr-2" />
             Contrat signé
           </Button>
@@ -542,7 +577,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     if (stepCode === 'e05_facturation') {
       return (
         <>
-          <Button onClick={() => handleWorkflowAction('facturee')} disabled={processing}>
+          <Button onClick={() => openConfirmDialog('facturee', 'Facture émise', 'Confirmez-vous l\'émission de la facture ?')} disabled={processing}>
             <CheckCircle2 className="h-4 w-4 mr-2" />
             Facture émise
           </Button>
@@ -554,10 +589,11 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     if (stepCode === 'e06_mise_a_disposition') {
       return (
         <>
-          <Button variant="outline" className="bg-yellow-50" onClick={() => handleWorkflowAction('facture_complementaire')} disabled={processing}>
-            Dégâts constatés - Facture complémentaire
+          <Button variant="outline" className="bg-yellow-50" onClick={() => openConfirmDialog('degats_constates', 'Dégâts constatés', 'Des dégâts ont-ils été constatés nécessitant une facturation complémentaire ?')} disabled={processing}>
+            <AlertCircle className="h-4 w-4 mr-2" />
+            Dégâts constatés
           </Button>
-          <Button onClick={() => handleWorkflowAction('mise_a_disposition')} disabled={processing}>
+          <Button onClick={() => openConfirmDialog('validee', 'États des lieux OK', 'Confirmez-vous que les états des lieux d\'entrée et de sortie sont signés et conformes ?')} disabled={processing}>
             <CheckCircle2 className="h-4 w-4 mr-2" />
             États des lieux signés
           </Button>
@@ -569,7 +605,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     if (stepCode === 'e07_facturation_complementaire') {
       return (
         <>
-          <Button onClick={() => handleWorkflowAction('facture_complementaire')} disabled={processing}>
+          <Button onClick={() => openConfirmDialog('validee', 'Facture complémentaire', 'Confirmez-vous l\'émission de la facture complémentaire pour les dégâts ?')} disabled={processing}>
             <CheckCircle2 className="h-4 w-4 mr-2" />
             Facture complémentaire émise
           </Button>
@@ -581,11 +617,11 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     if (stepCode === 'e08_cloture') {
       return (
         <>
-          <Button variant="outline" onClick={() => handleWorkflowAction('archivee_sans_suite')} disabled={processing}>
+          <Button variant="outline" onClick={() => openConfirmDialog('archivee_sans_suite', 'Archiver sans suite', 'Archiver ce dossier sans suite (ex: après 60j de vérification) ?')} disabled={processing}>
             <Archive className="h-4 w-4 mr-2" />
             Archiver sans suite
           </Button>
-          <Button onClick={() => handleWorkflowAction('cloturee')} disabled={processing}>
+          <Button onClick={() => openConfirmDialog('cloturee', 'Clôturer', 'Confirmez-vous la clôture définitive de ce dossier ?')} disabled={processing}>
             <CheckCircle2 className="h-4 w-4 mr-2" />
             Clôturer le dossier
           </Button>
@@ -595,69 +631,35 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
 
     // Par défaut
     return (
-      <Button onClick={() => handleWorkflowAction('validee')} disabled={processing}>
+      <Button onClick={() => openConfirmDialog('validee', 'Valider l\'étape', 'Voulez-vous valider cette étape du workflow ?')} disabled={processing}>
         <CheckCircle2 className="h-4 w-4 mr-2" />
         Valider l'étape
       </Button>
     );
   };
 
+  if (!booking) return null;
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-2xl">
-            <GitBranch className="h-6 w-6 text-primary" />
-            Traitement de la demande - Workflow
-          </DialogTitle>
-          <DialogDescription>
-            {booking && (
-              <div className="space-y-2 mt-2">
-                <p className="text-base">
-                  <span className="font-semibold">Organisation:</span> {booking.organization_name}
-                </p>
-                <p className="text-base">
-                  <span className="font-semibold">Espace:</span> {booking.cultural_spaces?.name}
-                </p>
-                <p className="text-base">
-                  <span className="font-semibold">Dates:</span>{' '}
-                  {format(new Date(booking.start_date), 'dd/MM/yyyy', { locale: fr })} -{' '}
-                  {format(new Date(booking.end_date), 'dd/MM/yyyy', { locale: fr })}
-                </p>
-              </div>
-            )}
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              Traitement du workflow - Réservation #{booking.id.substring(0, 8).toUpperCase()}
+            </DialogTitle>
+            <DialogDescription>
+              Statut actuel: <Badge>{booking.status}</Badge>
+              {booking.current_step_order && (
+                <span className="ml-2">
+                  Étape {booking.current_step_order} / {workflowSteps.length}
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          {/* Étape actuelle */}
-          <div className="bg-primary/10 p-4 rounded-lg border-2 border-primary">
-            {!booking?.current_step_code ? (
-              <div>
-                <p className="text-lg font-semibold text-primary">
-                  Workflow non démarré
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Cliquez sur "Démarrer le workflow" pour commencer le traitement de cette demande
-                </p>
-              </div>
-            ) : (
-              <div>
-                <p className="text-lg font-semibold text-primary">
-                  Étape actuelle: {booking?.current_step_order || 1}. {
-                    workflowSteps.find(s => s.step_code === booking?.current_step_code)?.step_name || 'Chargement...'
-                  }
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Responsable: {workflowSteps.find(s => s.step_code === booking?.current_step_code)?.assigned_role}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Visualisation du workflow */}
+          {/* Progression du workflow */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-lg">Progression du workflow</h3>
             {workflowSteps.map((step, index) => {
               const status = getStepStatus(step.step_order);
               const historyEntry = workflowHistory.find(h => h.step_name === step.step_name);
@@ -720,39 +722,46 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
               </div>
             )}
 
+            {/* Commentaire */}
             <div>
-              <Label htmlFor="workflow-comment">
-                Commentaire 
-                {(booking?.current_step_code === 'e04_contractualisation' || 
-                  booking?.current_step_code === 'e05_facturation' || 
-                  booking?.current_step_code === 'e07_facturation_complementaire') && ' (optionnel)'}
-                {(!booking?.current_step_code || 
-                  booking?.current_step_code === 'e02_decision_direction' || 
-                  booking?.current_step_code === 'e01_reception') && ' (requis pour refus/vérification)'}
-              </Label>
+              <Label htmlFor="comment">Commentaire {(booking?.current_step_code === 'e01_reception' || booking?.current_step_code === 'e02_decision_direction') && '*'}</Label>
               <Textarea
-                id="workflow-comment"
+                id="comment"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="Ajouter un commentaire sur cette étape..."
+                placeholder="Ajoutez un commentaire..."
                 rows={3}
-                className="mt-2"
               />
             </div>
 
-            <div className="flex gap-2 justify-end flex-wrap">
-              <Button
-                variant="outline"
-                onClick={onClose}
-                disabled={processing}
-              >
-                Annuler
-              </Button>
+            {/* Boutons d'action */}
+            <div className="flex gap-2 justify-end">
               {getActionsForCurrentStep()}
             </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de confirmation */}
+      <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmDialog.title}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmDialog.description}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => handleWorkflowAction(confirmDialog.action)}
+              className={confirmDialog.variant === 'destructive' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : ''}
+            >
+              Confirmer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
