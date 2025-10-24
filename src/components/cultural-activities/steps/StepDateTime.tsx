@@ -8,6 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Calendar as CalendarIcon, Clock, Users, Trash2, Plus, CheckCircle, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -24,6 +25,14 @@ interface StepDateTimeProps {
 
 export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
   const [slots, setSlots] = useState<EventSlot[]>(data.eventSlots || []);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newSlot, setNewSlot] = useState<EventSlot>({
+    id: '',
+    date: new Date(),
+    startTime: "09:00",
+    endTime: "18:00",
+    participants: 1
+  });
 
   // Récupérer les infos de l'espace sélectionné
   const { data: selectedSpace } = useQuery({
@@ -47,22 +56,31 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
     onUpdate({ eventSlots: slots });
   }, [slots]);
 
-  // Ajouter un nouveau créneau
-  const addSlot = () => {
+  // Ouvrir la modale pour ajouter un créneau
+  const openAddSlotDialog = () => {
     if (slots.length >= 10) {
       toast.error("Maximum 10 créneaux autorisés");
       return;
     }
-
-    const newSlot: EventSlot = {
+    setNewSlot({
       id: `slot-${Date.now()}`,
       date: new Date(),
       startTime: "09:00",
       endTime: "18:00",
       participants: 1
-    };
+    });
+    setIsDialogOpen(true);
+  };
+
+  // Confirmer l'ajout du créneau
+  const confirmAddSlot = () => {
+    if (!newSlot.date || !newSlot.startTime || !newSlot.endTime || !newSlot.participants) {
+      toast.error("Veuillez compléter tous les champs");
+      return;
+    }
 
     setSlots([...slots, newSlot]);
+    setIsDialogOpen(false);
     toast.success("Créneau ajouté");
   };
 
@@ -173,7 +191,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
           </div>
           <Button
             type="button"
-            onClick={addSlot}
+            onClick={openAddSlotDialog}
             disabled={slots.length >= 10}
             className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white"
           >
@@ -400,6 +418,123 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
           </p>
         )}
       </div>
+
+      {/* Modale d'ajout de créneau */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-[#002B45]">
+              Ajouter un créneau
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Date */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4" />
+                Date *
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal h-11",
+                      !newSlot.date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {newSlot.date ? (
+                      format(newSlot.date, "PPP", { locale: fr })
+                    ) : (
+                      <span>Sélectionner</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="w-auto p-0" 
+                  align="start"
+                  style={{ zIndex: 10000 }}
+                >
+                  <Calendar
+                    mode="single"
+                    selected={newSlot.date}
+                    onSelect={(date) => date && setNewSlot({ ...newSlot, date })}
+                    disabled={(date) => date < today}
+                    initialFocus
+                    locale={fr}
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Heure de début */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Heure de début *
+                </Label>
+                <Input
+                  type="time"
+                  value={newSlot.startTime}
+                  onChange={(e) => setNewSlot({ ...newSlot, startTime: e.target.value })}
+                  className="h-11"
+                />
+              </div>
+
+              {/* Heure de fin */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Heure de fin *
+                </Label>
+                <Input
+                  type="time"
+                  value={newSlot.endTime}
+                  onChange={(e) => setNewSlot({ ...newSlot, endTime: e.target.value })}
+                  className="h-11"
+                />
+              </div>
+            </div>
+
+            {/* Nombre de participants */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Nombre de participants *
+              </Label>
+              <Input
+                type="number"
+                min="1"
+                max="500"
+                value={newSlot.participants}
+                onChange={(e) => setNewSlot({ ...newSlot, participants: parseInt(e.target.value) || 1 })}
+                placeholder="Ex: 50"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="button"
+              onClick={confirmAddSlot}
+              className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white"
+            >
+              Ajouter
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
