@@ -100,7 +100,15 @@ export function SimpleMultiSelect({
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0 bg-popover text-popover-foreground border z-[var(--z-popover)]" align="start" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+        <PopoverContent 
+          className="w-full p-0 bg-background text-foreground border shadow-lg" 
+          align="start" 
+          sideOffset={4}
+          style={{ 
+            width: 'var(--radix-popover-trigger-width)',
+            zIndex: 9999
+          }}
+        >
           <Command>
             <CommandInput placeholder="Rechercher..." />
             <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
