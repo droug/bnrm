@@ -431,16 +431,24 @@ export const generateInventoryReport = async (booking: Booking, space?: Space) =
     'Propreté générale'
   ];
   
+  // Fonction pour dessiner une case à cocher
+  const drawCheckbox = (x: number, y: number) => {
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.3);
+    doc.rect(x, y, 4, 4);
+  };
+  
   // Tableau État des lieux d'entrée
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.text('ÉTAT DES LIEUX D\'ENTRÉE', 20, yPos);
+  doc.text("ÉTAT DES LIEUX D'ENTRÉE", 20, yPos);
   yPos += 7;
   
+  const startYEntree = yPos;
   autoTable(doc, {
     startY: yPos,
     head: [['Élément', 'Bon', 'Moyen', 'Mauvais', 'Observations']],
-    body: elements.map(element => [element, '☐', '☐', '☐', '']),
+    body: elements.map(element => [element, '', '', '', '']),
     theme: 'grid',
     headStyles: { fillColor: [41, 128, 185], textColor: 255, halign: 'center' },
     margin: { left: 20, right: 20 },
@@ -450,6 +458,13 @@ export const generateInventoryReport = async (booking: Booking, space?: Space) =
       2: { cellWidth: 15, halign: 'center' },
       3: { cellWidth: 20, halign: 'center' },
       4: { cellWidth: 60 }
+    },
+    didDrawCell: (data) => {
+      if (data.section === 'body' && data.column.index >= 1 && data.column.index <= 3) {
+        const cellCenter = data.cell.x + data.cell.width / 2;
+        const cellMiddle = data.cell.y + data.cell.height / 2;
+        drawCheckbox(cellCenter - 2, cellMiddle - 2);
+      }
     }
   });
   
@@ -466,13 +481,13 @@ export const generateInventoryReport = async (booking: Booking, space?: Space) =
   // Tableau État des lieux de sortie
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.text('ÉTAT DES LIEUX DE SORTIE', 20, yPos);
+  doc.text("ÉTAT DES LIEUX DE SORTIE", 20, yPos);
   yPos += 7;
   
   autoTable(doc, {
     startY: yPos,
     head: [['Élément', 'Bon', 'Moyen', 'Mauvais', 'Observations']],
-    body: elements.map(element => [element, '☐', '☐', '☐', '']),
+    body: elements.map(element => [element, '', '', '', '']),
     theme: 'grid',
     headStyles: { fillColor: [41, 128, 185], textColor: 255, halign: 'center' },
     margin: { left: 20, right: 20 },
@@ -482,6 +497,13 @@ export const generateInventoryReport = async (booking: Booking, space?: Space) =
       2: { cellWidth: 15, halign: 'center' },
       3: { cellWidth: 20, halign: 'center' },
       4: { cellWidth: 60 }
+    },
+    didDrawCell: (data) => {
+      if (data.section === 'body' && data.column.index >= 1 && data.column.index <= 3) {
+        const cellCenter = data.cell.x + data.cell.width / 2;
+        const cellMiddle = data.cell.y + data.cell.height / 2;
+        drawCheckbox(cellCenter - 2, cellMiddle - 2);
+      }
     }
   });
   
