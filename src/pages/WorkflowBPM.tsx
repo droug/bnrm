@@ -11,7 +11,8 @@ import { WorkflowRolesManager } from "@/components/workflow/WorkflowRolesManager
 import { WorkflowModelsManager } from "@/components/workflow/WorkflowModelsManager";
 import { WorkflowDynamicSelects } from "@/components/workflow/WorkflowDynamicSelects";
 import { PredefinedWorkflowsImporter } from "@/components/workflow/PredefinedWorkflowsImporter";
-import { Activity, GitBranch, Settings, TrendingUp, Users, ArrowLeft, FolderKanban, ListFilter, Package } from "lucide-react";
+import { Activity, GitBranch, Settings, TrendingUp, Users, ArrowLeft, FolderKanban, ListFilter, Package, CalendarRange } from "lucide-react";
+import { BookingWorkflowStepsManager } from "@/components/workflow/BookingWorkflowStepsManager";
 
 export default function WorkflowBPM() {
   const { user, profile } = useAuth();
@@ -51,7 +52,7 @@ export default function WorkflowBPM() {
         </div>
 
         <Tabs defaultValue="predefined" className="w-full">
-          <TabsList className="grid w-full grid-cols-8 mb-6">
+          <TabsList className="grid w-full grid-cols-9 mb-6">
             <TabsTrigger value="predefined">
               <Package className="w-4 h-4 mr-2" />
               Modèles Prédéfinis
@@ -83,6 +84,10 @@ export default function WorkflowBPM() {
             <TabsTrigger value="integrations">
               <Settings className="w-4 h-4 mr-2" />
               Intégrations
+            </TabsTrigger>
+            <TabsTrigger value="cultural-activities">
+              <CalendarRange className="w-4 h-4 mr-2" />
+              Activités Culturelles
             </TabsTrigger>
           </TabsList>
 
@@ -116,6 +121,10 @@ export default function WorkflowBPM() {
 
           <TabsContent value="integrations" className="mt-6">
             <WorkflowIntegrations />
+          </TabsContent>
+
+          <TabsContent value="cultural-activities" className="mt-6">
+            <BookingWorkflowStepsManager />
           </TabsContent>
         </Tabs>
       </main>
