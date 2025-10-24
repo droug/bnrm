@@ -334,6 +334,37 @@ const SpaceReservationsBackoffice = () => {
     }
   };
 
+  const handleVerificationInProgress = async () => {
+    if (!selectedBooking) return;
+
+    try {
+      const { error } = await supabase
+        .from("bookings")
+        .update({ 
+          status: "verification_en_cours",
+          reviewed_at: new Date().toISOString()
+        })
+        .eq("id", selectedBooking.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Statut mis à jour",
+        description: "La demande est maintenant en vérification.",
+      });
+
+      fetchBookings();
+      closeDialog();
+    } catch (error) {
+      console.error("Error updating booking status:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour le statut",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleReject = async () => {
     if (!selectedBooking || !rejectionReason.trim()) {
       toast({
@@ -622,6 +653,7 @@ const SpaceReservationsBackoffice = () => {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       en_attente: { label: "En attente", className: "bg-yellow-100 text-yellow-800" },
+      verification_en_cours: { label: "Vérification en cours", className: "bg-blue-100 text-blue-800" },
       validee: { label: "Validée", className: "bg-green-100 text-green-800" },
       rejetee: { label: "Rejetée", className: "bg-red-100 text-red-800" },
       annulee: { label: "Annulée", className: "bg-gray-100 text-gray-800" },
@@ -680,6 +712,7 @@ const SpaceReservationsBackoffice = () => {
               options={[
                 { value: "all", label: "Tous les statuts" },
                 { value: "en_attente", label: "En attente" },
+                { value: "verification_en_cours", label: "Vérification en cours" },
                 { value: "validee", label: "Validée" },
                 { value: "rejetee", label: "Rejetée" },
               ]}
@@ -752,7 +785,7 @@ const SpaceReservationsBackoffice = () => {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          {booking.status === 'en_attente' && (
+                          {(booking.status === 'en_attente' || booking.status === 'verification_en_cours') && (
                             <>
                               <Button
                                 size="sm"
@@ -797,8 +830,14 @@ const SpaceReservationsBackoffice = () => {
               Souhaitez-vous valider cette demande ? Une lettre de confirmation sera générée et envoyée au demandeur.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button variant="outline" onClick={closeDialog}>Annuler</Button>
+            <Button 
+              onClick={handleVerificationInProgress} 
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Vérification en cours
+            </Button>
             <Button onClick={handleApprove} className="bg-green-600 hover:bg-green-700">
               Valider
             </Button>
