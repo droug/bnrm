@@ -139,10 +139,10 @@ const getEventColor = (type: CalendarEvent["type"]) => {
 
 const getEventLabel = (type: CalendarEvent["type"]) => {
   const labels = {
-    cultural: "Activité culturelle",
+    cultural: "Présentation libre",
     exhibition: "Exposition",
-    conference: "Conférence",
-    workshop: "Atelier"
+    conference: "Conférence/Débat",
+    workshop: "Formation"
   };
   return labels[type];
 };
@@ -218,10 +218,10 @@ const CulturalCalendar = () => {
                 onValueChange={setFilterType}
                 options={[
                   { value: "all", label: "Tous les événements" },
-                  { value: "cultural", label: "Activité culturelle" },
+                  { value: "cultural", label: "Présentation libre" },
                   { value: "exhibition", label: "Exposition" },
-                  { value: "conference", label: "Conférence" },
-                  { value: "workshop", label: "Atelier" },
+                  { value: "conference", label: "Conférence/Débat" },
+                  { value: "workshop", label: "Formation" },
                 ]}
                 placeholder="Filtrer par type"
                 icon={<Filter className="h-4 w-4 text-[#D4AF37]" />}
@@ -291,7 +291,7 @@ const CulturalCalendar = () => {
             <div className="flex flex-wrap gap-4 justify-center">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-blue-500" />
-                <span className="text-sm text-[#333333]">Activité culturelle</span>
+                <span className="text-sm text-[#333333]">Présentation libre</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-green-500" />
@@ -299,11 +299,11 @@ const CulturalCalendar = () => {
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-orange-500" />
-                <span className="text-sm text-[#333333]">Conférence</span>
+                <span className="text-sm text-[#333333]">Conférence/Débat</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-purple-500" />
-                <span className="text-sm text-[#333333]">Atelier</span>
+                <span className="text-sm text-[#333333]">Formation</span>
               </div>
             </div>
           </div>
