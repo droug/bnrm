@@ -1,65 +1,47 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 
-// Import images
-import auditorium1 from "@/assets/spaces/auditorium-1.jpg";
-import auditorium2 from "@/assets/spaces/auditorium-2.jpg";
-import exhibitionHall1 from "@/assets/spaces/exhibition-hall-1.jpg";
-import exhibitionHall2 from "@/assets/spaces/exhibition-hall-2.jpg";
-import seminarRoom1 from "@/assets/spaces/seminar-room-1.jpg";
-import meetingRoom1 from "@/assets/spaces/meeting-room-1.jpg";
-import annexHall1 from "@/assets/spaces/annex-hall-1.jpg";
+interface GalleryImage {
+  url: string;
+  alt: string;
+  order: number;
+}
 
 interface SpaceGalleryModalProps {
   isOpen: boolean;
   onClose: () => void;
   spaceName: string;
+  galleryImages: GalleryImage[];
 }
 
-const spaceImages: Record<string, { src: string; alt: string }[]> = {
-  "Auditorium": [
-    { src: auditorium1, alt: "Auditorium - Vue d'ensemble depuis les sièges" },
-    { src: auditorium2, alt: "Auditorium - Vue de la scène" },
-  ],
-  "Grande salle d'exposition": [
-    { src: exhibitionHall1, alt: "Grande salle d'exposition - Espace vide" },
-    { src: exhibitionHall2, alt: "Grande salle d'exposition - Configuration d'exposition" },
-  ],
-  "Salle séminaire": [
-    { src: seminarRoom1, alt: "Salle séminaire - Disposition en U" },
-  ],
-  "Salle de réunion": [
-    { src: meetingRoom1, alt: "Salle de réunion - Table de conférence" },
-  ],
-  "Salle de l'annexe": [
-    { src: annexHall1, alt: "Salle de l'annexe - Espace modulable" },
-  ],
-};
-
-export default function SpaceGalleryModal({ isOpen, onClose, spaceName }: SpaceGalleryModalProps) {
+export default function SpaceGalleryModal({ isOpen, onClose, spaceName, galleryImages }: SpaceGalleryModalProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
   
-  const images = spaceImages[spaceName] || [];
+  const images = galleryImages.length > 0 ? galleryImages : [
+    { url: "/placeholder.svg", alt: spaceName + " - Aucune image disponible", order: 1 }
+  ];
 
-  const scrollPrev = () => {
-    if (emblaApi) {
-      emblaApi.scrollPrev();
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const onSelect = () => {
       setSelectedIndex(emblaApi.selectedScrollSnap());
-    }
-  };
+    };
 
-  const scrollNext = () => {
-    if (emblaApi) {
-      emblaApi.scrollNext();
-      setSelectedIndex(emblaApi.selectedScrollSnap());
-    }
-  };
+    emblaApi.on('select', onSelect);
+    onSelect();
 
-  if (images.length === 0) return null;
+    return () => {
+      emblaApi.off('select', onSelect);
+    };
+  }, [emblaApi]);
+
+  const scrollPrev = () => emblaApi?.scrollPrev();
+  const scrollNext = () => emblaApi?.scrollNext();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -74,7 +56,7 @@ export default function SpaceGalleryModal({ isOpen, onClose, spaceName }: SpaceG
               {images.map((image, index) => (
                 <div key={index} className="flex-[0_0_100%] min-w-0">
                   <img
-                    src={image.src}
+                    src={image.url}
                     alt={image.alt}
                     className="w-full h-[500px] object-cover rounded-lg"
                   />
@@ -114,7 +96,6 @@ export default function SpaceGalleryModal({ isOpen, onClose, spaceName }: SpaceG
                     }`}
                     onClick={() => {
                       emblaApi?.scrollTo(index);
-                      setSelectedIndex(index);
                     }}
                   />
                 ))}

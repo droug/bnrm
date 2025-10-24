@@ -12,9 +12,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PageHeader } from "@/components/cultural-activities/shared/PageHeader";
-import { Settings, Save, Mail, FileText, Clock, HardDrive, Building, Calendar, BookOpen, Library } from "lucide-react";
+import { Settings, Save, Mail, FileText, Clock, HardDrive, Building, Calendar, BookOpen, Library, Image } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import SpaceGalleryManagement from "@/components/cultural-activities/SpaceGalleryManagement";
 
 interface SystemSettings {
   max_file_size_mb: number;
@@ -632,6 +633,9 @@ const SystemSettingsPage = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Gallery Management */}
+          <SpaceGalleryManagement />
 
           {/* Status indicator */}
           {saving && (

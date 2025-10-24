@@ -452,6 +452,7 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
           isOpen={galleryOpen}
           onClose={() => setGalleryOpen(false)}
           spaceName={selectedSpace.name}
+          galleryImages={(selectedSpace.gallery_images as any) || []}
         />
       )}
     </div>

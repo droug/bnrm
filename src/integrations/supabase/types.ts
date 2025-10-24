@@ -1562,6 +1562,7 @@ export type Database = {
           description: string | null
           electricity_charge: number | null
           floor_level: string | null
+          gallery_images: Json | null
           has_lighting: boolean | null
           has_projection: boolean | null
           has_sound_system: boolean | null
@@ -1586,6 +1587,7 @@ export type Database = {
           description?: string | null
           electricity_charge?: number | null
           floor_level?: string | null
+          gallery_images?: Json | null
           has_lighting?: boolean | null
           has_projection?: boolean | null
           has_sound_system?: boolean | null
@@ -1610,6 +1612,7 @@ export type Database = {
           description?: string | null
           electricity_charge?: number | null
           floor_level?: string | null
+          gallery_images?: Json | null
           has_lighting?: boolean | null
           has_projection?: boolean | null
           has_sound_system?: boolean | null
