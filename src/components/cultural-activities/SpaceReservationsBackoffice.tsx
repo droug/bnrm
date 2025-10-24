@@ -177,7 +177,7 @@ const SpaceReservationsBackoffice = () => {
             space_id: "space-2",
             start_date: "2025-11-20T14:00:00Z",
             end_date: "2025-11-20T18:00:00Z",
-            status: "validee",
+            status: "en_attente",
             created_at: "2025-10-18T14:20:00Z",
             contact_person: "Fatima Zahra Alami",
             contact_email: "fz.alami@fondation.ma",
@@ -187,7 +187,7 @@ const SpaceReservationsBackoffice = () => {
             participants_count: 80,
             total_amount: 2500,
             rejection_reason: null,
-            admin_notes: "Demande approuvée - paiement reçu",
+            admin_notes: null,
             duration_type: "demi_journee",
             cultural_spaces: {
               name: "Galerie d'exposition"
@@ -246,7 +246,7 @@ const SpaceReservationsBackoffice = () => {
             space_id: "space-2",
             start_date: "2025-11-15T09:00:00Z",
             end_date: "2025-11-15T12:00:00Z",
-            status: "rejetee",
+            status: "en_attente",
             created_at: "2025-10-10T11:20:00Z",
             contact_person: "Youssef Tazi",
             contact_email: "y.tazi@techinnovations.ma",
@@ -255,8 +255,8 @@ const SpaceReservationsBackoffice = () => {
             event_description: "Présentation d'un nouveau produit technologique à la presse.",
             participants_count: 40,
             total_amount: 1800,
-            rejection_reason: "L'événement proposé ne correspond pas à la vocation culturelle de nos espaces.",
-            admin_notes: "Demande commerciale - hors champ d'activité",
+            rejection_reason: null,
+            admin_notes: null,
             duration_type: "demi_journee",
             cultural_spaces: {
               name: "Galerie d'exposition"
@@ -269,7 +269,7 @@ const SpaceReservationsBackoffice = () => {
             space_id: "space-1",
             start_date: "2025-12-10T14:00:00Z",
             end_date: "2025-12-11T17:00:00Z",
-            status: "validee",
+            status: "en_attente",
             created_at: "2025-10-25T08:30:00Z",
             contact_person: "Dr. Amina El Mansouri",
             contact_email: "a.elmansouri@um5.ac.ma",
@@ -279,7 +279,7 @@ const SpaceReservationsBackoffice = () => {
             participants_count: 200,
             total_amount: 6500,
             rejection_reason: null,
-            admin_notes: "Convention cadre - tarif préférentiel appliqué",
+            admin_notes: null,
             duration_type: "journee_complete",
             cultural_spaces: {
               name: "Salle de Conférence Principale"
