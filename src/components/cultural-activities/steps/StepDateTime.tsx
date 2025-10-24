@@ -198,7 +198,11 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => removeSlot(slot.id)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          removeSlot(slot.id);
+                        }}
                         className="text-destructive hover:text-destructive hover:bg-destructive/10"
                       >
                         <Trash2 className="h-4 w-4" />
