@@ -379,6 +379,24 @@ export const generateConfirmationLetter = async (booking: Booking, space?: Space
   
   yPos = (doc as any).lastAutoTable.finalY + 7;
   
+  // Vérifier si on doit passer à la page 3
+  if (yPos > 210) {
+    // Finir la page 2 avec la note
+    doc.setFontSize(8);
+    doc.setTextColor(80, 80, 80);
+    doc.text('¹ Pour ce secteur, toute dérogation de paiement différé doit faire l\'objet d\'une demande justifiée.', 20, 270);
+    doc.setFontSize(9);
+    doc.text('Notre règlement d\'utilisation des espaces est consultable sur le site BNRM : www.bnrm.ma', 105, 275, { align: 'center' });
+    addBNRMFooter(doc, 2);
+    
+    // PAGE 3
+    doc.addPage();
+    await addBNRMHeader(doc);
+    yPos = 50;
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+  }
+  
   // Nombre de personnes attendues
   doc.setFont('helvetica', 'bold');
   doc.text('Nombre de personnes attendues :', 20, yPos);
@@ -395,8 +413,9 @@ export const generateConfirmationLetter = async (booking: Booking, space?: Space
   yPos += 5;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
-  doc.text('Conférence - Congrès - Colloque - Séminaire - Formation - Exposition - Activité artistiques (cinéma, théâtre, musique)', 20, yPos);
-  yPos += 8;
+  const typeManif = doc.splitTextToSize('Conférence - Congrès - Colloque - Séminaire - Formation - Exposition - Activité artistiques (cinéma, théâtre, musique)', 170);
+  doc.text(typeManif, 20, yPos);
+  yPos += typeManif.length * 4 + 5;
   
   // Pause Café
   doc.setFontSize(10);
@@ -431,7 +450,7 @@ export const generateConfirmationLetter = async (booking: Booking, space?: Space
   yPos += 5;
   doc.setFont('helvetica', 'normal');
   doc.line(20, yPos, 190, yPos);
-  yPos += 10;
+  yPos += 15;
   
   // Signatures
   doc.setFont('helvetica', 'normal');
