@@ -327,7 +327,7 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
                 <h3 className="font-semibold text-lg">Disponibilités</h3>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                Les dates en rouge sont déjà réservées ou indisponibles
+                Les dates non cliquables sont déjà réservées ou indisponibles
               </p>
               <Calendar
                 mode="single"
