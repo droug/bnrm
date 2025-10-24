@@ -32,7 +32,9 @@ export function InlineMultiSelect({
 }: InlineMultiSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const selectedOptions = options.filter(opt => selected.includes(opt.value));
 
@@ -53,6 +55,18 @@ export function InlineMultiSelect({
     onChange(selected.filter(v => v !== value));
   };
 
+  // Calculer la position du dropdown quand il s'ouvre
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+  }, [isOpen]);
+
   // Fermer le dropdown quand on clique à l'extérieur
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -67,7 +81,7 @@ export function InlineMultiSelect({
   }, []);
 
   return (
-    <div className={cn("space-y-2 relative", className)} ref={containerRef}>
+    <div className={cn("space-y-2", className)} ref={containerRef}>
       {/* Selected badges */}
       {selectedOptions.length > 0 && (
         <div className="flex flex-wrap gap-2 p-3 border rounded-md bg-muted/30">
@@ -94,6 +108,7 @@ export function InlineMultiSelect({
 
       {/* Trigger button */}
       <Button
+        ref={buttonRef}
         type="button"
         variant="outline"
         onClick={() => setIsOpen(!isOpen)}
@@ -107,11 +122,19 @@ export function InlineMultiSelect({
         <ChevronDown className={cn("ml-2 h-4 w-4 shrink-0 opacity-50 transition-transform", isOpen && "rotate-180")} />
       </Button>
 
-      {/* Dropdown list - affiché directement sous le bouton */}
+      {/* Dropdown list - utilise position fixed pour éviter les problèmes de conteneur */}
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full mt-1 bg-background border rounded-md shadow-lg z-50 max-h-80 overflow-hidden">
+        <div 
+          className="fixed bg-background border rounded-md shadow-lg max-h-80 overflow-hidden"
+          style={{ 
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+            width: `${dropdownPosition.width}px`,
+            zIndex: 9999
+          }}
+        >
           {/* Search input */}
-          <div className="p-2 border-b">
+          <div className="p-2 border-b bg-background sticky top-0">
             <Input
               placeholder="Rechercher..."
               value={searchQuery}
@@ -122,7 +145,7 @@ export function InlineMultiSelect({
           </div>
 
           {/* Options list */}
-          <div className="overflow-y-auto max-h-64">
+          <div className="overflow-y-auto max-h-64 bg-background">
             {filteredOptions.length === 0 ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
                 Aucun résultat trouvé.
