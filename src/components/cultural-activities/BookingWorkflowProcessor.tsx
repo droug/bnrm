@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, Clock, GitBranch, ArrowRight } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, GitBranch, ArrowRight, Archive } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -68,11 +68,12 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     }
   };
 
-  const handleWorkflowAction = async (decision: 'validee' | 'refusee' | 'verification_en_cours') => {
-    if (decision === 'refusee' && !comment.trim()) {
+  const handleWorkflowAction = async (decision: string) => {
+    // Validation des commentaires requis
+    if ((decision === 'refusee' || decision === 'verification_en_cours') && !comment.trim()) {
       toast({
         title: "Attention",
-        description: "Un commentaire est requis pour un refus",
+        description: "Un commentaire est requis pour cette action",
         variant: "destructive",
       });
       return;
@@ -90,15 +91,28 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
 
       const result = data as any;
       if (result?.success) {
+        const actionMessages: Record<string, string> = {
+          'validee': 'Demande validée avec succès',
+          'refusee': 'Demande refusée',
+          'verification_en_cours': 'Mise en vérification',
+          'confirmee': 'Demande confirmée',
+          'contractualisee': 'Contrat signé',
+          'facturee': 'Facture émise',
+          'mise_a_disposition': 'Mise à disposition effectuée',
+          'facture_complementaire': 'Facture complémentaire émise',
+          'cloturee': 'Dossier clôturé',
+          'archivee_sans_suite': 'Dossier archivé sans suite'
+        };
+
         if (result.workflow_completed) {
           toast({
             title: "Workflow terminé",
-            description: `Statut final: ${decision === 'validee' ? 'Validée' : decision === 'refusee' ? 'Rejetée' : 'En vérification'}`,
+            description: actionMessages[decision] || 'Workflow complété',
           });
         } else {
           toast({
             title: "Étape suivante",
-            description: `Demande passée à: ${result.next_step}`,
+            description: `${actionMessages[decision] || 'Action effectuée'}. Prochaine étape: ${result.next_step}`,
           });
         }
         onSuccess();
@@ -132,12 +146,164 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
 
   const getDecisionBadge = (decision: string) => {
     const config = {
+      demarrage: { label: "Démarrage", className: "bg-blue-100 text-blue-800" },
       validee: { label: "Validée", className: "bg-green-100 text-green-800" },
       refusee: { label: "Refusée", className: "bg-red-100 text-red-800" },
       verification_en_cours: { label: "Vérification en cours", className: "bg-orange-100 text-orange-800" },
+      confirmee: { label: "Confirmée", className: "bg-teal-100 text-teal-800" },
+      contractualisee: { label: "Contractualisée", className: "bg-purple-100 text-purple-800" },
+      facturee: { label: "Facturée", className: "bg-indigo-100 text-indigo-800" },
+      mise_a_disposition: { label: "Mise à disposition", className: "bg-cyan-100 text-cyan-800" },
+      facture_complementaire: { label: "Facture complémentaire", className: "bg-yellow-100 text-yellow-800" },
+      cloturee: { label: "Clôturée", className: "bg-gray-100 text-gray-800" },
+      archivee_sans_suite: { label: "Archivée sans suite", className: "bg-gray-200 text-gray-600" },
     };
-    const c = config[decision as keyof typeof config] || config.verification_en_cours;
+    const c = config[decision as keyof typeof config] || { label: decision, className: "bg-gray-100 text-gray-800" };
     return <Badge className={c.className}>{c.label}</Badge>;
+  };
+
+  const getActionsForCurrentStep = () => {
+    if (!booking?.current_step_code) {
+      return (
+        <Button onClick={() => handleWorkflowAction('demarrage')} disabled={processing}>
+          <CheckCircle2 className="h-4 w-4 mr-2" />
+          Démarrer le workflow
+        </Button>
+      );
+    }
+
+    const stepCode = booking.current_step_code;
+    
+    // E01 - Réception et validation initiale
+    if (stepCode === 'e01_reception') {
+      return (
+        <>
+          <Button variant="outline" onClick={() => handleWorkflowAction('verification_en_cours')} disabled={processing}>
+            <Clock className="h-4 w-4 mr-2" />
+            Mettre en vérification
+          </Button>
+          <Button variant="destructive" onClick={() => handleWorkflowAction('refusee')} disabled={processing}>
+            <XCircle className="h-4 w-4 mr-2" />
+            Refuser
+          </Button>
+          <Button onClick={() => handleWorkflowAction('validee')} disabled={processing}>
+            <CheckCircle2 className="h-4 w-4 mr-2" />
+            Transmettre au Directeur
+          </Button>
+        </>
+      );
+    }
+
+    // E02 - Décision de la Direction
+    if (stepCode === 'e02_decision_direction') {
+      return (
+        <>
+          <Button variant="outline" className="bg-orange-50" onClick={() => handleWorkflowAction('verification_en_cours')} disabled={processing}>
+            <Clock className="h-4 w-4 mr-2" />
+            Cas sensible - Vérification
+          </Button>
+          <Button variant="destructive" onClick={() => handleWorkflowAction('refusee')} disabled={processing}>
+            <XCircle className="h-4 w-4 mr-2" />
+            Refuser
+          </Button>
+          <Button onClick={() => handleWorkflowAction('validee')} disabled={processing}>
+            <CheckCircle2 className="h-4 w-4 mr-2" />
+            Approuver
+          </Button>
+        </>
+      );
+    }
+
+    // E03 - Traitement par le DAC
+    if (stepCode === 'e03_traitement_dac') {
+      return (
+        <>
+          <Button variant="outline" onClick={() => handleWorkflowAction('refusee')} disabled={processing}>
+            <XCircle className="h-4 w-4 mr-2" />
+            Refuser (indisponibilité)
+          </Button>
+          <Button onClick={() => handleWorkflowAction('confirmee')} disabled={processing}>
+            <CheckCircle2 className="h-4 w-4 mr-2" />
+            Confirmer disponibilité
+          </Button>
+        </>
+      );
+    }
+
+    // E04 - Contractualisation
+    if (stepCode === 'e04_contractualisation') {
+      return (
+        <>
+          <Button onClick={() => handleWorkflowAction('contractualisee')} disabled={processing}>
+            <CheckCircle2 className="h-4 w-4 mr-2" />
+            Contrat signé
+          </Button>
+        </>
+      );
+    }
+
+    // E05 - Facturation
+    if (stepCode === 'e05_facturation') {
+      return (
+        <>
+          <Button onClick={() => handleWorkflowAction('facturee')} disabled={processing}>
+            <CheckCircle2 className="h-4 w-4 mr-2" />
+            Facture émise
+          </Button>
+        </>
+      );
+    }
+
+    // E06 - Mise à disposition
+    if (stepCode === 'e06_mise_a_disposition') {
+      return (
+        <>
+          <Button variant="outline" className="bg-yellow-50" onClick={() => handleWorkflowAction('facture_complementaire')} disabled={processing}>
+            Dégâts constatés - Facture complémentaire
+          </Button>
+          <Button onClick={() => handleWorkflowAction('mise_a_disposition')} disabled={processing}>
+            <CheckCircle2 className="h-4 w-4 mr-2" />
+            États des lieux signés
+          </Button>
+        </>
+      );
+    }
+
+    // E07 - Facturation complémentaire
+    if (stepCode === 'e07_facturation_complementaire') {
+      return (
+        <>
+          <Button onClick={() => handleWorkflowAction('facture_complementaire')} disabled={processing}>
+            <CheckCircle2 className="h-4 w-4 mr-2" />
+            Facture complémentaire émise
+          </Button>
+        </>
+      );
+    }
+
+    // E08 - Clôture
+    if (stepCode === 'e08_cloture') {
+      return (
+        <>
+          <Button variant="outline" onClick={() => handleWorkflowAction('archivee_sans_suite')} disabled={processing}>
+            <Archive className="h-4 w-4 mr-2" />
+            Archiver sans suite
+          </Button>
+          <Button onClick={() => handleWorkflowAction('cloturee')} disabled={processing}>
+            <CheckCircle2 className="h-4 w-4 mr-2" />
+            Clôturer le dossier
+          </Button>
+        </>
+      );
+    }
+
+    // Par défaut
+    return (
+      <Button onClick={() => handleWorkflowAction('validee')} disabled={processing}>
+        <CheckCircle2 className="h-4 w-4 mr-2" />
+        Valider l'étape
+      </Button>
+    );
   };
 
   return (
@@ -170,14 +336,27 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
         <div className="space-y-6 py-4">
           {/* Étape actuelle */}
           <div className="bg-primary/10 p-4 rounded-lg border-2 border-primary">
-            <p className="text-lg font-semibold text-primary">
-              Étape actuelle: {booking?.current_step_order}. {
-                workflowSteps.find(s => s.step_code === booking?.current_step_code)?.step_name || 'Chargement...'
-              }
-            </p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Responsable: {workflowSteps.find(s => s.step_code === booking?.current_step_code)?.assigned_role}
-            </p>
+            {!booking?.current_step_code ? (
+              <div>
+                <p className="text-lg font-semibold text-primary">
+                  Workflow non démarré
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Cliquez sur "Démarrer le workflow" pour commencer le traitement de cette demande
+                </p>
+              </div>
+            ) : (
+              <div>
+                <p className="text-lg font-semibold text-primary">
+                  Étape actuelle: {booking?.current_step_order || 1}. {
+                    workflowSteps.find(s => s.step_code === booking?.current_step_code)?.step_name || 'Chargement...'
+                  }
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Responsable: {workflowSteps.find(s => s.step_code === booking?.current_step_code)?.assigned_role}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Visualisation du workflow */}
@@ -239,7 +418,15 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
           {/* Actions */}
           <div className="space-y-4 border-t pt-4">
             <div>
-              <Label htmlFor="workflow-comment">Commentaire {booking?.current_step_order === workflowSteps.length && '(optionnel)'}</Label>
+              <Label htmlFor="workflow-comment">
+                Commentaire 
+                {(booking?.current_step_code === 'e04_contractualisation' || 
+                  booking?.current_step_code === 'e05_facturation' || 
+                  booking?.current_step_code === 'e07_facturation_complementaire') && ' (optionnel)'}
+                {(!booking?.current_step_code || 
+                  booking?.current_step_code === 'e02_decision_direction' || 
+                  booking?.current_step_code === 'e01_reception') && ' (requis pour refus/vérification)'}
+              </Label>
               <Textarea
                 id="workflow-comment"
                 value={comment}
@@ -250,7 +437,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
               />
             </div>
 
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-2 justify-end flex-wrap">
               <Button
                 variant="outline"
                 onClick={onClose}
@@ -258,29 +445,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
               >
                 Annuler
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => handleWorkflowAction('verification_en_cours')}
-                disabled={processing}
-              >
-                <Clock className="h-4 w-4 mr-2" />
-                Vérification en cours
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => handleWorkflowAction('refusee')}
-                disabled={processing}
-              >
-                <XCircle className="h-4 w-4 mr-2" />
-                Refuser
-              </Button>
-              <Button
-                onClick={() => handleWorkflowAction('validee')}
-                disabled={processing}
-              >
-                <CheckCircle2 className="h-4 w-4 mr-2" />
-                Valider
-              </Button>
+              {getActionsForCurrentStep()}
             </div>
           </div>
         </div>

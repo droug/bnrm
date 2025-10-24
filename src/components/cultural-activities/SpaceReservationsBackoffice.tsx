@@ -65,6 +65,10 @@ interface Booking {
   rejection_reason: string | null;
   admin_notes: string | null;
   duration_type: string;
+  current_step_code: string | null;
+  current_step_order: number | null;
+  workflow_started_at: string | null;
+  workflow_completed_at: string | null;
   cultural_spaces?: {
     name: string;
   };
@@ -168,6 +172,10 @@ const SpaceReservationsBackoffice = () => {
             rejection_reason: null,
             admin_notes: null,
             duration_type: "journee_complete",
+            current_step_code: null,
+            current_step_order: null,
+            workflow_started_at: null,
+            workflow_completed_at: null,
             cultural_spaces: {
               name: "Salle de Conférence Principale"
             }
@@ -191,6 +199,10 @@ const SpaceReservationsBackoffice = () => {
             rejection_reason: null,
             admin_notes: null,
             duration_type: "demi_journee",
+            current_step_code: null,
+            current_step_order: null,
+            workflow_started_at: null,
+            workflow_completed_at: null,
             cultural_spaces: {
               name: "Galerie d'exposition"
             }
@@ -214,6 +226,10 @@ const SpaceReservationsBackoffice = () => {
             rejection_reason: null,
             admin_notes: null,
             duration_type: "demi_journee",
+            current_step_code: null,
+            current_step_order: null,
+            workflow_started_at: null,
+            workflow_completed_at: null,
             cultural_spaces: {
               name: "Salle de Conférence Principale"
             }
@@ -237,6 +253,10 @@ const SpaceReservationsBackoffice = () => {
             rejection_reason: null,
             admin_notes: null,
             duration_type: "journee_complete",
+            current_step_code: null,
+            current_step_order: null,
+            workflow_started_at: null,
+            workflow_completed_at: null,
             cultural_spaces: {
               name: "Auditorium"
             }
@@ -260,6 +280,10 @@ const SpaceReservationsBackoffice = () => {
             rejection_reason: null,
             admin_notes: null,
             duration_type: "demi_journee",
+            current_step_code: null,
+            current_step_order: null,
+            workflow_started_at: null,
+            workflow_completed_at: null,
             cultural_spaces: {
               name: "Galerie d'exposition"
             }
@@ -283,6 +307,10 @@ const SpaceReservationsBackoffice = () => {
             rejection_reason: null,
             admin_notes: null,
             duration_type: "journee_complete",
+            current_step_code: null,
+            current_step_order: null,
+            workflow_started_at: null,
+            workflow_completed_at: null,
             cultural_spaces: {
               name: "Salle de Conférence Principale"
             }
@@ -781,7 +809,8 @@ const SpaceReservationsBackoffice = () => {
                   <TableHead>Demandeur</TableHead>
                   <TableHead>Espace</TableHead>
                   <TableHead>Dates</TableHead>
-                  <TableHead>Type organisme</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Étape</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -789,7 +818,7 @@ const SpaceReservationsBackoffice = () => {
               <TableBody>
                 {bookings.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                       Aucune réservation
                     </TableCell>
                   </TableRow>
@@ -812,6 +841,18 @@ const SpaceReservationsBackoffice = () => {
                         {format(new Date(booking.end_date), 'dd/MM/yyyy', { locale: fr })}
                       </TableCell>
                       <TableCell className="capitalize">{booking.organization_type}</TableCell>
+                      <TableCell>
+                        {booking.current_step_order ? (
+                          <div className="text-sm">
+                            <span className="font-medium">E{booking.current_step_order.toString().padStart(2, '0')}</span>
+                            <p className="text-xs text-muted-foreground">
+                              {booking.current_step_code?.replace(/_/g, ' ').replace('e0', 'E').substring(0, 20)}...
+                            </p>
+                          </div>
+                        ) : (
+                          <Badge variant="outline" className="text-xs">Non démarré</Badge>
+                        )}
+                      </TableCell>
                       <TableCell>{getStatusBadge(booking.status)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
