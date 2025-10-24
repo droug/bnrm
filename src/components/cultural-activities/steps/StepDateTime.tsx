@@ -397,38 +397,16 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                 <CalendarIcon className="h-4 w-4" />
                 Date *
               </Label>
-              <Popover modal={true}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal h-11",
-                      !newSlot.date && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {newSlot.date ? (
-                      format(newSlot.date, "PPP", { locale: fr })
-                    ) : (
-                      <span>Sélectionner</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent 
-                  className="w-auto p-0 bg-white" 
-                  align="start"
-                >
-                  <Calendar
-                    mode="single"
-                    selected={newSlot.date}
-                    onSelect={(date) => date && setNewSlot({ ...newSlot, date })}
-                    disabled={(date) => date < today}
-                    initialFocus
-                    locale={fr}
-                    className="p-3 pointer-events-auto bg-white rounded-md border"
-                  />
-                </PopoverContent>
-              </Popover>
+              <div className="border rounded-md p-3 bg-white">
+                <Calendar
+                  mode="single"
+                  selected={newSlot.date}
+                  onSelect={(date) => date && setNewSlot({ ...newSlot, date })}
+                  disabled={(date) => date < today}
+                  locale={fr}
+                  className="pointer-events-auto"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
