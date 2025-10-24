@@ -911,16 +911,16 @@ const SpaceReservationsBackoffice = () => {
                   <ArrowRight className="h-6 w-6 text-muted-foreground" />
                 </div>
 
-                {/* Étape 2: Examen préliminaire */}
+                {/* Nouvelle étape: Décision du directeur - Envoyer pour Avis */}
                 <div className={`flex items-start gap-4 p-4 border rounded-lg ${
                   selectedBooking.status === 'en_attente' 
-                    ? 'bg-yellow-50 border-yellow-200' 
+                    ? 'bg-purple-50 border-purple-200' 
                     : 'bg-green-50 border-green-200'
                 }`}>
                   <div className="flex-shrink-0">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                       selectedBooking.status === 'en_attente'
-                        ? 'bg-yellow-500 text-white'
+                        ? 'bg-purple-500 text-white'
                         : 'bg-green-600 text-white'
                     }`}>
                       {selectedBooking.status === 'en_attente' ? '2' : '✓'}
@@ -928,14 +928,52 @@ const SpaceReservationsBackoffice = () => {
                   </div>
                   <div className="flex-1">
                     <h4 className={`font-semibold ${
-                      selectedBooking.status === 'en_attente' ? 'text-yellow-900' : 'text-green-900'
+                      selectedBooking.status === 'en_attente' ? 'text-purple-900' : 'text-green-900'
+                    }`}>
+                      Décision du directeur : Envoyer pour Avis
+                    </h4>
+                    <p className={`text-sm ${
+                      selectedBooking.status === 'en_attente' ? 'text-purple-800' : 'text-green-800'
+                    }`}>
+                      Le directeur décide de l'orientation du dossier
+                    </p>
+                    <div className="mt-2 flex gap-2 flex-wrap">
+                      <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded">✓ Validée</span>
+                      <span className="text-xs px-2 py-1 bg-red-100 text-red-800 rounded">✗ Refusée</span>
+                      <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">⏸ Vérification en cours</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-center">
+                  <ArrowRight className="h-6 w-6 text-muted-foreground" />
+                </div>
+
+                {/* Étape 2: Examen préliminaire */}
+                <div className={`flex items-start gap-4 p-4 border rounded-lg ${
+                  selectedBooking.status === 'en_attente' 
+                    ? 'bg-gray-50 border-gray-200' 
+                    : 'bg-yellow-50 border-yellow-200'
+                }`}>
+                  <div className="flex-shrink-0">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                      selectedBooking.status === 'en_attente'
+                        ? 'bg-gray-300 text-gray-600'
+                        : 'bg-yellow-500 text-white'
+                    }`}>
+                      3
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className={`font-semibold ${
+                      selectedBooking.status === 'en_attente' ? 'text-gray-700' : 'text-yellow-900'
                     }`}>
                       E02 - Examen préliminaire (DAC)
                     </h4>
                     <p className={`text-sm ${
-                      selectedBooking.status === 'en_attente' ? 'text-yellow-800' : 'text-green-800'
+                      selectedBooking.status === 'en_attente' ? 'text-gray-600' : 'text-yellow-800'
                     }`}>
-                      Vérification de la complétude du dossier
+                      Vérification de la complétude du dossier après décision
                     </p>
                   </div>
                 </div>
@@ -944,73 +982,40 @@ const SpaceReservationsBackoffice = () => {
                   <ArrowRight className="h-6 w-6 text-muted-foreground" />
                 </div>
 
-                {/* Étape 3: Décision directionnelle */}
+                {/* Étape 3: Validation directionnelle */}
                 <div className={`flex items-start gap-4 p-4 border rounded-lg ${
                   selectedBooking.status === 'verification_en_cours'
                     ? 'bg-blue-50 border-blue-200'
-                    : selectedBooking.status === 'en_attente'
-                    ? 'bg-gray-50 border-gray-200'
-                    : 'bg-green-50 border-green-200'
+                    : 'bg-gray-50 border-gray-200'
                 }`}>
                   <div className="flex-shrink-0">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                       selectedBooking.status === 'verification_en_cours'
                         ? 'bg-blue-600 text-white'
-                        : selectedBooking.status === 'en_attente'
-                        ? 'bg-gray-300 text-gray-600'
-                        : 'bg-green-600 text-white'
+                        : 'bg-gray-300 text-gray-600'
                     }`}>
-                      {selectedBooking.status === 'verification_en_cours' ? '3' : 
-                       selectedBooking.status === 'en_attente' ? '3' : '✓'}
+                      {selectedBooking.status === 'verification_en_cours' ? <Clock className="h-5 w-5" /> : '4'}
                     </div>
                   </div>
                   <div className="flex-1">
                     <h4 className={`font-semibold ${
                       selectedBooking.status === 'verification_en_cours'
                         ? 'text-blue-900'
-                        : selectedBooking.status === 'en_attente'
-                        ? 'text-gray-700'
-                        : 'text-green-900'
+                        : 'text-gray-700'
                     }`}>
                       E03 - Validation directionnelle
                     </h4>
                     <p className={`text-sm ${
                       selectedBooking.status === 'verification_en_cours'
                         ? 'text-blue-800'
-                        : selectedBooking.status === 'en_attente'
-                        ? 'text-gray-600'
-                        : 'text-green-800'
+                        : 'text-gray-600'
                     }`}>
-                      Décision du directeur : Accepter / Refuser / Vérification
+                      {selectedBooking.status === 'verification_en_cours' 
+                        ? 'Dossier en attente d\'analyse approfondie'
+                        : 'Décision finale du directeur'}
                     </p>
                   </div>
                 </div>
-
-                {/* Cas spécial : Vérification en cours */}
-                {selectedBooking.status === 'verification_en_cours' && (
-                  <>
-                    <div className="flex justify-center">
-                      <Clock className="h-6 w-6 text-blue-500 animate-pulse" />
-                    </div>
-                    <div className="flex items-start gap-4 p-4 bg-blue-50 border-2 border-blue-400 rounded-lg">
-                      <div className="flex-shrink-0">
-                        <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center">
-                          <Clock className="h-5 w-5 animate-pulse" />
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-blue-900">E04 - Vérification en cours (Cas spécial)</h4>
-                        <p className="text-sm text-blue-800">
-                          Dossier sensible en attente d'analyse approfondie
-                        </p>
-                        <div className="mt-3 p-3 bg-blue-100 rounded text-xs text-blue-900">
-                          <p className="font-semibold">⚠️ Contexte :</p>
-                          <p>Organisation sensible ou contexte juridique/politique ambigu nécessitant une analyse approfondie pour éviter toute exposition juridique ou médiatique.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
               </div>
 
               {/* Actions disponibles */}
