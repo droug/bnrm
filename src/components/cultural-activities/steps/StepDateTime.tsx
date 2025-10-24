@@ -415,9 +415,9 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent 
-                  className="w-auto p-0" 
+                  className="w-auto p-0 bg-white" 
                   align="start"
-                  style={{ zIndex: 10000 }}
+                  style={{ zIndex: 10001 }}
                 >
                   <Calendar
                     mode="single"
@@ -426,7 +426,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                     disabled={(date) => date < today}
                     initialFocus
                     locale={fr}
-                    className="p-3 pointer-events-auto"
+                    className="p-3 pointer-events-auto bg-white rounded-md border"
                   />
                 </PopoverContent>
               </Popover>
