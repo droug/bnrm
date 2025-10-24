@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 import StepOrganizerType from "./steps/StepOrganizerType";
 import StepDateTime from "./steps/StepDateTime";
 import StepEquipment from "./steps/StepEquipment";
@@ -58,6 +59,8 @@ const STEPS = [
   { id: 6, title: "Confirmation & notification", component: StepConfirmation }
 ];
 
+const STORAGE_KEY = 'cultural_activities_booking_draft';
+
 export default function BookingWizard() {
   const [currentStep, setCurrentStep] = useState(1);
   const [bookingData, setBookingData] = useState<BookingData>({
@@ -71,6 +74,37 @@ export default function BookingWizard() {
       participants: 1
     }]
   });
+
+  // Charger les données sauvegardées au montage
+  useEffect(() => {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        // Reconvertir les dates
+        if (parsed.eventSlots) {
+          parsed.eventSlots = parsed.eventSlots.map((slot: any) => ({
+            ...slot,
+            date: new Date(slot.date)
+          }));
+        }
+        if (parsed.startDate) parsed.startDate = new Date(parsed.startDate);
+        if (parsed.endDate) parsed.endDate = new Date(parsed.endDate);
+        
+        setBookingData(parsed);
+        toast.success("Brouillon chargé");
+      } catch (error) {
+        console.error("Erreur lors du chargement du brouillon:", error);
+      }
+    }
+  }, []);
+
+  // Sauvegarder automatiquement les données
+  useEffect(() => {
+    if (bookingData.organizerType || bookingData.spaceId) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookingData));
+    }
+  }, [bookingData]);
 
   const CurrentStepComponent = STEPS[currentStep - 1].component;
   const progress = (currentStep / STEPS.length) * 100;
@@ -106,7 +140,8 @@ export default function BookingWizard() {
           bookingData.eventTitle &&
           bookingData.eventDescription &&
           bookingData.eventSlots &&
-          bookingData.eventSlots.length > 0
+          bookingData.eventSlots.length > 0 &&
+          bookingData.programDocument
         );
       
       case 3: // Équipements & Services

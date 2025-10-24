@@ -349,7 +349,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
 
       {/* Upload du programme */}
       <div className="space-y-2">
-        <Label htmlFor="program">Programme de l'événement (PDF, Word)</Label>
+        <Label htmlFor="program">Programme de l'événement (PDF, Word) *</Label>
         <Input
           id="program"
           type="file"
@@ -380,12 +380,18 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
             }
           }}
           className="cursor-pointer"
+          required
         />
         {data.programDocument && (
           <div className="flex items-center gap-2 text-sm text-green-600">
             <CheckCircle className="h-4 w-4" />
             <span>Fichier ajouté: {(data.programDocument as File).name}</span>
           </div>
+        )}
+        {!data.programDocument && (
+          <p className="text-sm text-muted-foreground">
+            Veuillez télécharger le programme de votre événement
+          </p>
         )}
       </div>
     </div>
