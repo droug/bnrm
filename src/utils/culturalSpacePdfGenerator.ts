@@ -152,9 +152,122 @@ export const generateConfirmationLetter = async (booking: Booking, space?: Space
 };
 
 /**
+ * Génère une lettre de refus en PDF
+ */
+export const generateRejectionLetter = async (booking: Booking, space?: Space, rejectionReason?: string) => {
+  const doc = new jsPDF();
+  
+  // Ajouter l'en-tête BNRM
+  const yAfterHeader = await addBNRMHeader(doc);
+  let yPos = yAfterHeader + 10;
+  
+  // Titre
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('LETTRE DE REFUS DE RÉSERVATION', 105, yPos, { align: 'center' });
+  yPos += 15;
+  
+  // Numéro de réservation
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Référence: ${booking.booking_number}`, 20, yPos);
+  yPos += 7;
+  doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 20, yPos);
+  yPos += 15;
+  
+  // Informations de l'organisme
+  doc.setFont('helvetica', 'bold');
+  doc.text('Organisme demandeur:', 20, yPos);
+  yPos += 7;
+  doc.setFont('helvetica', 'normal');
+  doc.text(booking.organization_name, 20, yPos);
+  yPos += 5;
+  doc.text(`Contact: ${booking.contact_person}`, 20, yPos);
+  yPos += 5;
+  doc.text(`Email: ${booking.email}`, 20, yPos);
+  yPos += 5;
+  doc.text(`Téléphone: ${booking.phone}`, 20, yPos);
+  yPos += 12;
+  
+  // Objet
+  doc.setFont('helvetica', 'bold');
+  doc.text('Objet:', 20, yPos);
+  yPos += 7;
+  doc.setFont('helvetica', 'normal');
+  const objectText = `Refus de réservation d'espace pour ${booking.activity_type}`;
+  doc.text(objectText, 20, yPos);
+  yPos += 12;
+  
+  // Corps de la lettre
+  const bodyText = [
+    'Madame, Monsieur,',
+    '',
+    `Nous accusons réception de votre demande de réservation de l'espace "${space?.name || 'Non spécifié'}"`,
+    `pour la période du ${new Date(booking.start_date).toLocaleDateString('fr-FR')} au ${new Date(booking.end_date).toLocaleDateString('fr-FR')}.`,
+    '',
+    'Après étude de votre dossier, nous sommes au regret de vous informer que nous ne pouvons',
+    'donner suite favorable à votre demande pour les raisons suivantes:',
+    ''
+  ];
+  
+  doc.setFontSize(11);
+  bodyText.forEach(line => {
+    doc.text(line, 20, yPos);
+    yPos += 6;
+  });
+  
+  // Raison du refus
+  if (rejectionReason) {
+    const splitReason = doc.splitTextToSize(rejectionReason, 170);
+    doc.text(splitReason, 25, yPos);
+    yPos += splitReason.length * 6 + 10;
+  } else {
+    const defaultReason = [
+      '- Indisponibilité de l\'espace pour les dates demandées',
+      '- Non-conformité de l\'activité proposée avec le règlement intérieur',
+      '- Dossier incomplet'
+    ];
+    defaultReason.forEach(reason => {
+      doc.text(reason, 25, yPos);
+      yPos += 6;
+    });
+    yPos += 10;
+  }
+  
+  // Formule de politesse
+  if (yPos > 230) {
+    doc.addPage();
+    yPos = 20;
+  }
+  
+  const closingText = [
+    'Nous vous remercions de l\'intérêt que vous portez à notre établissement et restons',
+    'à votre disposition pour toute autre demande.',
+    '',
+    'Veuillez agréer, Madame, Monsieur, nos salutations distinguées.'
+  ];
+  
+  closingText.forEach(line => {
+    doc.text(line, 20, yPos);
+    yPos += 6;
+  });
+  
+  // Signature
+  yPos += 10;
+  doc.setFont('helvetica', 'bold');
+  doc.text('La Direction', 20, yPos);
+  doc.text('Bibliothèque Nationale du Royaume du Maroc', 20, yPos + 6);
+  
+  // Pied de page
+  addBNRMFooter(doc, 1);
+  
+  doc.save(`refus_${booking.booking_number}.pdf`);
+};
+
+/**
  * Génère un contrat de réservation en PDF
  */
-export const generateContract = async (booking: Booking, space?: Space) => {
+export const generateContract = async (booking: Booking, space?: Space, contractNumber?: string) => {
   const doc = new jsPDF();
   
   // Ajouter l'en-tête BNRM
@@ -170,7 +283,7 @@ export const generateContract = async (booking: Booking, space?: Space) => {
   // Numéro de contrat
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Contrat N°: ${booking.booking_number}`, 20, yPos);
+  doc.text(`Contrat N°: ${contractNumber || booking.booking_number}`, 20, yPos);
   yPos += 7;
   doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 20, yPos);
   yPos += 15;
@@ -269,13 +382,13 @@ export const generateContract = async (booking: Booking, space?: Space) => {
   // Pied de page
   addBNRMFooter(doc, doc.internal.pages.length - 1);
   
-  doc.save(`contrat_${booking.booking_number}.pdf`);
+  doc.save(`contrat_${contractNumber || booking.booking_number}.pdf`);
 };
 
 /**
  * Génère une facture en PDF
  */
-export const generateInvoice = async (booking: Booking, space?: Space) => {
+export const generateInvoice = async (booking: Booking, space?: Space, invoiceNumber?: string) => {
   const doc = new jsPDF();
   
   // Ajouter l'en-tête BNRM
@@ -291,7 +404,7 @@ export const generateInvoice = async (booking: Booking, space?: Space) => {
   // Informations facture
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Facture N°: ${booking.booking_number}`, 20, yPos);
+  doc.text(`Facture N°: ${invoiceNumber || booking.booking_number}`, 20, yPos);
   doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 140, yPos);
   yPos += 15;
   
@@ -378,7 +491,7 @@ export const generateInvoice = async (booking: Booking, space?: Space) => {
   // Pied de page
   addBNRMFooter(doc, 1);
   
-  doc.save(`facture_${booking.booking_number}.pdf`);
+  doc.save(`facture_${invoiceNumber || booking.booking_number}.pdf`);
 };
 
 /**

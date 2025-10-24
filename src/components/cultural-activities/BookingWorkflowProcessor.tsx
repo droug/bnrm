@@ -11,7 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { 
-  generateConfirmationLetter as generateConfirmationPDF, 
+  generateConfirmationLetter as generateConfirmationPDF,
+  generateRejectionLetter as generateRejectionPDF,
   generateContract as generateContractPDF, 
   generateInvoice as generateInvoicePDF, 
   generateInventoryReport as generateInventoryPDF 
@@ -226,7 +227,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
 
       const bookingData = {
         id: booking.id,
-        booking_number: booking.id.substring(0, 8).toUpperCase(),
+        booking_number: booking.booking_number || booking.id.substring(0, 8).toUpperCase(),
         organization_name: booking.organization_name,
         organization_type: booking.organization_type,
         contact_person: booking.contact_person,
@@ -250,15 +251,15 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
           toast({ title: "✓ Lettre de confirmation générée" });
           break;
         case 'rejection':
-          await generateConfirmationPDF(bookingData, space);
-          toast({ title: "✓ Lettre de rejet générée" });
+          await generateRejectionPDF(bookingData, space, comment);
+          toast({ title: "✓ Lettre de refus générée" });
           break;
         case 'contract':
-          await generateContractPDF(bookingData, space);
+          await generateContractPDF(bookingData, space, contractNumber);
           toast({ title: "✓ Contrat généré" });
           break;
         case 'invoice':
-          await generateInvoicePDF(bookingData, space);
+          await generateInvoicePDF(bookingData, space, invoiceNumber);
           toast({ title: "✓ Facture générée" });
           break;
         case 'inventory_entry':
@@ -275,7 +276,7 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
             total_amount: parseFloat(damageAmount) || 0,
             special_requirements: `${bookingData.special_requirements}\n\nDégâts constatés:\n${damageDescription}`
           };
-          await generateInvoicePDF(damageBookingData, space);
+          await generateInvoicePDF(damageBookingData, space, invoiceNumber);
           toast({ title: "✓ Facture complémentaire pour dégâts générée" });
           break;
       }
