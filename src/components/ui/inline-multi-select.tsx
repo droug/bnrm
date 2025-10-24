@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Check, ChevronDown, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +36,7 @@ export function InlineMultiSelect({
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const selectedOptions = options.filter(opt => selected.includes(opt.value));
 
@@ -55,9 +57,9 @@ export function InlineMultiSelect({
     onChange(selected.filter(v => v !== value));
   };
 
-  // Calculer la position du dropdown quand il s'ouvre
-  useEffect(() => {
-    if (isOpen && buttonRef.current) {
+  // Calculer la position du dropdown
+  const updatePosition = () => {
+    if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setDropdownPosition({
         top: rect.bottom + window.scrollY + 4,
@@ -65,20 +67,106 @@ export function InlineMultiSelect({
         width: rect.width
       });
     }
+  };
+
+  // Mettre à jour la position quand le dropdown s'ouvre
+  useEffect(() => {
+    if (isOpen) {
+      updatePosition();
+      // Mettre à jour la position lors du scroll
+      const handleScroll = () => updatePosition();
+      window.addEventListener('scroll', handleScroll, true);
+      window.addEventListener('resize', handleScroll);
+      return () => {
+        window.removeEventListener('scroll', handleScroll, true);
+        window.removeEventListener('resize', handleScroll);
+      };
+    }
   }, [isOpen]);
 
   // Fermer le dropdown quand on clique à l'extérieur
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current && 
+        !containerRef.current.contains(event.target as Node) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
         setSearchQuery("");
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen]);
+
+  const dropdownContent = isOpen ? (
+    <div 
+      ref={dropdownRef}
+      className="fixed bg-background border rounded-md shadow-xl max-h-80 overflow-hidden"
+      style={{ 
+        top: `${dropdownPosition.top}px`,
+        left: `${dropdownPosition.left}px`,
+        width: `${dropdownPosition.width}px`,
+        zIndex: 999999
+      }}
+    >
+      {/* Search input */}
+      <div className="p-2 border-b bg-background sticky top-0 z-10">
+        <Input
+          placeholder="Rechercher..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="h-9"
+          autoFocus
+        />
+      </div>
+
+      {/* Options list */}
+      <div className="overflow-y-auto max-h-64 bg-background">
+        {filteredOptions.length === 0 ? (
+          <div className="p-4 text-center text-sm text-muted-foreground">
+            Aucun résultat trouvé.
+          </div>
+        ) : (
+          filteredOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => toggleOption(option.value)}
+              className="w-full text-left px-3 py-2.5 hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-2"
+            >
+              <Check
+                className={cn(
+                  "h-4 w-4 shrink-0",
+                  selected.includes(option.value) ? "opacity-100" : "opacity-0"
+                )}
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-medium">{option.label}</span>
+                  {option.badge && (
+                    <Badge variant={option.badge.variant} className="text-xs">
+                      {option.badge.text}
+                    </Badge>
+                  )}
+                </div>
+                {option.description && (
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {option.description}
+                  </p>
+                )}
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  ) : null;
 
   return (
     <div className={cn("space-y-2", className)} ref={containerRef}>
@@ -122,69 +210,8 @@ export function InlineMultiSelect({
         <ChevronDown className={cn("ml-2 h-4 w-4 shrink-0 opacity-50 transition-transform", isOpen && "rotate-180")} />
       </Button>
 
-      {/* Dropdown list - utilise position fixed pour éviter les problèmes de conteneur */}
-      {isOpen && (
-        <div 
-          className="fixed bg-background border rounded-md shadow-lg max-h-80 overflow-hidden"
-          style={{ 
-            top: `${dropdownPosition.top}px`,
-            left: `${dropdownPosition.left}px`,
-            width: `${dropdownPosition.width}px`,
-            zIndex: 9999
-          }}
-        >
-          {/* Search input */}
-          <div className="p-2 border-b bg-background sticky top-0">
-            <Input
-              placeholder="Rechercher..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-9"
-              autoFocus
-            />
-          </div>
-
-          {/* Options list */}
-          <div className="overflow-y-auto max-h-64 bg-background">
-            {filteredOptions.length === 0 ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                Aucun résultat trouvé.
-              </div>
-            ) : (
-              filteredOptions.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => toggleOption(option.value)}
-                  className="w-full text-left px-3 py-2.5 hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-2"
-                >
-                  <Check
-                    className={cn(
-                      "h-4 w-4 shrink-0",
-                      selected.includes(option.value) ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium">{option.label}</span>
-                      {option.badge && (
-                        <Badge variant={option.badge.variant} className="text-xs">
-                          {option.badge.text}
-                        </Badge>
-                      )}
-                    </div>
-                    {option.description && (
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {option.description}
-                      </p>
-                    )}
-                  </div>
-                </button>
-              ))
-            )}
-          </div>
-        </div>
-      )}
+      {/* Portal pour rendre le dropdown en dehors de la hiérarchie */}
+      {typeof document !== 'undefined' && createPortal(dropdownContent, document.body)}
     </div>
   );
 }
