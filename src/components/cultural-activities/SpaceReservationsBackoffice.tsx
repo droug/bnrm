@@ -83,6 +83,7 @@ const SpaceReservationsBackoffice = () => {
   const [filterOrgType, setFilterOrgType] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterPeriod, setFilterPeriod] = useState<string>("all");
+  const [validationConfirmDialog, setValidationConfirmDialog] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -912,11 +913,18 @@ const SpaceReservationsBackoffice = () => {
                 </div>
 
                 {/* Nouvelle étape: Décision du directeur - Envoyer pour Avis */}
-                <div className={`flex items-start gap-4 p-4 border rounded-lg ${
-                  selectedBooking.status === 'en_attente' 
-                    ? 'bg-purple-50 border-purple-200' 
-                    : 'bg-green-50 border-green-200'
-                }`}>
+                <div 
+                  className={`flex items-start gap-4 p-4 border rounded-lg cursor-pointer hover:shadow-md transition-shadow ${
+                    selectedBooking.status === 'en_attente' 
+                      ? 'bg-purple-50 border-purple-200 hover:bg-purple-100' 
+                      : 'bg-green-50 border-green-200'
+                  }`}
+                  onClick={() => {
+                    if (selectedBooking.status === 'en_attente') {
+                      setValidationConfirmDialog(true);
+                    }
+                  }}
+                >
                   <div className="flex-shrink-0">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                       selectedBooking.status === 'en_attente'
@@ -935,7 +943,9 @@ const SpaceReservationsBackoffice = () => {
                     <p className={`text-sm ${
                       selectedBooking.status === 'en_attente' ? 'text-purple-800' : 'text-green-800'
                     }`}>
-                      Le directeur décide de l'orientation du dossier
+                      {selectedBooking.status === 'en_attente' 
+                        ? 'Cliquez pour prendre une décision'
+                        : 'Le directeur a décidé de l\'orientation du dossier'}
                     </p>
                     <div className="mt-2 flex gap-2 flex-wrap">
                       <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded">✓ Validée</span>
@@ -1141,6 +1151,63 @@ const SpaceReservationsBackoffice = () => {
 
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog}>Fermer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de confirmation de validation */}
+      <Dialog open={validationConfirmDialog} onOpenChange={setValidationConfirmDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Décision du directeur</DialogTitle>
+            <DialogDescription>
+              Confirmez-vous la validation de cette demande pour passer à l'étape suivante ?
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedBooking && (
+            <div className="space-y-4 py-4">
+              <div className="bg-muted/50 p-3 rounded-lg">
+                <div className="text-sm space-y-2">
+                  <div>
+                    <span className="text-muted-foreground">N° Réservation:</span>
+                    <span className="ml-2 font-semibold">{selectedBooking.id.substring(0, 8).toUpperCase()}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Demandeur:</span>
+                    <span className="ml-2 font-semibold">{selectedBooking.organization_name}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Événement:</span>
+                    <span className="ml-2">{selectedBooking.event_title}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setValidationConfirmDialog(false);
+                setActionDialog({ open: true, type: 'reject' });
+              }}
+              className="flex-1 border-red-300 text-red-600 hover:bg-red-50"
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Refuser
+            </Button>
+            <Button
+              onClick={() => {
+                setValidationConfirmDialog(false);
+                handleApprove();
+              }}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Confirmer la validation
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
