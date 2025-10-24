@@ -36,7 +36,11 @@ import {
   Eye,
   FileText,
   Download,
-  Mail
+  Mail,
+  GitBranch,
+  ArrowRight,
+  Clock,
+  Archive
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -820,29 +824,17 @@ const SpaceReservationsBackoffice = () => {
                             <Eye className="h-4 w-4" />
                           </Button>
                           {(booking.status === 'en_attente' || booking.status === 'verification_en_cours') && (
-                            <>
-                              <Button
-                                size="sm"
-                                className="bg-green-600 hover:bg-green-700 text-white"
-                                onClick={() => {
-                                  setSelectedBooking(booking);
-                                  setActionDialog({ open: true, type: 'approve' });
-                                }}
-                              >
-                                <CheckCircle className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-red-300 text-red-600 hover:bg-red-50"
-                                onClick={() => {
-                                  setSelectedBooking(booking);
-                                  setActionDialog({ open: true, type: 'reject' });
-                                }}
-                              >
-                                <XCircle className="h-4 w-4" />
-                              </Button>
-                            </>
+                            <Button
+                              size="sm"
+                              className="bg-primary hover:bg-primary/90 text-white"
+                              onClick={() => {
+                                setSelectedBooking(booking);
+                                setActionDialog({ open: true, type: 'approve' });
+                              }}
+                              title="Traiter la demande"
+                            >
+                              <GitBranch className="h-4 w-4" />
+                            </Button>
                           )}
                         </div>
                       </TableCell>
@@ -855,43 +847,295 @@ const SpaceReservationsBackoffice = () => {
         </CardContent>
       </Card>
 
-      {/* Dialog de validation */}
+      {/* Dialog de traitement (workflow) */}
       <Dialog open={actionDialog.open && actionDialog.type === 'approve'} onOpenChange={closeDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              {selectedBooking?.status === 'verification_en_cours' 
-                ? 'Décision sur la demande en vérification' 
-                : 'Valider la demande'}
+            <DialogTitle className="flex items-center gap-2 text-2xl">
+              <GitBranch className="h-6 w-6 text-primary" />
+              Traitement de la demande
             </DialogTitle>
             <DialogDescription>
-              {selectedBooking?.status === 'verification_en_cours'
-                ? 'Cette demande est en vérification. Vous pouvez maintenant l\'accepter, la refuser, ou l\'archiver sans suite.'
-                : 'Souhaitez-vous valider cette demande ? Une lettre de confirmation sera générée et envoyée au demandeur.'}
+              Workflow de validation et traitement de la demande de réservation
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 flex-wrap">
-            <Button variant="outline" onClick={closeDialog}>Annuler</Button>
-            {selectedBooking?.status !== 'verification_en_cours' && (
-              <Button 
-                onClick={handleVerificationInProgress} 
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                Vérification en cours
-              </Button>
-            )}
-            {selectedBooking?.status === 'verification_en_cours' && (
-              <Button 
-                onClick={handleArchive} 
-                variant="outline"
-                className="border-gray-400 text-gray-700 hover:bg-gray-100"
-              >
-                Archiver sans suite
-              </Button>
-            )}
-            <Button onClick={handleApprove} className="bg-green-600 hover:bg-green-700">
-              Accepter
-            </Button>
+
+          {selectedBooking && (
+            <div className="space-y-6 py-4">
+              {/* Informations de la demande */}
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">N° Réservation:</span>
+                    <span className="ml-2 font-semibold">{selectedBooking.id.substring(0, 8).toUpperCase()}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Demandeur:</span>
+                    <span className="ml-2 font-semibold">{selectedBooking.organization_name}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Espace:</span>
+                    <span className="ml-2">{selectedBooking.cultural_spaces?.name}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Statut actuel:</span>
+                    <span className="ml-2">{getStatusBadge(selectedBooking.status)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Workflow visuel */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  <GitBranch className="h-5 w-5" />
+                  Étapes du workflow
+                </h3>
+
+                {/* Étape 1: Soumission */}
+                <div className="flex items-start gap-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center font-bold">
+                      ✓
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-green-900">E01 - Soumission de la demande</h4>
+                    <p className="text-sm text-green-800">Demande soumise par {selectedBooking.contact_person}</p>
+                    <p className="text-xs text-green-700 mt-1">
+                      {format(new Date(selectedBooking.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex justify-center">
+                  <ArrowRight className="h-6 w-6 text-muted-foreground" />
+                </div>
+
+                {/* Étape 2: Examen préliminaire */}
+                <div className={`flex items-start gap-4 p-4 border rounded-lg ${
+                  selectedBooking.status === 'en_attente' 
+                    ? 'bg-yellow-50 border-yellow-200' 
+                    : 'bg-green-50 border-green-200'
+                }`}>
+                  <div className="flex-shrink-0">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                      selectedBooking.status === 'en_attente'
+                        ? 'bg-yellow-500 text-white'
+                        : 'bg-green-600 text-white'
+                    }`}>
+                      {selectedBooking.status === 'en_attente' ? '2' : '✓'}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className={`font-semibold ${
+                      selectedBooking.status === 'en_attente' ? 'text-yellow-900' : 'text-green-900'
+                    }`}>
+                      E02 - Examen préliminaire (DAC)
+                    </h4>
+                    <p className={`text-sm ${
+                      selectedBooking.status === 'en_attente' ? 'text-yellow-800' : 'text-green-800'
+                    }`}>
+                      Vérification de la complétude du dossier
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex justify-center">
+                  <ArrowRight className="h-6 w-6 text-muted-foreground" />
+                </div>
+
+                {/* Étape 3: Décision directionnelle */}
+                <div className={`flex items-start gap-4 p-4 border rounded-lg ${
+                  selectedBooking.status === 'verification_en_cours'
+                    ? 'bg-blue-50 border-blue-200'
+                    : selectedBooking.status === 'en_attente'
+                    ? 'bg-gray-50 border-gray-200'
+                    : 'bg-green-50 border-green-200'
+                }`}>
+                  <div className="flex-shrink-0">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                      selectedBooking.status === 'verification_en_cours'
+                        ? 'bg-blue-600 text-white'
+                        : selectedBooking.status === 'en_attente'
+                        ? 'bg-gray-300 text-gray-600'
+                        : 'bg-green-600 text-white'
+                    }`}>
+                      {selectedBooking.status === 'verification_en_cours' ? '3' : 
+                       selectedBooking.status === 'en_attente' ? '3' : '✓'}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className={`font-semibold ${
+                      selectedBooking.status === 'verification_en_cours'
+                        ? 'text-blue-900'
+                        : selectedBooking.status === 'en_attente'
+                        ? 'text-gray-700'
+                        : 'text-green-900'
+                    }`}>
+                      E03 - Validation directionnelle
+                    </h4>
+                    <p className={`text-sm ${
+                      selectedBooking.status === 'verification_en_cours'
+                        ? 'text-blue-800'
+                        : selectedBooking.status === 'en_attente'
+                        ? 'text-gray-600'
+                        : 'text-green-800'
+                    }`}>
+                      Décision du directeur : Accepter / Refuser / Vérification
+                    </p>
+                  </div>
+                </div>
+
+                {/* Cas spécial : Vérification en cours */}
+                {selectedBooking.status === 'verification_en_cours' && (
+                  <>
+                    <div className="flex justify-center">
+                      <Clock className="h-6 w-6 text-blue-500 animate-pulse" />
+                    </div>
+                    <div className="flex items-start gap-4 p-4 bg-blue-50 border-2 border-blue-400 rounded-lg">
+                      <div className="flex-shrink-0">
+                        <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center">
+                          <Clock className="h-5 w-5 animate-pulse" />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-blue-900">E04 - Vérification en cours (Cas spécial)</h4>
+                        <p className="text-sm text-blue-800">
+                          Dossier sensible en attente d'analyse approfondie
+                        </p>
+                        <div className="mt-3 p-3 bg-blue-100 rounded text-xs text-blue-900">
+                          <p className="font-semibold">⚠️ Contexte :</p>
+                          <p>Organisation sensible ou contexte juridique/politique ambigu nécessitant une analyse approfondie pour éviter toute exposition juridique ou médiatique.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Actions disponibles */}
+              <div className="border-t pt-6">
+                <h3 className="font-semibold text-lg mb-4">Actions disponibles</h3>
+                <div className="grid grid-cols-1 gap-3">
+                  {selectedBooking.status === 'en_attente' && (
+                    <>
+                      <Button 
+                        onClick={handleApprove} 
+                        className="w-full bg-green-600 hover:bg-green-700 text-white h-auto py-4"
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-3">
+                            <CheckCircle className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-semibold">Accepter la demande</div>
+                              <div className="text-xs opacity-90">Génération de la lettre de confirmation et du contrat</div>
+                            </div>
+                          </div>
+                          <ArrowRight className="h-5 w-5" />
+                        </div>
+                      </Button>
+                      
+                      <Button 
+                        onClick={handleVerificationInProgress} 
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white h-auto py-4"
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-3">
+                            <Clock className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-semibold">Mettre en vérification</div>
+                              <div className="text-xs opacity-90">Pour les dossiers sensibles nécessitant une analyse</div>
+                            </div>
+                          </div>
+                          <ArrowRight className="h-5 w-5" />
+                        </div>
+                      </Button>
+
+                      <Button 
+                        onClick={() => {
+                          closeDialog();
+                          setActionDialog({ open: true, type: 'reject' });
+                        }}
+                        variant="outline"
+                        className="w-full border-red-300 text-red-600 hover:bg-red-50 h-auto py-4"
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-3">
+                            <XCircle className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-semibold">Refuser la demande</div>
+                              <div className="text-xs opacity-90">Envoi de la lettre de refus motivée</div>
+                            </div>
+                          </div>
+                          <ArrowRight className="h-5 w-5" />
+                        </div>
+                      </Button>
+                    </>
+                  )}
+
+                  {selectedBooking.status === 'verification_en_cours' && (
+                    <>
+                      <Button 
+                        onClick={handleApprove} 
+                        className="w-full bg-green-600 hover:bg-green-700 text-white h-auto py-4"
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-3">
+                            <CheckCircle className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-semibold">Accepter après vérification</div>
+                              <div className="text-xs opacity-90">Reprendre le flux normal de validation</div>
+                            </div>
+                          </div>
+                          <ArrowRight className="h-5 w-5" />
+                        </div>
+                      </Button>
+
+                      <Button 
+                        onClick={() => {
+                          closeDialog();
+                          setActionDialog({ open: true, type: 'reject' });
+                        }}
+                        variant="outline"
+                        className="w-full border-red-300 text-red-600 hover:bg-red-50 h-auto py-4"
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-3">
+                            <XCircle className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-semibold">Refuser après vérification</div>
+                              <div className="text-xs opacity-90">Rejet motivé ou administratif</div>
+                            </div>
+                          </div>
+                          <ArrowRight className="h-5 w-5" />
+                        </div>
+                      </Button>
+
+                      <Button 
+                        onClick={handleArchive} 
+                        variant="outline"
+                        className="w-full border-gray-400 text-gray-700 hover:bg-gray-100 h-auto py-4"
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-3">
+                            <Archive className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-semibold">Archiver sans suite</div>
+                              <div className="text-xs opacity-90">Pas de retour public, conservation interne</div>
+                            </div>
+                          </div>
+                          <ArrowRight className="h-5 w-5" />
+                        </div>
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={closeDialog}>Fermer</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
