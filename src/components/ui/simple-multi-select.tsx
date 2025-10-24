@@ -84,7 +84,7 @@ export function SimpleMultiSelect({
       )}
 
       {/* Dropdown */}
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={setOpen} modal={true}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -100,7 +100,7 @@ export function SimpleMultiSelect({
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0" align="start" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+        <PopoverContent className="w-full p-0 bg-popover text-popover-foreground border z-[var(--z-popover)]" align="start" style={{ width: 'var(--radix-popover-trigger-width)' }}>
           <Command>
             <CommandInput placeholder="Rechercher..." />
             <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
