@@ -4,11 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, Clock, GitBranch, ArrowRight, Archive } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, GitBranch, ArrowRight, Archive, FileText, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { 
+  generateConfirmationLetter as generateConfirmationPDF, 
+  generateContract as generateContractPDF, 
+  generateInvoice as generateInvoicePDF, 
+  generateInventoryReport as generateInventoryPDF 
+} from "@/utils/culturalSpacePdfGenerator";
 
 interface WorkflowStep {
   step_order: number;
@@ -38,6 +45,14 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
   const [workflowHistory, setWorkflowHistory] = useState<WorkflowHistoryEntry[]>([]);
   const [comment, setComment] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [generatingDoc, setGeneratingDoc] = useState(false);
+  
+  // Champs pour les documents
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [contractNumber, setContractNumber] = useState("");
+  const [damageAmount, setDamageAmount] = useState("");
+  const [damageDescription, setDamageDescription] = useState("");
+  
   const { toast } = useToast();
 
   useEffect(() => {
@@ -160,6 +175,287 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
     };
     const c = config[decision as keyof typeof config] || { label: decision, className: "bg-gray-100 text-gray-800" };
     return <Badge className={c.className}>{c.label}</Badge>;
+  };
+
+  const generateDocument = async (docType: string) => {
+    if (!booking) return;
+    
+    setGeneratingDoc(true);
+    try {
+      const space = {
+        name: booking.cultural_spaces?.name || "Espace non spécifié",
+        capacity: booking.participants_count,
+        description: booking.event_description,
+        location: ""
+      };
+
+      const bookingData = {
+        id: booking.id,
+        booking_number: booking.id.substring(0, 8).toUpperCase(),
+        organization_name: booking.organization_name,
+        organization_type: booking.organization_type,
+        contact_person: booking.contact_person,
+        phone: booking.contact_phone,
+        email: booking.contact_email,
+        activity_type: booking.event_title,
+        activity_description: booking.event_description,
+        start_date: booking.start_date,
+        end_date: booking.end_date,
+        duration_type: booking.duration_type,
+        expected_attendees: booking.participants_count,
+        special_requirements: booking.admin_notes || "",
+        total_amount: booking.total_amount,
+        status: booking.status,
+        space_id: booking.space_id
+      };
+
+      switch (docType) {
+        case 'confirmation':
+          await generateConfirmationPDF(bookingData, space);
+          toast({ title: "✓ Lettre de confirmation générée" });
+          break;
+        case 'rejection':
+          await generateConfirmationPDF(bookingData, space); // Même PDF avec statut différent
+          toast({ title: "✓ Lettre de rejet générée" });
+          break;
+        case 'contract':
+          await generateContractPDF(bookingData, space);
+          toast({ title: "✓ Contrat généré" });
+          break;
+        case 'invoice':
+          await generateInvoicePDF(bookingData, space);
+          toast({ title: "✓ Facture générée" });
+          break;
+        case 'inventory_entry':
+          await generateInventoryPDF(bookingData, space);
+          toast({ title: "✓ État des lieux d'entrée généré" });
+          break;
+        case 'inventory_exit':
+          await generateInventoryPDF(bookingData, space);
+          toast({ title: "✓ État des lieux de sortie généré" });
+          break;
+        case 'damage_invoice':
+          const damageBookingData = {
+            ...bookingData,
+            total_amount: parseFloat(damageAmount) || 0,
+            special_requirements: `${bookingData.special_requirements}\n\nDégâts constatés:\n${damageDescription}`
+          };
+          await generateInvoicePDF(damageBookingData, space);
+          toast({ title: "✓ Facture complémentaire pour dégâts générée" });
+          break;
+      }
+    } catch (error) {
+      console.error('Error generating document:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le document",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingDoc(false);
+    }
+  };
+
+  const getDocumentsForCurrentStep = () => {
+    if (!booking?.current_step_code) return null;
+
+    const stepCode = booking.current_step_code;
+    
+    // E02 - Décision de la Direction : Lettres de confirmation/rejet
+    if (stepCode === 'e02_decision_direction') {
+      return (
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold text-muted-foreground">Documents disponibles:</h4>
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => generateDocument('confirmation')}
+              disabled={generatingDoc}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Lettre de confirmation
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => generateDocument('rejection')}
+              disabled={generatingDoc}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Lettre de rejet
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    // E03 - Traitement par le DAC : Lettres
+    if (stepCode === 'e03_traitement_dac') {
+      return (
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold text-muted-foreground">Documents disponibles:</h4>
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => generateDocument('confirmation')}
+              disabled={generatingDoc}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Lettre de confirmation
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => generateDocument('rejection')}
+              disabled={generatingDoc}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Lettre de refus
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    // E04 - Contractualisation : Contrat
+    if (stepCode === 'e04_contractualisation') {
+      return (
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold text-muted-foreground">Documents disponibles:</h4>
+          <div className="space-y-2">
+            <div className="flex gap-2 items-end">
+              <div className="flex-1">
+                <Label htmlFor="contract-number" className="text-xs">N° Contrat (optionnel)</Label>
+                <Input
+                  id="contract-number"
+                  placeholder="CT/2025/001"
+                  value={contractNumber}
+                  onChange={(e) => setContractNumber(e.target.value)}
+                  className="h-8 text-sm"
+                />
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => generateDocument('contract')}
+                disabled={generatingDoc}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Générer contrat
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // E05 - Facturation : Facture
+    if (stepCode === 'e05_facturation') {
+      return (
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold text-muted-foreground">Documents disponibles:</h4>
+          <div className="space-y-2">
+            <div className="flex gap-2 items-end">
+              <div className="flex-1">
+                <Label htmlFor="invoice-number" className="text-xs">N° Facture (optionnel)</Label>
+                <Input
+                  id="invoice-number"
+                  placeholder="FC/2025/001"
+                  value={invoiceNumber}
+                  onChange={(e) => setInvoiceNumber(e.target.value)}
+                  className="h-8 text-sm"
+                />
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => generateDocument('invoice')}
+                disabled={generatingDoc}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Générer facture
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // E06 - Mise à disposition : États des lieux
+    if (stepCode === 'e06_mise_a_disposition') {
+      return (
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold text-muted-foreground">Documents disponibles:</h4>
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => generateDocument('inventory_entry')}
+              disabled={generatingDoc}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              État des lieux entrant
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => generateDocument('inventory_exit')}
+              disabled={generatingDoc}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              État des lieux sortant
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    // E07 - Facturation complémentaire : Facture pour dégâts
+    if (stepCode === 'e07_facturation_complementaire') {
+      return (
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold text-muted-foreground">Documents disponibles:</h4>
+          <div className="space-y-3 p-3 border rounded-lg bg-yellow-50/50">
+            <div>
+              <Label htmlFor="damage-amount" className="text-xs">Montant des dégâts (MAD)</Label>
+              <Input
+                id="damage-amount"
+                type="number"
+                placeholder="0.00"
+                value={damageAmount}
+                onChange={(e) => setDamageAmount(e.target.value)}
+                className="h-8 text-sm"
+              />
+            </div>
+            <div>
+              <Label htmlFor="damage-description" className="text-xs">Description des dégâts</Label>
+              <Textarea
+                id="damage-description"
+                placeholder="Décrire les dégâts constatés..."
+                value={damageDescription}
+                onChange={(e) => setDamageDescription(e.target.value)}
+                rows={2}
+                className="text-sm"
+              />
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => generateDocument('damage_invoice')}
+              disabled={generatingDoc || !damageAmount || !damageDescription}
+              className="w-full"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Générer facture complémentaire
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
   };
 
   const getActionsForCurrentStep = () => {
@@ -417,6 +713,13 @@ export function BookingWorkflowProcessor({ booking, open, onClose, onSuccess }: 
 
           {/* Actions */}
           <div className="space-y-4 border-t pt-4">
+            {/* Documents disponibles */}
+            {getDocumentsForCurrentStep() && (
+              <div className="pb-4 mb-4 border-b">
+                {getDocumentsForCurrentStep()}
+              </div>
+            )}
+
             <div>
               <Label htmlFor="workflow-comment">
                 Commentaire 
