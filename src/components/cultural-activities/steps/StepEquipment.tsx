@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
-import { Loader2, Package, Sparkles, DollarSign } from "lucide-react";
+import { Loader2, Package, Sparkles, Coins } from "lucide-react";
 import { SimpleMultiSelect } from "@/components/ui/simple-multi-select";
 import type { BookingData } from "../BookingWizard";
 
@@ -148,7 +148,7 @@ export default function StepEquipment({ data, onUpdate }: StepEquipmentProps) {
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-primary" />
+                  <Coins className="h-5 w-5 text-primary" />
                   <span className="text-lg font-semibold">Total estimé</span>
                 </div>
                 <div className="text-right">
