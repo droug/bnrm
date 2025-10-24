@@ -57,8 +57,8 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
     const newSlot: EventSlot = {
       id: `slot-${Date.now()}`,
       date: new Date(),
-      startTime: "",
-      endTime: "",
+      startTime: "09:00",
+      endTime: "18:00",
       participants: 1
     };
 
@@ -258,6 +258,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                         type="time"
                         value={slot.startTime}
                         onChange={(e) => updateSlot(slot.id, { startTime: e.target.value })}
+                        className="h-11"
                         required
                       />
                     </div>
@@ -272,6 +273,7 @@ export default function StepDateTime({ data, onUpdate }: StepDateTimeProps) {
                         type="time"
                         value={slot.endTime}
                         onChange={(e) => updateSlot(slot.id, { endTime: e.target.value })}
+                        className="h-11"
                         required
                       />
                     </div>

@@ -69,8 +69,8 @@ export default function BookingWizard() {
     eventSlots: [{
       id: `slot-${Date.now()}`,
       date: new Date(),
-      startTime: "",
-      endTime: "",
+      startTime: "09:00",
+      endTime: "18:00",
       participants: 1
     }]
   });
