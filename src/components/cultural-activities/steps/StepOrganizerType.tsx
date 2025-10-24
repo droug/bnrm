@@ -145,35 +145,37 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
         )}
       </div>
 
-      {/* Upload pièces justificatives */}
-      <Card className="border-2 border-primary/20 bg-primary/5">
-        <CardContent className="p-6 space-y-4">
-          <div>
-            <Label htmlFor="justification" className="text-base font-semibold flex items-center gap-2">
-              <Upload className="h-5 w-5" />
-              Pièces justificatives (obligatoire)
-            </Label>
-            <p className="text-sm text-muted-foreground mt-1 mb-3">
-              Documents justifiant le statut de votre organisme (Format PDF, max 10 MB)
-            </p>
-          </div>
-          
-          <Input
-            id="justification"
-            type="file"
-            accept=".pdf"
-            onChange={handleFileUpload}
-            className="cursor-pointer"
-          />
-          
-          {data.justificationDocument && (
-            <div className="flex items-center gap-2 text-sm text-green-600">
-              <CheckCircle className="h-4 w-4" />
-              <span>Fichier ajouté: {(data.justificationDocument as File).name}</span>
+      {/* Upload pièces justificatives - obligatoire pour organisme public */}
+      {data.organizerType === 'public' && (
+        <Card className="border-2 border-primary/20 bg-primary/5">
+          <CardContent className="p-6 space-y-4">
+            <div>
+              <Label htmlFor="justification" className="text-base font-semibold flex items-center gap-2">
+                <Upload className="h-5 w-5" />
+                Pièces justificatives (obligatoire)
+              </Label>
+              <p className="text-sm text-muted-foreground mt-1 mb-3">
+                Documents justifiant le statut d'organisme public (Format PDF, max 10 MB)
+              </p>
             </div>
-          )}
-        </CardContent>
-      </Card>
+            
+            <Input
+              id="justification"
+              type="file"
+              accept=".pdf"
+              onChange={handleFileUpload}
+              className="cursor-pointer"
+            />
+            
+            {data.justificationDocument && (
+              <div className="flex items-center gap-2 text-sm text-green-600">
+                <CheckCircle className="h-4 w-4" />
+                <span>Fichier ajouté: {(data.justificationDocument as File).name}</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Sélection de l'espace */}
       <div className="space-y-2 relative z-50" ref={spaceRef}>
