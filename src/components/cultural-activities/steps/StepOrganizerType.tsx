@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Upload, CheckCircle, Loader2, Users, Square, ChevronDown, CalendarDays } from "lucide-react";
+import { Upload, CheckCircle, Loader2, Users, Square, ChevronDown, CalendarDays, Image } from "lucide-react";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import type { BookingData } from "../BookingWizard";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import SpaceGalleryModal from "../SpaceGalleryModal";
 
 interface StepOrganizerTypeProps {
   data: BookingData;
@@ -24,6 +25,7 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
   const [organizerTypeOpen, setOrganizerTypeOpen] = useState(false);
   const [spaceDropdownOpen, setSpaceDropdownOpen] = useState(false);
   const [spaceSearch, setSpaceSearch] = useState("");
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const organizerTypeRef = useRef<HTMLDivElement>(null);
   const spaceRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -273,10 +275,21 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
                   <p className="text-sm text-muted-foreground">{selectedSpace.floor_level}</p>
                 )}
               </div>
-              <Badge className="gap-1">
-                <CheckCircle className="h-3 w-3" />
-                Sélectionné
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={() => setGalleryOpen(true)}
+                >
+                  <Image className="h-4 w-4" />
+                  Visualiser l'espace
+                </Button>
+                <Badge className="gap-1">
+                  <CheckCircle className="h-3 w-3" />
+                  Sélectionné
+                </Badge>
+              </div>
             </div>
 
             {selectedSpace.description && (
@@ -432,6 +445,15 @@ export default function StepOrganizerType({ data, onUpdate }: StepOrganizerTypeP
           </p>
         </CardContent>
       </Card>
+
+      {/* Gallery Modal */}
+      {selectedSpace && (
+        <SpaceGalleryModal
+          isOpen={galleryOpen}
+          onClose={() => setGalleryOpen(false)}
+          spaceName={selectedSpace.name}
+        />
+      )}
     </div>
   );
 }
