@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,10 @@ export default function DigitalLibraryHome() {
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
+  
+  const autoplayPlugin = useRef(
+    Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: true })
+  );
 
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -209,20 +213,14 @@ export default function DigitalLibraryHome() {
                   align: "start",
                   loop: true,
                 }}
-                plugins={[
-                  Autoplay({
-                    delay: 5000,
-                    stopOnInteraction: true,
-                    stopOnMouseEnter: true,
-                  })
-                ]}
+                plugins={[autoplayPlugin.current]}
                 className="w-full"
               >
                 <CarouselContent>
                   {newItems.map((item) => (
-                     <CarouselItem key={item.id}>
+                     <CarouselItem key={item.id} className="animate-fade-in">
                        <div className="p-1">
-                         <Card className="border-2 hover:shadow-2xl transition-all duration-500 bg-card/95 backdrop-blur-sm animate-fade-in">
+                         <Card className="border-2 hover:shadow-2xl transition-all duration-700 bg-card/95 backdrop-blur-sm hover:scale-[1.02]">
                            <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8">
                              <div className="flex-1">
                                <Badge className="mb-3">{item.type}</Badge>
