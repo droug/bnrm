@@ -32,34 +32,79 @@ export function CoteAutocomplete({
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchSuggestions = async (query: string) => {
-    if (!query || query.length < 2) {
+    if (!query || query.length < 1) {
       setSuggestions([]);
       return;
     }
 
     setLoading(true);
     try {
-      // Search in manuscripts table for cote numbers
-      const { data: manuscriptData, error: manuscriptError } = await supabase
+      // Search in manuscripts with cote
+      const { data: manuscriptData } = await supabase
         .from("manuscripts")
         .select("cote, title")
-        .ilike("cote", `%${query}%`)
         .not("cote", "is", null)
+        .or(`cote.ilike.%${query}%,title.ilike.%${query}%`)
+        .order("cote")
         .limit(15);
 
-      if (manuscriptError) throw manuscriptError;
+      // Search in cote_collections for collection codes
+      const { data: collectionsData } = await supabase
+        .from("cote_collections")
+        .select("code, nom_francais")
+        .or(`code.ilike.%${query}%,nom_francais.ilike.%${query}%`)
+        .limit(10);
 
-      const allCotes = (manuscriptData || []).map(item => ({ 
-        cote: item.cote!, 
-        type: item.title ? item.title.substring(0, 30) + '...' : 'Manuscrit' 
-      }));
+      // Search in cote_nomenclatures for prefixes
+      const { data: nomenclaturesData } = await supabase
+        .from("cote_nomenclatures")
+        .select("prefixe, description")
+        .or(`prefixe.ilike.%${query}%,description.ilike.%${query}%`)
+        .eq("is_active", true)
+        .limit(10);
+
+      const suggestions: CoteSuggestion[] = [];
+
+      // Add manuscripts with cote
+      if (manuscriptData) {
+        manuscriptData.forEach(item => {
+          suggestions.push({
+            cote: item.cote!,
+            type: item.title ? (item.title.length > 35 ? item.title.substring(0, 35) + '...' : item.title) : 'Manuscrit'
+          });
+        });
+      }
+
+      // Add collection codes as suggestions
+      if (collectionsData) {
+        collectionsData.forEach(item => {
+          suggestions.push({
+            cote: item.code,
+            type: item.nom_francais
+          });
+        });
+      }
+
+      // Add nomenclature prefixes
+      if (nomenclaturesData) {
+        nomenclaturesData.forEach(item => {
+          // Extract example from description
+          const match = item.description?.match(/Exemple:\s*([^\s(]+)/);
+          const example = match ? match[1] : item.prefixe;
+          suggestions.push({
+            cote: example,
+            type: `Modèle ${item.prefixe}`
+          });
+        });
+      }
 
       // Remove duplicates by cote
       const uniqueCotes = Array.from(
-        new Map(allCotes.map(item => [item.cote, item])).values()
+        new Map(suggestions.map(item => [item.cote, item])).values()
       );
 
       setSuggestions(uniqueCotes);
+      console.log("Côte suggestions found:", uniqueCotes.length, uniqueCotes);
     } catch (error) {
       console.error("Error fetching côte suggestions:", error);
       setSuggestions([]);
