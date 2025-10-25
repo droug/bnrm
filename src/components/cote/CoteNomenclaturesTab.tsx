@@ -136,10 +136,49 @@ export const CoteNomenclaturesTab = () => {
   };
 
   const testCodification = (model: string, data: typeof testData) => {
-    return model
-      .replace("ED##", `ED${data.edition}`)
-      .replace("VILLE##", data.ville)
-      .replace("###", String(data.numero).padStart(3, "0"));
+    let result = model;
+    
+    // Remplacer ED## par ED + numéro d'édition
+    if (result.includes('ED##')) {
+      result = result.replace('ED##', `ED${data.edition}`);
+    }
+    
+    // Remplacer VILLE## par le code ville
+    if (result.includes('VILLE##')) {
+      result = result.replace('VILLE##', data.ville);
+    }
+    
+    // Remplacer COLL## par le code collection
+    if (result.includes('COLL##')) {
+      result = result.replace('COLL##', data.ville); // Réutilise le champ ville pour collection
+    }
+    
+    // Remplacer AAAA par l'année (utilise edition comme année)
+    if (result.includes('AAAA')) {
+      result = result.replace(/AAAA/g, data.edition.padStart(4, '20'));
+    }
+    
+    // Remplacer MM par le mois (utilise les 2 premiers chiffres de numero)
+    if (result.includes('MM')) {
+      result = result.replace('MM', data.numero.padStart(2, '0').substring(0, 2));
+    }
+    
+    // Remplacer #### par numéro à 4 chiffres
+    if (result.includes('####')) {
+      result = result.replace('####', data.numero.padStart(4, '0'));
+    }
+    
+    // Remplacer ### par numéro à 3 chiffres
+    if (result.includes('###')) {
+      result = result.replace('###', data.numero.padStart(3, '0'));
+    }
+    
+    // Remplacer ## par numéro à 2 chiffres
+    if (result.includes('##')) {
+      result = result.replace(/##/g, data.numero.padStart(2, '0'));
+    }
+    
+    return result;
   };
 
   const handleTest = () => {
@@ -307,33 +346,45 @@ export const CoteNomenclaturesTab = () => {
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label>Édition</Label>
+                          <Label>Édition / Année</Label>
                           <Input
                             value={testData.edition}
                             onChange={(e) => setTestData({ ...testData, edition: e.target.value })}
+                            placeholder="42 ou 2024"
                           />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Pour ED## ou AAAA
+                          </p>
                         </div>
                         <div>
-                          <Label>Ville</Label>
+                          <Label>Ville / Collection</Label>
                           <Input
                             value={testData.ville}
                             onChange={(e) => setTestData({ ...testData, ville: e.target.value })}
+                            placeholder="MRK ou D"
                           />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Pour VILLE## ou COLL##
+                          </p>
                         </div>
                         <div>
-                          <Label>Numéro</Label>
+                          <Label>Numéro séquentiel</Label>
                           <Input
                             value={testData.numero}
                             onChange={(e) => setTestData({ ...testData, numero: e.target.value })}
+                            placeholder="122"
                           />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Pour ###, ####, ou ##
+                          </p>
                         </div>
                         <Button onClick={handleTest} className="w-full">
-                          Générer
+                          Générer l&apos;exemple
                         </Button>
                         {testResult && (
                           <div className="p-3 bg-muted rounded-md">
                             <Label>Résultat :</Label>
-                            <p className="font-mono text-lg mt-1">{testResult}</p>
+                            <p className="font-mono text-lg mt-1 font-bold text-primary">{testResult}</p>
                           </div>
                         )}
                       </div>
