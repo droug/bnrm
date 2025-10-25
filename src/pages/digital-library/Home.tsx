@@ -220,7 +220,7 @@ export default function DigitalLibraryHome() {
                   {newItems.map((item) => (
                      <CarouselItem key={item.id} className="animate-fade-in">
                        <div className="p-1">
-                         <Card className="border-2 hover:shadow-2xl transition-all duration-700 bg-card/95 backdrop-blur-sm hover:scale-[1.02]">
+                         <Card className="border-2 hover:shadow-2xl transition-all duration-700 bg-background/10 backdrop-blur-sm border-primary-foreground/30 hover:bg-background/20 hover:scale-[1.02]">
                            <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8">
                              <div className="flex-1">
                                <Badge className="mb-3">{item.type}</Badge>
