@@ -19,6 +19,7 @@ import archivesPhotoMaroc from "@/assets/digital-library/archives-photo-maroc.jp
 import cartesAnciennes from "@/assets/digital-library/cartes-anciennes.jpg";
 import logicielPatrimoine from "@/assets/digital-library/logiciel-patrimoine.jpg";
 import manuscritsAndalous from "@/assets/digital-library/manuscrits-andalous.jpg";
+import libraryBanner from "@/assets/digital-library/library-banner.jpg";
 
 export default function DigitalLibraryHome() {
   const navigate = useNavigate();
@@ -177,14 +178,22 @@ export default function DigitalLibraryHome() {
 
   return (
     <DigitalLibraryLayout>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary/10 via-accent/5 to-background py-12">
-        <div className="container mx-auto px-4">
+      {/* Hero Section with Background Image */}
+      <section 
+        className="relative py-16 overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${libraryBanner})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold text-foreground mb-4 animate-fade-in">
+            <h1 className="text-5xl font-bold text-white mb-4 animate-fade-in drop-shadow-lg">
               Bienvenue à la Bibliothèque Numérique
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto animate-fade-in">
+            <p className="text-xl text-white/90 max-w-3xl mx-auto animate-fade-in drop-shadow-md">
               Accédez à plus de 100,000 documents numérisés du patrimoine marocain
             </p>
           </div>
@@ -201,27 +210,27 @@ export default function DigitalLibraryHome() {
               >
                 <CarouselContent>
                   {newItems.map((item) => (
-                    <CarouselItem key={item.id}>
-                      <div className="p-1">
-                        <Card className="border-2 hover:shadow-lg transition-shadow">
-                          <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8">
-                            <div className="flex-1">
-                              <Badge className="mb-3">{item.type}</Badge>
-                              <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
-                              <p className="text-muted-foreground mb-4">{item.author}</p>
-                              <p className="text-sm text-muted-foreground mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
-                              <div className="flex gap-2">
-                                <Button size="lg" variant="outline" onClick={() => handleConsultDocument(item)}>
-                                  Consulter
-                                </Button>
-                                {!item.isAvailable && session && userProfile && (
-                                  <Button size="lg" onClick={() => handleReservationClick(item)}>
-                                    🗓️ Réserver
-                                  </Button>
-                                )}
+                     <CarouselItem key={item.id}>
+                       <div className="p-1">
+                         <Card className="border-2 hover:shadow-2xl transition-all bg-card/95 backdrop-blur-sm">
+                           <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8">
+                             <div className="flex-1">
+                               <Badge className="mb-3">{item.type}</Badge>
+                               <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
+                               <p className="text-muted-foreground mb-4">{item.author}</p>
+                               <p className="text-sm text-muted-foreground mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
+                               <div className="flex gap-2">
+                                 <Button size="lg" variant="outline" onClick={() => handleConsultDocument(item)}>
+                                   Consulter
+                                 </Button>
+                                 {!item.isAvailable && session && userProfile && (
+                                   <Button size="lg" onClick={() => handleReservationClick(item)}>
+                                     🗓️ Réserver
+                                   </Button>
+                                 )}
                               </div>
                             </div>
-                            <div className="w-full md:w-48 h-64 rounded-lg overflow-hidden hover-scale">
+                            <div className="w-full md:w-48 h-64 rounded-lg overflow-hidden hover-scale shadow-xl">
                               <img 
                                 src={item.thumbnail} 
                                 alt={item.title}
@@ -241,12 +250,12 @@ export default function DigitalLibraryHome() {
           )}
           {loading && (
             <div className="max-w-5xl mx-auto text-center py-12">
-              <p className="text-muted-foreground">Chargement des documents...</p>
+              <p className="text-white/90 drop-shadow-md">Chargement des documents...</p>
             </div>
           )}
           {!loading && newItems.length === 0 && (
             <div className="max-w-5xl mx-auto text-center py-12">
-              <p className="text-muted-foreground">Aucun document disponible pour le moment</p>
+              <p className="text-white/90 drop-shadow-md">Aucun document disponible pour le moment</p>
             </div>
           )}
         </div>
