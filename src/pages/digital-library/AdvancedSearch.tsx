@@ -10,10 +10,13 @@ import { useNavigate } from "react-router-dom";
 import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
 import { AuthorAutocomplete } from "@/components/ui/author-autocomplete";
 import { LanguageAutocomplete } from "@/components/ui/language-autocomplete";
+import { CoteAutocomplete } from "@/components/ui/cote-autocomplete";
 
 export default function AdvancedSearch() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    keyword: "",
+    cote: "",
     author: "",
     title: "",
     subject: "",
@@ -37,6 +40,8 @@ export default function AdvancedSearch() {
 
   const handleReset = () => {
     setFormData({
+      keyword: "",
+      cote: "",
       author: "",
       title: "",
       subject: "",
@@ -67,6 +72,25 @@ export default function AdvancedSearch() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Keyword */}
+              <div className="space-y-2">
+                <Label htmlFor="keyword">Mot-clé</Label>
+                <Input
+                  id="keyword"
+                  placeholder="Recherche par mot-clé"
+                  value={formData.keyword}
+                  onChange={(e) => setFormData({ ...formData, keyword: e.target.value })}
+                />
+              </div>
+
+              {/* Cote - with autocomplete */}
+              <CoteAutocomplete
+                label="Numéro de Côte"
+                placeholder="Rechercher un numéro de côte"
+                value={formData.cote}
+                onChange={(value) => setFormData({ ...formData, cote: value })}
+              />
+
               {/* Author - with autocomplete */}
               <AuthorAutocomplete
                 label="Auteur"
