@@ -20,6 +20,19 @@ export default function MySpace() {
   const [downloads, setDownloads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const handleConsultDocument = (item: any) => {
+    // Déterminer si c'est un manuscrit ou un document
+    const isManuscript = item.content_type === 'manuscript' || item.manuscript_id;
+    
+    if (isManuscript) {
+      const manuscriptId = item.manuscript_id || item.content_id;
+      navigate(`/manuscript-reader/${manuscriptId}`);
+    } else {
+      const documentId = item.content_id || item.id;
+      navigate(`/book-reader/${documentId}`);
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       navigate("/auth");
@@ -328,7 +341,7 @@ export default function MySpace() {
                         </div>
                         <Button
                           size="sm"
-                          onClick={() => navigate(item.content_id ? `/digital-library/document/${item.content_id}` : `/manuscripts/${item.manuscript_id}`)}
+                          onClick={() => handleConsultDocument(item)}
                         >
                           Consulter
                         </Button>

@@ -18,6 +18,16 @@ export default function MyLoans() {
   const [loanHistory, setLoanHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const handleConsultLoan = (loan: any) => {
+    // Pour l'instant, utiliser book-reader pour les prêts
+    // Dans une vraie implémentation, vous auriez un loan_id qui référence un document/manuscrit
+    if (loan.id) {
+      navigate(`/book-reader/${loan.id}`);
+    } else {
+      navigate('/digital-library');
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       navigate("/auth");
@@ -254,7 +264,7 @@ export default function MyLoans() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => navigate(`/digital-library`)}
+                            onClick={() => handleConsultLoan(loan)}
                           >
                             <BookOpen className="h-4 w-4 mr-1" />
                             Consulter

@@ -101,6 +101,17 @@ export default function DigitalLibraryHome() {
     setShowReservationDialog(true);
   };
 
+  const handleConsultDocument = (item: any) => {
+    // Déterminer si c'est un manuscrit ou un document
+    const isManuscript = item.type === 'Manuscrit' || item.file_type === 'manuscript';
+    
+    if (isManuscript) {
+      navigate(`/manuscript-reader/${item.id}`);
+    } else {
+      navigate(`/book-reader/${item.id}`);
+    }
+  };
+
   const featuredCollections = [
     {
       id: "books",
@@ -174,7 +185,7 @@ export default function DigitalLibraryHome() {
                               <p className="text-muted-foreground mb-4">{item.author}</p>
                               <p className="text-sm text-muted-foreground mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
                               <div className="flex gap-2">
-                                <Button size="lg" variant="outline" onClick={() => navigate(`/digital-library/documents/${item.id}`)}>
+                                <Button size="lg" variant="outline" onClick={() => handleConsultDocument(item)}>
                                   Consulter
                                 </Button>
                                 {!item.isAvailable && session && userProfile && (
@@ -240,7 +251,7 @@ export default function DigitalLibraryHome() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col gap-2">
-                    <Button className="w-full" variant="outline" onClick={() => navigate(`/digital-library/documents/${item.id}`)}>
+                    <Button className="w-full" variant="outline" onClick={() => handleConsultDocument(item)}>
                       Consulter
                     </Button>
                     {!item.isAvailable && session && userProfile && (
