@@ -117,7 +117,7 @@ const CBMOrganesGestion = lazy(() => import("./pages/CBMOrganesGestion"));
 const CBMAdhesion = lazy(() => import("./pages/CBMAdhesion"));
 const CBMRecherche = lazy(() => import("./pages/CBMRecherche"));
 const CBMAccesRapide = lazy(() => import("./pages/CBMAccesRapide"));
-const CBNRechercheAvancee = lazy(() => import("./pages/cbn/RechercheAvancee"));
+const CBNRechercheAvancee = lazy(() => import("./pages/cbm/RechercheAvancee"));
 
 // Kitab Platform (lazy)
 const KitabPortal = lazy(() => import("./pages/KitabPortal"));
@@ -276,7 +276,7 @@ const App = () => (
           <Route path="/cbm/acces-rapide" element={<CBMAccesRapide />} />
 
           {/* CBN Routes */}
-          <Route path="/cbn/recherche-avancee" element={<CBNRechercheAvancee />} />
+          <Route path="/cbm/recherche-avancee" element={<CBNRechercheAvancee />} />
 
           {/* Kitab Platform Routes */}
           <Route path="/kitab" element={<KitabPortal />} />
