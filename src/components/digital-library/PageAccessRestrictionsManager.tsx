@@ -175,82 +175,159 @@ export function PageAccessRestrictionsManager() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-gradient-to-br from-orange-500 to-red-600">
-              <Lock className="h-6 w-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <CardTitle>Restriction d'accès aux pages</CardTitle>
-              <CardDescription>
-                Gérer les restrictions d'accès aux pages pour les utilisateurs non connectés et les comptes publics
-              </CardDescription>
+    <div className="space-y-8">
+      {/* En-tête avec gradient */}
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 p-8 text-white shadow-2xl">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10 flex items-start gap-6">
+          <div className="rounded-2xl bg-white/20 p-4 backdrop-blur-sm">
+            <Lock className="h-10 w-10" />
+          </div>
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold mb-2">Restriction d'accès aux pages</h1>
+            <p className="text-white/90 text-lg">
+              Gérer les restrictions d'accès aux pages pour les utilisateurs non connectés et les comptes publics
+            </p>
+            <div className="mt-4 flex gap-3">
+              <Badge variant="secondary" className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+                <FileText className="h-3 w-3 mr-1" />
+                {documents?.length || 0} documents
+              </Badge>
+              <Badge variant="secondary" className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+                <Lock className="h-3 w-3 mr-1" />
+                {documents?.filter(d => d.page_access_restrictions?.[0]?.is_restricted).length || 0} restreints
+              </Badge>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Filtres de recherche */}
+      <Card className="shadow-lg">
+        <CardHeader className="bg-muted/30">
+          <div className="flex items-center gap-2">
+            <Search className="h-5 w-5 text-primary" />
+            <CardTitle className="text-xl">Recherche et Filtres</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Filtres de recherche */}
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
-              <Label htmlFor="search" className="flex items-center gap-2">
-                <Search className="h-4 w-4" />
-                Rechercher
+        <CardContent className="pt-6">
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="space-y-3">
+              <Label htmlFor="search" className="text-sm font-semibold flex items-center gap-2">
+                <Search className="h-4 w-4 text-muted-foreground" />
+                Rechercher un document
               </Label>
               <Input
                 id="search"
-                placeholder="Titre du document..."
+                placeholder="Rechercher par titre ou description..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-11"
               />
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="filter-type" className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
+            <div className="space-y-3">
+              <Label htmlFor="filter-type" className="text-sm font-semibold flex items-center gap-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
                 Type de contenu
               </Label>
               <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger id="filter-type">
+                <SelectTrigger id="filter-type" className="h-11">
                   <SelectValue placeholder="Tous les types" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous les types</SelectItem>
                   <SelectItem value="page">Pages</SelectItem>
                   <SelectItem value="news">Actualités</SelectItem>
+                  <SelectItem value="event">Événements</SelectItem>
                   <SelectItem value="exhibition">Expositions</SelectItem>
+                  <SelectItem value="manuscript">Manuscrits</SelectItem>
+                  <SelectItem value="book">Livres</SelectItem>
+                  <SelectItem value="document">Documents</SelectItem>
+                  <SelectItem value="article">Articles</SelectItem>
+                  <SelectItem value="photo">Photos</SelectItem>
+                  <SelectItem value="video">Vidéos</SelectItem>
+                  <SelectItem value="audio">Audio</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="filter-status" className="flex items-center gap-2">
-                <Lock className="h-4 w-4" />
-                Statut
+            <div className="space-y-3">
+              <Label htmlFor="filter-status" className="text-sm font-semibold flex items-center gap-2">
+                <Lock className="h-4 w-4 text-muted-foreground" />
+                Statut de restriction
               </Label>
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger id="filter-status">
+                <SelectTrigger id="filter-status" className="h-11">
                   <SelectValue placeholder="Tous les statuts" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="restricted">Restreints</SelectItem>
-                  <SelectItem value="public">Publics</SelectItem>
+                  <SelectItem value="restricted">
+                    <div className="flex items-center gap-2">
+                      <Lock className="h-4 w-4 text-destructive" />
+                      Restreints
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="public">
+                    <div className="flex items-center gap-2">
+                      <Unlock className="h-4 w-4 text-green-600" />
+                      Publics
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           {/* Résultats */}
-          <div className="text-sm text-muted-foreground">
-            {filteredDocuments.length} document(s) trouvé(s)
+          <div className="mt-6 flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              <span className="text-muted-foreground">
+                Résultats: 
+              </span>
+              <span className="text-foreground font-bold">
+                {filteredDocuments.length} document(s)
+              </span>
+            </div>
+            {(searchQuery || filterType !== "all" || filterStatus !== "all") && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchQuery("");
+                  setFilterType("all");
+                  setFilterStatus("all");
+                }}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Réinitialiser
+              </Button>
+            )}
           </div>
+        </CardContent>
+      </Card>
 
+      {/* Liste des documents */}
+      <Card className="shadow-lg">
+        <CardHeader className="bg-muted/30 border-b">
+          <CardTitle className="text-xl flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-primary" />
+            Documents de la bibliothèque
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
           {isLoading ? (
-            <p className="text-center text-muted-foreground py-8">Chargement...</p>
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center space-y-3">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                <p className="text-muted-foreground">Chargement des documents...</p>
+              </div>
+            </div>
           ) : (
-            <Table>
+            <div className="overflow-x-auto">
+              <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Document</TableHead>
@@ -260,73 +337,116 @@ export function PageAccessRestrictionsManager() {
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
-                {filteredDocuments.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      Aucun document trouvé avec ces critères de recherche
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredDocuments.map((doc) => {
-                    const restriction = doc.page_access_restrictions?.[0];
-                    return (
-                      <TableRow key={doc.id}>
-                      <TableCell className="font-medium">{doc.title}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{doc.content_type}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        {restriction?.is_restricted ? (
-                          <Badge variant="destructive" className="gap-1">
-                            <Lock className="h-3 w-3" />
-                            Restreint
-                          </Badge>
-                        ) : (
-                          <Badge variant="default" className="gap-1">
-                            <Unlock className="h-3 w-3" />
-                            Public
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {restriction?.is_restricted ? (
-                          restriction.restriction_mode === 'range' ? (
-                            `Pages ${restriction.start_page}-${restriction.end_page}`
-                          ) : (
-                            `${restriction.manual_pages?.length || 0} pages sélectionnées`
-                          )
-                        ) : (
-                          'Aucune restriction'
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEditDocument(doc)}
-                          >
-                            <Edit className="h-4 w-4 mr-1" />
-                            Configurer
-                          </Button>
-                          {restriction && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleRemoveRestriction(doc)}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          )}
+                <TableBody>
+                  {filteredDocuments.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-12">
+                        <div className="flex flex-col items-center gap-4">
+                          <div className="rounded-full bg-muted p-6">
+                            <Search className="h-12 w-12 text-muted-foreground" />
+                          </div>
+                          <div className="space-y-2">
+                            <p className="text-lg font-medium">Aucun document trouvé</p>
+                            <p className="text-sm text-muted-foreground">
+                              Essayez de modifier vos critères de recherche
+                            </p>
+                          </div>
                         </div>
                       </TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
+                    </TableRow>
+                  ) : (
+                    filteredDocuments.map((doc) => {
+                      const restriction = doc.page_access_restrictions?.[0];
+                      return (
+                        <TableRow key={doc.id} className="hover:bg-muted/50 transition-colors">
+                          <TableCell className="font-medium py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                                <FileText className="h-5 w-5 text-primary" />
+                              </div>
+                              <div>
+                                <p className="font-semibold">{doc.title}</p>
+                                {doc.excerpt && (
+                                  <p className="text-xs text-muted-foreground line-clamp-1">
+                                    {doc.excerpt}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="font-medium">
+                              {doc.content_type}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {restriction?.is_restricted ? (
+                              <Badge variant="destructive" className="gap-1.5 px-3 py-1">
+                                <Lock className="h-3 w-3" />
+                                Restreint
+                              </Badge>
+                            ) : (
+                              <Badge className="gap-1.5 px-3 py-1 bg-green-500 hover:bg-green-600">
+                                <Unlock className="h-3 w-3" />
+                                Public
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {restriction?.is_restricted ? (
+                              <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                  {restriction.restriction_mode === 'range' ? (
+                                    <BookOpen className="h-4 w-4 text-primary" />
+                                  ) : (
+                                    <FileText className="h-4 w-4 text-primary" />
+                                  )}
+                                </div>
+                                <div className="text-sm">
+                                  {restriction.restriction_mode === 'range' ? (
+                                    <span className="font-medium">
+                                      Pages {restriction.start_page}-{restriction.end_page}
+                                    </span>
+                                  ) : (
+                                    <span className="font-medium">
+                                      {restriction.manual_pages?.length || 0} pages
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">Aucune restriction</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => handleEditDocument(doc)}
+                                className="gap-2"
+                              >
+                                <Edit className="h-4 w-4" />
+                                Configurer
+                              </Button>
+                              {restriction && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleRemoveRestriction(doc)}
+                                  className="hover:bg-destructive/10 hover:text-destructive"
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
