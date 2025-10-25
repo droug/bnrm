@@ -221,12 +221,12 @@ export default function DigitalLibraryHome() {
                      <CarouselItem key={item.id} className="animate-fade-in">
                        <div className="p-1">
                          <Card className="border-2 hover:shadow-2xl transition-all duration-700 bg-background/10 backdrop-blur-sm border-primary-foreground/30 hover:bg-background/20 hover:scale-[1.02]">
-                           <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8">
+                           <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8 text-white">
                              <div className="flex-1">
                                <Badge className="mb-3">{item.type}</Badge>
-                               <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
-                               <p className="text-muted-foreground mb-4">{item.author}</p>
-                               <p className="text-sm text-muted-foreground mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
+                               <h3 className="text-2xl font-bold mb-2 text-white">{item.title}</h3>
+                               <p className="text-white/80 mb-4">{item.author}</p>
+                               <p className="text-sm text-white/70 mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
                                <div className="flex gap-2">
                                  <Button size="lg" variant="outline" onClick={() => handleConsultDocument(item)}>
                                    Consulter
