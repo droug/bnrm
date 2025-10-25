@@ -42,9 +42,7 @@ export const CoteNomenclaturesTab = () => {
   const [testData, setTestData] = useState({
     edition: "25",
     ville: "MRK",
-    numero: "42",
-    annee: "2024",
-    mois: "06"
+    numero: "42"
   });
   const [testResult, setTestResult] = useState("");
 
@@ -153,16 +151,6 @@ export const CoteNomenclaturesTab = () => {
     // Remplacer COLL## par le code collection
     if (result.includes('COLL##')) {
       result = result.replace('COLL##', data.ville); // Réutilise le champ ville pour collection
-    }
-    
-    // Remplacer AAAA par l'année
-    if (result.includes('AAAA')) {
-      result = result.replace(/AAAA/g, data.annee);
-    }
-    
-    // Remplacer MM par le mois
-    if (result.includes('MM')) {
-      result = result.replace(/MM/g, data.mois.padStart(2, '0'));
     }
     
     // Remplacer #### par numéro à 4 chiffres
@@ -405,28 +393,6 @@ export const CoteNomenclaturesTab = () => {
                           />
                           <p className="text-xs text-muted-foreground mt-1">
                             Pour ED## (ex: ED42)
-                          </p>
-                        </div>
-                        <div>
-                          <Label>Année</Label>
-                          <Input
-                            value={testData.annee}
-                            onChange={(e) => setTestData({ ...testData, annee: e.target.value })}
-                            placeholder="2024"
-                          />
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Pour AAAA (ex: 2024)
-                          </p>
-                        </div>
-                        <div>
-                          <Label>Mois</Label>
-                          <Input
-                            value={testData.mois}
-                            onChange={(e) => setTestData({ ...testData, mois: e.target.value })}
-                            placeholder="06"
-                          />
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Pour MM (ex: 06 pour juin)
                           </p>
                         </div>
                         <div>
