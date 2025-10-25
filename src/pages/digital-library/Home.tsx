@@ -228,7 +228,7 @@ export default function DigitalLibraryHome() {
                                <p className="text-white/80 mb-4">{item.author}</p>
                                <p className="text-sm text-white/70 mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
                                <div className="flex gap-2">
-                                 <Button size="lg" variant="outline" onClick={() => handleConsultDocument(item)}>
+                                 <Button size="lg" variant="outline" className="text-black hover:text-black" onClick={() => handleConsultDocument(item)}>
                                    Consulter
                                  </Button>
                                  {!item.isAvailable && session && userProfile && (
