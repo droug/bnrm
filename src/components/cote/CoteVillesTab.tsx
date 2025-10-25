@@ -236,7 +236,7 @@ export const CoteVillesTab = () => {
                 Ajouter une ville
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
                   {editingVille ? "Modifier la ville" : "Ajouter une ville"}

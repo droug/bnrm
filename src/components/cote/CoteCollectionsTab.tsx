@@ -258,7 +258,7 @@ export const CoteCollectionsTab = () => {
                 Ajouter une collection
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
                   {editingCollection ? "Modifier la collection" : "Ajouter une collection"}
