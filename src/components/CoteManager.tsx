@@ -21,7 +21,7 @@ export const CoteManager = () => {
             </TabsTrigger>
             <TabsTrigger value="nomenclatures" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              Modèles de fichiers
+              Nomenclature des fichiers
             </TabsTrigger>
           </TabsList>
 
