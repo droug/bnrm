@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Check, Languages, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -27,7 +28,21 @@ export function LanguageAutocomplete({
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value);
   const [filteredLanguages, setFilteredLanguages] = useState(worldLanguages);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Mettre à jour la position du dropdown
+  useEffect(() => {
+    if (open && inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+  }, [open]);
 
   // Fermer au clic extérieur
   useEffect(() => {
@@ -88,6 +103,7 @@ export function LanguageAutocomplete({
       
       <div className="relative">
         <Input
+          ref={inputRef}
           type="text"
           placeholder={placeholder}
           value={inputValue}
@@ -109,8 +125,15 @@ export function LanguageAutocomplete({
         </div>
 
         {/* Dropdown des suggestions */}
-        {open && filteredLanguages.length > 0 && (
-          <div className="absolute z-[9999] w-full mt-1 bg-popover text-popover-foreground border rounded-lg shadow-lg max-h-80 overflow-auto">
+        {open && filteredLanguages.length > 0 && createPortal(
+          <div 
+            className="fixed z-[9999] bg-popover text-popover-foreground border rounded-lg shadow-lg max-h-80 overflow-auto"
+            style={{
+              top: `${dropdownPosition.top + 4}px`,
+              left: `${dropdownPosition.left}px`,
+              width: `${dropdownPosition.width}px`
+            }}
+          >
             <div className="py-1">
               {filteredLanguages.map((lang) => (
                 <button
@@ -137,16 +160,25 @@ export function LanguageAutocomplete({
                 </button>
               ))}
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* Message si aucun résultat */}
-        {open && filteredLanguages.length === 0 && inputValue.length > 0 && (
-          <div className="absolute z-[9999] w-full mt-1 bg-popover text-popover-foreground border rounded-lg shadow-lg">
+        {open && filteredLanguages.length === 0 && inputValue.length > 0 && createPortal(
+          <div 
+            className="fixed z-[9999] bg-popover text-popover-foreground border rounded-lg shadow-lg"
+            style={{
+              top: `${dropdownPosition.top + 4}px`,
+              left: `${dropdownPosition.left}px`,
+              width: `${dropdownPosition.width}px`
+            }}
+          >
             <div className="p-4 text-sm text-muted-foreground text-center">
               Aucune langue trouvée pour "{inputValue}"
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </div>
