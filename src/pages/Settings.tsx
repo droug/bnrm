@@ -6,12 +6,14 @@ import { Separator } from "@/components/ui/separator";
 import { 
   Settings as SettingsIcon, 
   ArrowLeft,
-  Key
+  Key,
+  BookMarked
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { PermissionsManager } from "@/components/PermissionsManager";
+import { CoteManager } from "@/components/CoteManager";
 
 const SettingsPage = () => {
   const { profile } = useAuth();
@@ -69,10 +71,40 @@ const SettingsPage = () => {
                 </div>
               </div>
 
-              {/* Permissions Management */}
-              <Card className="shadow-soft">
-                <PermissionsManager />
-              </Card>
+              {/* Settings Cards */}
+              <div className="grid gap-6 md:grid-cols-2">
+                {/* Permissions Management */}
+                <Card className="shadow-soft cursor-pointer hover:shadow-lg transition-shadow">
+                  <CardHeader className="flex flex-row items-center space-x-4 pb-3">
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <Key className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle>Gestion des Permissions</CardTitle>
+                      <CardDescription>Gérez les permissions utilisateurs</CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <PermissionsManager />
+                  </CardContent>
+                </Card>
+
+                {/* Gestion des Côtes */}
+                <Card className="shadow-soft">
+                  <CardHeader className="flex flex-row items-center space-x-4 pb-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center">
+                      <BookMarked className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle>Gestion des Côtes</CardTitle>
+                      <CardDescription>Collections, villes et nomenclatures</CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CoteManager />
+                  </CardContent>
+                </Card>
+              </div>
 
             </div>
           </div>

@@ -1421,6 +1421,99 @@ export type Database = {
           },
         ]
       }
+      cote_collections: {
+        Row: {
+          code: string
+          commentaire: string | null
+          created_at: string | null
+          id: string
+          nom_arabe: string
+          nom_francais: string
+          type_collection: string
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          commentaire?: string | null
+          created_at?: string | null
+          id?: string
+          nom_arabe: string
+          nom_francais: string
+          type_collection: string
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          commentaire?: string | null
+          created_at?: string | null
+          id?: string
+          nom_arabe?: string
+          nom_francais?: string
+          type_collection?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      cote_nomenclatures: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          modele_codification: string
+          module_concerne: string
+          prefixe: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          modele_codification: string
+          module_concerne: string
+          prefixe: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          modele_codification?: string
+          module_concerne?: string
+          prefixe?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      cote_villes: {
+        Row: {
+          abreviation: string
+          created_at: string | null
+          id: string
+          nom_arabe: string
+          nom_francais: string
+          updated_at: string | null
+        }
+        Insert: {
+          abreviation: string
+          created_at?: string | null
+          id?: string
+          nom_arabe: string
+          nom_francais: string
+          updated_at?: string | null
+        }
+        Update: {
+          abreviation?: string
+          created_at?: string | null
+          id?: string
+          nom_arabe?: string
+          nom_francais?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       cultural_activity_tariffs: {
         Row: {
           amount_ht: number
