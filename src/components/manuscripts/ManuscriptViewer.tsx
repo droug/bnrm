@@ -1,10 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { PageFlipBook } from "@/components/book-reader/PageFlipBook";
+import manuscriptPage1 from "@/assets/manuscript-page-1.jpg";
+import manuscriptPage2 from "@/assets/manuscript-page-2.jpg";
+import manuscriptPage3 from "@/assets/manuscript-page-3.jpg";
+import manuscriptPage4 from "@/assets/manuscript-page-4.jpg";
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -69,6 +74,7 @@ interface Manuscript {
   permalink: string;
   page_count: number;
   file_url: string;
+  thumbnail_url: string;
   pages_data: any[];
   has_ocr: boolean;
   block_right_click: boolean;
@@ -105,6 +111,15 @@ export function ManuscriptViewer() {
   const [emailAddress, setEmailAddress] = useState("");
   const [searchText, setSearchText] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+  const [manuscriptImage, setManuscriptImage] = useState<string>("");
+  
+  // Fictional manuscript pages (fallback)
+  const manuscriptPages = [
+    manuscriptPage1,
+    manuscriptPage2,
+    manuscriptPage3,
+    manuscriptPage4,
+  ];
 
   useEffect(() => {
     if (id) {
@@ -147,9 +162,14 @@ export function ManuscriptViewer() {
         .from('manuscripts')
         .select('id, title, author, description, language, period, material, dimensions, page_count, thumbnail_url, digital_copy_url, access_level, status, has_ocr, block_right_click, block_screenshot, allow_download, allow_print, allow_email_share, created_at, permalink, condition_notes, inventory_number, genre, cote, source, historical_period')
         .or(`id.eq.${id},permalink.eq.${id}`)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      
+      if (!data) {
+        setLoading(false);
+        return;
+      }
       
       // Assurer que toutes les propriétés requises existent  
       const manuscriptData: Manuscript = {
@@ -165,6 +185,7 @@ export function ManuscriptViewer() {
         institution: (data as any).institution || 'BNRM',
         page_count: (data as any).page_count || 100,
         file_url: (data as any).file_url || '',
+        thumbnail_url: data.thumbnail_url || '',
         pages_data: Array.isArray((data as any).pages_data) ? (data as any).pages_data : [],
         has_ocr: (data as any).has_ocr || false,
         block_right_click: (data as any).block_right_click || false,
@@ -173,6 +194,22 @@ export function ManuscriptViewer() {
         allow_print: (data as any).allow_print !== false,
         allow_email_share: (data as any).allow_email_share !== false,
       };
+      
+      // Set manuscript image
+      const titleImageMap: { [key: string]: string } = {
+        "Archives Photographiques du Maroc Colonial": "/src/assets/digital-library/archives-photo-maroc.jpg",
+        "Collection de Cartes Anciennes": "/src/assets/digital-library/cartes-anciennes.jpg",
+        "Logiciel Patrimoine": "/src/assets/digital-library/logiciel-patrimoine.jpg",
+        "Manuscrits Andalous": "/src/assets/digital-library/manuscrits-andalous.jpg",
+        "Documents Administratifs Historiques": "/src/assets/digital-library/documents-administratifs.jpg",
+      };
+
+      setManuscriptImage(
+        titleImageMap[data.title] || 
+        data.thumbnail_url || 
+        data.digital_copy_url || 
+        manuscriptPage1
+      );
       
       setManuscript(manuscriptData);
     } catch (error: any) {
@@ -352,6 +389,22 @@ export function ManuscriptViewer() {
     toast.success(`Langue changée: ${lang === "fr" ? "Français" : lang === "ar" ? "العربية" : "English"}`);
   };
 
+  const getCurrentPageImage = () => {
+    if (manuscriptImage) {
+      return manuscriptImage;
+    }
+    return manuscriptPages[(currentPage - 1) % manuscriptPages.length];
+  };
+
+  const generatePageImages = () => {
+    const images = [];
+    const pageCount = manuscript?.page_count || 100;
+    for (let i = 0; i < pageCount; i++) {
+      images.push(manuscriptImage || manuscriptPages[i % manuscriptPages.length]);
+    }
+    return images;
+  };
+
   const isPageBookmarked = bookmarks.some(b => b.page_number === currentPage);
 
   if (loading) {
@@ -445,6 +498,21 @@ export function ManuscriptViewer() {
                 </TabsList>
 
                 <TabsContent value="info" className="space-y-4 mt-4">
+                  {/* Thumbnail */}
+                  <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg overflow-hidden">
+                    {manuscriptImage ? (
+                      <img 
+                        src={manuscriptImage} 
+                        alt={manuscript.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <BookOpen className="h-24 w-24 text-primary/40" />
+                      </div>
+                    )}
+                  </div>
+
                   <div>
                     <Badge variant="secondary" className="mb-3">{manuscript.institution}</Badge>
                     <h2 className="text-lg font-bold mb-2">{manuscript.title}</h2>
@@ -749,59 +817,33 @@ export function ManuscriptViewer() {
           )}
 
           {/* Page Display Area */}
-          <div className="flex-1 overflow-auto bg-muted/20 p-8">
-            <div className="max-w-6xl mx-auto">
-              <div className="flex items-center justify-center gap-4">
-                {viewMode === "single" ? (
-                  <div 
-                    className="bg-white shadow-2xl"
-                    style={{
-                      transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-                      transition: "transform 0.2s ease-out"
-                    }}
-                  >
-                    <div className="aspect-[3/4] w-[600px] bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                      <div className="text-center text-muted-foreground">
-                        <p className="text-lg font-semibold mb-2">Page {currentPage}</p>
-                        <p className="text-sm">Image du manuscrit</p>
-                      </div>
-                    </div>
+          <div className="flex-1 overflow-hidden bg-muted/20 flex items-center justify-center p-8">
+            <div className="max-w-6xl mx-auto w-full h-full flex items-center justify-center">
+              {viewMode === "double" ? (
+                <PageFlipBook 
+                  images={generatePageImages()}
+                  currentPage={currentPage}
+                  onPageChange={setCurrentPage}
+                  zoom={zoom}
+                  rotation={rotation}
+                />
+              ) : (
+                <div 
+                  className="bg-white shadow-2xl"
+                  style={{
+                    transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
+                    transition: "transform 0.2s ease-out"
+                  }}
+                >
+                  <div className="aspect-[3/4] w-[600px] overflow-hidden">
+                    <img 
+                      src={getCurrentPageImage()} 
+                      alt={`Page ${currentPage}`}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
-                ) : (
-                  <>
-                    <div 
-                      className="bg-white shadow-2xl"
-                      style={{
-                        transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-                        transition: "transform 0.2s ease-out"
-                      }}
-                    >
-                      <div className="aspect-[3/4] w-[400px] bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                        <div className="text-center text-muted-foreground">
-                          <p className="text-lg font-semibold mb-2">Page {currentPage}</p>
-                          <p className="text-sm">Image du manuscrit</p>
-                        </div>
-                      </div>
-                    </div>
-                    {currentPage < manuscript.page_count && (
-                      <div 
-                        className="bg-white shadow-2xl"
-                        style={{
-                          transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-                          transition: "transform 0.2s ease-out"
-                        }}
-                      >
-                        <div className="aspect-[3/4] w-[400px] bg-gradient-to-br from-accent/10 to-primary/10 flex items-center justify-center">
-                          <div className="text-center text-muted-foreground">
-                            <p className="text-lg font-semibold mb-2">Page {currentPage + 1}</p>
-                            <p className="text-sm">Image du manuscrit</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </main>
