@@ -13,8 +13,9 @@ interface CoteAutocompleteProps {
 }
 
 interface CoteSuggestion {
-  cote: string;
-  type?: string;
+  prefixe: string;
+  modele: string;
+  description: string;
 }
 
 export function CoteAutocomplete({
@@ -39,74 +40,29 @@ export function CoteAutocomplete({
 
     setLoading(true);
     try {
-      // Search in manuscripts with cote
-      const { data: manuscriptData } = await supabase
-        .from("manuscripts")
-        .select("cote, title")
-        .not("cote", "is", null)
-        .or(`cote.ilike.%${query}%,title.ilike.%${query}%`)
-        .order("cote")
-        .limit(15);
-
-      // Search in cote_collections for collection codes
-      const { data: collectionsData } = await supabase
-        .from("cote_collections")
-        .select("code, nom_francais")
-        .or(`code.ilike.%${query}%,nom_francais.ilike.%${query}%`)
-        .limit(10);
-
-      // Search in cote_nomenclatures for prefixes
-      const { data: nomenclaturesData } = await supabase
+      // Search only in cote_nomenclatures (Nomenclatures de Fichiers)
+      const { data: nomenclaturesData, error } = await supabase
         .from("cote_nomenclatures")
-        .select("prefixe, description")
-        .or(`prefixe.ilike.%${query}%,description.ilike.%${query}%`)
+        .select("prefixe, modele_codification, description")
+        .or(`prefixe.ilike.%${query}%,modele_codification.ilike.%${query}%,description.ilike.%${query}%`)
         .eq("is_active", true)
-        .limit(10);
+        .order("prefixe");
 
-      const suggestions: CoteSuggestion[] = [];
-
-      // Add manuscripts with cote
-      if (manuscriptData) {
-        manuscriptData.forEach(item => {
-          suggestions.push({
-            cote: item.cote!,
-            type: item.title ? (item.title.length > 35 ? item.title.substring(0, 35) + '...' : item.title) : 'Manuscrit'
-          });
-        });
+      if (error) {
+        console.error("Error fetching nomenclatures:", error);
+        setSuggestions([]);
+      } else {
+        const suggestions = (nomenclaturesData || []).map(item => ({
+          prefixe: item.prefixe,
+          modele: item.modele_codification,
+          description: item.description || ''
+        }));
+        
+        setSuggestions(suggestions);
+        console.log("Nomenclatures found:", suggestions.length, suggestions);
       }
-
-      // Add collection codes as suggestions
-      if (collectionsData) {
-        collectionsData.forEach(item => {
-          suggestions.push({
-            cote: item.code,
-            type: item.nom_francais
-          });
-        });
-      }
-
-      // Add nomenclature prefixes
-      if (nomenclaturesData) {
-        nomenclaturesData.forEach(item => {
-          // Extract example from description
-          const match = item.description?.match(/Exemple:\s*([^\s(]+)/);
-          const example = match ? match[1] : item.prefixe;
-          suggestions.push({
-            cote: example,
-            type: `Modèle ${item.prefixe}`
-          });
-        });
-      }
-
-      // Remove duplicates by cote
-      const uniqueCotes = Array.from(
-        new Map(suggestions.map(item => [item.cote, item])).values()
-      );
-
-      setSuggestions(uniqueCotes);
-      console.log("Côte suggestions found:", uniqueCotes.length, uniqueCotes);
     } catch (error) {
-      console.error("Error fetching côte suggestions:", error);
+      console.error("Error fetching nomenclatures:", error);
       setSuggestions([]);
     } finally {
       setLoading(false);
@@ -128,9 +84,9 @@ export function CoteAutocomplete({
     }, 300);
   };
 
-  const handleSelect = (cote: string) => {
-    setInputValue(cote);
-    onChange(cote);
+  const handleSelect = (prefixe: string) => {
+    setInputValue(prefixe);
+    onChange(prefixe);
     setOpen(false);
   };
 
@@ -176,18 +132,25 @@ export function CoteAutocomplete({
       </div>
 
       {open && suggestions.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-80 overflow-auto">
           {suggestions.map((suggestion, index) => (
             <button
               key={index}
               type="button"
-              onClick={() => handleSelect(suggestion.cote)}
-              className="w-full px-4 py-2 text-left hover:bg-accent transition-colors flex items-center justify-between"
+              onClick={() => handleSelect(suggestion.prefixe)}
+              className="w-full px-4 py-3 text-left hover:bg-accent transition-colors border-b border-border last:border-0"
             >
-              <span className="font-medium">{suggestion.cote}</span>
-              {suggestion.type && (
-                <span className="text-xs text-muted-foreground">{suggestion.type}</span>
-              )}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <div className="font-semibold text-sm mb-1">{suggestion.prefixe}</div>
+                  <div className="text-xs text-muted-foreground mb-1">
+                    Modèle: <span className="font-mono">{suggestion.modele}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground line-clamp-2">
+                    {suggestion.description}
+                  </div>
+                </div>
+              </div>
             </button>
           ))}
         </div>
@@ -195,7 +158,7 @@ export function CoteAutocomplete({
 
       {open && !loading && inputValue && suggestions.length === 0 && (
         <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg p-4 text-center text-sm text-muted-foreground">
-          Aucun numéro de côte trouvé
+          Aucune nomenclature trouvée
         </div>
       )}
     </div>
