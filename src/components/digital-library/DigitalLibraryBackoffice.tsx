@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Upload, Trash2, Eye, EyeOff, Download, Share2, Mail, AlertCircle, FileText, Library, Ban, Shield, Calendar, BarChart3, Image, Copy, BookOpen, Users, Sparkles, FileImage, ShieldCheck, CalendarClock, UploadCloud } from "lucide-react";
+import { Plus, Upload, Trash2, Eye, EyeOff, Download, Share2, Mail, AlertCircle, FileText, Library, Ban, Shield, Calendar, BarChart3, Image, Copy, BookOpen, Users, Sparkles, FileImage, ShieldCheck, CalendarClock, UploadCloud, Lock } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 
@@ -235,6 +235,14 @@ export default function DigitalLibraryBackoffice() {
       count: null,
       action: () => navigate('/admin/digital-library/bulk-import'),
       gradient: "from-cyan-500 to-teal-600"
+    },
+    {
+      icon: Lock,
+      title: "Restriction d'accès aux pages",
+      description: "Gérer les pages accessibles pour les utilisateurs non authentifiés",
+      count: null,
+      action: () => navigate('/admin/digital-library/page-restrictions'),
+      gradient: "from-amber-500 to-orange-600"
     }
   ];
 

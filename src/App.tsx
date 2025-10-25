@@ -102,6 +102,7 @@ const DigitalLibraryReproduction = lazy(() => import("./pages/DigitalLibraryRepr
 const DigitalLibraryRestrictions = lazy(() => import("./pages/DigitalLibraryRestrictions"));
 const DigitalLibraryCopyright = lazy(() => import("./pages/DigitalLibraryCopyright"));
 const DigitalLibraryBulkImport = lazy(() => import("./pages/DigitalLibraryBulkImport"));
+const PageAccessRestrictionsBackoffice = lazy(() => import("./pages/PageAccessRestrictionsBackoffice"));
 const AccessPolicies = lazy(() => import("./pages/AccessPolicies"));
 
 // Reproduction (lazy)
@@ -259,6 +260,7 @@ const App = () => (
           <Route path="/admin/digital-library/restrictions" element={<DigitalLibraryRestrictions />} />
           <Route path="/admin/digital-library/copyright" element={<DigitalLibraryCopyright />} />
           <Route path="/admin/digital-library/bulk-import" element={<DigitalLibraryBulkImport />} />
+          <Route path="/admin/digital-library/page-restrictions" element={<PageAccessRestrictionsBackoffice />} />
           <Route path="/admin/digital-library/settings" element={<DigitalLibraryAdminSettings />} />
           <Route path="/admin/digital-library/requests-management" element={<RequestsManagement />} />
           <Route path="/access-policies" element={<AccessPolicies />} />

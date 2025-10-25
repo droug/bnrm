@@ -3654,6 +3654,53 @@ export type Database = {
           },
         ]
       }
+      page_access_restrictions: {
+        Row: {
+          content_id: string
+          created_at: string | null
+          created_by: string | null
+          end_page: number | null
+          id: string
+          is_restricted: boolean | null
+          manual_pages: number[] | null
+          restriction_mode: string | null
+          start_page: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          content_id: string
+          created_at?: string | null
+          created_by?: string | null
+          end_page?: number | null
+          id?: string
+          is_restricted?: boolean | null
+          manual_pages?: number[] | null
+          restriction_mode?: string | null
+          start_page?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          content_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          end_page?: number | null
+          id?: string
+          is_restricted?: boolean | null
+          manual_pages?: number[] | null
+          restriction_mode?: string | null
+          start_page?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_access_restrictions_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: true
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partner_collections: {
         Row: {
           approved_at: string | null
