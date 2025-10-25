@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { BookMarked } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CoteAutocompleteProps {
   value: string;
@@ -11,39 +12,25 @@ interface CoteAutocompleteProps {
   placeholder?: string;
 }
 
-// Exemples de cotes (à remplacer par des données réelles de l'API)
-const SAMPLE_COTES = [
-  'A123.456',
-  'A234.567',
-  'B345.678',
-  'B456.789',
-  'C567.890',
-  'D678.901',
-  'E789.012',
-  'F890.123',
-  'G901.234',
-  'H012.345',
-  'MAR001.001',
-  'MAR002.003',
-  'FRA100.250',
-  'HIS200.100',
-  'LIT300.050',
-  'SCI400.200',
-  'ART500.150',
-  'REL600.300',
-  'POL700.400',
-  'ECO800.500'
-];
+interface CoteNomenclature {
+  id: string;
+  prefixe: string;
+  modele_codification: string;
+  description?: string;
+  module_concerne: string;
+  is_active: boolean;
+}
 
 export function CoteAutocomplete({ 
   value, 
   onChange, 
   label = 'Cote', 
-  placeholder = 'Ex: A123.456' 
+  placeholder = 'Ex: PH2_ED25_MRK_001' 
 }: CoteAutocompleteProps) {
   const [inputValue, setInputValue] = useState(value);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [filteredCotes, setFilteredCotes] = useState<string[]>([]);
+  const [filteredCotes, setFilteredCotes] = useState<CoteNomenclature[]>([]);
+  const [allCotes, setAllCotes] = useState<CoteNomenclature[]>([]);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -51,10 +38,32 @@ export function CoteAutocomplete({
     setInputValue(value);
   }, [value]);
 
+  // Récupérer les nomenclatures de cotes depuis la base de données
+  useEffect(() => {
+    const fetchCotes = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('cote_nomenclatures')
+          .select('*')
+          .eq('is_active', true)
+          .order('prefixe');
+        
+        if (error) throw error;
+        setAllCotes(data || []);
+      } catch (error) {
+        console.error('Erreur lors du chargement des cotes:', error);
+      }
+    };
+    
+    fetchCotes();
+  }, []);
+
   useEffect(() => {
     if (inputValue.trim()) {
-      const filtered = SAMPLE_COTES.filter(cote =>
-        cote.toLowerCase().includes(inputValue.toLowerCase())
+      const filtered = allCotes.filter(cote =>
+        cote.prefixe.toLowerCase().includes(inputValue.toLowerCase()) ||
+        cote.modele_codification.toLowerCase().includes(inputValue.toLowerCase()) ||
+        cote.description?.toLowerCase().includes(inputValue.toLowerCase())
       );
       setFilteredCotes(filtered);
       setShowSuggestions(true);
@@ -62,7 +71,7 @@ export function CoteAutocomplete({
       setFilteredCotes([]);
       setShowSuggestions(false);
     }
-  }, [inputValue]);
+  }, [inputValue, allCotes]);
 
   useEffect(() => {
     if (showSuggestions && inputRef.current) {
@@ -75,9 +84,10 @@ export function CoteAutocomplete({
     }
   }, [showSuggestions]);
 
-  const handleSelect = (cote: string) => {
-    setInputValue(cote);
-    onChange(cote);
+  const handleSelect = (cote: CoteNomenclature) => {
+    const coteValue = `${cote.prefixe}_${cote.modele_codification}`;
+    setInputValue(coteValue);
+    onChange(coteValue);
     setShowSuggestions(false);
   };
 
@@ -111,13 +121,30 @@ export function CoteAutocomplete({
           >
             {filteredCotes.map((cote) => (
               <button
-                key={cote}
+                key={cote.id}
                 type="button"
-                className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground cursor-pointer flex items-center gap-2"
+                className="w-full text-left px-3 py-3 hover:bg-accent hover:text-accent-foreground cursor-pointer border-b last:border-b-0"
                 onClick={() => handleSelect(cote)}
               >
-                <BookMarked className="h-4 w-4 text-muted-foreground" />
-                <span className="font-mono">{cote}</span>
+                <div className="flex items-start gap-2">
+                  <BookMarked className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-semibold text-sm">{cote.prefixe}</span>
+                      <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full">
+                        {cote.module_concerne}
+                      </span>
+                    </div>
+                    <div className="font-mono text-xs text-muted-foreground mt-1">
+                      {cote.modele_codification}
+                    </div>
+                    {cote.description && (
+                      <div className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                        {cote.description}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </button>
             ))}
           </div>,
