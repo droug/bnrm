@@ -16,6 +16,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { LanguageAutocomplete } from '@/components/ui/language-autocomplete';
 import { CountryAutocomplete } from '@/components/ui/country-autocomplete';
+import { CoteAutocomplete } from '@/components/ui/cote-autocomplete';
 
 interface SearchCriteria {
   keywords: string;
@@ -30,6 +31,7 @@ interface SearchCriteria {
   support: string[];
   holder: string[];
   exactYear: string;
+  cote: string;
   availableOnly: boolean;
   includeHybrid: boolean;
   normalizedKeywordsOnly: boolean;
@@ -52,6 +54,7 @@ const RechercheAvancee = () => {
     support: [],
     holder: [],
     exactYear: '',
+    cote: '',
     availableOnly: false,
     includeHybrid: false,
     normalizedKeywordsOnly: false,
@@ -129,6 +132,7 @@ const RechercheAvancee = () => {
       support: [],
       holder: [],
       exactYear: '',
+      cote: '',
       availableOnly: false,
       includeHybrid: false,
       normalizedKeywordsOnly: false,
@@ -329,8 +333,12 @@ const RechercheAvancee = () => {
                   <h3 className="text-xl font-semibold mb-6">Recherche par cote ou identifiant</h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                      <Label htmlFor="cote">Cote interne</Label>
-                      <Input id="cote" placeholder="Ex: A123.456" />
+                      <CoteAutocomplete
+                        label="Cote"
+                        placeholder="Ex: A123.456"
+                        value={criteria.cote}
+                        onChange={(cote) => setCriteria({ ...criteria, cote })}
+                      />
                     </div>
                     <div>
                       <Label htmlFor="isbn">ISBN</Label>

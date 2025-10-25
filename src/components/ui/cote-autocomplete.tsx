@@ -1,166 +1,143 @@
-import { useState, useEffect, useRef } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Search, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { BookMarked } from 'lucide-react';
 
 interface CoteAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
-  placeholder?: string;
   label?: string;
-  className?: string;
+  placeholder?: string;
 }
 
-interface CoteSuggestion {
-  prefixe: string;
-  modele: string;
-  description: string;
-}
+// Exemples de cotes (à remplacer par des données réelles de l'API)
+const SAMPLE_COTES = [
+  'A123.456',
+  'A234.567',
+  'B345.678',
+  'B456.789',
+  'C567.890',
+  'D678.901',
+  'E789.012',
+  'F890.123',
+  'G901.234',
+  'H012.345',
+  'MAR001.001',
+  'MAR002.003',
+  'FRA100.250',
+  'HIS200.100',
+  'LIT300.050',
+  'SCI400.200',
+  'ART500.150',
+  'REL600.300',
+  'POL700.400',
+  'ECO800.500'
+];
 
-export function CoteAutocomplete({
-  value,
-  onChange,
-  placeholder = "Rechercher un numéro de cote",
-  label,
-  className = "",
+export function CoteAutocomplete({ 
+  value, 
+  onChange, 
+  label = 'Cote', 
+  placeholder = 'Ex: A123.456' 
 }: CoteAutocompleteProps) {
-  const [suggestions, setSuggestions] = useState<CoteSuggestion[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  const fetchSuggestions = async (query: string) => {
-    if (!query || query.length < 1) {
-      setSuggestions([]);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // Search only in cote_nomenclatures (Nomenclatures de Fichiers)
-      const { data: nomenclaturesData, error } = await supabase
-        .from("cote_nomenclatures")
-        .select("prefixe, modele_codification, description")
-        .or(`prefixe.ilike.%${query}%,modele_codification.ilike.%${query}%,description.ilike.%${query}%`)
-        .eq("is_active", true)
-        .order("prefixe");
-
-      if (error) {
-        console.error("Error fetching nomenclatures:", error);
-        setSuggestions([]);
-      } else {
-        const suggestions = (nomenclaturesData || []).map(item => ({
-          prefixe: item.prefixe,
-          modele: item.modele_codification,
-          description: item.description || ''
-        }));
-        
-        setSuggestions(suggestions);
-        console.log("Nomenclatures found:", suggestions.length, suggestions);
-      }
-    } catch (error) {
-      console.error("Error fetching nomenclatures:", error);
-      setSuggestions([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
-    onChange(newValue);
-    setOpen(true);
-
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-
-    debounceTimerRef.current = setTimeout(() => {
-      fetchSuggestions(newValue);
-    }, 300);
-  };
-
-  const handleSelect = (prefixe: string) => {
-    setInputValue(prefixe);
-    onChange(prefixe);
-    setOpen(false);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, []);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredCotes, setFilteredCotes] = useState<string[]>([]);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setInputValue(value);
   }, [value]);
 
+  useEffect(() => {
+    if (inputValue.trim()) {
+      const filtered = SAMPLE_COTES.filter(cote =>
+        cote.toLowerCase().includes(inputValue.toLowerCase())
+      );
+      setFilteredCotes(filtered);
+      setShowSuggestions(true);
+    } else {
+      setFilteredCotes([]);
+      setShowSuggestions(false);
+    }
+  }, [inputValue]);
+
+  useEffect(() => {
+    if (showSuggestions && inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+  }, [showSuggestions]);
+
+  const handleSelect = (cote: string) => {
+    setInputValue(cote);
+    onChange(cote);
+    setShowSuggestions(false);
+  };
+
+  const handleInputChange = (newValue: string) => {
+    setInputValue(newValue);
+    onChange(newValue);
+  };
+
   return (
-    <div className={`space-y-2 relative ${className}`} ref={wrapperRef}>
-      {label && <Label>{label}</Label>}
+    <div className="space-y-2">
+      <Label>{label}</Label>
       <div className="relative">
         <Input
-          type="text"
+          ref={inputRef}
           value={inputValue}
-          onChange={handleInputChange}
+          onChange={(e) => handleInputChange(e.target.value)}
           placeholder={placeholder}
-          onFocus={() => inputValue && setOpen(true)}
-          className="pl-10"
+          onFocus={() => inputValue.trim() && setShowSuggestions(true)}
+          className="w-full pr-10"
         />
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
-          {loading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Search className="h-4 w-4" />
-          )}
-        </div>
+        <BookMarked className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        
+        {showSuggestions && filteredCotes.length > 0 && createPortal(
+          <div
+            className="fixed bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto z-[9999]"
+            style={{
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+              width: `${dropdownPosition.width}px`
+            }}
+          >
+            {filteredCotes.map((cote) => (
+              <button
+                key={cote}
+                type="button"
+                className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground cursor-pointer flex items-center gap-2"
+                onClick={() => handleSelect(cote)}
+              >
+                <BookMarked className="h-4 w-4 text-muted-foreground" />
+                <span className="font-mono">{cote}</span>
+              </button>
+            ))}
+          </div>,
+          document.body
+        )}
+
+        {showSuggestions && filteredCotes.length === 0 && inputValue.trim() && createPortal(
+          <div
+            className="fixed bg-popover border border-border rounded-md shadow-lg p-3 text-sm text-muted-foreground z-[9999]"
+            style={{
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+              width: `${dropdownPosition.width}px`
+            }}
+          >
+            Aucune cote trouvée
+          </div>,
+          document.body
+        )}
       </div>
-
-      {open && suggestions.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-80 overflow-auto">
-          {suggestions.map((suggestion, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => handleSelect(suggestion.prefixe)}
-              className="w-full px-4 py-3 text-left hover:bg-accent transition-colors border-b border-border last:border-0"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <div className="font-semibold text-sm mb-1">{suggestion.prefixe}</div>
-                  <div className="text-xs text-muted-foreground mb-1">
-                    Modèle: <span className="font-mono">{suggestion.modele}</span>
-                  </div>
-                  <div className="text-xs text-muted-foreground line-clamp-2">
-                    {suggestion.description}
-                  </div>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {open && !loading && inputValue && suggestions.length === 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg p-4 text-center text-sm text-muted-foreground">
-          Aucune nomenclature trouvée
-        </div>
-      )}
     </div>
   );
 }
