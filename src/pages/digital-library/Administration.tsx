@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, Database, Users, Upload, BarChart3, FileImage,
-  Shield, Copyright, Settings, Image, FolderOpen
+  Shield, Copyright, Settings, Image, FolderOpen, Lock
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -109,6 +109,13 @@ export default function Administration() {
       icon: Copyright,
       path: "/admin/digital-library/copyright",
       color: "bg-orange-100 text-orange-600",
+    },
+    {
+      title: "Restriction d'accès aux pages",
+      description: "Gérer les pages accessibles par document",
+      icon: Lock,
+      path: "/admin/digital-library/page-restrictions",
+      color: "bg-amber-100 text-amber-600",
     },
     {
       title: "Gestion des Demandes",
