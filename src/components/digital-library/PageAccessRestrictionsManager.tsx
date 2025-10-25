@@ -13,7 +13,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { PageFlipBook } from "@/components/book-reader/PageFlipBook";
 
 export function PageAccessRestrictionsManager() {
   const { toast } = useToast();
@@ -29,11 +30,13 @@ export function PageAccessRestrictionsManager() {
   // État du formulaire
   const [isRestricted, setIsRestricted] = useState(false);
   const [restrictionMode, setRestrictionMode] = useState<"range" | "manual">("range");
-  const [startPage, setStartPage] = useState(1);
-  const [endPage, setEndPage] = useState(10);
+  const [pageRanges, setPageRanges] = useState<Array<{start: number, end: number}>>([{start: 1, end: 10}]);
   const [manualPages, setManualPages] = useState<number[]>([]);
   const [totalPages, setTotalPages] = useState(245);
   const [currentPreviewPage, setCurrentPreviewPage] = useState(1);
+  const [viewMode, setViewMode] = useState<"single" | "double">("single");
+  const [zoom, setZoom] = useState(100);
+  const [rotation, setRotation] = useState(0);
 
   // Fetch documents
   const { data: documents, isLoading } = useQuery({
@@ -79,13 +82,30 @@ export function PageAccessRestrictionsManager() {
   // Mutation pour créer ou mettre à jour une restriction
   const saveRestriction = useMutation({
     mutationFn: async (data: any) => {
+      // Convertir les plages en tableau de pages
+      let allowedPages: number[] = [];
+      
+      if (data.restrictionMode === 'range') {
+        // Fusionner toutes les plages
+        data.pageRanges.forEach((range: {start: number, end: number}) => {
+          for (let i = range.start; i <= range.end; i++) {
+            if (!allowedPages.includes(i)) {
+              allowedPages.push(i);
+            }
+          }
+        });
+        allowedPages.sort((a, b) => a - b);
+      } else {
+        allowedPages = data.manualPages;
+      }
+
       const restrictionData = {
         content_id: selectedDocument.id,
         is_restricted: data.isRestricted,
         restriction_mode: data.restrictionMode,
-        start_page: data.startPage,
-        end_page: data.endPage,
-        manual_pages: data.manualPages,
+        start_page: data.restrictionMode === 'range' && data.pageRanges.length > 0 ? data.pageRanges[0].start : 1,
+        end_page: data.restrictionMode === 'range' && data.pageRanges.length > 0 ? data.pageRanges[data.pageRanges.length - 1].end : 10,
+        manual_pages: allowedPages,
       };
 
       const { error } = await supabase
@@ -137,33 +157,61 @@ export function PageAccessRestrictionsManager() {
     if (restriction) {
       setIsRestricted(restriction.is_restricted);
       setRestrictionMode(restriction.restriction_mode);
-      setStartPage(restriction.start_page);
-      setEndPage(restriction.end_page);
+      
+      // Reconstruire les plages à partir des pages manuelles
+      if (restriction.restriction_mode === 'range' && restriction.manual_pages?.length > 0) {
+        const pages = [...restriction.manual_pages].sort((a, b) => a - b);
+        const ranges: Array<{start: number, end: number}> = [];
+        let currentRange = { start: pages[0], end: pages[0] };
+        
+        for (let i = 1; i < pages.length; i++) {
+          if (pages[i] === currentRange.end + 1) {
+            currentRange.end = pages[i];
+          } else {
+            ranges.push({...currentRange});
+            currentRange = { start: pages[i], end: pages[i] };
+          }
+        }
+        ranges.push(currentRange);
+        setPageRanges(ranges.length > 0 ? ranges : [{start: 1, end: 10}]);
+      } else {
+        setPageRanges([{start: restriction.start_page || 1, end: restriction.end_page || 10}]);
+      }
+      
       setManualPages(restriction.manual_pages || []);
     } else {
       setIsRestricted(false);
       setRestrictionMode("range");
-      setStartPage(1);
-      setEndPage(10);
+      setPageRanges([{start: 1, end: 10}]);
       setManualPages([]);
     }
     
     setCurrentPreviewPage(1);
+    setViewMode("single");
+    setZoom(100);
+    setRotation(0);
     setShowEditDialog(true);
   };
 
   // Obtenir l'image de la page actuelle pour la preview
   const getCurrentPageImage = (page: number) => {
-    // Ici vous pouvez adapter selon votre logique d'images
     return selectedDocument?.file_url || "/placeholder.svg";
+  };
+
+  // Générer les images pour le flip book
+  const generatePageImages = () => {
+    const images = [];
+    for (let i = 0; i < totalPages; i++) {
+      images.push(selectedDocument?.file_url || "/placeholder.svg");
+    }
+    return images;
   };
 
   const handleSaveRestriction = () => {
     saveRestriction.mutate({
       isRestricted,
       restrictionMode,
-      startPage,
-      endPage,
+      pageRanges,
       manualPages,
     });
   };
@@ -405,7 +453,7 @@ export function PageAccessRestrictionsManager() {
                                 <div className="text-sm">
                                   {restriction.restriction_mode === 'range' ? (
                                     <span className="font-medium">
-                                      Pages {restriction.start_page}-{restriction.end_page}
+                                      {restriction.manual_pages?.length || 0} pages
                                     </span>
                                   ) : (
                                     <span className="font-medium">
@@ -521,32 +569,69 @@ export function PageAccessRestrictionsManager() {
                 <CardContent className="flex-1 p-0 bg-muted/30 relative overflow-hidden">
                   {/* Image de la page - Style BookReader */}
                   <div className="absolute inset-0 flex items-center justify-center p-8">
-                    <Card className="max-w-4xl w-full shadow-2xl">
-                      <CardContent className="p-0 relative">
-                        <div 
-                          className="aspect-[3/4] bg-gradient-to-br from-background to-muted flex items-center justify-center overflow-hidden rounded-lg"
-                        >
-                          <img 
-                            src={getCurrentPageImage(currentPreviewPage)}
-                            alt={`Page ${currentPreviewPage}`}
-                            className="w-full h-full object-contain"
-                          />
-                          
-                          {/* Badge de sélection */}
-                          {restrictionMode === 'manual' && manualPages.includes(currentPreviewPage) && (
-                            <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600 text-white text-base px-4 py-2 shadow-lg">
-                              <Lock className="h-4 w-4 mr-2" />
-                              Page accessible
+                    {viewMode === "double" ? (
+                      <PageFlipBook 
+                        images={generatePageImages()}
+                        currentPage={currentPreviewPage}
+                        onPageChange={setCurrentPreviewPage}
+                        zoom={zoom}
+                        rotation={rotation}
+                      />
+                    ) : (
+                      <Card className="max-w-4xl w-full shadow-2xl">
+                        <CardContent className="p-0 relative">
+                          <div 
+                            className="aspect-[3/4] bg-gradient-to-br from-background to-muted flex items-center justify-center overflow-hidden rounded-lg"
+                            style={{ 
+                              transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
+                              transformOrigin: 'center',
+                              transition: 'transform 0.3s ease'
+                            }}
+                          >
+                            <img 
+                              src={getCurrentPageImage(currentPreviewPage)}
+                              alt={`Page ${currentPreviewPage}`}
+                              className="w-full h-full object-contain"
+                            />
+                            
+                            {/* Badge de sélection */}
+                            {restrictionMode === 'manual' && manualPages.includes(currentPreviewPage) && (
+                              <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600 text-white text-base px-4 py-2 shadow-lg">
+                                <Lock className="h-4 w-4 mr-2" />
+                                Page accessible
+                              </Badge>
+                            )}
+                            
+                            {/* Numéro de page */}
+                            <Badge className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-sm px-4 py-2 shadow-lg">
+                              Page {currentPreviewPage}
                             </Badge>
-                          )}
-                          
-                          {/* Numéro de page */}
-                          <Badge className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-sm px-4 py-2 shadow-lg">
-                            Page {currentPreviewPage}
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                  
+                  {/* Contrôles de vue */}
+                  <div className="absolute bottom-4 right-4 flex gap-2">
+                    <Button
+                      size="sm"
+                      variant={viewMode === "single" ? "default" : "outline"}
+                      onClick={() => setViewMode("single")}
+                      className="shadow-lg"
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Simple
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={viewMode === "double" ? "default" : "outline"}
+                      onClick={() => setViewMode("double")}
+                      className="shadow-lg"
+                    >
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Double
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -651,46 +736,102 @@ export function PageAccessRestrictionsManager() {
                   {restrictionMode === "range" ? (
                     <Card className="shadow-md">
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-base">Configuration de la plage</CardTitle>
+                        <CardTitle className="text-base">Configuration des plages de pages</CardTitle>
+                        <CardDescription className="text-xs">
+                          Définissez une ou plusieurs plages de pages accessibles
+                        </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="start-page" className="text-sm font-medium">
-                            Page de début
-                          </Label>
-                          <Input
-                            id="start-page"
-                            type="number"
-                            min={1}
-                            max={totalPages}
-                            value={startPage}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value) || 1;
-                              setStartPage(Math.min(totalPages, Math.max(1, val)));
-                            }}
-                            className="h-10"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="end-page" className="text-sm font-medium">
-                            Page de fin
-                          </Label>
-                          <Input
-                            id="end-page"
-                            type="number"
-                            min={startPage}
-                            max={totalPages}
-                            value={endPage}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value) || 1;
-                              setEndPage(Math.min(totalPages, Math.max(startPage, val)));
-                            }}
-                            className="h-10"
-                          />
-                        </div>
+                        {pageRanges.map((range, index) => (
+                          <div key={index} className="flex gap-3 items-end p-3 border rounded-lg bg-muted/30">
+                            <div className="flex-1 space-y-2">
+                              <Label htmlFor={`start-page-${index}`} className="text-xs font-medium">
+                                Début
+                              </Label>
+                              <Input
+                                id={`start-page-${index}`}
+                                type="number"
+                                min={1}
+                                max={totalPages}
+                                value={range.start}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value) || 1;
+                                  const newRanges = [...pageRanges];
+                                  newRanges[index].start = Math.min(totalPages, Math.max(1, val));
+                                  setPageRanges(newRanges);
+                                }}
+                                className="h-9"
+                              />
+                            </div>
+                            <div className="flex-1 space-y-2">
+                              <Label htmlFor={`end-page-${index}`} className="text-xs font-medium">
+                                Fin
+                              </Label>
+                              <Input
+                                id={`end-page-${index}`}
+                                type="number"
+                                min={range.start}
+                                max={totalPages}
+                                value={range.end}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value) || 1;
+                                  const newRanges = [...pageRanges];
+                                  newRanges[index].end = Math.min(totalPages, Math.max(range.start, val));
+                                  setPageRanges(newRanges);
+                                }}
+                                className="h-9"
+                              />
+                            </div>
+                            {pageRanges.length > 1 && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  const newRanges = pageRanges.filter((_, i) => i !== index);
+                                  setPageRanges(newRanges);
+                                }}
+                                className="h-9 w-9 p-0 hover:bg-destructive/10 hover:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setPageRanges([...pageRanges, { start: 1, end: 10 }]);
+                          }}
+                          className="w-full"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Ajouter une plage
+                        </Button>
+                        
                         <div className="p-3 bg-muted/50 rounded-lg">
-                          <p className="text-sm text-muted-foreground">
-                            Les utilisateurs non connectés pourront voir les pages <strong className="text-foreground">{startPage}</strong> à <strong className="text-foreground">{endPage}</strong>
+                          <p className="text-xs text-muted-foreground mb-2 font-medium">
+                            Résumé des pages accessibles :
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {pageRanges.map((range, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {range.start === range.end ? 
+                                  `Page ${range.start}` : 
+                                  `Pages ${range.start}-${range.end}`
+                                }
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                          <p className="text-xs text-blue-900 dark:text-blue-100">
+                            💡 <strong>Exemples :</strong>
+                            <br />• Les 10 premières pages : 1-10
+                            <br />• Les 10 dernières pages : {totalPages - 9}-{totalPages}
+                            <br />• Pages 5-15 + dernières : Ajoutez deux plages
                           </p>
                         </div>
                       </CardContent>
