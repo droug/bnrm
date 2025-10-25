@@ -91,7 +91,7 @@ export default function CBMPortal() {
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4">
               <Link to="/cbm/recherche">
-                <Button size="lg" className="bg-background text-foreground hover:bg-background/90 h-12 px-8">
+                <Button size="lg" variant="outline" className="bg-background/10 text-primary-foreground border-primary-foreground/30 hover:bg-background/20 h-12 px-8 backdrop-blur-sm">
                   <Database className="w-5 h-5 mr-2" />
                   Rechercher dans le Catalogue
                   <ArrowRight className="w-5 h-5 ml-2" />
