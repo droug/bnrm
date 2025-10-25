@@ -53,6 +53,7 @@ const AccessRequestsManagement = lazy(() => import("./pages/AccessRequestsManage
 const EmailManagement = lazy(() => import("./pages/EmailManagement"));
 const SystemListsPage = lazy(() => import("./pages/SystemListsPage"));
 const WorkflowBPM = lazy(() => import("./pages/WorkflowBPM"));
+const CoteManagementPage = lazy(() => import("./pages/CoteManagementPage"));
 
 // BNRM Portal (lazy)
 const BNRMPortal = lazy(() => import("./pages/BNRMPortal"));
@@ -212,6 +213,7 @@ const App = () => (
         <Route path="/admin/legal-deposit" element={<LegalDepositPage />} />
         <Route path="/admin/archiving" element={<ArchivingPage />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
+        <Route path="/admin/cote-management" element={<CoteManagementPage />} />
         <Route path="/admin/bnrm-backoffice" element={<BNRMBackOffice />} />
         <Route path="/admin/catalog-metadata" element={<CatalogMetadata />} />
         <Route path="/admin/reproduction" element={<ReproductionBackofficePage />} />

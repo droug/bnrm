@@ -145,6 +145,14 @@ export default function AdminSettings() {
       href: "/admin/activites-culturelles/categories",
       permission: "content.manage",
       gradient: "from-rose-500 to-rose-600"
+    },
+    {
+      icon: BookMarked,
+      title: "Gestion des Côtes",
+      description: "Collections, villes et nomenclatures de fichiers BNRM",
+      href: "/admin/cote-management",
+      permission: "content.manage",
+      gradient: "from-amber-500 to-amber-600"
     }
   ];
 
