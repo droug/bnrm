@@ -260,6 +260,7 @@ const App = () => (
           <Route path="/admin/digital-library/restrictions" element={<DigitalLibraryRestrictions />} />
           <Route path="/admin/digital-library/copyright" element={<DigitalLibraryCopyright />} />
           <Route path="/admin/digital-library/bulk-import" element={<DigitalLibraryBulkImport />} />
+          <Route path="/admin/digital-library-backoffice" element={<DigitalLibraryBackoffice />} />
           <Route path="/admin/digital-library/page-restrictions" element={<PageAccessRestrictionsBackoffice />} />
           <Route path="/admin/digital-library/settings" element={<DigitalLibraryAdminSettings />} />
           <Route path="/admin/digital-library/requests-management" element={<RequestsManagement />} />
