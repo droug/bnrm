@@ -9,6 +9,12 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import document1 from "@/assets/digital-library/document-1.jpg";
+import document2 from "@/assets/digital-library/document-2.jpg";
+import document3 from "@/assets/digital-library/document-3.jpg";
+import document4 from "@/assets/digital-library/document-4.jpg";
+import document5 from "@/assets/digital-library/document-5.jpg";
+import document6 from "@/assets/digital-library/document-6.jpg";
 
 export default function DigitalLibraryHome() {
   const navigate = useNavigate();
@@ -64,7 +70,10 @@ export default function DigitalLibraryHome() {
             authorsData?.map(author => [author.user_id, author]) || []
           );
 
-          const formattedItems = data.map((item: any) => {
+          // Images réelles pour les exemples
+          const exampleImages = [document1, document2, document3, document4, document5, document6];
+
+          const formattedItems = data.map((item: any, index: number) => {
             const author = item.author_id ? authorsMap.get(item.author_id) : null;
             return {
               id: item.id,
@@ -78,6 +87,7 @@ export default function DigitalLibraryHome() {
               date: item.published_at,
               isAvailable: !!item.file_url,
               cote: item.file_type || 'DOC',
+              thumbnail: exampleImages[index % exampleImages.length],
             };
           });
           
@@ -195,8 +205,12 @@ export default function DigitalLibraryHome() {
                                 )}
                               </div>
                             </div>
-                            <div className="w-full md:w-48 h-64 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center hover-scale">
-                              <BookOpen className="h-16 w-16 text-primary/40" />
+                            <div className="w-full md:w-48 h-64 rounded-lg overflow-hidden hover-scale">
+                              <img 
+                                src={item.thumbnail} 
+                                alt={item.title}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
                           </CardContent>
                         </Card>
@@ -242,8 +256,12 @@ export default function DigitalLibraryHome() {
             {newItems.map((item) => (
               <Card key={item.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg mb-4 flex items-center justify-center">
-                    <BookOpen className="h-12 w-12 text-primary/40" />
+                  <div className="aspect-[3/4] rounded-lg mb-4 overflow-hidden">
+                    <img 
+                      src={item.thumbnail} 
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <Badge variant="secondary" className="w-fit mb-2">{item.type}</Badge>
                   <CardTitle className="text-lg line-clamp-2">{item.title}</CardTitle>
