@@ -335,10 +335,12 @@ const RechercheAvancee = () => {
                     <div>
                       <CoteAutocomplete
                         label="Cote"
-                        placeholder="Ex: A123.456"
                         value={criteria.cote}
                         onChange={(cote) => setCriteria({ ...criteria, cote })}
                       />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        💡 Tapez un préfixe (PH2, MAN, DOC...) pour voir les modèles disponibles
+                      </p>
                     </div>
                     <div>
                       <Label htmlFor="isbn">ISBN</Label>

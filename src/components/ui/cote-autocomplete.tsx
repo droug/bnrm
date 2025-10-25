@@ -25,7 +25,7 @@ export function CoteAutocomplete({
   value, 
   onChange, 
   label = 'Cote', 
-  placeholder = 'Ex: PH2_ED25_MRK_001' 
+  placeholder = 'Rechercher par préfixe (ex: PH2, MAN, DOC...) ou modèle de codification' 
 }: CoteAutocompleteProps) {
   const [inputValue, setInputValue] = useState(value);
   const [showSuggestions, setShowSuggestions] = useState(false);
