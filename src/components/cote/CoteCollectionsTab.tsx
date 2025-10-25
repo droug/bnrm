@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Pencil, Trash2, Upload, Download } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import * as XLSX from "xlsx";
+import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
 
 interface Collection {
   id: string;
@@ -274,11 +275,10 @@ export const CoteCollectionsTab = () => {
                 </div>
                 <div>
                   <Label>Nom en Arabe *</Label>
-                  <Input
+                  <ArabicInputWithKeyboard
                     value={formData.nom_arabe}
-                    onChange={(e) => setFormData({ ...formData, nom_arabe: e.target.value })}
+                    onChange={(value) => setFormData({ ...formData, nom_arabe: value })}
                     placeholder="الدخيرة"
-                    dir="rtl"
                   />
                 </div>
                 <div>

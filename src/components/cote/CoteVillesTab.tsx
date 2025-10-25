@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Pencil, Trash2, Upload, Download } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import * as XLSX from "xlsx";
+import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
 
 interface Ville {
   id: string;
@@ -244,11 +245,10 @@ export const CoteVillesTab = () => {
               <div className="space-y-4">
                 <div>
                   <Label>Nom en Arabe *</Label>
-                  <Input
+                  <ArabicInputWithKeyboard
                     value={formData.nom_arabe}
-                    onChange={(e) => setFormData({ ...formData, nom_arabe: e.target.value })}
+                    onChange={(value) => setFormData({ ...formData, nom_arabe: value })}
                     placeholder="مراكش"
-                    dir="rtl"
                   />
                 </div>
                 <div>
