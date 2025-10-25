@@ -9,6 +9,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import Autoplay from "embla-carousel-autoplay";
 import document1 from "@/assets/digital-library/document-1.jpg";
 import document2 from "@/assets/digital-library/document-2.jpg";
 import document3 from "@/assets/digital-library/document-3.jpg";
@@ -19,6 +20,7 @@ import archivesPhotoMaroc from "@/assets/digital-library/archives-photo-maroc.jp
 import cartesAnciennes from "@/assets/digital-library/cartes-anciennes.jpg";
 import logicielPatrimoine from "@/assets/digital-library/logiciel-patrimoine.jpg";
 import manuscritsAndalous from "@/assets/digital-library/manuscrits-andalous.jpg";
+import documentsAdministratifs from "@/assets/digital-library/documents-administratifs.jpg";
 import libraryBanner from "@/assets/digital-library/library-banner.jpg";
 
 export default function DigitalLibraryHome() {
@@ -84,6 +86,7 @@ export default function DigitalLibraryHome() {
             "Collection de Cartes Anciennes": cartesAnciennes,
             "Logiciel Patrimoine": logicielPatrimoine,
             "Manuscrits Andalous": manuscritsAndalous,
+            "Documents Administratifs Historiques": documentsAdministratifs,
           };
 
           const formattedItems = data.map((item: any, index: number) => {
@@ -206,13 +209,20 @@ export default function DigitalLibraryHome() {
                   align: "start",
                   loop: true,
                 }}
+                plugins={[
+                  Autoplay({
+                    delay: 5000,
+                    stopOnInteraction: true,
+                    stopOnMouseEnter: true,
+                  })
+                ]}
                 className="w-full"
               >
                 <CarouselContent>
                   {newItems.map((item) => (
                      <CarouselItem key={item.id}>
                        <div className="p-1">
-                         <Card className="border-2 hover:shadow-2xl transition-all bg-card/95 backdrop-blur-sm">
+                         <Card className="border-2 hover:shadow-2xl transition-all duration-500 bg-card/95 backdrop-blur-sm animate-fade-in">
                            <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8">
                              <div className="flex-1">
                                <Badge className="mb-3">{item.type}</Badge>
