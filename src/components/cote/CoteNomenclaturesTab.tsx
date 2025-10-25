@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Download, TestTube } from "lucide-react";
+import { Plus, Pencil, Trash2, Download, TestTube, Upload } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import * as XLSX from "xlsx";
 
@@ -201,6 +201,43 @@ export const CoteNomenclaturesTab = () => {
     XLSX.writeFile(workbook, "nomenclatures.xlsx");
   };
 
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        for (const row of jsonData as any[]) {
+          await supabase.from("cote_nomenclatures").insert({
+            prefixe: row.Préfixe || row.prefixe,
+            modele_codification: row['Modèle'] || row.modele_codification,
+            description: row.Description || row.description,
+            module_concerne: row.Module || row.module_concerne || 'Autres',
+            is_active: row.Actif === 'Oui' || row.is_active === true
+          });
+        }
+
+        toast({ title: "Import réussi" });
+        fetchNomenclatures();
+      } catch (error: any) {
+        toast({
+          title: "Erreur d'import",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    // Reset input to allow re-importing the same file
+    event.target.value = '';
+  };
+
   const columns: ColumnDef<Nomenclature>[] = [
     {
       accessorKey: "prefixe",
@@ -258,6 +295,20 @@ export const CoteNomenclaturesTab = () => {
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Gestion unifiée des Nomenclatures de Fichiers</h3>
         <div className="flex gap-2">
+          <label>
+            <Button variant="outline" asChild>
+              <span>
+                <Upload className="h-4 w-4 mr-2" />
+                Importer
+              </span>
+            </Button>
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              onChange={handleImport}
+            />
+          </label>
           <Button variant="outline" onClick={handleExport}>
             <Download className="h-4 w-4 mr-2" />
             Exporter
