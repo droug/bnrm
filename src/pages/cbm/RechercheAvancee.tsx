@@ -14,6 +14,8 @@ import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { LanguageAutocomplete } from '@/components/ui/language-autocomplete';
+import { CountryAutocomplete } from '@/components/ui/country-autocomplete';
 
 interface SearchCriteria {
   keywords: string;
@@ -444,26 +446,15 @@ const RechercheAvancee = () => {
                       <span className="font-semibold text-base">Par langue</span>
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-                        {languages.map((language) => (
-                          <div key={language} className="flex items-center space-x-2">
-                            <Checkbox
-                              id={`lang-${language}`}
-                              checked={criteria.languages.includes(language)}
-                              onCheckedChange={() => toggleLanguage(language)}
-                            />
-                            <Label htmlFor={`lang-${language}`} className="cursor-pointer">
-                              {language}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                      {criteria.languages.includes('Autres') && (
-                        <div>
-                          <Label htmlFor="other-lang">Préciser la langue</Label>
-                          <Input id="other-lang" placeholder="Autre langue..." />
-                        </div>
-                      )}
+                      <LanguageAutocomplete
+                        label="Langue"
+                        placeholder="Rechercher une langue..."
+                        value={criteria.languages[0] || ''}
+                        onChange={(langCode) => setCriteria({ ...criteria, languages: [langCode] })}
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Choisissez parmi plus de 7000 langues mondiales
+                      </p>
                     </AccordionContent>
                   </AccordionItem>
 
@@ -473,16 +464,15 @@ const RechercheAvancee = () => {
                       <span className="font-semibold text-base">Par pays de publication</span>
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
-                      <div>
-                        <Label htmlFor="country">Pays</Label>
-                        <Input
-                          id="country"
-                          placeholder="Rechercher un pays..."
-                        />
-                        <p className="text-sm text-muted-foreground mt-2">
-                          Source : Référentiel pays (API lecture seule)
-                        </p>
-                      </div>
+                      <CountryAutocomplete
+                        label="Pays"
+                        placeholder="Rechercher un pays..."
+                        value={criteria.countries}
+                        onChange={(countries) => setCriteria({ ...criteria, countries })}
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Sélectionnez un ou plusieurs pays de publication
+                      </p>
                     </AccordionContent>
                   </AccordionItem>
 
