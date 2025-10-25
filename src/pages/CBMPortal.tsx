@@ -5,7 +5,7 @@ import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Network, Target, Users, UserPlus, Database, BookOpen, ArrowRight, Library, FileText, GraduationCap } from "lucide-react";
+import { Network, Target, Users, UserPlus, Database, BookOpen, ArrowRight, Library, FileText, GraduationCap, Search } from "lucide-react";
 import cbmHeroBanner from "@/assets/cbm-hero-banner.jpg";
 
 export default function CBMPortal() {
@@ -88,13 +88,19 @@ export default function CBMPortal() {
               entre bibliothèques marocaines.
             </p>
             
-            {/* CTA Button */}
-            <div>
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-4">
               <Link to="/cbm/recherche">
                 <Button size="lg" className="bg-background text-foreground hover:bg-background/90 h-12 px-8">
                   <Database className="w-5 h-5 mr-2" />
                   Rechercher dans le Catalogue
                   <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link to="/cbm/recherche-avancee">
+                <Button size="lg" variant="outline" className="bg-background/10 text-primary-foreground border-primary-foreground/30 hover:bg-background/20 h-12 px-8 backdrop-blur-sm">
+                  <Search className="w-5 h-5 mr-2" />
+                  Recherche Avancée
                 </Button>
               </Link>
             </div>
