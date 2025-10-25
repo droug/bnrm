@@ -15,6 +15,10 @@ import document3 from "@/assets/digital-library/document-3.jpg";
 import document4 from "@/assets/digital-library/document-4.jpg";
 import document5 from "@/assets/digital-library/document-5.jpg";
 import document6 from "@/assets/digital-library/document-6.jpg";
+import archivesPhotoMaroc from "@/assets/digital-library/archives-photo-maroc.jpg";
+import cartesAnciennes from "@/assets/digital-library/cartes-anciennes.jpg";
+import logicielPatrimoine from "@/assets/digital-library/logiciel-patrimoine.jpg";
+import manuscritsAndalous from "@/assets/digital-library/manuscrits-andalous.jpg";
 
 export default function DigitalLibraryHome() {
   const navigate = useNavigate();
@@ -72,9 +76,21 @@ export default function DigitalLibraryHome() {
 
           // Images réelles pour les exemples
           const exampleImages = [document1, document2, document3, document4, document5, document6];
+          
+          // Mapping spécifique pour certains titres
+          const titleImageMap: { [key: string]: string } = {
+            "Archives Photographiques du Maroc Colonial": archivesPhotoMaroc,
+            "Collection de Cartes Anciennes": cartesAnciennes,
+            "Logiciel Patrimoine": logicielPatrimoine,
+            "Manuscrits Andalous": manuscritsAndalous,
+          };
 
           const formattedItems = data.map((item: any, index: number) => {
             const author = item.author_id ? authorsMap.get(item.author_id) : null;
+            
+            // Utiliser l'image spécifique si elle existe, sinon utiliser l'image par défaut
+            const thumbnail = titleImageMap[item.title] || exampleImages[index % exampleImages.length];
+            
             return {
               id: item.id,
               title: item.title,
@@ -87,7 +103,7 @@ export default function DigitalLibraryHome() {
               date: item.published_at,
               isAvailable: !!item.file_url,
               cote: item.file_type || 'DOC',
-              thumbnail: exampleImages[index % exampleImages.length],
+              thumbnail: thumbnail,
             };
           });
           
