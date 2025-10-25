@@ -110,7 +110,7 @@ export function LanguageAutocomplete({
 
         {/* Dropdown des suggestions */}
         {open && filteredLanguages.length > 0 && (
-          <div className="absolute z-50 w-full mt-1 bg-background border rounded-lg shadow-lg max-h-80 overflow-auto">
+          <div className="absolute z-[var(--z-popover)] w-full mt-1 bg-popover text-popover-foreground border rounded-lg shadow-lg max-h-80 overflow-auto">
             <div className="py-1">
               {filteredLanguages.map((lang) => (
                 <button
@@ -142,7 +142,7 @@ export function LanguageAutocomplete({
 
         {/* Message si aucun résultat */}
         {open && filteredLanguages.length === 0 && inputValue.length > 0 && (
-          <div className="absolute z-50 w-full mt-1 bg-background border rounded-lg shadow-lg">
+          <div className="absolute z-[var(--z-popover)] w-full mt-1 bg-popover text-popover-foreground border rounded-lg shadow-lg">
             <div className="p-4 text-sm text-muted-foreground text-center">
               Aucune langue trouvée pour "{inputValue}"
             </div>
