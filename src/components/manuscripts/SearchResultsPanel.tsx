@@ -7,6 +7,7 @@ import { Eye, ChevronRight, FileText } from "lucide-react";
 import { SearchResult } from "@/hooks/useManuscriptSearch";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { sanitizeHtml } from "@/lib/sanitizeHtml";
+import { toast } from "sonner";
 
 interface SearchResultsPanelProps {
   results: SearchResult[];
@@ -24,8 +25,15 @@ export function SearchResultsPanel({ results, searchQuery, onResultClick, highli
     setIsOpen(true);
   };
 
+
   const navigateToManuscript = () => {
     if (selectedResult) {
+      // Vérifier si le manuscrit est numérisé avant de naviguer
+      if (!selectedResult.digital_copy_url && !selectedResult.file_url) {
+        toast.error("Ce manuscrit est catalogué mais n'est pas encore numérisé. Vous pouvez faire une demande de numérisation.");
+        setIsOpen(false);
+        return;
+      }
       onResultClick(selectedResult);
       setIsOpen(false);
     }

@@ -33,6 +33,8 @@ export interface SearchResult {
   material: string;
   dimensions: string;
   created_at: string;
+  digital_copy_url?: string;
+  file_url?: string;
   highlights?: {
     title?: string[];
     description?: string[];
@@ -70,7 +72,7 @@ export function useManuscriptSearch() {
     try {
       let queryBuilder = supabase
         .from('manuscripts')
-        .select('id, title, author, description, thumbnail_url, language, period, genre, publication_year, cote, source, historical_period, status, access_level, permalink, material, dimensions, created_at', { count: 'exact' })
+        .select('id, title, author, description, thumbnail_url, language, period, genre, publication_year, cote, source, historical_period, status, access_level, permalink, material, dimensions, created_at, digital_copy_url, file_url', { count: 'exact' })
         .eq('is_visible', true);
 
       // Recherche plein texte si une requête est fournie

@@ -119,6 +119,15 @@ export default function ManuscriptsPlatform() {
   };
 
   const handleResultClick = (result: any) => {
+    // Vérifier si le manuscrit est numérisé
+    if (!result.digital_copy_url && !result.file_url) {
+      toast({
+        title: "Ouvrage non numérisé",
+        description: "Ce manuscrit est catalogué mais n'est pas encore numérisé. Vous pouvez faire une demande de numérisation.",
+        variant: "default",
+      });
+      return;
+    }
     navigate(`/lecteur-manuscrit/${result.id}`);
   };
 
