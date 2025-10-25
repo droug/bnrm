@@ -9,6 +9,7 @@ import manuscriptPage1 from "@/assets/manuscript-page-1.jpg";
 import manuscriptPage2 from "@/assets/manuscript-page-2.jpg";
 import manuscriptPage3 from "@/assets/manuscript-page-3.jpg";
 import manuscriptPage4 from "@/assets/manuscript-page-4.jpg";
+import { PageFlipBook } from "@/components/book-reader/PageFlipBook";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -111,9 +112,11 @@ const BookReader = () => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [emailAddress, setEmailAddress] = useState("");
   
-  const totalPages = 245;
+  const [loading, setLoading] = useState(true);
+  const [documentData, setDocumentData] = useState<any>(null);
+  const [documentImage, setDocumentImage] = useState<string>("");
   
-  // Fictional manuscript pages
+  // Fictional manuscript pages (fallback)
   const manuscriptPages = [
     manuscriptPage1,
     manuscriptPage2,
@@ -121,17 +124,92 @@ const BookReader = () => {
     manuscriptPage4,
   ];
   
+  // Load document data from Supabase
+  useEffect(() => {
+    const loadDocument = async () => {
+      if (!id) return;
+      
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('content')
+          .select('id, title, excerpt, content_type, published_at, file_url, file_type, tags, author_id')
+          .eq('id', id)
+          .single();
+
+        if (data && !error) {
+          // Load author info
+          let authorName = "Auteur inconnu";
+          if (data.author_id) {
+            const { data: authorData } = await supabase
+              .from('profiles')
+              .select('first_name, last_name')
+              .eq('user_id', data.author_id)
+              .single();
+            
+            if (authorData) {
+              authorName = `${authorData.first_name || ''} ${authorData.last_name || ''}`.trim() || 'Auteur inconnu';
+            }
+          }
+
+          setDocumentData({
+            ...data,
+            author: authorName
+          });
+
+          // Set document image based on title or use file_url
+          const titleImageMap: { [key: string]: string } = {
+            "Archives Photographiques du Maroc Colonial": "/src/assets/digital-library/archives-photo-maroc.jpg",
+            "Collection de Cartes Anciennes": "/src/assets/digital-library/cartes-anciennes.jpg",
+            "Logiciel Patrimoine": "/src/assets/digital-library/logiciel-patrimoine.jpg",
+            "Manuscrits Andalous": "/src/assets/digital-library/manuscrits-andalous.jpg",
+            "Documents Administratifs Historiques": "/src/assets/digital-library/documents-administratifs.jpg",
+          };
+
+          setDocumentImage(titleImageMap[data.title] || data.file_url || manuscriptPage1);
+        } else {
+          console.error('Error loading document:', error);
+          toast.error("Erreur lors du chargement du document");
+        }
+      } catch (err) {
+        console.error('Exception loading document:', err);
+        toast.error("Erreur lors du chargement du document");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDocument();
+  }, [id]);
+  
+  const totalPages = 245;
+  
   const getCurrentPageImage = (page: number) => {
-    // Cycle through the 4 manuscript images
+    // If we have a real document image, use it for all pages
+    if (documentImage) {
+      return documentImage;
+    }
+    // Otherwise cycle through the manuscript images
     return manuscriptPages[(page - 1) % manuscriptPages.length];
+  };
+
+  // Generate page images for flip book
+  const generatePageImages = () => {
+    const images = [];
+    for (let i = 0; i < totalPages; i++) {
+      images.push(documentImage || manuscriptPages[i % manuscriptPages.length]);
+    }
+    return images;
   };
   
   const bookInfo = {
-    title: "Manuscrit andalou du XIIe siècle",
-    author: "Ibn Rushd (Averroès)",
-    collection: "Manuscrits",
-    date: "1195",
-    description: "Commentaire philosophique majeur sur les œuvres d'Aristote",
+    title: documentData?.title || "Chargement...",
+    author: documentData?.author || "Auteur inconnu",
+    collection: documentData?.content_type === 'news' ? 'Articles' : 
+                documentData?.content_type === 'event' ? 'Événements' : 
+                documentData?.content_type === 'exhibition' ? 'Expositions' : 'Manuscrits',
+    date: documentData?.published_at ? new Date(documentData.published_at).getFullYear().toString() : "N/A",
+    description: documentData?.excerpt || "Description non disponible",
     language: "Arabe classique",
     pages: totalPages,
     format: "PDF Haute résolution",
@@ -358,8 +436,18 @@ const BookReader = () => {
 
                 <TabsContent value="info" className="space-y-6 mt-6">
                   {/* Thumbnail */}
-                  <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center">
-                    <FileText className="h-24 w-24 text-primary/40" />
+                  <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg overflow-hidden">
+                    {documentImage ? (
+                      <img 
+                        src={documentImage} 
+                        alt={bookInfo.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <FileText className="h-24 w-24 text-primary/40" />
+                      </div>
+                    )}
                   </div>
 
                   {/* Book Details */}
@@ -738,10 +826,21 @@ const BookReader = () => {
 
           {/* Book Display Area */}
           {readingMode === "book" ? (
-            <div className="flex-1 overflow-auto bg-muted/10 p-8">
-              <div className={`${viewMode === "double" ? "max-w-7xl" : "max-w-4xl"} mx-auto`}>
-                <div className={`grid ${viewMode === "double" ? "grid-cols-2" : "grid-cols-1"} gap-4`}>
-                  {/* Page 1 or Single Page */}
+            <div className="flex-1 overflow-hidden bg-muted/10 flex items-center justify-center p-8">
+              {loading ? (
+                <div className="text-center">
+                  <p className="text-muted-foreground">Chargement du document...</p>
+                </div>
+              ) : viewMode === "double" ? (
+                <PageFlipBook 
+                  images={generatePageImages()}
+                  currentPage={currentPage}
+                  onPageChange={setCurrentPage}
+                  zoom={zoom}
+                  rotation={rotation}
+                />
+              ) : (
+                <div className="max-w-4xl mx-auto">
                   <Card className="shadow-2xl">
                     <CardContent className="p-0">
                       <div 
@@ -766,36 +865,8 @@ const BookReader = () => {
                       </div>
                     </CardContent>
                   </Card>
-
-                  {/* Page 2 (Double page mode only) */}
-                  {viewMode === "double" && currentPage < totalPages && (
-                    <Card className="shadow-2xl">
-                      <CardContent className="p-0">
-                        <div 
-                          className="aspect-[3/4] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden"
-                          style={{ 
-                            transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-                            transformOrigin: 'center',
-                            transition: 'transform 0.3s ease'
-                          }}
-                        >
-                          <img 
-                            src={getCurrentPageImage(currentPage + 1)}
-                            alt={`Page ${currentPage + 1}`}
-                            className="w-full h-full object-contain"
-                          />
-                          {bookmarks.includes(currentPage + 1) && (
-                            <Badge className="absolute top-4 right-4 bg-primary/90">
-                              <Bookmark className="h-3 w-3 mr-1 fill-current" />
-                              Marqué
-                            </Badge>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
                 </div>
-              </div>
+              )}
             </div>
           ) : (
             // Audio Mode
