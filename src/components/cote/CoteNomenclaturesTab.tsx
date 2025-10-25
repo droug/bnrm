@@ -42,7 +42,9 @@ export const CoteNomenclaturesTab = () => {
   const [testData, setTestData] = useState({
     edition: "25",
     ville: "MRK",
-    numero: "42"
+    numero: "42",
+    annee: "2024",
+    mois: "06"
   });
   const [testResult, setTestResult] = useState("");
 
@@ -153,14 +155,14 @@ export const CoteNomenclaturesTab = () => {
       result = result.replace('COLL##', data.ville); // Réutilise le champ ville pour collection
     }
     
-    // Remplacer AAAA par l'année (utilise edition comme année)
+    // Remplacer AAAA par l'année
     if (result.includes('AAAA')) {
-      result = result.replace(/AAAA/g, data.edition.padStart(4, '20'));
+      result = result.replace(/AAAA/g, data.annee);
     }
     
-    // Remplacer MM par le mois (utilise les 2 premiers chiffres de numero)
+    // Remplacer MM par le mois
     if (result.includes('MM')) {
-      result = result.replace('MM', data.numero.padStart(2, '0').substring(0, 2));
+      result = result.replace(/MM/g, data.mois.padStart(2, '0'));
     }
     
     // Remplacer #### par numéro à 4 chiffres
@@ -173,10 +175,8 @@ export const CoteNomenclaturesTab = () => {
       result = result.replace('###', data.numero.padStart(3, '0'));
     }
     
-    // Remplacer ## par numéro à 2 chiffres
-    if (result.includes('##')) {
-      result = result.replace(/##/g, data.numero.padStart(2, '0'));
-    }
+    // Remplacer ## par numéro à 2 chiffres (non suivi par autre chose)
+    result = result.replace(/##(?!#)/g, data.numero.padStart(2, '0'));
     
     return result;
   };
@@ -397,14 +397,36 @@ export const CoteNomenclaturesTab = () => {
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label>Édition / Année</Label>
+                          <Label>Édition</Label>
                           <Input
                             value={testData.edition}
                             onChange={(e) => setTestData({ ...testData, edition: e.target.value })}
-                            placeholder="42 ou 2024"
+                            placeholder="42"
                           />
                           <p className="text-xs text-muted-foreground mt-1">
-                            Pour ED## ou AAAA
+                            Pour ED## (ex: ED42)
+                          </p>
+                        </div>
+                        <div>
+                          <Label>Année</Label>
+                          <Input
+                            value={testData.annee}
+                            onChange={(e) => setTestData({ ...testData, annee: e.target.value })}
+                            placeholder="2024"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Pour AAAA (ex: 2024)
+                          </p>
+                        </div>
+                        <div>
+                          <Label>Mois</Label>
+                          <Input
+                            value={testData.mois}
+                            onChange={(e) => setTestData({ ...testData, mois: e.target.value })}
+                            placeholder="06"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Pour MM (ex: 06 pour juin)
                           </p>
                         </div>
                         <div>
