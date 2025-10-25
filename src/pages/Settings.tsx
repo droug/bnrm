@@ -96,7 +96,7 @@ const SettingsPage = () => {
                       <BookMarked className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <CardTitle>Gestion des Côtes</CardTitle>
+                      <CardTitle>Gestion des Cotes</CardTitle>
                       <CardDescription>Collections, villes et nomenclatures</CardDescription>
                     </div>
                   </CardHeader>

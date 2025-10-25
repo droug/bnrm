@@ -148,7 +148,7 @@ export default function AdminSettings() {
     },
     {
       icon: BookMarked,
-      title: "Gestion des Côtes",
+      title: "Gestion des Cotes",
       description: "Collections, villes et nomenclatures de fichiers BNRM",
       href: "/admin/cote-management",
       permission: "content.manage",

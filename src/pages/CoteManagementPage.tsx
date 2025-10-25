@@ -16,7 +16,7 @@ export default function CoteManagementPage() {
       >
         <div className="min-h-screen bg-background">
           <AdminHeader 
-            title="Gestion des Côtes"
+            title="Gestion des Cotes"
             subtitle="Collections, villes et nomenclatures de fichiers"
           />
           

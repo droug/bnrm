@@ -401,13 +401,13 @@ export default function AdvancedSearch() {
                       Recherche par numéro
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Recherchez par ISBN, ISSN ou numéro de côte
+                      Recherchez par ISBN, ISSN ou numéro de cote
                     </p>
                   </div>
 
                   <CoteAutocomplete
-                    label="Numéro de côte"
-                    placeholder="Numéro de côte de la bibliothèque"
+                    label="Numéro de cote"
+                    placeholder="Numéro de cote de la bibliothèque"
                     value={formData.cote}
                     onChange={(value) => setFormData({ ...formData, cote: value })}
                   />

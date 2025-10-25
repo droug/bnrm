@@ -21,7 +21,7 @@ interface CoteSuggestion {
 export function CoteAutocomplete({
   value,
   onChange,
-  placeholder = "Rechercher un numéro de côte",
+  placeholder = "Rechercher un numéro de cote",
   label,
   className = "",
 }: CoteAutocompleteProps) {
