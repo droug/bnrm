@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -11,14 +11,20 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Lock, Unlock, Edit, Save, X, BookOpen, FileText } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 
 export function PageAccessRestrictionsManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  
+  // Filtres de recherche
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
   
   // État du formulaire
   const [isRestricted, setIsRestricted] = useState(false);
@@ -27,6 +33,7 @@ export function PageAccessRestrictionsManager() {
   const [endPage, setEndPage] = useState(10);
   const [manualPages, setManualPages] = useState<number[]>([]);
   const [totalPages, setTotalPages] = useState(245);
+  const [currentPreviewPage, setCurrentPreviewPage] = useState(1);
 
   // Fetch documents
   const { data: documents, isLoading } = useQuery({
@@ -45,6 +52,29 @@ export function PageAccessRestrictionsManager() {
       return data;
     }
   });
+
+  // Filtrer les documents
+  const filteredDocuments = useMemo(() => {
+    if (!documents) return [];
+    
+    return documents.filter((doc) => {
+      // Filtre par recherche textuelle
+      const matchesSearch = searchQuery === "" || 
+        doc.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        doc.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Filtre par type
+      const matchesType = filterType === "all" || doc.content_type === filterType;
+      
+      // Filtre par statut de restriction
+      const restriction = doc.page_access_restrictions?.[0];
+      const matchesStatus = filterStatus === "all" || 
+        (filterStatus === "restricted" && restriction?.is_restricted) ||
+        (filterStatus === "public" && (!restriction || !restriction.is_restricted));
+      
+      return matchesSearch && matchesType && matchesStatus;
+    });
+  }, [documents, searchQuery, filterType, filterStatus]);
 
   // Mutation pour créer ou mettre à jour une restriction
   const saveRestriction = useMutation({
@@ -118,7 +148,14 @@ export function PageAccessRestrictionsManager() {
       setManualPages([]);
     }
     
+    setCurrentPreviewPage(1);
     setShowEditDialog(true);
+  };
+
+  // Obtenir l'image de la page actuelle pour la preview
+  const getCurrentPageImage = (page: number) => {
+    // Ici vous pouvez adapter selon votre logique d'images
+    return selectedDocument?.file_url || "/placeholder.svg";
   };
 
   const handleSaveRestriction = () => {
@@ -145,7 +182,7 @@ export function PageAccessRestrictionsManager() {
             <div className="p-3 rounded-lg bg-gradient-to-br from-orange-500 to-red-600">
               <Lock className="h-6 w-6 text-white" />
             </div>
-            <div>
+            <div className="flex-1">
               <CardTitle>Restriction d'accès aux pages</CardTitle>
               <CardDescription>
                 Gérer les restrictions d'accès aux pages pour les utilisateurs non connectés et les comptes publics
@@ -153,9 +190,65 @@ export function PageAccessRestrictionsManager() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
+          {/* Filtres de recherche */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <Label htmlFor="search" className="flex items-center gap-2">
+                <Search className="h-4 w-4" />
+                Rechercher
+              </Label>
+              <Input
+                id="search"
+                placeholder="Titre du document..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="filter-type" className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                Type de contenu
+              </Label>
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger id="filter-type">
+                  <SelectValue placeholder="Tous les types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les types</SelectItem>
+                  <SelectItem value="page">Pages</SelectItem>
+                  <SelectItem value="news">Actualités</SelectItem>
+                  <SelectItem value="exhibition">Expositions</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="filter-status" className="flex items-center gap-2">
+                <Lock className="h-4 w-4" />
+                Statut
+              </Label>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger id="filter-status">
+                  <SelectValue placeholder="Tous les statuts" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="restricted">Restreints</SelectItem>
+                  <SelectItem value="public">Publics</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Résultats */}
+          <div className="text-sm text-muted-foreground">
+            {filteredDocuments.length} document(s) trouvé(s)
+          </div>
+
           {isLoading ? (
-            <p className="text-center text-muted-foreground">Chargement...</p>
+            <p className="text-center text-muted-foreground py-8">Chargement...</p>
           ) : (
             <Table>
               <TableHeader>
@@ -168,10 +261,17 @@ export function PageAccessRestrictionsManager() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {documents?.map((doc) => {
-                  const restriction = doc.page_access_restrictions?.[0];
-                  return (
-                    <TableRow key={doc.id}>
+                {filteredDocuments.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                      Aucun document trouvé avec ces critères de recherche
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredDocuments.map((doc) => {
+                    const restriction = doc.page_access_restrictions?.[0];
+                    return (
+                      <TableRow key={doc.id}>
                       <TableCell className="font-medium">{doc.title}</TableCell>
                       <TableCell>
                         <Badge variant="outline">{doc.content_type}</Badge>
@@ -221,9 +321,10 @@ export function PageAccessRestrictionsManager() {
                           )}
                         </div>
                       </TableCell>
-                    </TableRow>
-                  );
-                })}
+                      </TableRow>
+                    );
+                  })
+                )}
               </TableBody>
             </Table>
           )}
@@ -329,58 +430,130 @@ export function PageAccessRestrictionsManager() {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
-                    <div className="space-y-2">
-                      <Label>Pages accessibles (séparées par des virgules)</Label>
-                      <Input
-                        placeholder="Ex: 1,5,10,15,20"
-                        value={manualPages.join(",")}
-                        onChange={(e) => {
-                          const pages = e.target.value
-                            .split(",")
-                            .map(p => parseInt(p.trim()))
-                            .filter(p => !isNaN(p) && p >= 1 && p <= totalPages);
-                          setManualPages(pages);
-                        }}
-                      />
-                    </div>
-                    
-                    <Accordion type="single" collapsible>
-                      <AccordionItem value="grid">
-                        <AccordionTrigger>
-                          Sélectionner visuellement ({manualPages.length} pages)
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <ScrollArea className="h-64 border rounded-md p-3">
-                            <div className="grid grid-cols-8 gap-2">
-                              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                <Button
-                                  key={page}
-                                  size="sm"
-                                  variant={manualPages.includes(page) ? "default" : "outline"}
-                                  onClick={() => {
-                                    if (manualPages.includes(page)) {
-                                      setManualPages(manualPages.filter(p => p !== page));
-                                    } else {
-                                      setManualPages([...manualPages, page].sort((a, b) => a - b));
-                                    }
-                                  }}
-                                  className="h-8 w-full text-xs p-0"
-                                >
-                                  {page}
-                                </Button>
-                              ))}
-                            </div>
-                          </ScrollArea>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-
-                    {manualPages.length > 0 && (
-                      <div className="text-sm text-muted-foreground">
-                        Pages sélectionnées: {manualPages.sort((a, b) => a - b).join(", ")}
+                  <div className="space-y-4">
+                    {/* Preview de l'ouvrage */}
+                    <div className="border rounded-lg bg-muted/30 overflow-hidden">
+                      <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-3 border-b">
+                        <div className="flex items-center justify-between">
+                          <Label className="flex items-center gap-2 font-semibold">
+                            <Eye className="h-4 w-4" />
+                            Prévisualisation de l'ouvrage
+                          </Label>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setCurrentPreviewPage(Math.max(1, currentPreviewPage - 1))}
+                              disabled={currentPreviewPage === 1}
+                            >
+                              <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <span className="text-sm font-medium px-3">
+                              Page {currentPreviewPage} / {totalPages}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setCurrentPreviewPage(Math.min(totalPages, currentPreviewPage + 1))}
+                              disabled={currentPreviewPage === totalPages}
+                            >
+                              <ChevronRight className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
                       </div>
-                    )}
+                      
+                      {/* Image de la page */}
+                      <div className="aspect-[3/4] bg-gradient-to-br from-background to-muted flex items-center justify-center relative">
+                        <img 
+                          src={getCurrentPageImage(currentPreviewPage)}
+                          alt={`Page ${currentPreviewPage}`}
+                          className="w-full h-full object-contain"
+                        />
+                        
+                        {/* Badge de sélection */}
+                        {manualPages.includes(currentPreviewPage) && (
+                          <Badge className="absolute top-4 right-4 bg-primary/90 text-lg px-4 py-2">
+                            <Lock className="h-4 w-4 mr-2" />
+                            Page accessible
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      {/* Actions sur la page courante */}
+                      <div className="p-4 border-t bg-background">
+                        <Button
+                          className="w-full"
+                          variant={manualPages.includes(currentPreviewPage) ? "destructive" : "default"}
+                          onClick={() => {
+                            if (manualPages.includes(currentPreviewPage)) {
+                              setManualPages(manualPages.filter(p => p !== currentPreviewPage));
+                              toast({ 
+                                title: "Page retirée", 
+                                description: `La page ${currentPreviewPage} ne sera plus accessible` 
+                              });
+                            } else {
+                              setManualPages([...manualPages, currentPreviewPage].sort((a, b) => a - b));
+                              toast({ 
+                                title: "Page ajoutée", 
+                                description: `La page ${currentPreviewPage} sera accessible` 
+                              });
+                            }
+                          }}
+                        >
+                          {manualPages.includes(currentPreviewPage) ? (
+                            <>
+                              <Unlock className="h-4 w-4 mr-2" />
+                              Retirer l'accès à cette page
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="h-4 w-4 mr-2" />
+                              Autoriser l'accès à cette page
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Saisie manuelle des pages */}
+                    <div className="p-4 border rounded-lg">
+                      <div className="space-y-2">
+                        <Label>Ou saisir les numéros de pages (séparés par des virgules)</Label>
+                        <Input
+                          placeholder="Ex: 1,5,10,15,20"
+                          value={manualPages.join(",")}
+                          onChange={(e) => {
+                            const pages = e.target.value
+                              .split(",")
+                              .map(p => parseInt(p.trim()))
+                              .filter(p => !isNaN(p) && p >= 1 && p <= totalPages);
+                            setManualPages(pages);
+                          }}
+                        />
+                      </div>
+                      
+                      {manualPages.length > 0 && (
+                        <div className="mt-3 p-3 bg-muted/50 rounded-md">
+                          <p className="text-sm font-medium mb-2">
+                            {manualPages.length} page(s) accessible(s):
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {manualPages.sort((a, b) => a - b).map((page) => (
+                              <Badge 
+                                key={page} 
+                                variant="secondary"
+                                className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
+                                onClick={() => setManualPages(manualPages.filter(p => p !== page))}
+                              >
+                                {page}
+                                <X className="h-3 w-3 ml-1" />
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </>
