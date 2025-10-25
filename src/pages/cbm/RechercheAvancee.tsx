@@ -224,6 +224,9 @@ const RechercheAvancee = () => {
           <CardContent className="p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-5 mb-6">
+                <TabsTrigger value="multi-criteria" className="flex items-center gap-2">
+                  🔍 Multi-critères
+                </TabsTrigger>
                 <TabsTrigger value="author-az" className="flex items-center gap-2">
                   📚 Auteur A-Z
                 </TabsTrigger>
@@ -235,9 +238,6 @@ const RechercheAvancee = () => {
                 </TabsTrigger>
                 <TabsTrigger value="identifier" className="flex items-center gap-2">
                   📁 Cote / Identifiant
-                </TabsTrigger>
-                <TabsTrigger value="multi-criteria" className="flex items-center gap-2">
-                  🔍 Multi-critères
                 </TabsTrigger>
               </TabsList>
 
@@ -348,11 +348,13 @@ const RechercheAvancee = () => {
 
               {/* Recherche multi-critères */}
               <TabsContent value="multi-criteria" className="space-y-4">
-                <Accordion type="multiple" className="w-full">
+                <Accordion type="multiple" className="w-full space-y-3">
                   {/* Par mot-clé */}
-                  <AccordionItem value="keywords">
-                    <AccordionTrigger>Par mot-clé</AccordionTrigger>
-                    <AccordionContent className="space-y-4">
+                  <AccordionItem value="keywords" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Par mot-clé</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4 pb-4">
                       <div>
                         <Label htmlFor="keywords">Recherche</Label>
                         <Input
@@ -378,9 +380,11 @@ const RechercheAvancee = () => {
                   </AccordionItem>
 
                   {/* Par nature de document */}
-                  <AccordionItem value="nature">
-                    <AccordionTrigger>Par nature de document</AccordionTrigger>
-                    <AccordionContent>
+                  <AccordionItem value="nature" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Par nature de document</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                         {documentNatures.map((nature) => (
                           <div key={nature} className="flex items-center space-x-2">
@@ -411,9 +415,11 @@ const RechercheAvancee = () => {
                   </AccordionItem>
 
                   {/* Par typologie */}
-                  <AccordionItem value="typology">
-                    <AccordionTrigger>Par typologie</AccordionTrigger>
-                    <AccordionContent>
+                  <AccordionItem value="typology" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Par typologie</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
                       <div>
                         <Label htmlFor="typology">Type de document</Label>
                         <Select>
@@ -433,9 +439,11 @@ const RechercheAvancee = () => {
                   </AccordionItem>
 
                   {/* Par langue */}
-                  <AccordionItem value="language">
-                    <AccordionTrigger>Par langue</AccordionTrigger>
-                    <AccordionContent>
+                  <AccordionItem value="language" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Par langue</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                         {languages.map((language) => (
                           <div key={language} className="flex items-center space-x-2">
@@ -460,9 +468,11 @@ const RechercheAvancee = () => {
                   </AccordionItem>
 
                   {/* Par pays de publication */}
-                  <AccordionItem value="country">
-                    <AccordionTrigger>Par pays de publication</AccordionTrigger>
-                    <AccordionContent>
+                  <AccordionItem value="country" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Par pays de publication</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
                       <div>
                         <Label htmlFor="country">Pays</Label>
                         <Input
@@ -477,9 +487,11 @@ const RechercheAvancee = () => {
                   </AccordionItem>
 
                   {/* Par date de publication */}
-                  <AccordionItem value="pub-date">
-                    <AccordionTrigger>Par date de publication</AccordionTrigger>
-                    <AccordionContent className="space-y-4">
+                  <AccordionItem value="pub-date" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Par date de publication</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4 pb-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="pub-from">De</Label>
@@ -527,9 +539,11 @@ const RechercheAvancee = () => {
                   </AccordionItem>
 
                   {/* Par date d'enregistrement */}
-                  <AccordionItem value="reg-date">
-                    <AccordionTrigger>Par date d'enregistrement (interne BNRM)</AccordionTrigger>
-                    <AccordionContent className="space-y-4">
+                  <AccordionItem value="reg-date" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Par date d'enregistrement (interne BNRM)</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4 pb-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="reg-from">De</Label>
@@ -566,9 +580,11 @@ const RechercheAvancee = () => {
                   </AccordionItem>
 
                   {/* Par support physique */}
-                  <AccordionItem value="support">
-                    <AccordionTrigger>Par support physique</AccordionTrigger>
-                    <AccordionContent>
+                  <AccordionItem value="support" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Par support physique</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                         {supportTypes.map((support) => (
                           <div key={support} className="flex items-center space-x-2">
@@ -599,9 +615,11 @@ const RechercheAvancee = () => {
                   </AccordionItem>
 
                   {/* Par établissement détenteur */}
-                  <AccordionItem value="holder">
-                    <AccordionTrigger>Par établissement détenteur</AccordionTrigger>
-                    <AccordionContent>
+                  <AccordionItem value="holder" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Par établissement détenteur</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
                       <div>
                         <Label htmlFor="holder">Établissement</Label>
                         <Input
