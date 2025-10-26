@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +30,8 @@ import {
   Search,
   Globe,
   FileBarChart,
-  TrendingUp
+  TrendingUp,
+  BookMarked
 } from "lucide-react";
 import { 
   generateISBNMonthlyReport,
@@ -51,6 +52,7 @@ import { DepositValidationWorkflow } from "@/components/legal-deposit/DepositVal
 export default function BNRMBackOffice() {
   const { user, profile, loading } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedDepositModal, setSelectedDepositModal] = useState<string | null>(null);
   const [selectedDepositData, setSelectedDepositData] = useState<any>(null);
@@ -148,6 +150,14 @@ export default function BNRMBackOffice() {
                 <TabsTrigger value="editorial-monitoring" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium">
                   <Search className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Veille</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="reservations" 
+                  className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium"
+                  onClick={() => navigate('/admin/reservations-ouvrages')}
+                >
+                  <BookMarked className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden md:inline">Réservations</span>
                 </TabsTrigger>
                 <TabsTrigger value="notifications" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium">
                   <Bell className="h-4 w-4 flex-shrink-0" />
