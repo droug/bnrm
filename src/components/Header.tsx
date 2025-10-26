@@ -328,21 +328,52 @@ const Header = () => {
                   <span className="hidden lg:inline">{t('nav.services')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[400px] bg-popover border border-primary/20 shadow-xl">
+                  <div className="grid gap-2 p-4 w-[650px] lg:grid-cols-2 bg-popover border border-primary/20 shadow-xl">
                     <div className="space-y-1">
+                      <h4 className="text-base font-bold text-primary mb-2">Services aux usagers</h4>
                       <NavigationMenuLink asChild>
-                        <Link to="/digital-library" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          {t('nav.consult.national.library')}
+                        <Link to="/auth?action=signup" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Inscription en ligne / Réinscription</div>
+                          <div className="text-xs text-muted-foreground mt-1">Créez votre compte ou renouvelez votre abonnement</div>
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/legal-deposit" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          {t('nav.legal.deposit')}
+                        <Link to="/digital-library" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Consulter la Bibliothèque Nationale</div>
+                          <div className="text-xs text-muted-foreground mt-1">Accédez à notre bibliothèque numérique</div>
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/demande-reproduction" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          {t('nav.reproduction.request')}
+                        <Link to="/my-library-space" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Réserver un ouvrage</div>
+                          <div className="text-xs text-muted-foreground mt-1">Réservez un document pour consultation</div>
+                        </Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link to="/my-library-space" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Réserver nos espaces</div>
+                          <div className="text-xs text-muted-foreground mt-1">Réservez un espace de travail ou une salle</div>
+                        </Link>
+                      </NavigationMenuLink>
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-base font-bold text-primary mb-2">Services spécialisés</h4>
+                      <NavigationMenuLink asChild>
+                        <Link to="/legal-deposit" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Dépôt légal</div>
+                          <div className="text-xs text-muted-foreground mt-1">Service obligatoire selon le Dahir n° 1-60-050 (1960)</div>
+                        </Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link to="/demande-reproduction" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Demande de reproduction</div>
+                          <div className="text-xs text-muted-foreground mt-1">Commandez des reproductions de documents</div>
+                        </Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link to="/my-library-space" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Demande de restauration</div>
+                          <div className="text-xs text-muted-foreground mt-1">Service de restauration de documents anciens</div>
                         </Link>
                       </NavigationMenuLink>
                     </div>
