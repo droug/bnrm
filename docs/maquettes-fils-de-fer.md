@@ -67,6 +67,7 @@ graph TD
     SERVICES --> DEPOT[Dépôt Légal]
     SERVICES --> REPRO[Reproduction]
     SERVICES --> CATALOG[Catalogue]
+    SERVICES --> CULTURAL[Activités Culturelles]
     
     %% Authentification
     HOME --> AUTH[Authentification]
@@ -84,6 +85,13 @@ graph TD
     %% BNRM
     BNRM --> BNRM_SERVICES[Services BNRM]
     BNRM --> BNRM_TARIFS[Tarifs]
+    BNRM --> BNRM_CULTURAL[Services Culturels]
+    
+    %% Services Culturels
+    CULTURAL --> PROGRAMS[Programmes Culturels]
+    CULTURAL --> EVENTS[Événements]
+    CULTURAL --> WORKSHOPS[Ateliers]
+    CULTURAL --> EXHIBITIONS[Expositions]
     
     %% Bibliothèque Numérique
     DL --> DL_SEARCH[Recherche]
@@ -111,11 +119,13 @@ graph TD
     classDef service fill:#10b981,stroke:#059669,color:#fff
     classDef user fill:#8b5cf6,stroke:#6d28d9,color:#fff
     classDef info fill:#06b6d4,stroke:#0891b2,color:#fff
+    classDef cultural fill:#f59e0b,stroke:#d97706,color:#fff
     
     class HOME,BNRM,KITAB,CBM,DL,MS portal
     class SERVICES,DEPOT,REPRO,CATALOG service
     class AUTH,USER_SPACE,MY_LIB,MY_MS,PROFILE,WALLET user
     class INFO,ABOUT,HELP,ACCESS,NEWS info
+    class CULTURAL,PROGRAMS,EVENTS,WORKSHOPS,EXHIBITIONS,BNRM_CULTURAL cultural
 ```
 
 ---
@@ -126,44 +136,45 @@ graph TD
 
 ```mermaid
 graph TB
-    subgraph "Page d'Accueil - Desktop 1920px"
+    subgraph Homepage["Page d'Accueil - Desktop 1920px"]
         HEADER[Header - Navigation Principale]
         
-        subgraph "Hero Section - Full Width"
+        subgraph HeroSection["Hero Section - Full Width"]
             HERO_BG[Image de Fond avec Overlay]
             HERO_TITLE[Titre Principal H1]
             HERO_SEARCH[Barre de Recherche Globale]
-            HERO_CTA[Boutons d'Action: Explorer | Bibliothèque]
+            HERO_CTA_1[Bouton: Explorer]
+            HERO_CTA_2[Bouton: Bibliothèque]
         end
         
-        subgraph "Section Portails - Grid 3 Colonnes"
-            PORTAL_1[Portail BNRM<br/>Services & Tarifs]
-            PORTAL_2[Bibliothèque Numérique<br/>Consultation]
-            PORTAL_3[Plateforme Manuscrits<br/>Patrimoine]
-            PORTAL_4[Portail Kitab<br/>Publications]
-            PORTAL_5[Portail CBM<br/>Consortium]
+        subgraph PortalSection["Section Portails - Grid 3 Colonnes"]
+            PORTAL_1[Portail BNRM - Services et Tarifs]
+            PORTAL_2[Bibliothèque Numérique - Consultation]
+            PORTAL_3[Plateforme Manuscrits - Patrimoine]
+            PORTAL_4[Portail Kitab - Publications]
+            PORTAL_5[Portail CBM - Consortium]
         end
         
-        subgraph "Services Rapides - Grid 4 Colonnes"
+        subgraph ServiceSection["Services Rapides - Grid 4 Colonnes"]
             SERVICE_1[Dépôt Légal]
             SERVICE_2[Reproduction]
             SERVICE_3[Catalogue]
             SERVICE_4[Aide]
         end
         
-        subgraph "Statistiques - Grid 4 Colonnes"
+        subgraph StatsSection["Statistiques - Grid 4 Colonnes"]
             STAT_1[Documents Numérisés]
             STAT_2[Manuscrits]
             STAT_3[Visiteurs]
             STAT_4[Collections]
         end
         
-        subgraph "Actualités - 2 Colonnes"
-            NEWS_1[Actualité 1 - Image + Texte]
-            NEWS_2[Actualité 2 - Image + Texte]
+        subgraph NewsSection["Actualités - 2 Colonnes"]
+            NEWS_1[Actualité 1 - Image et Texte]
+            NEWS_2[Actualité 2 - Image et Texte]
         end
         
-        FOOTER[Footer - Liens & Informations]
+        FOOTER[Footer - Liens et Informations]
         CHATBOT[Chatbot Flottant - Coin Inférieur Droit]
         ACCESSIBILITY[Outils Accessibilité - Coin Supérieur Droit]
     end
