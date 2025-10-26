@@ -105,7 +105,7 @@ const LegalDepositPage = () => {
               <div>
                 <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
                   <Scale className="h-8 w-8 text-primary" />
-                  Backoffice Dépôt Légal - CPS Conforme
+                  Backoffice Dépôt Légal
                 </h1>
                 <p className="text-muted-foreground mt-2">
                   Workflow complet : Professionnel A & B, Validation 4 niveaux, Attribution automatique DL/ISBN/ISSN/ISMN
