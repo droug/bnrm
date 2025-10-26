@@ -75,6 +75,14 @@ export default function AdminSettings() {
       gradient: "from-emerald-500 to-emerald-600"
     },
     {
+      icon: BookOpenCheck,
+      title: "Gestion des Réservations d'Ouvrages",
+      description: "Gérer les réservations d'ouvrages du portail CBN - Validation et traitement",
+      href: "/admin/reservations-ouvrages",
+      permission: "requests.manage",
+      gradient: "from-indigo-500 to-blue-600"
+    },
+    {
       icon: DatabaseZap,
       title: "Catalogue en Ligne - Métadonnées",
       description: "Gérer les métadonnées du catalogue, imports SIGB et exports",
