@@ -285,36 +285,53 @@ const Header = () => {
                   <span className="hidden lg:inline">{t('nav.discover')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[500px] lg:grid-cols-2 bg-popover border border-primary/20 shadow-xl">
+                  <div className="grid gap-2 p-4 w-[650px] lg:grid-cols-2 bg-popover border border-primary/20 shadow-xl">
                     <div className="space-y-1">
-                      <h4 className="text-base font-bold text-primary mb-1 pb-1">{t('nav.practical.info')}</h4>
+                      <h4 className="text-base font-bold text-primary mb-2">Informations pratiques</h4>
                       <NavigationMenuLink asChild>
-                        <Link to="/practical-info" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          {t('nav.schedules.access')}
+                        <Link to="/practical-info" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Horaires et accès</div>
+                          <div className="text-xs text-muted-foreground mt-1">Consultez nos horaires d'ouverture et comment nous rejoindre</div>
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/services-tarifs" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          {t('nav.services.catalog')}
+                        <Link to="/services-tarifs" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Catalogue de services et tarifs</div>
+                          <div className="text-xs text-muted-foreground mt-1">Découvrez nos services et leurs tarifs</div>
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/help" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          {language === 'ar' ? 'مركز المساعدة' : 'Centre d\'Aide'}
+                        <Link to="/visites-virtuelles" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Visites virtuelles</div>
+                          <div className="text-xs text-muted-foreground mt-1">Explorez la bibliothèque depuis chez vous</div>
+                        </Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link to="/donateurs" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Nos donateurs</div>
+                          <div className="text-xs text-muted-foreground mt-1">Recherchez par donateurs ou par œuvre</div>
                         </Link>
                       </NavigationMenuLink>
                     </div>
                     <div className="space-y-1">
-                      <h4 className="text-base font-bold text-primary mb-1 pb-1">{t('nav.history.missions')}</h4>
+                      <h4 className="text-base font-bold text-primary mb-2">Histoire et missions</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/histoire" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          {t('nav.library.history')}
-                        </a>
+                        <Link to="/histoire" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Histoire de la bibliothèque</div>
+                          <div className="text-xs text-muted-foreground mt-1">Missions et valeurs prônées</div>
+                        </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/mot-direction" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          {t('nav.management.message')}
-                        </a>
+                        <Link to="/mot-direction" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Mot de la Direction</div>
+                          <div className="text-xs text-muted-foreground mt-1">Message du directeur de la BNRM</div>
+                        </Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link to="/organigramme" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Organigramme</div>
+                          <div className="text-xs text-muted-foreground mt-1">Structure organisationnelle de la BNRM</div>
+                        </Link>
                       </NavigationMenuLink>
                     </div>
                   </div>
