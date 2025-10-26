@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { BookOpen, Library, Building2, CalendarIcon, AlertCircle } from "lucide-react";
+import { BookOpen, Library, Building2, CalendarIcon, AlertCircle, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -74,6 +74,8 @@ export function BookReservationDialog({
   const { userRole, isAuthenticated, isAdmin, isLibrarian } = useAccessControl();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPhysicalWarning, setShowPhysicalWarning] = useState(false);
+  const [showUserTypeList, setShowUserTypeList] = useState(false);
+  const userTypeRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<BookReservationFormData>({
     resolver: zodResolver(bookReservationSchema),
@@ -99,6 +101,7 @@ export function BookReservationDialog({
   });
 
   const requestPhysical = form.watch("requestPhysical");
+  const selectedUserType = form.watch("userType");
 
   useEffect(() => {
     if (requestPhysical && !allowPhysicalConsultation) {
@@ -107,6 +110,18 @@ export function BookReservationDialog({
       setShowPhysicalWarning(false);
     }
   }, [requestPhysical, allowPhysicalConsultation]);
+
+  // Fermer la liste si on clique à l'extérieur
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userTypeRef.current && !userTypeRef.current.contains(event.target as Node)) {
+        setShowUserTypeList(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Fonction pour déterminer le routage
   const determineRouting = (data: BookReservationFormData): {
@@ -365,20 +380,53 @@ export function BookReservationDialog({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Type de demandeur</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <div ref={userTypeRef} className="relative">
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Sélectionnez votre profil" />
-                            </SelectTrigger>
+                            <button
+                              type="button"
+                              onClick={() => setShowUserTypeList(!showUserTypeList)}
+                              className={cn(
+                                "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
+                                "hover:bg-accent/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              <span>
+                                {field.value
+                                  ? USER_TYPES.find((t) => t.value === field.value)?.label
+                                  : "Sélectionnez votre profil"}
+                              </span>
+                              <ChevronDown className={cn(
+                                "h-4 w-4 opacity-50 transition-transform",
+                                showUserTypeList && "rotate-180"
+                              )} />
+                            </button>
                           </FormControl>
-                          <SelectContent>
-                            {USER_TYPES.map((type) => (
-                              <SelectItem key={type.value} value={type.value}>
-                                {type.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          
+                          {showUserTypeList && (
+                            <div className="relative mt-1">
+                              <ul className="w-full bg-popover border border-border rounded-md shadow-md overflow-hidden z-50">
+                                {USER_TYPES.map((type) => (
+                                  <li key={type.value}>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        field.onChange(type.value);
+                                        setShowUserTypeList(false);
+                                      }}
+                                      className={cn(
+                                        "w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors",
+                                        field.value === type.value && "bg-accent/50"
+                                      )}
+                                    >
+                                      {type.label}
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
