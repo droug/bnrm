@@ -339,12 +339,14 @@ export default function GestionReservationsOuvrages() {
 
         {/* Statistiques */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-          <Card className="relative overflow-hidden border-border/50 hover:shadow-md transition-shadow">
-            <div className="absolute inset-0 bg-gradient-to-br from-muted/20 to-transparent opacity-50" />
+          <Card className="group relative overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50">
+            <div className="absolute inset-0 bg-gradient-to-br from-muted/10 to-transparent opacity-50" />
             <CardHeader className="pb-3 relative">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-slate-500 to-gray-600 shadow-md">
+                  <FileText className="h-5 w-5 text-white" />
+                </div>
                 <CardTitle className="text-sm font-medium text-muted-foreground">Total</CardTitle>
-                <FileText className="h-5 w-5 text-muted-foreground/50" />
               </div>
             </CardHeader>
             <CardContent className="relative">
@@ -353,12 +355,14 @@ export default function GestionReservationsOuvrages() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-primary/30 hover:shadow-md transition-shadow">
+          <Card className="group relative overflow-hidden hover:shadow-lg transition-all duration-300 border-primary/30">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
             <CardHeader className="pb-3 relative">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 shadow-md">
+                  <AlertCircle className="h-5 w-5 text-white" />
+                </div>
                 <CardTitle className="text-sm font-medium text-primary">Soumises</CardTitle>
-                <AlertCircle className="h-5 w-5 text-primary/50" />
               </div>
             </CardHeader>
             <CardContent className="relative">
@@ -367,12 +371,14 @@ export default function GestionReservationsOuvrages() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-accent/30 hover:shadow-md transition-shadow">
+          <Card className="group relative overflow-hidden hover:shadow-lg transition-all duration-300 border-accent/30">
             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent" />
             <CardHeader className="pb-3 relative">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 shadow-md">
+                  <Clock className="h-5 w-5 text-white" />
+                </div>
                 <CardTitle className="text-sm font-medium text-accent">En cours</CardTitle>
-                <Clock className="h-5 w-5 text-accent/50" />
               </div>
             </CardHeader>
             <CardContent className="relative">
@@ -381,12 +387,14 @@ export default function GestionReservationsOuvrages() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-green-500/30 hover:shadow-md transition-shadow">
+          <Card className="group relative overflow-hidden hover:shadow-lg transition-all duration-300 border-green-500/30">
             <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent" />
             <CardHeader className="pb-3 relative">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-md">
+                  <CheckCircle className="h-5 w-5 text-white" />
+                </div>
                 <CardTitle className="text-sm font-medium text-green-700">Validées</CardTitle>
-                <CheckCircle className="h-5 w-5 text-green-500/50" />
               </div>
             </CardHeader>
             <CardContent className="relative">
@@ -395,12 +403,14 @@ export default function GestionReservationsOuvrages() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-destructive/30 hover:shadow-md transition-shadow">
+          <Card className="group relative overflow-hidden hover:shadow-lg transition-all duration-300 border-destructive/30">
             <div className="absolute inset-0 bg-gradient-to-br from-destructive/10 to-transparent" />
             <CardHeader className="pb-3 relative">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-md">
+                  <XCircle className="h-5 w-5 text-white" />
+                </div>
                 <CardTitle className="text-sm font-medium text-destructive">Refusées</CardTitle>
-                <XCircle className="h-5 w-5 text-destructive/50" />
               </div>
             </CardHeader>
             <CardContent className="relative">
@@ -409,12 +419,14 @@ export default function GestionReservationsOuvrages() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-border/50 hover:shadow-md transition-shadow">
+          <Card className="group relative overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50">
             <div className="absolute inset-0 bg-gradient-to-br from-muted/10 to-transparent" />
             <CardHeader className="pb-3 relative">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-slate-500 to-slate-600 shadow-md">
+                  <Archive className="h-5 w-5 text-white" />
+                </div>
                 <CardTitle className="text-sm font-medium text-muted-foreground">Archivées</CardTitle>
-                <FolderArchive className="h-5 w-5 text-muted-foreground/50" />
               </div>
             </CardHeader>
             <CardContent className="relative">
