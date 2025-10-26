@@ -77,7 +77,7 @@ export default function AdminSettings() {
     {
       icon: BookOpenCheck,
       title: "Gestion des Réservations d'Ouvrages",
-      description: "Gérer les réservations d'ouvrages du portail CBN - Validation et traitement",
+      description: "Gérer les réservations d'ouvrages, Validation et traitement",
       href: "/admin/reservations-ouvrages",
       permission: "requests.manage",
       gradient: "from-indigo-500 to-blue-600"
