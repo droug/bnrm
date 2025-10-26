@@ -60,7 +60,7 @@ const BNRMPortal = lazy(() => import("./pages/BNRMPortal"));
 const BNRMTariffsPage = lazy(() => import("./pages/BNRMTariffsPage"));
 const BNRMBackOffice = lazy(() => import("./pages/BNRMBackOffice"));
 const ServicesCatalog = lazy(() => import("./pages/ServicesCatalog"));
-const GestionReservationsOuvrages = lazy(() => import("./pages/backoffice/GestionReservationsOuvrages"));
+const GestionReservationsOuvrages = lazy(() => import("./pages/GestionReservationsOuvrages"));
 
 // Legal Deposit (lazy)
 const LegalDepositPage = lazy(() => import("./pages/LegalDepositPage"));
