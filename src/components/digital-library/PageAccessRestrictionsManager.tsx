@@ -29,9 +29,10 @@ export function PageAccessRestrictionsManager() {
   
   // État du formulaire
   const [isRestricted, setIsRestricted] = useState(false);
-  const [restrictionMode, setRestrictionMode] = useState<"range" | "manual">("range");
+  const [restrictionMode, setRestrictionMode] = useState<"range" | "manual" | "percentage">("range");
   const [pageRanges, setPageRanges] = useState<Array<{start: number, end: number}>>([{start: 1, end: 10}]);
   const [manualPages, setManualPages] = useState<number[]>([]);
+  const [percentageValue, setPercentageValue] = useState(10);
   const [totalPages, setTotalPages] = useState(245);
   const [currentPreviewPage, setCurrentPreviewPage] = useState(1);
   const [viewMode, setViewMode] = useState<"single" | "double">("single");
@@ -95,6 +96,13 @@ export function PageAccessRestrictionsManager() {
           }
         });
         allowedPages.sort((a, b) => a - b);
+      } else if (data.restrictionMode === 'percentage') {
+        // Calculer le nombre de pages selon le pourcentage
+        const numPages = Math.ceil((totalPages * data.percentageValue) / 100);
+        // Autoriser les premières pages (ou ajuster selon besoin)
+        for (let i = 1; i <= numPages; i++) {
+          allowedPages.push(i);
+        }
       } else {
         allowedPages = data.manualPages;
       }
@@ -179,11 +187,18 @@ export function PageAccessRestrictionsManager() {
       }
       
       setManualPages(restriction.manual_pages || []);
+      
+      // Calculer le pourcentage si c'est le mode percentage
+      if (restriction.restriction_mode === 'percentage' && restriction.manual_pages?.length > 0) {
+        const percentage = Math.round((restriction.manual_pages.length / totalPages) * 100);
+        setPercentageValue(percentage);
+      }
     } else {
       setIsRestricted(false);
       setRestrictionMode("range");
       setPageRanges([{start: 1, end: 10}]);
       setManualPages([]);
+      setPercentageValue(10);
     }
     
     setCurrentPreviewPage(1);
@@ -213,6 +228,7 @@ export function PageAccessRestrictionsManager() {
       restrictionMode,
       pageRanges,
       manualPages,
+      percentageValue,
     });
   };
 
@@ -729,11 +745,81 @@ export function PageAccessRestrictionsManager() {
                           <div className="text-xs opacity-80">Choisir page par page</div>
                         </div>
                       </Button>
+                      <Button
+                        type="button"
+                        variant={restrictionMode === "percentage" ? "default" : "outline"}
+                        onClick={() => setRestrictionMode("percentage")}
+                        className="w-full h-auto py-4 flex items-center gap-3"
+                      >
+                        <Eye className="h-5 w-5" />
+                        <div className="text-left flex-1">
+                          <div className="font-semibold">Pourcentage de pages</div>
+                          <div className="text-xs opacity-80">Autoriser un % de pages</div>
+                        </div>
+                      </Button>
                     </CardContent>
                   </Card>
 
                   {/* Configuration selon le mode */}
-                  {restrictionMode === "range" ? (
+                  {restrictionMode === "percentage" ? (
+                    <Card className="shadow-md">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-base">Pourcentage de pages accessibles</CardTitle>
+                        <CardDescription className="text-xs">
+                          Définissez le pourcentage de pages accessibles aux visiteurs non connectés
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-3">
+                          <Label htmlFor="percentage-input" className="text-sm font-medium">
+                            Pourcentage (%)
+                          </Label>
+                          <div className="flex gap-3 items-center">
+                            <Input
+                              id="percentage-input"
+                              type="number"
+                              min={1}
+                              max={100}
+                              value={percentageValue}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value) || 1;
+                                setPercentageValue(Math.min(100, Math.max(1, val)));
+                              }}
+                              className="h-11 text-lg font-semibold"
+                            />
+                            <span className="text-2xl font-bold text-muted-foreground">%</span>
+                          </div>
+                        </div>
+                        
+                        <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                          <p className="text-sm font-semibold mb-2">Résumé :</p>
+                          <div className="space-y-1 text-sm">
+                            <p className="text-muted-foreground">
+                              • Total de pages : <span className="font-semibold text-foreground">{totalPages}</span>
+                            </p>
+                            <p className="text-muted-foreground">
+                              • Pourcentage autorisé : <span className="font-semibold text-foreground">{percentageValue}%</span>
+                            </p>
+                            <p className="text-muted-foreground">
+                              • Pages accessibles : <span className="font-semibold text-foreground">{Math.ceil((totalPages * percentageValue) / 100)}</span> pages
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              (Les {Math.ceil((totalPages * percentageValue) / 100)} premières pages de l'œuvre)
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                          <p className="text-xs text-blue-900 dark:text-blue-100">
+                            💡 <strong>Exemples :</strong>
+                            <br />• 10% = {Math.ceil((totalPages * 10) / 100)} pages
+                            <br />• 25% = {Math.ceil((totalPages * 25) / 100)} pages
+                            <br />• 50% = {Math.ceil((totalPages * 50) / 100)} pages
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : restrictionMode === "range" ? (
                     <Card className="shadow-md">
                       <CardHeader className="pb-3">
                         <CardTitle className="text-base">Configuration des plages de pages</CardTitle>
