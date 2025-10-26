@@ -24,6 +24,39 @@
 
 ---
 
+## Liste des Figures
+
+### Diagrammes Mermaid
+
+1. **Figure 1**: Arborescence Générale du Portail BNRM
+2. **Figure 2**: Structure Desktop - Page d'Accueil
+3. **Figure 3**: Structure Page Portail BNRM
+4. **Figure 4**: Flux de Navigation - Bibliothèque Numérique
+5. **Figure 5**: Flux de Navigation - Plateforme Manuscrits
+6. **Figure 6**: Flux - Dépôt Légal (E-Services)
+7. **Figure 7**: Stratégie Responsive Multi-supports
+8. **Figure 8**: Conformité WCAG 2.1 AA - Principes d'Accessibilité
+
+### Wireframes ASCII
+
+9. **Figure 9**: Wireframe Détaillé Desktop - Page d'Accueil
+10. **Figure 10**: Wireframe Mobile - Page d'Accueil
+11. **Figure 11**: Wireframe Desktop - Portail BNRM
+12. **Figure 12**: Wireframe - Page d'Accueil Bibliothèque Numérique
+13. **Figure 13**: Wireframe - Lecteur de Document (Bibliothèque Numérique)
+14. **Figure 14**: Wireframe - Visionneuse de Manuscrits
+15. **Figure 15**: Wireframe - Portail Kitab
+16. **Figure 16**: Wireframe - Portail CBM
+17. **Figure 17**: Wireframe - Déclaration de Dépôt Légal
+18. **Figure 18**: Wireframe - Espace Utilisateur (Tableau de Bord)
+19. **Figure 19**: Comparaison Layouts Responsive (Desktop/Tablette/Mobile)
+20. **Figure 20**: Outils d'Accessibilité (Configuration)
+21. **Figure 21**: Raccourcis Clavier
+22. **Figure 22**: Éléments de Navigation Globaux (Header/Footer/Breadcrumb)
+23. **Figure 23**: Chatbot Assistant Intelligent
+
+---
+
 ## Introduction
 
 Ce document présente les maquettes fils de fer (wireframes) du portail web de la BNRM. Ces maquettes définissent:
