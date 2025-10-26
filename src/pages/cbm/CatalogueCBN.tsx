@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { 
   Search, 
   BookOpen, 
@@ -13,7 +16,9 @@ import {
   User, 
   Filter,
   Library,
-  FileText
+  FileText,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import {
   Select,
@@ -22,6 +27,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { LanguageAutocomplete } from "@/components/ui/language-autocomplete";
+import { CountryAutocomplete } from "@/components/ui/country-autocomplete";
+import { CoteAutocomplete } from "@/components/ui/cote-autocomplete";
 
 // Données d'exemple pour le catalogue
 const MOCK_DOCUMENTS = [
@@ -93,6 +101,45 @@ export default function CatalogueCBN() {
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filteredDocuments, setFilteredDocuments] = useState(MOCK_DOCUMENTS);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  
+  // Critères de recherche avancée
+  const [advancedCriteria, setAdvancedCriteria] = useState({
+    author: "",
+    title: "",
+    subject: "",
+    publisher: "",
+    isbn: "",
+    issn: "",
+    cote: "",
+    yearFrom: "",
+    yearTo: "",
+    language: "",
+    countries: [] as string[],
+    documentNatures: [] as string[],
+    supportTypes: [] as string[],
+  });
+
+  const documentNatures = [
+    'Monographie',
+    'Périodique',
+    'Thèse',
+    'Manuscrit',
+    'Carte/Plan',
+    'Partition/Audio',
+    'Image/Visuel',
+    'Électronique',
+    'Autre'
+  ];
+
+  const supportTypes = [
+    'Papier',
+    'Numérique',
+    'Microfilm',
+    'Audio',
+    'Vidéo',
+    'Autre'
+  ];
 
   const handleSearch = () => {
     let results = MOCK_DOCUMENTS;
@@ -190,7 +237,7 @@ export default function CatalogueCBN() {
               </Button>
             </div>
 
-            {/* Filtres */}
+            {/* Filtres simples */}
             <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-1">
@@ -233,13 +280,260 @@ export default function CatalogueCBN() {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => navigate("/cbm/recherche-avancee")}
+                  onClick={() => setShowAdvanced(!showAdvanced)}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Recherche avancée
+                  {showAdvanced ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />}
                 </Button>
               </div>
             </div>
+
+            {/* Recherche Avancée */}
+            {showAdvanced && (
+              <div className="mt-6 pt-6 border-t border-border">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Critères de recherche avancée
+                </h3>
+                
+                <Accordion type="multiple" className="w-full space-y-3">
+                  {/* Champs bibliographiques */}
+                  <AccordionItem value="biblio" className="border border-border rounded-lg px-4 bg-card">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Champs bibliographiques</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4 pb-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="author">Auteur</Label>
+                          <Input
+                            id="author"
+                            placeholder="Nom de l'auteur..."
+                            value={advancedCriteria.author}
+                            onChange={(e) => setAdvancedCriteria({...advancedCriteria, author: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="title">Titre</Label>
+                          <Input
+                            id="title"
+                            placeholder="Titre de l'ouvrage..."
+                            value={advancedCriteria.title}
+                            onChange={(e) => setAdvancedCriteria({...advancedCriteria, title: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="subject">Sujet</Label>
+                          <Input
+                            id="subject"
+                            placeholder="Sujet ou thématique..."
+                            value={advancedCriteria.subject}
+                            onChange={(e) => setAdvancedCriteria({...advancedCriteria, subject: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="publisher">Éditeur</Label>
+                          <Input
+                            id="publisher"
+                            placeholder="Nom de l'éditeur..."
+                            value={advancedCriteria.publisher}
+                            onChange={(e) => setAdvancedCriteria({...advancedCriteria, publisher: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Identifiants */}
+                  <AccordionItem value="identifiers" className="border border-border rounded-lg px-4 bg-card">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Identifiants</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4 pb-4">
+                      <div className="grid md:grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="isbn">ISBN</Label>
+                          <Input
+                            id="isbn"
+                            placeholder="Ex: 978-2-1234-5678-9"
+                            value={advancedCriteria.isbn}
+                            onChange={(e) => setAdvancedCriteria({...advancedCriteria, isbn: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="issn">ISSN</Label>
+                          <Input
+                            id="issn"
+                            placeholder="Ex: 1234-5678"
+                            value={advancedCriteria.issn}
+                            onChange={(e) => setAdvancedCriteria({...advancedCriteria, issn: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <CoteAutocomplete
+                            label="Cote"
+                            value={advancedCriteria.cote}
+                            onChange={(cote) => setAdvancedCriteria({...advancedCriteria, cote})}
+                          />
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Date de publication */}
+                  <AccordionItem value="dates" className="border border-border rounded-lg px-4 bg-card">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Date de publication</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4 pb-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="yearFrom">De l'année</Label>
+                          <Input
+                            id="yearFrom"
+                            type="number"
+                            placeholder="1900"
+                            value={advancedCriteria.yearFrom}
+                            onChange={(e) => setAdvancedCriteria({...advancedCriteria, yearFrom: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="yearTo">À l'année</Label>
+                          <Input
+                            id="yearTo"
+                            type="number"
+                            placeholder="2025"
+                            value={advancedCriteria.yearTo}
+                            onChange={(e) => setAdvancedCriteria({...advancedCriteria, yearTo: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Langue et pays */}
+                  <AccordionItem value="language-country" className="border border-border rounded-lg px-4 bg-card">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Langue et Pays</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4 pb-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <LanguageAutocomplete
+                          label="Langue"
+                          value={advancedCriteria.language}
+                          onChange={(language) => setAdvancedCriteria({...advancedCriteria, language})}
+                        />
+                        <CountryAutocomplete
+                          label="Pays de publication"
+                          value={advancedCriteria.countries}
+                          onChange={(countries) => setAdvancedCriteria({...advancedCriteria, countries})}
+                        />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Nature de document */}
+                  <AccordionItem value="nature" className="border border-border rounded-lg px-4 bg-card">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Nature de document</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {documentNatures.map((nature) => (
+                          <div key={nature} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`nature-${nature}`}
+                              checked={advancedCriteria.documentNatures.includes(nature)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setAdvancedCriteria({
+                                    ...advancedCriteria,
+                                    documentNatures: [...advancedCriteria.documentNatures, nature]
+                                  });
+                                } else {
+                                  setAdvancedCriteria({
+                                    ...advancedCriteria,
+                                    documentNatures: advancedCriteria.documentNatures.filter(n => n !== nature)
+                                  });
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`nature-${nature}`} className="cursor-pointer text-sm">
+                              {nature}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Type de support */}
+                  <AccordionItem value="support" className="border border-border rounded-lg px-4 bg-card">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="font-semibold text-base">Type de support</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {supportTypes.map((support) => (
+                          <div key={support} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`support-${support}`}
+                              checked={advancedCriteria.supportTypes.includes(support)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setAdvancedCriteria({
+                                    ...advancedCriteria,
+                                    supportTypes: [...advancedCriteria.supportTypes, support]
+                                  });
+                                } else {
+                                  setAdvancedCriteria({
+                                    ...advancedCriteria,
+                                    supportTypes: advancedCriteria.supportTypes.filter(s => s !== support)
+                                  });
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`support-${support}`} className="cursor-pointer text-sm">
+                              {support}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+
+                <div className="flex gap-3 mt-6">
+                  <Button onClick={handleSearch} className="flex-1">
+                    <Search className="h-4 w-4 mr-2" />
+                    Lancer la recherche
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setAdvancedCriteria({
+                        author: "",
+                        title: "",
+                        subject: "",
+                        publisher: "",
+                        isbn: "",
+                        issn: "",
+                        cote: "",
+                        yearFrom: "",
+                        yearTo: "",
+                        language: "",
+                        countries: [],
+                        documentNatures: [],
+                        supportTypes: [],
+                      });
+                    }}
+                  >
+                    Réinitialiser
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
