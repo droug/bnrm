@@ -547,35 +547,44 @@ const Header = () => {
                   <span className="hidden lg:inline">{t('nav.consult.news')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[600px] md:w-[700px] lg:grid-cols-2 bg-popover border border-primary/20 shadow-xl">
-                    <div className="space-y-1">
-                      <h4 className="text-base font-bold text-primary mb-1">{t('nav.news.section')}</h4>
+                  <div className="grid gap-3 p-5 w-[700px] lg:grid-cols-2 bg-popover border border-primary/20 shadow-xl">
+                    {/* Colonne 1 - Actualités */}
+                    <div className="space-y-2">
+                      <h4 className="text-base font-bold text-primary mb-2">Actualités</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/news" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          <div className="font-medium">{t('nav.news.publications')}</div>
-                          <p className="text-sm text-muted-foreground">
-                            {t('nav.news.publications.desc')}
-                          </p>
-                        </a>
+                        <Link to="/news" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Actualités et publications</div>
+                          <div className="text-xs text-muted-foreground mt-1">Nouvelles acquisitions et actualités du fonds documentaire</div>
+                        </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <a href="/ils-parlent-de-nous" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          <div className="font-medium">{t('nav.they.talk.about.us')}</div>
-                          <p className="text-sm text-muted-foreground">
-                            {t('nav.they.talk.about.us.desc')}
-                          </p>
-                        </a>
+                        <Link to="/ils-parlent-de-nous" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Ils parlent de nous</div>
+                          <div className="text-xs text-muted-foreground mt-1">La BNRM dans les médias et publications</div>
+                        </Link>
                       </NavigationMenuLink>
                     </div>
-                    <div className="space-y-1">
-                      <h4 className="text-base font-bold text-primary mb-1">{t('nav.culture.section')}</h4>
+
+                    {/* Colonne 2 - Programmation culturelle */}
+                    <div className="space-y-2">
+                      <h4 className="text-base font-bold text-primary mb-2">Notre programmation culturelle</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/programmation-culturelle" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          <div className="font-medium">{t('nav.cultural.programming')}</div>
-                          <p className="text-sm text-muted-foreground">
-                            {t('nav.cultural.programming.desc')}
-                          </p>
-                        </a>
+                        <Link to="/programmation-culturelle" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Programmation culturelle</div>
+                          <div className="text-xs text-muted-foreground mt-1">Découvrez nos activités culturelles</div>
+                        </Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link to="/agenda" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Agenda</div>
+                          <div className="text-xs text-muted-foreground mt-1">Calendrier de nos événements</div>
+                        </Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link to="/expositions" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">Nos expositions</div>
+                          <div className="text-xs text-muted-foreground mt-1">Expositions actuelles et passées</div>
+                        </Link>
                       </NavigationMenuLink>
                     </div>
                   </div>
