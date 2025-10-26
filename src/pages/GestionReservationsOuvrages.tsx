@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
@@ -25,6 +25,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { toast } from "sonner";
 import { 
   BookOpen, 
@@ -37,7 +38,13 @@ import {
   Filter,
   TrendingUp,
   Users,
-  FileText
+  FileText,
+  Home,
+  Clock,
+  CheckCircle,
+  XCircle,
+  FolderArchive,
+  AlertCircle
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -263,11 +270,11 @@ export default function GestionReservationsOuvrages() {
 
   const getStatusColor = (statut: string) => {
     switch (statut) {
-      case "validee": return "bg-success/10 text-success border-success/20";
-      case "refusee": return "bg-destructive/10 text-destructive border-destructive/20";
-      case "archivee": return "bg-muted text-muted-foreground border-muted";
-      case "en_cours": return "bg-warning/10 text-warning border-warning/20";
-      default: return "bg-primary/10 text-primary border-primary/20";
+      case "validee": return "bg-green-500/10 text-green-700 border-green-500/30 hover:bg-green-500/20";
+      case "refusee": return "bg-destructive/10 text-destructive border-destructive/30 hover:bg-destructive/20";
+      case "archivee": return "bg-muted/50 text-muted-foreground border-border hover:bg-muted/70";
+      case "en_cours": return "bg-accent/10 text-accent border-accent/30 hover:bg-accent/20";
+      default: return "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20";
     }
   };
 
@@ -298,9 +305,33 @@ export default function GestionReservationsOuvrages() {
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-8">
+        {/* Breadcrumb */}
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/" className="flex items-center gap-2">
+                  <Home className="h-4 w-4" />
+                  Accueil
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/admin/settings">Administration</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Gestion des Réservations</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         {/* En-tête */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Gestion des Réservations d'Ouvrages</h1>
+          <h1 className="text-3xl font-bold mb-2 text-primary">Gestion des Réservations d'Ouvrages</h1>
           <p className="text-muted-foreground">
             Interface de gestion centralisée pour toutes les demandes de réservation
           </p>
@@ -308,57 +339,87 @@ export default function GestionReservationsOuvrages() {
 
         {/* Statistiques */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total</CardTitle>
+          <Card className="relative overflow-hidden border-border/50 hover:shadow-md transition-shadow">
+            <div className="absolute inset-0 bg-gradient-to-br from-muted/20 to-transparent opacity-50" />
+            <CardHeader className="pb-3 relative">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total</CardTitle>
+                <FileText className="h-5 w-5 text-muted-foreground/50" />
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold">{stats.total}</div>
+              <p className="text-xs text-muted-foreground mt-1">Toutes réservations</p>
             </CardContent>
           </Card>
 
-          <Card className="border-primary/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-primary">Soumises</CardTitle>
+          <Card className="relative overflow-hidden border-primary/30 hover:shadow-md transition-shadow">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
+            <CardHeader className="pb-3 relative">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-primary">Soumises</CardTitle>
+                <AlertCircle className="h-5 w-5 text-primary/50" />
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">{stats.soumise}</div>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold text-primary">{stats.soumise}</div>
+              <p className="text-xs text-muted-foreground mt-1">À traiter</p>
             </CardContent>
           </Card>
 
-          <Card className="border-warning/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-warning">En cours</CardTitle>
+          <Card className="relative overflow-hidden border-accent/30 hover:shadow-md transition-shadow">
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent" />
+            <CardHeader className="pb-3 relative">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-accent">En cours</CardTitle>
+                <Clock className="h-5 w-5 text-accent/50" />
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-warning">{stats.en_cours}</div>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold text-accent">{stats.en_cours}</div>
+              <p className="text-xs text-muted-foreground mt-1">En traitement</p>
             </CardContent>
           </Card>
 
-          <Card className="border-success/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-success">Validées</CardTitle>
+          <Card className="relative overflow-hidden border-green-500/30 hover:shadow-md transition-shadow">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent" />
+            <CardHeader className="pb-3 relative">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-green-700">Validées</CardTitle>
+                <CheckCircle className="h-5 w-5 text-green-500/50" />
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-success">{stats.validee}</div>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold text-green-700">{stats.validee}</div>
+              <p className="text-xs text-muted-foreground mt-1">Approuvées</p>
             </CardContent>
           </Card>
 
-          <Card className="border-destructive/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-destructive">Refusées</CardTitle>
+          <Card className="relative overflow-hidden border-destructive/30 hover:shadow-md transition-shadow">
+            <div className="absolute inset-0 bg-gradient-to-br from-destructive/10 to-transparent" />
+            <CardHeader className="pb-3 relative">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-destructive">Refusées</CardTitle>
+                <XCircle className="h-5 w-5 text-destructive/50" />
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-destructive">{stats.refusee}</div>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold text-destructive">{stats.refusee}</div>
+              <p className="text-xs text-muted-foreground mt-1">Non approuvées</p>
             </CardContent>
           </Card>
 
-          <Card className="border-muted">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Archivées</CardTitle>
+          <Card className="relative overflow-hidden border-border/50 hover:shadow-md transition-shadow">
+            <div className="absolute inset-0 bg-gradient-to-br from-muted/10 to-transparent" />
+            <CardHeader className="pb-3 relative">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Archivées</CardTitle>
+                <FolderArchive className="h-5 w-5 text-muted-foreground/50" />
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-muted-foreground">{stats.archivee}</div>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold text-muted-foreground">{stats.archivee}</div>
+              <p className="text-xs text-muted-foreground mt-1">Traitées</p>
             </CardContent>
           </Card>
         </div>
