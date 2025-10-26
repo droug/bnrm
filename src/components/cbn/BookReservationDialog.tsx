@@ -202,16 +202,8 @@ export function BookReservationDialog({
     }
   };
 
-  // Si c'est un admin ou librarian, ne pas afficher le dialogue
-  if (isAdmin || isLibrarian) {
-    return null;
-  }
-
-  // Si c'est libre accès, rediriger directement
-  if (isFreeAccess) {
-    // Cette logique devrait être gérée avant l'ouverture du dialogue
-    return null;
-  }
+  // Si c'est libre accès, la logique est gérée dans NoticeDetaillee
+  // On n'empêche pas les admins de voir le formulaire pour tests
 
   const getStatusBadge = () => {
     if (supportStatus === "libre_acces") {
