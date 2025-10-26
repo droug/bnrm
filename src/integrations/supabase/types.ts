@@ -5272,6 +5272,87 @@ export type Database = {
           },
         ]
       }
+      reservations_ouvrages: {
+        Row: {
+          allow_physical_consultation: boolean
+          comments: string | null
+          created_at: string
+          document_author: string | null
+          document_id: string
+          document_title: string
+          document_year: string | null
+          id: string
+          is_free_access: boolean
+          motif: string | null
+          processed_at: string | null
+          processed_by: string | null
+          request_physical: boolean
+          requested_date: string | null
+          routed_to: string
+          statut: string
+          support_status: string
+          support_type: string
+          updated_at: string
+          user_email: string
+          user_id: string | null
+          user_name: string
+          user_phone: string | null
+          user_type: string | null
+        }
+        Insert: {
+          allow_physical_consultation?: boolean
+          comments?: string | null
+          created_at?: string
+          document_author?: string | null
+          document_id: string
+          document_title: string
+          document_year?: string | null
+          id?: string
+          is_free_access?: boolean
+          motif?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          request_physical?: boolean
+          requested_date?: string | null
+          routed_to: string
+          statut?: string
+          support_status: string
+          support_type: string
+          updated_at?: string
+          user_email: string
+          user_id?: string | null
+          user_name: string
+          user_phone?: string | null
+          user_type?: string | null
+        }
+        Update: {
+          allow_physical_consultation?: boolean
+          comments?: string | null
+          created_at?: string
+          document_author?: string | null
+          document_id?: string
+          document_title?: string
+          document_year?: string | null
+          id?: string
+          is_free_access?: boolean
+          motif?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          request_physical?: boolean
+          requested_date?: string | null
+          routed_to?: string
+          statut?: string
+          support_status?: string
+          support_type?: string
+          updated_at?: string
+          user_email?: string
+          user_id?: string | null
+          user_name?: string
+          user_phone?: string | null
+          user_type?: string | null
+        }
+        Relationships: []
+      }
       reservations_requests: {
         Row: {
           admin_comments: string | null
