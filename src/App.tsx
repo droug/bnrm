@@ -120,6 +120,8 @@ const CBMRecherche = lazy(() => import("./pages/CBMRecherche"));
 const CBMAccesRapide = lazy(() => import("./pages/CBMAccesRapide"));
 const CBNRechercheAvancee = lazy(() => import("./pages/cbm/RechercheAvancee"));
 const CBNNoticeExample = lazy(() => import("./pages/cbm/NoticeExample"));
+const CatalogueCBN = lazy(() => import("./pages/cbm/CatalogueCBN"));
+const NoticeDetaillee = lazy(() => import("./pages/cbm/NoticeDetaillee"));
 const UserBookReservations = lazy(() => import("./pages/UserBookReservations"));
 
 // Kitab Platform (lazy)
@@ -281,6 +283,8 @@ const App = () => (
           <Route path="/cbm/acces-rapide" element={<CBMAccesRapide />} />
 
           {/* CBN Routes */}
+          <Route path="/cbm/catalogue" element={<CatalogueCBN />} />
+          <Route path="/cbm/notice/:id" element={<NoticeDetaillee />} />
           <Route path="/cbm/recherche-avancee" element={<CBNRechercheAvancee />} />
           <Route path="/cbm/notice-example" element={<CBNNoticeExample />} />
           <Route path="/user/book-reservations" element={<UserBookReservations />} />

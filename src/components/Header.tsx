@@ -361,9 +361,9 @@ const Header = () => {
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/cbm/notice-example" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                        <Link to="/cbm/catalogue" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
                           <div className="font-semibold">Réserver un ouvrage</div>
-                          <div className="text-xs text-muted-foreground mt-1">Réservez un document pour consultation</div>
+                          <div className="text-xs text-muted-foreground mt-1">Recherchez et réservez un document</div>
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
