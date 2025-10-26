@@ -36,7 +36,7 @@ export default function AdminSettings() {
     },
     {
       icon: ClockAlert,
-      title: "Demandes en attente",
+      title: "Demandes Accès en attente",
       description: "Traiter les demandes d'accès et Abonnements",
       href: "/admin/access-requests",
       permission: "requests.manage",
