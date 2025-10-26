@@ -405,42 +405,136 @@ const Header = () => {
                   <span className="hidden lg:inline">{t('nav.explore')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[450px] lg:grid-cols-2 bg-popover border border-primary/20 shadow-xl">
-                    <div className="space-y-1">
-                      <h4 className="text-base font-bold text-primary mb-1">{t('nav.collections')}</h4>
+                  <div className="grid gap-3 p-5 w-[900px] lg:grid-cols-3 bg-popover border border-primary/20 shadow-xl">
+                    {/* Colonne 1 - Galerie et Collections */}
+                    <div className="space-y-2">
                       <NavigationMenuLink asChild>
-                        <Link to="/plateforme-manuscrits" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded bg-accent/50">
-                          📜 Plateforme Manuscrits (BNRM & Partenaires)
+                        <Link to="/galerie-medias" className="block p-3 text-base font-semibold text-primary hover:bg-primary/10 rounded border-l-2 border-primary">
+                          Galerie des médias
                         </Link>
                       </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/manuscripts" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          {t('nav.manuscripts')}
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/collections-numerisees" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          {t('nav.digitized.collections')}
-                        </a>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link to="/news" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          {t('nav.news.events')}
-                        </Link>
-                      </NavigationMenuLink>
+                      
+                      <div className="pt-2">
+                        <h4 className="text-sm font-bold text-primary mb-2 px-2">Collections</h4>
+                        <NavigationMenuLink asChild>
+                          <Link to="/collections-specialisees" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                            Collections spécialisées
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/collections-numerisees" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                            Collections numérisées
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/collections-offertes" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                            Collections offertes
+                          </Link>
+                        </NavigationMenuLink>
+                        <div className="ml-3 mt-1 space-y-1">
+                          <NavigationMenuLink asChild>
+                            <Link to="/plateforme-manuscrits" className="block p-1.5 text-xs text-muted-foreground hover:text-primary rounded">
+                              • Manuscrits
+                            </Link>
+                          </NavigationMenuLink>
+                          <NavigationMenuLink asChild>
+                            <Link to="/monographies" className="block p-1.5 text-xs text-muted-foreground hover:text-primary rounded">
+                              • Monographies
+                            </Link>
+                          </NavigationMenuLink>
+                          <NavigationMenuLink asChild>
+                            <Link to="/periodiques" className="block p-1.5 text-xs text-muted-foreground hover:text-primary rounded">
+                              • Périodiques
+                            </Link>
+                          </NavigationMenuLink>
+                          <NavigationMenuLink asChild>
+                            <Link to="/bouquets-abonnements" className="block p-1.5 text-xs text-muted-foreground hover:text-primary rounded">
+                              • Bouquets des abonnements
+                            </Link>
+                          </NavigationMenuLink>
+                          <NavigationMenuLink asChild>
+                            <Link to="/audiovisuelles" className="block p-1.5 text-xs text-muted-foreground hover:text-primary rounded">
+                              • Audiovisuelles et multimédias
+                            </Link>
+                          </NavigationMenuLink>
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <h4 className="text-base font-bold text-primary mb-1">Ressources</h4>
+
+                    {/* Colonne 2 - Catalogue général */}
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-bold text-primary mb-2 px-2">Catalogue général en ligne</h4>
+                      
+                      <div>
+                        <p className="text-xs font-semibold text-foreground px-2 mb-1">Lire, écouter et voir</p>
+                        <NavigationMenuLink asChild>
+                          <Link to="/bibliographies" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                            Bibliographies
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/rapports-activites" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                            Rapport d'activités
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/tresors" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                            Trésors
+                          </Link>
+                        </NavigationMenuLink>
+                      </div>
+
+                      <div className="pt-2">
+                        <NavigationMenuLink asChild>
+                          <Link to="/archives-manuscrits" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                            Archives et manuscrits
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/autres-catalogues" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                            Autres catalogues et bases
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/digital-library" className="block p-2 text-sm font-medium text-primary hover:bg-primary/10 rounded border-l-2 border-primary/50">
+                            📚 Catalogue numérisé (Plateforme BN)
+                          </Link>
+                        </NavigationMenuLink>
+                      </div>
+                    </div>
+
+                    {/* Colonne 3 - Recherche avancée */}
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-bold text-primary mb-2 px-2">Chercher un document</h4>
                       <NavigationMenuLink asChild>
-                        <a href="/catalogue-general" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          Catalogue général
-                        </a>
+                        <Link to="/recherche-avancee" className="block p-2 text-sm font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded bg-accent/30">
+                          🔍 Recherche avancée
+                        </Link>
                       </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <a href="/bibliographies" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                          Bibliographies
-                        </a>
-                      </NavigationMenuLink>
+                      
+                      <div className="pt-2 space-y-1">
+                        <p className="text-xs font-semibold text-muted-foreground px-2 mb-2">Documents en accès libre :</p>
+                        <NavigationMenuLink asChild>
+                          <Link to="/recherche-avancee?type=livres-periodiques" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                            • Livres et périodiques conservés
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/recherche-avancee?type=manuscrits-archives" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                            • Manuscrits modernes et archives
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/recherche-avancee?type=iconographiques" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                            • Documents iconographiques (estampes, photos, affiches)
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/recherche-avancee?type=periodiques-extraits" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                            • Périodiques (extraits)
+                          </Link>
+                        </NavigationMenuLink>
+                      </div>
                     </div>
                   </div>
                 </NavigationMenuContent>
