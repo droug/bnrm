@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,36 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+
+// Schéma de validation Zod pour la sécurité
+const reservationSchema = z.object({
+  guestName: z.string()
+    .trim()
+    .min(2, { message: "Le nom doit contenir au moins 2 caractères" })
+    .max(100, { message: "Le nom ne peut pas dépasser 100 caractères" })
+    .optional()
+    .or(z.literal("")),
+  guestEmail: z.string()
+    .trim()
+    .email({ message: "Email invalide" })
+    .max(255, { message: "L'email ne peut pas dépasser 255 caractères" })
+    .optional()
+    .or(z.literal("")),
+  guestPhone: z.string()
+    .trim()
+    .regex(/^(\+212|0)[5-7]\d{8}$/, { message: "Numéro de téléphone marocain invalide" })
+    .optional()
+    .or(z.literal("")),
+  motif: z.string()
+    .trim()
+    .min(5, { message: "Le motif doit contenir au moins 5 caractères" })
+    .max(200, { message: "Le motif ne peut pas dépasser 200 caractères" }),
+  comments: z.string()
+    .trim()
+    .max(1000, { message: "Les commentaires ne peuvent pas dépasser 1000 caractères" })
+    .optional()
+    .or(z.literal("")),
+});
 
 interface ReservationModalProps {
   open: boolean;
@@ -54,14 +85,32 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user && (!guestName || !guestEmail)) {
-      toast.error("Veuillez remplir tous les champs obligatoires");
-      return;
-    }
+    // Validation côté client avec Zod
+    try {
+      const validationData = {
+        guestName: user ? "" : guestName,
+        guestEmail: user ? "" : guestEmail,
+        guestPhone: user ? "" : guestPhone,
+        motif,
+        comments
+      };
 
-    if (!motif) {
-      toast.error("Veuillez indiquer le motif de votre demande");
-      return;
+      const validatedData = reservationSchema.parse(validationData);
+
+      // Validation supplémentaire pour utilisateurs non connectés
+      if (!user) {
+        if (!validatedData.guestName || !validatedData.guestEmail) {
+          toast.error("Veuillez remplir tous les champs obligatoires");
+          return;
+        }
+      }
+
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast.error(firstError.message);
+        return;
+      }
     }
 
     setLoading(true);

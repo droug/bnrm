@@ -65,6 +65,7 @@
     "react-contenteditable": "^3.3.7",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
+    "react-helmet": "^6.1.0",
     "react-hook-form": "^7.61.1",
     "react-pageflip": "^2.0.3",
     "react-resizable-panels": "^2.1.9",

@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import ReservationModal from "@/components/cbn/ReservationModal";
+import NoticeHead from "@/components/cbn/NoticeHead";
 
 interface NoticeDocument {
   id: string;
@@ -235,6 +236,13 @@ export default function CBNNoticeDetail() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <NoticeHead 
+        title={document.title}
+        author={document.author}
+        summary={document.summary}
+        keywords={document.keywords}
+        isbn={document.isbn}
+      />
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-8">
@@ -269,11 +277,11 @@ export default function CBNNoticeDetail() {
             <Card>
               <CardHeader className="border-b border-border/30">
                 <div className="space-y-4">
-                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <h1 className="text-2xl font-bold text-primary mb-2">{document.title}</h1>
+                      <h1 className="text-2xl font-bold text-primary mb-2 uppercase">{document.title}</h1>
                       {document.title_ar && (
-                        <h2 className="text-xl text-muted-foreground mb-4 font-arabic">{document.title_ar}</h2>
+                        <h2 className="text-xl text-muted-foreground mb-4 font-arabic" dir="rtl">{document.title_ar}</h2>
                       )}
                     </div>
                     {getAccessStatusBadge(document.access_status)}
