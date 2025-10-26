@@ -5274,9 +5274,14 @@ export type Database = {
       }
       reservations_ouvrages: {
         Row: {
+          admin_comments: string | null
           allow_physical_consultation: boolean
+          archived_by: string | null
           comments: string | null
           created_at: string
+          date_archivage: string | null
+          date_refus: string | null
+          date_validation: string | null
           document_author: string | null
           document_id: string
           document_title: string
@@ -5286,6 +5291,8 @@ export type Database = {
           motif: string | null
           processed_at: string | null
           processed_by: string | null
+          reason_refus: string | null
+          refused_by: string | null
           request_physical: boolean
           requested_date: string | null
           routed_to: string
@@ -5298,11 +5305,17 @@ export type Database = {
           user_name: string
           user_phone: string | null
           user_type: string | null
+          validated_by: string | null
         }
         Insert: {
+          admin_comments?: string | null
           allow_physical_consultation?: boolean
+          archived_by?: string | null
           comments?: string | null
           created_at?: string
+          date_archivage?: string | null
+          date_refus?: string | null
+          date_validation?: string | null
           document_author?: string | null
           document_id: string
           document_title: string
@@ -5312,6 +5325,8 @@ export type Database = {
           motif?: string | null
           processed_at?: string | null
           processed_by?: string | null
+          reason_refus?: string | null
+          refused_by?: string | null
           request_physical?: boolean
           requested_date?: string | null
           routed_to: string
@@ -5324,11 +5339,17 @@ export type Database = {
           user_name: string
           user_phone?: string | null
           user_type?: string | null
+          validated_by?: string | null
         }
         Update: {
+          admin_comments?: string | null
           allow_physical_consultation?: boolean
+          archived_by?: string | null
           comments?: string | null
           created_at?: string
+          date_archivage?: string | null
+          date_refus?: string | null
+          date_validation?: string | null
           document_author?: string | null
           document_id?: string
           document_title?: string
@@ -5338,6 +5359,8 @@ export type Database = {
           motif?: string | null
           processed_at?: string | null
           processed_by?: string | null
+          reason_refus?: string | null
+          refused_by?: string | null
           request_physical?: boolean
           requested_date?: string | null
           routed_to?: string
@@ -5350,6 +5373,7 @@ export type Database = {
           user_name?: string
           user_phone?: string | null
           user_type?: string | null
+          validated_by?: string | null
         }
         Relationships: []
       }
