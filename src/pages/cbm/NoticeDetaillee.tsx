@@ -15,6 +15,7 @@ import {
   Building2, FileText, Tag, BookMarked, Globe, Users, Clock, ExternalLink
 } from "lucide-react";
 import { toast } from "sonner";
+import { getDocumentById } from "@/data/mockDocuments";
 
 interface DocumentData {
   id: string;
@@ -98,40 +99,45 @@ export default function NoticeDetaillee() {
         digitalLink: doc.digitalLink
       });
     } else {
-      // Ici, vous chargerez les données depuis votre API
-      // Pour l'instant, on utilise des données d'exemple
-      setDocumentData({
-        id: id || "DOC-2024-001",
-        title: "Histoire de la littérature marocaine moderne",
-        titleAr: "تاريخ الأدب المغربي الحديث",
-        author: "Ahmed Ben Mohammed",
-        secondaryAuthors: ["Co-auteur 1", "Co-auteur 2"],
-        year: "2023",
-        publisher: "Éditions Atlas",
-        publishPlace: "Rabat",
-        pages: 342,
-        isbn: "978-9954-123-456-7",
-        cote: "840.MAR.BEN",
-        internalId: "BNM-2024-001",
-        supportType: "Livre",
-        supportStatus: "numerise",
-        isFreeAccess: false,
-        allowPhysicalConsultation: true,
-        description: "Cet ouvrage propose une étude approfondie de l'évolution de la littérature marocaine moderne, de l'indépendance à nos jours. Il analyse les principaux courants littéraires, les auteurs majeurs et les thèmes récurrents qui caractérisent cette période riche en productions.",
-        summary: "Cet ouvrage propose une étude approfondie de l'évolution de la littérature marocaine moderne.",
-        tableOfContents: [
-          "Introduction à la littérature marocaine",
-          "Les courants littéraires post-indépendance",
-          "Les auteurs majeurs et leurs œuvres",
-          "Thèmes récurrents et symboles",
-          "Conclusion et perspectives"
-        ],
-        keywords: ["Littérature marocaine", "Histoire littéraire", "Analyse culturelle"],
-        collection: "Patrimoine Littéraire",
-        language: "Français",
-        physicalDescription: "342 p. : ill. ; 24 cm",
-        noticeOrigin: "Bibliothèque Nationale du Royaume du Maroc"
-      });
+      // Essayer de charger depuis les données mockées
+      const mockDoc = getDocumentById(id || "DOC-2024-001");
+      if (mockDoc) {
+        setDocumentData(mockDoc);
+      } else {
+        // Fallback sur des données par défaut
+        setDocumentData({
+          id: id || "DOC-2024-001",
+          title: "Histoire de la littérature marocaine moderne",
+          titleAr: "تاريخ الأدب المغربي الحديث",
+          author: "Ahmed Ben Mohammed",
+          secondaryAuthors: ["Co-auteur 1", "Co-auteur 2"],
+          year: "2023",
+          publisher: "Éditions Atlas",
+          publishPlace: "Rabat",
+          pages: 342,
+          isbn: "978-9954-123-456-7",
+          cote: "840.MAR.BEN",
+          internalId: "BNM-2024-001",
+          supportType: "Livre",
+          supportStatus: "numerise",
+          isFreeAccess: false,
+          allowPhysicalConsultation: true,
+          description: "Cet ouvrage propose une étude approfondie de l'évolution de la littérature marocaine moderne, de l'indépendance à nos jours. Il analyse les principaux courants littéraires, les auteurs majeurs et les thèmes récurrents qui caractérisent cette période riche en productions.",
+          summary: "Cet ouvrage propose une étude approfondie de l'évolution de la littérature marocaine moderne.",
+          tableOfContents: [
+            "Introduction à la littérature marocaine",
+            "Les courants littéraires post-indépendance",
+            "Les auteurs majeurs et leurs œuvres",
+            "Thèmes récurrents et symboles",
+            "Conclusion et perspectives"
+          ],
+          keywords: ["Littérature marocaine", "Histoire littéraire", "Analyse culturelle"],
+          collection: "Patrimoine Littéraire",
+          language: "Français",
+          physicalDescription: "342 p. : ill. ; 24 cm",
+          noticeOrigin: "Bibliothèque Nationale du Royaume du Maroc"
+        });
+      }
     }
 
     // Charger les documents liés
@@ -685,7 +691,7 @@ export default function NoticeDetaillee() {
                         onClick={handleOpenReservation}
                       >
                         <BookOpen className="mr-2 h-4 w-4" />
-                        Réserver un Ouvrage
+                        Réserver cet Ouvrage
                       </Button>
                     </>
                   )}
