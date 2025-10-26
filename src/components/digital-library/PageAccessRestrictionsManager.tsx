@@ -33,6 +33,7 @@ export function PageAccessRestrictionsManager() {
   const [pageRanges, setPageRanges] = useState<Array<{start: number, end: number}>>([{start: 1, end: 10}]);
   const [manualPages, setManualPages] = useState<number[]>([]);
   const [percentageValue, setPercentageValue] = useState(10);
+  const [allowPhysicalConsultation, setAllowPhysicalConsultation] = useState(false);
   const [totalPages, setTotalPages] = useState(245);
   const [currentPreviewPage, setCurrentPreviewPage] = useState(1);
   const [viewMode, setViewMode] = useState<"single" | "double">("single");
@@ -114,6 +115,7 @@ export function PageAccessRestrictionsManager() {
         start_page: data.restrictionMode === 'range' && data.pageRanges.length > 0 ? data.pageRanges[0].start : 1,
         end_page: data.restrictionMode === 'range' && data.pageRanges.length > 0 ? data.pageRanges[data.pageRanges.length - 1].end : 10,
         manual_pages: allowedPages,
+        allow_physical_consultation: data.allowPhysicalConsultation,
       };
 
       const { error } = await supabase
@@ -165,6 +167,7 @@ export function PageAccessRestrictionsManager() {
     if (restriction) {
       setIsRestricted(restriction.is_restricted);
       setRestrictionMode(restriction.restriction_mode);
+      setAllowPhysicalConsultation(restriction.allow_physical_consultation || false);
       
       // Reconstruire les plages à partir des pages manuelles
       if (restriction.restriction_mode === 'range' && restriction.manual_pages?.length > 0) {
@@ -199,6 +202,7 @@ export function PageAccessRestrictionsManager() {
       setPageRanges([{start: 1, end: 10}]);
       setManualPages([]);
       setPercentageValue(10);
+      setAllowPhysicalConsultation(false);
     }
     
     setCurrentPreviewPage(1);
@@ -229,6 +233,7 @@ export function PageAccessRestrictionsManager() {
       pageRanges,
       manualPages,
       percentageValue,
+      allowPhysicalConsultation,
     });
   };
 
@@ -715,6 +720,25 @@ export function PageAccessRestrictionsManager() {
 
               {isRestricted && (
                 <>
+                  {/* Consultation physique */}
+                  <Card className="shadow-md">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <Label className="text-base font-semibold">Consultation physique autorisée</Label>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Autoriser la consultation du document complet sur place
+                          </p>
+                        </div>
+                        <Switch
+                          checked={allowPhysicalConsultation}
+                          onCheckedChange={setAllowPhysicalConsultation}
+                          className="ml-4"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   {/* Mode de restriction */}
                   <Card className="shadow-md">
                     <CardHeader className="pb-3">
