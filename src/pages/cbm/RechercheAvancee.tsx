@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Info, Search, RotateCcw, Save, Download } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Info, Search, RotateCcw, Save, Download, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -40,6 +41,7 @@ interface SearchCriteria {
 
 const RechercheAvancee = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('multi-criteria');
   const [criteria, setCriteria] = useState<SearchCriteria>({
     keywords: '',
@@ -100,13 +102,52 @@ const RechercheAvancee = () => {
       // Simuler une recherche (à remplacer par l'appel API réel)
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast({
-        title: "Recherche lancée",
-        description: "Votre recherche est en cours...",
-      });
+      // Données de démonstration
+      const mockResults = [
+        {
+          id: "DOC-2024-001",
+          title: "Histoire de la littérature marocaine moderne",
+          author: "Ahmed Ben Mohammed",
+          year: "2023",
+          publisher: "Éditions Atlas",
+          supportType: "Livre",
+          supportStatus: "numerise" as const,
+          isFreeAccess: false,
+          cote: "840.MAR.BEN",
+          description: "Étude approfondie de l'évolution de la littérature marocaine moderne..."
+        },
+        {
+          id: "DOC-2024-002",
+          title: "Architecture traditionnelle du Maroc",
+          author: "Fatima Zahra El Alami",
+          year: "2022",
+          publisher: "Presses Universitaires",
+          supportType: "Livre",
+          supportStatus: "numerise" as const,
+          isFreeAccess: true,
+          cote: "720.MAR.ELA",
+          description: "Analyse des styles architecturaux marocains à travers les siècles..."
+        },
+        {
+          id: "DOC-2024-003",
+          title: "Manuscrits anciens de Fès",
+          author: "Mohammed Bennis",
+          year: "2021",
+          publisher: "Bibliothèque Nationale",
+          supportType: "Manuscrit",
+          supportStatus: "non_numerise" as const,
+          isFreeAccess: false,
+          cote: "091.MAR.BEN",
+          description: "Collection de manuscrits historiques préservés à Fès..."
+        }
+      ];
       
-      // TODO: Implémenter l'appel API réel
-      setSearchResults([]);
+      setSearchResults(mockResults);
+      
+      toast({
+        title: "Recherche terminée",
+        description: `${mockResults.length} résultats trouvés`,
+      });
     } catch (error) {
       toast({
         title: "Erreur",
@@ -683,11 +724,60 @@ const RechercheAvancee = () => {
               <CardTitle>Résultats de recherche</CardTitle>
               <CardDescription>{searchResults.length} résultats trouvés</CardDescription>
             </CardHeader>
-            <CardContent>
-              {/* TODO: Afficher les résultats */}
-              <p className="text-center text-muted-foreground py-8">
-                Les résultats de recherche s'afficheront ici
-              </p>
+            <CardContent className="space-y-4">
+              {searchResults.map((doc: any) => (
+                <Card key={doc.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-start gap-3 mb-3">
+                          <BookOpen className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                          <div>
+                            <h3 className="font-bold text-lg text-foreground mb-1">
+                              {doc.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              Par {doc.author} • {doc.year} • {doc.publisher}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {doc.isFreeAccess ? (
+                            <Badge variant="outline" className="bg-success/10 text-success border-success/20">
+                              Libre accès
+                            </Badge>
+                          ) : doc.supportStatus === "numerise" ? (
+                            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                              Numérisé
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
+                              Non numérisé
+                            </Badge>
+                          )}
+                          <Badge variant="outline">{doc.supportType}</Badge>
+                          <Badge variant="outline" className="font-mono text-xs">
+                            {doc.cote}
+                          </Badge>
+                        </div>
+                        
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {doc.description}
+                        </p>
+                      </div>
+                      
+                      <Button 
+                        onClick={() => navigate(`/cbm/notice/${doc.id}`)}
+                        variant="default"
+                        size="lg"
+                      >
+                        {doc.isFreeAccess ? 'Voir le document' : 'Réserver'}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </CardContent>
           </Card>
         )}
