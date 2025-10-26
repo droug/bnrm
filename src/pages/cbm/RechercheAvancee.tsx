@@ -18,6 +18,7 @@ import Footer from '@/components/Footer';
 import { LanguageAutocomplete } from '@/components/ui/language-autocomplete';
 import { CountryAutocomplete } from '@/components/ui/country-autocomplete';
 import { CoteAutocomplete } from '@/components/ui/cote-autocomplete';
+import { mockDocuments } from '@/data/mockDocuments';
 
 interface SearchCriteria {
   keywords: string;
@@ -102,51 +103,48 @@ const RechercheAvancee = () => {
       // Simuler une recherche (à remplacer par l'appel API réel)
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Données de démonstration
-      const mockResults = [
-        {
-          id: "DOC-2024-001",
-          title: "Histoire de la littérature marocaine moderne",
-          author: "Ahmed Ben Mohammed",
-          year: "2023",
-          publisher: "Éditions Atlas",
-          supportType: "Livre",
-          supportStatus: "numerise" as const,
-          isFreeAccess: false,
-          cote: "840.MAR.BEN",
-          description: "Étude approfondie de l'évolution de la littérature marocaine moderne..."
-        },
-        {
-          id: "DOC-2024-002",
-          title: "Architecture traditionnelle du Maroc",
-          author: "Fatima Zahra El Alami",
-          year: "2022",
-          publisher: "Presses Universitaires",
-          supportType: "Livre",
-          supportStatus: "numerise" as const,
-          isFreeAccess: true,
-          cote: "720.MAR.ELA",
-          description: "Analyse des styles architecturaux marocains à travers les siècles..."
-        },
-        {
-          id: "DOC-2024-003",
-          title: "Manuscrits anciens de Fès",
-          author: "Mohammed Bennis",
-          year: "2021",
-          publisher: "Bibliothèque Nationale",
-          supportType: "Manuscrit",
-          supportStatus: "non_numerise" as const,
-          isFreeAccess: false,
-          cote: "091.MAR.BEN",
-          description: "Collection de manuscrits historiques préservés à Fès..."
-        }
-      ];
+      // Utiliser les documents mockés réels avec tous les exemples
+      let results = [...mockDocuments];
       
-      setSearchResults(mockResults);
+      // Filtrer par mots-clés si présents
+      if (criteria.keywords) {
+        const keywords = criteria.keywords.toLowerCase();
+        results = results.filter(doc => 
+          doc.title.toLowerCase().includes(keywords) ||
+          doc.author.toLowerCase().includes(keywords) ||
+          doc.description.toLowerCase().includes(keywords) ||
+          doc.keywords?.some(k => k.toLowerCase().includes(keywords))
+        );
+      }
+      
+      // Filtrer par nature de document
+      if (criteria.nature.length > 0) {
+        results = results.filter(doc => 
+          criteria.nature.includes(doc.supportType)
+        );
+      }
+      
+      // Filtrer par langue
+      if (criteria.languages.length > 0) {
+        results = results.filter(doc => 
+          doc.language && criteria.languages.some(lang => 
+            doc.language?.includes(lang)
+          )
+        );
+      }
+      
+      // Filtrer par cote si présente
+      if (criteria.cote) {
+        results = results.filter(doc => 
+          doc.cote.toLowerCase().includes(criteria.cote.toLowerCase())
+        );
+      }
+      
+      setSearchResults(results);
       
       toast({
         title: "Recherche terminée",
-        description: `${mockResults.length} résultats trouvés`,
+        description: `${results.length} résultat${results.length > 1 ? 's' : ''} trouvé${results.length > 1 ? 's' : ''}`,
       });
     } catch (error) {
       toast({
@@ -768,11 +766,11 @@ const RechercheAvancee = () => {
                       </div>
                       
                       <Button 
-                        onClick={() => navigate(`/cbm/notice/${doc.id}`)}
+                        onClick={() => navigate(`/cbm/notice/${doc.id}`, { state: { document: doc } })}
                         variant="default"
                         size="lg"
                       >
-                        {doc.isFreeAccess ? 'Voir le document' : 'Réserver'}
+                        Notice
                       </Button>
                     </div>
                   </CardContent>
