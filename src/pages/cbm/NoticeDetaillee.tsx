@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookReservationDialog } from "@/components/cbn/BookReservationDialog";
-import { BookOpen, Calendar, MapPin, Library, User, Hash, ArrowLeft, Share2 } from "lucide-react";
+import { BookOpen, Calendar, MapPin, Library, User, Hash, ArrowLeft, Share2, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 interface DocumentData {
@@ -75,6 +75,20 @@ export default function NoticeDetaillee() {
       return;
     }
     setIsReservationOpen(true);
+  };
+
+  const handleConsult = () => {
+    if (!documentData) return;
+
+    // Rediriger vers le lecteur de livres avec l'ID du document
+    // Pour les documents numérisés, ouvrir le book-reader
+    if (documentData.supportStatus === "numerise" || documentData.isFreeAccess) {
+      navigate(`/book-reader/${documentData.id}`);
+    } else {
+      toast.info("Document non numérisé", {
+        description: "Ce document n'est pas encore disponible en version numérique"
+      });
+    }
   };
 
   const handleShare = () => {
@@ -241,9 +255,23 @@ export default function NoticeDetaillee() {
 
             {/* Actions */}
             <div className="pt-4 border-t">
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
+                {/* Bouton Consulter - pour documents numérisés */}
+                {(documentData.supportStatus === "numerise" || documentData.isFreeAccess) && (
+                  <Button
+                    size="lg"
+                    variant="default"
+                    onClick={handleConsult}
+                    className="flex-1 sm:flex-none"
+                  >
+                    <Eye className="mr-2 h-4 w-4" />
+                    Consulter
+                  </Button>
+                )}
+                
                 <Button
                   size="lg"
+                  variant={documentData.supportStatus === "numerise" || documentData.isFreeAccess ? "outline" : "default"}
                   onClick={handleOpenReservation}
                   className="flex-1 sm:flex-none"
                 >
