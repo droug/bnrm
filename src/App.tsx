@@ -250,7 +250,7 @@ const App = () => (
         <Route path="/reproduction" element={<ReproductionPage />} />
         <Route path="/reproduction/:action" element={<ReproductionPage />} />
         <Route path="/reproduction/details/:id" element={<ReproductionDetailsPage />} />
-        <Route path="/demande-reproduction" element={<ReproductionPage />} />
+        <Route path="/demande-reproduction" element={<DemandeReproduction />} />
         <Route path="/manuscripts" element={<Manuscripts />} />
         <Route path="/my-library-space" element={<MyLibrarySpace />} />
         <Route path="/help" element={<HelpPage />} />
