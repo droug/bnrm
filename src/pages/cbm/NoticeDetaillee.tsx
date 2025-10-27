@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { BookReservationDialog } from "@/components/cbn/BookReservationDialog";
 import { ReproductionRequestDialog } from "@/components/cbn/ReproductionRequestDialog";
+import { DigitizationRequestDialog } from "@/components/digital-library/DigitizationRequestDialog";
 import { CartDialog } from "@/components/cbm/CartDialog";
 import { SubscriptionDialog } from "@/components/cbm/SubscriptionDialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -16,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { 
   BookOpen, Calendar, MapPin, Library, User, Hash, ArrowLeft, Share2, Eye,
   Building2, FileText, Tag, BookMarked, Globe, Users, Clock, ExternalLink,
-  ShoppingCart, LogIn
+  ShoppingCart, LogIn, Scan
 } from "lucide-react";
 import { toast } from "sonner";
 import { getDocumentById } from "@/data/mockDocuments";
@@ -68,9 +69,10 @@ export default function NoticeDetaillee() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [isReservationOpen, setIsReservationOpen] = useState(false);
   const [isReproductionOpen, setIsReproductionOpen] = useState(false);
+  const [isDigitizationOpen, setIsDigitizationOpen] = useState(false);
   const [documentData, setDocumentData] = useState<DocumentData | null>(null);
   const [relatedDocuments, setRelatedDocuments] = useState<RelatedDocument[]>([]);
   const [userReservations, setUserReservations] = useState<UserReservation[]>([]);
@@ -330,9 +332,12 @@ export default function NoticeDetaillee() {
           onClick={() => {
             // Si on vient de la recherche, restaurer l'état de recherche
             if (location.state?.searchState) {
-              const targetRoute = location.state?.fromReproduction 
-                ? '/demande-reproduction' 
-                : '/cbm/recherche-avancee';
+              let targetRoute = '/cbm/recherche-avancee';
+              if (location.state?.fromReproduction) {
+                targetRoute = '/demande-reproduction';
+              } else if (location.state?.fromDigitization) {
+                targetRoute = '/demande-numerisation';
+              }
               navigate(targetRoute, { state: { searchState: location.state.searchState } });
             } else {
               navigate(-1);
@@ -792,6 +797,19 @@ export default function NoticeDetaillee() {
                       Demande de reproduction
                     </Button>
                   )}
+
+                  {/* Bouton numérisation uniquement depuis le contexte numérisation */}
+                  {location.state?.fromDigitization && (
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-full"
+                      onClick={() => setIsDigitizationOpen(true)}
+                    >
+                      <Scan className="mr-2 h-4 w-4" />
+                      Demande de numérisation
+                    </Button>
+                  )}
                 </div>
 
                 {documentData.isFreeAccess && (
@@ -889,6 +907,22 @@ export default function NoticeDetaillee() {
             author: documentData.author,
             cote: documentData.cote,
             year: documentData.year
+          }}
+        />
+      )}
+
+      {/* Dialogue de demande de numérisation */}
+      {documentData && user && profile && (
+        <DigitizationRequestDialog
+          isOpen={isDigitizationOpen}
+          onClose={() => setIsDigitizationOpen(false)}
+          documentId={documentData.id}
+          documentTitle={documentData.title}
+          documentCote={documentData.cote}
+          userProfile={{
+            firstName: profile.first_name || "",
+            lastName: profile.last_name || "",
+            email: profile.email || user.email || ""
           }}
         />
       )}
