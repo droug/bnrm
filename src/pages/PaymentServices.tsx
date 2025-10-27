@@ -12,6 +12,7 @@ import {
   CreditCard, 
   FileText, 
   Book,
+  BookOpen,
   Building,
   CheckCircle,
   Theater,
@@ -55,6 +56,21 @@ export default function PaymentServices() {
         "Livraison rapide"
       ],
       action: () => navigate("/cbm/demande-reproduction"),
+      available: true
+    },
+    {
+      id: "book-reservation",
+      title: "Réserver un ouvrage",
+      description: "Réservez vos ouvrages et consultez-les sur place ou en ligne",
+      icon: BookOpen,
+      color: "from-teal-500 to-teal-600",
+      features: [
+        "Réservation en ligne",
+        "Consultation sur place",
+        "Accès numérique",
+        "Notification instantanée"
+      ],
+      action: () => navigate("/cbn"),
       available: true
     },
     {
