@@ -19,6 +19,7 @@ import { LanguageAutocomplete } from '@/components/ui/language-autocomplete';
 import { CountryAutocomplete } from '@/components/ui/country-autocomplete';
 import { CoteAutocomplete } from '@/components/ui/cote-autocomplete';
 import { mockDocuments } from '@/data/mockDocuments';
+import { WatermarkContainer } from '@/components/ui/watermark';
 
 interface SearchCriteria {
   keywords: string;
@@ -230,10 +231,16 @@ const RechercheAvancee = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F7F2]">
-      <Header />
-      
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
+    <WatermarkContainer watermarkProps={{ 
+      text: "BNRM - Recherche Avancée",
+      position: "pattern",
+      variant: "subtle",
+      opacity: 0.03
+    }}>
+      <div className="min-h-screen bg-[#F8F7F2]">
+        <Header />
+        
+        <main className="container mx-auto px-4 py-8 max-w-7xl">
         {/* En-tête */}
         <div className="mb-8">
           <div className="flex items-start justify-between mb-4">
@@ -806,6 +813,7 @@ const RechercheAvancee = () => {
 
       <Footer />
     </div>
+    </WatermarkContainer>
   );
 };
 
