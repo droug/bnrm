@@ -12,7 +12,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   BookOpen, Calendar, MapPin, Library, User, Hash, ArrowLeft, Share2, Eye,
-  Building2, FileText, Tag, BookMarked, Globe, Users, Clock, ExternalLink
+  Building2, FileText, Tag, BookMarked, Globe, Users, Clock, ExternalLink,
+  ShoppingCart, LogIn
 } from "lucide-react";
 import { toast } from "sonner";
 import { getDocumentById } from "@/data/mockDocuments";
@@ -662,6 +663,7 @@ export default function NoticeDetaillee() {
 
                 <div className="pt-4 border-t space-y-3">
                   {documentData.isFreeAccess ? (
+                    // Libre d'accès - Consulter en ligne directement
                     <Button
                       size="lg"
                       variant="default"
@@ -672,8 +674,10 @@ export default function NoticeDetaillee() {
                       Consulter en ligne
                     </Button>
                   ) : (
+                    // Accès restreint
                     <>
-                      {(documentData.supportStatus === "numerise" || documentData.isFreeAccess) && (
+                      {/* Si numérisé et utilisateur connecté : Consulter en ligne */}
+                      {documentData.supportStatus === "numerise" && user && (
                         <Button
                           size="lg"
                           variant="default"
@@ -681,18 +685,60 @@ export default function NoticeDetaillee() {
                           onClick={handleConsult}
                         >
                           <Eye className="mr-2 h-4 w-4" />
-                          Consulter
+                          Consulter en ligne
                         </Button>
                       )}
-                      <Button
-                        size="lg"
-                        variant={documentData.supportStatus === "numerise" ? "outline" : "default"}
-                        className="w-full"
-                        onClick={handleOpenReservation}
-                      >
-                        <BookOpen className="mr-2 h-4 w-4" />
-                        Réserver cet Ouvrage
-                      </Button>
+
+                      {/* Si non connecté : Se connecter/S'inscrire */}
+                      {!user && (
+                        <Button
+                          size="lg"
+                          variant="default"
+                          className="w-full"
+                          onClick={() => navigate("/auth")}
+                        >
+                          <LogIn className="mr-2 h-4 w-4" />
+                          Se connecter / S'inscrire
+                        </Button>
+                      )}
+
+                      {/* Si connecté et pas libre accès : Réserver (sauf si numérisé) */}
+                      {user && documentData.supportStatus !== "numerise" && (
+                        <Button
+                          size="lg"
+                          variant="default"
+                          className="w-full"
+                          onClick={handleOpenReservation}
+                        >
+                          <BookOpen className="mr-2 h-4 w-4" />
+                          Réserver cet Ouvrage
+                        </Button>
+                      )}
+
+                      {/* Si connecté : Panier et Adhérer */}
+                      {user && (
+                        <>
+                          <Button
+                            size="lg"
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => {
+                              toast.success("Ajouté au panier");
+                            }}
+                          >
+                            <ShoppingCart className="mr-2 h-4 w-4" />
+                            Ajouter au panier
+                          </Button>
+                          <Button
+                            size="lg"
+                            variant="secondary"
+                            className="w-full"
+                            onClick={() => navigate("/subscription")}
+                          >
+                            Adhérer
+                          </Button>
+                        </>
+                      )}
                     </>
                   )}
                   
