@@ -19,7 +19,8 @@ import {
   ArrowRight,
   Shield,
   Lock,
-  Zap
+  Zap,
+  Wrench
 } from "lucide-react";
 
 export default function PaymentServices() {
@@ -56,6 +57,21 @@ export default function PaymentServices() {
         "Livraison rapide"
       ],
       action: () => navigate("/cbm/demande-reproduction"),
+      available: true
+    },
+    {
+      id: "restoration",
+      title: "Demande de restauration",
+      description: "Confiez-nous la restauration de vos documents et œuvres précieuses",
+      icon: Wrench,
+      color: "from-amber-500 to-amber-600",
+      features: [
+        "Expertise qualifiée",
+        "Techniques modernes",
+        "Préservation du patrimoine",
+        "Devis personnalisé"
+      ],
+      action: () => navigate("/demande-restauration"),
       available: true
     },
     {
