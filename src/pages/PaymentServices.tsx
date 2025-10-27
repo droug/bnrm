@@ -54,7 +54,7 @@ export default function PaymentServices() {
         "Suivi de commande",
         "Livraison rapide"
       ],
-      action: () => navigate("/reproduction"),
+      action: () => navigate("/cbm/demande-reproduction"),
       available: true
     },
     {
