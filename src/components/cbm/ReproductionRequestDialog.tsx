@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChevronDown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Camera, FileText, Printer, Download } from "lucide-react";
@@ -50,6 +50,7 @@ export function ReproductionRequestDialog({
   const [comments, setComments] = useState<string>("");
   const [acceptTerms, setAcceptTerms] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFormatOpen, setIsFormatOpen] = useState(false);
 
   const reproductionTypes = [
     { value: "photocopie", label: "Photocopie noir & blanc", icon: Printer, price: "0.50 DH/page" },
@@ -216,18 +217,37 @@ export function ReproductionRequestDialog({
           </div>
 
           {/* Format */}
-          <div className="space-y-2">
+          <div className="space-y-2 relative">
             <Label htmlFor="format" className="text-base font-semibold">Format *</Label>
-            <Select value={format} onValueChange={setFormat}>
-              <SelectTrigger id="format">
-                <SelectValue placeholder="Sélectionner un format" />
-              </SelectTrigger>
-              <SelectContent>
-                {formatOptions[reproductionType as keyof typeof formatOptions]?.map((fmt) => (
-                  <SelectItem key={fmt} value={fmt}>{fmt}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsFormatOpen(!isFormatOpen)}
+                className="w-full flex items-center justify-between px-3 py-2 text-sm border border-input bg-background rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+              >
+                <span className={format ? "text-foreground" : "text-muted-foreground"}>
+                  {format || "Sélectionner un format"}
+                </span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${isFormatOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isFormatOpen && (
+                <div className="absolute z-50 w-full mt-1 border border-input bg-background rounded-md shadow-lg">
+                  {formatOptions[reproductionType as keyof typeof formatOptions]?.map((fmt) => (
+                    <button
+                      key={fmt}
+                      type="button"
+                      onClick={() => {
+                        setFormat(fmt);
+                        setIsFormatOpen(false);
+                      }}
+                      className="w-full px-3 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground transition-colors first:rounded-t-md last:rounded-b-md"
+                    >
+                      {fmt}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Pages à reproduire */}
