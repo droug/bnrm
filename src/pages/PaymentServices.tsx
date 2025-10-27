@@ -141,7 +141,7 @@ export default function PaymentServices() {
                 </Badge>
               </div>
               <h1 className="text-5xl font-bold mb-6">
-                Services de paiement BNRM
+                Services de la BNRM
               </h1>
               <p className="text-xl opacity-90 mb-8 leading-relaxed">
                 Découvrez nos solutions de paiement sécurisées pour tous vos besoins 
