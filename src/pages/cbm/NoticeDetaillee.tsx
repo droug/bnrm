@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { BookReservationDialog } from "@/components/cbn/BookReservationDialog";
 import { CartDialog } from "@/components/cbm/CartDialog";
 import { SubscriptionDialog } from "@/components/cbm/SubscriptionDialog";
+import { ReproductionRequestDialog } from "@/components/cbm/ReproductionRequestDialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import NoticeHead from "@/components/cbn/NoticeHead";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { 
   BookOpen, Calendar, MapPin, Library, User, Hash, ArrowLeft, Share2, Eye,
   Building2, FileText, Tag, BookMarked, Globe, Users, Clock, ExternalLink,
-  ShoppingCart, LogIn
+  ShoppingCart, LogIn, Camera
 } from "lucide-react";
 import { toast } from "sonner";
 import { getDocumentById } from "@/data/mockDocuments";
@@ -75,6 +76,7 @@ export default function NoticeDetaillee() {
   const [reservationStats, setReservationStats] = useState({ total: 0, pending: 0, lastConsultation: "" });
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
+  const [isReproductionOpen, setIsReproductionOpen] = useState(false);
   const [cartItems, setCartItems] = useState<Array<{id: string, title: string, author: string, cote: string}>>([]);
 
   useEffect(() => {
@@ -760,6 +762,15 @@ export default function NoticeDetaillee() {
                           >
                             Adhérer
                           </Button>
+                          <Button
+                            size="lg"
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => setIsReproductionOpen(true)}
+                          >
+                            <Camera className="mr-2 h-4 w-4" />
+                            Demande de reproduction
+                          </Button>
                         </>
                       )}
                     </>
@@ -858,6 +869,16 @@ export default function NoticeDetaillee() {
       <SubscriptionDialog
         isOpen={isSubscriptionOpen}
         onClose={() => setIsSubscriptionOpen(false)}
+      />
+
+      {/* Dialogue de demande de reproduction */}
+      <ReproductionRequestDialog
+        isOpen={isReproductionOpen}
+        onClose={() => setIsReproductionOpen(false)}
+        documentId={documentData.id}
+        documentTitle={documentData.title}
+        documentAuthor={documentData.author}
+        documentCote={documentData.cote}
       />
     </div>
   );
