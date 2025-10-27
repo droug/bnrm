@@ -110,6 +110,7 @@ const AccessPolicies = lazy(() => import("./pages/AccessPolicies"));
 const ReproductionPage = lazy(() => import("./pages/ReproductionPage"));
 const ReproductionBackofficePage = lazy(() => import("./pages/ReproductionBackofficePage"));
 const ReproductionDetailsPage = lazy(() => import("./pages/ReproductionDetailsPage"));
+const RestorationRequest = lazy(() => import("./pages/RestorationRequest"));
 
 // CBM Portal (lazy)
 const CBMPortal = lazy(() => import("./pages/CBMPortal"));
@@ -251,6 +252,7 @@ const App = () => (
         <Route path="/reproduction/:action" element={<ReproductionPage />} />
         <Route path="/reproduction/details/:id" element={<ReproductionDetailsPage />} />
         <Route path="/demande-reproduction" element={<DemandeReproduction />} />
+        <Route path="/demande-restauration" element={<RestorationRequest />} />
         <Route path="/manuscripts" element={<Manuscripts />} />
         <Route path="/my-library-space" element={<MyLibrarySpace />} />
         <Route path="/help" element={<HelpPage />} />
