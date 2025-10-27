@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookReservationDialog } from "@/components/cbn/BookReservationDialog";
+import { ReproductionRequestDialog } from "@/components/cbn/ReproductionRequestDialog";
 import { CartDialog } from "@/components/cbm/CartDialog";
 import { SubscriptionDialog } from "@/components/cbm/SubscriptionDialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -69,6 +70,7 @@ export default function NoticeDetaillee() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isReservationOpen, setIsReservationOpen] = useState(false);
+  const [isReproductionOpen, setIsReproductionOpen] = useState(false);
   const [documentData, setDocumentData] = useState<DocumentData | null>(null);
   const [relatedDocuments, setRelatedDocuments] = useState<RelatedDocument[]>([]);
   const [userReservations, setUserReservations] = useState<UserReservation[]>([]);
@@ -774,6 +776,16 @@ export default function NoticeDetaillee() {
                     <Share2 className="mr-2 h-4 w-4" />
                     Partager
                   </Button>
+
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    onClick={() => setIsReproductionOpen(true)}
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    Demande de reproduction
+                  </Button>
                 </div>
 
                 {documentData.isFreeAccess && (
@@ -859,6 +871,21 @@ export default function NoticeDetaillee() {
         isOpen={isSubscriptionOpen}
         onClose={() => setIsSubscriptionOpen(false)}
       />
+
+      {/* Dialogue de demande de reproduction */}
+      {documentData && (
+        <ReproductionRequestDialog
+          isOpen={isReproductionOpen}
+          onClose={() => setIsReproductionOpen(false)}
+          document={{
+            id: documentData.id,
+            title: documentData.title,
+            author: documentData.author,
+            cote: documentData.cote,
+            year: documentData.year
+          }}
+        />
+      )}
     </div>
   );
 }
