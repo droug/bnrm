@@ -667,7 +667,10 @@ export default function NoticeDetaillee() {
                   {!documentData.isFreeAccess && documentData.supportStatus !== "numerise" && (
                     <div className="bg-muted/50 p-3 rounded-lg">
                       <p className="text-xs text-muted-foreground">
-                        📍 Disponible en salle de consultation BNRM
+                        📍 {documentData.allowPhysicalConsultation 
+                          ? "Disponible en salle de consultation BNRM"
+                          : "Disponible en salle de consultation BNRM pour chercheur"
+                        }
                       </p>
                     </div>
                   )}
