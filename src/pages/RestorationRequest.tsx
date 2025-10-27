@@ -13,7 +13,7 @@ import { Upload, FileText, Calendar, User, Mail, Phone, MessageSquare } from "lu
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function RestorationRequest() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -123,6 +123,17 @@ export default function RestorationRequest() {
                 </p>
               </CardContent>
             </Card>
+          </div>
+
+          <div className="text-center mt-12">
+            <Button 
+              size="lg" 
+              onClick={() => setIsOpen(true)}
+              className="px-8"
+            >
+              <FileText className="mr-2 h-5 w-5" />
+              Demande de restauration
+            </Button>
           </div>
         </div>
       </main>
