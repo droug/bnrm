@@ -29,6 +29,7 @@ const Index = () => {
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<Array<{ type: string; value: string }>>([]);
+  const [showDigitalServices, setShowDigitalServices] = useState(false);
 
   // Vérifier si le popup d'accueil doit être affiché
   useEffect(() => {
@@ -555,13 +556,13 @@ const Index = () => {
 
                 {/* Cartes sidebar avec différentes mosaïques */}
                 {[
-                  { title: "Aide & Support", subtitle: "FAQ, règlements, contacts", icon: MousePointer, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-moroccan-stars", border: "border-accent/25", shadow: "shadow-elegant hover:shadow-zellige", href: "/help" },
-                  { title: "Services numériques", subtitle: "Catalogue, reproduction", icon: Download, gradient: "bg-gradient-neutral", pattern: "bg-pattern-filigrane", border: "border-gold/25", shadow: "shadow-gold hover:shadow-mosaique", href: "/cbm/demande-reproduction" },
-                  { title: "Langues", subtitle: "", icon: Globe, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-highlight/25", shadow: "shadow-berber hover:shadow-gold", href: "#" },
-                  { title: "Accessibilité", subtitle: "Options d'accessibilité", icon: Accessibility, gradient: "bg-gradient-neutral", pattern: "bg-pattern-moroccan-stars", border: "border-royal/25", shadow: "shadow-royal hover:shadow-mosaique", href: "#" },
-                  { title: "Partager", subtitle: "", icon: Share2, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-filigrane", border: "border-primary/25", shadow: "shadow-mosaique hover:shadow-zellige", href: "#" }
-                ].map((item, index) => (
-                  <Link key={index} to={item.href}>
+                  { title: "Aide & Support", subtitle: "FAQ, règlements, contacts", icon: MousePointer, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-moroccan-stars", border: "border-accent/25", shadow: "shadow-elegant hover:shadow-zellige", href: "/help", isLink: true },
+                  { title: "Services numériques", subtitle: "Catalogue, reproduction", icon: Download, gradient: "bg-gradient-neutral", pattern: "bg-pattern-filigrane", border: "border-gold/25", shadow: "shadow-gold hover:shadow-mosaique", onClick: () => setShowDigitalServices(true), isLink: false },
+                  { title: "Langues", subtitle: "", icon: Globe, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-highlight/25", shadow: "shadow-berber hover:shadow-gold", href: "#", isLink: true },
+                  { title: "Accessibilité", subtitle: "Options d'accessibilité", icon: Accessibility, gradient: "bg-gradient-neutral", pattern: "bg-pattern-moroccan-stars", border: "border-royal/25", shadow: "shadow-royal hover:shadow-mosaique", href: "#", isLink: true },
+                  { title: "Partager", subtitle: "", icon: Share2, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-filigrane", border: "border-primary/25", shadow: "shadow-mosaique hover:shadow-zellige", href: "#", isLink: true }
+                ].map((item, index) => {
+                  const cardContent = (
                     <Card className={`relative overflow-hidden group border-3 ${item.border} ${item.shadow} transition-all duration-500 cursor-pointer`}>
                       <div className={`absolute inset-0 ${item.pattern} opacity-15 group-hover:opacity-25 transition-opacity duration-500`}></div>
                       <div className={`absolute inset-0 ${item.gradient} opacity-85`}></div>
@@ -571,8 +572,18 @@ const Index = () => {
                         {item.subtitle && <p className="text-xs text-muted-foreground mt-1">{item.subtitle}</p>}
                       </CardContent>
                     </Card>
-                  </Link>
-                ))}
+                  );
+                  
+                  return item.isLink ? (
+                    <Link key={index} to={item.href!}>
+                      {cardContent}
+                    </Link>
+                  ) : (
+                    <div key={index} onClick={item.onClick}>
+                      {cardContent}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </main>
@@ -583,6 +594,113 @@ const Index = () => {
           <GlobalAccessibilityTools />
         </div>
       </div>
+
+      {/* Dialog Services Numériques */}
+      {showDigitalServices && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowDigitalServices(false)}>
+          <Card className="relative w-full max-w-5xl mx-4 max-h-[90vh] overflow-y-auto border-3 border-gold/25 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="absolute inset-0 bg-pattern-filigrane opacity-10"></div>
+            <div className="absolute inset-0 bg-gradient-mosaique opacity-95"></div>
+            <CardContent className="p-8 relative z-10">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-3xl font-moroccan font-bold text-foreground mb-2">Services Numériques BNRM</h2>
+                  <div className="w-40 h-2 bg-gradient-neutral rounded-full shadow-gold"></div>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setShowDigitalServices(false)} 
+                  className="rounded-full hover:bg-background/20"
+                >
+                  <X className="h-6 w-6" />
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[
+                  { 
+                    title: "Catalogue bibliographique", 
+                    subtitle: "Recherche dans le catalogue national", 
+                    icon: Search, 
+                    color: "text-primary", 
+                    bg: "bg-primary/10", 
+                    border: "border-primary/25",
+                    pattern: "bg-pattern-moroccan-stars",
+                    href: "/cbm/recherche-simple"
+                  },
+                  { 
+                    title: "Recherche avancée", 
+                    subtitle: "Recherche multi-critères", 
+                    icon: Filter, 
+                    color: "text-accent", 
+                    bg: "bg-accent/10", 
+                    border: "border-accent/25",
+                    pattern: "bg-pattern-zellige-tiles",
+                    href: "/cbm/recherche-avancee"
+                  },
+                  { 
+                    title: "Réserver un ouvrage", 
+                    subtitle: "Réservation en ligne", 
+                    icon: BookOpen, 
+                    color: "text-highlight", 
+                    bg: "bg-highlight/10", 
+                    border: "border-highlight/25",
+                    pattern: "bg-pattern-filigrane",
+                    href: "/cbm/recherche-avancee"
+                  },
+                  { 
+                    title: "Demande de reproduction", 
+                    subtitle: "Reproduction de documents", 
+                    icon: Download, 
+                    color: "text-royal", 
+                    bg: "bg-royal/10", 
+                    border: "border-royal/25",
+                    pattern: "bg-pattern-moroccan-stars",
+                    href: "/cbm/demande-reproduction"
+                  },
+                  { 
+                    title: "Bibliothèque numérique", 
+                    subtitle: "Documents numérisés", 
+                    icon: Book, 
+                    color: "text-gold", 
+                    bg: "bg-gold/10", 
+                    border: "border-gold/25",
+                    pattern: "bg-pattern-zellige-complex",
+                    href: "/collections"
+                  },
+                  { 
+                    title: "Ressources en ligne", 
+                    subtitle: "Bases de données et périodiques", 
+                    icon: Network, 
+                    color: "text-primary", 
+                    bg: "bg-primary/10", 
+                    border: "border-primary/25",
+                    pattern: "bg-pattern-filigrane",
+                    href: "#"
+                  }
+                ].map((service, index) => (
+                  <Link 
+                    key={index} 
+                    to={service.href}
+                    onClick={() => setShowDigitalServices(false)}
+                  >
+                    <Card className={`relative overflow-hidden group border-2 ${service.border} shadow-elegant hover:shadow-zellige transition-all duration-300 cursor-pointer h-full`}>
+                      <div className={`absolute inset-0 ${service.pattern} opacity-10 group-hover:opacity-20 transition-opacity`}></div>
+                      <div className={`absolute inset-0 ${service.bg}`}></div>
+                      <CardContent className="p-6 relative z-10">
+                        <service.icon className={`h-10 w-10 ${service.color} mb-3`} />
+                        <h3 className="font-moroccan text-lg font-bold text-foreground mb-2">{service.title}</h3>
+                        <p className="text-sm text-muted-foreground">{service.subtitle}</p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </>
   );
 };
