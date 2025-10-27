@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookReservationDialog } from "@/components/cbn/BookReservationDialog";
+import { CartDialog } from "@/components/cbm/CartDialog";
+import { SubscriptionDialog } from "@/components/cbm/SubscriptionDialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import NoticeHead from "@/components/cbn/NoticeHead";
 import { useAuth } from "@/hooks/useAuth";
@@ -71,6 +73,9 @@ export default function NoticeDetaillee() {
   const [relatedDocuments, setRelatedDocuments] = useState<RelatedDocument[]>([]);
   const [userReservations, setUserReservations] = useState<UserReservation[]>([]);
   const [reservationStats, setReservationStats] = useState({ total: 0, pending: 0, lastConsultation: "" });
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
+  const [cartItems, setCartItems] = useState<Array<{id: string, title: string, author: string, cote: string}>>([]);
 
   useEffect(() => {
     // Récupérer les données du document depuis l'état de navigation ou charger depuis l'API
@@ -730,7 +735,15 @@ export default function NoticeDetaillee() {
                             variant="outline"
                             className="w-full"
                             onClick={() => {
-                              toast.success("Ajouté au panier");
+                              if (documentData) {
+                                setCartItems(prev => [...prev, {
+                                  id: documentData.id,
+                                  title: documentData.title,
+                                  author: documentData.author,
+                                  cote: documentData.cote
+                                }]);
+                                setIsCartOpen(true);
+                              }
                             }}
                           >
                             <ShoppingCart className="mr-2 h-4 w-4" />
@@ -740,7 +753,7 @@ export default function NoticeDetaillee() {
                             size="lg"
                             variant="secondary"
                             className="w-full"
-                            onClick={() => navigate("/subscription")}
+                            onClick={() => setIsSubscriptionOpen(true)}
                           >
                             Adhérer
                           </Button>
@@ -827,6 +840,21 @@ export default function NoticeDetaillee() {
         onReserve={() => {
           toast.success("Réservation effectuée avec succès");
         }}
+      />
+
+      {/* Dialogue du panier */}
+      <CartDialog
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        items={cartItems}
+        onRemoveItem={(id) => setCartItems(prev => prev.filter(item => item.id !== id))}
+        onClearCart={() => setCartItems([])}
+      />
+
+      {/* Dialogue d'adhésion */}
+      <SubscriptionDialog
+        isOpen={isSubscriptionOpen}
+        onClose={() => setIsSubscriptionOpen(false)}
       />
     </div>
   );
