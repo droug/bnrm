@@ -330,7 +330,10 @@ export default function NoticeDetaillee() {
           onClick={() => {
             // Si on vient de la recherche, restaurer l'état de recherche
             if (location.state?.searchState) {
-              navigate('/cbm/recherche-avancee', { state: { searchState: location.state.searchState } });
+              const targetRoute = location.state?.fromReproduction 
+                ? '/demande-reproduction' 
+                : '/cbm/recherche-avancee';
+              navigate(targetRoute, { state: { searchState: location.state.searchState } });
             } else {
               navigate(-1);
             }
@@ -719,8 +722,8 @@ export default function NoticeDetaillee() {
                         </Button>
                       )}
 
-                      {/* Si connecté et pas libre accès : Réserver (sauf si numérisé) */}
-                      {user && documentData.supportStatus !== "numerise" && (
+                      {/* Si connecté et pas libre accès : Réserver (sauf si numérisé) - uniquement depuis le contexte réservation */}
+                      {user && documentData.supportStatus !== "numerise" && location.state?.fromReservation && (
                         <Button
                           size="lg"
                           variant="default"
@@ -777,15 +780,18 @@ export default function NoticeDetaillee() {
                     Partager
                   </Button>
 
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full"
-                    onClick={() => setIsReproductionOpen(true)}
-                  >
-                    <FileText className="mr-2 h-4 w-4" />
-                    Demande de reproduction
-                  </Button>
+                  {/* Bouton reproduction uniquement depuis le contexte reproduction */}
+                  {location.state?.fromReproduction && (
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-full"
+                      onClick={() => setIsReproductionOpen(true)}
+                    >
+                      <FileText className="mr-2 h-4 w-4" />
+                      Demande de reproduction
+                    </Button>
+                  )}
                 </div>
 
                 {documentData.isFreeAccess && (

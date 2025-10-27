@@ -783,6 +783,7 @@ const RechercheAvancee = () => {
                         onClick={() => navigate(`/cbm/notice/${doc.id}`, { 
                           state: { 
                             document: doc,
+                            fromReservation: true,
                             searchState: {
                               criteria,
                               results: searchResults,
