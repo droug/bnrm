@@ -70,7 +70,7 @@ export default function PaymentServices() {
         "Accès numérique",
         "Notification instantanée"
       ],
-      action: () => navigate("/cbn"),
+      action: () => navigate("/cbm/catalogue"),
       available: true
     },
     {
