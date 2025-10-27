@@ -20,7 +20,8 @@ import {
   Shield,
   Lock,
   Zap,
-  Wrench
+  Wrench,
+  Scan
 } from "lucide-react";
 
 export default function PaymentServices() {
@@ -72,6 +73,21 @@ export default function PaymentServices() {
         "Devis personnalisé"
       ],
       action: () => navigate("/demande-restauration"),
+      available: true
+    },
+    {
+      id: "digitization",
+      title: "Demande de numérisation",
+      description: "Demandez la numérisation de vos documents dans différents formats",
+      icon: Scan,
+      color: "from-cyan-500 to-cyan-600",
+      features: [
+        "Haute résolution",
+        "Formats multiples",
+        "Livraison rapide",
+        "Tarification compétitive"
+      ],
+      action: () => navigate("/demande-numerisation"),
       available: true
     },
     {
