@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Info, Search, RotateCcw, Save, Download, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,6 +43,7 @@ interface SearchCriteria {
 const RechercheAvancee = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('multi-criteria');
   const [criteria, setCriteria] = useState<SearchCriteria>({
     keywords: '',
@@ -66,6 +67,19 @@ const RechercheAvancee = () => {
   const [yearRange, setYearRange] = useState([1900, 2025]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Restaurer l'état de recherche au retour de la notice
+  useEffect(() => {
+    if (location.state?.searchState) {
+      const { criteria: savedCriteria, results, yearRange: savedYearRange } = location.state.searchState;
+      setCriteria(savedCriteria);
+      setSearchResults(results);
+      if (savedYearRange) setYearRange(savedYearRange);
+      
+      // Nettoyer l'état pour éviter de le restaurer à nouveau
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const documentNatures = [
     'Monographie',
@@ -766,7 +780,16 @@ const RechercheAvancee = () => {
                       </div>
                       
                       <Button 
-                        onClick={() => navigate(`/cbm/notice/${doc.id}`, { state: { document: doc } })}
+                        onClick={() => navigate(`/cbm/notice/${doc.id}`, { 
+                          state: { 
+                            document: doc,
+                            searchState: {
+                              criteria,
+                              results: searchResults,
+                              yearRange
+                            }
+                          } 
+                        })}
                         variant="default"
                         size="lg"
                       >

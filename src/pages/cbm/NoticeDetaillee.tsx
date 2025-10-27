@@ -320,7 +320,14 @@ export default function NoticeDetaillee() {
         <Button
           variant="ghost"
           className="mb-6"
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            // Si on vient de la recherche, restaurer l'état de recherche
+            if (location.state?.searchState) {
+              navigate('/cbm/recherche-avancee', { state: { searchState: location.state.searchState } });
+            } else {
+              navigate(-1);
+            }
+          }}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour
