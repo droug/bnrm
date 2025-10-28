@@ -27,6 +27,7 @@ import { bookDisciplines } from "@/data/bookDisciplines";
 import { worldLanguages } from "@/data/worldLanguages";
 import { worldCountries } from "@/data/worldCountries";
 import { PhoneInput } from "@/components/ui/phone-input";
+import { useSystemList } from "@/hooks/useSystemList";
 
 interface Publisher {
   id: string;
@@ -133,6 +134,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [distributors, setDistributors] = useState<Distributor[]>([]);
   const [distributorSearch, setDistributorSearch] = useState<string>("");
   const [selectedDistributor, setSelectedDistributor] = useState<Distributor | null>(null);
+
+  // Load system lists for Publications Périodiques
+  const { options: publicationTypePeriodicalOptions } = useSystemList('publication_type_periodical');
 
   // Fetch publication types from database
   useEffect(() => {
@@ -1285,11 +1289,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Label>Type de publication</Label>
                   <InlineSelect
                     placeholder="Sélectionner le type"
-                    options={[
-                      { value: "journal", label: "Journal" },
-                      { value: "revue", label: "Revue" },
-                      { value: "monographie_simple", label: "Monographie simple" },
-                    ]}
+                    options={publicationTypePeriodicalOptions}
                   />
                 </div>
 
