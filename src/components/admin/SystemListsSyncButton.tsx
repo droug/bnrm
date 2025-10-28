@@ -99,6 +99,9 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
       { value_code: "journal", value_label: "Journal", sort_order: 1 },
       { value_code: "revue", value_label: "Revue", sort_order: 2 },
       { value_code: "monographie_simple", value_label: "Monographie simple", sort_order: 3 },
+      { value_code: "Magazine", value_label: "Magazine", sort_order: 4 },
+      { value_code: "Bulletin_Officiel", value_label: "Bulletin Officiel", sort_order: 5 },
+      { value_code: "Autre", value_label: "Autre", sort_order: 6 },
     ],
   },
   {
@@ -269,6 +272,21 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
       { value_code: "spectacle", value_label: "Spectacle", sort_order: 4 },
     ],
   },
+  {
+    list_code: "ESPACE_CULTUREL",
+    list_name: "Espaces culturels",
+    module: "Activités culturelles",
+    form_name: "Réservation d'espace",
+    field_type: "simple",
+    description: "Espaces disponibles pour réservation",
+    values: [
+      { value_code: "auditorium", value_label: "Auditorium", sort_order: 1 },
+      { value_code: "grande_salle", value_label: "Grande salle d'exposition", sort_order: 2 },
+      { value_code: "salle_seminaire", value_label: "Salle séminaire", sort_order: 3 },
+      { value_code: "salle_reunion", value_label: "Salle de réunion", sort_order: 4 },
+      { value_code: "salle_annexe", value_label: "Salle de l'annexe", sort_order: 5 },
+    ],
+  },
   
   // Bibliothèque Numérique
   {
@@ -282,6 +300,36 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
       { value_code: "pdf", value_label: "PDF", sort_order: 1 },
       { value_code: "epub", value_label: "EPUB", sort_order: 2 },
       { value_code: "jpg", value_label: "Image JPEG", sort_order: 3 },
+    ],
+  },
+  {
+    list_code: "digital_library_collections",
+    list_name: "Bibliothèque Numérique - Menu Collections",
+    module: "digital_library",
+    form_name: "",
+    field_type: "simple",
+    description: "Collections disponibles dans la bibliothèque numérique",
+    values: [
+      { value_code: "books", value_label: "Livres numériques", sort_order: 1 },
+      { value_code: "periodicals", value_label: "Revues et périodiques", sort_order: 2 },
+      { value_code: "manuscripts", value_label: "Manuscrits numérisés", sort_order: 3 },
+      { value_code: "photos", value_label: "Photographies et cartes", sort_order: 4 },
+      { value_code: "audiovisual", value_label: "Archives sonores et audiovisuelles", sort_order: 5 },
+    ],
+  },
+  {
+    list_code: "digital_library_themes",
+    list_name: "Bibliothèque Numérique - Menu Thèmes",
+    module: "digital_library",
+    form_name: "",
+    field_type: "simple",
+    description: "Thèmes de navigation dans la bibliothèque numérique",
+    values: [
+      { value_code: "history", value_label: "Histoire & Patrimoine", sort_order: 1 },
+      { value_code: "arts", value_label: "Arts & Culture", sort_order: 2 },
+      { value_code: "sciences", value_label: "Sciences & Techniques", sort_order: 3 },
+      { value_code: "religion", value_label: "Religion & Philosophie", sort_order: 4 },
+      { value_code: "literature", value_label: "Littérature & Poésie", sort_order: 5 },
     ],
   },
 
