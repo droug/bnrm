@@ -363,12 +363,12 @@ export const AutocompleteListsManager = () => {
             {modules.length > 0 && (
               <div>
                 <Label>Filtrer par module</Label>
-                <Select value={moduleFilter} onValueChange={setModuleFilter}>
+                <Select value={moduleFilter || "all"} onValueChange={(v) => setModuleFilter(v === "all" ? "" : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Tous les modules" />
                   </SelectTrigger>
                   <SelectContent className="bg-background">
-                    <SelectItem value="">Tous les modules</SelectItem>
+                    <SelectItem value="all">Tous les modules</SelectItem>
                     {modules.map((module) => (
                       <SelectItem key={module} value={module!}>
                         {module}
@@ -381,11 +381,12 @@ export const AutocompleteListsManager = () => {
 
             <div>
               <Label>Sélectionner une liste</Label>
-              <Select value={selectedList || ""} onValueChange={setSelectedList}>
+              <Select value={selectedList || "none"} onValueChange={(v) => setSelectedList(v === "none" ? null : v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Choisir une liste" />
                 </SelectTrigger>
                 <SelectContent className="bg-background">
+                  <SelectItem value="none">Choisir une liste</SelectItem>
                   {filteredLists.map((list) => (
                     <SelectItem key={list.id} value={list.id}>
                       {list.list_name} ({list.list_code}) - {list.max_levels} niveau(x)
