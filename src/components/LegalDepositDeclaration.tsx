@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SimpleDropdown } from "@/components/ui/simple-dropdown";
+import { InlineSelect } from "@/components/ui/inline-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -1222,7 +1223,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 {/* Informations géographiques */}
                 <div className="space-y-2">
                   <Label>Région</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder="Sélectionner une région"
                     value={directorRegion}
                     onChange={(value) => {
@@ -1238,7 +1239,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Ville</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder={directorRegion ? "Sélectionner une ville" : "Sélectionnez d'abord une région"}
                     value={directorCity}
                     onChange={setDirectorCity}
@@ -1276,7 +1277,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de publication</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder="Sélectionner le type"
                     options={[
                       { value: "journal", label: "Journal" },
@@ -1287,7 +1288,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Nature publication</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     value={naturePublication}
                     onChange={setNaturePublication}
                     placeholder="Sélectionner la nature"
@@ -1351,7 +1352,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Type de support</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     value={formData.supportType}
                     onChange={(value) => setFormData({ ...formData, supportType: value })}
                     placeholder="Sélectionner le type"
@@ -1386,7 +1387,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Périodicité</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder="Sélectionner la périodicité"
                     options={[
                       { value: "daily", label: "Quotidien" },
