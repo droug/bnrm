@@ -1286,14 +1286,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             <h3 className="text-2xl font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Type de publication</Label>
-                  <InlineSelect
-                    placeholder="Sélectionner le type"
-                    options={publicationTypePeriodicalOptions}
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <Label>Nature publication</Label>
                   <InlineSelect
                     value={naturePublication}
@@ -1303,6 +1295,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       { value: "etatique", label: "Étatique" },
                       { value: "non-etatique", label: "Non étatique" },
                     ]}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Type de publication</Label>
+                  <InlineSelect
+                    placeholder="Sélectionner le type"
+                    options={publicationTypePeriodicalOptions}
                   />
                 </div>
 
