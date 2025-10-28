@@ -39,10 +39,15 @@ export function useSystemList(listCode: string) {
         .from('system_lists')
         .select('id, is_hierarchical')
         .eq('list_code', listCode)
-        .single();
+        .maybeSingle();
 
       if (listError) throw listError;
-      if (!listData) throw new Error(`Liste ${listCode} non trouvée`);
+      if (!listData) {
+        console.warn(`Liste ${listCode} non trouvée`);
+        setValues([]);
+        setLoading(false);
+        return;
+      }
 
       // Récupérer les valeurs
       const { data: valuesData, error: valuesError } = await supabase

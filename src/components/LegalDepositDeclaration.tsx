@@ -136,7 +136,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [selectedDistributor, setSelectedDistributor] = useState<Distributor | null>(null);
 
   // Load system lists for Publications Périodiques
-  const { options: publicationTypePeriodicalOptions } = useSystemList('publication_type_periodical');
+  const { options: publicationTypePeriodicalOptions } = useSystemList('period_type_publication');
 
   // Fetch publication types from database
   useEffect(() => {
