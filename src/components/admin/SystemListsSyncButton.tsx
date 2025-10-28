@@ -18,8 +18,8 @@ interface SystemListDefinition {
   }>;
 }
 
-// Définitions des listes système pour les 4 types de dépôt légal
-const LEGAL_DEPOSIT_LISTS: SystemListDefinition[] = [
+// Définitions de toutes les listes système
+const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
   // ========== MONOGRAPHIES ==========
   {
     list_code: "mono_type_publication",
@@ -252,6 +252,69 @@ const LEGAL_DEPOSIT_LISTS: SystemListDefinition[] = [
       { value_code: "mixed", value_label: "Mixte", sort_order: 3 },
     ],
   },
+
+  // ========== AUTRES MODULES ==========
+  // Activités Culturelles
+  {
+    list_code: "cultural_event_type",
+    list_name: "Type d'événement culturel",
+    module: "Activités Culturelles",
+    form_name: "Programmation culturelle",
+    field_type: "simple",
+    description: "Types d'événements culturels proposés",
+    values: [
+      { value_code: "conference", value_label: "Conférence", sort_order: 1 },
+      { value_code: "atelier", value_label: "Atelier", sort_order: 2 },
+      { value_code: "exposition", value_label: "Exposition", sort_order: 3 },
+      { value_code: "spectacle", value_label: "Spectacle", sort_order: 4 },
+    ],
+  },
+  
+  // Bibliothèque Numérique
+  {
+    list_code: "document_format",
+    list_name: "Format de document",
+    module: "Bibliothèque Numérique",
+    form_name: "Demande numérisation",
+    field_type: "simple",
+    description: "Formats de documents disponibles",
+    values: [
+      { value_code: "pdf", value_label: "PDF", sort_order: 1 },
+      { value_code: "epub", value_label: "EPUB", sort_order: 2 },
+      { value_code: "jpg", value_label: "Image JPEG", sort_order: 3 },
+    ],
+  },
+
+  // Manuscrits
+  {
+    list_code: "manuscript_condition",
+    list_name: "État de conservation",
+    module: "Manuscrits",
+    form_name: "Demande d'accès",
+    field_type: "simple",
+    description: "État de conservation des manuscrits",
+    values: [
+      { value_code: "excellent", value_label: "Excellent", sort_order: 1 },
+      { value_code: "bon", value_label: "Bon", sort_order: 2 },
+      { value_code: "moyen", value_label: "Moyen", sort_order: 3 },
+      { value_code: "fragile", value_label: "Fragile", sort_order: 4 },
+    ],
+  },
+
+  // Reproduction
+  {
+    list_code: "reproduction_type",
+    list_name: "Type de reproduction",
+    module: "Reproduction",
+    form_name: "Demande reproduction",
+    field_type: "simple",
+    description: "Types de reproduction disponibles",
+    values: [
+      { value_code: "photocopy", value_label: "Photocopie", sort_order: 1 },
+      { value_code: "scan", value_label: "Numérisation", sort_order: 2 },
+      { value_code: "photo", value_label: "Photographie", sort_order: 3 },
+    ],
+  },
 ];
 
 export const SystemListsSyncButton = () => {
@@ -264,7 +327,7 @@ export const SystemListsSyncButton = () => {
       let listsCreated = 0;
       let valuesCreated = 0;
 
-      for (const listDef of LEGAL_DEPOSIT_LISTS) {
+      for (const listDef of ALL_SYSTEM_LISTS) {
         // Vérifier si la liste existe déjà
         const { data: existingList } = await supabase
           .from("system_lists")

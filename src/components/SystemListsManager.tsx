@@ -605,7 +605,7 @@ export const SystemListsManager = () => {
           <div className="mb-3">
             <h4 className="text-sm font-semibold mb-1">🔄 Synchronisation des Listes Système</h4>
             <p className="text-xs text-muted-foreground">
-              Synchroniser toutes les listes déroulantes des 4 types de formulaires de dépôt légal avec la base de données
+              Synchroniser toutes les listes déroulantes des formulaires du système avec la base de données
             </p>
           </div>
           <SystemListsSyncButton />
