@@ -1282,6 +1282,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     options={[
                       { value: "journal", label: "Journal" },
                       { value: "revue", label: "Revue" },
+                      { value: "monographie_simple", label: "Monographie simple" },
                     ]}
                   />
                 </div>
