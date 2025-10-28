@@ -1205,6 +1205,17 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
+                  <Label>Genre</Label>
+                  <InlineSelect
+                    placeholder="Sélectionner le genre"
+                    options={[
+                      { value: "homme", label: "Homme" },
+                      { value: "femme", label: "Femme" }
+                    ]}
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Pseudonyme</Label>
                   <Input placeholder="Pseudonyme" />
                 </div>
@@ -1260,11 +1271,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <div className="space-y-2">
                   <Label>Date de naissance</Label>
                   <Input type="date" placeholder="Date de naissance" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Lieu de naissance</Label>
-                  <Input placeholder="Lieu de naissance" />
                 </div>
               </div>
             </div>
