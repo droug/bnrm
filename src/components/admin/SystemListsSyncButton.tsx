@@ -372,7 +372,7 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
     list_name: "Disciplines (Hiérarchique)",
     module: "Dépôt Légal",
     form_name: "Publications périodiques et Monographies",
-    field_type: "hierarchical",
+    field_type: "auto_select",
     description: "Disciplines académiques organisées en catégories et sous-catégories",
     is_hierarchical: true,
     values: [
