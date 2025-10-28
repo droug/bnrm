@@ -178,20 +178,80 @@ export const AutocompleteListsManager = () => {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
 
-      const values = jsonData.map((row) => ({
-        list_id: selectedList,
-        value_code: row.Code || row.code,
-        value_label: row.Libellé || row.Libelle || row.libelle || row.label,
-        parent_value_code: row.Parent || row.parent || null,
-        level: row.Niveau || row.niveau || row.Level || row.level || 1,
-        sort_order: row.Ordre || row.ordre || row.Order || row.order || 0,
-      }));
+      if (jsonData.length === 0) {
+        toast({
+          title: "Erreur",
+          description: "Le fichier Excel est vide",
+          variant: "destructive",
+        });
+        return;
+      }
 
-      const { error } = await supabase
+      // Valider les données
+      const errors: string[] = [];
+      const values = jsonData.map((row, index) => {
+        const rowNum = index + 2; // +2 car Excel commence à 1 et il y a une ligne d'en-tête
+        
+        if (!row.Code && !row.code) {
+          errors.push(`Ligne ${rowNum}: Le champ 'Code' est obligatoire`);
+        }
+        if (!row.Libellé && !row.Libelle && !row.libelle && !row.label) {
+          errors.push(`Ligne ${rowNum}: Le champ 'Libellé' est obligatoire`);
+        }
+
+        const level = parseInt(row.Niveau || row.niveau || row.Level || row.level || '1');
+        if (level < 1 || level > 2) {
+          errors.push(`Ligne ${rowNum}: Le niveau doit être 1 ou 2`);
+        }
+
+        // Si niveau 2, vérifier qu'il y a un parent
+        if (level === 2 && !row.Parent && !row.parent) {
+          errors.push(`Ligne ${rowNum}: Un parent est obligatoire pour le niveau 2`);
+        }
+
+        return {
+          list_id: selectedList,
+          value_code: row.Code || row.code,
+          value_label: row.Libellé || row.Libelle || row.libelle || row.label,
+          parent_value_code: row.Parent || row.parent || null,
+          level: level,
+          sort_order: parseInt(row.Ordre || row.ordre || row.Order || row.order || '0'),
+        };
+      });
+
+      if (errors.length > 0) {
+        toast({
+          title: "Erreurs de validation",
+          description: errors.slice(0, 3).join("\n") + (errors.length > 3 ? `\n...et ${errors.length - 3} autres erreurs` : ""),
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Supprimer les valeurs existantes pour cette liste
+      const confirmReplace = confirm(
+        `Cette opération va remplacer toutes les valeurs existantes de cette liste par les données du fichier Excel.\n\nNombre de lignes à importer: ${values.length}\n\nVoulez-vous continuer ?`
+      );
+
+      if (!confirmReplace) {
+        event.target.value = "";
+        return;
+      }
+
+      // Supprimer les anciennes valeurs
+      const { error: deleteError } = await supabase
+        .from('autocomplete_list_values')
+        .delete()
+        .eq('list_id', selectedList);
+
+      if (deleteError) throw deleteError;
+
+      // Insérer les nouvelles valeurs
+      const { error: insertError } = await supabase
         .from('autocomplete_list_values')
         .insert(values);
 
-      if (error) throw error;
+      if (insertError) throw insertError;
 
       toast({
         title: "Succès",
@@ -241,14 +301,43 @@ export const AutocompleteListsManager = () => {
   const handleDownloadTemplate = () => {
     const template = [
       { Code: 'categorie1', Libellé: 'Catégorie 1', Parent: '', Niveau: 1, Ordre: 1 },
-      { Code: 'sous_cat1', Libellé: 'Sous-catégorie 1', Parent: 'categorie1', Niveau: 2, Ordre: 1 },
-      { Code: 'sous_cat2', Libellé: 'Sous-catégorie 2', Parent: 'categorie1', Niveau: 2, Ordre: 2 },
+      { Code: 'sous_cat1_1', Libellé: 'Sous-catégorie 1.1', Parent: 'categorie1', Niveau: 2, Ordre: 1 },
+      { Code: 'sous_cat1_2', Libellé: 'Sous-catégorie 1.2', Parent: 'categorie1', Niveau: 2, Ordre: 2 },
+      { Code: 'categorie2', Libellé: 'Catégorie 2', Parent: '', Niveau: 1, Ordre: 2 },
+      { Code: 'sous_cat2_1', Libellé: 'Sous-catégorie 2.1', Parent: 'categorie2', Niveau: 2, Ordre: 1 },
     ];
 
     const worksheet = XLSX.utils.json_to_sheet(template);
+    
+    // Ajouter des instructions en commentaire
+    const instructions = [
+      "",
+      "INSTRUCTIONS D'UTILISATION :",
+      "1. Code: Identifiant unique (ex: cat1, sous_cat1)",
+      "2. Libellé: Nom affiché (ex: Sciences, Mathématiques)",
+      "3. Parent: Laisser vide pour niveau 1, indiquer le Code parent pour niveau 2",
+      "4. Niveau: 1 pour catégorie principale, 2 pour sous-catégorie",
+      "5. Ordre: Numéro d'ordre d'affichage (1, 2, 3...)",
+      "",
+      "EXEMPLE DE STRUCTURE :",
+      "Code: sciences | Libellé: Sciences | Parent: (vide) | Niveau: 1 | Ordre: 1",
+      "Code: maths | Libellé: Mathématiques | Parent: sciences | Niveau: 2 | Ordre: 1",
+      "Code: physique | Libellé: Physique | Parent: sciences | Niveau: 2 | Ordre: 2",
+    ];
+
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Données");
+    
+    // Ajouter une feuille d'instructions
+    const instructionsWs = XLSX.utils.aoa_to_sheet(instructions.map(i => [i]));
+    XLSX.utils.book_append_sheet(workbook, instructionsWs, "Instructions");
+    
     XLSX.writeFile(workbook, 'template_liste_hierarchique.xlsx');
+    
+    toast({
+      title: "Template téléchargé",
+      description: "Remplissez le fichier Excel selon le modèle et importez-le",
+    });
   };
 
   const filteredLists = moduleFilter
@@ -398,7 +487,7 @@ export const AutocompleteListsManager = () => {
 
             {selectedList && (
               <div className="space-y-4">
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button variant="outline" onClick={() => document.getElementById('excel-import')?.click()}>
                     <Upload className="w-4 h-4 mr-2" />
                     Importer Excel
@@ -414,6 +503,22 @@ export const AutocompleteListsManager = () => {
                     <Download className="w-4 h-4 mr-2" />
                     Exporter Excel
                   </Button>
+                  <div className="text-sm text-muted-foreground flex items-center gap-2 px-3 py-2 bg-muted rounded-md">
+                    <FileSpreadsheet className="w-4 h-4" />
+                    Format: Code, Libellé, Parent, Niveau (1-2), Ordre
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg">
+                  <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                    💡 Comment importer vos données ?
+                  </p>
+                  <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1 list-decimal list-inside">
+                    <li>Téléchargez le modèle Excel ci-dessus</li>
+                    <li>Remplissez-le avec vos catégories et sous-catégories</li>
+                    <li>Utilisez le bouton "Importer Excel" pour injecter les données</li>
+                    <li>Les données existantes seront remplacées</li>
+                  </ol>
                 </div>
 
                 <div className="border rounded-lg">
