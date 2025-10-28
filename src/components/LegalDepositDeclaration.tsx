@@ -1431,11 +1431,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Mention d'édition</Label>
-                  <Input placeholder="Mention d'édition" />
-                </div>
-
-                <div className="space-y-2">
                   <Label>URL</Label>
                   <Input type="url" placeholder="URL du site web" />
                 </div>
