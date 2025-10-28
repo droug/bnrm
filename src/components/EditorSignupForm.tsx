@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface EditorFormData {
   type: "morale" | "physique";
+  nature: string;
   // Commun
   email: string;
   phone: string;
@@ -38,6 +39,7 @@ const EditorSignupForm = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState<EditorFormData>({
     type: "morale",
+    nature: "",
     email: "",
     phone: "+212 ",
     address: "",
@@ -108,6 +110,23 @@ const EditorSignupForm = () => {
                 </Label>
               </div>
             </RadioGroup>
+          </div>
+
+          {/* Nature de l'éditeur */}
+          <div className="space-y-2">
+            <Label htmlFor="nature">Nature de l'éditeur *</Label>
+            <Select 
+              value={formData.nature}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, nature: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionnez la nature" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="etatique">Étatique</SelectItem>
+                <SelectItem value="non-etatique">Non étatique</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <Tabs value={formData.type} className="w-full">

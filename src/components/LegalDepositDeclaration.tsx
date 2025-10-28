@@ -100,6 +100,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [numberOfVolumes, setNumberOfVolumes] = useState<string>("");
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [publisherSearch, setPublisherSearch] = useState<string>("");
+  const [publisherNature, setPublisherNature] = useState<string>("");
   const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
   const [publicationDate, setPublicationDate] = useState<Date>();
   const [publicationDateInput, setPublicationDateInput] = useState<string>("");
@@ -1542,6 +1543,19 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       </Button>
                     </div>
                   )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Nature de l'éditeur</Label>
+                  <InlineSelect
+                    value={publisherNature}
+                    onChange={setPublisherNature}
+                    placeholder="Sélectionner la nature"
+                    options={[
+                      { value: "etatique", label: "Étatique" },
+                      { value: "non-etatique", label: "Non étatique" },
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-2">
