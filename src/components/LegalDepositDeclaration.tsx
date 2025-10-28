@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SimpleDropdown } from "@/components/ui/simple-dropdown";
 import { InlineSelect } from "@/components/ui/inline-select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DynamicHierarchicalSelect } from "@/components/ui/dynamic-hierarchical-select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft, CalendarIcon, ExternalLink, Check, ChevronsUpDown } from "lucide-react";
@@ -1334,8 +1335,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 )}
 
                 <div className="space-y-2">
-                  <Label>Discipline</Label>
-                  <Input placeholder="Discipline" />
+                  <DynamicHierarchicalSelect
+                    source="book_disciplines"
+                    value={formData.periodicalDiscipline}
+                    onChange={(value) => setFormData({ ...formData, periodicalDiscipline: value })}
+                    placeholder="Sélectionner une discipline"
+                    label="Discipline"
+                    required
+                  />
                 </div>
 
                 <div className="space-y-2">

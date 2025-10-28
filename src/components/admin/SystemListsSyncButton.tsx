@@ -11,10 +11,12 @@ interface SystemListDefinition {
   form_name: string;
   field_type: string;
   description: string;
+  is_hierarchical?: boolean;
   values: Array<{
     value_code: string;
     value_label: string;
     sort_order: number;
+    parent_code?: string;
   }>;
 }
 
@@ -363,6 +365,120 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
       { value_code: "photo", value_label: "Photographie", sort_order: 3 },
     ],
   },
+
+  // ========== DISCIPLINES (HIÉRARCHIQUE) ==========
+  {
+    list_code: "book_disciplines",
+    list_name: "Disciplines (Hiérarchique)",
+    module: "Dépôt Légal",
+    form_name: "Publications périodiques et Monographies",
+    field_type: "hierarchical",
+    description: "Disciplines académiques organisées en catégories et sous-catégories",
+    is_hierarchical: true,
+    values: [
+      // Sciences exactes et naturelles
+      { value_code: "sciences_exactes", value_label: "Sciences exactes et naturelles", sort_order: 1 },
+      { value_code: "mathematiques", value_label: "Mathématiques et statistiques", sort_order: 2, parent_code: "sciences_exactes" },
+      { value_code: "physique", value_label: "Physique", sort_order: 3, parent_code: "sciences_exactes" },
+      { value_code: "chimie", value_label: "Chimie", sort_order: 4, parent_code: "sciences_exactes" },
+      { value_code: "sciences_vie", value_label: "Sciences de la vie (biologie, botanique, zoologie)", sort_order: 5, parent_code: "sciences_exactes" },
+      { value_code: "sciences_terre", value_label: "Sciences de la terre et de l'environnement", sort_order: 6, parent_code: "sciences_exactes" },
+      { value_code: "astronomie", value_label: "Astronomie", sort_order: 7, parent_code: "sciences_exactes" },
+
+      // Sciences de l'ingénieur et technologies
+      { value_code: "sciences_ingenieur", value_label: "Sciences de l'ingénieur et technologies", sort_order: 10 },
+      { value_code: "informatique", value_label: "Informatique et systèmes d'information", sort_order: 11, parent_code: "sciences_ingenieur" },
+      { value_code: "electronique", value_label: "Électronique et télécommunications", sort_order: 12, parent_code: "sciences_ingenieur" },
+      { value_code: "genie_civil", value_label: "Génie civil et construction", sort_order: 13, parent_code: "sciences_ingenieur" },
+      { value_code: "mecanique", value_label: "Mécanique et énergie", sort_order: 14, parent_code: "sciences_ingenieur" },
+      { value_code: "genie_industriel", value_label: "Génie industriel et production", sort_order: 15, parent_code: "sciences_ingenieur" },
+      { value_code: "tech_environnement", value_label: "Technologies de l'environnement", sort_order: 16, parent_code: "sciences_ingenieur" },
+
+      // Sciences humaines et sociales
+      { value_code: "sciences_humaines", value_label: "Sciences humaines et sociales", sort_order: 20 },
+      { value_code: "philosophie", value_label: "Philosophie", sort_order: 21, parent_code: "sciences_humaines" },
+      { value_code: "sociologie", value_label: "Sociologie", sort_order: 22, parent_code: "sciences_humaines" },
+      { value_code: "anthropologie", value_label: "Anthropologie", sort_order: 23, parent_code: "sciences_humaines" },
+      { value_code: "psychologie", value_label: "Psychologie", sort_order: 24, parent_code: "sciences_humaines" },
+      { value_code: "demographie", value_label: "Démographie", sort_order: 25, parent_code: "sciences_humaines" },
+      { value_code: "travail_social", value_label: "Travail social", sort_order: 26, parent_code: "sciences_humaines" },
+
+      // Sciences juridiques et politiques
+      { value_code: "sciences_juridiques", value_label: "Sciences juridiques et politiques", sort_order: 30 },
+      { value_code: "droit_public", value_label: "Droit public", sort_order: 31, parent_code: "sciences_juridiques" },
+      { value_code: "droit_prive", value_label: "Droit privé", sort_order: 32, parent_code: "sciences_juridiques" },
+      { value_code: "sciences_politiques", value_label: "Sciences politiques", sort_order: 33, parent_code: "sciences_juridiques" },
+      { value_code: "relations_internationales", value_label: "Relations internationales", sort_order: 34, parent_code: "sciences_juridiques" },
+      { value_code: "administration_publique", value_label: "Administration publique", sort_order: 35, parent_code: "sciences_juridiques" },
+
+      // Sciences économiques et gestion
+      { value_code: "sciences_economiques", value_label: "Sciences économiques et gestion", sort_order: 40 },
+      { value_code: "economie_generale", value_label: "Économie générale", sort_order: 41, parent_code: "sciences_economiques" },
+      { value_code: "economie_developpement", value_label: "Économie du développement", sort_order: 42, parent_code: "sciences_economiques" },
+      { value_code: "sciences_gestion", value_label: "Sciences de gestion", sort_order: 43, parent_code: "sciences_economiques" },
+      { value_code: "finance_comptabilite", value_label: "Finance et comptabilité", sort_order: 44, parent_code: "sciences_economiques" },
+      { value_code: "marketing", value_label: "Marketing", sort_order: 45, parent_code: "sciences_economiques" },
+      { value_code: "entrepreneuriat", value_label: "Entrepreneuriat", sort_order: 46, parent_code: "sciences_economiques" },
+
+      // Histoire et géographie
+      { value_code: "histoire_geographie", value_label: "Histoire et géographie", sort_order: 50 },
+      { value_code: "histoire_generale", value_label: "Histoire générale", sort_order: 51, parent_code: "histoire_geographie" },
+      { value_code: "histoire_maroc", value_label: "Histoire du Maroc", sort_order: 52, parent_code: "histoire_geographie" },
+      { value_code: "geographie_humaine", value_label: "Géographie humaine", sort_order: 53, parent_code: "histoire_geographie" },
+      { value_code: "geographie_physique", value_label: "Géographie physique", sort_order: 54, parent_code: "histoire_geographie" },
+      { value_code: "archeologie", value_label: "Archéologie", sort_order: 55, parent_code: "histoire_geographie" },
+
+      // Langue et littérature
+      { value_code: "langue_litterature", value_label: "Langue et littérature", sort_order: 60 },
+      { value_code: "linguistique", value_label: "Linguistique générale", sort_order: 61, parent_code: "langue_litterature" },
+      { value_code: "langue_arabe", value_label: "Langue arabe", sort_order: 62, parent_code: "langue_litterature" },
+      { value_code: "langue_francaise", value_label: "Langue française", sort_order: 63, parent_code: "langue_litterature" },
+      { value_code: "langue_anglaise", value_label: "Langue anglaise", sort_order: 64, parent_code: "langue_litterature" },
+      { value_code: "litterature_comparee", value_label: "Littérature comparée", sort_order: 65, parent_code: "langue_litterature" },
+      { value_code: "poesie_roman", value_label: "Poésie, roman, théâtre, critique littéraire", sort_order: 66, parent_code: "langue_litterature" },
+
+      // Arts, culture et communication
+      { value_code: "arts_culture", value_label: "Arts, culture et communication", sort_order: 70 },
+      { value_code: "beaux_arts", value_label: "Beaux-arts", sort_order: 71, parent_code: "arts_culture" },
+      { value_code: "musique_danse", value_label: "Musique et danse", sort_order: 72, parent_code: "arts_culture" },
+      { value_code: "cinema", value_label: "Cinéma et audiovisuel", sort_order: 73, parent_code: "arts_culture" },
+      { value_code: "architecture", value_label: "Architecture et design", sort_order: 74, parent_code: "arts_culture" },
+      { value_code: "medias", value_label: "Médias, journalisme, communication", sort_order: 75, parent_code: "arts_culture" },
+      { value_code: "patrimoine", value_label: "Patrimoine culturel", sort_order: 76, parent_code: "arts_culture" },
+
+      // Sciences de l'éducation
+      { value_code: "sciences_education", value_label: "Sciences de l'éducation", sort_order: 80 },
+      { value_code: "pedagogie", value_label: "Pédagogie générale", sort_order: 81, parent_code: "sciences_education" },
+      { value_code: "didactique", value_label: "Didactique des disciplines", sort_order: 82, parent_code: "sciences_education" },
+      { value_code: "formation_enseignants", value_label: "Formation des enseignants", sort_order: 83, parent_code: "sciences_education" },
+      { value_code: "evaluation", value_label: "Évaluation et orientation", sort_order: 84, parent_code: "sciences_education" },
+      { value_code: "education_societe", value_label: "Éducation et société", sort_order: 85, parent_code: "sciences_education" },
+
+      // Sciences de la santé
+      { value_code: "sciences_sante", value_label: "Sciences de la santé", sort_order: 90 },
+      { value_code: "medecine", value_label: "Médecine", sort_order: 91, parent_code: "sciences_sante" },
+      { value_code: "pharmacie", value_label: "Pharmacie", sort_order: 92, parent_code: "sciences_sante" },
+      { value_code: "medecine_dentaire", value_label: "Médecine dentaire", sort_order: 93, parent_code: "sciences_sante" },
+      { value_code: "sciences_infirmieres", value_label: "Sciences infirmières", sort_order: 94, parent_code: "sciences_sante" },
+      { value_code: "sante_publique", value_label: "Santé publique", sort_order: 95, parent_code: "sciences_sante" },
+
+      // Sciences islamiques et études religieuses
+      { value_code: "sciences_islamiques", value_label: "Sciences islamiques et études religieuses", sort_order: 100 },
+      { value_code: "etudes_coraniques", value_label: "Études coraniques", sort_order: 101, parent_code: "sciences_islamiques" },
+      { value_code: "hadith", value_label: "Hadith et sciences du hadith", sort_order: 102, parent_code: "sciences_islamiques" },
+      { value_code: "fiqh", value_label: "Fiqh (jurisprudence islamique)", sort_order: 103, parent_code: "sciences_islamiques" },
+      { value_code: "theologie", value_label: "Théologie et pensée islamique", sort_order: 104, parent_code: "sciences_islamiques" },
+      { value_code: "histoire_islam", value_label: "Histoire de l'islam", sort_order: 105, parent_code: "sciences_islamiques" },
+      { value_code: "etudes_religieuses", value_label: "Études religieuses comparées", sort_order: 106, parent_code: "sciences_islamiques" },
+
+      // Ouvrages généraux et encyclopédies
+      { value_code: "ouvrages_generaux", value_label: "Ouvrages généraux et encyclopédies", sort_order: 110 },
+      { value_code: "encyclopedies", value_label: "Encyclopédies générales", sort_order: 111, parent_code: "ouvrages_generaux" },
+      { value_code: "dictionnaires", value_label: "Dictionnaires", sort_order: 112, parent_code: "ouvrages_generaux" },
+      { value_code: "bibliographies", value_label: "Bibliographies", sort_order: 113, parent_code: "ouvrages_generaux" },
+      { value_code: "references", value_label: "Ouvrages de référence", sort_order: 114, parent_code: "ouvrages_generaux" },
+    ],
+  },
 ];
 
 export const SystemListsSyncButton = () => {
@@ -385,7 +501,7 @@ export const SystemListsSyncButton = () => {
 
         let listId: string;
 
-        if (existingList) {
+          if (existingList) {
           listId = existingList.id;
           
           // Mettre à jour les métadonnées de la liste
@@ -397,6 +513,7 @@ export const SystemListsSyncButton = () => {
               form_name: listDef.form_name,
               field_type: listDef.field_type,
               description: listDef.description,
+              is_hierarchical: listDef.is_hierarchical || false,
             })
             .eq("id", listId);
         } else {
@@ -410,6 +527,7 @@ export const SystemListsSyncButton = () => {
               form_name: listDef.form_name,
               field_type: listDef.field_type,
               description: listDef.description,
+              is_hierarchical: listDef.is_hierarchical || false,
             })
             .select("id")
             .single();
@@ -435,6 +553,7 @@ export const SystemListsSyncButton = () => {
               .update({
                 value_label: valueDef.value_label,
                 sort_order: valueDef.sort_order,
+                parent_code: valueDef.parent_code || null,
               })
               .eq("id", existingValue.id);
           } else {
@@ -446,6 +565,7 @@ export const SystemListsSyncButton = () => {
                 value_code: valueDef.value_code,
                 value_label: valueDef.value_label,
                 sort_order: valueDef.sort_order,
+                parent_code: valueDef.parent_code || null,
               });
 
             if (valueError) throw valueError;
