@@ -104,8 +104,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [publicationDateInput, setPublicationDateInput] = useState<string>("");
   const [publicationType, setPublicationType] = useState<string>("");
   const [publicationTypes, setPublicationTypes] = useState<Array<{code: string, label: string}>>([]);
-  const [amazonLink, setAmazonLink] = useState<string>("");
-  const [amazonLinkError, setAmazonLinkError] = useState<string>("");
   const [authorPseudonym, setAuthorPseudonym] = useState<string>("");
   const [isPeriodic, setIsPeriodic] = useState<string>("");
   const [isIssnModalOpen, setIsIssnModalOpen] = useState(false);
@@ -912,53 +910,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       >
                         Modifier
                       </Button>
-                    </div>
-                  )}
-
-                  {/* Amazon Link Field - Only show when Amazon is selected */}
-                  {selectedPublisher && selectedPublisher.name.toLowerCase().includes('amazon') && (
-                    <div className="mt-4 space-y-2 animate-fade-in">
-                      <Label className="flex items-center gap-2">
-                        🔗 Lien du produit Amazon <span className="text-destructive">*</span>
-                      </Label>
-                      <Input
-                        type="url"
-                        placeholder="Exemple : https://www.amazon.fr/.../dp/..."
-                        value={amazonLink}
-                        onChange={(e) => {
-                          const url = e.target.value;
-                          setAmazonLink(url);
-                          
-                          // Validate Amazon domain
-                          if (url && !url.toLowerCase().includes('amazon.')) {
-                            setAmazonLinkError("L'URL fournie n'est pas valide. Seules les pages Amazon officielles sont acceptées.");
-                          } else {
-                            setAmazonLinkError("");
-                          }
-                        }}
-                        className={cn(
-                          "transition-all",
-                          amazonLinkError && "border-destructive focus-visible:ring-destructive"
-                        )}
-                      />
-                      {amazonLinkError && (
-                        <p className="text-sm text-destructive flex items-center gap-1">
-                          <AlertTriangle className="h-3 w-3" />
-                          {amazonLinkError}
-                        </p>
-                      )}
-                      <p className="text-xs text-muted-foreground">
-                        Collez le lien direct vers la page de votre livre sur Amazon (ex. Amazon.fr, Amazon.com, Amazon.ca, etc.)
-                      </p>
-                      <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-md">
-                        <p className="text-sm text-yellow-700 dark:text-yellow-400 font-medium flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          Validation manuelle requise
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Les dépôts avec Amazon nécessitent une vérification manuelle du lien et des informations.
-                        </p>
-                      </div>
                     </div>
                   )}
                 </div>
@@ -3227,19 +3178,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       return;
     }
 
-    // Check for Amazon publisher and validate link
-    const isAmazonPublisher = selectedPublisher && selectedPublisher.name.toLowerCase().includes('amazon');
-    if (isAmazonPublisher) {
-      if (!amazonLink) {
-        toast.error("Le lien du produit Amazon est obligatoire pour les dépôts Amazon");
-        return;
-      }
-      if (!amazonLink.toLowerCase().includes('amazon.')) {
-        toast.error("L'URL fournie n'est pas valide. Seules les pages Amazon officielles sont acceptées.");
-        return;
-      }
-    }
-
     // Check required documents
     const requiredDocs = ['cover', 'cin'];
     if (depositType === "monographie" || depositType === "periodique") {
@@ -3267,21 +3205,15 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
       // Créer la demande de dépôt légal
       const requestNumber = `DL-${new Date().getFullYear()}-${Date.now()}`;
-      const isAmazonPublisher = selectedPublisher && selectedPublisher.name.toLowerCase().includes('amazon');
-      
-      type DepositStatus = 'en_attente_validation_b' | 'brouillon';
-      const depositStatus: DepositStatus = isAmazonPublisher ? 'en_attente_validation_b' : 'brouillon';
       
       const newRequest = {
         initiator_id: professionalData.id,
         request_number: requestNumber,
         support_type: 'imprime' as const,
         monograph_type: 'livres' as const,
-        status: depositStatus,
+        status: 'brouillon' as const,
         title: formData.title || 'Sans titre',
         author_name: formData.author_name || '',
-        amazon_link: isAmazonPublisher ? amazonLink : null,
-        requires_amazon_validation: isAmazonPublisher,
         metadata: {
           editor: editorData,
           printer: printerData,

@@ -11,12 +11,10 @@ export function useLegalDepositValidation(
 ) {
   const publicationType = form.watch('publication.publicationType');
   const authorType = form.watch('author.authorType');
-  const publisherName = form.watch('publisher.publisherName');
 
   // Déterminer quels documents sont obligatoires
   const isThesisRecommendationRequired = publicationType === 'these';
   const isQuranAuthorizationRequired = publicationType === 'coran';
-  const isAmazonLinkRequired = publisherName?.toLowerCase().includes('amazon') || false;
 
   // Déterminer quels champs d'auteur sont obligatoires
   const isAuthorStatusRequired = authorType === 'morale';
@@ -58,33 +56,10 @@ export function useLegalDepositValidation(
     }
   }, [isQuranAuthorizationRequired, form]);
 
-  useEffect(() => {
-    // Validation du lien Amazon
-    if (isAmazonLinkRequired) {
-      const amazonLink = form.getValues('publisher.amazonLink');
-      if (!amazonLink) {
-        form.setError('publisher.amazonLink', {
-          type: 'required',
-          message: 'Le lien du produit Amazon est obligatoire'
-        });
-      } else if (!amazonLink.toLowerCase().includes('amazon.')) {
-        form.setError('publisher.amazonLink', {
-          type: 'pattern',
-          message: 'L\'URL fournie n\'est pas valide. Seules les pages Amazon officielles sont acceptées.'
-        });
-      } else {
-        form.clearErrors('publisher.amazonLink');
-      }
-    } else {
-      form.clearErrors('publisher.amazonLink');
-    }
-  }, [isAmazonLinkRequired, publisherName, form]);
-
   return {
     // Flags pour affichage conditionnel
     isThesisRecommendationRequired,
     isQuranAuthorizationRequired,
-    isAmazonLinkRequired,
     isAuthorStatusRequired,
     isAuthorGenderRequired,
     isAuthorBirthDateRequired,
@@ -92,6 +67,5 @@ export function useLegalDepositValidation(
     // Données de surveillance
     publicationType,
     authorType,
-    publisherName,
   };
 }
