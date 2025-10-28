@@ -6,7 +6,6 @@ import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
 import { useNavigate } from "react-router-dom";
 import { CreateTestDepositButton } from "@/components/admin/CreateTestDepositButton";
-import { SystemListsSyncButton } from "@/components/admin/SystemListsSyncButton";
 
 export default function AdminSettings() {
   const navigate = useNavigate();
@@ -133,7 +132,7 @@ export default function AdminSettings() {
     },
     {
       icon: List,
-      title: "Gestion des Systèmes de listes",
+      title: "Gestion des listes système",
       description: "Paramétrer les listes déroulantes et leurs valeurs",
       href: "/admin/system-lists",
       permission: "content.manage",
@@ -195,7 +194,7 @@ export default function AdminSettings() {
             </div>
             
             {/* Bouton de création de test */}
-            <div className="mb-8 space-y-6">
+            <div className="mb-8">
               <Card>
                 <CardHeader>
                   <CardTitle>🧪 Environnement de Test</CardTitle>
@@ -205,18 +204,6 @@ export default function AdminSettings() {
                 </CardHeader>
                 <CardContent>
                   <CreateTestDepositButton />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>🔄 Synchronisation des Listes Système</CardTitle>
-                  <CardDescription>
-                    Synchroniser toutes les listes déroulantes des formulaires de dépôt légal avec la base de données
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <SystemListsSyncButton />
                 </CardContent>
               </Card>
             </div>

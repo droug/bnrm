@@ -16,7 +16,7 @@ export default function SystemListsPage() {
       >
         <div className="min-h-screen bg-background">
           <AdminHeader 
-            title="Gestion des Systèmes de listes"
+            title="Gestion des listes système"
             subtitle="Configurez les listes déroulantes paramétrables du système"
           />
           

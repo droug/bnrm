@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Trash2, Plus, Upload, Download, Edit2, Zap, List, Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import * as XLSX from 'xlsx';
+import { SystemListsSyncButton } from "@/components/admin/SystemListsSyncButton";
 
 interface SystemList {
   id: string;
@@ -465,7 +466,7 @@ export const SystemListsManager = () => {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>🗂️ Gestion des Systèmes de listes</CardTitle>
+            <CardTitle>🗂️ Gestion des listes système</CardTitle>
             <CardDescription>
               Gérez toutes les listes déroulantes du système
             </CardDescription>
@@ -598,7 +599,18 @@ export const SystemListsManager = () => {
           </Dialog>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">`
+      <CardContent className="space-y-6">
+        {/* Bouton de synchronisation */}
+        <div className="mb-6 p-4 bg-muted/50 rounded-lg border">
+          <div className="mb-3">
+            <h4 className="text-sm font-semibold mb-1">🔄 Synchronisation des Listes Système</h4>
+            <p className="text-xs text-muted-foreground">
+              Synchroniser toutes les listes déroulantes des 4 types de formulaires de dépôt légal avec la base de données
+            </p>
+          </div>
+          <SystemListsSyncButton />
+        </div>
+        
         <div className="space-y-4">
           <div>
             <Label>Filtrer les listes par module / formulaire</Label>
