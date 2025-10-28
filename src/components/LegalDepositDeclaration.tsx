@@ -2714,13 +2714,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             </div>
           )}
 
-          <div className="mt-4 p-4 bg-muted/30 rounded-lg">
-            <h4 className="font-semibold mb-2">Adresse d'envoi :</h4>
-            <p className="text-sm text-muted-foreground">
-              Les pièces doivent être envoyées à l'adresse e-mail suivante : <strong>depot.legal@bnrm.ma</strong>
-            </p>
-          </div>
-
           <div className="mt-4 p-4 bg-accent/10 rounded-lg">
             <h4 className="font-semibold mb-2">Modalités et nombre d'exemplaires à déposer :</h4>
             <p className="text-sm text-muted-foreground mb-2">
@@ -3045,13 +3038,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             </div>
           </div>
         )}
-
-        <div className="mt-4 p-4 bg-muted/30 rounded-lg">
-          <h4 className="font-semibold mb-2">عنوان الإرسال:</h4>
-          <p className="text-sm text-muted-foreground">
-            يجب إرسال الوثائق إلى العنوان الإلكتروني التالي: <strong>depot.legal@bnrm.ma</strong>
-          </p>
-        </div>
 
         <div className="mt-4 p-4 bg-accent/10 rounded-lg">
           <h4 className="font-semibold mb-2">طرائق وعدد النسخ الواجب إيداعها:</h4>
