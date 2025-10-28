@@ -645,6 +645,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 {isPeriodic === "yes" && (
                   <div className="space-y-2 animate-fade-in md:col-span-2">
+                    <Label>Demande ISSN</Label>
                     <Button
                       type="button"
                       variant="outline"
