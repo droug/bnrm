@@ -395,7 +395,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de l'auteur</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     value={authorType}
                     onChange={setAuthorType}
                     placeholder="Sélectionner le type"
@@ -432,7 +432,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                     <div className="space-y-2">
                       <Label>Statut</Label>
-                      <SimpleDropdown
+                      <InlineSelect
                         value={authorStatus}
                         onChange={setAuthorStatus}
                         placeholder="Sélectionner le statut"
@@ -449,7 +449,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <>
                     <div className="space-y-2">
                       <Label>Genre</Label>
-                      <SimpleDropdown
+                      <InlineSelect
                         value={authorGender}
                         onChange={setAuthorGender}
                         placeholder="Sélectionner le genre"
@@ -467,7 +467,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                     <div className="space-y-2">
                       <Label>Nature de la déclaration</Label>
-                      <SimpleDropdown
+                      <InlineSelect
                         value={declarationNature}
                         onChange={setDeclarationNature}
                         placeholder="Sélectionner la nature"
@@ -496,7 +496,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Région</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     value={selectedRegion}
                     onChange={(value) => {
                       setSelectedRegion(value);
@@ -512,7 +512,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Ville</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     value={selectedCity}
                     onChange={setSelectedCity}
                     placeholder={selectedRegion ? "Sélectionner la ville" : "Sélectionner d'abord une région"}
@@ -603,7 +603,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Type de support</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder="Sélectionner le type"
                     options={[
                       { value: "printed", label: "Imprimé" },
@@ -614,7 +614,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Type de publication <span className="text-destructive">*</span></Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder="Sélectionner le type de publication"
                     value={publicationType}
                     onChange={setPublicationType}
@@ -624,7 +624,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Périodicité <span className="text-destructive">*</span></Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder="Sélectionner"
                     value={isPeriodic}
                     onChange={(value) => {
@@ -663,7 +663,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Présence de matériel d'accompagnement <span className="text-destructive">*</span></Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder="Sélectionner"
                     value={formData.hasAccompanyingMaterial || ""}
                     onChange={(value) => {
@@ -683,7 +683,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 {formData.hasAccompanyingMaterial === "yes" && (
                   <div className="space-y-2 animate-fade-in">
                     <Label>Type de matériel d'accompagnement <span className="text-destructive">*</span></Label>
-                    <SimpleDropdown
+                    <InlineSelect
                       placeholder="Sélectionner le type"
                       value={formData.accompanyingMaterialType || ""}
                       onChange={(value) => setFormData({ ...formData, accompanyingMaterialType: value })}
@@ -775,7 +775,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Publication en plusieurs volumes</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder="Sélectionner"
                     value={multipleVolumes}
                     onChange={setMultipleVolumes}
