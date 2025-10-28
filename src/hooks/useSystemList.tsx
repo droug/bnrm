@@ -34,32 +34,64 @@ export function useSystemList(listCode: string) {
       setLoading(true);
       setError(null);
 
-      // Récupérer la liste
+      // D'abord, vérifier dans system_lists (listes déroulantes)
       const { data: listData, error: listError } = await supabase
         .from('system_lists')
         .select('id, is_hierarchical')
         .eq('list_code', listCode)
         .maybeSingle();
 
-      if (listError) throw listError;
-      if (!listData) {
-        console.warn(`Liste ${listCode} non trouvée`);
-        setValues([]);
+      if (!listError && listData) {
+        // Récupérer les valeurs depuis system_list_values
+        const { data: valuesData, error: valuesError } = await supabase
+          .from('system_list_values')
+          .select('value_code, value_label, sort_order, metadata, parent_code')
+          .eq('list_id', listData.id)
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true });
+
+        if (valuesError) throw valuesError;
+        setValues(valuesData || []);
         setLoading(false);
         return;
       }
 
-      // Récupérer les valeurs
-      const { data: valuesData, error: valuesError } = await supabase
-        .from('system_list_values')
-        .select('value_code, value_label, sort_order, metadata, parent_code')
-        .eq('list_id', listData.id)
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
+      // Sinon, essayer dans autocomplete_lists (listes auto-complètes)
+      const { data: autoListData, error: autoListError } = await supabase
+        .from('autocomplete_lists')
+        .select('id')
+        .eq('list_code', listCode)
+        .maybeSingle();
 
-      if (valuesError) throw valuesError;
+      if (!autoListError && autoListData) {
+        // Récupérer les valeurs depuis autocomplete_list_values
+        const { data: autoValuesData, error: autoValuesError } = await supabase
+          .from('autocomplete_list_values')
+          .select('value_code, value_label, sort_order, parent_value_code')
+          .eq('list_id', autoListData.id)
+          .eq('is_active', true)
+          .order('level', { ascending: true })
+          .order('sort_order', { ascending: true });
 
-      setValues(valuesData || []);
+        if (autoValuesError) throw autoValuesError;
+        
+        // Mapper pour correspondre à l'interface SystemListValue
+        const mappedValues = (autoValuesData || []).map(v => ({
+          value_code: v.value_code,
+          value_label: v.value_label,
+          sort_order: v.sort_order,
+          parent_code: v.parent_value_code,
+          metadata: null
+        }));
+        
+        setValues(mappedValues);
+        setLoading(false);
+        return;
+      }
+
+      // Si pas trouvé dans les deux tables
+      console.warn(`Liste ${listCode} non trouvée`);
+      setValues([]);
     } catch (err: any) {
       console.error(`Error loading system list ${listCode}:`, err);
       setError(err.message);

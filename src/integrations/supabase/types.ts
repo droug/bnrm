@@ -254,6 +254,89 @@ export type Database = {
         }
         Relationships: []
       }
+      autocomplete_list_values: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          level: number
+          list_id: string
+          parent_value_code: string | null
+          sort_order: number | null
+          value_code: string
+          value_label: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          level?: number
+          list_id: string
+          parent_value_code?: string | null
+          sort_order?: number | null
+          value_code: string
+          value_label: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          level?: number
+          list_id?: string
+          parent_value_code?: string | null
+          sort_order?: number | null
+          value_code?: string
+          value_label?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "autocomplete_list_values_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "autocomplete_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      autocomplete_lists: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          form_name: string | null
+          id: string
+          is_active: boolean | null
+          list_code: string
+          list_name: string
+          max_levels: number | null
+          module: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          form_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          list_code: string
+          list_name: string
+          max_levels?: number | null
+          module?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          form_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          list_code?: string
+          list_name?: string
+          max_levels?: number | null
+          module?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       bnrm_categories_generales: {
         Row: {
           code: string
