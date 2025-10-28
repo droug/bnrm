@@ -1546,19 +1546,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Nature de l'éditeur</Label>
-                  <InlineSelect
-                    value={publisherNature}
-                    onChange={setPublisherNature}
-                    placeholder="Sélectionner la nature"
-                    options={[
-                      { value: "etatique", label: "Étatique" },
-                      { value: "non-etatique", label: "Non étatique" },
-                    ]}
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <Label>Date prévue de parution</Label>
                   <div className="flex gap-2">
                     <Input
@@ -3347,6 +3334,21 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>{language === 'ar' ? 'طبيعة الناشر' : 'Nature de l\'éditeur'}</Label>
+              <InlineSelect
+                value={publisherNature}
+                onChange={setPublisherNature}
+                placeholder={language === 'ar' ? 'اختر الطبيعة' : 'Sélectionner la nature'}
+                options={[
+                  { value: "etatique", label: language === 'ar' ? 'حكومي' : 'Étatique' },
+                  { value: "non-etatique", label: language === 'ar' ? 'غير حكومي' : 'Non étatique' },
+                ]}
+              />
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{language === 'ar' ? 'الاسم' : 'Nom'}</Label>
