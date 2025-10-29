@@ -2727,7 +2727,10 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </>
               )}
               {depositType === "periodique" && (
-                <li>• 4 exemplaires pour les périodiques imprimés</li>
+                <>
+                  <li>• 5 exemplaires pour les périodiques imprimés</li>
+                  <li>• 4 exemplaires pour les numéros à suivre</li>
+                </>
               )}
               {(depositType === "bd_logiciels" || depositType === "collections_specialisees") && (
                 <li>• 2 exemplaires de format identique (CD, DVD, clés USB, etc.)</li>
