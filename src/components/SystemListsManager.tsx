@@ -33,6 +33,7 @@ interface SystemListValue {
   value_label: string;
   sort_order: number;
   is_active: boolean;
+  parent_value_id: string | null;
 }
 
 export const SystemListsManager = () => {
@@ -41,8 +42,11 @@ export const SystemListsManager = () => {
   const [selectedList, setSelectedList] = useState<string | null>(null);
   const [listValues, setListValues] = useState<SystemListValue[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newValue, setNewValue] = useState({ code: "", label: "", order: 0 });
+  const [newValue, setNewValue] = useState({ code: "", label: "", order: 0, parent_value_id: null as string | null });
   const [editingValue, setEditingValue] = useState<SystemListValue | null>(null);
+  const [parentLists, setParentLists] = useState<SystemList[]>([]);
+  const [parentValues, setParentValues] = useState<SystemListValue[]>([]);
+  const [selectedParentList, setSelectedParentList] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCreateListDialogOpen, setIsCreateListDialogOpen] = useState(false);
@@ -76,6 +80,7 @@ export const SystemListsManager = () => {
 
   useEffect(() => {
     fetchLists();
+    fetchParentLists();
   }, []);
 
   useEffect(() => {
@@ -175,11 +180,49 @@ export const SystemListsManager = () => {
     }
   };
 
-  const fetchListValues = async (listId: string) => {
+  const fetchParentLists = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('system_lists')
+        .select('*')
+        .order('list_name');
+
+      if (error) throw error;
+      setParentLists(data || []);
+    } catch (error: any) {
+      console.error("Error fetching parent lists:", error);
+    }
+  };
+
+  const fetchParentValues = async (listId: string) => {
     try {
       const { data, error } = await supabase
         .from('system_list_values')
         .select('*')
+        .eq('list_id', listId)
+        .order('sort_order');
+
+      if (error) throw error;
+      setParentValues(data || []);
+    } catch (error: any) {
+      console.error("Error fetching parent values:", error);
+    }
+  };
+
+  const fetchListValues = async (listId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('system_list_values')
+        .select(`
+          *,
+          parent:parent_value_id (
+            value_label,
+            value_code,
+            list:list_id (
+              list_name
+            )
+          )
+        `)
         .eq('list_id', listId)
         .order('sort_order');
 
@@ -212,6 +255,7 @@ export const SystemListsManager = () => {
           value_code: newValue.code,
           value_label: newValue.label,
           sort_order: newValue.order,
+          parent_value_id: newValue.parent_value_id,
         });
 
       if (error) throw error;
@@ -221,7 +265,9 @@ export const SystemListsManager = () => {
         description: "Valeur ajoutée avec succès",
       });
 
-      setNewValue({ code: "", label: "", order: 0 });
+      setNewValue({ code: "", label: "", order: 0, parent_value_id: null });
+      setSelectedParentList(null);
+      setParentValues([]);
       setIsAddDialogOpen(false);
       fetchListValues(selectedList);
     } catch (error: any) {
@@ -243,6 +289,7 @@ export const SystemListsManager = () => {
           value_code: editingValue.value_code,
           value_label: editingValue.value_label,
           sort_order: editingValue.sort_order,
+          parent_value_id: editingValue.parent_value_id,
         })
         .eq('id', editingValue.id);
 
@@ -255,6 +302,8 @@ export const SystemListsManager = () => {
 
       setIsEditDialogOpen(false);
       setEditingValue(null);
+      setSelectedParentList(null);
+      setParentValues([]);
       if (selectedList) fetchListValues(selectedList);
     } catch (error: any) {
       toast({
@@ -782,6 +831,60 @@ export const SystemListsManager = () => {
                           onChange={(e) => setNewValue({ ...newValue, order: parseInt(e.target.value) || 0 })}
                         />
                       </div>
+                      
+                      <div className="space-y-2 pt-4 border-t">
+                        <Label className="text-sm font-medium">Liaison à une valeur parent (optionnel)</Label>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          Permet de lier cette valeur à une autre liste (ex: Discipline → Type de publication)
+                        </p>
+                        <div>
+                          <Label className="text-xs">1. Sélectionner une liste parent</Label>
+                          <Select 
+                            value={selectedParentList || ""} 
+                            onValueChange={(value) => {
+                              setSelectedParentList(value);
+                              fetchParentValues(value);
+                              setNewValue({ ...newValue, parent_value_id: null });
+                            }}
+                          >
+                            <SelectTrigger className="bg-background">
+                              <SelectValue placeholder="Choisir une liste parent..." />
+                            </SelectTrigger>
+                            <SelectContent className="bg-background max-h-[300px]">
+                              {parentLists
+                                .filter(list => list.id !== selectedList)
+                                .map((list) => (
+                                  <SelectItem key={list.id} value={list.id}>
+                                    {list.list_name} ({list.list_code})
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        {selectedParentList && (
+                          <div>
+                            <Label className="text-xs">2. Sélectionner une valeur parent</Label>
+                            <Select 
+                              value={newValue.parent_value_id || ""} 
+                              onValueChange={(value) => setNewValue({ ...newValue, parent_value_id: value })}
+                            >
+                              <SelectTrigger className="bg-background">
+                                <SelectValue placeholder="Choisir une valeur parent..." />
+                              </SelectTrigger>
+                              <SelectContent className="bg-background max-h-[300px]">
+                                <SelectItem value="">Aucun parent</SelectItem>
+                                {parentValues.map((value) => (
+                                  <SelectItem key={value.id} value={value.id}>
+                                    {value.value_label} ({value.value_code})
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                      </div>
+
                       <Button onClick={handleAddValue} className="w-full">
                         Ajouter
                       </Button>
@@ -829,6 +932,7 @@ export const SystemListsManager = () => {
                   <TableRow>
                     <TableHead>Code</TableHead>
                     <TableHead>Libellé</TableHead>
+                    <TableHead>Valeur parent</TableHead>
                     <TableHead>Ordre</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -856,6 +960,18 @@ export const SystemListsManager = () => {
                           />
                         ) : (
                           value.value_label
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {(value as any).parent ? (
+                          <div className="text-xs">
+                            <div className="font-medium">{(value as any).parent.value_label}</div>
+                            <div className="text-muted-foreground">
+                              {(value as any).parent.list?.list_name}
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">-</span>
                         )}
                       </TableCell>
                       <TableCell>

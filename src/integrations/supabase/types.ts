@@ -6129,6 +6129,7 @@ export type Database = {
           list_id: string
           metadata: Json | null
           parent_code: string | null
+          parent_value_id: string | null
           sort_order: number | null
           updated_at: string | null
           value_code: string
@@ -6141,6 +6142,7 @@ export type Database = {
           list_id: string
           metadata?: Json | null
           parent_code?: string | null
+          parent_value_id?: string | null
           sort_order?: number | null
           updated_at?: string | null
           value_code: string
@@ -6153,6 +6155,7 @@ export type Database = {
           list_id?: string
           metadata?: Json | null
           parent_code?: string | null
+          parent_value_id?: string | null
           sort_order?: number | null
           updated_at?: string | null
           value_code?: string
@@ -6164,6 +6167,13 @@ export type Database = {
             columns: ["list_id"]
             isOneToOne: false
             referencedRelation: "system_lists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "system_list_values_parent_value_id_fkey"
+            columns: ["parent_value_id"]
+            isOneToOne: false
+            referencedRelation: "system_list_values"
             referencedColumns: ["id"]
           },
         ]
