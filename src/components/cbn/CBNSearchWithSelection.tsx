@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { CBNAdvancedSearch } from "./CBNAdvancedSearch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, User, Calendar, Building2, CheckCircle2 } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SearchResult {
@@ -28,6 +29,7 @@ export function CBNSearchWithSelection({
   selectedDocumentId,
   compact = false 
 }: CBNSearchWithSelectionProps) {
+  const navigate = useNavigate();
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -171,7 +173,7 @@ export function CBNSearchWithSelection({
                       {/* Notice Button */}
                       <Button 
                         className="shrink-0"
-                        onClick={() => onSelectDocument(result)}
+                        onClick={() => navigate(`/cbn/notice/${result.id}`)}
                       >
                         Notice
                       </Button>
