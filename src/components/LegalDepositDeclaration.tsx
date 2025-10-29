@@ -1883,11 +1883,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input placeholder="Disciplines de la publication" />
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Mots clés</Label>
-                  <Input placeholder="Mots clés" />
-                </div>
-
               </div>
             </div>
 
