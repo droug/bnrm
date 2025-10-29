@@ -649,18 +649,18 @@ export const SystemListsManager = () => {
                   <div className="space-y-2">
                     <Label className="text-xs">Liste parent</Label>
                     <Select
-                      value={newListData.parent_list_id || ""}
+                      value={newListData.parent_list_id || "none"}
                       onValueChange={(value) => setNewListData({ 
                         ...newListData, 
-                        parent_list_id: value || null,
-                        depends_on_parent_value: value ? true : false
+                        parent_list_id: value === "none" ? null : value,
+                        depends_on_parent_value: value !== "none" ? true : false
                       })}
                     >
                       <SelectTrigger className="bg-background">
                         <SelectValue placeholder="Aucune dépendance" />
                       </SelectTrigger>
                       <SelectContent className="bg-background max-h-[300px]">
-                        <SelectItem value="">Aucune dépendance</SelectItem>
+                        <SelectItem value="none">Aucune dépendance</SelectItem>
                         {lists.map((list) => (
                           <SelectItem key={list.id} value={list.id}>
                             {list.list_name} ({list.list_code})
@@ -945,14 +945,14 @@ export const SystemListsManager = () => {
                           <div>
                             <Label className="text-xs">2. Sélectionner une valeur parent</Label>
                             <Select 
-                              value={newValue.parent_value_id || ""} 
-                              onValueChange={(value) => setNewValue({ ...newValue, parent_value_id: value })}
+                              value={newValue.parent_value_id || "none"} 
+                              onValueChange={(value) => setNewValue({ ...newValue, parent_value_id: value === "none" ? null : value })}
                             >
                               <SelectTrigger className="bg-background">
                                 <SelectValue placeholder="Choisir une valeur parent..." />
                               </SelectTrigger>
                               <SelectContent className="bg-background max-h-[300px]">
-                                <SelectItem value="">Aucun parent</SelectItem>
+                                <SelectItem value="none">Aucun parent</SelectItem>
                                 {parentValues.map((value) => (
                                   <SelectItem key={value.id} value={value.id}>
                                     {value.value_label} ({value.value_code})
