@@ -11,6 +11,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { Upload, FileText, Plus, Trash2, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { CBNSearchWithSelection } from "@/components/cbn/CBNSearchWithSelection";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ReproductionItem {
   id?: string;
@@ -35,6 +37,7 @@ export function ReproductionRequestForm() {
   const [userNotes, setUserNotes] = useState("");
   const [supportingDocs, setSupportingDocs] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSearchDialog, setShowSearchDialog] = useState(false);
 
   const modalityOptions = [
     { value: "papier", label: language === "ar" ? "ورقي" : "Papier" },
@@ -46,8 +49,8 @@ export function ReproductionRequestForm() {
   const addItem = (selectedDoc: any) => {
     const newItem: ReproductionItem = {
       title: selectedDoc.title,
-      reference: selectedDoc.reference || "",
-      content_id: selectedDoc.content_id,
+      reference: selectedDoc.cote || selectedDoc.reference || "",
+      content_id: selectedDoc.id || selectedDoc.content_id,
       manuscript_id: selectedDoc.manuscript_id,
       formats: ["pdf"],
       pages_specification: "",
@@ -56,6 +59,7 @@ export function ReproductionRequestForm() {
       quantity: 1,
     };
     setItems([...items, newItem]);
+    setShowSearchDialog(false);
   };
 
   const removeItem = (index: number) => {
@@ -224,7 +228,7 @@ export function ReproductionRequestForm() {
               <Label className="text-base font-semibold">
                 {language === "ar" ? "الوثائق المطلوبة" : "Documents à reproduire"}
               </Label>
-              <Button type="button" variant="outline" size="sm" onClick={() => {/* Open document selector */}}>
+              <Button type="button" variant="outline" size="sm" onClick={() => setShowSearchDialog(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 {language === "ar" ? "إضافة وثيقة" : "Ajouter un document"}
               </Button>
@@ -344,6 +348,22 @@ export function ReproductionRequestForm() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Search Dialog */}
+      <Dialog open={showSearchDialog} onOpenChange={setShowSearchDialog}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Rechercher un document dans le catalogue CBN</DialogTitle>
+            <DialogDescription>
+              Utilisez la recherche avancée pour trouver le document à reproduire
+            </DialogDescription>
+          </DialogHeader>
+          <CBNSearchWithSelection 
+            onSelectDocument={addItem}
+            compact
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
