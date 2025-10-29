@@ -40,32 +40,52 @@ export function CBNSearchWithSelection({
       const mockResults: SearchResult[] = [
         {
           id: "1",
-          title: "Histoire du Maroc contemporain",
-          author: "Mohamed El Mansour",
-          publisher: "Éditions La Croisée des Chemins",
-          year: "2020",
+          title: "Histoire de la littérature marocaine moderne",
+          author: "Ahmed Ben Mohammed",
+          publisher: "Éditions Atlas",
+          year: "2023",
           type: "Livre",
-          status: "Disponible",
-          cote: "HIS-MAR-2020-001"
+          status: "Libre accès",
+          cote: "840.MAR.BEN"
         },
         {
           id: "2",
-          title: "La littérature marocaine francophone",
-          author: "Tahar Ben Jelloun",
-          publisher: "Éditions du Seuil",
-          year: "2018",
-          type: "Livre",
-          status: "Disponible",
-          cote: "LIT-MAR-2018-045"
+          title: "Manuscrits enluminés du Maroc médiéval",
+          author: "Hassan El Fassi",
+          publisher: "Publications de la BNRM",
+          year: "2022",
+          type: "Manuscrit",
+          status: "Numérisé",
+          cote: "091.MAR.ELF"
         },
         {
           id: "3",
+          title: "Archives royales du Maroc : Correspondances diplomatiques 1912-1956",
+          author: "Mohammed Kenbib",
+          publisher: "Éditions du Palais Royal",
+          year: "2023",
+          type: "Archives",
+          status: "Non numérisé",
+          cote: "327.64.KEN"
+        },
+        {
+          id: "4",
+          title: "Revue marocaine d'études juridiques et politiques",
+          author: "Collectif",
+          publisher: "Faculté de Droit - Rabat",
+          year: "2024",
+          type: "Périodique",
+          status: "Numérisé",
+          cote: "340.05.REV"
+        },
+        {
+          id: "5",
           title: "Architecture et urbanisme au Maroc",
           author: "Ahmed Skounti",
           publisher: "Centre Jacques-Berque",
           year: "2019",
           type: "Livre",
-          status: "Consultation sur place",
+          status: "Disponible",
           cote: "ARC-MAR-2019-023"
         },
       ];
@@ -88,90 +108,75 @@ export function CBNSearchWithSelection({
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[400px] pr-4">
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {searchResults.map((result) => (
-                  <Card 
+                  <div 
                     key={result.id}
-                    className={`cursor-pointer transition-all hover:shadow-md ${
+                    className={`p-4 border rounded-lg transition-all ${
                       selectedDocumentId === result.id 
-                        ? 'border-2 border-primary bg-primary/5' 
-                        : 'border border-border'
+                        ? 'border-primary bg-primary/5' 
+                        : 'border-border bg-card'
                     }`}
-                    onClick={() => onSelectDocument(result)}
                   >
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 space-y-2">
-                          <div className="flex items-start gap-2">
-                            <BookOpen className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-base leading-tight">
-                                {result.title}
-                              </h4>
-                              {result.cote && (
-                                <p className="text-sm text-muted-foreground mt-1">
-                                  Cote: {result.cote}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          
-                          <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                            {result.author && (
-                              <div className="flex items-center gap-1">
-                                <User className="h-3.5 w-3.5" />
-                                <span>{result.author}</span>
-                              </div>
-                            )}
-                            {result.publisher && (
-                              <div className="flex items-center gap-1">
-                                <Building2 className="h-3.5 w-3.5" />
-                                <span>{result.publisher}</span>
-                              </div>
-                            )}
-                            {result.year && (
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-3.5 w-3.5" />
-                                <span>{result.year}</span>
-                              </div>
-                            )}
-                          </div>
-                          
-                          <div className="flex gap-2">
-                            {result.type && (
-                              <Badge variant="secondary" className="text-xs">
-                                {result.type}
-                              </Badge>
-                            )}
-                            {result.status && (
-                              <Badge 
-                                variant={result.status === "Disponible" ? "default" : "outline"}
-                                className="text-xs"
-                              >
-                                {result.status}
-                              </Badge>
-                            )}
-                          </div>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 space-y-3">
+                        {/* Title with icon */}
+                        <div className="flex items-start gap-2">
+                          <BookOpen className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                          <h4 className="font-semibold text-base leading-tight">
+                            {result.title}
+                          </h4>
                         </div>
                         
-                        {selectedDocumentId === result.id && (
-                          <CheckCircle2 className="h-6 w-6 text-primary shrink-0" />
-                        )}
+                        {/* Author, Year, Publisher */}
+                        <p className="text-sm text-muted-foreground">
+                          {result.author && `Par ${result.author}`}
+                          {result.author && result.year && ' • '}
+                          {result.year}
+                          {(result.author || result.year) && result.publisher && ' • '}
+                          {result.publisher}
+                        </p>
+                        
+                        {/* Badges */}
+                        <div className="flex flex-wrap gap-2">
+                          {result.status && (
+                            <Badge 
+                              variant="secondary"
+                              className="text-xs"
+                            >
+                              {result.status}
+                            </Badge>
+                          )}
+                          {result.type && (
+                            <Badge variant="outline" className="text-xs">
+                              {result.type}
+                            </Badge>
+                          )}
+                          {result.cote && (
+                            <Badge variant="outline" className="text-xs">
+                              {result.cote}
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        {/* Description - mock for now */}
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {result.title.includes("littérature") && "Cet ouvrage propose une étude approfondie de l'évolution de la littérature marocaine moderne, de l'indépendance à nos jours. Il analyse les principaux courants littéraires, les auteurs majeurs et les thèmes récurrents qui caractérisent cette période riche en productions."}
+                          {result.title.includes("Manuscrits") && "Catalogue exhaustif des manuscrits enluminés conservés à la Bibliothèque Nationale. Cet ouvrage présente une analyse détaillée de l'art de l'enluminure au Maroc médiéval, avec des reproductions haute résolution de pages exceptionnelles."}
+                          {result.title.includes("Archives") && "Recueil de correspondances diplomatiques entre le Maroc et diverses puissances étrangères durant la période du protectorat. Documents d'archives inédits accompagnés d'analyses contextuelles."}
+                          {result.title.includes("Revue") && "Revue académique trimestrielle consacrée aux études juridiques et politiques au Maroc et dans le monde arabe. Numéro spécial sur les réformes constitutionnelles."}
+                        </p>
                       </div>
                       
+                      {/* Notice Button */}
                       <Button 
-                        variant={selectedDocumentId === result.id ? "default" : "outline"}
-                        size="sm"
-                        className="w-full mt-3"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectDocument(result);
-                        }}
+                        className="shrink-0"
+                        onClick={() => onSelectDocument(result)}
                       >
-                        {selectedDocumentId === result.id ? "Document sélectionné" : "Sélectionner ce document"}
+                        Notice
                       </Button>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))}
               </div>
             </ScrollArea>
