@@ -29,6 +29,7 @@ import { worldLanguages } from "@/data/worldLanguages";
 import { worldCountries } from "@/data/worldCountries";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { useSystemList } from "@/hooks/useSystemList";
+import { useDependentList } from "@/hooks/useDependentList";
 
 interface Publisher {
   id: string;
@@ -110,7 +111,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [isPeriodic, setIsPeriodic] = useState<string>("");
   const [disciplineInput, setDisciplineInput] = useState<string>("");
   const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>([]);
-  const [availableDisciplines, setAvailableDisciplines] = useState<Array<{id: string, code: string, label: string}>>([]);
+
+  // Load disciplines based on publication type using dependent list hook
+  const { values: disciplineValues, loading: disciplinesLoading } = useDependentList({
+    listCode: 'bd_discipline',
+    parentListCode: 'bd_type_publication',
+    parentSelectedValue: publicationType,
+    enabled: depositType === 'bd_logiciels' && !!publicationType
+  });
   const [isIssnModalOpen, setIsIssnModalOpen] = useState(false);
   const [issnSubmitted, setIssnSubmitted] = useState(false);
   const [issnFormData, setIssnFormData] = useState({
@@ -141,110 +149,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   // Load system lists for Publications Périodiques
   const { options: publicationTypePeriodicalOptions } = useSystemList('period_type_publication');
 
-  // Load disciplines based on publication type
-  useEffect(() => {
-    const fetchDisciplines = async () => {
-      if (!publicationType) {
-        setAvailableDisciplines([]);
-        return;
-      }
-
-      try {
-        // First, get the Type de publication list
-        const { data: typeList, error: typeListError } = await supabase
-          .from('system_lists')
-          .select('id')
-          .eq('list_code', 'bd_type_publication')
-          .single();
-
-        if (typeListError) throw typeListError;
-
-        // Get the selected type value
-        const { data: typeValues, error: typeValuesError } = await supabase
-          .from('system_list_values')
-          .select('id')
-          .eq('list_id', typeList.id)
-          .eq('value_code', publicationType)
-          .single();
-
-        if (typeValuesError) throw typeValuesError;
-
-        // Get disciplines linked to this type
-        const { data: disciplinesList, error: disciplinesListError } = await supabase
-          .from('system_lists')
-          .select('id')
-          .eq('list_code', 'bd_discipline')
-          .single();
-
-        if (disciplinesListError) throw disciplinesListError;
-
-        const { data: disciplines, error: disciplinesError } = await supabase
-          .from('system_list_values')
-          .select('id, value_code, value_label')
-          .eq('list_id', disciplinesList.id)
-          .eq('parent_value_id', typeValues.id)
-          .order('sort_order');
-
-        if (disciplinesError) throw disciplinesError;
-
-        setAvailableDisciplines(disciplines.map(d => ({
-          id: d.id,
-          code: d.value_code,
-          label: d.value_label
-        })));
-      } catch (error) {
-        console.error("Error loading disciplines:", error);
-        // Fallback to hardcoded suggestions if DB fetch fails
-        const fallbackSuggestions = {
-          database: [
-            "Bases de données bibliographiques",
-            "Bases de données scientifiques",
-            "Bases de données juridiques",
-            "Bases de données économiques",
-            "Bases de données médicales",
-            "Bases de données éducatives",
-            "Bases de données géographiques",
-            "Bases de données statistiques",
-            "Archives numériques",
-            "Répertoires et annuaires"
-          ],
-          software: [
-            "Logiciels éducatifs",
-            "Logiciels de gestion",
-            "Logiciels de comptabilité",
-            "Logiciels de santé",
-            "Logiciels scientifiques",
-            "Logiciels de conception graphique",
-            "Logiciels de traitement de texte",
-            "Logiciels de communication",
-            "Applications mobiles",
-            "Jeux vidéo éducatifs"
-          ],
-          audiovisual: [
-            "Documentaires",
-            "Films éducatifs",
-            "Reportages",
-            "Conférences enregistrées",
-            "Émissions culturelles",
-            "Tutoriels vidéo",
-            "Archives audiovisuelles",
-            "Enregistrements musicaux",
-            "Performances artistiques",
-            "Contenus pédagogiques multimédia"
-          ]
-        };
-        
-        const fallback = fallbackSuggestions[publicationType as keyof typeof fallbackSuggestions] || [];
-        setAvailableDisciplines(fallback.map((label, index) => ({
-          id: `fallback-${index}`,
-          code: label.toLowerCase().replace(/\s+/g, '_'),
-          label
-        })));
-      }
-    };
-
-    fetchDisciplines();
-  }, [publicationType]);
+  // Fetch publication types from database
   useEffect(() => {
     const fetchPublicationTypes = async () => {
       const { data: listData, error: listError } = await supabase
@@ -2002,35 +1907,40 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     />
                     {disciplineInput && publicationType && (
                       <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
-                        {(() => {
-                          const filtered = availableDisciplines.filter(disc => 
-                            disc.label.toLowerCase().includes(disciplineInput.toLowerCase()) &&
-                            !selectedDisciplines.includes(disc.label)
-                          );
-
-                          return (
-                            <>
-                              {filtered.map((disc) => (
+                        {disciplinesLoading ? (
+                          <div className="px-4 py-2 text-sm text-muted-foreground">
+                            Chargement des disciplines...
+                          </div>
+                        ) : (
+                          <>
+                            {disciplineValues
+                              .filter(disc => 
+                                disc.value_label.toLowerCase().includes(disciplineInput.toLowerCase()) &&
+                                !selectedDisciplines.includes(disc.value_label)
+                              )
+                              .map((disc) => (
                                 <button
                                   key={disc.id}
                                   type="button"
                                   className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
                                   onClick={() => {
-                                    setSelectedDisciplines([...selectedDisciplines, disc.label]);
+                                    setSelectedDisciplines([...selectedDisciplines, disc.value_label]);
                                     setDisciplineInput("");
                                   }}
                                 >
-                                  {disc.label}
+                                  {disc.value_label}
                                 </button>
                               ))}
-                              {filtered.length === 0 && (
-                                <div className="px-4 py-2 text-sm text-muted-foreground">
-                                  Aucune discipline trouvée
-                                </div>
-                              )}
-                            </>
-                          );
-                        })()}
+                            {disciplineValues.filter(disc => 
+                              disc.value_label.toLowerCase().includes(disciplineInput.toLowerCase()) &&
+                              !selectedDisciplines.includes(disc.value_label)
+                            ).length === 0 && (
+                              <div className="px-4 py-2 text-sm text-muted-foreground">
+                                Aucune discipline trouvée
+                              </div>
+                            )}
+                          </>
+                        )}
                       </div>
                     )}
                   </div>

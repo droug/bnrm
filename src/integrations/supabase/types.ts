@@ -6181,6 +6181,7 @@ export type Database = {
       system_lists: {
         Row: {
           created_at: string | null
+          depends_on_parent_value: boolean | null
           description: string | null
           field_type: string | null
           form_name: string | null
@@ -6190,10 +6191,12 @@ export type Database = {
           list_code: string
           list_name: string
           module: string | null
+          parent_list_id: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          depends_on_parent_value?: boolean | null
           description?: string | null
           field_type?: string | null
           form_name?: string | null
@@ -6203,10 +6206,12 @@ export type Database = {
           list_code: string
           list_name: string
           module?: string | null
+          parent_list_id?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          depends_on_parent_value?: boolean | null
           description?: string | null
           field_type?: string | null
           form_name?: string | null
@@ -6216,9 +6221,18 @@ export type Database = {
           list_code?: string
           list_name?: string
           module?: string | null
+          parent_list_id?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "system_lists_parent_list_id_fkey"
+            columns: ["parent_list_id"]
+            isOneToOne: false
+            referencedRelation: "system_lists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tariff_conditional_rules: {
         Row: {

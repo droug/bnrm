@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, Plus, Upload, Download, Edit2, Zap, List, Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import * as XLSX from 'xlsx';
@@ -24,6 +25,8 @@ interface SystemList {
   module: string | null;
   form_name: string | null;
   field_type: string | null;
+  parent_list_id: string | null;
+  depends_on_parent_value: boolean;
 }
 
 interface SystemListValue {
@@ -63,7 +66,9 @@ export const SystemListsManager = () => {
     module: "",
     form_name: "",
     field_type: "simple",
-    description: ""
+    description: "",
+    parent_list_id: null as string | null,
+    depends_on_parent_value: false
   });
 
   // Créer une liste unique de modules/formulaires
@@ -360,6 +365,8 @@ export const SystemListsManager = () => {
           form_name: newListData.form_name,
           field_type: newListData.field_type,
           description: newListData.description,
+          parent_list_id: newListData.parent_list_id,
+          depends_on_parent_value: newListData.depends_on_parent_value,
         });
 
       if (error) throw error;
@@ -376,7 +383,9 @@ export const SystemListsManager = () => {
         module: "",
         form_name: "",
         field_type: "simple",
-        description: ""
+        description: "",
+        parent_list_id: null,
+        depends_on_parent_value: false
       });
       fetchLists();
     } catch (error: any) {
@@ -631,6 +640,63 @@ export const SystemListsManager = () => {
                   </Select>
                 </div>
 
+                <div className="space-y-3 pt-4 border-t">
+                  <Label className="text-sm font-medium">Dépendance à une liste parent (optionnel)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Si cette liste dépend d'une autre liste, configurez la liaison ici. Les valeurs de cette liste seront filtrées selon la valeur sélectionnée dans la liste parent.
+                  </p>
+                  
+                  <div className="space-y-2">
+                    <Label className="text-xs">Liste parent</Label>
+                    <Select
+                      value={newListData.parent_list_id || ""}
+                      onValueChange={(value) => setNewListData({ 
+                        ...newListData, 
+                        parent_list_id: value || null,
+                        depends_on_parent_value: value ? true : false
+                      })}
+                    >
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Aucune dépendance" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background max-h-[300px]">
+                        <SelectItem value="">Aucune dépendance</SelectItem>
+                        {lists.map((list) => (
+                          <SelectItem key={list.id} value={list.id}>
+                            {list.list_name} ({list.list_code})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Ex: "Disciplines" peut dépendre de "Type de publication"
+                    </p>
+                  </div>
+                  
+                  {newListData.parent_list_id && (
+                    <div className="flex items-center space-x-2 p-3 bg-muted/30 rounded-md">
+                      <Checkbox
+                        id="depends-parent"
+                        checked={newListData.depends_on_parent_value}
+                        onCheckedChange={(checked) => 
+                          setNewListData({ ...newListData, depends_on_parent_value: !!checked })
+                        }
+                      />
+                      <div className="flex-1">
+                        <label
+                          htmlFor="depends-parent"
+                          className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Filtrer les valeurs selon la sélection parent
+                        </label>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Les valeurs de cette liste seront automatiquement filtrées en fonction de la valeur sélectionnée dans la liste parent
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <div>
                   <Label>Description</Label>
                   <Input
@@ -779,6 +845,19 @@ export const SystemListsManager = () => {
                       </div>
                       {list.module && <p className="text-muted-foreground">Module: {list.module}</p>}
                       {list.form_name && <p className="text-muted-foreground">Formulaire: {list.form_name}</p>}
+                      {list.parent_list_id && (
+                        <div className="mt-2 pt-2 border-t">
+                          <p className="text-muted-foreground">
+                            <span className="font-medium">Dépend de:</span>{' '}
+                            {lists.find(l => l.id === list.parent_list_id)?.list_name || 'Liste inconnue'}
+                          </p>
+                          {list.depends_on_parent_value && (
+                            <p className="text-xs text-primary">
+                              ✓ Filtrage automatique activé selon valeur parent
+                            </p>
+                          )}
+                        </div>
+                      )}
                       {list.description && <p className="text-muted-foreground mt-2">{list.description}</p>}
                     </div>
                   ) : null;
