@@ -1893,6 +1893,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Disciplines de la publication</Label>
+                  {publicationType && (
+                    <p className="text-xs text-muted-foreground">
+                      {publicationType === "database" && "Ex: Bases de données bibliographiques, scientifiques, juridiques, économiques, médicales..."}
+                      {publicationType === "software" && "Ex: Logiciels éducatifs, de gestion, de comptabilité, scientifiques, de santé..."}
+                      {publicationType === "audiovisual" && "Ex: Documentaires, films éducatifs, reportages, conférences enregistrées, émissions culturelles..."}
+                    </p>
+                  )}
                   <div className="relative">
                     <Input
                       placeholder={
