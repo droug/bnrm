@@ -6,8 +6,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SimpleDropdown } from "@/components/ui/simple-dropdown";
 import { InlineSelect } from "@/components/ui/inline-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DynamicHierarchicalSelect } from "@/components/ui/dynamic-hierarchical-select";
@@ -1734,7 +1732,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de l'auteur</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder="Sélectionner le type"
                     options={[
                       { value: "physique", label: "Personne physique" },
@@ -1770,7 +1768,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Région</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     value={selectedRegion}
                     onChange={(value) => {
                       setSelectedRegion(value);
@@ -1786,7 +1784,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Ville</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     value={selectedCity}
                     onChange={setSelectedCity}
                     placeholder={selectedRegion ? "Sélectionner la ville" : "Sélectionner d'abord une région"}
@@ -1813,7 +1811,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Type de publication</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     value={publicationType}
                     onChange={setPublicationType}
                     placeholder="Sélectionner le type"
@@ -2256,7 +2254,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de l'auteur</Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder="Sélectionner le type"
                     options={[
                       { value: "physique", label: "Personne physique" },
@@ -2902,15 +2900,15 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>نوع المؤلف</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="اختر النوع" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="physique">شخص مادي</SelectItem>
-                <SelectItem value="morale">شخص معنوي (هيئة)</SelectItem>
-              </SelectContent>
-            </Select>
+            <InlineSelect
+              value={authorType}
+              onChange={setAuthorType}
+              placeholder="اختر النوع"
+              options={[
+                { value: "physique", label: "شخص مادي" },
+                { value: "morale", label: "شخص معنوي (هيئة)" },
+              ]}
+            />
           </div>
           
           <div className="space-y-2">
@@ -2958,15 +2956,15 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
           <div className="space-y-2">
             <Label>نوع الحامل</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="اختر نوع الحامل" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="printed">مطبوع</SelectItem>
-                <SelectItem value="electronic">إلكتروني</SelectItem>
-              </SelectContent>
-            </Select>
+            <InlineSelect
+              value={naturePublication}
+              onChange={setNaturePublication}
+              placeholder="اختر نوع الحامل"
+              options={[
+                { value: "printed", label: "مطبوع" },
+                { value: "electronic", label: "إلكتروني" },
+              ]}
+            />
           </div>
 
           <div className="space-y-2">
@@ -2991,17 +2989,17 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
           <div className="space-y-2">
             <Label>اللغة</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="اختر اللغة" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ar">العربية</SelectItem>
-                <SelectItem value="fr">الفرنسية</SelectItem>
-                <SelectItem value="en">الإنجليزية</SelectItem>
-                <SelectItem value="ber">الأمازيغية</SelectItem>
-              </SelectContent>
-            </Select>
+            <InlineSelect
+              value=""
+              onChange={() => {}}
+              placeholder="اختر اللغة"
+              options={[
+                { value: "ar", label: "العربية" },
+                { value: "fr", label: "الفرنسية" },
+                { value: "en", label: "الإنجليزية" },
+                { value: "ber", label: "الأمازيغية" },
+              ]}
+            />
           </div>
 
           <div className="space-y-2">
@@ -3016,15 +3014,15 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
           <div className="space-y-2">
             <Label>أول طلب للردمك</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="اختر" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="yes">نعم</SelectItem>
-                <SelectItem value="no">لا</SelectItem>
-              </SelectContent>
-            </Select>
+            <InlineSelect
+              value=""
+              onChange={() => {}}
+              placeholder="اختر"
+              options={[
+                { value: "yes", label: "نعم" },
+                { value: "no", label: "لا" },
+              ]}
+            />
           </div>
 
           <div className="space-y-2 md:col-span-2">
@@ -3693,7 +3691,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Support <span className="text-destructive">*</span></Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder="Sélectionner le support"
                     value={issnFormData.support}
                     onChange={(value) => setIssnFormData({ ...issnFormData, support: value })}
@@ -3707,7 +3705,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Fréquence de parution <span className="text-destructive">*</span></Label>
-                  <SimpleDropdown
+                  <InlineSelect
                     placeholder="Sélectionner la fréquence"
                     value={issnFormData.frequency}
                     onChange={(value) => setIssnFormData({ ...issnFormData, frequency: value })}
