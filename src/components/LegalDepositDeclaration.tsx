@@ -108,6 +108,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [publicationTypes, setPublicationTypes] = useState<Array<{code: string, label: string}>>([]);
   const [authorPseudonym, setAuthorPseudonym] = useState<string>("");
   const [isPeriodic, setIsPeriodic] = useState<string>("");
+  const [disciplineInput, setDisciplineInput] = useState<string>("");
+  const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>([]);
   const [isIssnModalOpen, setIsIssnModalOpen] = useState(false);
   const [issnSubmitted, setIssnSubmitted] = useState(false);
   const [issnFormData, setIssnFormData] = useState({
@@ -1803,6 +1805,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <div className="space-y-2">
                   <Label>Type de publication</Label>
                   <SimpleDropdown
+                    value={publicationType}
+                    onChange={setPublicationType}
                     placeholder="Sélectionner le type"
                     options={[
                       { value: "database", label: "Base de données" },
@@ -1880,7 +1884,113 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Disciplines de la publication</Label>
-                  <Input placeholder="Disciplines de la publication" />
+                  <div className="relative">
+                    <Input
+                      placeholder={
+                        !publicationType 
+                          ? "Sélectionner d'abord un type de publication..." 
+                          : "Rechercher et sélectionner des disciplines..."
+                      }
+                      value={disciplineInput}
+                      onChange={(e) => setDisciplineInput(e.target.value)}
+                      disabled={!publicationType}
+                      className="pr-10"
+                    />
+                    {disciplineInput && publicationType && (
+                      <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                        {(() => {
+                          const suggestions = {
+                            database: [
+                              "Bases de données bibliographiques",
+                              "Bases de données scientifiques",
+                              "Bases de données juridiques",
+                              "Bases de données économiques",
+                              "Bases de données médicales",
+                              "Bases de données éducatives",
+                              "Bases de données géographiques",
+                              "Bases de données statistiques",
+                              "Archives numériques",
+                              "Répertoires et annuaires"
+                            ],
+                            software: [
+                              "Logiciels éducatifs",
+                              "Logiciels de gestion",
+                              "Logiciels de comptabilité",
+                              "Logiciels de santé",
+                              "Logiciels scientifiques",
+                              "Logiciels de conception graphique",
+                              "Logiciels de traitement de texte",
+                              "Logiciels de communication",
+                              "Applications mobiles",
+                              "Jeux vidéo éducatifs"
+                            ],
+                            audiovisual: [
+                              "Documentaires",
+                              "Films éducatifs",
+                              "Reportages",
+                              "Conférences enregistrées",
+                              "Émissions culturelles",
+                              "Tutoriels vidéo",
+                              "Archives audiovisuelles",
+                              "Enregistrements musicaux",
+                              "Performances artistiques",
+                              "Contenus pédagogiques multimédia"
+                            ]
+                          };
+
+                          const currentSuggestions = suggestions[publicationType as keyof typeof suggestions] || [];
+                          const filtered = currentSuggestions.filter(disc => 
+                            disc.toLowerCase().includes(disciplineInput.toLowerCase()) &&
+                            !selectedDisciplines.includes(disc)
+                          );
+
+                          return (
+                            <>
+                              {filtered.map((disc) => (
+                                <button
+                                  key={disc}
+                                  type="button"
+                                  className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                                  onClick={() => {
+                                    setSelectedDisciplines([...selectedDisciplines, disc]);
+                                    setDisciplineInput("");
+                                  }}
+                                >
+                                  {disc}
+                                </button>
+                              ))}
+                              {filtered.length === 0 && (
+                                <div className="px-4 py-2 text-sm text-muted-foreground">
+                                  Aucune discipline trouvée
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </div>
+                  {selectedDisciplines.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {selectedDisciplines.map((disc, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm"
+                        >
+                          {disc}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedDisciplines(selectedDisciplines.filter((_, i) => i !== index));
+                            }}
+                            className="hover:text-destructive"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
               </div>
