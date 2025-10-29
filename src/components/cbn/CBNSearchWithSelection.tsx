@@ -159,19 +159,17 @@ export function CBNSearchWithSelection({
                         )}
                       </div>
                       
-                      {selectedDocumentId !== result.id && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="w-full mt-3"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectDocument(result);
-                          }}
-                        >
-                          Sélectionner ce document
-                        </Button>
-                      )}
+                      <Button 
+                        variant={selectedDocumentId === result.id ? "default" : "outline"}
+                        size="sm"
+                        className="w-full mt-3"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectDocument(result);
+                        }}
+                      >
+                        {selectedDocumentId === result.id ? "Document sélectionné" : "Sélectionner ce document"}
+                      </Button>
                     </CardContent>
                   </Card>
                 ))}

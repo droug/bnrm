@@ -14,10 +14,13 @@ interface SearchCriteria {
   author?: string;
   publisher?: string;
   year?: string;
+  yearEnd?: string;
   subject?: string;
   language?: string;
   documentType?: string;
   isbn?: string;
+  cote?: string;
+  collection?: string;
 }
 
 interface CBNAdvancedSearchProps {
@@ -35,10 +38,13 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
   const [author, setAuthor] = useState("");
   const [publisher, setPublisher] = useState("");
   const [year, setYear] = useState("");
+  const [yearEnd, setYearEnd] = useState("");
   const [subject, setSubject] = useState("");
   const [language, setLanguage] = useState("all");
   const [documentType, setDocumentType] = useState("all");
   const [isbn, setIsbn] = useState("");
+  const [cote, setCote] = useState("");
+  const [collection, setCollection] = useState("");
 
   const handleSimpleSearch = () => {
     onSearch({
@@ -53,10 +59,13 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
       author: author || undefined,
       publisher: publisher || undefined,
       year: year || undefined,
+      yearEnd: yearEnd || undefined,
       subject: subject || undefined,
       language: language !== "all" ? language : undefined,
       documentType: documentType !== "all" ? documentType : undefined,
       isbn: isbn || undefined,
+      cote: cote || undefined,
+      collection: collection || undefined,
     });
   };
 
@@ -193,12 +202,32 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Année de publication</label>
+                  <label className="text-sm font-medium">Collection</label>
+                  <Input 
+                    placeholder="Nom de la collection" 
+                    value={collection}
+                    onChange={(e) => setCollection(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Année (de)</label>
                   <Input 
                     type="number" 
                     placeholder="AAAA" 
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Année (à)</label>
+                  <Input 
+                    type="number" 
+                    placeholder="AAAA" 
+                    value={yearEnd}
+                    onChange={(e) => setYearEnd(e.target.value)}
                   />
                 </div>
               </div>
@@ -212,7 +241,26 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                 />
               </div>
 
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Cote</label>
+                  <Input 
+                    placeholder="Ex: LIT-MAR-2020-001" 
+                    value={cote}
+                    onChange={(e) => setCote(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">ISBN/ISSN</label>
+                  <Input 
+                    placeholder="ISBN ou ISSN" 
+                    value={isbn}
+                    onChange={(e) => setIsbn(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Langue</label>
                   <Select value={language} onValueChange={setLanguage}>
@@ -243,14 +291,6 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                       <SelectItem value="digital">Numérique</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">ISBN/ISSN</label>
-                  <Input 
-                    placeholder="ISBN ou ISSN" 
-                    value={isbn}
-                    onChange={(e) => setIsbn(e.target.value)}
-                  />
                 </div>
               </div>
 
