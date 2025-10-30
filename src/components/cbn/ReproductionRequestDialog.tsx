@@ -418,7 +418,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                 </span>
               </div>
               <div className="pt-2 border-t text-xs text-muted-foreground">
-                Un devis détaillé vous sera communiqué par email dans les 48h.
+                Les liens de téléchargement des documents seront valables pendant 2 mois.
               </div>
             </div>
           </div>
