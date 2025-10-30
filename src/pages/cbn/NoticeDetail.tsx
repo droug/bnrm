@@ -466,14 +466,6 @@ export default function NoticeDetail() {
 
                 <Separator />
 
-                {/* Type de reproduction */}
-                <ReproductionTypeSelector 
-                  documentStatus={document.status}
-                  documentType={document.type}
-                />
-
-                <Separator />
-
                 {/* Votre historique */}
                 <div>
                   <h4 className="font-semibold mb-2">⏱️ Votre historique</h4>
