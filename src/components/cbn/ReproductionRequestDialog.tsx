@@ -199,10 +199,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
 
             {formData.reproductionType === "microfilm" && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-                <h4 className="text-sm font-semibold text-blue-900 mb-2">ℹ️ Information sur le Duplicate</h4>
-                <p className="text-sm text-blue-800">
-                  La reproduction sur microfilm consiste en la création d'un duplicate. Cette procédure permet de préserver et de reproduire des documents fragiles ou anciens sur support microfilm.
-                </p>
+                <p className="text-sm font-semibold text-blue-900">Création de duplicata</p>
               </div>
             )}
 
