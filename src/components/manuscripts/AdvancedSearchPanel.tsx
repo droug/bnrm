@@ -45,7 +45,7 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
             {filters[filterKey] && <Badge variant="secondary" className="ml-1 px-1 text-xs">{String(filters[filterKey]).slice(0, 15)}</Badge>}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-64 p-2" align="start">
+        <PopoverContent className="w-64 p-2 bg-background border shadow-lg z-50" align="start" side="bottom" sideOffset={4}>
           <div className="space-y-1">
             {entries.map(([value, count]) => (
               <button
