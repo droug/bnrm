@@ -354,39 +354,6 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             </div>
           </div>
 
-          {/* Options supplémentaires */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold border-b pb-2">Options supplémentaires</h3>
-            
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="urgentRequest"
-                  checked={formData.urgentRequest}
-                  onCheckedChange={(checked) => 
-                    setFormData({ ...formData, urgentRequest: checked as boolean })
-                  }
-                />
-                <Label htmlFor="urgentRequest" className="cursor-pointer">
-                  Demande urgente (traitement prioritaire - frais supplémentaires)
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="certifiedCopy"
-                  checked={formData.certifiedCopy}
-                  onCheckedChange={(checked) => 
-                    setFormData({ ...formData, certifiedCopy: checked as boolean })
-                  }
-                />
-                <Label htmlFor="certifiedCopy" className="cursor-pointer">
-                  Copie certifiée conforme (frais supplémentaires)
-                </Label>
-              </div>
-            </div>
-          </div>
-
           {/* Conditions */}
           <div className="space-y-4 bg-muted/30 p-4 rounded-lg">
             <h3 className="text-lg font-semibold">Conditions et autorisations</h3>
