@@ -23,7 +23,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ReproductionTypeSelector } from "@/components/cbn/ReproductionTypeSelector";
 import { ReproductionRequestDialog } from "@/components/cbn/ReproductionRequestDialog";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -428,14 +427,6 @@ export default function NoticeDetailReproduction() {
                     Partager
                   </Button>
                 </div>
-
-                <Separator />
-
-                {/* Type de reproduction */}
-                <ReproductionTypeSelector 
-                  documentStatus={document.status}
-                  documentType={document.type}
-                />
 
                 <Separator />
 
