@@ -432,8 +432,12 @@ export default function NoticeDetail() {
 
                 {/* Actions */}
                 <div className="space-y-2">
-                  {(document.status === "Libre accès" || document.status === "Numérisé") && document.type !== "Microfilm" && (
-                    <Button className="w-full" variant="default">
+                  {document.status === "Numérisé" && document.type !== "Microfilm" && (
+                    <Button 
+                      className="w-full" 
+                      variant="default"
+                      onClick={() => navigate(`/book-reader/${document.id}`)}
+                    >
                       <Download className="h-4 w-4 mr-2" />
                       Consulter en ligne
                     </Button>
