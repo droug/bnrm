@@ -906,7 +906,8 @@ export default function NoticeDetaillee() {
             title: documentData.title,
             author: documentData.author,
             cote: documentData.cote,
-            year: documentData.year
+            year: documentData.year,
+            supportType: documentData.supportType
           }}
         />
       )}

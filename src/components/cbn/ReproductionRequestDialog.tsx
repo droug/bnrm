@@ -19,6 +19,7 @@ interface ReproductionRequestDialogProps {
     author: string;
     cote: string;
     year: string;
+    supportType?: string;
   };
 }
 
@@ -36,8 +37,8 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     country: "Maroc",
     
     // Type de reproduction
-    reproductionType: "numerique", // numerique, papier, microfilm
-    format: "pdf", // pdf, jpeg, tiff pour numérique | A4, A3 pour papier
+    reproductionType: document.supportType === "Microfilm" ? "microfilm" : "numerique", // numerique, papier, microfilm
+    format: document.supportType === "Microfilm" ? "35mm" : "pdf", // pdf, jpeg, tiff pour numérique | A4, A3 pour papier | 35mm, 16mm, microfiche pour microfilm
     quality: "standard", // standard, haute
     
     // Détails de la reproduction
@@ -100,6 +101,11 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             Document : <span className="font-semibold text-foreground">{document.title}</span>
             <br />
             Auteur : {document.author} • Cote : {document.cote}
+            {document.supportType === "Microfilm" && (
+              <span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full font-medium">
+                📼 Microfilm
+              </span>
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -231,6 +237,12 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                         <SelectItem value="jpeg">JPEG</SelectItem>
                         <SelectItem value="tiff">TIFF</SelectItem>
                       </>
+                    ) : formData.reproductionType === "microfilm" ? (
+                      <>
+                        <SelectItem value="35mm">35mm (Standard)</SelectItem>
+                        <SelectItem value="16mm">16mm (Compact)</SelectItem>
+                        <SelectItem value="microfiche">Microfiche</SelectItem>
+                      </>
                     ) : (
                       <>
                         <SelectItem value="A4">A4</SelectItem>
@@ -252,13 +264,33 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="standard">Standard (150 DPI)</SelectItem>
-                    <SelectItem value="haute">Haute qualité (300 DPI)</SelectItem>
-                    <SelectItem value="tres_haute">Très haute qualité (600 DPI)</SelectItem>
+                    {formData.reproductionType === "microfilm" ? (
+                      <>
+                        <SelectItem value="standard">Standard (lecture courante)</SelectItem>
+                        <SelectItem value="haute">Haute résolution (conservation)</SelectItem>
+                        <SelectItem value="tres_haute">Résolution maximale (archivage)</SelectItem>
+                      </>
+                    ) : (
+                      <>
+                        <SelectItem value="standard">Standard (150 DPI)</SelectItem>
+                        <SelectItem value="haute">Haute qualité (300 DPI)</SelectItem>
+                        <SelectItem value="tres_haute">Très haute qualité (600 DPI)</SelectItem>
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
             </div>
+
+            {formData.reproductionType === "microfilm" && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                <h4 className="text-sm font-semibold text-blue-900 mb-2">ℹ️ Information Microfilm</h4>
+                <p className="text-sm text-blue-800">
+                  Les reproductions sur microfilm sont particulièrement adaptées pour la conservation à long terme de documents fragiles. 
+                  Le microfilm 35mm offre la meilleure qualité de reproduction pour les manuscrits anciens.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Étendue de la reproduction */}
@@ -444,13 +476,36 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
 
           {/* Informations tarifaires */}
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-            <h4 className="font-semibold mb-2">ℹ️ Informations tarifaires</h4>
-            <ul className="text-sm space-y-1 text-muted-foreground">
-              <li>• Un devis vous sera envoyé par email sous 48h ouvrées</li>
-              <li>• Les tarifs varient selon le type, le format et la qualité de reproduction</li>
-              <li>• Le paiement se fait avant la livraison</li>
-              <li>• Délai de traitement : 5-10 jours ouvrés (hors demandes urgentes)</li>
-            </ul>
+            <h4 className="font-semibold mb-3">💰 Tarification estimative</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>Type de reproduction :</span>
+                <span className="font-medium">
+                  {formData.reproductionType === "numerique" && "Numérique"}
+                  {formData.reproductionType === "papier" && "Papier"}
+                  {formData.reproductionType === "microfilm" && "Microfilm"}
+                </span>
+              </div>
+              {formData.reproductionType === "microfilm" && (
+                <div className="bg-amber-50 border border-amber-200 rounded p-3 mt-2">
+                  <p className="text-xs text-amber-900 font-medium">
+                    ⚠️ Les reproductions sur microfilm nécessitent un équipement spécialisé. 
+                    Tarif sur devis selon le nombre de bobines et la résolution demandée.
+                  </p>
+                </div>
+              )}
+              <div className="flex justify-between text-muted-foreground">
+                <span>Qualité :</span>
+                <span>
+                  {formData.quality === "standard" && "Standard"}
+                  {formData.quality === "haute" && "Haute qualité"}
+                  {formData.quality === "tres_haute" && "Très haute qualité"}
+                </span>
+              </div>
+              <div className="pt-2 border-t text-xs text-muted-foreground">
+                Un devis détaillé vous sera communiqué par email dans les 48h.
+              </div>
+            </div>
           </div>
 
           {/* Boutons d'action */}

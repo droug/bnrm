@@ -199,6 +199,7 @@ export default function DemandeReproduction() {
             author: currentDocument.author || "",
             cote: currentDocument.cote || "",
             year: currentDocument.year || "",
+            supportType: currentDocument.type || "",
           }}
         />
       )}

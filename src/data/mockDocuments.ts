@@ -271,6 +271,72 @@ export const mockDocuments: MockDocument[] = [
     language: "Français / Latin",
     physicalDescription: "1 carte : grav. col. ; 48 x 62 cm",
     noticeOrigin: "Bibliothèque Nationale du Royaume du Maroc"
+  },
+
+  // 9. Manuscrit sur MICROFILM - Archive médiévale
+  {
+    id: "MIC-1320-001",
+    title: "Al-Muqaddima - Ibn Khaldoun (Manuscrit original)",
+    titleAr: "المقدمة - ابن خلدون (مخطوط أصلي)",
+    author: "Ibn Khaldoun",
+    year: "1320",
+    publisher: "Manuscrit médiéval",
+    publishPlace: "Fès",
+    pages: 378,
+    cote: "091.MAR.IBN.M",
+    internalId: "MIC-1320-001",
+    supportType: "Microfilm",
+    supportStatus: "numerise",
+    isFreeAccess: false,
+    allowPhysicalConsultation: false,
+    description: "Manuscrit original d'Al-Muqaddima conservé sur microfilm 35mm. Ce document exceptionnel du XIVe siècle est l'un des plus importants textes de philosophie de l'histoire et de sociologie du monde arabe. Le manuscrit original étant très fragile, seul le microfilm est disponible pour consultation.",
+    summary: "Manuscrit médiéval d'Ibn Khaldoun conservé sur microfilm - Document patrimonial exceptionnel.",
+    tableOfContents: [
+      "Introduction à la science de la civilisation",
+      "Les dynasties et les royaumes",
+      "L'organisation sociale et politique",
+      "Les sciences et les arts",
+      "La méthodologie historique"
+    ],
+    keywords: ["Manuscrit", "Microfilm", "Ibn Khaldoun", "Philosophie", "Histoire", "Sociologie", "Patrimoine islamique"],
+    collection: "Fonds Manuscrits sur Microfilms",
+    language: "Arabe classique",
+    physicalDescription: "Microfilm 35mm, 4 bobines - Manuscrit original : 378 folios, calligraphie maghribine",
+    noticeOrigin: "Bibliothèque Nationale du Royaume du Maroc",
+    digitalLink: "https://bibliotheque-numerique-bnrm.ma/microfilms/MIC-1320-001"
+  },
+
+  // 10. Manuscrit sur MICROFILM - Collection religieuse
+  {
+    id: "MIC-1450-002",
+    title: "Recueil de Hadiths - Manuscrit de la Qarawiyine",
+    titleAr: "مجموع الأحاديث - مخطوط القرويين",
+    author: "Al-Qadi Iyad",
+    year: "1450",
+    publisher: "Manuscrit de la Mosquée Qarawiyine",
+    publishPlace: "Fès",
+    pages: 524,
+    cote: "091.QAR.HAD.M",
+    internalId: "MIC-1450-002",
+    supportType: "Microfilm",
+    supportStatus: "numerise",
+    isFreeAccess: false,
+    allowPhysicalConsultation: false,
+    description: "Recueil exceptionnel de Hadiths du XVe siècle provenant de la bibliothèque de la mosquée Qarawiyine. Conservé sur microfilm pour préserver l'original. Ce manuscrit contient des annotations rares de plusieurs savants marocains de l'époque. La qualité de la calligraphie et des enluminures en fait un document d'une valeur patrimoniale inestimable.",
+    summary: "Manuscrit religieux du XVe siècle de la Qarawiyine - Conservation sur microfilm.",
+    tableOfContents: [
+      "Hadiths sur la foi et les croyances",
+      "Hadiths sur les pratiques religieuses",
+      "Hadiths sur l'éthique et la morale",
+      "Commentaires des savants",
+      "Index thématique"
+    ],
+    keywords: ["Manuscrit", "Microfilm", "Hadiths", "Islam", "Qarawiyine", "Patrimoine religieux", "Calligraphie"],
+    collection: "Fonds Manuscrits Religieux sur Microfilms",
+    language: "Arabe classique",
+    physicalDescription: "Microfilm 35mm, 6 bobines - Manuscrit original : 524 folios, calligraphie andalouse avec enluminures",
+    noticeOrigin: "Bibliothèque Nationale du Royaume du Maroc - Fonds Qarawiyine",
+    digitalLink: "https://bibliotheque-numerique-bnrm.ma/microfilms/MIC-1450-002"
   }
 ];
 
