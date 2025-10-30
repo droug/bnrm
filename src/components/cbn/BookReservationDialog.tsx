@@ -97,11 +97,17 @@ export function BookReservationDialog({
       userType: "",
       motif: "",
       comments: "",
+      isStudentPFE: false,
+      pfeTheme: "",
     },
   });
 
   const requestPhysical = form.watch("requestPhysical");
   const selectedUserType = form.watch("userType");
+  const isStudentPFE = form.watch("isStudentPFE");
+  
+  // Vérifier si le document est un manuscrit
+  const isManuscript = supportType?.toLowerCase().includes("manuscrit");
 
   useEffect(() => {
     if (requestPhysical && !allowPhysicalConsultation) {
@@ -168,8 +174,53 @@ export function BookReservationDialog({
         return;
       }
 
+      // Vérification pour les manuscrits et étudiants PFE
+      if (isManuscript && data.userType === "etudiant") {
+        if (!data.isStudentPFE) {
+          toast.error("Exception requise", {
+            description: "Les manuscrits sont réservés aux chercheurs. Les étudiants doivent avoir un PFE pour faire une demande d'exception.",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+        if (!data.pfeTheme || !data.pfeProofFile) {
+          toast.error("Preuve requise", {
+            description: "Veuillez fournir le thème de votre PFE et une preuve justificative.",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // Déterminer le routage
       const routing = determineRouting(data);
+
+      // Upload du fichier de preuve PFE si présent
+      let pfeProofUrl = null;
+      if (data.pfeProofFile && data.isStudentPFE) {
+        const fileExt = data.pfeProofFile.name.split('.').pop();
+        const fileName = `${user?.id || 'guest'}_${Date.now()}.${fileExt}`;
+        const filePath = `pfe-proofs/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(filePath, data.pfeProofFile);
+
+        if (uploadError) {
+          console.error('Error uploading PFE proof:', uploadError);
+          toast.error("Erreur lors de l'upload de la preuve", {
+            description: "Veuillez réessayer ou contacter le support",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('documents')
+          .getPublicUrl(filePath);
+        
+        pfeProofUrl = urlData.publicUrl;
+      }
 
       // Préparer les données pour l'insertion
       const reservationData = {
@@ -192,6 +243,9 @@ export function BookReservationDialog({
         user_phone: data.userPhone || null,
         user_type: data.userType || null,
         comments: data.comments || null,
+        is_student_pfe: data.isStudentPFE || false,
+        pfe_theme: data.pfeTheme || null,
+        pfe_proof_url: pfeProofUrl,
       };
 
       const { error } = await supabase
@@ -518,6 +572,92 @@ export function BookReservationDialog({
                 />
               </CardContent>
             </Card>
+
+            {/* Exception PFE pour manuscrits */}
+            {isManuscript && selectedUserType === "etudiant" && (
+              <Card className="border-primary/50">
+                <CardContent className="pt-6 space-y-4">
+                  <div className="flex items-start gap-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                    <AlertCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-medium text-primary">Exception pour les étudiants</p>
+                      <p className="text-muted-foreground mt-1">
+                        Les manuscrits sont généralement réservés aux chercheurs. Si vous avez un Projet de Fin d'Études (PFE), vous pouvez faire une demande d'exception en fournissant une preuve justificative.
+                      </p>
+                    </div>
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="isStudentPFE"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center justify-between space-y-0">
+                        <div className="space-y-1">
+                          <FormLabel className="text-base font-semibold">
+                            J'ai un Projet de Fin d'Études (PFE)
+                          </FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            Cochez cette case si vous souhaitez demander une exception
+                          </p>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  {isStudentPFE && (
+                    <div className="space-y-4 pt-4 border-t">
+                      <FormField
+                        control={form.control}
+                        name="pfeTheme"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Thème du PFE *</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="Intitulé de votre projet de fin d'études" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="pfeProofFile"
+                        render={({ field: { value, onChange, ...field } }) => (
+                          <FormItem>
+                            <FormLabel>Preuve justificative *</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="file"
+                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    onChange(file);
+                                  }
+                                }}
+                                className="cursor-pointer"
+                              />
+                            </FormControl>
+                            <p className="text-xs text-muted-foreground">
+                              Document attestant de votre PFE (attestation, page de garde, sujet validé, etc.)
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>

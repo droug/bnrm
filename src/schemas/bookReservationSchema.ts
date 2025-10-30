@@ -19,6 +19,9 @@ export const bookReservationSchema = z.object({
   userPhone: z.string().optional(),
   userType: z.string().optional(),
   comments: z.string().optional(),
+  isStudentPFE: z.boolean().default(false),
+  pfeProofFile: z.instanceof(File).optional(),
+  pfeTheme: z.string().optional(),
 });
 
 export type BookReservationFormData = z.infer<typeof bookReservationSchema>;
