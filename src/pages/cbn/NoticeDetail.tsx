@@ -327,7 +327,7 @@ export default function NoticeDetail() {
               <CardContent className="space-y-2">
                 <Collapsible open={openSections.zone100} onOpenChange={() => toggleSection("zone100")}>
                   <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-accent/50 rounded-md transition-colors">
-                    <span className="font-medium">Zone 100 - Auteur principal</span>
+                    <span className="font-medium">Auteur principal</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${openSections.zone100 ? 'rotate-180' : ''}`} />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="px-3 py-2 text-sm text-muted-foreground">
@@ -339,7 +339,7 @@ export default function NoticeDetail() {
 
                 <Collapsible open={openSections.zone210} onOpenChange={() => toggleSection("zone210")}>
                   <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-accent/50 rounded-md transition-colors">
-                    <span className="font-medium">Zone 210 - Publication / Éditeur</span>
+                    <span className="font-medium">Publication / Éditeur</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${openSections.zone210 ? 'rotate-180' : ''}`} />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="px-3 py-2 text-sm text-muted-foreground">
@@ -351,7 +351,7 @@ export default function NoticeDetail() {
 
                 <Collapsible open={openSections.zone300} onOpenChange={() => toggleSection("zone300")}>
                   <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-accent/50 rounded-md transition-colors">
-                    <span className="font-medium">Zone 300 - Description matérielle</span>
+                    <span className="font-medium">Description matérielle</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${openSections.zone300 ? 'rotate-180' : ''}`} />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="px-3 py-2 text-sm text-muted-foreground">
@@ -363,7 +363,7 @@ export default function NoticeDetail() {
 
                 <Collapsible open={openSections.zone330} onOpenChange={() => toggleSection("zone330")}>
                   <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-accent/50 rounded-md transition-colors">
-                    <span className="font-medium">Zone 330 - Résumé</span>
+                    <span className="font-medium">Résumé</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${openSections.zone330 ? 'rotate-180' : ''}`} />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="px-3 py-2 text-sm text-muted-foreground">
@@ -375,7 +375,7 @@ export default function NoticeDetail() {
 
                 <Collapsible open={openSections.zone600} onOpenChange={() => toggleSection("zone600")}>
                   <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-accent/50 rounded-md transition-colors">
-                    <span className="font-medium">Zone 600 - Mots-clés</span>
+                    <span className="font-medium">Mots-clés</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${openSections.zone600 ? 'rotate-180' : ''}`} />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="px-3 py-2">
@@ -391,7 +391,7 @@ export default function NoticeDetail() {
 
                 <Collapsible open={openSections.zone801} onOpenChange={() => toggleSection("zone801")}>
                   <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-accent/50 rounded-md transition-colors">
-                    <span className="font-medium">Zone 801 - Origine de la notice</span>
+                    <span className="font-medium">Origine de la notice</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${openSections.zone801 ? 'rotate-180' : ''}`} />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="px-3 py-2 text-sm text-muted-foreground">
@@ -403,7 +403,7 @@ export default function NoticeDetail() {
 
                 <Collapsible open={openSections.zone856} onOpenChange={() => toggleSection("zone856")}>
                   <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-accent/50 rounded-md transition-colors">
-                    <span className="font-medium">Zone 856 - Cote et exemplaires</span>
+                    <span className="font-medium">Cote et exemplaires</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${openSections.zone856 ? 'rotate-180' : ''}`} />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="px-3 py-2 text-sm text-muted-foreground">
