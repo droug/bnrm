@@ -20,19 +20,26 @@ interface ReproductionRequestDialogProps {
     cote: string;
     year: string;
     supportType?: string;
+    status?: string;
   };
 }
 
 export function ReproductionRequestDialog({ isOpen, onClose, document }: ReproductionRequestDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Conditions basées sur le statut et le type du document
+  const isReproductionDisabled = document.status === "Non numérisé";
+  const isMicrofilm = document.supportType === "Microfilm";
+  const isRestrictedAccess = false; // À connecter avec les vraies données
+  
   const [formData, setFormData] = useState({
     // Informations du demandeur (pré-remplies depuis le compte adhérent)
     lastName: "Nom Adhérent",
     firstName: "Prénom Adhérent",
     
     // Type de reproduction
-    reproductionType: document.supportType === "Microfilm" ? "microfilm" : "numerique", // numerique, papier, microfilm
-    format: document.supportType === "Microfilm" ? "35mm" : "pdf", // pdf, jpeg, tiff pour numérique | A4, A3 pour papier | 35mm, 16mm, microfiche pour microfilm
+    reproductionType: isMicrofilm ? "microfilm" : "numerique", // numerique, papier, microfilm
+    format: isMicrofilm ? "35mm" : "pdf", // pdf, jpeg, tiff pour numérique | A4, A3 pour papier | 35mm, 16mm, microfiche pour microfilm
     quality: "haute", // standard, haute
     
     // Détails de la reproduction
@@ -83,6 +90,57 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     }
   };
 
+  // Affichage pour reproduction désactivée
+  if (isReproductionDisabled) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <FileText className="h-5 w-5 text-primary" />
+              Demande de Reproduction
+            </DialogTitle>
+          </DialogHeader>
+          <div className="p-6 bg-muted/30 rounded-lg border border-border text-center space-y-2">
+            <p className="text-sm text-muted-foreground">
+              ⚠️ La reproduction n'est pas autorisée pour ce document.
+            </p>
+            <p className="text-xs italic text-muted-foreground">
+              Dans des cas exceptionnels, une demande peut être faite avec l'autorisation de l'auteur.
+            </p>
+          </div>
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={onClose}>Fermer</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Affichage pour accès restreint
+  if (isRestrictedAccess) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <FileText className="h-5 w-5 text-primary" />
+              Demande de Reproduction
+            </DialogTitle>
+          </DialogHeader>
+          <div className="p-6 bg-muted/30 rounded-lg border border-border text-center">
+            <p className="text-sm text-muted-foreground">
+              🔒 Reproduction soumise à autorisation spéciale.
+            </p>
+          </div>
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={onClose}>Fermer</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -95,7 +153,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             Document : <span className="font-semibold text-foreground">{document.title}</span>
             <br />
             Auteur : {document.author} • Cote : {document.cote}
-            {document.supportType === "Microfilm" && (
+            {isMicrofilm && (
               <span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full font-medium">
                 📼 Microfilm
               </span>
@@ -136,27 +194,31 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
           <div className="space-y-4">
             <h3 className="text-lg font-semibold border-b pb-2">Type de reproduction</h3>
             
-            <div>
-              <Label>Support souhaité *</Label>
-              <RadioGroup
-                value={formData.reproductionType}
-                onValueChange={(value) => setFormData({ ...formData, reproductionType: value })}
-                className="flex gap-4 mt-2"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="numerique" id="numerique" />
-                  <Label htmlFor="numerique" className="cursor-pointer">Numérique</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="papier" id="papier" />
-                  <Label htmlFor="papier" className="cursor-pointer">Papier</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="microfilm" id="microfilm" />
-                  <Label htmlFor="microfilm" className="cursor-pointer">Microfilm</Label>
-                </div>
-              </RadioGroup>
-            </div>
+            {isMicrofilm ? (
+              <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-md">
+                <p className="text-sm text-amber-900 dark:text-amber-200">
+                  ℹ️ Les microfilms ne peuvent être reproduits que sur support microfilm
+                </p>
+              </div>
+            ) : (
+              <div>
+                <Label>Support souhaité *</Label>
+                <RadioGroup
+                  value={formData.reproductionType}
+                  onValueChange={(value) => setFormData({ ...formData, reproductionType: value })}
+                  className="flex gap-4 mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="numerique" id="numerique" />
+                    <Label htmlFor="numerique" className="cursor-pointer">Numérique</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="papier" id="papier" />
+                    <Label htmlFor="papier" className="cursor-pointer">Papier</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -165,14 +227,14 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                   value={formData.format}
                   onChange={(value) => setFormData({ ...formData, format: value })}
                   options={
-                    formData.reproductionType === "numerique" ? [
-                      { value: "pdf", label: "PDF" },
-                      { value: "jpeg", label: "JPEG" },
-                      { value: "tiff", label: "TIFF" }
-                    ] : formData.reproductionType === "microfilm" ? [
+                    isMicrofilm || formData.reproductionType === "microfilm" ? [
                       { value: "35mm", label: "35mm (Standard)" },
                       { value: "16mm", label: "16mm (Compact)" },
                       { value: "microfiche", label: "Microfiche" }
+                    ] : formData.reproductionType === "numerique" ? [
+                      { value: "pdf", label: "PDF" },
+                      { value: "jpeg", label: "JPEG" },
+                      { value: "tiff", label: "TIFF" }
                     ] : [
                       { value: "A4", label: "A4" },
                       { value: "A3", label: "A3" },
@@ -187,16 +249,16 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                 <Input
                   id="quality"
                   disabled
-                  value={formData.reproductionType === "microfilm" ? "Haute résolution (conservation)" : "Haute qualité (300 DPI)"}
+                  value={isMicrofilm || formData.reproductionType === "microfilm" ? "Haute résolution (conservation)" : "Haute qualité (300 DPI)"}
                   className="bg-muted cursor-not-allowed"
                 />
               </div>
             </div>
 
-            {formData.reproductionType === "microfilm" && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-                <h4 className="text-sm font-semibold text-blue-900 mb-2">ℹ️ Information Microfilm</h4>
-                <p className="text-sm text-blue-800">
+            {(isMicrofilm || formData.reproductionType === "microfilm") && (
+              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
+                <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-2">ℹ️ Information Microfilm</h4>
+                <p className="text-sm text-blue-800 dark:text-blue-300">
                   Les reproductions sur microfilm sont particulièrement adaptées pour la conservation à long terme de documents fragiles. 
                   Le microfilm 35mm offre la meilleure qualité de reproduction pour les manuscrits anciens.
                 </p>
