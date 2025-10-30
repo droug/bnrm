@@ -24,12 +24,14 @@ interface CBNSearchWithSelectionProps {
   onSelectDocument: (document: SearchResult) => void;
   selectedDocumentId?: string;
   compact?: boolean;
+  detailsRoute?: "reservation" | "reproduction";
 }
 
 export function CBNSearchWithSelection({ 
   onSelectDocument, 
   selectedDocumentId,
-  compact = false 
+  compact = false,
+  detailsRoute = "reservation"
 }: CBNSearchWithSelectionProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -244,7 +246,12 @@ export function CBNSearchWithSelection({
                       {/* Details Button */}
                       <Button 
                         className="shrink-0"
-                        onClick={() => navigate(`/cbn/notice/${result.id}`)}
+                        onClick={() => {
+                          const route = detailsRoute === "reproduction" 
+                            ? `/cbn/notice-reproduction/${result.id}`
+                            : `/cbn/notice/${result.id}`;
+                          navigate(route);
+                        }}
                       >
                         Détails
                       </Button>

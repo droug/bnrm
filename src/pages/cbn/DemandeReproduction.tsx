@@ -152,6 +152,7 @@ export default function DemandeReproduction() {
         <CBNSearchWithSelection
           onSelectDocument={handleSelectDocument}
           selectedDocumentId={selectedDocuments[selectedDocuments.length - 1]?.id}
+          detailsRoute="reproduction"
         />
 
         {/* Informations supplémentaires */}
