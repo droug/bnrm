@@ -511,10 +511,6 @@ export default function NoticeDetail() {
                     Ajouter au panier
                   </Button>
                   
-                  <Button className="w-full" variant="outline">
-                    Acheter
-                  </Button>
-                  
                   <Button className="w-full" variant="ghost">
                     <Share2 className="h-4 w-4 mr-2" />
                     Partager
