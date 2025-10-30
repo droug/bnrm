@@ -33,7 +33,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     // Type de reproduction
     reproductionType: document.supportType === "Microfilm" ? "microfilm" : "numerique", // numerique, papier, microfilm
     format: document.supportType === "Microfilm" ? "35mm" : "pdf", // pdf, jpeg, tiff pour numérique | A4, A3 pour papier | 35mm, 16mm, microfiche pour microfilm
-    quality: "standard", // standard, haute
+    quality: "haute", // standard, haute
     
     // Détails de la reproduction
     reproductionScope: "partielle", // complete, partielle
@@ -194,29 +194,12 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
               
               <div>
                 <Label htmlFor="quality">Qualité</Label>
-                <Select
-                  value={formData.quality}
-                  onValueChange={(value) => setFormData({ ...formData, quality: value })}
-                >
-                  <SelectTrigger id="quality">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {formData.reproductionType === "microfilm" ? (
-                      <>
-                        <SelectItem value="standard">Standard (lecture courante)</SelectItem>
-                        <SelectItem value="haute">Haute résolution (conservation)</SelectItem>
-                        <SelectItem value="tres_haute">Résolution maximale (archivage)</SelectItem>
-                      </>
-                    ) : (
-                      <>
-                        <SelectItem value="standard">Standard (150 DPI)</SelectItem>
-                        <SelectItem value="haute">Haute qualité (300 DPI)</SelectItem>
-                        <SelectItem value="tres_haute">Très haute qualité (600 DPI)</SelectItem>
-                      </>
-                    )}
-                  </SelectContent>
-                </Select>
+                <Input
+                  id="quality"
+                  disabled
+                  value={formData.reproductionType === "microfilm" ? "Haute résolution (conservation)" : "Haute qualité (300 DPI)"}
+                  className="bg-muted cursor-not-allowed"
+                />
               </div>
             </div>
 
