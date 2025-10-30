@@ -421,7 +421,7 @@ export function BookReservationDialog({
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Date souhaitée de consultation</FormLabel>
-                      <Popover>
+                      <Popover modal={true}>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
@@ -440,7 +440,12 @@ export function BookReservationDialog({
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 z-50" align="start">
+                        <PopoverContent 
+                          className="w-auto p-0" 
+                          align="start"
+                          side="bottom"
+                          sideOffset={4}
+                        >
                           <Calendar
                             mode="single"
                             selected={field.value}
@@ -448,7 +453,7 @@ export function BookReservationDialog({
                             disabled={(date) => date < new Date()}
                             initialFocus
                             locale={fr}
-                            className="p-3 pointer-events-auto"
+                            className="p-3"
                           />
                         </PopoverContent>
                       </Popover>
