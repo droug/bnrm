@@ -214,7 +214,9 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                     options={[
                       { value: "email", label: "Par E-mail" },
                       { value: "telechargement", label: "À télécharger" },
-                      { value: "sous_support", label: "Sous support" }
+                      { value: "sous_support", label: "Sous support" },
+                      { value: "retrait", label: "Retrait sur place (BNRM)" },
+                      { value: "autre", label: "Autre" }
                     ]}
                   />
                 </div>
