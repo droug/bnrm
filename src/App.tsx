@@ -125,7 +125,7 @@ const CBNRechercheAvancee = lazy(() => import("./pages/cbm/RechercheAvancee"));
 const CBNNoticeExample = lazy(() => import("./pages/cbm/NoticeExample"));
 const CatalogueCBN = lazy(() => import("./pages/cbm/CatalogueCBN"));
 const NoticeDetaillee = lazy(() => import("./pages/cbm/NoticeDetaillee"));
-const DemandeReproduction = lazy(() => import("./pages/cbm/DemandeReproduction"));
+const DemandeReproduction = lazy(() => import("./pages/cbn/DemandeReproduction"));
 const UserBookReservations = lazy(() => import("./pages/UserBookReservations"));
 const BookReservationService = lazy(() => import("./pages/BookReservationService"));
 const NoticeDetail = lazy(() => import("./pages/cbn/NoticeDetail"));
@@ -296,7 +296,6 @@ const App = () => (
           <Route path="/cbm/notice/:id" element={<NoticeDetaillee />} />
           <Route path="/cbm/recherche-avancee" element={<CBNRechercheAvancee />} />
           <Route path="/cbm/notice-example" element={<CBNNoticeExample />} />
-          <Route path="/cbm/demande-reproduction" element={<DemandeReproduction />} />
           <Route path="/cbn/reserver-ouvrage" element={<BookReservationService />} />
           <Route path="/cbn/notice/:id" element={<NoticeDetail />} />
           <Route path="/user/book-reservations" element={<UserBookReservations />} />
