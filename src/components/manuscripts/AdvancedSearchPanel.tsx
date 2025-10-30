@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { Badge } from "@/components/ui/badge";
 import { Search, X, Filter, SlidersHorizontal } from "lucide-react";
 import { SearchFilters } from "@/hooks/useManuscriptSearch";
@@ -76,24 +76,22 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
         {renderFacetButton('Période', 'periods', 'period')}
         {renderFacetButton('Genre', 'genres', 'genre')}
         
-        <Select
+        <SimpleSelect
           value={filters.status || 'all'}
-          onValueChange={(value) => {
+          onChange={(value) => {
             setFilters({ ...filters, status: value === 'all' ? undefined : value });
             onSearch();
           }}
-        >
-          <SelectTrigger className="h-8 w-auto">
-            <SelectValue placeholder="Statut" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous statuts</SelectItem>
-            <SelectItem value="available">Disponible</SelectItem>
-            <SelectItem value="digitization">Numérisation</SelectItem>
-            <SelectItem value="reserved">Réservé</SelectItem>
-            <SelectItem value="maintenance">Maintenance</SelectItem>
-          </SelectContent>
-        </Select>
+          options={[
+            { value: 'all', label: 'Tous statuts' },
+            { value: 'available', label: 'Disponible' },
+            { value: 'digitization', label: 'Numérisation' },
+            { value: 'reserved', label: 'Réservé' },
+            { value: 'maintenance', label: 'Maintenance' },
+          ]}
+          placeholder="Statut"
+          className="h-8 w-auto"
+        />
 
         <Button
           variant="outline"
