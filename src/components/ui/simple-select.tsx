@@ -53,16 +53,16 @@ export function SimpleSelect({ value, options, onChange, placeholder, className,
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-input rounded-md shadow-md overflow-hidden z-50">
-          <div className="max-h-60 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-input rounded-md shadow-lg z-50">
+          <div className="max-h-60 overflow-y-auto py-1">
             {options.map((option) => (
               <button
                 key={option.value}
                 type="button"
                 onClick={() => handleSelect(option.value)}
                 className={cn(
-                  "w-full px-3 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground transition-colors",
-                  option.value === value && "bg-accent text-accent-foreground font-medium"
+                  "w-full px-3 py-2.5 text-sm text-left hover:bg-accent hover:text-accent-foreground transition-colors",
+                  option.value === value && "bg-accent text-accent-foreground font-semibold"
                 )}
               >
                 {option.label}
