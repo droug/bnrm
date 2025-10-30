@@ -26,7 +26,6 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { BookReservationDialog } from "@/components/cbn/BookReservationDialog";
-import { ReproductionTypeSelector } from "@/components/cbn/ReproductionTypeSelector";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function NoticeDetail() {
@@ -443,19 +442,13 @@ export default function NoticeDetail() {
                     </Button>
                   )}
                   
-                  {document.status === "Numérisé" && (
-                    <Button className="w-full" variant="default">
-                      Adhérer
-                    </Button>
-                  )}
-                  
                   <Button 
                     className="w-full" 
-                    variant="outline"
+                    variant="default"
                     onClick={() => setShowReservationDialog(true)}
                   >
                     <ShoppingCart className="h-4 w-4 mr-2" />
-                    Ajouter au panier
+                    Réserver l'ouvrage
                   </Button>
                   
                   <Button className="w-full" variant="ghost">
@@ -500,9 +493,10 @@ export default function NoticeDetail() {
           documentYear={document.year}
           supportType={document.type}
           supportStatus={getSupportStatus(document.status)}
+          isFreeAccess={document.status === "Libre accès"}
+          allowPhysicalConsultation={document.status !== "Non numérisé"}
           onReserve={() => {
             setShowReservationDialog(false);
-            // Optionnel: redirection ou notification
           }}
         />
       )}

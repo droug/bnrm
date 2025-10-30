@@ -24,6 +24,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ReproductionTypeSelector } from "@/components/cbn/ReproductionTypeSelector";
+import { ReproductionRequestDialog } from "@/components/cbn/ReproductionRequestDialog";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function NoticeDetailReproduction() {
@@ -32,6 +33,7 @@ export default function NoticeDetailReproduction() {
   const location = useLocation();
   const [document, setDocument] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showReproductionDialog, setShowReproductionDialog] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     zone100: false,
     zone210: false,
@@ -412,6 +414,15 @@ export default function NoticeDetailReproduction() {
 
                 {/* Actions */}
                 <div className="space-y-2">
+                  <Button 
+                    className="w-full" 
+                    variant="default"
+                    onClick={() => setShowReproductionDialog(true)}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Demande de reproduction
+                  </Button>
+                  
                   <Button className="w-full" variant="ghost">
                     <Share2 className="h-4 w-4 mr-2" />
                     Partager
@@ -450,6 +461,22 @@ export default function NoticeDetailReproduction() {
         </div>
       </main>
       <Footer />
+
+      {/* Reproduction Request Dialog */}
+      {showReproductionDialog && document && (
+        <ReproductionRequestDialog
+          isOpen={showReproductionDialog}
+          onClose={() => setShowReproductionDialog(false)}
+          document={{
+            id: document.id,
+            title: document.title,
+            author: document.author,
+            year: document.year,
+            supportType: document.type,
+            cote: document.cote
+          }}
+        />
+      )}
     </div>
   );
 }
