@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CBNAdvancedSearch } from "./CBNAdvancedSearch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +32,18 @@ export function CBNSearchWithSelection({
   const navigate = useNavigate();
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Charger les résultats depuis sessionStorage au montage
+  useEffect(() => {
+    const savedResults = sessionStorage.getItem('cbn_search_results');
+    if (savedResults) {
+      try {
+        setSearchResults(JSON.parse(savedResults));
+      } catch (e) {
+        console.error('Error parsing saved search results:', e);
+      }
+    }
+  }, []);
 
   const handleSearch = async (criteria: any) => {
     setIsSearching(true);
@@ -93,6 +105,8 @@ export function CBNSearchWithSelection({
       ];
       
       setSearchResults(mockResults);
+      // Sauvegarder les résultats dans sessionStorage
+      sessionStorage.setItem('cbn_search_results', JSON.stringify(mockResults));
       setIsSearching(false);
     }, 500);
   };
