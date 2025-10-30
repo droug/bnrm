@@ -36,6 +36,8 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     quality: "haute", // standard, haute
     deliveryMode: "email", // email, telechargement, sous_support
     supportType: "cd", // cd, usb, ssd, autre
+    numberOfCopies: "1", // pour papier
+    paperFormat: "A4", // A4, A3, autre pour papier
     
     // Détails de la reproduction
     reproductionScope: "partielle", // complete, partielle
@@ -238,6 +240,35 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                   </div>
                 )}
               </>
+            )}
+
+            {formData.reproductionType === "papier" && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="numberOfCopies">Nombre de copies demandées *</Label>
+                  <Input
+                    id="numberOfCopies"
+                    type="number"
+                    min="1"
+                    value={formData.numberOfCopies}
+                    onChange={(e) => setFormData({ ...formData, numberOfCopies: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="paperFormat">Format *</Label>
+                  <SimpleSelect
+                    id="paperFormat"
+                    value={formData.paperFormat}
+                    onChange={(value) => setFormData({ ...formData, paperFormat: value })}
+                    options={[
+                      { value: "A4", label: "A4" },
+                      { value: "A3", label: "A3" },
+                      { value: "autre", label: "Autre" }
+                    ]}
+                  />
+                </div>
+              </div>
             )}
           </div>
 
