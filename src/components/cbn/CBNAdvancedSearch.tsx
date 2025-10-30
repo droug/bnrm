@@ -2,11 +2,10 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, BookOpen, Filter } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { LanguageCombobox } from "./LanguageCombobox";
+import { SimpleDropdown } from "./SimpleDropdown";
 
 interface SearchCriteria {
   query?: string;
@@ -75,6 +74,101 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
     onSearch({ documentType: type });
   };
 
+  // Options for dropdowns
+  const searchFieldOptions = [
+    { value: "all", label: "Tous les champs" },
+    { value: "title", label: "Titre" },
+    { value: "author", label: "Auteur" },
+    { value: "subject", label: "Sujet" },
+    { value: "isbn", label: "ISBN/ISSN" },
+  ];
+
+  const languageOptions = [
+    { value: "all", label: "Toutes les langues" },
+    { value: "ar", label: "Arabe" },
+    { value: "fr", label: "Français" },
+    { value: "en", label: "Anglais" },
+    { value: "es", label: "Espagnol" },
+    { value: "de", label: "Allemand" },
+    { value: "it", label: "Italien" },
+    { value: "pt", label: "Portugais" },
+    { value: "ru", label: "Russe" },
+    { value: "zh", label: "Chinois" },
+    { value: "ja", label: "Japonais" },
+    { value: "ko", label: "Coréen" },
+    { value: "tr", label: "Turc" },
+    { value: "nl", label: "Néerlandais" },
+    { value: "pl", label: "Polonais" },
+    { value: "sv", label: "Suédois" },
+    { value: "no", label: "Norvégien" },
+    { value: "da", label: "Danois" },
+    { value: "fi", label: "Finnois" },
+    { value: "el", label: "Grec" },
+    { value: "he", label: "Hébreu" },
+    { value: "hi", label: "Hindi" },
+    { value: "bn", label: "Bengali" },
+    { value: "ur", label: "Ourdou" },
+    { value: "fa", label: "Persan" },
+    { value: "th", label: "Thaï" },
+    { value: "vi", label: "Vietnamien" },
+    { value: "id", label: "Indonésien" },
+    { value: "ms", label: "Malais" },
+    { value: "tl", label: "Tagalog" },
+    { value: "sw", label: "Swahili" },
+    { value: "am", label: "Amharique" },
+    { value: "ha", label: "Haoussa" },
+    { value: "yo", label: "Yoruba" },
+    { value: "ig", label: "Igbo" },
+    { value: "zu", label: "Zoulou" },
+    { value: "xh", label: "Xhosa" },
+    { value: "af", label: "Afrikaans" },
+    { value: "sq", label: "Albanais" },
+    { value: "hy", label: "Arménien" },
+    { value: "az", label: "Azéri" },
+    { value: "eu", label: "Basque" },
+    { value: "be", label: "Biélorusse" },
+    { value: "bs", label: "Bosniaque" },
+    { value: "bg", label: "Bulgare" },
+    { value: "ca", label: "Catalan" },
+    { value: "hr", label: "Croate" },
+    { value: "cs", label: "Tchèque" },
+    { value: "et", label: "Estonien" },
+    { value: "gl", label: "Galicien" },
+    { value: "ka", label: "Géorgien" },
+    { value: "hu", label: "Hongrois" },
+    { value: "is", label: "Islandais" },
+    { value: "ga", label: "Irlandais" },
+    { value: "kk", label: "Kazakh" },
+    { value: "lv", label: "Letton" },
+    { value: "lt", label: "Lituanien" },
+    { value: "mk", label: "Macédonien" },
+    { value: "mt", label: "Maltais" },
+    { value: "mn", label: "Mongol" },
+    { value: "ro", label: "Roumain" },
+    { value: "sr", label: "Serbe" },
+    { value: "sk", label: "Slovaque" },
+    { value: "sl", label: "Slovène" },
+    { value: "uk", label: "Ukrainien" },
+    { value: "cy", label: "Gallois" },
+    { value: "yi", label: "Yiddish" },
+    { value: "la", label: "Latin" },
+    { value: "sa", label: "Sanskrit" },
+    { value: "ber", label: "Berbère (Tamazight)" },
+    { value: "kab", label: "Kabyle" },
+    { value: "tzm", label: "Tamazight du Maroc central" },
+    { value: "shi", label: "Tachelhit" },
+    { value: "rif", label: "Tarifit" },
+  ];
+
+  const documentTypeOptions = [
+    { value: "all", label: "Tous" },
+    { value: "book", label: "Livre" },
+    { value: "periodical", label: "Périodique" },
+    { value: "thesis", label: "Thèse" },
+    { value: "manuscript", label: "Manuscrit" },
+    { value: "digital", label: "Numérique" },
+  ];
+
   return (
     <Card className={`border-2 border-primary/20 shadow-lg ${!compact ? 'mb-6' : ''}`}>
       <CardHeader>
@@ -112,18 +206,13 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSimpleSearch()}
               />
-              <Select value={searchField} onValueChange={setSearchField}>
-                <SelectTrigger className="w-44">
-                  <SelectValue placeholder="Tous les champs" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les champs</SelectItem>
-                  <SelectItem value="title">Titre</SelectItem>
-                  <SelectItem value="author">Auteur</SelectItem>
-                  <SelectItem value="subject">Sujet</SelectItem>
-                  <SelectItem value="isbn">ISBN/ISSN</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="w-44">
+                <SimpleDropdown
+                  value={searchField}
+                  onChange={setSearchField}
+                  options={searchFieldOptions}
+                />
+              </div>
               <Button 
                 className="bg-primary hover:bg-primary/90 px-6"
                 onClick={handleSimpleSearch}
@@ -264,23 +353,20 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Langue</label>
-                  <LanguageCombobox value={language} onChange={setLanguage} />
+                  <SimpleDropdown
+                    value={language}
+                    onChange={setLanguage}
+                    options={languageOptions}
+                    searchable
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Type de document</label>
-                  <Select value={documentType} onValueChange={setDocumentType}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Tous" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Tous</SelectItem>
-                      <SelectItem value="book">Livre</SelectItem>
-                      <SelectItem value="periodical">Périodique</SelectItem>
-                      <SelectItem value="thesis">Thèse</SelectItem>
-                      <SelectItem value="manuscript">Manuscrit</SelectItem>
-                      <SelectItem value="digital">Numérique</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SimpleDropdown
+                    value={documentType}
+                    onChange={setDocumentType}
+                    options={documentTypeOptions}
+                  />
                 </div>
               </div>
 
