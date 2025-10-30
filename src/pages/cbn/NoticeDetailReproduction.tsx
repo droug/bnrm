@@ -77,6 +77,7 @@ export default function NoticeDetailReproduction() {
             cote: data.cote,
             isbn: data.isbn || "Absent",
             pages: data.pages || data.physical_description || "Non spécifié",
+            pageCount: data.pages, // Nombre de pages (integer)
             collection: data.collection,
             language: data.language,
             resume: data.summary,
@@ -414,7 +415,9 @@ export default function NoticeDetailReproduction() {
 
                 {/* Actions */}
                 <div className="space-y-2">
-                  {(document.status === "Libre accès" || document.status === "Numérisé") && document.type !== "Microfilm" && document.type !== "Carte" && (
+                  {(document.status === "Libre accès" || document.status === "Numérisé") && 
+                   document.type !== "Microfilm" && 
+                   !(document.type === "Carte" && (!document.pageCount || document.pageCount <= 1)) && (
                     <Button 
                       className="w-full" 
                       variant="default"
