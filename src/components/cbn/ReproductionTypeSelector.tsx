@@ -180,6 +180,10 @@ export function ReproductionTypeSelector({
       <div className="p-4 bg-muted/30 rounded-lg border border-border">
         <p className="text-sm text-muted-foreground text-center">
           ⚠️ La reproduction n'est pas autorisée pour ce document.
+          <br />
+          <span className="text-xs italic mt-1 block">
+            Dans des cas exceptionnels, une demande peut être faite avec l'autorisation de l'auteur.
+          </span>
         </p>
       </div>
     );
