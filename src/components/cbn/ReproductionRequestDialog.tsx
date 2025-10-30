@@ -230,8 +230,8 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                       onChange={(value) => setFormData({ ...formData, supportType: value })}
                       options={[
                         { value: "cd", label: "CD" },
-                        { value: "usb", label: "Sous support USB" },
-                        { value: "ssd", label: "Sous support SSD" },
+                        { value: "usb", label: "USB" },
+                        { value: "ssd", label: "Carte SD" },
                         { value: "autre", label: "Autre" }
                       ]}
                     />
