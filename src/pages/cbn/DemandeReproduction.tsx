@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -24,6 +24,17 @@ export default function DemandeReproduction() {
   const [selectedDocuments, setSelectedDocuments] = useState<SelectedDocument[]>([]);
   const [showReproductionDialog, setShowReproductionDialog] = useState(false);
   const [currentDocument, setCurrentDocument] = useState<SelectedDocument | null>(null);
+
+  // Nettoyer les résultats de recherche sauvegardés au démontage
+  useEffect(() => {
+    return () => {
+      // Ne nettoyer que si on quitte vraiment la page (pas juste pour voir les détails)
+      const currentPath = window.location.pathname;
+      if (!currentPath.includes('/cbn/notice/')) {
+        sessionStorage.removeItem('cbn_search_results');
+      }
+    };
+  }, []);
 
   const handleSelectDocument = (document: SelectedDocument) => {
     const isAlreadySelected = selectedDocuments.some(doc => doc.id === document.id);

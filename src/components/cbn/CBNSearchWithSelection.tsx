@@ -37,6 +37,19 @@ export function CBNSearchWithSelection({
   const [isSearching, setIsSearching] = useState(false);
   const [documentsCache, setDocumentsCache] = useState<Record<string, any>>({});
 
+  // Charger les résultats sauvegardés au montage du composant
+  useEffect(() => {
+    const savedResults = sessionStorage.getItem('cbn_search_results');
+    if (savedResults) {
+      try {
+        const results = JSON.parse(savedResults);
+        setSearchResults(results);
+      } catch (error) {
+        console.error('Error loading saved search results:', error);
+      }
+    }
+  }, []);
+
   // Charger les documents depuis Supabase pour le cache
   useEffect(() => {
     const loadDocuments = async () => {

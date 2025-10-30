@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -25,6 +25,17 @@ export default function BookReservationService() {
   const navigate = useNavigate();
   const [selectedDocument, setSelectedDocument] = useState<SelectedDocument | null>(null);
   const [showReservationDialog, setShowReservationDialog] = useState(false);
+
+  // Nettoyer les résultats de recherche sauvegardés au démontage
+  useEffect(() => {
+    return () => {
+      // Ne nettoyer que si on quitte vraiment la page (pas juste pour voir les détails)
+      const currentPath = window.location.pathname;
+      if (!currentPath.includes('/cbn/notice/')) {
+        sessionStorage.removeItem('cbn_search_results');
+      }
+    };
+  }, []);
 
   const handleSelectDocument = (doc: SelectedDocument) => {
     setSelectedDocument(doc);
