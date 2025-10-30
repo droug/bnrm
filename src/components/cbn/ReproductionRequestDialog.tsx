@@ -269,46 +269,48 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
           </div>
 
           {/* Étendue de la reproduction */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold border-b pb-2">Étendue de la reproduction</h3>
-            
-            <RadioGroup
-              value={formData.reproductionScope}
-              onValueChange={(value) => setFormData({ ...formData, reproductionScope: value })}
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="complete" id="complete" />
-                <Label htmlFor="complete" className="cursor-pointer">Document complet</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="partielle" id="partielle" />
-                <Label htmlFor="partielle" className="cursor-pointer">Reproduction partielle</Label>
-              </div>
-            </RadioGroup>
+          {formData.reproductionType !== "microfilm" && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold border-b pb-2">Étendue de la reproduction</h3>
+              
+              <RadioGroup
+                value={formData.reproductionScope}
+                onValueChange={(value) => setFormData({ ...formData, reproductionScope: value })}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="complete" id="complete" />
+                  <Label htmlFor="complete" className="cursor-pointer">Document complet</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="partielle" id="partielle" />
+                  <Label htmlFor="partielle" className="cursor-pointer">Reproduction partielle</Label>
+                </div>
+              </RadioGroup>
 
-            {formData.reproductionScope === "partielle" && (
-              <div className="space-y-4 ml-6">
-                <div>
-                  <Label htmlFor="pages">Pages (ex: 10-25, 45, 67-89)</Label>
-                  <Input
-                    id="pages"
-                    placeholder="Ex: 10-25, 45, 67-89"
-                    value={formData.pages}
-                    onChange={(e) => setFormData({ ...formData, pages: e.target.value })}
-                  />
+              {formData.reproductionScope === "partielle" && (
+                <div className="space-y-4 ml-6">
+                  <div>
+                    <Label htmlFor="pages">Pages (ex: 10-25, 45, 67-89)</Label>
+                    <Input
+                      id="pages"
+                      placeholder="Ex: 10-25, 45, 67-89"
+                      value={formData.pages}
+                      onChange={(e) => setFormData({ ...formData, pages: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="sections">Sections / Chapitres</Label>
+                    <Textarea
+                      id="sections"
+                      placeholder="Précisez les sections ou chapitres souhaités"
+                      value={formData.sections}
+                      onChange={(e) => setFormData({ ...formData, sections: e.target.value })}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="sections">Sections / Chapitres</Label>
-                  <Textarea
-                    id="sections"
-                    placeholder="Précisez les sections ou chapitres souhaités"
-                    value={formData.sections}
-                    onChange={(e) => setFormData({ ...formData, sections: e.target.value })}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Usage */}
           <div className="space-y-4">
