@@ -148,7 +148,7 @@ export function BookReservationDialog({
         }
         return {
           routedTo: "responsable_support",
-          message: "Demande de consultation physique - routée vers le Responsable Support",
+          message: "Demande de consultation sur place - routée vers le Responsable Support",
         };
       }
       return {
@@ -352,7 +352,7 @@ export function BookReservationDialog({
                       <FormItem className="flex items-center justify-between space-y-0">
                         <div className="space-y-1">
                           <FormLabel className="text-base font-semibold">
-                            Demande de consultation physique
+                            Demande de consultation sur place
                           </FormLabel>
                           <p className="text-sm text-muted-foreground">
                             Souhaitez-vous consulter le document sur place?

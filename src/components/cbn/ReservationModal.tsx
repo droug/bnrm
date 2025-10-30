@@ -310,7 +310,7 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
               {document.support_status === 'non_numerise' ? (
                 "Cette demande sera traitée par le Responsable Support"
               ) : requestType === 'physique' ? (
-                "Cette demande de consultation physique sera traitée par le Responsable Support"
+                "Cette demande de consultation sur place sera traitée par le Responsable Support"
               ) : (
                 "Cette demande sera traitée par la Bibliothèque Numérique"
               )}
