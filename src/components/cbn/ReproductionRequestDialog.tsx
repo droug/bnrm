@@ -336,7 +336,8 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                   { value: "personnel", label: "Usage personnel" },
                   { value: "recherche", label: "Recherche académique" },
                   { value: "enseignement", label: "Enseignement" },
-                  { value: "commercial", label: "Usage commercial (licence requise)" }
+                  { value: "commercial", label: "Usage commercial" },
+                  { value: "autre", label: "Autre" }
                 ]}
               />
             </div>
