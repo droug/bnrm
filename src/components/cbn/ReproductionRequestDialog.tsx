@@ -38,6 +38,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     supportType: "cd", // cd, usb, ssd, autre
     numberOfCopies: "1", // pour papier
     paperFormat: "A4", // A4, A3, autre pour papier
+    displayMode: "couleur", // couleur, noir_blanc
     
     // Détails de la reproduction
     reproductionScope: "partielle", // complete, partielle
@@ -163,23 +164,17 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              {formData.reproductionType !== "microfilm" && (
+              {formData.reproductionType === "numerique" && (
                 <div>
                   <Label htmlFor="format">Format</Label>
                   <SimpleSelect
                     value={formData.format}
                     onChange={(value) => setFormData({ ...formData, format: value })}
-                    options={
-                      formData.reproductionType === "numerique" ? [
-                        { value: "pdf", label: "PDF" },
-                        { value: "jpeg", label: "JPEG" },
-                        { value: "tiff", label: "TIFF" }
-                      ] : [
-                        { value: "A4", label: "A4" },
-                        { value: "A3", label: "A3" },
-                        { value: "format_original", label: "Format original" }
-                      ]
-                    }
+                    options={[
+                      { value: "pdf", label: "PDF" },
+                      { value: "jpeg", label: "JPEG" },
+                      { value: "tiff", label: "TIFF" }
+                    ]}
                   />
                 </div>
               )}
@@ -241,28 +236,42 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             )}
 
             {formData.reproductionType === "papier" && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="numberOfCopies">Nombre de copies demandées *</Label>
-                  <Input
-                    id="numberOfCopies"
-                    type="number"
-                    min="1"
-                    value={formData.numberOfCopies}
-                    onChange={(e) => setFormData({ ...formData, numberOfCopies: e.target.value })}
-                    required
-                  />
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="numberOfCopies">Nombre de copies demandées *</Label>
+                    <Input
+                      id="numberOfCopies"
+                      type="number"
+                      min="1"
+                      value={formData.numberOfCopies}
+                      onChange={(e) => setFormData({ ...formData, numberOfCopies: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="paperFormat">Format *</Label>
+                    <SimpleSelect
+                      id="paperFormat"
+                      value={formData.paperFormat}
+                      onChange={(value) => setFormData({ ...formData, paperFormat: value })}
+                      options={[
+                        { value: "A4", label: "A4" },
+                        { value: "A3", label: "A3" },
+                        { value: "autre", label: "Autre" }
+                      ]}
+                    />
+                  </div>
                 </div>
                 <div>
-                  <Label htmlFor="paperFormat">Format *</Label>
+                  <Label htmlFor="displayMode">Affichage *</Label>
                   <SimpleSelect
-                    id="paperFormat"
-                    value={formData.paperFormat}
-                    onChange={(value) => setFormData({ ...formData, paperFormat: value })}
+                    id="displayMode"
+                    value={formData.displayMode}
+                    onChange={(value) => setFormData({ ...formData, displayMode: value })}
                     options={[
-                      { value: "A4", label: "A4" },
-                      { value: "A3", label: "A3" },
-                      { value: "autre", label: "Autre" }
+                      { value: "couleur", label: "Couleur" },
+                      { value: "noir_blanc", label: "Noir et Blanc" }
                     ]}
                   />
                 </div>
