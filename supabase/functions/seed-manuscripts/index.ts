@@ -25,7 +25,8 @@ Deno.serve(async (req) => {
         physical_description: 'Manuscrit en bon état',
         acquisition_method: 'don',
         conservation_status: 'bon',
-        classification: 'histoire'
+        classification: 'histoire',
+        thumbnail_url: '/manuscripts/muqaddima.jpg'
       },
       {
         title: 'كتاب الأغاني',
@@ -36,7 +37,8 @@ Deno.serve(async (req) => {
         physical_description: 'Manuscrit ancien',
         acquisition_method: 'don',
         conservation_status: 'bon',
-        classification: 'littérature'
+        classification: 'littérature',
+        thumbnail_url: '/manuscripts/aghani.jpg'
       },
       {
         title: 'الكتاب',
@@ -47,7 +49,8 @@ Deno.serve(async (req) => {
         physical_description: 'Manuscrit de grammaire arabe',
         acquisition_method: 'don',
         conservation_status: 'bon',
-        classification: 'linguistique'
+        classification: 'linguistique',
+        thumbnail_url: '/manuscripts/kitab.jpg'
       },
       {
         title: 'رسالة الغفران',
@@ -58,7 +61,8 @@ Deno.serve(async (req) => {
         physical_description: 'Œuvre littéraire classique',
         acquisition_method: 'don',
         conservation_status: 'bon',
-        classification: 'littérature'
+        classification: 'littérature',
+        thumbnail_url: '/manuscripts/ghufran.jpg'
       },
       {
         title: 'طوق الحمامة',
@@ -69,7 +73,8 @@ Deno.serve(async (req) => {
         physical_description: 'Traité sur l\'amour',
         acquisition_method: 'don',
         conservation_status: 'bon',
-        classification: 'philosophie'
+        classification: 'philosophie',
+        thumbnail_url: '/manuscripts/tawq.jpg'
       },
       {
         title: 'ألف ليلة وليلة',
@@ -80,7 +85,8 @@ Deno.serve(async (req) => {
         physical_description: 'Recueil de contes',
         acquisition_method: 'don',
         conservation_status: 'bon',
-        classification: 'littérature'
+        classification: 'littérature',
+        thumbnail_url: '/manuscripts/1001nights.jpg'
       },
       {
         title: 'الشفاء',
@@ -91,7 +97,8 @@ Deno.serve(async (req) => {
         physical_description: 'Encyclopédie philosophique et scientifique',
         acquisition_method: 'don',
         conservation_status: 'bon',
-        classification: 'philosophie'
+        classification: 'philosophie',
+        thumbnail_url: '/manuscripts/shifa.jpg'
       },
       {
         title: 'تاريخ الرسل والملوك',
@@ -102,7 +109,8 @@ Deno.serve(async (req) => {
         physical_description: 'Chronique historique',
         acquisition_method: 'don',
         conservation_status: 'bon',
-        classification: 'histoire'
+        classification: 'histoire',
+        thumbnail_url: '/manuscripts/tabari.jpg'
       },
       {
         title: 'كليلة ودمنة',
@@ -113,7 +121,8 @@ Deno.serve(async (req) => {
         physical_description: 'Fables et contes',
         acquisition_method: 'don',
         conservation_status: 'bon',
-        classification: 'littérature'
+        classification: 'littérature',
+        thumbnail_url: '/manuscripts/kalila.jpg'
       },
       {
         title: 'البخلاء',
@@ -124,7 +133,8 @@ Deno.serve(async (req) => {
         physical_description: 'Œuvre satirique',
         acquisition_method: 'don',
         conservation_status: 'bon',
-        classification: 'littérature'
+        classification: 'littérature',
+        thumbnail_url: '/manuscripts/bukhala.jpg'
       }
     ];
 
