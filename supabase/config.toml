@@ -68,3 +68,9 @@ verify_jwt = false
 
 [functions.send-cultural-activity-notification]
 verify_jwt = false
+
+[functions.update-manuscript-images]
+verify_jwt = false
+
+[functions.seed-manuscripts]
+verify_jwt = false
