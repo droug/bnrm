@@ -251,7 +251,7 @@ export default function ManuscriptsPlatform() {
                 <Button 
                   size="lg" 
                   asChild 
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all border-2 border-white/40"
+                  className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all"
                 >
                   <Link to="/manuscripts/help">
                     <HelpCircle className="h-5 w-5 mr-2" />
@@ -262,7 +262,7 @@ export default function ManuscriptsPlatform() {
                 {user && (
                   <Dialog open={partnerDialogOpen} onOpenChange={setPartnerDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button size="lg" className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg">
+                      <Button size="lg" className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all">
                         <Users className="h-5 w-5 mr-2" />
                         Devenir Partenaire
                       </Button>
