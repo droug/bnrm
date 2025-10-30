@@ -11,10 +11,11 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, User, Clock, Plus, Edit, Trash2, Save, Calendar, CheckCircle2 } from "lucide-react";
+import { Shield, User, Clock, Plus, Edit, Trash2, Save, Calendar, CheckCircle2, ChevronDown, Settings, BookOpen, FileText, Scale, Printer, HardDrive, CreditCard, Palette, Image as ImageIcon, Users, DollarSign, Workflow, FileCheck, Cog } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface Permission {
   id: string;
@@ -381,22 +382,43 @@ export function PermissionsManager() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
-      <div className="flex items-center space-x-4">
-        <Shield className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestion des Permissions</h1>
-          <p className="text-muted-foreground">
-            Configurez les droits et habilitations pour les rôles et utilisateurs
-          </p>
+    <div className="w-full max-w-[1600px] mx-auto space-y-6">
+      <div className="flex items-center justify-between border-b pb-6">
+        <div className="flex items-center space-x-4">
+          <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary/60 rounded-xl flex items-center justify-center shadow-lg">
+            <Shield className="h-7 w-7 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Gestion Avancée des Permissions
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Contrôle granulaire des droits d'accès par rôle et utilisateur - Tous les modules et plateformes
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="text-sm py-2 px-4">
+            <Settings className="h-4 w-4 mr-2" />
+            {permissions.length} Permissions
+          </Badge>
         </div>
       </div>
 
       <Tabs defaultValue="roles" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="roles">Permissions par Rôle</TabsTrigger>
-          <TabsTrigger value="users">Permissions Utilisateur</TabsTrigger>
-          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+        <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 h-12 bg-muted/50">
+          <TabsTrigger value="roles" className="text-base">
+            <Shield className="h-4 w-4 mr-2" />
+            Permissions par Rôle
+          </TabsTrigger>
+          <TabsTrigger value="users" className="text-base">
+            <User className="h-4 w-4 mr-2" />
+            Permissions Utilisateur
+          </TabsTrigger>
+          <TabsTrigger value="overview" className="text-base">
+            <Cog className="h-4 w-4 mr-2" />
+            Vue d'ensemble
+          </TabsTrigger>
         </TabsList>
 
           {/* Role Permissions Tab */}
@@ -570,78 +592,153 @@ export function PermissionsManager() {
             </CardContent>
           </Card>
 
-          {/* Permissions organisées par modules */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Permissions pour : {roleGroups.flatMap(g => g.roles).find(r => r.value === selectedRole)?.label}</CardTitle>
-              <CardDescription>
-                Configurez les permissions par module fonctionnel
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              {categoryGroups.map((group) => (
-                <div key={group.title} className="space-y-4">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <span className="text-2xl">{group.categories[0].icon}</span>
-                    {group.title}
-                  </h3>
-                  <Separator />
-                  <div className="grid gap-4">
-                    {group.categories.map((category) => {
-                      const categoryPermissions = permissions.filter(p => p.category === category.key);
-                      if (categoryPermissions.length === 0) return null;
-
-                      return (
-                        <div key={category.key} className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-semibold flex items-center gap-2">
-                              <span>{category.icon}</span>
-                              {category.label}
-                              <Badge variant="secondary" className="text-xs">
-                                {categoryPermissions.length} permissions
-                              </Badge>
-                            </h4>
-                          </div>
-                          <div className="grid gap-2 pl-8">
-                            {categoryPermissions.map((permission) => {
-                              const rolePermission = getRolePermissions(selectedRole).find(
-                                rp => rp.permission_id === permission.id
-                              );
-                              
-                              return (
-                                <div 
-                                  key={permission.id} 
-                                  className="flex items-center justify-between p-3 rounded-lg border bg-card hover:shadow-sm transition-all"
-                                >
-                                  <div className="space-y-1 flex-1">
-                                    <div className="flex items-center gap-2">
-                                      <span className="font-medium text-sm">{permission.name}</span>
-                                      {rolePermission?.granted && (
-                                        <Badge variant="default" className="text-xs">Actif</Badge>
-                                      )}
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">
-                                      {permission.description}
-                                    </p>
-                                  </div>
-                                  <Switch
-                                    checked={rolePermission?.granted || false}
-                                    onCheckedChange={(checked) => {
-                                      if (rolePermission) {
-                                        updateRolePermission(rolePermission.id, checked);
-                                      }
-                                    }}
-                                  />
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+          {/* Permissions organisées par modules avec Accordéons */}
+          <Card className="shadow-lg border-2">
+            <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-2xl">
+                    Permissions pour : {roleGroups.flatMap(g => g.roles).find(r => r.value === selectedRole)?.label}
+                  </CardTitle>
+                  <CardDescription className="text-base mt-2">
+                    Configurez les permissions par module fonctionnel via les accordéons ci-dessous
+                  </CardDescription>
                 </div>
-              ))}
+                <Badge variant="secondary" className="text-lg py-2 px-4">
+                  {getRolePermissions(selectedRole).filter(rp => rp.granted).length} Actives
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <Accordion type="multiple" className="space-y-3">
+                {categoryGroups.map((group, groupIndex) => {
+                  const groupCategories = group.categories.filter(category => 
+                    permissions.filter(p => p.category === category.key).length > 0
+                  );
+                  
+                  if (groupCategories.length === 0) return null;
+                  
+                  return (
+                    <AccordionItem 
+                      key={group.title} 
+                      value={`group-${groupIndex}`}
+                      className="border-2 rounded-xl overflow-hidden bg-gradient-to-br from-background to-muted/20"
+                    >
+                      <AccordionTrigger className="px-6 py-4 hover:bg-muted/40 transition-all [&[data-state=open]]:bg-primary/5 [&[data-state=open]]:border-b-2">
+                        <div className="flex items-center gap-4 text-left flex-1">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${
+                            groupIndex === 0 ? 'bg-blue-500/10' :
+                            groupIndex === 1 ? 'bg-green-500/10' :
+                            groupIndex === 2 ? 'bg-purple-500/10' :
+                            'bg-orange-500/10'
+                          }`}>
+                            {group.categories[0].icon}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold">{group.title}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {groupCategories.length} module{groupCategories.length > 1 ? 's' : ''} · {
+                                groupCategories.reduce((acc, cat) => 
+                                  acc + permissions.filter(p => p.category === cat.key).length, 0
+                                )
+                              } permissions
+                            </p>
+                          </div>
+                          <Badge variant="outline" className="ml-auto mr-4">
+                            {
+                              groupCategories.reduce((acc, cat) => {
+                                const catPerms = permissions.filter(p => p.category === cat.key);
+                                return acc + catPerms.filter(p => {
+                                  const rp = getRolePermissions(selectedRole).find(rp => rp.permission_id === p.id);
+                                  return rp?.granted;
+                                }).length;
+                              }, 0)
+                            } / {
+                              groupCategories.reduce((acc, cat) => 
+                                acc + permissions.filter(p => p.category === cat.key).length, 0
+                              )
+                            } actives
+                          </Badge>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-6 pb-6 pt-4">
+                        <Accordion type="multiple" className="space-y-2">
+                          {groupCategories.map((category) => {
+                            const categoryPermissions = permissions.filter(p => p.category === category.key);
+                            const activeCount = categoryPermissions.filter(p => {
+                              const rp = getRolePermissions(selectedRole).find(rp => rp.permission_id === p.id);
+                              return rp?.granted;
+                            }).length;
+                            
+                            return (
+                              <AccordionItem 
+                                key={category.key} 
+                                value={category.key}
+                                className="border rounded-lg overflow-hidden bg-card"
+                              >
+                                <AccordionTrigger className="px-4 py-3 hover:bg-muted/30 [&[data-state=open]]:bg-muted/50">
+                                  <div className="flex items-center gap-3 text-left flex-1">
+                                    <span className="text-xl">{category.icon}</span>
+                                    <div className="flex-1">
+                                      <h4 className="font-semibold">{category.label}</h4>
+                                      <p className="text-xs text-muted-foreground">
+                                        {categoryPermissions.length} permission{categoryPermissions.length > 1 ? 's' : ''}
+                                      </p>
+                                    </div>
+                                    <Badge 
+                                      variant={activeCount === categoryPermissions.length ? "default" : "secondary"}
+                                      className="mr-2"
+                                    >
+                                      {activeCount}/{categoryPermissions.length}
+                                    </Badge>
+                                  </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="px-4 pb-4">
+                                  <div className="space-y-2 pt-2">
+                                    {categoryPermissions.map((permission) => {
+                                      const rolePermission = getRolePermissions(selectedRole).find(
+                                        rp => rp.permission_id === permission.id
+                                      );
+                                      
+                                      return (
+                                        <div 
+                                          key={permission.id} 
+                                          className="flex items-center justify-between p-3 rounded-lg border bg-background hover:shadow-md transition-all group"
+                                        >
+                                          <div className="space-y-1 flex-1 pr-4">
+                                            <div className="flex items-center gap-2">
+                                              <span className="font-medium text-sm">{permission.name}</span>
+                                              {rolePermission?.granted && (
+                                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                              )}
+                                            </div>
+                                            <p className="text-xs text-muted-foreground leading-relaxed">
+                                              {permission.description}
+                                            </p>
+                                          </div>
+                                          <Switch
+                                            checked={rolePermission?.granted || false}
+                                            onCheckedChange={(checked) => {
+                                              if (rolePermission) {
+                                                updateRolePermission(rolePermission.id, checked);
+                                              }
+                                            }}
+                                            className="shrink-0"
+                                          />
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </AccordionContent>
+                              </AccordionItem>
+                            );
+                          })}
+                        </Accordion>
+                      </AccordionContent>
+                    </AccordionItem>
+                  );
+                })}
+              </Accordion>
             </CardContent>
           </Card>
         </TabsContent>

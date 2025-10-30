@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { 
   Settings as SettingsIcon, 
-  ArrowLeft,
-  Key
+  ArrowLeft
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
@@ -52,7 +50,7 @@ const SettingsPage = () => {
 
         {/* Main Content */}
         <main className="container py-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="w-full">
             <div className="space-y-6">
               {/* Profile Header */}
               <div className="flex items-center space-x-4 p-6 bg-gradient-primary rounded-lg text-primary-foreground shadow-moroccan">
@@ -69,24 +67,8 @@ const SettingsPage = () => {
                 </div>
               </div>
 
-              {/* Settings Cards */}
-              <div className="max-w-2xl">
-                {/* Permissions Management */}
-                <Card className="shadow-soft">
-                  <CardHeader className="flex flex-row items-center space-x-4 pb-3">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                      <Key className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <CardTitle>Gestion des Permissions</CardTitle>
-                      <CardDescription>Gérez les permissions utilisateurs</CardDescription>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <PermissionsManager />
-                  </CardContent>
-                </Card>
-              </div>
+              {/* Permissions Management - Full Width */}
+              <PermissionsManager />
 
             </div>
           </div>
