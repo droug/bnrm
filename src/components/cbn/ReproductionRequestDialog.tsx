@@ -186,15 +186,17 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                 />
               </div>
               
-              <div>
-                <Label htmlFor="quality">Qualité</Label>
-                <Input
-                  id="quality"
-                  disabled
-                  value={formData.reproductionType === "microfilm" ? "Haute résolution (conservation)" : "Haute qualité (300 DPI)"}
-                  className="bg-muted cursor-not-allowed"
-                />
-              </div>
+              {formData.reproductionType !== "papier" && (
+                <div>
+                  <Label htmlFor="quality">Qualité</Label>
+                  <Input
+                    id="quality"
+                    disabled
+                    value={formData.reproductionType === "microfilm" ? "Haute résolution (conservation)" : "Haute qualité (300 DPI)"}
+                    className="bg-muted cursor-not-allowed"
+                  />
+                </div>
+              )}
             </div>
 
             {formData.reproductionType === "microfilm" && (
