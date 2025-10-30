@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, BookOpen, Filter } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { LanguageCombobox } from "./LanguageCombobox";
 
 interface SearchCriteria {
   query?: string;
@@ -263,18 +264,7 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Langue</label>
-                  <Select value={language} onValueChange={setLanguage}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Toutes" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Toutes</SelectItem>
-                      <SelectItem value="ar">Arabe</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="en">Anglais</SelectItem>
-                      <SelectItem value="es">Espagnol</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <LanguageCombobox value={language} onChange={setLanguage} />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Type de document</label>
