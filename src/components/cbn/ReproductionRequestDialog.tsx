@@ -163,36 +163,34 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="format">Format</Label>
-                <SimpleSelect
-                  value={formData.format}
-                  onChange={(value) => setFormData({ ...formData, format: value })}
-                  options={
-                    formData.reproductionType === "numerique" ? [
-                      { value: "pdf", label: "PDF" },
-                      { value: "jpeg", label: "JPEG" },
-                      { value: "tiff", label: "TIFF" }
-                    ] : formData.reproductionType === "microfilm" ? [
-                      { value: "35mm", label: "35mm (Standard)" },
-                      { value: "16mm", label: "16mm (Compact)" },
-                      { value: "microfiche", label: "Microfiche" }
-                    ] : [
-                      { value: "A4", label: "A4" },
-                      { value: "A3", label: "A3" },
-                      { value: "format_original", label: "Format original" }
-                    ]
-                  }
-                />
-              </div>
+              {formData.reproductionType !== "microfilm" && (
+                <div>
+                  <Label htmlFor="format">Format</Label>
+                  <SimpleSelect
+                    value={formData.format}
+                    onChange={(value) => setFormData({ ...formData, format: value })}
+                    options={
+                      formData.reproductionType === "numerique" ? [
+                        { value: "pdf", label: "PDF" },
+                        { value: "jpeg", label: "JPEG" },
+                        { value: "tiff", label: "TIFF" }
+                      ] : [
+                        { value: "A4", label: "A4" },
+                        { value: "A3", label: "A3" },
+                        { value: "format_original", label: "Format original" }
+                      ]
+                    }
+                  />
+                </div>
+              )}
               
-              {formData.reproductionType !== "papier" && (
+              {formData.reproductionType !== "papier" && formData.reproductionType !== "microfilm" && (
                 <div>
                   <Label htmlFor="quality">Qualité</Label>
                   <Input
                     id="quality"
                     disabled
-                    value={formData.reproductionType === "microfilm" ? "Haute résolution (conservation)" : "Haute qualité (300 DPI)"}
+                    value="Haute qualité (300 DPI)"
                     className="bg-muted cursor-not-allowed"
                   />
                 </div>
@@ -201,10 +199,9 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
 
             {formData.reproductionType === "microfilm" && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-                <h4 className="text-sm font-semibold text-blue-900 mb-2">ℹ️ Information Microfilm</h4>
+                <h4 className="text-sm font-semibold text-blue-900 mb-2">ℹ️ Information sur le Duplicate</h4>
                 <p className="text-sm text-blue-800">
-                  Les reproductions sur microfilm sont particulièrement adaptées pour la conservation à long terme de documents fragiles. 
-                  Le microfilm 35mm offre la meilleure qualité de reproduction pour les manuscrits anciens.
+                  La reproduction sur microfilm consiste en la création d'un duplicate. Cette procédure permet de préserver et de reproduire des documents fragiles ou anciens sur support microfilm.
                 </p>
               </div>
             )}
