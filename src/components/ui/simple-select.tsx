@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SimpleSelectOption {
@@ -9,23 +9,18 @@ interface SimpleSelectOption {
 
 interface SimpleSelectProps {
   value: string;
-  onChange: (value: string) => void;
   options: SimpleSelectOption[];
+  onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
   id?: string;
 }
 
-export function SimpleSelect({
-  value,
-  onChange,
-  options,
-  placeholder = "Sélectionner...",
-  className,
-  id,
-}: SimpleSelectProps) {
+export function SimpleSelect({ value, options, onChange, placeholder, className, id }: SimpleSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const selectedOption = options.find(opt => opt.value === value);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -34,60 +29,46 @@ export function SimpleSelect({
       }
     };
 
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
-
-  const selectedOption = options.find((opt) => opt.value === value);
+  const handleSelect = (optionValue: string) => {
+    onChange(optionValue);
+    setIsOpen(false);
+  };
 
   return (
-    <div ref={containerRef} className={cn("relative", className)} id={id}>
+    <div ref={containerRef} className={cn("relative", className)}>
       <button
+        id={id}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={cn(
-          "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm",
-          "ring-offset-background placeholder:text-muted-foreground",
-          "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-          "hover:bg-accent/50 transition-colors"
-        )}
+        className="w-full flex items-center justify-between px-3 py-2 border border-input bg-background rounded-md text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
       >
         <span className={cn(!selectedOption && "text-muted-foreground")}>
-          {selectedOption ? selectedOption.label : placeholder}
+          {selectedOption ? selectedOption.label : placeholder || "Sélectionner..."}
         </span>
-        <ChevronDown
-          className={cn(
-            "h-4 w-4 opacity-50 transition-transform",
-            isOpen && "rotate-180"
-          )}
-        />
+        <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full mt-1 z-50 max-h-60 overflow-auto rounded-md border border-input bg-background shadow-lg">
-          {options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => {
-                onChange(option.value);
-                setIsOpen(false);
-              }}
-              className={cn(
-                "flex w-full items-center justify-between px-3 py-2 text-sm text-left",
-                "hover:bg-accent hover:text-accent-foreground transition-colors",
-                value === option.value && "bg-accent/50 font-medium"
-              )}
-            >
-              <span>{option.label}</span>
-              {value === option.value && <Check className="h-4 w-4" />}
-            </button>
-          ))}
+        <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-input rounded-md shadow-md overflow-hidden z-50">
+          <div className="max-h-60 overflow-y-auto">
+            {options.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => handleSelect(option.value)}
+                className={cn(
+                  "w-full px-3 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground transition-colors",
+                  option.value === value && "bg-accent text-accent-foreground font-medium"
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

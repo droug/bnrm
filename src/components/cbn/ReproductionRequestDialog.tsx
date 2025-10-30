@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
@@ -161,35 +161,25 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="format">Format</Label>
-                <Select
+                <SimpleSelect
                   value={formData.format}
-                  onValueChange={(value) => setFormData({ ...formData, format: value })}
-                >
-                  <SelectTrigger id="format">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {formData.reproductionType === "numerique" ? (
-                      <>
-                        <SelectItem value="pdf">PDF</SelectItem>
-                        <SelectItem value="jpeg">JPEG</SelectItem>
-                        <SelectItem value="tiff">TIFF</SelectItem>
-                      </>
-                    ) : formData.reproductionType === "microfilm" ? (
-                      <>
-                        <SelectItem value="35mm">35mm (Standard)</SelectItem>
-                        <SelectItem value="16mm">16mm (Compact)</SelectItem>
-                        <SelectItem value="microfiche">Microfiche</SelectItem>
-                      </>
-                    ) : (
-                      <>
-                        <SelectItem value="A4">A4</SelectItem>
-                        <SelectItem value="A3">A3</SelectItem>
-                        <SelectItem value="format_original">Format original</SelectItem>
-                      </>
-                    )}
-                  </SelectContent>
-                </Select>
+                  onChange={(value) => setFormData({ ...formData, format: value })}
+                  options={
+                    formData.reproductionType === "numerique" ? [
+                      { value: "pdf", label: "PDF" },
+                      { value: "jpeg", label: "JPEG" },
+                      { value: "tiff", label: "TIFF" }
+                    ] : formData.reproductionType === "microfilm" ? [
+                      { value: "35mm", label: "35mm (Standard)" },
+                      { value: "16mm", label: "16mm (Compact)" },
+                      { value: "microfiche", label: "Microfiche" }
+                    ] : [
+                      { value: "A4", label: "A4" },
+                      { value: "A3", label: "A3" },
+                      { value: "format_original", label: "Format original" }
+                    ]
+                  }
+                />
               </div>
               
               <div>
@@ -262,20 +252,16 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             
             <div>
               <Label htmlFor="usageType">Type d'usage *</Label>
-              <Select
+              <SimpleSelect
                 value={formData.usageType}
-                onValueChange={(value) => setFormData({ ...formData, usageType: value })}
-              >
-                <SelectTrigger id="usageType">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="personnel">Usage personnel</SelectItem>
-                  <SelectItem value="recherche">Recherche académique</SelectItem>
-                  <SelectItem value="enseignement">Enseignement</SelectItem>
-                  <SelectItem value="commercial">Usage commercial (licence requise)</SelectItem>
-                </SelectContent>
-              </Select>
+                onChange={(value) => setFormData({ ...formData, usageType: value })}
+                options={[
+                  { value: "personnel", label: "Usage personnel" },
+                  { value: "recherche", label: "Recherche académique" },
+                  { value: "enseignement", label: "Enseignement" },
+                  { value: "commercial", label: "Usage commercial (licence requise)" }
+                ]}
+              />
             </div>
 
             <div>
