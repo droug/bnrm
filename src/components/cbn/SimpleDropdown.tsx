@@ -74,7 +74,7 @@ export function SimpleDropdown({
 
       {/* Dropdown List - Simple, no floating */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-input rounded-md shadow-lg overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-input rounded-md shadow-lg overflow-hidden z-50">
           {searchable && (
             <div className="p-2 border-b border-input">
               <input
