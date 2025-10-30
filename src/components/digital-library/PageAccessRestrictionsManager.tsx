@@ -33,6 +33,8 @@ export function PageAccessRestrictionsManager() {
   const [pageRanges, setPageRanges] = useState<Array<{start: number, end: number}>>([{start: 1, end: 10}]);
   const [manualPages, setManualPages] = useState<number[]>([]);
   const [percentageValue, setPercentageValue] = useState(10);
+  const [percentagePages, setPercentagePages] = useState<number[]>([]);
+  const [showPercentagePages, setShowPercentagePages] = useState(false);
   const [allowPhysicalConsultation, setAllowPhysicalConsultation] = useState(false);
   const [totalPages, setTotalPages] = useState(245);
   const [currentPreviewPage, setCurrentPreviewPage] = useState(1);
@@ -98,11 +100,14 @@ export function PageAccessRestrictionsManager() {
         });
         allowedPages.sort((a, b) => a - b);
       } else if (data.restrictionMode === 'percentage') {
-        // Calculer le nombre de pages selon le pourcentage
-        const numPages = Math.ceil((totalPages * data.percentageValue) / 100);
-        // Autoriser les premières pages (ou ajuster selon besoin)
-        for (let i = 1; i <= numPages; i++) {
-          allowedPages.push(i);
+        // Utiliser les pages du pourcentage (modifiées manuellement ou calculées)
+        allowedPages = data.percentagePages.length > 0 ? data.percentagePages : [];
+        if (allowedPages.length === 0) {
+          // Fallback: calculer si aucune page n'est définie
+          const numPages = Math.ceil((totalPages * data.percentageValue) / 100);
+          for (let i = 1; i <= numPages; i++) {
+            allowedPages.push(i);
+          }
         }
       } else {
         allowedPages = data.manualPages;
@@ -195,6 +200,11 @@ export function PageAccessRestrictionsManager() {
       if (restriction.restriction_mode === 'percentage' && restriction.manual_pages?.length > 0) {
         const percentage = Math.round((restriction.manual_pages.length / totalPages) * 100);
         setPercentageValue(percentage);
+        setPercentagePages(restriction.manual_pages);
+        setShowPercentagePages(true);
+      } else {
+        setPercentagePages([]);
+        setShowPercentagePages(false);
       }
     } else {
       setIsRestricted(false);
@@ -202,6 +212,8 @@ export function PageAccessRestrictionsManager() {
       setPageRanges([{start: 1, end: 10}]);
       setManualPages([]);
       setPercentageValue(10);
+      setPercentagePages([]);
+      setShowPercentagePages(false);
       setAllowPhysicalConsultation(false);
     }
     
@@ -233,8 +245,33 @@ export function PageAccessRestrictionsManager() {
       pageRanges,
       manualPages,
       percentageValue,
+      percentagePages,
       allowPhysicalConsultation,
     });
+  };
+
+  // Calculer les pages basées sur le pourcentage
+  const calculatePercentagePages = () => {
+    const numPages = Math.ceil((totalPages * percentageValue) / 100);
+    const pages = [];
+    for (let i = 1; i <= numPages; i++) {
+      pages.push(i);
+    }
+    setPercentagePages(pages);
+    setShowPercentagePages(true);
+    toast({
+      title: "Pages calculées",
+      description: `${numPages} pages ont été sélectionnées selon le pourcentage de ${percentageValue}%`,
+    });
+  };
+
+  // Basculer une page dans la liste percentage
+  const togglePercentagePage = (page: number) => {
+    if (percentagePages.includes(page)) {
+      setPercentagePages(percentagePages.filter(p => p !== page));
+    } else {
+      setPercentagePages([...percentagePages, page].sort((a, b) => a - b));
+    }
   };
 
   const handleRemoveRestriction = (doc: any) => {
@@ -622,6 +659,12 @@ export function PageAccessRestrictionsManager() {
                                 Page accessible
                               </Badge>
                             )}
+                            {restrictionMode === 'percentage' && percentagePages.includes(currentPreviewPage) && (
+                              <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600 text-white text-base px-4 py-2 shadow-lg">
+                                <Lock className="h-4 w-4 mr-2" />
+                                Page accessible
+                              </Badge>
+                            )}
                             
                             {/* Numéro de page */}
                             <Badge className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-sm px-4 py-2 shadow-lg">
@@ -658,29 +701,43 @@ export function PageAccessRestrictionsManager() {
               </Card>
               
               {/* Actions rapides sur la page courante */}
-              {restrictionMode === 'manual' && (
+              {(restrictionMode === 'manual' || (restrictionMode === 'percentage' && showPercentagePages)) && (
                 <Card className="shadow-md">
                   <CardContent className="p-4">
                     <Button
                       className="w-full h-12 text-base"
-                      variant={manualPages.includes(currentPreviewPage) ? "destructive" : "default"}
+                      variant={
+                        restrictionMode === 'manual' 
+                          ? (manualPages.includes(currentPreviewPage) ? "destructive" : "default")
+                          : (percentagePages.includes(currentPreviewPage) ? "destructive" : "default")
+                      }
                       onClick={() => {
-                        if (manualPages.includes(currentPreviewPage)) {
-                          setManualPages(manualPages.filter(p => p !== currentPreviewPage));
-                          toast({ 
-                            title: "Page retirée", 
-                            description: `La page ${currentPreviewPage} ne sera plus accessible` 
-                          });
+                        if (restrictionMode === 'manual') {
+                          if (manualPages.includes(currentPreviewPage)) {
+                            setManualPages(manualPages.filter(p => p !== currentPreviewPage));
+                            toast({ 
+                              title: "Page retirée", 
+                              description: `La page ${currentPreviewPage} ne sera plus accessible` 
+                            });
+                          } else {
+                            setManualPages([...manualPages, currentPreviewPage].sort((a, b) => a - b));
+                            toast({ 
+                              title: "Page ajoutée", 
+                              description: `La page ${currentPreviewPage} sera accessible` 
+                            });
+                          }
                         } else {
-                          setManualPages([...manualPages, currentPreviewPage].sort((a, b) => a - b));
-                          toast({ 
-                            title: "Page ajoutée", 
-                            description: `La page ${currentPreviewPage} sera accessible` 
+                          togglePercentagePage(currentPreviewPage);
+                          toast({
+                            title: percentagePages.includes(currentPreviewPage) ? "Page retirée" : "Page ajoutée",
+                            description: percentagePages.includes(currentPreviewPage) 
+                              ? `La page ${currentPreviewPage} ne sera plus accessible`
+                              : `La page ${currentPreviewPage} sera accessible`
                           });
                         }
                       }}
                     >
-                      {manualPages.includes(currentPreviewPage) ? (
+                      {(restrictionMode === 'manual' ? manualPages : percentagePages).includes(currentPreviewPage) ? (
                         <>
                           <Unlock className="h-5 w-5 mr-2" />
                           Retirer l'accès à cette page
@@ -808,12 +865,102 @@ export function PageAccessRestrictionsManager() {
                               onChange={(e) => {
                                 const val = parseInt(e.target.value) || 1;
                                 setPercentageValue(Math.min(100, Math.max(1, val)));
+                                setShowPercentagePages(false);
                               }}
                               className="h-11 text-lg font-semibold"
                             />
                             <span className="text-2xl font-bold text-muted-foreground">%</span>
                           </div>
                         </div>
+                        
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={calculatePercentagePages}
+                          className="w-full"
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          Calculer et visualiser les pages
+                        </Button>
+                        
+                        {showPercentagePages && percentagePages.length > 0 && (
+                          <>
+                            <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                              <div className="flex items-center justify-between mb-3">
+                                <p className="text-sm font-semibold">Pages sélectionnées :</p>
+                                <Badge variant="default" className="text-sm">
+                                  {percentagePages.length} / {totalPages} pages
+                                </Badge>
+                              </div>
+                              <div className="space-y-2 text-sm">
+                                <p className="text-muted-foreground">
+                                  • Pourcentage : <span className="font-semibold text-foreground">{Math.round((percentagePages.length / totalPages) * 100)}%</span>
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Vous pouvez modifier cette sélection ci-dessous
+                                </p>
+                              </div>
+                            </div>
+                            
+                            <Accordion type="single" collapsible className="w-full">
+                              <AccordionItem value="page-list" className="border rounded-lg">
+                                <AccordionTrigger className="px-4 hover:no-underline">
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <FileText className="h-4 w-4" />
+                                    <span>Voir et modifier les pages ({percentagePages.length})</span>
+                                  </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="px-4 pb-4">
+                                  <ScrollArea className="h-64 pr-4">
+                                    <div className="grid grid-cols-5 gap-2">
+                                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                                        const isSelected = percentagePages.includes(pageNum);
+                                        return (
+                                          <Button
+                                            key={pageNum}
+                                            type="button"
+                                            variant={isSelected ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => togglePercentagePage(pageNum)}
+                                            className={`h-10 ${isSelected ? 'bg-primary' : ''}`}
+                                          >
+                                            {pageNum}
+                                          </Button>
+                                        );
+                                      })}
+                                    </div>
+                                  </ScrollArea>
+                                  
+                                  <div className="mt-4 flex gap-2">
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        const allPages = Array.from({ length: totalPages }, (_, i) => i + 1);
+                                        setPercentagePages(allPages);
+                                      }}
+                                      className="flex-1"
+                                    >
+                                      <Plus className="h-4 w-4 mr-1" />
+                                      Tout sélectionner
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => setPercentagePages([])}
+                                      className="flex-1"
+                                    >
+                                      <X className="h-4 w-4 mr-1" />
+                                      Tout désélectionner
+                                    </Button>
+                                  </div>
+                                </AccordionContent>
+                              </AccordionItem>
+                            </Accordion>
+                          </>
+                        )}
                         
                         <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
                           <p className="text-sm font-semibold mb-2">Résumé :</p>
@@ -822,23 +969,26 @@ export function PageAccessRestrictionsManager() {
                               • Total de pages : <span className="font-semibold text-foreground">{totalPages}</span>
                             </p>
                             <p className="text-muted-foreground">
-                              • Pourcentage autorisé : <span className="font-semibold text-foreground">{percentageValue}%</span>
+                              • Pourcentage ciblé : <span className="font-semibold text-foreground">{percentageValue}%</span>
                             </p>
                             <p className="text-muted-foreground">
-                              • Pages accessibles : <span className="font-semibold text-foreground">{Math.ceil((totalPages * percentageValue) / 100)}</span> pages
+                              • Pages calculées : <span className="font-semibold text-foreground">{Math.ceil((totalPages * percentageValue) / 100)}</span> pages
                             </p>
-                            <p className="text-xs text-muted-foreground mt-2">
-                              (Les {Math.ceil((totalPages * percentageValue) / 100)} premières pages de l'œuvre)
-                            </p>
+                            {showPercentagePages && (
+                              <p className="text-muted-foreground">
+                                • Pages actuellement sélectionnées : <span className="font-semibold text-foreground">{percentagePages.length}</span> pages
+                              </p>
+                            )}
                           </div>
                         </div>
                         
                         <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
                           <p className="text-xs text-blue-900 dark:text-blue-100">
-                            💡 <strong>Exemples :</strong>
-                            <br />• 10% = {Math.ceil((totalPages * 10) / 100)} pages
-                            <br />• 25% = {Math.ceil((totalPages * 25) / 100)} pages
-                            <br />• 50% = {Math.ceil((totalPages * 50) / 100)} pages
+                            💡 <strong>Comment ça marche :</strong>
+                            <br />1. Définissez le pourcentage souhaité
+                            <br />2. Cliquez sur "Calculer et visualiser"
+                            <br />3. Modifiez les pages si nécessaire
+                            <br />4. Enregistrez les restrictions
                           </p>
                         </div>
                       </CardContent>
