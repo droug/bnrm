@@ -1032,6 +1032,99 @@ export type Database = {
           },
         ]
       }
+      cbn_catalog_documents: {
+        Row: {
+          allow_physical_consultation: boolean | null
+          author: string
+          collection: string | null
+          cote: string
+          created_at: string | null
+          description: string | null
+          digital_link: string | null
+          id: string
+          internal_id: string | null
+          is_free_access: boolean
+          isbn: string | null
+          issn: string | null
+          keywords: string[] | null
+          language: string | null
+          notice_origin: string | null
+          pages: number | null
+          physical_description: string | null
+          publish_place: string | null
+          publisher: string
+          secondary_authors: string[] | null
+          summary: string | null
+          support_status: string
+          support_type: string
+          table_of_contents: string[] | null
+          title: string
+          title_ar: string | null
+          updated_at: string | null
+          year: string
+        }
+        Insert: {
+          allow_physical_consultation?: boolean | null
+          author: string
+          collection?: string | null
+          cote: string
+          created_at?: string | null
+          description?: string | null
+          digital_link?: string | null
+          id: string
+          internal_id?: string | null
+          is_free_access?: boolean
+          isbn?: string | null
+          issn?: string | null
+          keywords?: string[] | null
+          language?: string | null
+          notice_origin?: string | null
+          pages?: number | null
+          physical_description?: string | null
+          publish_place?: string | null
+          publisher: string
+          secondary_authors?: string[] | null
+          summary?: string | null
+          support_status: string
+          support_type: string
+          table_of_contents?: string[] | null
+          title: string
+          title_ar?: string | null
+          updated_at?: string | null
+          year: string
+        }
+        Update: {
+          allow_physical_consultation?: boolean | null
+          author?: string
+          collection?: string | null
+          cote?: string
+          created_at?: string | null
+          description?: string | null
+          digital_link?: string | null
+          id?: string
+          internal_id?: string | null
+          is_free_access?: boolean
+          isbn?: string | null
+          issn?: string | null
+          keywords?: string[] | null
+          language?: string | null
+          notice_origin?: string | null
+          pages?: number | null
+          physical_description?: string | null
+          publish_place?: string | null
+          publisher?: string
+          secondary_authors?: string[] | null
+          summary?: string | null
+          support_status?: string
+          support_type?: string
+          table_of_contents?: string[] | null
+          title?: string
+          title_ar?: string | null
+          updated_at?: string | null
+          year?: string
+        }
+        Relationships: []
+      }
       chat_conversations: {
         Row: {
           created_at: string | null

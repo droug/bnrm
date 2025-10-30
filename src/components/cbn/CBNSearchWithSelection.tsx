@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { mockDocuments, MockDocument } from "@/data/mockDocuments";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface SearchResult {
   id: string;
@@ -31,79 +32,68 @@ export function CBNSearchWithSelection({
   compact = false 
 }: CBNSearchWithSelectionProps) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [documentsCache, setDocumentsCache] = useState<Record<string, any>>({});
 
-  // Charger les résultats depuis sessionStorage au montage
+  // Charger les documents depuis Supabase pour le cache
   useEffect(() => {
-    const savedResults = sessionStorage.getItem('cbn_search_results');
-    if (savedResults) {
-      try {
-        setSearchResults(JSON.parse(savedResults));
-      } catch (e) {
-        console.error('Error parsing saved search results:', e);
+    const loadDocuments = async () => {
+      const { data, error } = await supabase
+        .from('cbn_catalog_documents')
+        .select('*');
+      
+      if (data && !error) {
+        const cache = data.reduce((acc, doc) => {
+          acc[doc.id] = doc;
+          return acc;
+        }, {} as Record<string, any>);
+        setDocumentsCache(cache);
       }
-    }
+    };
+    
+    loadDocuments();
   }, []);
 
   const handleSearch = async (criteria: any) => {
     setIsSearching(true);
     
-    setTimeout(() => {
-      // Filtrer les mockDocuments selon les critères de recherche
-      let filteredDocs = [...mockDocuments];
+    try {
+      // Construire la requête Supabase
+      let query = supabase
+        .from('cbn_catalog_documents')
+        .select('*');
       
       // Recherche simple (query)
       if (criteria.query) {
-        const query = criteria.query.toLowerCase();
-        filteredDocs = filteredDocs.filter(doc => 
-          doc.title.toLowerCase().includes(query) ||
-          doc.author.toLowerCase().includes(query) ||
-          doc.cote.toLowerCase().includes(query) ||
-          doc.supportType.toLowerCase().includes(query) ||
-          (doc.keywords && doc.keywords.some(k => k.toLowerCase().includes(query)))
-        );
+        const searchQuery = criteria.query.toLowerCase();
+        query = query.or(`title.ilike.%${searchQuery}%,author.ilike.%${searchQuery}%,cote.ilike.%${searchQuery}%,support_type.ilike.%${searchQuery}%,keywords.cs.{${searchQuery}}`);
       }
       
       // Filtres avancés
       if (criteria.title) {
-        const title = criteria.title.toLowerCase();
-        filteredDocs = filteredDocs.filter(doc => 
-          doc.title.toLowerCase().includes(title)
-        );
+        query = query.ilike('title', `%${criteria.title}%`);
       }
       
       if (criteria.author) {
-        const author = criteria.author.toLowerCase();
-        filteredDocs = filteredDocs.filter(doc => 
-          doc.author.toLowerCase().includes(author)
-        );
+        query = query.ilike('author', `%${criteria.author}%`);
       }
       
       if (criteria.publisher) {
-        const publisher = criteria.publisher.toLowerCase();
-        filteredDocs = filteredDocs.filter(doc => 
-          doc.publisher.toLowerCase().includes(publisher)
-        );
+        query = query.ilike('publisher', `%${criteria.publisher}%`);
       }
       
       if (criteria.year) {
-        filteredDocs = filteredDocs.filter(doc => 
-          parseInt(doc.year) >= parseInt(criteria.year)
-        );
+        query = query.gte('year', criteria.year);
       }
       
       if (criteria.yearEnd) {
-        filteredDocs = filteredDocs.filter(doc => 
-          parseInt(doc.year) <= parseInt(criteria.yearEnd)
-        );
+        query = query.lte('year', criteria.yearEnd);
       }
       
       if (criteria.cote) {
-        const cote = criteria.cote.toLowerCase();
-        filteredDocs = filteredDocs.filter(doc => 
-          doc.cote.toLowerCase().includes(cote)
-        );
+        query = query.ilike('cote', `%${criteria.cote}%`);
       }
       
       if (criteria.documentType && criteria.documentType !== "all") {
@@ -117,30 +107,51 @@ export function CBNSearchWithSelection({
         };
         const targetType = typeMap[criteria.documentType];
         if (targetType) {
-          filteredDocs = filteredDocs.filter(doc => 
-            doc.supportType.toLowerCase().includes(targetType.toLowerCase())
-          );
+          query = query.ilike('support_type', `%${targetType}%`);
         }
       }
       
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error('Error searching documents:', error);
+        toast({
+          title: "Erreur de recherche",
+          description: "Impossible de rechercher les documents",
+          variant: "destructive",
+        });
+        setSearchResults([]);
+        setIsSearching(false);
+        return;
+      }
+      
       // Mapper les documents au format SearchResult
-      const results: SearchResult[] = filteredDocs.map(doc => ({
+      const results: SearchResult[] = (data || []).map(doc => ({
         id: doc.id,
         title: doc.title,
         author: doc.author,
         publisher: doc.publisher,
         year: doc.year,
-        type: doc.supportType,
-        status: doc.supportStatus === "libre_acces" ? "Libre accès" : 
-                doc.supportStatus === "numerise" ? "Numérisé" : 
+        type: doc.support_type,
+        status: doc.support_status === "libre_acces" ? "Libre accès" : 
+                doc.support_status === "numerise" ? "Numérisé" : 
                 "Non numérisé",
         cote: doc.cote
       }));
       
       setSearchResults(results);
       sessionStorage.setItem('cbn_search_results', JSON.stringify(results));
+    } catch (error) {
+      console.error('Error searching documents:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la recherche",
+        variant: "destructive",
+      });
+      setSearchResults([]);
+    } finally {
       setIsSearching(false);
-    }, 500);
+    }
   };
 
   return (
@@ -211,8 +222,8 @@ export function CBNSearchWithSelection({
                         
                         {/* Description */}
                         <p className="text-sm text-muted-foreground line-clamp-2">
-                          {mockDocuments.find(doc => doc.id === result.id)?.description || 
-                           mockDocuments.find(doc => doc.id === result.id)?.summary || 
+                          {documentsCache[result.id]?.description || 
+                           documentsCache[result.id]?.summary || 
                            "Description non disponible"}
                         </p>
                       </div>

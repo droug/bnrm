@@ -1,4 +1,4 @@
-// Exemples de différents types d'ouvrages pour tester le système de réservation
+import { supabase } from "@/integrations/supabase/client";
 
 export interface MockDocument {
   id: string;
@@ -340,9 +340,48 @@ export const mockDocuments: MockDocument[] = [
   }
 ];
 
-// Fonction utilitaire pour récupérer un document par ID
-export const getDocumentById = (id: string): MockDocument | undefined => {
-  return mockDocuments.find(doc => doc.id === id);
+// Fonction utilitaire pour récupérer un document par ID depuis Supabase
+export const getDocumentById = async (id: string): Promise<MockDocument | null> => {
+  const { data, error } = await supabase
+    .from('cbn_catalog_documents')
+    .select('*')
+    .eq('id', id)
+    .single();
+  
+  if (error || !data) {
+    console.error('Error fetching document:', error);
+    return mockDocuments.find(doc => doc.id === id) || null;
+  }
+  
+  // Mapper les données Supabase au format MockDocument
+  return {
+    id: data.id,
+    title: data.title,
+    titleAr: data.title_ar,
+    author: data.author,
+    secondaryAuthors: data.secondary_authors,
+    year: data.year,
+    publisher: data.publisher,
+    publishPlace: data.publish_place,
+    pages: data.pages,
+    isbn: data.isbn,
+    issn: data.issn,
+    cote: data.cote,
+    internalId: data.internal_id,
+    supportType: data.support_type,
+    supportStatus: data.support_status as "numerise" | "non_numerise" | "libre_acces",
+    isFreeAccess: data.is_free_access,
+    allowPhysicalConsultation: data.allow_physical_consultation,
+    description: data.description,
+    summary: data.summary,
+    tableOfContents: data.table_of_contents,
+    keywords: data.keywords,
+    collection: data.collection,
+    language: data.language,
+    physicalDescription: data.physical_description,
+    noticeOrigin: data.notice_origin,
+    digitalLink: data.digital_link
+  };
 };
 
 // Fonction pour filtrer les documents par type de support
