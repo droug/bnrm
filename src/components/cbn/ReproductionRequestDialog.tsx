@@ -26,15 +26,9 @@ interface ReproductionRequestDialogProps {
 export function ReproductionRequestDialog({ isOpen, onClose, document }: ReproductionRequestDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    // Informations du demandeur
-    lastName: "",
-    firstName: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    postalCode: "",
-    country: "Maroc",
+    // Informations du demandeur (pré-remplies depuis le compte adhérent)
+    lastName: "Nom Adhérent",
+    firstName: "Prénom Adhérent",
     
     // Type de reproduction
     reproductionType: document.supportType === "Microfilm" ? "microfilm" : "numerique", // numerique, papier, microfilm
@@ -113,82 +107,26 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
           {/* Informations du demandeur */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold border-b pb-2">Informations du demandeur</h3>
+            <p className="text-sm text-muted-foreground">
+              Informations récupérées depuis votre compte adhérent
+            </p>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="lastName">Nom *</Label>
+                <Label htmlFor="lastName">Nom</Label>
                 <Input
                   id="lastName"
-                  required
+                  disabled
                   value={formData.lastName}
-                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                  className="bg-muted cursor-not-allowed"
                 />
               </div>
               <div>
-                <Label htmlFor="firstName">Prénom *</Label>
+                <Label htmlFor="firstName">Prénom</Label>
                 <Input
                   id="firstName"
-                  required
+                  disabled
                   value={formData.firstName}
-                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone">Téléphone *</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="address">Adresse</Label>
-              <Input
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              />
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="city">Ville</Label>
-                <Input
-                  id="city"
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="postalCode">Code postal</Label>
-                <Input
-                  id="postalCode"
-                  value={formData.postalCode}
-                  onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="country">Pays</Label>
-                <Input
-                  id="country"
-                  value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                  className="bg-muted cursor-not-allowed"
                 />
               </div>
             </div>
