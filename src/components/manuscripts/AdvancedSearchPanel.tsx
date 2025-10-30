@@ -6,7 +6,7 @@ import { SimpleSelect } from "@/components/ui/simple-select";
 import { Badge } from "@/components/ui/badge";
 import { Search, X, Filter, SlidersHorizontal } from "lucide-react";
 import { SearchFilters } from "@/hooks/useManuscriptSearch";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 import { Separator } from "@/components/ui/separator";
 
 interface AdvancedSearchPanelProps {
@@ -18,6 +18,7 @@ interface AdvancedSearchPanelProps {
 
 export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: AdvancedSearchPanelProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const clearFilters = () => {
     setFilters({});
@@ -33,38 +34,42 @@ export function AdvancedSearchPanel({ filters, setFilters, onSearch, facets }: A
     const entries = Object.entries(facetData).filter(([key]) => key).slice(0, 5);
     if (entries.length === 0) return null;
 
+    const isOpen = openDropdown === facetKey;
+
     return (
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button 
-            variant={filters[filterKey] ? "default" : "outline"} 
-            size="sm"
-            className="h-8"
-          >
-            {title}
-            {filters[filterKey] && <Badge variant="secondary" className="ml-1 px-1 text-xs">{String(filters[filterKey]).slice(0, 15)}</Badge>}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-64 p-2 bg-background border shadow-lg z-50" align="start" side="bottom" sideOffset={4}>
-          <div className="space-y-1">
-            {entries.map(([value, count]) => (
-              <button
-                key={value}
-                onClick={() => {
-                  setFilters({ ...filters, [filterKey]: value });
-                  onSearch();
-                }}
-                className={`w-full flex items-center justify-between px-2 py-1.5 text-sm rounded hover:bg-accent transition-colors ${
-                  filters[filterKey] === value ? 'bg-accent font-medium' : ''
-                }`}
-              >
-                <span className="truncate">{value}</span>
-                <Badge variant="secondary" className="ml-2 shrink-0 text-xs">{count}</Badge>
-              </button>
-            ))}
+      <div className="relative">
+        <Button 
+          variant={filters[filterKey] ? "default" : "outline"} 
+          size="sm"
+          className="h-8"
+          onClick={() => setOpenDropdown(isOpen ? null : facetKey)}
+        >
+          {title}
+          {filters[filterKey] && <Badge variant="secondary" className="ml-1 px-1 text-xs">{String(filters[filterKey]).slice(0, 15)}</Badge>}
+        </Button>
+        {isOpen && (
+          <div className="absolute top-full left-0 mt-1 w-64 p-2 bg-background border rounded-md shadow-lg z-50">
+            <div className="space-y-1">
+              {entries.map(([value, count]) => (
+                <button
+                  key={value}
+                  onClick={() => {
+                    setFilters({ ...filters, [filterKey]: value });
+                    setOpenDropdown(null);
+                    onSearch();
+                  }}
+                  className={`w-full flex items-center justify-between px-2 py-1.5 text-sm rounded hover:bg-accent transition-colors ${
+                    filters[filterKey] === value ? 'bg-accent font-medium' : ''
+                  }`}
+                >
+                  <span className="truncate">{value}</span>
+                  <Badge variant="secondary" className="ml-2 shrink-0 text-xs">{count}</Badge>
+                </button>
+              ))}
+            </div>
           </div>
-        </PopoverContent>
-      </Popover>
+        )}
+      </div>
     );
   };
 
