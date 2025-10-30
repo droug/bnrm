@@ -186,12 +186,12 @@ export function CBNSearchWithSelection({
                         </p>
                       </div>
                       
-                      {/* Notice Button */}
+                      {/* Details Button */}
                       <Button 
                         className="shrink-0"
                         onClick={() => navigate(`/cbn/notice/${result.id}`)}
                       >
-                        Notice
+                        Détails
                       </Button>
                     </div>
                   </div>
