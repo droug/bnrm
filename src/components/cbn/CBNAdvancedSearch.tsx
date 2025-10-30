@@ -166,6 +166,7 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
     { value: "periodical", label: "Périodique" },
     { value: "thesis", label: "Thèse" },
     { value: "manuscript", label: "Manuscrit" },
+    { value: "microfilm", label: "Microfilm" },
     { value: "digital", label: "Numérique" },
   ];
 
@@ -250,6 +251,13 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                 onClick={() => handleQuickFilter("manuscript")}
               >
                 <Filter className="h-3 w-3 mr-1" /> Manuscrits
+              </Badge>
+              <Badge 
+                variant="outline" 
+                className="cursor-pointer hover:bg-primary/10 transition-colors"
+                onClick={() => handleQuickFilter("microfilm")}
+              >
+                <Filter className="h-3 w-3 mr-1" /> 📼 Microfilms
               </Badge>
               <Badge 
                 variant="outline" 

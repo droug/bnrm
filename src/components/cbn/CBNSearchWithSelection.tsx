@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { mockDocuments, MockDocument } from "@/data/mockDocuments";
 
 interface SearchResult {
   id: string;
@@ -48,65 +49,96 @@ export function CBNSearchWithSelection({
   const handleSearch = async (criteria: any) => {
     setIsSearching(true);
     
-    // TODO: Remplacer par un vrai appel API au catalogue CBN
-    // Simulation de résultats pour le moment
     setTimeout(() => {
-      const mockResults: SearchResult[] = [
-        {
-          id: "1",
-          title: "Histoire de la littérature marocaine moderne",
-          author: "Ahmed Ben Mohammed",
-          publisher: "Éditions Atlas",
-          year: "2023",
-          type: "Livre",
-          status: "Libre accès",
-          cote: "840.MAR.BEN"
-        },
-        {
-          id: "2",
-          title: "Manuscrits enluminés du Maroc médiéval",
-          author: "Hassan El Fassi",
-          publisher: "Publications de la BNRM",
-          year: "2022",
-          type: "Manuscrit",
-          status: "Numérisé",
-          cote: "091.MAR.ELF"
-        },
-        {
-          id: "3",
-          title: "Archives royales du Maroc : Correspondances diplomatiques 1912-1956",
-          author: "Mohammed Kenbib",
-          publisher: "Éditions du Palais Royal",
-          year: "2023",
-          type: "Archives",
-          status: "Non numérisé",
-          cote: "327.64.KEN"
-        },
-        {
-          id: "4",
-          title: "Revue marocaine d'études juridiques et politiques",
-          author: "Collectif",
-          publisher: "Faculté de Droit - Rabat",
-          year: "2024",
-          type: "Périodique",
-          status: "Numérisé",
-          cote: "340.05.REV"
-        },
-        {
-          id: "5",
-          title: "Architecture et urbanisme au Maroc",
-          author: "Ahmed Skounti",
-          publisher: "Centre Jacques-Berque",
-          year: "2019",
-          type: "Livre",
-          status: "Disponible",
-          cote: "ARC-MAR-2019-023"
-        },
-      ];
+      // Filtrer les mockDocuments selon les critères de recherche
+      let filteredDocs = [...mockDocuments];
       
-      setSearchResults(mockResults);
-      // Sauvegarder les résultats dans sessionStorage
-      sessionStorage.setItem('cbn_search_results', JSON.stringify(mockResults));
+      // Recherche simple (query)
+      if (criteria.query) {
+        const query = criteria.query.toLowerCase();
+        filteredDocs = filteredDocs.filter(doc => 
+          doc.title.toLowerCase().includes(query) ||
+          doc.author.toLowerCase().includes(query) ||
+          doc.cote.toLowerCase().includes(query) ||
+          doc.supportType.toLowerCase().includes(query) ||
+          (doc.keywords && doc.keywords.some(k => k.toLowerCase().includes(query)))
+        );
+      }
+      
+      // Filtres avancés
+      if (criteria.title) {
+        const title = criteria.title.toLowerCase();
+        filteredDocs = filteredDocs.filter(doc => 
+          doc.title.toLowerCase().includes(title)
+        );
+      }
+      
+      if (criteria.author) {
+        const author = criteria.author.toLowerCase();
+        filteredDocs = filteredDocs.filter(doc => 
+          doc.author.toLowerCase().includes(author)
+        );
+      }
+      
+      if (criteria.publisher) {
+        const publisher = criteria.publisher.toLowerCase();
+        filteredDocs = filteredDocs.filter(doc => 
+          doc.publisher.toLowerCase().includes(publisher)
+        );
+      }
+      
+      if (criteria.year) {
+        filteredDocs = filteredDocs.filter(doc => 
+          parseInt(doc.year) >= parseInt(criteria.year)
+        );
+      }
+      
+      if (criteria.yearEnd) {
+        filteredDocs = filteredDocs.filter(doc => 
+          parseInt(doc.year) <= parseInt(criteria.yearEnd)
+        );
+      }
+      
+      if (criteria.cote) {
+        const cote = criteria.cote.toLowerCase();
+        filteredDocs = filteredDocs.filter(doc => 
+          doc.cote.toLowerCase().includes(cote)
+        );
+      }
+      
+      if (criteria.documentType && criteria.documentType !== "all") {
+        const typeMap: Record<string, string> = {
+          "book": "Livre",
+          "periodical": "Périodique",
+          "thesis": "Thèse",
+          "manuscript": "Manuscrit",
+          "microfilm": "Microfilm",
+          "digital": "CD-ROM"
+        };
+        const targetType = typeMap[criteria.documentType];
+        if (targetType) {
+          filteredDocs = filteredDocs.filter(doc => 
+            doc.supportType.toLowerCase().includes(targetType.toLowerCase())
+          );
+        }
+      }
+      
+      // Mapper les documents au format SearchResult
+      const results: SearchResult[] = filteredDocs.map(doc => ({
+        id: doc.id,
+        title: doc.title,
+        author: doc.author,
+        publisher: doc.publisher,
+        year: doc.year,
+        type: doc.supportType,
+        status: doc.supportStatus === "libre_acces" ? "Libre accès" : 
+                doc.supportStatus === "numerise" ? "Numérisé" : 
+                "Non numérisé",
+        cote: doc.cote
+      }));
+      
+      setSearchResults(results);
+      sessionStorage.setItem('cbn_search_results', JSON.stringify(results));
       setIsSearching(false);
     }, 500);
   };
@@ -177,12 +209,11 @@ export function CBNSearchWithSelection({
                           )}
                         </div>
                         
-                        {/* Description - mock for now */}
+                        {/* Description */}
                         <p className="text-sm text-muted-foreground line-clamp-2">
-                          {result.title.includes("littérature") && "Cet ouvrage propose une étude approfondie de l'évolution de la littérature marocaine moderne, de l'indépendance à nos jours. Il analyse les principaux courants littéraires, les auteurs majeurs et les thèmes récurrents qui caractérisent cette période riche en productions."}
-                          {result.title.includes("Manuscrits") && "Catalogue exhaustif des manuscrits enluminés conservés à la Bibliothèque Nationale. Cet ouvrage présente une analyse détaillée de l'art de l'enluminure au Maroc médiéval, avec des reproductions haute résolution de pages exceptionnelles."}
-                          {result.title.includes("Archives") && "Recueil de correspondances diplomatiques entre le Maroc et diverses puissances étrangères durant la période du protectorat. Documents d'archives inédits accompagnés d'analyses contextuelles."}
-                          {result.title.includes("Revue") && "Revue académique trimestrielle consacrée aux études juridiques et politiques au Maroc et dans le monde arabe. Numéro spécial sur les réformes constitutionnelles."}
+                          {mockDocuments.find(doc => doc.id === result.id)?.description || 
+                           mockDocuments.find(doc => doc.id === result.id)?.summary || 
+                           "Description non disponible"}
                         </p>
                       </div>
                       
