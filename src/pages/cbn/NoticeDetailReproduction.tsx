@@ -414,7 +414,7 @@ export default function NoticeDetailReproduction() {
 
                 {/* Actions */}
                 <div className="space-y-2">
-                  {(document.status === "Libre accès" || document.status === "Numérisé") && document.type !== "Microfilm" && (
+                  {(document.status === "Libre accès" || document.status === "Numérisé") && document.type !== "Microfilm" && document.type !== "Carte" && (
                     <Button 
                       className="w-full" 
                       variant="default"
