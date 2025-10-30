@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -27,123 +27,15 @@ import {
 } from "@/components/ui/collapsible";
 import { BookReservationDialog } from "@/components/cbn/BookReservationDialog";
 import { ReproductionTypeSelector } from "@/components/cbn/ReproductionTypeSelector";
-
-// Mock data - à remplacer par vraie API
-const getDocumentById = (id: string) => {
-  const documents: Record<string, any> = {
-    "1": {
-      id: "1",
-      title: "Histoire de la littérature marocaine moderne",
-      author: "Ahmed Ben Mohammed",
-      publisher: "Éditions Atlas",
-      year: "2023",
-      type: "Livre",
-      status: "Libre accès",
-      cote: "840.MAR.BEN",
-      isbn: "ISBN 978-9954-674-50-4",
-      pages: "456 pages",
-      collection: "Patrimoine littéraire",
-      language: "Français",
-      resume: "Un catalogue complet des manuscrits enluminés du Maroc médiéval avec analyse artistique et historique.",
-      noteContenu: "Catalogue exhaustif des manuscrits enluminés conservés à la Bibliothèque Nationale. Cet ouvrage présente une analyse détaillée de l'art de l'enluminure au Maroc médiéval, avec des reproductions haute résolution de pages exceptionnelles.",
-      sommaire: [
-        "Les techniques d'enluminure au Maghreb",
-        "Les ateliers de Fès et Marrakech",
-        "Symbolisme islamique et l'iconoclasme",
-        "Conservation et restauration",
-        "Catalogue des œuvres"
-      ],
-      keywords: ["Manuscrits", "Enluminure", "Art islamique", "Patrimoine", "Conservation"],
-      relatedDocs: [
-        { title: "Littérature contemporaine du Maghreb", author: "Ahmed Ben Mohammed", year: "2021" },
-        { title: "Poésie marocaine moderne", author: "Fatima El Mansouri", year: "2019" },
-      ]
-    },
-    "2": {
-      id: "2",
-      title: "Manuscrits enluminés du Maroc médiéval",
-      author: "Hassan El Fassi",
-      publisher: "Publications de la BNRM",
-      year: "2022",
-      type: "Manuscrit",
-      status: "Numérisé",
-      cote: "091.MAR.ELF",
-      isbn: "Absent (document ancien)",
-      pages: "Voir catalogue",
-      collection: "Patrimoine Manuscrit",
-      language: "Arabe",
-      resume: "Catalogue exhaustif des manuscrits enluminés conservés à la Bibliothèque Nationale.",
-      noteContenu: "Catalogue exhaustif des manuscrits enluminés conservés à la Bibliothèque Nationale. Cet ouvrage présente une analyse détaillée de l'art de l'enluminure au Maroc médiéval, avec des reproductions haute résolution de pages exceptionnelles.",
-      sommaire: [
-        "Les techniques d'enluminure au Maghreb",
-        "Les ateliers de Fès et Marrakech",
-        "Symbolisme islamique et l'iconoclasme",
-        "Conservation et restauration",
-        "Catalogue des œuvres"
-      ],
-      keywords: ["Manuscrits", "Enluminure", "Art islamique", "Patrimoine"],
-      relatedDocs: []
-    },
-    "3": {
-      id: "3",
-      title: "Archives royales du Maroc : Correspondances diplomatiques 1912-1956",
-      author: "Mohammed Kenbib",
-      publisher: "Éditions du Palais Royal",
-      year: "2023",
-      type: "Archives",
-      status: "Non numérisé",
-      cote: "327.64.KEN",
-      isbn: "ISBN 978-9954-678-12-1",
-      pages: "892 pages",
-      collection: "Documents historiques",
-      language: "Français / Arabe",
-      resume: "Recueil de correspondances diplomatiques entre le Maroc et diverses puissances étrangères durant la période du protectorat.",
-      noteContenu: "Recueil de correspondances diplomatiques entre le Maroc et diverses puissances étrangères durant la période du protectorat. Documents d'archives inédits accompagnés d'analyses contextuelles.",
-      sommaire: [
-        "Introduction historique",
-        "Correspondances avec la France",
-        "Relations avec l'Espagne",
-        "Contacts internationaux",
-        "Annexes documentaires"
-      ],
-      keywords: ["Archives", "Diplomatie", "Histoire", "Protectorat"],
-      relatedDocs: []
-    },
-    "4": {
-      id: "4",
-      title: "Revue marocaine d'études juridiques et politiques",
-      author: "Collectif",
-      publisher: "Faculté de Droit - Rabat",
-      year: "2024",
-      type: "Périodique",
-      status: "Numérisé",
-      cote: "340.05.REV",
-      isbn: "ISSN 2550-4576",
-      pages: "Périodique trimestriel",
-      collection: "Revues académiques",
-      language: "Français / Arabe",
-      resume: "Revue académique trimestrielle consacrée aux études juridiques et politiques au Maroc et dans le monde arabe.",
-      noteContenu: "Revue académique trimestrielle consacrée aux études juridiques et politiques au Maroc et dans le monde arabe. Numéro spécial sur les réformes constitutionnelles.",
-      sommaire: [
-        "Éditorial",
-        "Articles de recherche",
-        "Notes de lecture",
-        "Chronique législative",
-        "Jurisprudence commentée"
-      ],
-      keywords: ["Droit", "Politique", "Constitution", "Réformes"],
-      relatedDocs: []
-    },
-  };
-
-  return documents[id] || null;
-};
+import { supabase } from "@/integrations/supabase/client";
 
 export default function NoticeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [showReservationDialog, setShowReservationDialog] = useState(false);
+  const [document, setDocument] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     zone100: false,
     zone210: false,
@@ -155,7 +47,57 @@ export default function NoticeDetail() {
     zone856: false,
   });
 
-  const document = id ? getDocumentById(id) : null;
+  useEffect(() => {
+    const loadDocument = async () => {
+      if (!id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('cbn_catalog_documents')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) {
+          console.error('Error loading document:', error);
+          setDocument(null);
+        } else if (data) {
+          // Mapper les données Supabase au format attendu par le template
+          setDocument({
+            id: data.id,
+            title: data.title,
+            author: data.author,
+            publisher: data.publisher,
+            year: data.year,
+            type: data.support_type,
+            status: data.support_status === "libre_acces" ? "Libre accès" : 
+                    data.support_status === "numerise" ? "Numérisé" : 
+                    "Non numérisé",
+            cote: data.cote,
+            isbn: data.isbn || "Absent",
+            pages: data.pages || data.physical_description || "Non spécifié",
+            collection: data.collection,
+            language: data.language,
+            resume: data.summary,
+            noteContenu: data.description,
+            sommaire: data.table_of_contents || [],
+            keywords: data.keywords || [],
+            relatedDocs: []
+          });
+        }
+      } catch (error) {
+        console.error('Error loading document:', error);
+        setDocument(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDocument();
+  }, [id]);
 
   if (!document) {
     return (
