@@ -170,7 +170,7 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
   ];
 
   return (
-    <Card className={`border-2 border-primary/20 shadow-lg ${!compact ? 'mb-6' : ''}`}>
+    <Card className={`border-2 border-primary/20 shadow-lg overflow-visible ${!compact ? 'mb-6' : ''}`}>
       <CardHeader>
         <CardTitle className="text-xl text-primary flex items-center gap-2">
           <Search className="h-5 w-5" />
@@ -180,7 +180,7 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
           Recherchez dans le catalogue de la Bibliothèque Nationale
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-visible">
         <Tabs defaultValue="simple" className="w-full">
           <TabsList className="mb-4 bg-primary/10">
             <TabsTrigger 
@@ -261,8 +261,8 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
             </div>
           </TabsContent>
 
-          <TabsContent value="avancee" className="space-y-4">
-            <div className="grid gap-4">
+          <TabsContent value="avancee" className="space-y-4 overflow-visible">
+            <div className="grid gap-4 overflow-visible">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Titre</label>

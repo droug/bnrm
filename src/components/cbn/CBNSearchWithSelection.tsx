@@ -113,7 +113,9 @@ export function CBNSearchWithSelection({
 
   return (
     <div className="space-y-4">
-      <CBNAdvancedSearch onSearch={handleSearch} compact={compact} />
+      <div className="relative z-10">
+        <CBNAdvancedSearch onSearch={handleSearch} compact={compact} />
+      </div>
       
       {searchResults.length > 0 && (
         <Card className="border-2 border-primary/10">
