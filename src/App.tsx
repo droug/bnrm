@@ -129,6 +129,7 @@ const DemandeReproduction = lazy(() => import("./pages/cbn/DemandeReproduction")
 const UserBookReservations = lazy(() => import("./pages/UserBookReservations"));
 const BookReservationService = lazy(() => import("./pages/BookReservationService"));
 const NoticeDetail = lazy(() => import("./pages/cbn/NoticeDetail"));
+const NoticeDetailReproduction = lazy(() => import("./pages/cbn/NoticeDetailReproduction"));
 
 // Kitab Platform (lazy)
 const KitabPortal = lazy(() => import("./pages/KitabPortal"));
@@ -298,6 +299,7 @@ const App = () => (
           <Route path="/cbm/notice-example" element={<CBNNoticeExample />} />
           <Route path="/cbn/reserver-ouvrage" element={<BookReservationService />} />
           <Route path="/cbn/notice/:id" element={<NoticeDetail />} />
+          <Route path="/cbn/notice-reproduction/:id" element={<NoticeDetailReproduction />} />
           <Route path="/user/book-reservations" element={<UserBookReservations />} />
 
           {/* Kitab Platform Routes */}
