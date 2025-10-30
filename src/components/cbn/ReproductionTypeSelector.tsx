@@ -2,13 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -219,32 +213,34 @@ export function ReproductionTypeSelector({
         <div className="space-y-4 animate-in fade-in-50 duration-300">
           <div className="space-y-2">
             <Label htmlFor="reception-mode">Mode de réception *</Label>
-            <Select value={receptionMode} onValueChange={setReceptionMode}>
-              <SelectTrigger id="reception-mode">
-                <SelectValue placeholder="Sélectionner le mode de réception" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="email">Par e-mail</SelectItem>
-                <SelectItem value="download">À télécharger</SelectItem>
-                <SelectItem value="support">Sous support (CD, USB, Carte SD, Autre)</SelectItem>
-              </SelectContent>
-            </Select>
+            <SimpleSelect
+              id="reception-mode"
+              value={receptionMode}
+              onChange={setReceptionMode}
+              placeholder="Sélectionner le mode de réception"
+              options={[
+                { value: "email", label: "Par e-mail" },
+                { value: "download", label: "À télécharger" },
+                { value: "support", label: "Sous support (CD, USB, Carte SD, Autre)" },
+              ]}
+            />
           </div>
 
           {receptionMode === "support" && (
             <div className="space-y-2 animate-in fade-in-50 duration-300">
               <Label htmlFor="physical-support">Type de support physique *</Label>
-              <Select value={physicalSupport} onValueChange={setPhysicalSupport}>
-                <SelectTrigger id="physical-support">
-                  <SelectValue placeholder="Sélectionner le support" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cd">CD</SelectItem>
-                  <SelectItem value="usb">Clé USB</SelectItem>
-                  <SelectItem value="sd">Carte SD</SelectItem>
-                  <SelectItem value="autre">Autre</SelectItem>
-                </SelectContent>
-              </Select>
+              <SimpleSelect
+                id="physical-support"
+                value={physicalSupport}
+                onChange={setPhysicalSupport}
+                placeholder="Sélectionner le support"
+                options={[
+                  { value: "cd", label: "CD" },
+                  { value: "usb", label: "Clé USB" },
+                  { value: "sd", label: "Carte SD" },
+                  { value: "autre", label: "Autre" },
+                ]}
+              />
 
               {physicalSupport === "autre" && (
                 <Input
@@ -283,29 +279,31 @@ export function ReproductionTypeSelector({
 
           <div className="space-y-2">
             <Label htmlFor="format">Format *</Label>
-            <Select value={format} onValueChange={setFormat}>
-              <SelectTrigger id="format">
-                <SelectValue placeholder="Sélectionner le format" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="a4">A4</SelectItem>
-                <SelectItem value="a3">A3</SelectItem>
-                <SelectItem value="autre">Autre</SelectItem>
-              </SelectContent>
-            </Select>
+            <SimpleSelect
+              id="format"
+              value={format}
+              onChange={setFormat}
+              placeholder="Sélectionner le format"
+              options={[
+                { value: "a4", label: "A4" },
+                { value: "a3", label: "A3" },
+                { value: "autre", label: "Autre" },
+              ]}
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="recovery-mode">Mode de récupération *</Label>
-            <Select value={recoveryMode} onValueChange={setRecoveryMode}>
-              <SelectTrigger id="recovery-mode">
-                <SelectValue placeholder="Sélectionner le mode de récupération" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="onsite">Retrait sur place</SelectItem>
-                <SelectItem value="postal">Envoi postal</SelectItem>
-              </SelectContent>
-            </Select>
+            <SimpleSelect
+              id="recovery-mode"
+              value={recoveryMode}
+              onChange={setRecoveryMode}
+              placeholder="Sélectionner le mode de récupération"
+              options={[
+                { value: "onsite", label: "Retrait sur place" },
+                { value: "postal", label: "Envoi postal" },
+              ]}
+            />
           </div>
 
           {recoveryMode === "postal" && (
