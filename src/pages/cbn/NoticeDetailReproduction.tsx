@@ -16,7 +16,8 @@ import {
   FileText,
   Share2,
   ChevronDown,
-  ExternalLink
+  ExternalLink,
+  Download
 } from "lucide-react";
 import {
   Collapsible,
@@ -413,6 +414,23 @@ export default function NoticeDetailReproduction() {
 
                 {/* Actions */}
                 <div className="space-y-2">
+                  {(document.status === "Libre accès" || document.status === "Numérisé") && document.type !== "Microfilm" && (
+                    <Button 
+                      className="w-full" 
+                      variant="default"
+                      onClick={() => navigate(`/book-reader/${document.id}`)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Consulter en ligne
+                    </Button>
+                  )}
+                  
+                  {document.status === "Numérisé" && (
+                    <Button className="w-full" variant="default">
+                      Adhérer
+                    </Button>
+                  )}
+                  
                   <Button 
                     className="w-full" 
                     variant="default"
