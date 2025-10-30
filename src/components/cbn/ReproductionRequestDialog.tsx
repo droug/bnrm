@@ -344,43 +344,6 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             </div>
           </div>
 
-          {/* Livraison */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold border-b pb-2">Mode de livraison</h3>
-            
-            <RadioGroup
-              value={formData.deliveryMethod}
-              onValueChange={(value) => setFormData({ ...formData, deliveryMethod: value })}
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="email" id="email_delivery" />
-                <Label htmlFor="email_delivery" className="cursor-pointer">Par email (gratuit)</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="courrier" id="courrier" />
-                <Label htmlFor="courrier" className="cursor-pointer">Par courrier postal (frais supplémentaires)</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="retrait" id="retrait" />
-                <Label htmlFor="retrait" className="cursor-pointer">Retrait sur place (BNRM)</Label>
-              </div>
-            </RadioGroup>
-
-            {formData.deliveryMethod === "courrier" && (
-              <div className="ml-6">
-                <Label htmlFor="deliveryAddress">Adresse de livraison *</Label>
-                <Textarea
-                  id="deliveryAddress"
-                  required
-                  placeholder="Adresse complète de livraison"
-                  value={formData.deliveryAddress}
-                  onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })}
-                  rows={3}
-                />
-              </div>
-            )}
-          </div>
-
           {/* Options supplémentaires */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold border-b pb-2">Options supplémentaires</h3>
