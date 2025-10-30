@@ -475,9 +475,9 @@ export default function NoticeDetail() {
                   </div>
                 </div>
 
-                {/* Consultation physique */}
+                {/* Consultation sur place */}
                 <div>
-                  <p className="text-sm font-medium mb-1">Consultation physique</p>
+                  <p className="text-sm font-medium mb-1">Consultation sur place</p>
                   {document.status === "Non numérisé" ? (
                     <Badge variant="outline">❌ Non autorisée</Badge>
                   ) : (
