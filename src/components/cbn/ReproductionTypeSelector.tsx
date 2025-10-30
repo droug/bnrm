@@ -42,9 +42,12 @@ export function ReproductionTypeSelector({
   const [recoveryMode, setRecoveryMode] = useState<string>("");
   const [postalAddress, setPostalAddress] = useState<string>("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [confirmationType, setConfirmationType] = useState<"digital" | "paper">("digital");
+  const [confirmationType, setConfirmationType] = useState<"digital" | "paper" | "microfilm">("digital");
   const { toast } = useToast();
 
+  // Vérifier si c'est un microfilm
+  const isMicrofilm = documentType === "Microfilm";
+  
   // Vérifier si la reproduction est autorisée
   const isReproductionDisabled = documentStatus === "Non numérisé";
   const isRestrictedAccess = false; // À connecter avec les vraies données
@@ -113,6 +116,38 @@ export function ReproductionTypeSelector({
     setShowConfirmDialog(true);
   };
 
+  const handleSubmitMicrofilm = () => {
+    if (!copies || parseInt(copies) < 1) {
+      toast({
+        title: "Champ requis",
+        description: "Veuillez indiquer le nombre de copies",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!recoveryMode) {
+      toast({
+        title: "Champ requis",
+        description: "Veuillez sélectionner un mode de récupération",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (recoveryMode === "postal" && !postalAddress) {
+      toast({
+        title: "Champ requis",
+        description: "Veuillez fournir une adresse postale",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setConfirmationType("microfilm");
+    setShowConfirmDialog(true);
+  };
+
   const handleConfirm = () => {
     setShowConfirmDialog(false);
     
@@ -132,7 +167,12 @@ export function ReproductionTypeSelector({
     setPostalAddress("");
     
     // TODO: Redirection vers le back-office approprié selon le type
-    console.log(`Routing to ${confirmationType === "digital" ? "Bibliothèque Numérique" : "Service Support BNRM"}`);
+    const routingMessage = confirmationType === "microfilm" 
+      ? "Service Microfilms BNRM" 
+      : confirmationType === "digital" 
+      ? "Bibliothèque Numérique" 
+      : "Service Support BNRM";
+    console.log(`Routing to ${routingMessage}`);
   };
 
   if (isReproductionDisabled) {
@@ -151,6 +191,82 @@ export function ReproductionTypeSelector({
         <p className="text-sm text-muted-foreground text-center">
           🔒 Reproduction soumise à autorisation spéciale.
         </p>
+      </div>
+    );
+  }
+
+  // Interface spéciale pour les microfilms
+  if (isMicrofilm) {
+    return (
+      <div className="p-4 bg-[#F9F9F9] dark:bg-muted/20 rounded-lg border border-border space-y-4">
+        <div className="flex items-center gap-2">
+          <h4 className="font-semibold">🎞️ Reproduction sur Microfilm</h4>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs text-sm">
+                  Les documents microfilms ne peuvent être reproduits que sur support microfilm uniquement.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+
+        <div className="p-3 bg-primary/5 border border-primary/20 rounded-md">
+          <p className="text-sm text-muted-foreground">
+            ℹ️ Les microfilms ne peuvent être reproduits que sur support microfilm
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="microfilm-copies">Nombre de copies demandées *</Label>
+            <Input
+              id="microfilm-copies"
+              type="number"
+              min="1"
+              value={copies}
+              onChange={(e) => setCopies(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="microfilm-recovery">Mode de récupération *</Label>
+            <SimpleSelect
+              id="microfilm-recovery"
+              value={recoveryMode}
+              onChange={setRecoveryMode}
+              placeholder="Sélectionner le mode de récupération"
+              options={[
+                { value: "onsite", label: "Retrait sur place" },
+                { value: "postal", label: "Envoi postal" },
+              ]}
+            />
+          </div>
+
+          {recoveryMode === "postal" && (
+            <div className="space-y-2 animate-in fade-in-50 duration-300">
+              <Label htmlFor="microfilm-address">Adresse postale *</Label>
+              <Textarea
+                id="microfilm-address"
+                placeholder="Entrez votre adresse postale complète"
+                value={postalAddress}
+                onChange={(e) => setPostalAddress(e.target.value)}
+                rows={3}
+              />
+            </div>
+          )}
+
+          <Button 
+            className="w-full" 
+            onClick={handleSubmitMicrofilm}
+          >
+            🎞️ Soumettre la demande de reproduction microfilm
+          </Button>
+        </div>
       </div>
     );
   }
@@ -334,12 +450,16 @@ export function ReproductionTypeSelector({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {confirmationType === "digital" 
+              {confirmationType === "microfilm" 
+                ? "Confirmation - Reproduction sur Microfilm"
+                : confirmationType === "digital" 
                 ? "Confirmation - Reproduction numérique" 
                 : "Confirmation - Reproduction papier"}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {confirmationType === "digital" 
+              {confirmationType === "microfilm"
+                ? "Votre demande de reproduction sur microfilm sera transmise au Service Microfilms de la BNRM."
+                : confirmationType === "digital" 
                 ? "Votre demande de reproduction numérique sera transmise au service de la Bibliothèque Numérique." 
                 : "Votre demande sera traitée par le Service Support de la BNRM."}
               <br /><br />
