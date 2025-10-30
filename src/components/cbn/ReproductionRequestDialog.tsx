@@ -34,6 +34,8 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     reproductionType: document.supportType === "Microfilm" ? "microfilm" : "numerique", // numerique, papier, microfilm
     format: document.supportType === "Microfilm" ? "35mm" : "pdf", // pdf, jpeg, tiff pour numérique | A4, A3 pour papier | 35mm, 16mm, microfiche pour microfilm
     quality: "haute", // standard, haute
+    deliveryMode: "email", // email, telechargement, sous_support
+    supportType: "cd", // cd, usb, ssd, autre
     
     // Détails de la reproduction
     reproductionScope: "partielle", // complete, partielle
@@ -201,6 +203,41 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                   Le microfilm 35mm offre la meilleure qualité de reproduction pour les manuscrits anciens.
                 </p>
               </div>
+            )}
+
+            {formData.reproductionType === "numerique" && (
+              <>
+                <div>
+                  <Label htmlFor="deliveryMode">Mode de réception *</Label>
+                  <SimpleSelect
+                    id="deliveryMode"
+                    value={formData.deliveryMode}
+                    onChange={(value) => setFormData({ ...formData, deliveryMode: value })}
+                    options={[
+                      { value: "email", label: "Par E-mail" },
+                      { value: "telechargement", label: "À télécharger" },
+                      { value: "sous_support", label: "Sous support" }
+                    ]}
+                  />
+                </div>
+
+                {formData.deliveryMode === "sous_support" && (
+                  <div>
+                    <Label htmlFor="supportType">Type de support *</Label>
+                    <SimpleSelect
+                      id="supportType"
+                      value={formData.supportType}
+                      onChange={(value) => setFormData({ ...formData, supportType: value })}
+                      options={[
+                        { value: "cd", label: "CD" },
+                        { value: "usb", label: "Sous support USB" },
+                        { value: "ssd", label: "Sous support SSD" },
+                        { value: "autre", label: "Autre" }
+                      ]}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </div>
 
