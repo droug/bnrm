@@ -26,6 +26,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { BookReservationDialog } from "@/components/cbn/BookReservationDialog";
+import { ReproductionTypeSelector } from "@/components/cbn/ReproductionTypeSelector";
 
 // Mock data - à remplacer par vraie API
 const getDocumentById = (id: string) => {
@@ -516,6 +517,14 @@ export default function NoticeDetail() {
                     Partager
                   </Button>
                 </div>
+
+                <Separator />
+
+                {/* Type de reproduction */}
+                <ReproductionTypeSelector 
+                  documentStatus={document.status}
+                  documentType={document.type}
+                />
 
                 <Separator />
 
