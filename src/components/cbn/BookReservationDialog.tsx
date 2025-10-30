@@ -13,6 +13,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -392,100 +393,20 @@ export function BookReservationDialog({
                     <FormItem>
                       <FormLabel>Nom complet *</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Votre nom et prénom" />
+                        <Input 
+                          {...field} 
+                          placeholder="Votre nom et prénom"
+                          disabled
+                          className="bg-muted cursor-not-allowed"
+                        />
                       </FormControl>
+                      <FormDescription className="text-xs">
+                        Information récupérée depuis votre compte
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="userEmail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email *</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="email" placeholder="votre@email.com" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="userPhone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Téléphone</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="+212 6XX XXX XXX" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {isAuthenticated && (
-                  <FormField
-                    control={form.control}
-                    name="userType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Type de demandeur</FormLabel>
-                        <div ref={userTypeRef} className="relative">
-                          <FormControl>
-                            <button
-                              type="button"
-                              onClick={() => setShowUserTypeList(!showUserTypeList)}
-                              className={cn(
-                                "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
-                                "hover:bg-accent/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              <span>
-                                {field.value
-                                  ? USER_TYPES.find((t) => t.value === field.value)?.label
-                                  : "Sélectionnez votre profil"}
-                              </span>
-                              <ChevronDown className={cn(
-                                "h-4 w-4 opacity-50 transition-transform",
-                                showUserTypeList && "rotate-180"
-                              )} />
-                            </button>
-                          </FormControl>
-                          
-                          {showUserTypeList && (
-                            <div className="relative mt-1">
-                              <ul className="w-full bg-popover border border-border rounded-md shadow-md overflow-hidden z-50">
-                                {USER_TYPES.map((type) => (
-                                  <li key={type.value}>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        field.onChange(type.value);
-                                        setShowUserTypeList(false);
-                                      }}
-                                      className={cn(
-                                        "w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors",
-                                        field.value === type.value && "bg-accent/50"
-                                      )}
-                                    >
-                                      {type.label}
-                                    </button>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
               </CardContent>
             </Card>
 
