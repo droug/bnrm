@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CBNSearchWithSelection } from "@/components/cbn/CBNSearchWithSelection";
 import { ReproductionRequestDialog } from "@/components/cbn/ReproductionRequestDialog";
-import { FileText, ShoppingCart } from "lucide-react";
+import { FileText, ShoppingCart, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface SelectedDocument {
@@ -62,6 +62,16 @@ export default function DemandeReproduction() {
       <Header />
       
       <main className="container mx-auto px-4 py-8">
+        {/* Bouton retour */}
+        <Button
+          variant="ghost"
+          className="mb-6"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Retour
+        </Button>
+
         {/* En-tête */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-primary mb-2">Demande de reproduction</h1>
