@@ -988,11 +988,6 @@ export const SystemListsManager = () => {
                     </DialogContent>
                   </Dialog>
 
-                  <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
-                    <Download className="w-4 h-4 mr-2" />
-                    Télécharger modèle
-                  </Button>
-
                   <Button variant="outline" size="sm" onClick={() => document.getElementById('excel-import')?.click()}>
                     <Upload className="w-4 h-4 mr-2" />
                     Importer Excel
