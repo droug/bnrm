@@ -192,6 +192,7 @@ export default function DocumentsManager() {
       // Métadonnées du catalogue (catalog_metadata)
       'isbn',
       'issn',
+      'ismn',
       'auteur_principal',
       'co_auteurs',
       'editeur',
@@ -259,6 +260,7 @@ export default function DocumentsManager() {
         // Métadonnées du catalogue
         '978-3-16-148410-0', // isbn
         '', // issn
+        '', // ismn
         'Dupont, Jean', // auteur_principal
         'Martin, Marie;Durand, Pierre', // co_auteurs (séparés par ;)
         'Éditions Scientifiques', // editeur
@@ -324,6 +326,7 @@ export default function DocumentsManager() {
         // Métadonnées du catalogue
         '', // isbn
         '2345-6789', // issn
+        'M-2306-7118-7', // ismn (exemple pour partition musicale)
         'Comité de rédaction', // auteur_principal
         '', // co_auteurs
         'BNRM Éditions', // editeur
@@ -397,6 +400,7 @@ export default function DocumentsManager() {
       { wch: 40 }, // url_image_mise_en_avant
       { wch: 20 }, // isbn
       { wch: 15 }, // issn
+      { wch: 18 }, // ismn
       { wch: 25 }, // auteur_principal
       { wch: 30 }, // co_auteurs
       { wch: 25 }, // editeur
@@ -492,7 +496,7 @@ export default function DocumentsManager() {
                     </code>
                     <p className="font-medium mt-2">Métadonnées bibliographiques :</p>
                     <code className="text-xs block whitespace-pre-wrap break-all">
-                      isbn, issn, auteur_principal, co_auteurs, editeur, annee_publication, lieu_publication, edition, classification_dewey, classification_udc, nombre_pages, mots_cles, sujets, etc.
+                      isbn, issn, ismn, auteur_principal, co_auteurs, editeur, annee_publication, lieu_publication, edition, classification_dewey, classification_udc, nombre_pages, mots_cles, sujets, etc.
                     </code>
                     <p className="text-muted-foreground mt-2">
                       Téléchargez le modèle Excel ci-dessous pour voir tous les champs disponibles avec des exemples.
