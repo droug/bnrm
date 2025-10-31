@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SimpleDropdown } from "@/components/cbn/SimpleDropdown";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Lock, Unlock, Search, Filter, FileText, X, Shield, Download, Camera, MousePointerClick, Layers, Eye } from "lucide-react";
+import { Lock, Unlock, Search, Filter, FileText, X, Shield, Download, Camera, MousePointerClick, Layers, Eye, Info } from "lucide-react";
 
 export function BatchRestrictionsManager() {
   const { toast } = useToast();
@@ -41,6 +41,10 @@ export function BatchRestrictionsManager() {
   const [allowDownload, setAllowDownload] = useState(true);
   const [allowScreenshot, setAllowScreenshot] = useState(true);
   const [allowRightClick, setAllowRightClick] = useState(true);
+  
+  // État pour le dialog de détails
+  const [selectedDocumentForDetails, setSelectedDocumentForDetails] = useState<any>(null);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
   // Fetch documents
   const { data: documents, isLoading } = useQuery({
@@ -472,6 +476,7 @@ export function BatchRestrictionsManager() {
                     <TableHead>Type</TableHead>
                     <TableHead>Statut</TableHead>
                     <TableHead>Mode de restriction</TableHead>
+                    <TableHead className="w-24">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -513,6 +518,19 @@ export function BatchRestrictionsManager() {
                             <span className="text-muted-foreground text-sm">-</span>
                           )}
                         </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedDocumentForDetails(doc);
+                              setShowDetailsDialog(true);
+                            }}
+                          >
+                            <Info className="h-4 w-4 mr-1" />
+                            Détails
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -522,6 +540,200 @@ export function BatchRestrictionsManager() {
           )}
         </CardContent>
       </Card>
+
+      {/* Dialog de détails du document */}
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl flex items-center gap-2">
+              <Info className="h-6 w-6" />
+              Détails du document
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedDocumentForDetails && (
+            <div className="space-y-6 py-4">
+              {/* Informations générales */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Informations générales
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-3 gap-2">
+                    <span className="text-sm font-semibold text-muted-foreground">Titre:</span>
+                    <span className="col-span-2 text-sm">{selectedDocumentForDetails.title}</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <span className="text-sm font-semibold text-muted-foreground">Type:</span>
+                    <span className="col-span-2">
+                      <Badge variant="outline">{selectedDocumentForDetails.content_type}</Badge>
+                    </span>
+                  </div>
+                  {selectedDocumentForDetails.excerpt && (
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-sm font-semibold text-muted-foreground">Description:</span>
+                      <span className="col-span-2 text-sm">{selectedDocumentForDetails.excerpt}</span>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-3 gap-2">
+                    <span className="text-sm font-semibold text-muted-foreground">ID:</span>
+                    <span className="col-span-2 text-xs font-mono">{selectedDocumentForDetails.id}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Statut de restriction */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Lock className="h-5 w-5" />
+                    Statut de restriction
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {selectedDocumentForDetails.page_access_restrictions?.[0] ? (
+                    <>
+                      <div className="grid grid-cols-3 gap-2">
+                        <span className="text-sm font-semibold text-muted-foreground">Statut:</span>
+                        <span className="col-span-2">
+                          {selectedDocumentForDetails.page_access_restrictions[0].is_restricted ? (
+                            <Badge variant="destructive" className="gap-1">
+                              <Lock className="h-3 w-3" />
+                              Restreint
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary" className="gap-1">
+                              <Unlock className="h-3 w-3" />
+                              Public
+                            </Badge>
+                          )}
+                        </span>
+                      </div>
+
+                      {selectedDocumentForDetails.page_access_restrictions[0].is_restricted && (
+                        <>
+                          <div className="grid grid-cols-3 gap-2">
+                            <span className="text-sm font-semibold text-muted-foreground">Mode:</span>
+                            <span className="col-span-2">
+                              <Badge variant="outline">
+                                {selectedDocumentForDetails.page_access_restrictions[0].restriction_mode === 'range' && 'Par plage de pages'}
+                                {selectedDocumentForDetails.page_access_restrictions[0].restriction_mode === 'manual' && 'Sélection manuelle'}
+                                {selectedDocumentForDetails.page_access_restrictions[0].restriction_mode === 'percentage' && 'Par pourcentage'}
+                              </Badge>
+                            </span>
+                          </div>
+
+                          {selectedDocumentForDetails.page_access_restrictions[0].restriction_mode === 'range' && (
+                            <div className="grid grid-cols-3 gap-2">
+                              <span className="text-sm font-semibold text-muted-foreground">Plage:</span>
+                              <span className="col-span-2 text-sm">
+                                Pages {selectedDocumentForDetails.page_access_restrictions[0].start_page} à {selectedDocumentForDetails.page_access_restrictions[0].end_page}
+                              </span>
+                            </div>
+                          )}
+
+                          {selectedDocumentForDetails.page_access_restrictions[0].manual_pages && selectedDocumentForDetails.page_access_restrictions[0].manual_pages.length > 0 && (
+                            <div className="grid grid-cols-3 gap-2">
+                              <span className="text-sm font-semibold text-muted-foreground">Pages accessibles:</span>
+                              <div className="col-span-2">
+                                <div className="p-3 bg-muted/50 rounded-md max-h-32 overflow-y-auto">
+                                  <span className="text-sm font-mono">
+                                    {selectedDocumentForDetails.page_access_restrictions[0].manual_pages.join(', ')}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {selectedDocumentForDetails.page_access_restrictions[0].manual_pages.length} page(s) accessible(s)
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center py-4">
+                      <Badge variant="secondary" className="gap-1">
+                        <Unlock className="h-3 w-3" />
+                        Aucune restriction configurée
+                      </Badge>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Ce document est entièrement public
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Paramètres de sécurité */}
+              {selectedDocumentForDetails.page_access_restrictions?.[0] && (
+                <Card>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Shield className="h-5 w-5" />
+                      Paramètres de sécurité
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-sm font-semibold text-muted-foreground flex items-center gap-1">
+                        <Download className="h-3 w-3" />
+                        Téléchargement:
+                      </span>
+                      <span className="col-span-2">
+                        <Badge variant={selectedDocumentForDetails.page_access_restrictions[0].allow_download ? "default" : "destructive"}>
+                          {selectedDocumentForDetails.page_access_restrictions[0].allow_download ? "Autorisé" : "Bloqué"}
+                        </Badge>
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-sm font-semibold text-muted-foreground flex items-center gap-1">
+                        <Camera className="h-3 w-3" />
+                        Captures d'écran:
+                      </span>
+                      <span className="col-span-2">
+                        <Badge variant={selectedDocumentForDetails.page_access_restrictions[0].allow_screenshot ? "default" : "destructive"}>
+                          {selectedDocumentForDetails.page_access_restrictions[0].allow_screenshot ? "Autorisé" : "Bloqué"}
+                        </Badge>
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-sm font-semibold text-muted-foreground flex items-center gap-1">
+                        <MousePointerClick className="h-3 w-3" />
+                        Clic droit:
+                      </span>
+                      <span className="col-span-2">
+                        <Badge variant={selectedDocumentForDetails.page_access_restrictions[0].allow_right_click ? "default" : "destructive"}>
+                          {selectedDocumentForDetails.page_access_restrictions[0].allow_right_click ? "Autorisé" : "Bloqué"}
+                        </Badge>
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-sm font-semibold text-muted-foreground flex items-center gap-1">
+                        <FileText className="h-3 w-3" />
+                        Consultation physique:
+                      </span>
+                      <span className="col-span-2">
+                        <Badge variant={selectedDocumentForDetails.page_access_restrictions[0].allow_physical_consultation ? "default" : "secondary"}>
+                          {selectedDocumentForDetails.page_access_restrictions[0].allow_physical_consultation ? "Autorisée" : "Non disponible"}
+                        </Badge>
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
+              Fermer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog de configuration des restrictions en lot */}
       <Dialog open={showBatchDialog} onOpenChange={setShowBatchDialog}>
