@@ -111,13 +111,6 @@ export default function Administration() {
       color: "bg-orange-100 text-orange-600",
     },
     {
-      title: "Restriction d'accès aux pages",
-      description: "Gérer les pages accessibles par document",
-      icon: Lock,
-      path: "/admin/digital-library/page-restrictions",
-      color: "bg-amber-100 text-amber-600",
-    },
-    {
       title: "Gestion des Demandes",
       description: "Réservations et numérisations",
       icon: FolderOpen,

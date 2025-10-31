@@ -235,14 +235,6 @@ export default function DigitalLibraryBackoffice() {
       count: null,
       action: () => navigate('/admin/digital-library/bulk-import'),
       gradient: "from-cyan-500 to-teal-600"
-    },
-    {
-      icon: Lock,
-      title: "Restriction d'accès aux pages",
-      description: "Gérer les pages accessibles pour les utilisateurs non authentifiés",
-      count: null,
-      action: () => navigate('/admin/digital-library/page-restrictions'),
-      gradient: "from-amber-500 to-orange-600"
     }
   ];
 
