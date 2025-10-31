@@ -7,6 +7,10 @@ import { supabase } from "@/integrations/supabase/client";
 interface SystemListDefinition {
   list_code: string;
   list_name: string;
+  portal: string;
+  platform: string;
+  service: string;
+  sub_service?: string;
   module: string;
   form_name: string;
   field_type: string;
@@ -20,12 +24,16 @@ interface SystemListDefinition {
   }>;
 }
 
-// Définitions de toutes les listes système
+// Définitions complètes de toutes les listes système avec hiérarchie
 const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
-  // ========== MONOGRAPHIES ==========
+  // ========== DÉPÔT LÉGAL - MONOGRAPHIES ==========
   {
     list_code: "mono_type_publication",
     list_name: "Type de publication (Monographies)",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des dépôts",
+    sub_service: "Monographies",
     module: "Dépôt Légal",
     form_name: "Monographies",
     field_type: "simple",
@@ -40,6 +48,10 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
   {
     list_code: "mono_nature_publication",
     list_name: "Nature de publication (Monographies)",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des dépôts",
+    sub_service: "Monographies",
     module: "Dépôt Légal",
     form_name: "Monographies",
     field_type: "simple",
@@ -53,6 +65,10 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
   {
     list_code: "mono_type_auteur",
     list_name: "Type d'auteur (Monographies)",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des dépôts",
+    sub_service: "Monographies",
     module: "Dépôt Légal",
     form_name: "Monographies",
     field_type: "simple",
@@ -65,6 +81,10 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
   {
     list_code: "mono_genre",
     list_name: "Genre (Monographies)",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des dépôts",
+    sub_service: "Monographies",
     module: "Dépôt Légal",
     form_name: "Monographies",
     field_type: "simple",
@@ -77,6 +97,10 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
   {
     list_code: "mono_statut_auteur",
     list_name: "Statut de l'auteur (Monographies)",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des dépôts",
+    sub_service: "Monographies",
     module: "Dépôt Légal",
     form_name: "Monographies",
     field_type: "simple",
@@ -89,10 +113,14 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
     ],
   },
 
-  // ========== PUBLICATIONS PÉRIODIQUES ==========
+  // ========== DÉPÔT LÉGAL - PUBLICATIONS PÉRIODIQUES ==========
   {
     list_code: "period_type_publication",
     list_name: "Type de publication (Périodiques)",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des dépôts",
+    sub_service: "Publications périodiques",
     module: "Dépôt Légal",
     form_name: "Publications périodiques",
     field_type: "simple",
@@ -109,6 +137,10 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
   {
     list_code: "period_nature_publication",
     list_name: "Nature de publication (Périodiques)",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des dépôts",
+    sub_service: "Publications périodiques",
     module: "Dépôt Légal",
     form_name: "Publications périodiques",
     field_type: "simple",
@@ -121,6 +153,10 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
   {
     list_code: "period_type_support",
     list_name: "Type de support (Périodiques)",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des dépôts",
+    sub_service: "Publications périodiques",
     module: "Dépôt Légal",
     form_name: "Publications périodiques",
     field_type: "simple",
@@ -133,6 +169,10 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
   {
     list_code: "period_periodicite",
     list_name: "Périodicité (Périodiques)",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des dépôts",
+    sub_service: "Publications périodiques",
     module: "Dépôt Légal",
     form_name: "Publications périodiques",
     field_type: "simple",
@@ -147,136 +187,15 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
       { value_code: "annuel", value_label: "Annuel", sort_order: 7 },
     ],
   },
-  {
-    list_code: "period_region",
-    list_name: "Région (Périodiques)",
-    module: "Dépôt Légal",
-    form_name: "Publications périodiques",
-    field_type: "simple",
-    description: "Région du directeur de publication",
-    values: [
-      { value_code: "tanger_tetouan_hoceima", value_label: "Tanger-Tétouan-Al Hoceïma", sort_order: 1 },
-      { value_code: "oriental", value_label: "L'Oriental", sort_order: 2 },
-      { value_code: "fes_meknes", value_label: "Fès-Meknès", sort_order: 3 },
-      { value_code: "rabat_sale_kenitra", value_label: "Rabat-Salé-Kénitra", sort_order: 4 },
-      { value_code: "beni_mellal_khenifra", value_label: "Béni Mellal-Khénifra", sort_order: 5 },
-      { value_code: "casablanca_settat", value_label: "Casablanca-Settat", sort_order: 6 },
-      { value_code: "marrakech_safi", value_label: "Marrakech-Safi", sort_order: 7 },
-      { value_code: "draa_tafilalet", value_label: "Drâa-Tafilalet", sort_order: 8 },
-      { value_code: "souss_massa", value_label: "Souss-Massa", sort_order: 9 },
-      { value_code: "guelmim_oued_noun", value_label: "Guelmim-Oued Noun", sort_order: 10 },
-      { value_code: "laayoune_sakia_hamra", value_label: "Laâyoune-Sakia El Hamra", sort_order: 11 },
-      { value_code: "dakhla_oued_eddahab", value_label: "Dakhla-Oued Ed-Dahab", sort_order: 12 },
-    ],
-  },
-
-  // ========== BASES DE DONNÉES & LOGICIELS ==========
-  {
-    list_code: "bd_type_publication",
-    list_name: "Type de publication (BD & Logiciels)",
-    module: "Dépôt Légal",
-    form_name: "BD & Logiciels",
-    field_type: "simple",
-    description: "Type de publication pour bases de données et logiciels",
-    values: [
-      { value_code: "database", value_label: "Base de données", sort_order: 1 },
-      { value_code: "software", value_label: "Logiciel", sort_order: 2 },
-      { value_code: "audiovisual", value_label: "Document audiovisuel", sort_order: 3 },
-    ],
-  },
-  {
-    list_code: "bd_nature_publication",
-    list_name: "Nature de publication (BD & Logiciels)",
-    module: "Dépôt Légal",
-    form_name: "BD & Logiciels",
-    field_type: "simple",
-    description: "Nature de la publication numérique",
-    values: [
-      { value_code: "initial", value_label: "Initial", sort_order: 1 },
-      { value_code: "mise_a_jour", value_label: "Mise à jour", sort_order: 2 },
-      { value_code: "nouvelle_version", value_label: "Nouvelle version", sort_order: 3 },
-    ],
-  },
-  {
-    list_code: "bd_type_support",
-    list_name: "Type de support (BD & Logiciels)",
-    module: "Dépôt Légal",
-    form_name: "BD & Logiciels",
-    field_type: "simple",
-    description: "Support de diffusion",
-    values: [
-      { value_code: "online", value_label: "En ligne", sort_order: 1 },
-      { value_code: "cdrom", value_label: "CD-ROM", sort_order: 2 },
-      { value_code: "dvd", value_label: "DVD", sort_order: 3 },
-      { value_code: "usb", value_label: "Clé USB", sort_order: 4 },
-    ],
-  },
-
-  // ========== COLLECTIONS SPÉCIALISÉES ==========
-  {
-    list_code: "coll_type_publication",
-    list_name: "Type de publication (Collections Spécialisées)",
-    module: "Dépôt Légal",
-    form_name: "Collections Spécialisées",
-    field_type: "simple",
-    description: "Type de publication pour collections spécialisées",
-    values: [
-      { value_code: "carte", value_label: "Carte géographique", sort_order: 1 },
-      { value_code: "partition", value_label: "Partition musicale", sort_order: 2 },
-      { value_code: "affiche", value_label: "Affiche", sort_order: 3 },
-      { value_code: "estampe", value_label: "Estampe", sort_order: 4 },
-      { value_code: "photographie", value_label: "Photographie", sort_order: 5 },
-    ],
-  },
-  {
-    list_code: "coll_nature_support",
-    list_name: "Nature du support (Collections Spécialisées)",
-    module: "Dépôt Légal",
-    form_name: "Collections Spécialisées",
-    field_type: "simple",
-    description: "Nature physique du support",
-    values: [
-      { value_code: "papier", value_label: "Papier", sort_order: 1 },
-      { value_code: "toile", value_label: "Toile", sort_order: 2 },
-      { value_code: "numerique", value_label: "Numérique", sort_order: 3 },
-      { value_code: "autre", value_label: "Autre", sort_order: 4 },
-    ],
-  },
-
-  // ========== LISTES COMMUNES ==========
-  {
-    list_code: "common_type_support",
-    list_name: "Type de support (Commun)",
-    module: "Dépôt Légal",
-    form_name: "Commun",
-    field_type: "simple",
-    description: "Type de support utilisé pour tous les formulaires",
-    values: [
-      { value_code: "printed", value_label: "Imprimé", sort_order: 1 },
-      { value_code: "electronic", value_label: "Électronique", sort_order: 2 },
-      { value_code: "mixed", value_label: "Mixte", sort_order: 3 },
-    ],
-  },
-
-  // ========== AUTRES MODULES ==========
-  // Activités Culturelles
-  {
-    list_code: "cultural_event_type",
-    list_name: "Type d'événement culturel",
-    module: "Activités Culturelles",
-    form_name: "Programmation culturelle",
-    field_type: "simple",
-    description: "Types d'événements culturels proposés",
-    values: [
-      { value_code: "conference", value_label: "Conférence", sort_order: 1 },
-      { value_code: "atelier", value_label: "Atelier", sort_order: 2 },
-      { value_code: "exposition", value_label: "Exposition", sort_order: 3 },
-      { value_code: "spectacle", value_label: "Spectacle", sort_order: 4 },
-    ],
-  },
+  
+  // ========== ACTIVITÉS CULTURELLES ==========
   {
     list_code: "ESPACE_CULTUREL",
     list_name: "Espaces culturels",
+    portal: "BNRM",
+    platform: "Activités Culturelles",
+    service: "Réservations",
+    sub_service: "Espaces culturels",
     module: "Activités culturelles",
     form_name: "Réservation d'espace",
     field_type: "simple",
@@ -289,11 +208,274 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
       { value_code: "salle_annexe", value_label: "Salle de l'annexe", sort_order: 5 },
     ],
   },
-  
-  // Bibliothèque Numérique
+
+  // ========== PROFESSIONNELS ==========
+  {
+    list_code: "author_literary_genre",
+    list_name: "Genre littéraire",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion professionnels",
+    sub_service: "Auteurs",
+    module: "Dépôt Légal",
+    form_name: "Inscription auteur",
+    field_type: "simple",
+    description: "Genres littéraires pour les auteurs",
+    values: [
+      { value_code: "roman", value_label: "Roman", sort_order: 1 },
+      { value_code: "poesie", value_label: "Poésie", sort_order: 2 },
+      { value_code: "nouvelles", value_label: "Nouvelles", sort_order: 3 },
+      { value_code: "essai", value_label: "Essai", sort_order: 4 },
+      { value_code: "theatre", value_label: "Théâtre", sort_order: 5 },
+      { value_code: "jeunesse", value_label: "Littérature jeunesse", sort_order: 6 },
+      { value_code: "biographie", value_label: "Biographie", sort_order: 7 },
+      { value_code: "autres", value_label: "Autres", sort_order: 8 },
+    ],
+  },
+  {
+    list_code: "author_publishing_goals",
+    list_name: "Objectifs de publication",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion professionnels",
+    sub_service: "Auteurs",
+    module: "Dépôt Légal",
+    form_name: "Inscription auteur",
+    field_type: "simple",
+    description: "Objectifs de publication des auteurs",
+    values: [
+      { value_code: "premier-livre", value_label: "Mon premier livre", sort_order: 1 },
+      { value_code: "nouveau-livre", value_label: "Un nouveau livre", sort_order: 2 },
+      { value_code: "reedition", value_label: "Réédition d'une œuvre", sort_order: 3 },
+      { value_code: "collection", value_label: "Une collection d'œuvres", sort_order: 4 },
+    ],
+  },
+  {
+    list_code: "professional_legal_status",
+    list_name: "Statut juridique",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion professionnels",
+    sub_service: "Éditeurs/Distributeurs",
+    module: "Dépôt Légal",
+    form_name: "Inscription professionnel",
+    field_type: "simple",
+    description: "Statuts juridiques des entreprises",
+    values: [
+      { value_code: "sarl", value_label: "SARL", sort_order: 1 },
+      { value_code: "sa", value_label: "SA", sort_order: 2 },
+      { value_code: "sas", value_label: "SAS", sort_order: 3 },
+      { value_code: "eurl", value_label: "EURL", sort_order: 4 },
+      { value_code: "entreprise-individuelle", value_label: "Entreprise individuelle", sort_order: 5 },
+    ],
+  },
+  {
+    list_code: "distribution_scope",
+    list_name: "Périmètre de distribution",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion professionnels",
+    sub_service: "Distributeurs",
+    module: "Dépôt Légal",
+    form_name: "Inscription distributeur",
+    field_type: "simple",
+    description: "Périmètres géographiques de distribution",
+    values: [
+      { value_code: "national", value_label: "National", sort_order: 1 },
+      { value_code: "regional", value_label: "Régional", sort_order: 2 },
+      { value_code: "local", value_label: "Local", sort_order: 3 },
+      { value_code: "international", value_label: "International", sort_order: 4 },
+    ],
+  },
+  {
+    list_code: "stock_volume",
+    list_name: "Volume de stock",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion professionnels",
+    sub_service: "Distributeurs",
+    module: "Dépôt Légal",
+    form_name: "Inscription distributeur",
+    field_type: "simple",
+    description: "Volumes de stock des distributeurs",
+    values: [
+      { value_code: "moins-1000", value_label: "Moins de 1 000 ouvrages", sort_order: 1 },
+      { value_code: "1000-5000", value_label: "1 000 - 5 000 ouvrages", sort_order: 2 },
+      { value_code: "5000-20000", value_label: "5 000 - 20 000 ouvrages", sort_order: 3 },
+      { value_code: "plus-20000", value_label: "Plus de 20 000 ouvrages", sort_order: 4 },
+    ],
+  },
+  {
+    list_code: "professional_experience",
+    list_name: "Expérience professionnelle",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion professionnels",
+    module: "Dépôt Légal",
+    form_name: "Inscription professionnel",
+    field_type: "simple",
+    description: "Années d'expérience professionnelle",
+    values: [
+      { value_code: "debutant", value_label: "Moins de 2 ans", sort_order: 1 },
+      { value_code: "intermediaire", value_label: "2 - 5 ans", sort_order: 2 },
+      { value_code: "experimente", value_label: "5 - 10 ans", sort_order: 3 },
+      { value_code: "expert", value_label: "Plus de 10 ans", sort_order: 4 },
+    ],
+  },
+
+  // ========== RÉGIONS DU MAROC (COMMUN) ==========
+  {
+    list_code: "morocco_regions",
+    list_name: "Régions du Maroc",
+    portal: "BNRM",
+    platform: "BNRM",
+    service: "Commun",
+    module: "Commun",
+    form_name: "Tous formulaires",
+    field_type: "simple",
+    description: "Liste des régions administratives du Maroc",
+    values: [
+      { value_code: "tanger-tetouan-alhoceima", value_label: "Tanger-Tétouan-Al Hoceïma", sort_order: 1 },
+      { value_code: "oriental", value_label: "Oriental", sort_order: 2 },
+      { value_code: "fes-meknes", value_label: "Fès-Meknès", sort_order: 3 },
+      { value_code: "rabat-sale-kenitra", value_label: "Rabat-Salé-Kénitra", sort_order: 4 },
+      { value_code: "beni-mellal-khenifra", value_label: "Béni Mellal-Khénifra", sort_order: 5 },
+      { value_code: "casablanca-settat", value_label: "Casablanca-Settat", sort_order: 6 },
+      { value_code: "marrakech-safi", value_label: "Marrakech-Safi", sort_order: 7 },
+      { value_code: "draa-tafilalet", value_label: "Drâa-Tafilalet", sort_order: 8 },
+      { value_code: "souss-massa", value_label: "Souss-Massa", sort_order: 9 },
+      { value_code: "guelmim-oued-noun", value_label: "Guelmim-Oued Noun", sort_order: 10 },
+      { value_code: "laayoune-sakia-elhamra", value_label: "Laâyoune-Sakia El Hamra", sort_order: 11 },
+      { value_code: "dakhla-oued-eddahab", value_label: "Dakhla-Oued Ed-Dahab", sort_order: 12 },
+    ],
+  },
+
+  // ========== DÉPÔT LÉGAL - GESTION ==========
+  {
+    list_code: "deposit_party_roles",
+    list_name: "Rôles des parties",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des dépôts",
+    module: "Dépôt Légal",
+    form_name: "Gestion des parties",
+    field_type: "simple",
+    description: "Rôles des parties dans le dépôt légal",
+    values: [
+      { value_code: "editor", value_label: "Éditeur", sort_order: 1 },
+      { value_code: "printer", value_label: "Imprimeur", sort_order: 2 },
+      { value_code: "producer", value_label: "Producteur", sort_order: 3 },
+    ],
+  },
+  {
+    list_code: "committee_roles",
+    list_name: "Rôles du comité",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des dépôts",
+    module: "Dépôt Légal",
+    form_name: "Comité de validation",
+    field_type: "simple",
+    description: "Rôles des membres du comité de validation",
+    values: [
+      { value_code: "president", value_label: "Président", sort_order: 1 },
+      { value_code: "secretary", value_label: "Secrétaire", sort_order: 2 },
+      { value_code: "member", value_label: "Membre", sort_order: 3 },
+    ],
+  },
+  {
+    list_code: "issn_status",
+    list_name: "Statuts ISSN",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion ISSN",
+    module: "Dépôt Légal",
+    form_name: "Demandes ISSN",
+    field_type: "simple",
+    description: "Statuts des demandes ISSN",
+    values: [
+      { value_code: "all", value_label: "Tous les statuts", sort_order: 0 },
+      { value_code: "en_attente", value_label: "En attente", sort_order: 1 },
+      { value_code: "validee", value_label: "Validée", sort_order: 2 },
+      { value_code: "refusee", value_label: "Refusée", sort_order: 3 },
+    ],
+  },
+  {
+    list_code: "issn_support_type",
+    list_name: "Types de support ISSN",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion ISSN",
+    module: "Dépôt Légal",
+    form_name: "Demandes ISSN",
+    field_type: "simple",
+    description: "Types de support pour les demandes ISSN",
+    values: [
+      { value_code: "all", value_label: "Tous les supports", sort_order: 0 },
+      { value_code: "papier", value_label: "Papier", sort_order: 1 },
+      { value_code: "en_ligne", value_label: "En ligne", sort_order: 2 },
+      { value_code: "mixte", value_label: "Mixte", sort_order: 3 },
+    ],
+  },
+  {
+    list_code: "reserved_ranges_deposit_type",
+    list_name: "Types de dépôt (plages réservées)",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des numéros",
+    module: "Dépôt Légal",
+    form_name: "Plages réservées",
+    field_type: "simple",
+    description: "Types de dépôt pour les plages de numéros réservées",
+    values: [
+      { value_code: "monographie", value_label: "Monographie", sort_order: 1 },
+      { value_code: "periodique", value_label: "Publication périodique", sort_order: 2 },
+      { value_code: "non-livre", value_label: "Non-livre", sort_order: 3 },
+      { value_code: "numerique", value_label: "Numérique", sort_order: 4 },
+    ],
+  },
+  {
+    list_code: "reserved_ranges_number_type",
+    list_name: "Types de numéro (plages réservées)",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Gestion des numéros",
+    module: "Dépôt Légal",
+    form_name: "Plages réservées",
+    field_type: "simple",
+    description: "Types de numéro pour les plages réservées",
+    values: [
+      { value_code: "isbn", value_label: "ISBN", sort_order: 1 },
+      { value_code: "issn", value_label: "ISSN", sort_order: 2 },
+      { value_code: "dl", value_label: "Dépôt Légal", sort_order: 3 },
+    ],
+  },
+
+  // ========== REPRODUCTION ==========
+  {
+    list_code: "reproduction_type",
+    list_name: "Type de reproduction",
+    portal: "BNRM",
+    platform: "Reproduction",
+    service: "Demandes de reproduction",
+    module: "Reproduction",
+    form_name: "Demande reproduction",
+    field_type: "simple",
+    description: "Types de reproduction disponibles",
+    values: [
+      { value_code: "papier", value_label: "Tirage papier", sort_order: 1 },
+      { value_code: "numerique", value_label: "Numérique", sort_order: 2 },
+      { value_code: "microfilm", value_label: "Duplicata Microfilm", sort_order: 3 },
+    ],
+  },
+
+  // ========== BIBLIOTHÈQUE NUMÉRIQUE ==========
   {
     list_code: "document_format",
     list_name: "Format de document",
+    portal: "BNRM",
+    platform: "Bibliothèque Numérique",
+    service: "Numérisation",
     module: "Bibliothèque Numérique",
     form_name: "Demande numérisation",
     field_type: "simple",
@@ -304,41 +486,14 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
       { value_code: "jpg", value_label: "Image JPEG", sort_order: 3 },
     ],
   },
-  {
-    list_code: "digital_library_collections",
-    list_name: "Bibliothèque Numérique - Menu Collections",
-    module: "digital_library",
-    form_name: "",
-    field_type: "simple",
-    description: "Collections disponibles dans la bibliothèque numérique",
-    values: [
-      { value_code: "books", value_label: "Livres numériques", sort_order: 1 },
-      { value_code: "periodicals", value_label: "Revues et périodiques", sort_order: 2 },
-      { value_code: "manuscripts", value_label: "Manuscrits numérisés", sort_order: 3 },
-      { value_code: "photos", value_label: "Photographies et cartes", sort_order: 4 },
-      { value_code: "audiovisual", value_label: "Archives sonores et audiovisuelles", sort_order: 5 },
-    ],
-  },
-  {
-    list_code: "digital_library_themes",
-    list_name: "Bibliothèque Numérique - Menu Thèmes",
-    module: "digital_library",
-    form_name: "",
-    field_type: "simple",
-    description: "Thèmes de navigation dans la bibliothèque numérique",
-    values: [
-      { value_code: "history", value_label: "Histoire & Patrimoine", sort_order: 1 },
-      { value_code: "arts", value_label: "Arts & Culture", sort_order: 2 },
-      { value_code: "sciences", value_label: "Sciences & Techniques", sort_order: 3 },
-      { value_code: "religion", value_label: "Religion & Philosophie", sort_order: 4 },
-      { value_code: "literature", value_label: "Littérature & Poésie", sort_order: 5 },
-    ],
-  },
 
-  // Manuscrits
+  // ========== MANUSCRITS ==========
   {
     list_code: "manuscript_condition",
     list_name: "État de conservation",
+    portal: "BNRM",
+    platform: "Manuscrits",
+    service: "Gestion des manuscrits",
     module: "Manuscrits",
     form_name: "Demande d'accès",
     field_type: "simple",
@@ -351,25 +506,13 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
     ],
   },
 
-  // Reproduction
-  {
-    list_code: "reproduction_type",
-    list_name: "Type de reproduction",
-    module: "Reproduction",
-    form_name: "Demande reproduction",
-    field_type: "simple",
-    description: "Types de reproduction disponibles",
-    values: [
-      { value_code: "photocopy", value_label: "Photocopie", sort_order: 1 },
-      { value_code: "scan", value_label: "Numérisation", sort_order: 2 },
-      { value_code: "photo", value_label: "Photographie", sort_order: 3 },
-    ],
-  },
-
   // ========== DISCIPLINES (HIÉRARCHIQUE) ==========
   {
     list_code: "book_disciplines",
     list_name: "Disciplines (Hiérarchique)",
+    portal: "BNRM",
+    platform: "Dépôt Légal",
+    service: "Catalogage",
     module: "Dépôt Légal",
     form_name: "Publications périodiques et Monographies",
     field_type: "auto_select",
@@ -462,124 +605,161 @@ const ALL_SYSTEM_LISTS: SystemListDefinition[] = [
       { value_code: "sciences_infirmieres", value_label: "Sciences infirmières", sort_order: 94, parent_code: "sciences_sante" },
       { value_code: "sante_publique", value_label: "Santé publique", sort_order: 95, parent_code: "sciences_sante" },
 
-      // Sciences islamiques et études religieuses
+      // Sciences islamiques
       { value_code: "sciences_islamiques", value_label: "Sciences islamiques et études religieuses", sort_order: 100 },
-      { value_code: "etudes_coraniques", value_label: "Études coraniques", sort_order: 101, parent_code: "sciences_islamiques" },
-      { value_code: "hadith", value_label: "Hadith et sciences du hadith", sort_order: 102, parent_code: "sciences_islamiques" },
-      { value_code: "fiqh", value_label: "Fiqh (jurisprudence islamique)", sort_order: 103, parent_code: "sciences_islamiques" },
-      { value_code: "theologie", value_label: "Théologie et pensée islamique", sort_order: 104, parent_code: "sciences_islamiques" },
-      { value_code: "histoire_islam", value_label: "Histoire de l'islam", sort_order: 105, parent_code: "sciences_islamiques" },
-      { value_code: "etudes_religieuses", value_label: "Études religieuses comparées", sort_order: 106, parent_code: "sciences_islamiques" },
+      { value_code: "coran", value_label: "Coran et exégèse", sort_order: 101, parent_code: "sciences_islamiques" },
+      { value_code: "hadith", value_label: "Hadith", sort_order: 102, parent_code: "sciences_islamiques" },
+      { value_code: "fiqh", value_label: "Fiqh (Jurisprudence islamique)", sort_order: 103, parent_code: "sciences_islamiques" },
+      { value_code: "theologie", value_label: "Théologie (Aqida)", sort_order: 104, parent_code: "sciences_islamiques" },
+      { value_code: "histoire_islam", value_label: "Histoire de l'Islam", sort_order: 105, parent_code: "sciences_islamiques" },
+      { value_code: "etudes_comparees", value_label: "Études religieuses comparées", sort_order: 106, parent_code: "sciences_islamiques" },
 
-      // Ouvrages généraux et encyclopédies
-      { value_code: "ouvrages_generaux", value_label: "Ouvrages généraux et encyclopédies", sort_order: 110 },
-      { value_code: "encyclopedies", value_label: "Encyclopédies générales", sort_order: 111, parent_code: "ouvrages_generaux" },
-      { value_code: "dictionnaires", value_label: "Dictionnaires", sort_order: 112, parent_code: "ouvrages_generaux" },
-      { value_code: "bibliographies", value_label: "Bibliographies", sort_order: 113, parent_code: "ouvrages_generaux" },
-      { value_code: "references", value_label: "Ouvrages de référence", sort_order: 114, parent_code: "ouvrages_generaux" },
+      // Agriculture et sciences vétérinaires
+      { value_code: "agriculture", value_label: "Agriculture et sciences vétérinaires", sort_order: 110 },
+      { value_code: "agronomie", value_label: "Agronomie", sort_order: 111, parent_code: "agriculture" },
+      { value_code: "elevage", value_label: "Élevage et zootechnie", sort_order: 112, parent_code: "agriculture" },
+      { value_code: "veterinaire", value_label: "Médecine vétérinaire", sort_order: 113, parent_code: "agriculture" },
+      { value_code: "foresterie", value_label: "Foresterie et environnement", sort_order: 114, parent_code: "agriculture" },
+      { value_code: "agroalimentaire", value_label: "Technologies agroalimentaires", sort_order: 115, parent_code: "agriculture" },
     ],
   },
 ];
 
 export const SystemListsSyncButton = () => {
-  const { toast } = useToast();
   const [syncing, setSyncing] = useState(false);
+  const { toast } = useToast();
 
   const handleSync = async () => {
     setSyncing(true);
     try {
-      let listsCreated = 0;
-      let valuesCreated = 0;
+      let syncedCount = 0;
+      let updatedCount = 0;
+      let errorsCount = 0;
 
       for (const listDef of ALL_SYSTEM_LISTS) {
-        // Vérifier si la liste existe déjà
-        const { data: existingList } = await supabase
-          .from("system_lists")
-          .select("id")
-          .eq("list_code", listDef.list_code)
-          .single();
+        try {
+          // Vérifier si la liste existe déjà
+          const { data: existingList, error: fetchError } = await supabase
+            .from('system_lists')
+            .select('id, is_hierarchical')
+            .eq('list_code', listDef.list_code)
+            .maybeSingle();
 
-        let listId: string;
+          if (fetchError) throw fetchError;
 
-          if (existingList) {
-          listId = existingList.id;
-          
-          // Mettre à jour les métadonnées de la liste
-          await supabase
-            .from("system_lists")
-            .update({
-              list_name: listDef.list_name,
-              module: listDef.module,
-              form_name: listDef.form_name,
-              field_type: listDef.field_type,
-              description: listDef.description,
-              is_hierarchical: listDef.is_hierarchical || false,
-            })
-            .eq("id", listId);
-        } else {
-          // Créer la nouvelle liste
-          const { data: newList, error: listError } = await supabase
-            .from("system_lists")
-            .insert({
-              list_code: listDef.list_code,
-              list_name: listDef.list_name,
-              module: listDef.module,
-              form_name: listDef.form_name,
-              field_type: listDef.field_type,
-              description: listDef.description,
-              is_hierarchical: listDef.is_hierarchical || false,
-            })
-            .select("id")
-            .single();
+          let listId: string;
 
-          if (listError) throw listError;
-          listId = newList.id;
-          listsCreated++;
-        }
-
-        // Synchroniser les valeurs
-        for (const valueDef of listDef.values) {
-          const { data: existingValue } = await supabase
-            .from("system_list_values")
-            .select("id")
-            .eq("list_id", listId)
-            .eq("value_code", valueDef.value_code)
-            .single();
-
-          if (existingValue) {
-            // Mettre à jour la valeur existante
-            await supabase
-              .from("system_list_values")
-              .update({
-                value_label: valueDef.value_label,
-                sort_order: valueDef.sort_order,
-                parent_code: valueDef.parent_code || null,
-              })
-              .eq("id", existingValue.id);
-          } else {
-            // Créer la nouvelle valeur
-            const { error: valueError } = await supabase
-              .from("system_list_values")
+          if (!existingList) {
+            // Créer la liste
+            const { data: newList, error: insertError } = await supabase
+              .from('system_lists')
               .insert({
-                list_id: listId,
-                value_code: valueDef.value_code,
-                value_label: valueDef.value_label,
-                sort_order: valueDef.sort_order,
-                parent_code: valueDef.parent_code || null,
-              });
+                list_code: listDef.list_code,
+                list_name: listDef.list_name,
+                portal: listDef.portal,
+                platform: listDef.platform,
+                service: listDef.service,
+                sub_service: listDef.sub_service,
+                module: listDef.module,
+                form_name: listDef.form_name,
+                field_type: listDef.field_type,
+                description: listDef.description,
+                is_hierarchical: listDef.is_hierarchical || false,
+                is_active: true,
+              })
+              .select('id')
+              .single();
 
-            if (valueError) throw valueError;
-            valuesCreated++;
+            if (insertError) throw insertError;
+            listId = newList.id;
+            syncedCount++;
+          } else {
+            listId = existingList.id;
+            
+            // Mettre à jour les informations de la liste avec la hiérarchie
+            const { error: updateError } = await supabase
+              .from('system_lists')
+              .update({
+                list_name: listDef.list_name,
+                portal: listDef.portal,
+                platform: listDef.platform,
+                service: listDef.service,
+                sub_service: listDef.sub_service,
+                module: listDef.module,
+                form_name: listDef.form_name,
+                description: listDef.description,
+              })
+              .eq('id', listId);
+
+            if (updateError) throw updateError;
+            updatedCount++;
           }
+
+          // Gérer les valeurs de la liste
+          for (const value of listDef.values) {
+            // Gérer parent_value_id si c'est une liste hiérarchique
+            let parent_value_id: string | null = null;
+            if (value.parent_code && listDef.is_hierarchical) {
+              const { data: parentValue } = await supabase
+                .from('system_list_values')
+                .select('id')
+                .eq('list_id', listId)
+                .eq('value_code', value.parent_code)
+                .maybeSingle();
+
+              if (parentValue) {
+                parent_value_id = parentValue.id;
+              }
+            }
+
+            // Vérifier si la valeur existe
+            const { data: existingValue } = await supabase
+              .from('system_list_values')
+              .select('id')
+              .eq('list_id', listId)
+              .eq('value_code', value.value_code)
+              .maybeSingle();
+
+            if (!existingValue) {
+              // Insérer la valeur
+              const { error: valueError } = await supabase
+                .from('system_list_values')
+                .insert({
+                  list_id: listId,
+                  value_code: value.value_code,
+                  value_label: value.value_label,
+                  sort_order: value.sort_order,
+                  parent_value_id: parent_value_id,
+                  is_active: true,
+                });
+
+              if (valueError) throw valueError;
+            } else {
+              // Mettre à jour la valeur existante
+              const { error: updateValueError } = await supabase
+                .from('system_list_values')
+                .update({
+                  value_label: value.value_label,
+                  sort_order: value.sort_order,
+                  parent_value_id: parent_value_id,
+                  is_active: true,
+                })
+                .eq('id', existingValue.id);
+
+              if (updateValueError) throw updateValueError;
+            }
+          }
+        } catch (error: any) {
+          console.error(`Erreur pour la liste ${listDef.list_code}:`, error);
+          errorsCount++;
         }
       }
 
       toast({
-        title: "✅ Synchronisation réussie",
-        description: `${listsCreated} listes créées, ${valuesCreated} valeurs ajoutées`,
+        title: "✅ Synchronisation terminée",
+        description: `${syncedCount} listes créées, ${updatedCount} mises à jour. ${errorsCount > 0 ? `${errorsCount} erreurs.` : ''}`,
       });
     } catch (error: any) {
-      console.error("Erreur lors de la synchronisation:", error);
       toast({
         title: "❌ Erreur de synchronisation",
         description: error.message,
@@ -591,14 +771,18 @@ export const SystemListsSyncButton = () => {
   };
 
   return (
-    <Button
-      onClick={handleSync}
-      disabled={syncing}
-      className="w-full"
-      size="lg"
-    >
-      <RefreshCw className={`h-5 w-5 mr-2 ${syncing ? "animate-spin" : ""}`} />
-      {syncing ? "Synchronisation en cours..." : "Synchroniser toutes les listes déroulantes"}
+    <Button onClick={handleSync} disabled={syncing} className="w-full">
+      {syncing ? (
+        <>
+          <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+          Synchronisation en cours...
+        </>
+      ) : (
+        <>
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Synchroniser toutes les listes système
+        </>
+      )}
     </Button>
   );
 };

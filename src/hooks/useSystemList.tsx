@@ -15,6 +15,12 @@ export interface SystemList {
   list_name: string;
   description?: string;
   is_hierarchical: boolean;
+  portal?: string;
+  platform?: string;
+  service?: string;
+  sub_service?: string;
+  module?: string;
+  form_name?: string;
 }
 
 /**
@@ -171,7 +177,7 @@ export function useSystemLists() {
 
       const { data, error: fetchError } = await supabase
         .from('system_lists')
-        .select('id, list_code, list_name, description, is_hierarchical')
+        .select('id, list_code, list_name, description, is_hierarchical, portal, platform, service, sub_service, module, form_name')
         .order('list_name');
 
       if (fetchError) throw fetchError;
