@@ -1,14 +1,18 @@
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PageAccessRestrictionsManager } from "@/components/digital-library/PageAccessRestrictionsManager";
+import { BatchRestrictionsManager } from "@/components/digital-library/BatchRestrictionsManager";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, FileText, Layers } from "lucide-react";
 
 export default function PageAccessRestrictionsBackoffice() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("individual");
 
   // Bloquer l'accès aux comptes professionnels
   const professionalRoles = ['editor', 'printer', 'producer'];
@@ -22,13 +26,33 @@ export default function PageAccessRestrictionsBackoffice() {
       <main className="container mx-auto p-6">
         <Button
           variant="ghost"
-          onClick={() => navigate("/admin/digital-library-backoffice")}
+          onClick={() => navigate("/admin/digital-library")}
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour à l'administration
         </Button>
-        <PageAccessRestrictionsManager />
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="individual" className="gap-2">
+              <FileText className="h-4 w-4" />
+              Restrictions par œuvre
+            </TabsTrigger>
+            <TabsTrigger value="batch" className="gap-2">
+              <Layers className="h-4 w-4" />
+              Restrictions par lot
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="individual">
+            <PageAccessRestrictionsManager />
+          </TabsContent>
+
+          <TabsContent value="batch">
+            <BatchRestrictionsManager />
+          </TabsContent>
+        </Tabs>
       </main>
       <Footer />
     </div>
