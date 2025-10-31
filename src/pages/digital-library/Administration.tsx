@@ -104,6 +104,13 @@ export default function Administration() {
       color: "bg-red-100 text-red-600",
     },
     {
+      title: "Restriction d'accès aux pages",
+      description: "Gestion des restrictions par page",
+      icon: Lock,
+      path: "/admin/digital-library/page-restrictions",
+      color: "bg-rose-100 text-rose-600",
+    },
+    {
       title: "Droits d'auteur",
       description: "Gestion des droits",
       icon: Copyright,
