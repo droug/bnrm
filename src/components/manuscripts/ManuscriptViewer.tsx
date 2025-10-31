@@ -167,11 +167,21 @@ export function ManuscriptViewer() {
 
   const fetchManuscript = async () => {
     try {
-      const { data, error } = await supabase
+      // Déterminer si c'est un permalink ou un UUID
+      const isPermalink = id?.startsWith('ms-');
+      
+      let query = supabase
         .from('manuscripts')
-        .select('id, title, author, description, language, period, material, dimensions, page_count, thumbnail_url, digital_copy_url, access_level, status, has_ocr, block_right_click, block_screenshot, allow_download, allow_print, allow_email_share, created_at, permalink, condition_notes, inventory_number, genre, cote, source, historical_period')
-        .or(`id.eq."${id}",permalink.eq."${id}"`)
-        .maybeSingle();
+        .select('id, title, author, description, language, period, material, dimensions, page_count, thumbnail_url, digital_copy_url, access_level, status, has_ocr, block_right_click, block_screenshot, allow_download, allow_print, allow_email_share, created_at, permalink, condition_notes, inventory_number, genre, cote, source, historical_period');
+      
+      // Utiliser la bonne colonne selon le type d'identifiant
+      if (isPermalink) {
+        query = query.eq('permalink', id);
+      } else {
+        query = query.eq('id', id);
+      }
+      
+      const { data, error } = await query.maybeSingle();
 
       if (error) throw error;
       
