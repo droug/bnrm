@@ -162,48 +162,202 @@ export default function DocumentsManager() {
   // Download XLSX template
   const downloadTemplate = () => {
     const headers = [
+      // Informations de base (content)
+      'id',
       'titre',
-      'auteur',
-      'type_fichier',
-      'date_publication',
+      'slug',
+      'type_contenu',
+      'statut',
       'description',
       'url_fichier',
-      'telechargement_actif',
+      'type_fichier',
+      'taille_fichier_mb',
+      'date_publication',
+      'date_debut',
+      'date_fin',
       'visible',
+      'en_vedette',
+      'telechargement_actif',
       'partage_social',
       'partage_email',
       'derogation_copyright',
-      'date_expiration_copyright'
+      'date_expiration_copyright',
+      'localisation',
+      'tags',
+      'mots_cles_seo',
+      'meta_titre',
+      'meta_description',
+      'url_image_mise_en_avant',
+      
+      // Métadonnées du catalogue (catalog_metadata)
+      'isbn',
+      'issn',
+      'auteur_principal',
+      'co_auteurs',
+      'editeur',
+      'annee_publication',
+      'lieu_publication',
+      'edition',
+      'titre_original',
+      'sous_titre',
+      'titre_traduit',
+      'titre_serie',
+      'numero_volume',
+      'mots_cles',
+      'sujets',
+      'classification_dewey',
+      'classification_udc',
+      'classification_cdu',
+      'nombre_pages',
+      'description_physique',
+      'format_taille',
+      'format_numerique',
+      'mode_couleur',
+      'resolution_dpi',
+      'type_illustrations',
+      'illustrateurs',
+      'editeurs',
+      'traducteurs',
+      'couverture_geographique',
+      'periode_temporelle',
+      'statut_copyright',
+      'droits_acces',
+      'restrictions_usage',
+      'notes_contenu',
+      'notes_conservation',
+      'notes_generales',
     ];
-    
+
     const exampleRows = [
       [
-        'Exemple de livre',
-        'Auteur Exemple',
-        'livre',
-        '2024-01-15',
-        'Description du document exemple',
-        'https://example.com/fichier.pdf',
-        'true',
-        'true',
-        'true',
-        'true',
-        'false',
-        ''
+        '', // id (auto-généré)
+        'Guide pratique de la recherche scientifique', // titre
+        'guide-recherche-scientifique', // slug
+        'livre', // type_contenu (livre, article, these, rapport, periodique, multimedia)
+        'publié', // statut (brouillon, publié, archivé)
+        'Un guide complet pour les chercheurs', // description
+        'https://storage.supabase.co/documents/guide.pdf', // url_fichier
+        'PDF', // type_fichier
+        '5.2', // taille_fichier_mb
+        '2024-01-15', // date_publication
+        '', // date_debut
+        '', // date_fin
+        'true', // visible
+        'false', // en_vedette
+        'true', // telechargement_actif
+        'true', // partage_social
+        'true', // partage_email
+        'false', // derogation_copyright
+        '2074-01-15', // date_expiration_copyright
+        '', // localisation
+        'recherche;méthodologie;sciences', // tags (séparés par ;)
+        'recherche scientifique;méthodologie;guide', // mots_cles_seo (séparés par ;)
+        'Guide de recherche scientifique', // meta_titre
+        'Découvrez les meilleures pratiques de recherche', // meta_description
+        'https://storage.supabase.co/images/cover.jpg', // url_image_mise_en_avant
+        
+        // Métadonnées du catalogue
+        '978-3-16-148410-0', // isbn
+        '', // issn
+        'Dupont, Jean', // auteur_principal
+        'Martin, Marie;Durand, Pierre', // co_auteurs (séparés par ;)
+        'Éditions Scientifiques', // editeur
+        '2024', // annee_publication
+        'Paris', // lieu_publication
+        '3e édition', // edition
+        '', // titre_original
+        'Méthodologie et pratiques', // sous_titre
+        '', // titre_traduit
+        'Collection Recherche', // titre_serie
+        'Vol. 12', // numero_volume
+        'recherche;méthodologie;sciences;académique', // mots_cles (séparés par ;)
+        'Méthodologie;Recherche scientifique;Épistémologie', // sujets (séparés par ;)
+        '001.42', // classification_dewey
+        '001.8', // classification_udc
+        '', // classification_cdu
+        '350', // nombre_pages
+        '24 cm, illustrations', // description_physique
+        'A4', // format_taille
+        'PDF/A', // format_numerique
+        'couleur', // mode_couleur
+        '300', // resolution_dpi
+        'photographies, schémas', // type_illustrations
+        'Leclerc, Sophie', // illustrateurs (séparés par ;)
+        'Moreau, Luc;Bernard, Anne', // editeurs (séparés par ;)
+        '', // traducteurs (séparés par ;)
+        'France;Europe', // couverture_geographique (séparés par ;)
+        '2020-2024', // periode_temporelle
+        'Protégé par copyright', // statut_copyright
+        'Libre accès avec inscription', // droits_acces
+        'Usage académique uniquement', // restrictions_usage
+        'Inclut bibliographie et index', // notes_contenu
+        'Bon état', // notes_conservation
+        'Ouvrage de référence', // notes_generales
       ],
       [
-        'Manuscrit ancien',
-        'Auteur Inconnu',
-        'manuscrit',
-        '1850-06-20',
-        'Un manuscrit historique',
-        'https://example.com/manuscrit.pdf',
-        'false',
-        'true',
-        'true',
-        'false',
-        'true',
-        '2026-12-31'
+        '', // id (auto-généré)
+        'Revue Marocaine de Recherche', // titre
+        'revue-marocaine-recherche', // slug
+        'periodique', // type_contenu
+        'publié', // statut
+        'Revue scientifique trimestrielle', // description
+        'https://storage.supabase.co/documents/revue-2024-01.pdf', // url_fichier
+        'PDF', // type_fichier
+        '3.8', // taille_fichier_mb
+        '2024-03-01', // date_publication
+        '', // date_debut
+        '', // date_fin
+        'true', // visible
+        'true', // en_vedette
+        'true', // telechargement_actif
+        'true', // partage_social
+        'true', // partage_email
+        'false', // derogation_copyright
+        '2074-03-01', // date_expiration_copyright
+        '', // localisation
+        'revue;recherche;périodique', // tags (séparés par ;)
+        'revue scientifique;recherche;Maroc', // mots_cles_seo (séparés par ;)
+        'Revue Marocaine de Recherche - Mars 2024', // meta_titre
+        'Découvrez les dernières recherches scientifiques', // meta_description
+        '', // url_image_mise_en_avant
+        
+        // Métadonnées du catalogue
+        '', // isbn
+        '2345-6789', // issn
+        'Comité de rédaction', // auteur_principal
+        '', // co_auteurs
+        'BNRM Éditions', // editeur
+        '2024', // annee_publication
+        'Rabat', // lieu_publication
+        'Vol. 15, No. 1', // edition
+        '', // titre_original
+        'Numéro spécial: Intelligence Artificielle', // sous_titre
+        '', // titre_traduit
+        '', // titre_serie
+        '', // numero_volume
+        'IA;recherche;innovation;Maroc', // mots_cles (séparés par ;)
+        'Intelligence Artificielle;Innovation;Technologie', // sujets (séparés par ;)
+        '004', // classification_dewey
+        '004.8', // classification_udc
+        '', // classification_cdu
+        '120', // nombre_pages
+        '21 cm', // description_physique
+        'A4', // format_taille
+        'PDF', // format_numerique
+        'couleur', // mode_couleur
+        '300', // resolution_dpi
+        'graphiques, tableaux', // type_illustrations
+        '', // illustrateurs
+        'Hassan, Ahmed;Alami, Fatima', // editeurs (séparés par ;)
+        '', // traducteurs
+        'Maroc', // couverture_geographique
+        '2024', // periode_temporelle
+        'Accès libre', // statut_copyright
+        'Libre accès', // droits_acces
+        'Attribution CC BY 4.0', // restrictions_usage
+        'Articles peer-reviewed', // notes_contenu
+        '', // notes_conservation
+        'Publication trimestrielle', // notes_generales
       ]
     ];
 
@@ -216,18 +370,67 @@ export default function DocumentsManager() {
     
     // Set column widths
     ws['!cols'] = [
-      { wch: 30 }, // titre
-      { wch: 20 }, // auteur
-      { wch: 15 }, // type_fichier
+      { wch: 10 }, // id
+      { wch: 40 }, // titre
+      { wch: 30 }, // slug
+      { wch: 15 }, // type_contenu
+      { wch: 12 }, // statut
+      { wch: 50 }, // description
+      { wch: 50 }, // url_fichier
+      { wch: 12 }, // type_fichier
+      { wch: 12 }, // taille_fichier_mb
       { wch: 15 }, // date_publication
-      { wch: 40 }, // description
-      { wch: 40 }, // url_fichier
-      { wch: 20 }, // telechargement_actif
-      { wch: 15 }, // visible
+      { wch: 15 }, // date_debut
+      { wch: 15 }, // date_fin
+      { wch: 10 }, // visible
+      { wch: 12 }, // en_vedette
+      { wch: 18 }, // telechargement_actif
       { wch: 15 }, // partage_social
       { wch: 15 }, // partage_email
       { wch: 20 }, // derogation_copyright
       { wch: 25 }, // date_expiration_copyright
+      { wch: 20 }, // localisation
+      { wch: 30 }, // tags
+      { wch: 30 }, // mots_cles_seo
+      { wch: 30 }, // meta_titre
+      { wch: 40 }, // meta_description
+      { wch: 40 }, // url_image_mise_en_avant
+      { wch: 20 }, // isbn
+      { wch: 15 }, // issn
+      { wch: 25 }, // auteur_principal
+      { wch: 30 }, // co_auteurs
+      { wch: 25 }, // editeur
+      { wch: 15 }, // annee_publication
+      { wch: 20 }, // lieu_publication
+      { wch: 15 }, // edition
+      { wch: 30 }, // titre_original
+      { wch: 30 }, // sous_titre
+      { wch: 30 }, // titre_traduit
+      { wch: 25 }, // titre_serie
+      { wch: 12 }, // numero_volume
+      { wch: 40 }, // mots_cles
+      { wch: 40 }, // sujets
+      { wch: 18 }, // classification_dewey
+      { wch: 18 }, // classification_udc
+      { wch: 18 }, // classification_cdu
+      { wch: 12 }, // nombre_pages
+      { wch: 30 }, // description_physique
+      { wch: 15 }, // format_taille
+      { wch: 15 }, // format_numerique
+      { wch: 12 }, // mode_couleur
+      { wch: 12 }, // resolution_dpi
+      { wch: 25 }, // type_illustrations
+      { wch: 25 }, // illustrateurs
+      { wch: 30 }, // editeurs
+      { wch: 25 }, // traducteurs
+      { wch: 25 }, // couverture_geographique
+      { wch: 20 }, // periode_temporelle
+      { wch: 25 }, // statut_copyright
+      { wch: 30 }, // droits_acces
+      { wch: 30 }, // restrictions_usage
+      { wch: 40 }, // notes_contenu
+      { wch: 25 }, // notes_conservation
+      { wch: 30 }, // notes_generales
     ];
     
     // Add worksheet to workbook
@@ -281,18 +484,31 @@ export default function DocumentsManager() {
                   </Button>
                 </div>
                 <div className="bg-muted p-4 rounded-lg">
-                  <p className="text-sm font-semibold mb-2">Format Excel/CSV attendu :</p>
-                  <code className="text-xs block whitespace-pre-wrap break-all">
-                    titre,auteur,type_fichier,date_publication,description,url_fichier,telechargement_actif,visible,partage_social,partage_email,derogation_copyright,date_expiration_copyright
-                  </code>
+                  <p className="text-sm font-semibold mb-2">Format Excel attendu :</p>
+                  <div className="text-xs space-y-2">
+                    <p className="font-medium">Champs principaux :</p>
+                    <code className="text-xs block whitespace-pre-wrap break-all">
+                      id, titre, slug, type_contenu, statut, description, url_fichier, type_fichier, date_publication, visible, telechargement_actif, partage_social, partage_email, etc.
+                    </code>
+                    <p className="font-medium mt-2">Métadonnées bibliographiques :</p>
+                    <code className="text-xs block whitespace-pre-wrap break-all">
+                      isbn, issn, auteur_principal, co_auteurs, editeur, annee_publication, lieu_publication, edition, classification_dewey, classification_udc, nombre_pages, mots_cles, sujets, etc.
+                    </code>
+                    <p className="text-muted-foreground mt-2">
+                      Téléchargez le modèle Excel ci-dessous pour voir tous les champs disponibles avec des exemples.
+                    </p>
+                  </div>
                   <p className="text-xs text-muted-foreground mt-2">
                     Les colonnes booléennes acceptent : true/false, oui/non, 1/0
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Types de fichier acceptés : livre, article, video, audio, manuscrit, periodique
+                    Types de contenu acceptés : livre, article, video, audio, manuscrit, periodique, these, rapport, multimedia
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Format des dates : YYYY-MM-DD (ex: 2024-01-15)
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Listes multiples (séparées par ;) : tags, mots_cles, sujets, co_auteurs, editeurs, illustrateurs, traducteurs, etc.
                   </p>
                   <Button 
                     variant="link" 
@@ -301,7 +517,7 @@ export default function DocumentsManager() {
                     className="mt-2 h-auto p-0"
                   >
                     <FileDown className="h-3 w-3 mr-1" />
-                    Télécharger le modèle Excel avec exemples
+                    Télécharger le modèle Excel complet avec exemples
                   </Button>
                 </div>
               </div>
