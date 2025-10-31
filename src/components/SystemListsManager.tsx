@@ -156,23 +156,25 @@ export const SystemListsManager = () => {
     return true;
   });
   
-  // Organiser les listes en hiérarchie
-  const groupedLists = filteredLists.reduce((acc, list) => {
-    const portalKey = list.portal || "Sans portail";
-    const platformKey = list.platform || "Sans plateforme";
-    const serviceKey = list.service || "Sans service";
-    const subServiceKey = list.sub_service || "Sans sous-service";
-    const formKey = list.form_name || "Sans formulaire";
-    
-    if (!acc[portalKey]) acc[portalKey] = {};
-    if (!acc[portalKey][platformKey]) acc[portalKey][platformKey] = {};
-    if (!acc[portalKey][platformKey][serviceKey]) acc[portalKey][platformKey][serviceKey] = {};
-    if (!acc[portalKey][platformKey][serviceKey][subServiceKey]) acc[portalKey][platformKey][serviceKey][subServiceKey] = {};
-    if (!acc[portalKey][platformKey][serviceKey][subServiceKey][formKey]) acc[portalKey][platformKey][serviceKey][subServiceKey][formKey] = [];
-    
-    acc[portalKey][platformKey][serviceKey][subServiceKey][formKey].push(list);
-    return acc;
-  }, {} as Record<string, Record<string, Record<string, Record<string, Record<string, SystemList[]>>>>>);
+  // Organiser les listes en hiérarchie (exclure les valeurs nulles/vides)
+  const groupedLists = filteredLists
+    .filter(list => list.portal && list.platform && list.service) // Exclure les listes sans hiérarchie complète
+    .reduce((acc, list) => {
+      const portalKey = list.portal!;
+      const platformKey = list.platform!;
+      const serviceKey = list.service!;
+      const subServiceKey = list.sub_service || "Général";
+      const formKey = list.form_name || "Général";
+      
+      if (!acc[portalKey]) acc[portalKey] = {};
+      if (!acc[portalKey][platformKey]) acc[portalKey][platformKey] = {};
+      if (!acc[portalKey][platformKey][serviceKey]) acc[portalKey][platformKey][serviceKey] = {};
+      if (!acc[portalKey][platformKey][serviceKey][subServiceKey]) acc[portalKey][platformKey][serviceKey][subServiceKey] = {};
+      if (!acc[portalKey][platformKey][serviceKey][subServiceKey][formKey]) acc[portalKey][platformKey][serviceKey][subServiceKey][formKey] = [];
+      
+      acc[portalKey][platformKey][serviceKey][subServiceKey][formKey].push(list);
+      return acc;
+    }, {} as Record<string, Record<string, Record<string, Record<string, Record<string, SystemList[]>>>>>);
   
   const toggleSection = (key: string) => {
     const newExpanded = new Set(expandedSections);
