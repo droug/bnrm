@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SimpleDropdown } from "@/components/cbn/SimpleDropdown";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Lock, Unlock, Search, Filter, FileText, X, Shield, Download, Camera, MousePointerClick, Layers, Eye } from "lucide-react";
 
@@ -356,16 +356,16 @@ export function BatchRestrictionsManager() {
                 <Filter className="h-4 w-4 text-muted-foreground" />
                 Type de contenu
               </Label>
-              <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger id="filter-type" className="h-11">
-                  <SelectValue placeholder="Tous les types" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les types</SelectItem>
-                  <SelectItem value="page">Pages</SelectItem>
-                  <SelectItem value="news">Actualités</SelectItem>
-                </SelectContent>
-              </Select>
+              <SimpleDropdown
+                value={filterType}
+                onChange={setFilterType}
+                options={[
+                  { value: "all", label: "Tous les types" },
+                  { value: "page", label: "Pages" },
+                  { value: "news", label: "Actualités" },
+                ]}
+                placeholder="Tous les types"
+              />
             </div>
             
             <div className="space-y-3">
@@ -373,16 +373,16 @@ export function BatchRestrictionsManager() {
                 <Lock className="h-4 w-4 text-muted-foreground" />
                 Statut de restriction
               </Label>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger id="filter-status" className="h-11">
-                  <SelectValue placeholder="Tous les statuts" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="restricted">Restreints</SelectItem>
-                  <SelectItem value="public">Publics</SelectItem>
-                </SelectContent>
-              </Select>
+              <SimpleDropdown
+                value={filterStatus}
+                onChange={setFilterStatus}
+                options={[
+                  { value: "all", label: "Tous les statuts" },
+                  { value: "restricted", label: "Restreints" },
+                  { value: "public", label: "Publics" },
+                ]}
+                placeholder="Tous les statuts"
+              />
             </div>
           </div>
 
@@ -572,16 +572,16 @@ export function BatchRestrictionsManager() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <Select value={restrictionMode} onValueChange={(value: any) => setRestrictionMode(value)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="range">Par plage de pages</SelectItem>
-                        <SelectItem value="manual">Sélection manuelle</SelectItem>
-                        <SelectItem value="percentage">Par pourcentage</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <SimpleDropdown
+                      value={restrictionMode}
+                      onChange={(value: any) => setRestrictionMode(value)}
+                      options={[
+                        { value: "range", label: "Par plage de pages" },
+                        { value: "manual", label: "Sélection manuelle" },
+                        { value: "percentage", label: "Par pourcentage" },
+                      ]}
+                      placeholder="Sélectionner un mode"
+                    />
 
                     {/* Mode plage */}
                     {restrictionMode === 'range' && (
@@ -672,16 +672,16 @@ export function BatchRestrictionsManager() {
 
                         <div className="space-y-2">
                           <Label htmlFor="distribution">Mode de distribution des pages</Label>
-                          <Select value={percentageDistribution} onValueChange={(value: any) => setPercentageDistribution(value)}>
-                            <SelectTrigger id="distribution">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="start">Pages du début</SelectItem>
-                              <SelectItem value="end">Pages de la fin</SelectItem>
-                              <SelectItem value="distributed">Répartition équilibrée</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <SimpleDropdown
+                            value={percentageDistribution}
+                            onChange={(value: any) => setPercentageDistribution(value)}
+                            options={[
+                              { value: "start", label: "Pages du début" },
+                              { value: "end", label: "Pages de la fin" },
+                              { value: "distributed", label: "Répartition équilibrée" },
+                            ]}
+                            placeholder="Sélectionner une distribution"
+                          />
                           <p className="text-xs text-muted-foreground">
                             {percentageDistribution === "start" && "Les premières pages seront accessibles (1, 2, 3, ...)"}
                             {percentageDistribution === "end" && "Les dernières pages seront accessibles (..., n-2, n-1, n)"}
