@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { BNRMTariffs } from "@/components/bnrm/BNRMTariffs";
 import { BNRMServices } from "@/components/bnrm/BNRMServices";
 import { BNRMStatistics } from "@/components/bnrm/BNRMStatistics";
@@ -8,12 +9,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 export default function BNRMTariffsPage() {
-  const { user, profile, loading } = useAuth();
+  const { user } = useAuth();
+  const { isAdmin, loading } = useSecureRoles();
   const navigate = useNavigate();
 
-  if (loading || !profile) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -21,9 +24,8 @@ export default function BNRMTariffsPage() {
     );
   }
 
-  if (!user || profile.role !== 'admin') {
-    navigate('/dashboard');
-    return null;
+  if (!user || !isAdmin) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (

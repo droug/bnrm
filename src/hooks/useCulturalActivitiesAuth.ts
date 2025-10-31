@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 
@@ -12,27 +13,28 @@ const CULTURAL_ACTIVITIES_ROLES = [
 ];
 
 export function useCulturalActivitiesAuth() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { isAdmin, isLibrarian, loading: rolesLoading } = useSecureRoles();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkAuthorization();
-  }, [user, profile]);
+  }, [user, isAdmin, isLibrarian, rolesLoading]);
 
   const checkAuthorization = async () => {
-    if (!user) {
+    if (!user || rolesLoading) {
       setIsAuthorized(false);
-      setLoading(false);
+      setLoading(rolesLoading);
       return;
     }
 
     try {
       // Vérifier si l'utilisateur est admin ou librarian (accès complet)
-      if (profile?.role === 'admin' || profile?.role === 'librarian') {
+      if (isAdmin || isLibrarian) {
         setIsAuthorized(true);
-        setUserRole(profile.role);
+        setUserRole(isAdmin ? 'admin' : 'librarian');
         setLoading(false);
         return;
       }
