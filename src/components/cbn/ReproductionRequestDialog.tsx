@@ -159,7 +159,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="microfilm" id="microfilm" />
-                  <Label htmlFor="microfilm" className="cursor-pointer">Microfilm</Label>
+                  <Label htmlFor="microfilm" className="cursor-pointer">Duplicata Microfilm</Label>
                 </div>
               </RadioGroup>
             </div>
@@ -180,12 +180,6 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                 </div>
               )}
             </div>
-
-            {formData.reproductionType === "microfilm" && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-                <p className="text-sm font-semibold text-blue-900">Création de duplicata</p>
-              </div>
-            )}
 
             {formData.reproductionType === "numerique" && (
               <>
