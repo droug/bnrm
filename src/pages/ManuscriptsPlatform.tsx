@@ -128,7 +128,7 @@ export default function ManuscriptsPlatform() {
       });
       return;
     }
-    navigate(`/lecteur-manuscrit/${result.id}`);
+    navigate(`/manuscrit/${result.id}`);
   };
 
   const canAccessManuscript = (manuscript: Manuscript) => {
