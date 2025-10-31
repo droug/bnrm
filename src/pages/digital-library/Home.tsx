@@ -287,8 +287,8 @@ export default function DigitalLibraryHome() {
         {!loading && newItems.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {newItems.map((item) => (
-              <Card key={item.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
+              <Card key={item.id} className="hover:shadow-lg transition-shadow flex flex-col h-full">
+                <CardHeader className="flex-1">
                   <div className="aspect-[3/4] rounded-lg mb-4 overflow-hidden">
                     <img 
                       src={item.thumbnail} 
@@ -300,7 +300,7 @@ export default function DigitalLibraryHome() {
                   <CardTitle className="text-lg line-clamp-2">{item.title}</CardTitle>
                   <CardDescription>{item.author}</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="mt-auto pt-0">
                   <Button 
                     className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300" 
                     onClick={() => handleConsultDocument(item)}
