@@ -132,23 +132,8 @@ export default function ManuscriptsPlatform() {
   };
 
   const canAccessManuscript = (manuscript: Manuscript) => {
-    if (manuscript.access_level === 'public') return true;
-    
-    if (manuscript.access_level === 'restricted') {
-      return user && (
-        profile?.role === 'subscriber' || 
-        profile?.role === 'researcher' || 
-        profile?.role === 'partner' ||
-        profile?.role === 'librarian' ||
-        profile?.role === 'admin'
-      );
-    }
-    
-    if (manuscript.access_level === 'confidential') {
-      return profile?.role === 'admin' || profile?.role === 'librarian';
-    }
-    
-    return false;
+    // Tous les manuscrits sont maintenant accessibles
+    return true;
   };
 
   const getStatusColor = (status: string) => {
