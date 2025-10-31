@@ -18,6 +18,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import * as XLSX from 'xlsx';
 
 const documentSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
@@ -158,7 +159,7 @@ export default function DocumentsManager() {
     return matchesSearch && matchesVisible && matchesDownload;
   });
 
-  // Download CSV template
+  // Download XLSX template
   const downloadTemplate = () => {
     const headers = [
       'titre',
@@ -206,23 +207,35 @@ export default function DocumentsManager() {
       ]
     ];
 
-    // Create CSV content
-    const csvContent = [
-      headers.join(','),
-      ...exampleRows.map(row => row.map(cell => `"${cell}"`).join(','))
-    ].join('\n');
-
-    // Create blob and download
-    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'modele_import_documents.csv');
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
+    // Create worksheet data
+    const wsData = [headers, ...exampleRows];
+    
+    // Create workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    
+    // Set column widths
+    ws['!cols'] = [
+      { wch: 30 }, // titre
+      { wch: 20 }, // auteur
+      { wch: 15 }, // type_fichier
+      { wch: 15 }, // date_publication
+      { wch: 40 }, // description
+      { wch: 40 }, // url_fichier
+      { wch: 20 }, // telechargement_actif
+      { wch: 15 }, // visible
+      { wch: 15 }, // partage_social
+      { wch: 15 }, // partage_email
+      { wch: 20 }, // derogation_copyright
+      { wch: 25 }, // date_expiration_copyright
+    ];
+    
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Documents');
+    
+    // Generate and download file
+    XLSX.writeFile(wb, 'modele_import_documents.xlsx');
+    
     toast({ title: "Modèle téléchargé avec succès" });
   };
 
@@ -268,7 +281,7 @@ export default function DocumentsManager() {
                   </Button>
                 </div>
                 <div className="bg-muted p-4 rounded-lg">
-                  <p className="text-sm font-semibold mb-2">Format CSV attendu :</p>
+                  <p className="text-sm font-semibold mb-2">Format Excel/CSV attendu :</p>
                   <code className="text-xs block whitespace-pre-wrap break-all">
                     titre,auteur,type_fichier,date_publication,description,url_fichier,telechargement_actif,visible,partage_social,partage_email,derogation_copyright,date_expiration_copyright
                   </code>
@@ -288,7 +301,7 @@ export default function DocumentsManager() {
                     className="mt-2 h-auto p-0"
                   >
                     <FileDown className="h-3 w-3 mr-1" />
-                    Télécharger le modèle avec exemples
+                    Télécharger le modèle Excel avec exemples
                   </Button>
                 </div>
               </div>
