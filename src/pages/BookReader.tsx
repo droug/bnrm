@@ -495,7 +495,7 @@ const BookReader = () => {
                           </div>
 
                           <div>
-                            <span className="text-muted-foreground font-medium">Identifiant:</span>
+                            <span className="text-muted-foreground font-medium">Numéro de cote:</span>
                             <p className="font-mono text-xs bg-muted px-2 py-1 rounded mt-1">{id}</p>
                           </div>
 
