@@ -541,7 +541,7 @@ export const SYSTEM_LISTS_DEFINITIONS: SystemListDefinition[] = [
     ],
   },
 
-  // ========== REPRODUCTION ==========
+  // ========== REPRODUCTION (PORTAIL BNRM) ==========
   {
     list_code: "reproduction_type",
     list_name: "Type de reproduction",
@@ -595,7 +595,7 @@ export const SYSTEM_LISTS_DEFINITIONS: SystemListDefinition[] = [
     ],
   },
 
-  // ========== RESTAURATION ==========
+  // ========== RESTAURATION (PORTAIL BNRM) ==========
   {
     list_code: "restoration_type",
     list_name: "Type de restauration",
