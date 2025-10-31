@@ -8,13 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2, Plus, Upload, Download, Edit2, Zap, List, Check, ChevronsUpDown } from "lucide-react";
+import { Trash2, Plus, Upload, Download, Edit2, Zap, ChevronDown, ChevronRight, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import * as XLSX from 'xlsx';
 import { SystemListsSyncButton } from "@/components/admin/SystemListsSyncButton";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 interface SystemList {
   id: string;
@@ -22,6 +21,10 @@ interface SystemList {
   list_name: string;
   description: string | null;
   is_active: boolean;
+  portal: string | null;
+  platform: string | null;
+  service: string | null;
+  sub_service: string | null;
   module: string | null;
   form_name: string | null;
   field_type: string | null;
@@ -45,6 +48,17 @@ export const SystemListsManager = () => {
   const [selectedList, setSelectedList] = useState<string | null>(null);
   const [listValues, setListValues] = useState<SystemListValue[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Filtres hiérarchiques
+  const [selectedPortal, setSelectedPortal] = useState<string>("");
+  const [selectedPlatform, setSelectedPlatform] = useState<string>("");
+  const [selectedService, setSelectedService] = useState<string>("");
+  const [selectedSubService, setSelectedSubService] = useState<string>("");
+  const [selectedForm, setSelectedForm] = useState<string>("");
+  
+  // État des sections expandables
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  
   const [newValue, setNewValue] = useState({ code: "", label: "", order: 0, parent_value_id: null as string | null });
   const [editingValue, setEditingValue] = useState<SystemListValue | null>(null);
   const [parentLists, setParentLists] = useState<SystemList[]>([]);
@@ -53,9 +67,6 @@ export const SystemListsManager = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCreateListDialogOpen, setIsCreateListDialogOpen] = useState(false);
-  const [moduleFilter, setModuleFilter] = useState<string>("");
-  const [filteredLists, setFilteredLists] = useState<SystemList[]>([]);
-  const [openModuleCombo, setOpenModuleCombo] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredValues, setFilteredValues] = useState<SystemListValue[]>([]);
   const [inlineEditId, setInlineEditId] = useState<string | null>(null);
@@ -63,6 +74,10 @@ export const SystemListsManager = () => {
   const [newListData, setNewListData] = useState({
     list_name: "",
     list_code: "",
+    portal: "",
+    platform: "",
+    service: "",
+    sub_service: "",
     module: "",
     form_name: "",
     field_type: "simple",
@@ -70,18 +85,6 @@ export const SystemListsManager = () => {
     parent_list_id: null as string | null,
     depends_on_parent_value: false
   });
-
-  // Créer une liste unique de modules/formulaires
-  const moduleFormOptions = Array.from(
-    new Set(
-      lists
-        .filter(list => list.module && list.form_name)
-        .map(list => `${list.module} / ${list.form_name}`)
-    )
-  ).sort();
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [createModuleOpen, setCreateModuleOpen] = useState(false);
-  const [uniqueModuleForms, setUniqueModuleForms] = useState<Array<{ value: string; label: string; module: string; form: string }>>([]);
 
   useEffect(() => {
     fetchLists();
@@ -106,64 +109,88 @@ export const SystemListsManager = () => {
       setFilteredValues(filtered);
     }
   }, [searchTerm, listValues]);
-
-  useEffect(() => {
-    // Définir les modules disponibles (même sans listes existantes)
-    const predefinedModules = [
-      { module: "Activités Culturelles", form: "Réservation d'espaces" },
-      { module: "Activités Culturelles", form: "Visites guidées" },
-      { module: "Activités Culturelles", form: "Partenariats" },
-      { module: "Activités Culturelles", form: "Programmation culturelle" },
-      { module: "CBM", form: "Gestion adhésions" },
-      { module: "CBM", form: "Plan d'actions" },
-      { module: "Dépôt Légal", form: "Demande dépôt" },
-      { module: "Bibliothèque Numérique", form: "Réservation documents" },
-      { module: "Bibliothèque Numérique", form: "Demande numérisation" },
-      { module: "Manuscrits", form: "Demande d'accès" },
-      { module: "Reproduction", form: "Demande reproduction" },
-      { module: "BNRM", form: "Services généraux" }
-    ];
-
-    // Extraire les combinaisons uniques de module + formulaire depuis les listes existantes
-    const uniqueCombinations = new Map<string, { module: string; form: string }>();
+  
+  // Extraire les valeurs uniques pour les filtres en cascade
+  const portals = Array.from(new Set(lists.map(l => l.portal).filter(Boolean))).sort();
+  const platforms = Array.from(new Set(
+    lists
+      .filter(l => !selectedPortal || l.portal === selectedPortal)
+      .map(l => l.platform)
+      .filter(Boolean)
+  )).sort();
+  const services = Array.from(new Set(
+    lists
+      .filter(l => (!selectedPortal || l.portal === selectedPortal) && (!selectedPlatform || l.platform === selectedPlatform))
+      .map(l => l.service)
+      .filter(Boolean)
+  )).sort();
+  const subServices = Array.from(new Set(
+    lists
+      .filter(l => 
+        (!selectedPortal || l.portal === selectedPortal) && 
+        (!selectedPlatform || l.platform === selectedPlatform) &&
+        (!selectedService || l.service === selectedService)
+      )
+      .map(l => l.sub_service)
+      .filter(Boolean)
+  )).sort();
+  const forms = Array.from(new Set(
+    lists
+      .filter(l => 
+        (!selectedPortal || l.portal === selectedPortal) && 
+        (!selectedPlatform || l.platform === selectedPlatform) &&
+        (!selectedService || l.service === selectedService) &&
+        (!selectedSubService || l.sub_service === selectedSubService)
+      )
+      .map(l => l.form_name)
+      .filter(Boolean)
+  )).sort();
+  
+  // Filtrer les listes selon la hiérarchie sélectionnée
+  const filteredLists = lists.filter(list => {
+    if (selectedPortal && list.portal !== selectedPortal) return false;
+    if (selectedPlatform && list.platform !== selectedPlatform) return false;
+    if (selectedService && list.service !== selectedService) return false;
+    if (selectedSubService && list.sub_service !== selectedSubService) return false;
+    if (selectedForm && list.form_name !== selectedForm) return false;
+    return true;
+  });
+  
+  // Organiser les listes en hiérarchie
+  const groupedLists = filteredLists.reduce((acc, list) => {
+    const portalKey = list.portal || "Sans portail";
+    const platformKey = list.platform || "Sans plateforme";
+    const serviceKey = list.service || "Sans service";
+    const subServiceKey = list.sub_service || "Sans sous-service";
+    const formKey = list.form_name || "Sans formulaire";
     
-    // Ajouter d'abord les modules prédéfinis
-    predefinedModules.forEach(({ module, form }) => {
-      const key = `${module}|${form}`;
-      uniqueCombinations.set(key, { module, form });
-    });
+    if (!acc[portalKey]) acc[portalKey] = {};
+    if (!acc[portalKey][platformKey]) acc[portalKey][platformKey] = {};
+    if (!acc[portalKey][platformKey][serviceKey]) acc[portalKey][platformKey][serviceKey] = {};
+    if (!acc[portalKey][platformKey][serviceKey][subServiceKey]) acc[portalKey][platformKey][serviceKey][subServiceKey] = {};
+    if (!acc[portalKey][platformKey][serviceKey][subServiceKey][formKey]) acc[portalKey][platformKey][serviceKey][subServiceKey][formKey] = [];
     
-    // Ajouter ensuite les combinaisons depuis les listes existantes
-    lists.forEach(list => {
-      if (list.module && list.form_name) {
-        const key = `${list.module}|${list.form_name}`;
-        if (!uniqueCombinations.has(key)) {
-          uniqueCombinations.set(key, { module: list.module, form: list.form_name });
-        }
-      }
-    });
-    
-    const options = Array.from(uniqueCombinations.entries()).map(([key, value]) => ({
-      value: key,
-      label: `${value.module} - ${value.form}`,
-      module: value.module,
-      form: value.form
-    })).sort((a, b) => a.label.localeCompare(b.label));
-    
-    setUniqueModuleForms(options);
-  }, [lists]);
-
-  useEffect(() => {
-    if (moduleFilter) {
-      const [selectedModule, selectedForm] = moduleFilter.split('|');
-      const filtered = lists.filter(list => 
-        list.module === selectedModule && list.form_name === selectedForm
-      );
-      setFilteredLists(filtered);
+    acc[portalKey][platformKey][serviceKey][subServiceKey][formKey].push(list);
+    return acc;
+  }, {} as Record<string, Record<string, Record<string, Record<string, Record<string, SystemList[]>>>>>);
+  
+  const toggleSection = (key: string) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(key)) {
+      newExpanded.delete(key);
     } else {
-      setFilteredLists(lists);
+      newExpanded.add(key);
     }
-  }, [moduleFilter, lists]);
+    setExpandedSections(newExpanded);
+  };
+  
+  const resetFilters = () => {
+    setSelectedPortal("");
+    setSelectedPlatform("");
+    setSelectedService("");
+    setSelectedSubService("");
+    setSelectedForm("");
+  };
 
   const fetchLists = async () => {
     try {
@@ -361,6 +388,10 @@ export const SystemListsManager = () => {
         .insert({
           list_name: newListData.list_name,
           list_code: newListData.list_code,
+          portal: newListData.portal,
+          platform: newListData.platform,
+          service: newListData.service,
+          sub_service: newListData.sub_service,
           module: newListData.module,
           form_name: newListData.form_name,
           field_type: newListData.field_type,
@@ -380,6 +411,10 @@ export const SystemListsManager = () => {
       setNewListData({
         list_name: "",
         list_code: "",
+        portal: "",
+        platform: "",
+        service: "",
+        sub_service: "",
         module: "",
         form_name: "",
         field_type: "simple",
@@ -516,8 +551,184 @@ export const SystemListsManager = () => {
   };
 
   if (loading) {
-    return <div>Chargement...</div>;
+    return <div className="p-8">Chargement...</div>;
   }
+
+  const renderListHierarchy = () => {
+    const listsCount = filteredLists.length;
+    
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold">Listes système</h3>
+            <Badge variant="secondary">{listsCount} liste{listsCount > 1 ? 's' : ''}</Badge>
+          </div>
+          {(selectedPortal || selectedPlatform || selectedService || selectedSubService || selectedForm) && (
+            <Button variant="ghost" size="sm" onClick={resetFilters}>
+              Réinitialiser les filtres
+            </Button>
+          )}
+        </div>
+
+        {Object.entries(groupedLists).map(([portalName, platforms]) => (
+          <Card key={portalName} className="border-2">
+            <CardHeader 
+              className="cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => toggleSection(`portal-${portalName}`)}
+            >
+              <div className="flex items-center gap-2">
+                {expandedSections.has(`portal-${portalName}`) ? (
+                  <ChevronDown className="w-5 h-5" />
+                ) : (
+                  <ChevronRight className="w-5 h-5" />
+                )}
+                <CardTitle className="text-base">{portalName}</CardTitle>
+                <Badge variant="outline">
+                  {Object.values(platforms).flatMap(services => 
+                    Object.values(services).flatMap(subServices =>
+                      Object.values(subServices).flatMap(forms =>
+                        Object.values(forms).flat()
+                      )
+                    )
+                  ).length} listes
+                </Badge>
+              </div>
+            </CardHeader>
+            
+            {expandedSections.has(`portal-${portalName}`) && (
+              <CardContent className="space-y-3">
+                {Object.entries(platforms).map(([platformName, services]) => (
+                  <div key={platformName} className="ml-4 border-l-2 border-muted pl-4">
+                    <div 
+                      className="flex items-center gap-2 py-2 cursor-pointer hover:bg-muted/50 rounded px-2"
+                      onClick={() => toggleSection(`platform-${portalName}-${platformName}`)}
+                    >
+                      {expandedSections.has(`platform-${portalName}-${platformName}`) ? (
+                        <ChevronDown className="w-4 h-4" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4" />
+                      )}
+                      <span className="font-medium">{platformName}</span>
+                      <Badge variant="secondary" className="text-xs">
+                        {Object.values(services).flatMap(subServices =>
+                          Object.values(subServices).flatMap(forms =>
+                            Object.values(forms).flat()
+                          )
+                        ).length}
+                      </Badge>
+                    </div>
+                    
+                    {expandedSections.has(`platform-${portalName}-${platformName}`) && (
+                      <div className="ml-4 space-y-2 mt-2">
+                        {Object.entries(services).map(([serviceName, subServices]) => (
+                          <div key={serviceName} className="border-l-2 border-muted pl-4">
+                            <div 
+                              className="flex items-center gap-2 py-2 cursor-pointer hover:bg-muted/50 rounded px-2"
+                              onClick={() => toggleSection(`service-${portalName}-${platformName}-${serviceName}`)}
+                            >
+                              {expandedSections.has(`service-${portalName}-${platformName}-${serviceName}`) ? (
+                                <ChevronDown className="w-4 h-4" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4" />
+                              )}
+                              <span className="text-sm font-medium">{serviceName}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {Object.values(subServices).flatMap(forms =>
+                                  Object.values(forms).flat()
+                                ).length}
+                              </Badge>
+                            </div>
+                            
+                            {expandedSections.has(`service-${portalName}-${platformName}-${serviceName}`) && (
+                              <div className="ml-4 space-y-2 mt-2">
+                                {Object.entries(subServices).map(([subServiceName, forms]) => (
+                                  <div key={subServiceName} className="border-l-2 border-muted pl-4">
+                                    <div 
+                                      className="flex items-center gap-2 py-1 cursor-pointer hover:bg-muted/50 rounded px-2"
+                                      onClick={() => toggleSection(`subservice-${portalName}-${platformName}-${serviceName}-${subServiceName}`)}
+                                    >
+                                      {expandedSections.has(`subservice-${portalName}-${platformName}-${serviceName}-${subServiceName}`) ? (
+                                        <ChevronDown className="w-3 h-3" />
+                                      ) : (
+                                        <ChevronRight className="w-3 h-3" />
+                                      )}
+                                      <span className="text-sm">{subServiceName}</span>
+                                      <Badge variant="secondary" className="text-xs">
+                                        {Object.values(forms).flat().length}
+                                      </Badge>
+                                    </div>
+                                    
+                                    {expandedSections.has(`subservice-${portalName}-${platformName}-${serviceName}-${subServiceName}`) && (
+                                      <div className="ml-4 space-y-1 mt-1">
+                                        {Object.entries(forms).map(([formName, listItems]) => (
+                                          <div key={formName} className="border-l-2 border-muted pl-4">
+                                            <div 
+                                              className="flex items-center gap-2 py-1 cursor-pointer hover:bg-muted/50 rounded px-2"
+                                              onClick={() => toggleSection(`form-${portalName}-${platformName}-${serviceName}-${subServiceName}-${formName}`)}
+                                            >
+                                              {expandedSections.has(`form-${portalName}-${platformName}-${serviceName}-${subServiceName}-${formName}`) ? (
+                                                <ChevronDown className="w-3 h-3" />
+                                              ) : (
+                                                <ChevronRight className="w-3 h-3" />
+                                              )}
+                                              <span className="text-xs font-medium">{formName}</span>
+                                              <Badge variant="outline" className="text-xs">
+                                                {listItems.length}
+                                              </Badge>
+                                            </div>
+                                            
+                                            {expandedSections.has(`form-${portalName}-${platformName}-${serviceName}-${subServiceName}-${formName}`) && (
+                                              <div className="ml-4 space-y-1 mt-1">
+                                                {listItems.map((list) => (
+                                                  <div 
+                                                    key={list.id}
+                                                    className={cn(
+                                                      "p-2 rounded border cursor-pointer transition-colors",
+                                                      selectedList === list.id 
+                                                        ? "bg-primary/10 border-primary" 
+                                                        : "hover:bg-muted/50 border-border"
+                                                    )}
+                                                    onClick={() => setSelectedList(list.id)}
+                                                  >
+                                                    <div className="flex items-center gap-2">
+                                                      <Zap className={cn(
+                                                        "w-3 h-3",
+                                                        list.field_type === 'auto_select' ? "text-amber-500" : "text-blue-500"
+                                                      )} />
+                                                      <span className="text-xs font-medium">{list.list_name}</span>
+                                                      <code className="text-xs text-muted-foreground">{list.list_code}</code>
+                                                    </div>
+                                                    {list.description && (
+                                                      <p className="text-xs text-muted-foreground mt-1 ml-5">
+                                                        {list.description}
+                                                      </p>
+                                                    )}
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            )}
+          </Card>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <Card>
@@ -526,21 +737,21 @@ export const SystemListsManager = () => {
           <div>
             <CardTitle>🗂️ Gestion des listes système</CardTitle>
             <CardDescription>
-              Gérez toutes les listes déroulantes du système
+              Organisation hiérarchique par portail, plateforme, service et formulaire
             </CardDescription>
           </div>
           <Dialog open={isCreateListDialogOpen} onOpenChange={setIsCreateListDialogOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="w-4 h-4 mr-2" />
-                Créer une nouvelle liste
+                Créer une liste
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-background max-w-2xl">
+            <DialogContent className="bg-background max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Créer une nouvelle liste système</DialogTitle>
                 <DialogDescription>
-                  Créez une nouvelle liste déroulante paramétrable
+                  Définissez la hiérarchie et les paramètres de la liste
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
@@ -554,73 +765,76 @@ export const SystemListsManager = () => {
                     />
                   </div>
                   <div>
-                    <Label>Code interne (API) *</Label>
+                    <Label>Code interne *</Label>
                     <Input
                       value={newListData.list_code}
                       onChange={(e) => setNewListData({ ...newListData, list_code: e.target.value })}
                       placeholder="Ex: type_publication"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Code unique pour la liaison API
-                    </p>
+                  </div>
+                </div>
+
+                <Separator />
+                <h4 className="text-sm font-semibold">Hiérarchie</h4>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Portail *</Label>
+                    <Select value={newListData.portal} onValueChange={(v) => setNewListData({ ...newListData, portal: v })}>
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Choisir..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background">
+                        <SelectItem value="BNRM">BNRM</SelectItem>
+                        <SelectItem value="Kitab">Kitab</SelectItem>
+                        <SelectItem value="CBM">CBM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Plateforme *</Label>
+                    <Select value={newListData.platform} onValueChange={(v) => setNewListData({ ...newListData, platform: v })}>
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Choisir..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background">
+                        <SelectItem value="Dépôt Légal">Dépôt Légal</SelectItem>
+                        <SelectItem value="Activités Culturelles">Activités Culturelles</SelectItem>
+                        <SelectItem value="Bibliothèque Numérique">Bibliothèque Numérique</SelectItem>
+                        <SelectItem value="Manuscrits">Manuscrits</SelectItem>
+                        <SelectItem value="Reproduction">Reproduction</SelectItem>
+                        <SelectItem value="CBM">CBM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Service *</Label>
+                    <Input
+                      value={newListData.service}
+                      onChange={(e) => setNewListData({ ...newListData, service: e.target.value })}
+                      placeholder="Ex: Gestion des dépôts"
+                    />
+                  </div>
+                  <div>
+                    <Label>Sous-service</Label>
+                    <Input
+                      value={newListData.sub_service}
+                      onChange={(e) => setNewListData({ ...newListData, sub_service: e.target.value })}
+                      placeholder="Ex: Monographies"
+                    />
                   </div>
                 </div>
 
                 <div>
-                  <Label>Module à rattacher</Label>
-                  <Popover open={createModuleOpen} onOpenChange={setCreateModuleOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={createModuleOpen}
-                        className="w-full justify-between mt-2 bg-background"
-                      >
-                        {newListData.module && newListData.form_name
-                          ? `${newListData.module} - ${newListData.form_name}`
-                          : "Sélectionner un module et formulaire..."}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[500px] p-0 bg-background" align="start">
-                      <Command>
-                        <CommandInput placeholder="Rechercher un module ou formulaire..." />
-                        <CommandList>
-                          <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
-                          <CommandGroup>
-                            {uniqueModuleForms.map((item) => (
-                              <CommandItem
-                                key={item.value}
-                                value={item.label}
-                                onSelect={() => {
-                                  setNewListData({
-                                    ...newListData,
-                                    module: item.module,
-                                    form_name: item.form
-                                  });
-                                  setCreateModuleOpen(false);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    newListData.module === item.module && 
-                                    newListData.form_name === item.form
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {item.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Recherchez et sélectionnez le module et le formulaire associés
-                  </p>
+                  <Label>Formulaire *</Label>
+                  <Input
+                    value={newListData.form_name}
+                    onChange={(e) => setNewListData({ ...newListData, form_name: e.target.value })}
+                    placeholder="Ex: Demande de dépôt"
+                  />
                 </div>
 
                 <div>
@@ -634,67 +848,10 @@ export const SystemListsManager = () => {
                     </SelectTrigger>
                     <SelectContent className="bg-background">
                       <SelectItem value="simple">Liste simple</SelectItem>
-                      <SelectItem value="auto_select">Auto-complétion (Combobox)</SelectItem>
+                      <SelectItem value="auto_select">Auto-complétion</SelectItem>
                       <SelectItem value="hierarchical">Liste hiérarchique</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-
-                <div className="space-y-3 pt-4 border-t">
-                  <Label className="text-sm font-medium">Dépendance à une liste parent (optionnel)</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Si cette liste dépend d'une autre liste, configurez la liaison ici. Les valeurs de cette liste seront filtrées selon la valeur sélectionnée dans la liste parent.
-                  </p>
-                  
-                  <div className="space-y-2">
-                    <Label className="text-xs">Liste parent</Label>
-                    <Select
-                      value={newListData.parent_list_id || "none"}
-                      onValueChange={(value) => setNewListData({ 
-                        ...newListData, 
-                        parent_list_id: value === "none" ? null : value,
-                        depends_on_parent_value: value !== "none" ? true : false
-                      })}
-                    >
-                      <SelectTrigger className="bg-background">
-                        <SelectValue placeholder="Aucune dépendance" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background max-h-[300px]">
-                        <SelectItem value="none">Aucune dépendance</SelectItem>
-                        {lists.map((list) => (
-                          <SelectItem key={list.id} value={list.id}>
-                            {list.list_name} ({list.list_code})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <p className="text-xs text-muted-foreground">
-                      Ex: "Disciplines" peut dépendre de "Type de publication"
-                    </p>
-                  </div>
-                  
-                  {newListData.parent_list_id && (
-                    <div className="flex items-center space-x-2 p-3 bg-muted/30 rounded-md">
-                      <Checkbox
-                        id="depends-parent"
-                        checked={newListData.depends_on_parent_value}
-                        onCheckedChange={(checked) => 
-                          setNewListData({ ...newListData, depends_on_parent_value: !!checked })
-                        }
-                      />
-                      <div className="flex-1">
-                        <label
-                          htmlFor="depends-parent"
-                          className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Filtrer les valeurs selon la sélection parent
-                        </label>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Les valeurs de cette liste seront automatiquement filtrées en fonction de la valeur sélectionnée dans la liste parent
-                        </p>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 <div>
@@ -702,7 +859,7 @@ export const SystemListsManager = () => {
                   <Input
                     value={newListData.description || ""}
                     onChange={(e) => setNewListData({ ...newListData, description: e.target.value })}
-                    placeholder="Description de la liste"
+                    placeholder="Description optionnelle"
                   />
                 </div>
 
@@ -715,441 +872,255 @@ export const SystemListsManager = () => {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Bouton de synchronisation */}
-        <div className="mb-6 p-4 bg-muted/50 rounded-lg border">
-          <div className="mb-3">
-            <h4 className="text-sm font-semibold mb-1">🔄 Synchronisation des Listes Système</h4>
-            <p className="text-xs text-muted-foreground">
-              Synchroniser toutes les listes déroulantes des formulaires du système avec la base de données
-            </p>
-          </div>
+        {/* Synchronisation */}
+        <div className="p-4 bg-muted/50 rounded-lg border space-y-2">
+          <h4 className="text-sm font-semibold">🔄 Synchronisation</h4>
+          <p className="text-xs text-muted-foreground">
+            Synchronisez toutes les listes prédéfinies avec la base de données
+          </p>
           <SystemListsSyncButton />
         </div>
         
+        {/* Filtres hiérarchiques */}
         <div className="space-y-4">
-          <div>
-            <Label>Filtrer les listes par module / formulaire</Label>
-            <Popover open={filterOpen} onOpenChange={setFilterOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={filterOpen}
-                  className="w-full justify-between mt-2"
-                >
-                  {moduleFilter
-                    ? uniqueModuleForms.find((item) => item.value === moduleFilter)?.label
-                    : "Sélectionner un module / formulaire..."}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[600px] p-0" align="start">
-                <Command>
-                  <CommandInput placeholder="Rechercher un module ou formulaire..." />
-                  <CommandList>
-                    <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
-                    <CommandGroup>
-                      <CommandItem
-                        value="all"
-                        onSelect={() => {
-                          setModuleFilter("");
-                          setFilterOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            moduleFilter === "" ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        Toutes les listes
-                      </CommandItem>
-                      {uniqueModuleForms.map((item) => (
-                        <CommandItem
-                          key={item.value}
-                          value={item.label}
-                          onSelect={() => {
-                            setModuleFilter(item.value === moduleFilter ? "" : item.value);
-                            setFilterOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              moduleFilter === item.value ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          <div className="flex flex-col">
-                            <span className="font-medium">{item.module}</span>
-                            <span className="text-xs text-muted-foreground">{item.form}</span>
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-            {moduleFilter && (
-              <p className="text-sm text-muted-foreground mt-2">
-                {filteredLists.length} liste(s) trouvée(s)
-              </p>
-            )}
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4" />
+            <h3 className="font-semibold">Filtres hiérarchiques</h3>
           </div>
           
-          <div>
-            <Label>Sélectionner une liste</Label>
-            <Select value={selectedList || ""} onValueChange={setSelectedList}>
-              <SelectTrigger>
-                <SelectValue placeholder="Choisir une liste" />
-              </SelectTrigger>
-              <SelectContent className="max-h-[300px]">
-                {filteredLists.map((list) => (
-                  <SelectItem key={list.id} value={list.id}>
-                    <div className="flex items-center gap-2">
-                      {list.field_type === 'auto_select' ? (
-                        <Zap className="w-4 h-4 text-amber-500" />
-                      ) : (
-                        <List className="w-4 h-4 text-blue-500" />
-                      )}
-                      <span className="font-medium">{list.list_name}</span>
-                      <span className="text-muted-foreground text-xs">({list.list_code})</span>
-                      {list.module && list.form_name && (
-                        <span className="text-xs text-muted-foreground">
-                          - {list.module} / {list.form_name}
-                        </span>
-                      )}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {selectedList && (
-              <div className="mt-2 p-3 bg-muted/50 rounded-md">
-                {(() => {
-                  const list = lists.find(l => l.id === selectedList);
-                  return list ? (
-                    <div className="space-y-1 text-sm">
-                      <div className="flex items-center gap-2">
-                        {list.field_type === 'auto_select' ? (
-                          <>
-                            <Zap className="w-4 h-4 text-amber-500" />
-                            <span className="font-medium text-amber-700">Champ Auto select (autocomplétion)</span>
-                          </>
-                        ) : (
-                          <>
-                            <List className="w-4 h-4 text-blue-500" />
-                            <span className="font-medium text-blue-700">Liste déroulante simple</span>
-                          </>
-                        )}
-                      </div>
-                      {list.module && <p className="text-muted-foreground">Module: {list.module}</p>}
-                      {list.form_name && <p className="text-muted-foreground">Formulaire: {list.form_name}</p>}
-                      {list.parent_list_id && (
-                        <div className="mt-2 pt-2 border-t">
-                          <p className="text-muted-foreground">
-                            <span className="font-medium">Dépend de:</span>{' '}
-                            {lists.find(l => l.id === list.parent_list_id)?.list_name || 'Liste inconnue'}
-                          </p>
-                          {list.depends_on_parent_value && (
-                            <p className="text-xs text-primary">
-                              ✓ Filtrage automatique activé selon valeur parent
-                            </p>
-                          )}
-                        </div>
-                      )}
-                      {list.description && <p className="text-muted-foreground mt-2">{list.description}</p>}
-                    </div>
-                  ) : null;
-                })()}
-              </div>
-            )}
+          <div className="grid grid-cols-5 gap-4">
+            <div>
+              <Label className="text-xs">Portail</Label>
+              <Select value={selectedPortal} onValueChange={setSelectedPortal}>
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="Tous" />
+                </SelectTrigger>
+                <SelectContent className="bg-background">
+                  <SelectItem value="">Tous</SelectItem>
+                  {portals.map((p) => (
+                    <SelectItem key={p} value={p}>{p}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-xs">Plateforme</Label>
+              <Select value={selectedPlatform} onValueChange={setSelectedPlatform} disabled={!selectedPortal}>
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="Toutes" />
+                </SelectTrigger>
+                <SelectContent className="bg-background">
+                  <SelectItem value="">Toutes</SelectItem>
+                  {platforms.map((p) => (
+                    <SelectItem key={p} value={p}>{p}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-xs">Service</Label>
+              <Select value={selectedService} onValueChange={setSelectedService} disabled={!selectedPlatform}>
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="Tous" />
+                </SelectTrigger>
+                <SelectContent className="bg-background">
+                  <SelectItem value="">Tous</SelectItem>
+                  {services.map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-xs">Sous-service</Label>
+              <Select value={selectedSubService} onValueChange={setSelectedSubService} disabled={!selectedService}>
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="Tous" />
+                </SelectTrigger>
+                <SelectContent className="bg-background">
+                  <SelectItem value="">Tous</SelectItem>
+                  {subServices.map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-xs">Formulaire</Label>
+              <Select value={selectedForm} onValueChange={setSelectedForm} disabled={!selectedSubService}>
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="Tous" />
+                </SelectTrigger>
+                <SelectContent className="bg-background">
+                  <SelectItem value="">Tous</SelectItem>
+                  {forms.map((f) => (
+                    <SelectItem key={f} value={f}>{f}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
+        <Separator />
+
+        {/* Vue hiérarchique des listes */}
+        {renderListHierarchy()}
+
+        {/* Gestion des valeurs de la liste sélectionnée */}
         {selectedList && (
           <>
+            <Separator className="my-6" />
             <div className="space-y-4">
-              <div className="flex gap-2">
-                <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Ajouter une valeur
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-background">
-                    <DialogHeader>
-                      <DialogTitle>Ajouter une nouvelle valeur</DialogTitle>
-                      <DialogDescription>
-                        Ajoutez une nouvelle valeur à la liste sélectionnée
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label>Code</Label>
-                        <Input
-                          value={newValue.code}
-                          onChange={(e) => setNewValue({ ...newValue, code: e.target.value })}
-                          placeholder="Ex: COR"
-                        />
-                      </div>
-                      <div>
-                        <Label>Libellé</Label>
-                        <Input
-                          value={newValue.label}
-                          onChange={(e) => setNewValue({ ...newValue, label: e.target.value })}
-                          placeholder="Ex: Coran"
-                        />
-                      </div>
-                      <div>
-                        <Label>Ordre d'affichage</Label>
-                        <Input
-                          type="number"
-                          value={newValue.order}
-                          onChange={(e) => setNewValue({ ...newValue, order: parseInt(e.target.value) || 0 })}
-                        />
-                      </div>
-                      
-                      <div className="space-y-2 pt-4 border-t">
-                        <Label className="text-sm font-medium">Liaison à une valeur parent (optionnel)</Label>
-                        <p className="text-xs text-muted-foreground mb-2">
-                          Permet de lier cette valeur à une autre liste (ex: Discipline → Type de publication)
-                        </p>
-                        <div>
-                          <Label className="text-xs">1. Sélectionner une liste parent</Label>
-                          <Select 
-                            value={selectedParentList || ""} 
-                            onValueChange={(value) => {
-                              setSelectedParentList(value);
-                              fetchParentValues(value);
-                              setNewValue({ ...newValue, parent_value_id: null });
-                            }}
-                          >
-                            <SelectTrigger className="bg-background">
-                              <SelectValue placeholder="Choisir une liste parent..." />
-                            </SelectTrigger>
-                            <SelectContent className="bg-background max-h-[300px]">
-                              {parentLists
-                                .filter(list => list.id !== selectedList)
-                                .map((list) => (
-                                  <SelectItem key={list.id} value={list.id}>
-                                    {list.list_name} ({list.list_code})
-                                  </SelectItem>
-                                ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        {selectedParentList && (
-                          <div>
-                            <Label className="text-xs">2. Sélectionner une valeur parent</Label>
-                            <Select 
-                              value={newValue.parent_value_id || "none"} 
-                              onValueChange={(value) => setNewValue({ ...newValue, parent_value_id: value === "none" ? null : value })}
-                            >
-                              <SelectTrigger className="bg-background">
-                                <SelectValue placeholder="Choisir une valeur parent..." />
-                              </SelectTrigger>
-                              <SelectContent className="bg-background max-h-[300px]">
-                                <SelectItem value="none">Aucun parent</SelectItem>
-                                {parentValues.map((value) => (
-                                  <SelectItem key={value.id} value={value.id}>
-                                    {value.value_label} ({value.value_code})
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        )}
-                      </div>
-
-                      <Button onClick={handleAddValue} className="w-full">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">Valeurs de la liste</h3>
+                <div className="flex gap-2">
+                  <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm">
+                        <Plus className="w-4 h-4 mr-2" />
                         Ajouter
                       </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-
-                <Button variant="outline" onClick={() => document.getElementById('excel-import')?.click()}>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Importer Excel
-                </Button>
-                <input
-                  id="excel-import"
-                  type="file"
-                  accept=".xlsx,.xls"
-                  className="hidden"
-                  onChange={handleImportExcel}
-                />
-
-                <Button variant="outline" onClick={handleExportExcel}>
-                  <Download className="w-4 h-4 mr-2" />
-                  Exporter Excel
-                </Button>
-              </div>
-
-              <div>
-                <Label>Rechercher dans les valeurs</Label>
-                <Input
-                  placeholder="Rechercher par code ou libellé..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="mt-2"
-                />
-                {searchTerm && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {filteredValues.length} résultat(s) trouvé(s)
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="border rounded-lg">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Libellé</TableHead>
-                    <TableHead>Valeur parent</TableHead>
-                    <TableHead>Ordre</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredValues.map((value) => (
-                    <TableRow key={value.id}>
-                      <TableCell>
-                        {inlineEditId === value.id ? (
+                    </DialogTrigger>
+                    <DialogContent className="bg-background">
+                      <DialogHeader>
+                        <DialogTitle>Ajouter une valeur</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Code</Label>
                           <Input
-                            value={inlineEditValue.code}
-                            onChange={(e) => setInlineEditValue({ ...inlineEditValue, code: e.target.value })}
-                            className="h-8"
+                            value={newValue.code}
+                            onChange={(e) => setNewValue({ ...newValue, code: e.target.value })}
                           />
-                        ) : (
-                          value.value_code
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {inlineEditId === value.id ? (
+                        </div>
+                        <div>
+                          <Label>Libellé</Label>
                           <Input
-                            value={inlineEditValue.label}
-                            onChange={(e) => setInlineEditValue({ ...inlineEditValue, label: e.target.value })}
-                            className="h-8"
+                            value={newValue.label}
+                            onChange={(e) => setNewValue({ ...newValue, label: e.target.value })}
                           />
-                        ) : (
-                          value.value_label
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {(value as any).parent ? (
-                          <div className="text-xs">
-                            <div className="font-medium">{(value as any).parent.value_label}</div>
-                            <div className="text-muted-foreground">
-                              {(value as any).parent.list?.list_name}
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {inlineEditId === value.id ? (
+                        </div>
+                        <div>
+                          <Label>Ordre</Label>
                           <Input
                             type="number"
-                            value={inlineEditValue.order}
-                            onChange={(e) => setInlineEditValue({ ...inlineEditValue, order: parseInt(e.target.value) || 0 })}
-                            className="h-8 w-20"
+                            value={newValue.order}
+                            onChange={(e) => setNewValue({ ...newValue, order: parseInt(e.target.value) || 0 })}
                           />
-                        ) : (
-                          value.sort_order
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          {inlineEditId === value.id ? (
-                            <>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => saveInlineEdit(value.id)}
-                              >
-                                <Check className="w-4 h-4 text-green-600" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={cancelInlineEdit}
-                              >
-                                ✕
-                              </Button>
-                            </>
-                          ) : (
-                            <>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => startInlineEdit(value)}
-                                title="Éditer inline"
-                              >
-                                <Edit2 className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDeleteValue(value.id)}
-                                title="Supprimer"
-                              >
-                                <Trash2 className="w-4 h-4 text-destructive" />
-                              </Button>
-                            </>
-                          )}
                         </div>
-                      </TableCell>
+                        <Button onClick={handleAddValue} className="w-full">Ajouter</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Button variant="outline" size="sm" onClick={() => document.getElementById('excel-import')?.click()}>
+                    <Upload className="w-4 h-4 mr-2" />
+                    Import
+                  </Button>
+                  <input
+                    id="excel-import"
+                    type="file"
+                    accept=".xlsx,.xls"
+                    className="hidden"
+                    onChange={handleImportExcel}
+                  />
+
+                  <Button variant="outline" size="sm" onClick={handleExportExcel}>
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </Button>
+                </div>
+              </div>
+
+              <Input
+                placeholder="Rechercher..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+
+              <div className="border rounded-lg">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Code</TableHead>
+                      <TableHead>Libellé</TableHead>
+                      <TableHead>Ordre</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredValues.map((value) => (
+                      <TableRow key={value.id}>
+                        <TableCell>
+                          {inlineEditId === value.id ? (
+                            <Input
+                              value={inlineEditValue.code}
+                              onChange={(e) => setInlineEditValue({ ...inlineEditValue, code: e.target.value })}
+                              className="h-8"
+                            />
+                          ) : (
+                            value.value_code
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {inlineEditId === value.id ? (
+                            <Input
+                              value={inlineEditValue.label}
+                              onChange={(e) => setInlineEditValue({ ...inlineEditValue, label: e.target.value })}
+                              className="h-8"
+                            />
+                          ) : (
+                            value.value_label
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {inlineEditId === value.id ? (
+                            <Input
+                              type="number"
+                              value={inlineEditValue.order}
+                              onChange={(e) => setInlineEditValue({ ...inlineEditValue, order: parseInt(e.target.value) || 0 })}
+                              className="h-8 w-20"
+                            />
+                          ) : (
+                            value.sort_order
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            {inlineEditId === value.id ? (
+                              <>
+                                <Button variant="ghost" size="sm" onClick={() => saveInlineEdit(value.id)}>
+                                  ✓
+                                </Button>
+                                <Button variant="ghost" size="sm" onClick={cancelInlineEdit}>
+                                  ✕
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Button variant="ghost" size="sm" onClick={() => startInlineEdit(value)}>
+                                  <Edit2 className="w-4 h-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm" onClick={() => handleDeleteValue(value.id)}>
+                                  <Trash2 className="w-4 h-4 text-destructive" />
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </>
         )}
-
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Modifier la valeur</DialogTitle>
-            </DialogHeader>
-            {editingValue && (
-              <div className="space-y-4">
-                <div>
-                  <Label>Code</Label>
-                  <Input
-                    value={editingValue.value_code}
-                    onChange={(e) => setEditingValue({ ...editingValue, value_code: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label>Libellé</Label>
-                  <Input
-                    value={editingValue.value_label}
-                    onChange={(e) => setEditingValue({ ...editingValue, value_label: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label>Ordre d'affichage</Label>
-                  <Input
-                    type="number"
-                    value={editingValue.sort_order}
-                    onChange={(e) => setEditingValue({ ...editingValue, sort_order: parseInt(e.target.value) || 0 })}
-                  />
-                </div>
-                <Button onClick={handleUpdateValue} className="w-full">
-                  Enregistrer
-                </Button>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
       </CardContent>
     </Card>
   );

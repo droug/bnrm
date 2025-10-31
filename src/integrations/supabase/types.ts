@@ -6285,6 +6285,10 @@ export type Database = {
           list_name: string
           module: string | null
           parent_list_id: string | null
+          platform: string | null
+          portal: string | null
+          service: string | null
+          sub_service: string | null
           updated_at: string | null
         }
         Insert: {
@@ -6300,6 +6304,10 @@ export type Database = {
           list_name: string
           module?: string | null
           parent_list_id?: string | null
+          platform?: string | null
+          portal?: string | null
+          service?: string | null
+          sub_service?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -6315,6 +6323,10 @@ export type Database = {
           list_name?: string
           module?: string | null
           parent_list_id?: string | null
+          platform?: string | null
+          portal?: string | null
+          service?: string | null
+          sub_service?: string | null
           updated_at?: string | null
         }
         Relationships: [
