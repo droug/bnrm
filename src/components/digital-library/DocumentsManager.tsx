@@ -48,6 +48,114 @@ export default function DocumentsManager() {
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("documents");
+  const [showCompareDialog, setShowCompareDialog] = useState(false);
+  const [compareDocs, setCompareDocs] = useState<{ existing: any; imported: any } | null>(null);
+  const [keepSelection, setKeepSelection] = useState<"existing" | "imported" | "both">("both");
+
+  // Exemple de doublons détectés
+  const sampleDuplicates = [
+    {
+      id: 1,
+      existing: {
+        id: "DOC-001",
+        title: "Introduction à la philosophie",
+        author: "Jean Dupont",
+        isbn: "978-2-1234-5678-9",
+        issn: "",
+        ismn: "",
+        cote: "PHI-001",
+        publication_date: "2020-05-15",
+        editeur: "Éditions Savoir",
+        nombre_pages: "350"
+      },
+      imported: {
+        id: "DOC-156",
+        title: "Introduction à la philosophie",
+        author: "Jean Dupont",
+        isbn: "978-2-1234-5678-9",
+        issn: "",
+        ismn: "",
+        cote: "PHI-001",
+        publication_date: "2020-05-15",
+        editeur: "Éditions Savoir",
+        nombre_pages: "352"
+      }
+    },
+    {
+      id: 2,
+      existing: {
+        id: "DOC-042",
+        title: "Revue scientifique - Vol. 12",
+        author: "Collectif",
+        isbn: "",
+        issn: "1234-5678",
+        ismn: "",
+        cote: "REV-SCI-012",
+        publication_date: "2023-01-10",
+        editeur: "Publications Scientifiques",
+        nombre_pages: "120"
+      },
+      imported: {
+        id: "DOC-198",
+        title: "Revue scientifique - Volume 12",
+        author: "Collectif",
+        isbn: "",
+        issn: "1234-5678",
+        ismn: "",
+        cote: "REV-SCI-012",
+        publication_date: "2023-01-10",
+        editeur: "Publications Scientifiques SA",
+        nombre_pages: "120"
+      }
+    },
+    {
+      id: 3,
+      existing: {
+        id: "DOC-089",
+        title: "Partition musicale - Symphonie n°5",
+        author: "Mozart",
+        isbn: "",
+        issn: "",
+        ismn: "M-2306-7118-7",
+        cote: "MUS-MOZ-005",
+        publication_date: "2019-03-22",
+        editeur: "Éditions Musicales",
+        nombre_pages: "48"
+      },
+      imported: {
+        id: "DOC-223",
+        title: "Partition musicale - Symphonie n°5",
+        author: "W. A. Mozart",
+        isbn: "",
+        issn: "",
+        ismn: "M-2306-7118-7",
+        cote: "MUS-MOZ-005",
+        publication_date: "2019-03-22",
+        editeur: "Éditions Musicales",
+        nombre_pages: "48"
+      }
+    }
+  ];
+
+  const handleCompare = (duplicate: any) => {
+    setCompareDocs(duplicate);
+    setKeepSelection("both");
+    setShowCompareDialog(true);
+  };
+
+  const handleKeepDocument = () => {
+    toast({
+      title: "Action enregistrée",
+      description: `Choix: ${keepSelection === "existing" ? "Conserver l'existant" : keepSelection === "imported" ? "Conserver l'importé" : "Conserver les deux"}`,
+    });
+    setShowCompareDialog(false);
+  };
+
+  const getFieldComparison = (field: string, existingValue: any, importedValue: any) => {
+    const isIdentical = existingValue === importedValue;
+    const isEmpty = !existingValue && !importedValue;
+    return { isIdentical, isEmpty };
+  };
 
   const form = useForm<z.infer<typeof documentSchema>>({
     resolver: zodResolver(documentSchema),
@@ -1108,14 +1216,245 @@ export default function DocumentsManager() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <p className="text-lg font-semibold mb-2">Fonctionnalité en cours de développement</p>
-                <p className="text-sm">
-                  La détection automatique des doublons basée sur les métadonnées (ISBN, ISSN, ISMN, titre, auteur) sera bientôt disponible.
-                </p>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <Badge variant="secondary" className="text-sm">
+                    {sampleDuplicates.length} doublons détectés
+                  </Badge>
+                </div>
+
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID Existant</TableHead>
+                      <TableHead>ID Importé</TableHead>
+                      <TableHead>Titre</TableHead>
+                      <TableHead>Identifiant commun</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sampleDuplicates.map((duplicate) => (
+                      <TableRow key={duplicate.id}>
+                        <TableCell className="font-mono text-sm">{duplicate.existing.id}</TableCell>
+                        <TableCell className="font-mono text-sm">{duplicate.imported.id}</TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <p className="font-medium">{duplicate.existing.title}</p>
+                            <p className="text-sm text-muted-foreground">{duplicate.existing.author}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-1">
+                            {duplicate.existing.isbn && (
+                              <Badge variant="outline" className="w-fit text-xs">ISBN: {duplicate.existing.isbn}</Badge>
+                            )}
+                            {duplicate.existing.issn && (
+                              <Badge variant="outline" className="w-fit text-xs">ISSN: {duplicate.existing.issn}</Badge>
+                            )}
+                            {duplicate.existing.ismn && (
+                              <Badge variant="outline" className="w-fit text-xs">ISMN: {duplicate.existing.ismn}</Badge>
+                            )}
+                            {duplicate.existing.cote && (
+                              <Badge variant="outline" className="w-fit text-xs">Cote: {duplicate.existing.cote}</Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => handleCompare(duplicate)}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            Comparer
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
+
+          {/* Modale de comparaison */}
+          <Dialog open={showCompareDialog} onOpenChange={setShowCompareDialog}>
+            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Comparaison des documents</DialogTitle>
+                <DialogDescription>
+                  Comparez les détails des deux documents et choisissez lequel conserver
+                </DialogDescription>
+              </DialogHeader>
+
+              {compareDocs && (
+                <div className="space-y-6">
+                  {/* Sélection de l'action */}
+                  <Card className="bg-muted/50">
+                    <CardHeader>
+                      <CardTitle className="text-base">Action à effectuer</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="keep-existing"
+                          name="keep-selection"
+                          checked={keepSelection === "existing"}
+                          onChange={() => setKeepSelection("existing")}
+                          className="h-4 w-4"
+                        />
+                        <Label htmlFor="keep-existing" className="cursor-pointer font-normal">
+                          Conserver uniquement le document existant
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="keep-imported"
+                          name="keep-selection"
+                          checked={keepSelection === "imported"}
+                          onChange={() => setKeepSelection("imported")}
+                          className="h-4 w-4"
+                        />
+                        <Label htmlFor="keep-imported" className="cursor-pointer font-normal">
+                          Conserver uniquement le document importé
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="keep-both"
+                          name="keep-selection"
+                          checked={keepSelection === "both"}
+                          onChange={() => setKeepSelection("both")}
+                          className="h-4 w-4"
+                        />
+                        <Label htmlFor="keep-both" className="cursor-pointer font-normal">
+                          Conserver les deux documents
+                        </Label>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Comparaison détaillée */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Document existant */}
+                    <Card className={keepSelection === "existing" ? "border-primary border-2" : ""}>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center justify-between">
+                          Document Existant
+                          <Badge variant="secondary">Actuel</Badge>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {[
+                          { label: "ID", value: compareDocs.existing.id, key: "id", highlight: true },
+                          { label: "Cote", value: compareDocs.existing.cote, key: "cote", highlight: true },
+                          { label: "ISBN", value: compareDocs.existing.isbn || "-", key: "isbn", highlight: true },
+                          { label: "ISSN", value: compareDocs.existing.issn || "-", key: "issn", highlight: true },
+                          { label: "ISMN", value: compareDocs.existing.ismn || "-", key: "ismn", highlight: true },
+                          { label: "Titre", value: compareDocs.existing.title, key: "title" },
+                          { label: "Auteur", value: compareDocs.existing.author, key: "author" },
+                          { label: "Éditeur", value: compareDocs.existing.editeur, key: "editeur" },
+                          { label: "Date publication", value: compareDocs.existing.publication_date, key: "publication_date" },
+                          { label: "Nombre pages", value: compareDocs.existing.nombre_pages, key: "nombre_pages" },
+                        ].map((field) => {
+                          const comparison = getFieldComparison(
+                            field.key,
+                            compareDocs.existing[field.key],
+                            compareDocs.imported[field.key]
+                          );
+                          return (
+                            <div
+                              key={field.key}
+                              className={`p-2 rounded ${
+                                field.highlight && comparison.isIdentical && !comparison.isEmpty
+                                  ? "bg-green-100 dark:bg-green-900/20 border border-green-300 dark:border-green-700"
+                                  : !comparison.isIdentical && !comparison.isEmpty
+                                  ? "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
+                                  : ""
+                              }`}
+                            >
+                              <p className="text-xs text-muted-foreground mb-1">{field.label}</p>
+                              <p className="text-sm font-medium">{field.value}</p>
+                            </div>
+                          );
+                        })}
+                      </CardContent>
+                    </Card>
+
+                    {/* Document importé */}
+                    <Card className={keepSelection === "imported" ? "border-primary border-2" : ""}>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center justify-between">
+                          Document Importé
+                          <Badge variant="outline">Nouveau</Badge>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {[
+                          { label: "ID", value: compareDocs.imported.id, key: "id", highlight: true },
+                          { label: "Cote", value: compareDocs.imported.cote, key: "cote", highlight: true },
+                          { label: "ISBN", value: compareDocs.imported.isbn || "-", key: "isbn", highlight: true },
+                          { label: "ISSN", value: compareDocs.imported.issn || "-", key: "issn", highlight: true },
+                          { label: "ISMN", value: compareDocs.imported.ismn || "-", key: "ismn", highlight: true },
+                          { label: "Titre", value: compareDocs.imported.title, key: "title" },
+                          { label: "Auteur", value: compareDocs.imported.author, key: "author" },
+                          { label: "Éditeur", value: compareDocs.imported.editeur, key: "editeur" },
+                          { label: "Date publication", value: compareDocs.imported.publication_date, key: "publication_date" },
+                          { label: "Nombre pages", value: compareDocs.imported.nombre_pages, key: "nombre_pages" },
+                        ].map((field) => {
+                          const comparison = getFieldComparison(
+                            field.key,
+                            compareDocs.existing[field.key],
+                            compareDocs.imported[field.key]
+                          );
+                          return (
+                            <div
+                              key={field.key}
+                              className={`p-2 rounded ${
+                                field.highlight && comparison.isIdentical && !comparison.isEmpty
+                                  ? "bg-green-100 dark:bg-green-900/20 border border-green-300 dark:border-green-700"
+                                  : !comparison.isIdentical && !comparison.isEmpty
+                                  ? "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
+                                  : ""
+                              }`}
+                            >
+                              <p className="text-xs text-muted-foreground mb-1">{field.label}</p>
+                              <p className="text-sm font-medium">{field.value}</p>
+                            </div>
+                          );
+                        })}
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Légende */}
+                  <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-green-100 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded"></div>
+                      <span>Identiques</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded"></div>
+                      <span>Différents</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowCompareDialog(false)}>
+                  Annuler
+                </Button>
+                <Button onClick={handleKeepDocument}>
+                  Confirmer
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
       </Tabs>
     </div>
