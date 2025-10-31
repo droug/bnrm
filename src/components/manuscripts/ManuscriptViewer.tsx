@@ -34,7 +34,15 @@ import {
   EyeOff,
   MousePointerClick,
   Search,
-  HelpCircle
+  HelpCircle,
+  FileText,
+  Tag,
+  MapPin,
+  Archive,
+  Shield,
+  Info,
+  Globe,
+  Hash
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -60,6 +68,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useLanguage } from "@/hooks/useLanguage";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface Manuscript {
   id: string;
@@ -517,29 +526,194 @@ export function ManuscriptViewer() {
                     <Badge variant="secondary" className="mb-3">{manuscript.institution}</Badge>
                     <h2 className="text-lg font-bold mb-2">{manuscript.title}</h2>
                     <p className="text-sm text-muted-foreground mb-3">{manuscript.author}</p>
-                    <p className="text-sm">{manuscript.description}</p>
+                    <p className="text-sm text-muted-foreground">{manuscript.description}</p>
                   </div>
 
                   <Separator />
 
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Langue:</span>
-                      <span className="font-medium">{manuscript.language}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Période:</span>
-                      <span className="font-medium">{manuscript.period}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Matériau:</span>
-                      <span className="font-medium">{manuscript.material}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Pages:</span>
-                      <span className="font-medium">{manuscript.page_count}</span>
-                    </div>
-                  </div>
+                  {/* Accordion pour les métadonnées détaillées */}
+                  <Accordion type="multiple" defaultValue={["basic", "classification"]} className="w-full">
+                    {/* Informations de base */}
+                    <AccordionItem value="basic">
+                      <AccordionTrigger className="text-sm font-semibold">
+                        <div className="flex items-center gap-2">
+                          <Info className="h-4 w-4" />
+                          Informations de base
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Langue:</span>
+                            <span className="font-medium">{manuscript.language || "N/A"}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Période:</span>
+                            <span className="font-medium">{manuscript.period || "N/A"}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Pages:</span>
+                            <span className="font-medium">{manuscript.page_count}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Niveau d'accès:</span>
+                            <Badge
+                              variant={
+                                manuscript.access_level === 'public' ? 'default' :
+                                manuscript.access_level === 'restricted' ? 'secondary' :
+                                'destructive'
+                              }
+                              className="text-xs"
+                            >
+                              {manuscript.access_level === 'public' ? 'Public' :
+                               manuscript.access_level === 'restricted' ? 'Restreint' :
+                               'Confidentiel'}
+                            </Badge>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    {/* Classification */}
+                    <AccordionItem value="classification">
+                      <AccordionTrigger className="text-sm font-semibold">
+                        <div className="flex items-center gap-2">
+                          <Tag className="h-4 w-4" />
+                          Classification
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-2 text-sm">
+                          {(manuscript as any).genre && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Genre:</span>
+                              <span className="font-medium">{(manuscript as any).genre}</span>
+                            </div>
+                          )}
+                          {(manuscript as any).cote && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Cote:</span>
+                              <span className="font-medium">{(manuscript as any).cote}</span>
+                            </div>
+                          )}
+                          {(manuscript as any).historical_period && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Période historique:</span>
+                              <span className="font-medium">{(manuscript as any).historical_period}</span>
+                            </div>
+                          )}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    {/* Description physique */}
+                    <AccordionItem value="physical">
+                      <AccordionTrigger className="text-sm font-semibold">
+                        <div className="flex items-center gap-2">
+                          <Archive className="h-4 w-4" />
+                          Description physique
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Matériau:</span>
+                            <span className="font-medium">{manuscript.material || "N/A"}</span>
+                          </div>
+                          {(manuscript as any).dimensions && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Dimensions:</span>
+                              <span className="font-medium">{(manuscript as any).dimensions}</span>
+                            </div>
+                          )}
+                          {(manuscript as any).condition_notes && (
+                            <div className="flex flex-col gap-1">
+                              <span className="text-muted-foreground">État:</span>
+                              <span className="text-xs">{(manuscript as any).condition_notes}</span>
+                            </div>
+                          )}
+                          {(manuscript as any).inventory_number && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">N° inventaire:</span>
+                              <span className="font-medium text-xs">{(manuscript as any).inventory_number}</span>
+                            </div>
+                          )}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    {/* Provenance */}
+                    {((manuscript as any).source || (manuscript as any).institution) && (
+                      <AccordionItem value="provenance">
+                        <AccordionTrigger className="text-sm font-semibold">
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4" />
+                            Provenance
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-2 text-sm">
+                            {(manuscript as any).source && (
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Source:</span>
+                                <span className="font-medium">{(manuscript as any).source}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Institution:</span>
+                              <span className="font-medium">{manuscript.institution}</span>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    )}
+
+                    {/* Sécurité et protection */}
+                    {(manuscript.has_ocr || manuscript.block_right_click || manuscript.block_screenshot) && (
+                      <AccordionItem value="security">
+                        <AccordionTrigger className="text-sm font-semibold">
+                          <div className="flex items-center gap-2">
+                            <Shield className="h-4 w-4" />
+                            Sécurité et accès
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-2">
+                            {manuscript.has_ocr && (
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">OCR disponible:</span>
+                                <Badge variant="secondary" className="text-xs">Oui</Badge>
+                              </div>
+                            )}
+                            {manuscript.block_right_click && (
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Clic droit:</span>
+                                <Badge variant="outline" className="text-xs">Bloqué</Badge>
+                              </div>
+                            )}
+                            {manuscript.block_screenshot && (
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Captures d'écran:</span>
+                                <Badge variant="outline" className="text-xs">Bloquées</Badge>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Téléchargement:</span>
+                              <Badge variant={manuscript.allow_download ? "default" : "destructive"} className="text-xs">
+                                {manuscript.allow_download ? "Autorisé" : "Désactivé"}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Impression:</span>
+                              <Badge variant={manuscript.allow_print ? "default" : "destructive"} className="text-xs">
+                                {manuscript.allow_print ? "Autorisée" : "Désactivée"}
+                              </Badge>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    )}
+                  </Accordion>
 
                   <Separator />
 
