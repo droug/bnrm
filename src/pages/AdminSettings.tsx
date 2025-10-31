@@ -211,9 +211,9 @@ export default function AdminSettings() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {adminCards.map((card) => (
                 <PermissionGuard key={card.title} permission={card.permission}>
-                  <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/40">
+                  <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/40 flex flex-col">
                     <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                    <CardHeader className="relative">
+                    <CardHeader className="relative flex-grow">
                       <CardTitle className="flex items-center space-x-3">
                         <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                           <card.icon className="h-6 w-6 text-white" />
@@ -224,7 +224,7 @@ export default function AdminSettings() {
                         {card.description}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="relative">
+                    <CardContent className="relative mt-auto">
                       <Button 
                         className="w-full group-hover:scale-105 transition-transform" 
                         onClick={() => {
