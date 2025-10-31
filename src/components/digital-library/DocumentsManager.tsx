@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X } from "lucide-react";
+import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye } from "lucide-react";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,6 +41,8 @@ export default function DocumentsManager() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterVisible, setFilterVisible] = useState<string>("all");
   const [filterDownload, setFilterDownload] = useState<string>("all");
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<any>(null);
 
   const form = useForm<z.infer<typeof documentSchema>>({
     resolver: zodResolver(documentSchema),
@@ -586,17 +588,29 @@ export default function DocumentsManager() {
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => {
-                          if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
-                            deleteDocument.mutate(doc.id);
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedDocument(doc);
+                            setShowDetailsDialog(true);
+                          }}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => {
+                            if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
+                              deleteDocument.mutate(doc.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -610,6 +624,137 @@ export default function DocumentsManager() {
           )}
         </CardContent>
       </Card>
+
+      {/* Details Dialog */}
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Détails du document</DialogTitle>
+            <DialogDescription>
+              Informations complètes du document
+            </DialogDescription>
+          </DialogHeader>
+          {selectedDocument && (
+            <div className="space-y-6">
+              {/* Informations principales */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Informations principales</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-muted-foreground">Titre</Label>
+                    <p className="font-medium">{selectedDocument.title}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Type</Label>
+                    <p><Badge variant="outline">{selectedDocument.file_type || 'Non défini'}</Badge></p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Slug</Label>
+                    <p className="font-mono text-sm">{selectedDocument.slug}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Date de création</Label>
+                    <p>{new Date(selectedDocument.created_at).toLocaleDateString('fr-FR', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}</p>
+                  </div>
+                </div>
+                {selectedDocument.content_body && (
+                  <div>
+                    <Label className="text-muted-foreground">Description</Label>
+                    <p className="mt-1 text-sm">{selectedDocument.content_body}</p>
+                  </div>
+                )}
+                {selectedDocument.file_url && (
+                  <div>
+                    <Label className="text-muted-foreground">URL du fichier</Label>
+                    <a 
+                      href={selectedDocument.file_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline block mt-1"
+                    >
+                      {selectedDocument.file_url}
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* Permissions et accès */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Permissions et accès</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <Label>Visible sur le site</Label>
+                    <Badge variant={selectedDocument.is_visible ? "default" : "secondary"}>
+                      {selectedDocument.is_visible ? "Oui" : "Non"}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <Label>Téléchargement</Label>
+                    <Badge variant={selectedDocument.download_enabled ? "default" : "secondary"}>
+                      {selectedDocument.download_enabled ? "Activé" : "Désactivé"}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <Label>Partage social</Label>
+                    <Badge variant={selectedDocument.social_share_enabled ? "default" : "secondary"}>
+                      {selectedDocument.social_share_enabled ? "Activé" : "Désactivé"}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <Label>Partage email</Label>
+                    <Badge variant={selectedDocument.email_share_enabled ? "default" : "secondary"}>
+                      {selectedDocument.email_share_enabled ? "Activé" : "Désactivé"}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* Droits d'auteur */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Droits d'auteur</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <Label>Dérogation temporaire</Label>
+                    <Badge variant={selectedDocument.copyright_derogation ? "default" : "secondary"}>
+                      {selectedDocument.copyright_derogation ? "Oui" : "Non"}
+                    </Badge>
+                  </div>
+                  {selectedDocument.copyright_expires_at && (
+                    <div className="p-3 border rounded-lg">
+                      <Label className="text-muted-foreground">Date d'expiration</Label>
+                      <p className="flex items-center gap-2 mt-1">
+                        <Calendar className="h-4 w-4" />
+                        {new Date(selectedDocument.copyright_expires_at).toLocaleDateString('fr-FR', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Identifiant */}
+              <div className="space-y-2">
+                <Label className="text-muted-foreground">ID du document</Label>
+                <p className="font-mono text-xs bg-muted p-2 rounded">{selectedDocument.id}</p>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setShowDetailsDialog(false)}>
+              Fermer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
