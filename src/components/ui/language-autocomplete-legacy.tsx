@@ -1,6 +1,10 @@
 /**
- * Composant d'autocomplete pour les langues
- * Charge les données depuis la base de données via la liste "world_languages"
+ * @deprecated Ce composant est obsolète. Utilisez GenericAutocomplete avec listCode="world_languages" à la place.
+ * 
+ * Exemple de migration:
+ * <LanguageAutocomplete value={language} onChange={setLanguage} />
+ * devient:
+ * <GenericAutocomplete listCode="world_languages" value={language} onChange={setLanguage} />
  */
 
 import { GenericAutocomplete } from './generic-autocomplete';

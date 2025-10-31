@@ -1,6 +1,10 @@
 /**
- * Composant d'autocomplete pour les pays
- * Charge les données depuis la base de données via la liste "world_countries"
+ * @deprecated Ce composant est obsolète. Utilisez GenericAutocomplete avec listCode="world_countries" à la place.
+ * 
+ * Exemple de migration:
+ * <CountryAutocomplete value={countries} onChange={setCountries} />
+ * devient:
+ * <GenericAutocomplete listCode="world_countries" value={countries} onChange={setCountries} multiple />
  */
 
 import { GenericAutocomplete } from './generic-autocomplete';

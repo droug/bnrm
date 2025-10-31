@@ -1,3 +1,10 @@
+/**
+ * @deprecated Ce fichier est obsolète. Les langues sont maintenant gérées via la base de données.
+ * Utilisez le composant GenericAutocomplete avec listCode="world_languages" à la place.
+ * 
+ * Les données sont automatiquement synchronisées depuis src/data/autocompleteListsDefinitions.ts
+ */
+
 export const worldLanguages = [
   { code: "ar", name: "Arabe" },
   { code: "am", name: "Amazigh (Tifinagh)" },

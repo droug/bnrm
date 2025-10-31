@@ -1,3 +1,10 @@
+/**
+ * @deprecated Ce fichier est obsolète. Les pays sont maintenant gérés via la base de données.
+ * Utilisez le composant GenericAutocomplete avec listCode="world_countries" à la place.
+ * 
+ * Les données sont automatiquement synchronisées depuis src/data/autocompleteListsDefinitions.ts
+ */
+
 export interface Country {
   code: string; // ISO 3166-1 alpha-2
   name: string;
