@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,6 +49,9 @@ export const SystemListsManager = () => {
   const [listValues, setListValues] = useState<SystemListValue[]>([]);
   const [loading, setLoading] = useState(true);
   
+  // Référence pour scroller automatiquement vers la section des valeurs
+  const valuesRef = useRef<HTMLDivElement>(null);
+  
   // État des sections expandables
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   
@@ -86,7 +89,12 @@ export const SystemListsManager = () => {
 
   useEffect(() => {
     if (selectedList) {
+      console.log('📋 Liste sélectionnée:', selectedList);
       fetchListValues(selectedList);
+      // Scroller automatiquement vers la section des valeurs
+      setTimeout(() => {
+        valuesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     }
   }, [selectedList]);
 
@@ -688,27 +696,38 @@ export const SystemListsManager = () => {
                                             
                                             {expandedSections.has(`form-${portalName}-${platformName}-${serviceName}-${subServiceName}-${formName}`) && (
                                               <div className="ml-4 space-y-1 mt-1">
-                                                {listItems.map((list) => (
+                                                 {listItems.map((list) => (
                                                   <div 
                                                     key={list.id}
                                                     className={cn(
                                                       "p-2 rounded border cursor-pointer transition-colors",
                                                       selectedList === list.id 
-                                                        ? "bg-primary/10 border-primary" 
+                                                        ? "bg-primary text-primary-foreground border-primary shadow-md" 
                                                         : "hover:bg-muted/50 border-border"
                                                     )}
-                                                    onClick={() => setSelectedList(list.id)}
+                                                    onClick={() => {
+                                                      console.log('🖱️ Clic sur liste:', list.list_name, 'ID:', list.id);
+                                                      setSelectedList(list.id);
+                                                    }}
                                                   >
                                                     <div className="flex items-center gap-2">
                                                       <Zap className={cn(
                                                         "w-3 h-3",
-                                                        list.field_type === 'auto_select' ? "text-amber-500" : "text-blue-500"
+                                                        selectedList === list.id 
+                                                          ? "text-primary-foreground" 
+                                                          : list.field_type === 'auto_select' ? "text-amber-500" : "text-blue-500"
                                                       )} />
                                                       <span className="text-xs font-medium">{list.list_name}</span>
-                                                      <code className="text-xs text-muted-foreground">{list.list_code}</code>
+                                                      <code className={cn(
+                                                        "text-xs",
+                                                        selectedList === list.id ? "text-primary-foreground/80" : "text-muted-foreground"
+                                                      )}>{list.list_code}</code>
                                                     </div>
                                                     {list.description && (
-                                                      <p className="text-xs text-muted-foreground mt-1 ml-5">
+                                                      <p className={cn(
+                                                        "text-xs mt-1 ml-5",
+                                                        selectedList === list.id ? "text-primary-foreground/80" : "text-muted-foreground"
+                                                      )}>
                                                         {list.description}
                                                       </p>
                                                     )}
@@ -921,9 +940,14 @@ export const SystemListsManager = () => {
         {selectedList && (
           <>
             <Separator className="my-6" />
-            <div className="space-y-4">
+            <div className="space-y-4" ref={valuesRef}>
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold">Valeurs de la liste</h3>
+                <div>
+                  <h3 className="font-semibold">Valeurs de la liste</h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {lists.find(l => l.id === selectedList)?.list_name}
+                  </p>
+                </div>
                 <div className="flex gap-2">
                   <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                     <DialogTrigger asChild>
