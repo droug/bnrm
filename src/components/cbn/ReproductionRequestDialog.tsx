@@ -155,7 +155,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="papier" id="papier" />
-                  <Label htmlFor="papier" className="cursor-pointer">Papier</Label>
+                  <Label htmlFor="papier" className="cursor-pointer">Tirage papier</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="microfilm" id="microfilm" />
