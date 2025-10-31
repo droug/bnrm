@@ -227,11 +227,16 @@ export default function DigitalLibraryHome() {
                                <h3 className="text-2xl font-bold mb-2 text-white">{item.title}</h3>
                                <p className="text-white/80 mb-4">{item.author}</p>
                                <p className="text-sm text-white/70 mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
-                                <div className="flex gap-2">
-                                  <Button size="lg" variant="outline" className="text-black hover:text-black" onClick={() => handleConsultDocument(item)}>
-                                    Consulter
-                                  </Button>
-                               </div>
+                                 <div className="flex gap-2 mt-6">
+                                   <Button 
+                                     size="lg" 
+                                     className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
+                                     onClick={() => handleConsultDocument(item)}
+                                   >
+                                     <BookOpen className="h-5 w-5 mr-2" />
+                                     Consulter
+                                   </Button>
+                                </div>
                             </div>
                             <div className="w-full md:w-48 h-64 rounded-lg overflow-hidden hover-scale shadow-xl">
                               <img 
@@ -296,11 +301,13 @@ export default function DigitalLibraryHome() {
                   <CardDescription>{item.author}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-col gap-2">
-                    <Button className="w-full" variant="outline" onClick={() => handleConsultDocument(item)}>
-                      Consulter
-                    </Button>
-                  </div>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300" 
+                    onClick={() => handleConsultDocument(item)}
+                  >
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Consulter
+                  </Button>
                 </CardContent>
               </Card>
             ))}
