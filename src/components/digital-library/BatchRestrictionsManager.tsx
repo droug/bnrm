@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Lock, Unlock, Search, Filter, FileText, X, Shield, Download, Camera, MousePointerClick, Layers } from "lucide-react";
+import { Lock, Unlock, Search, Filter, FileText, X, Shield, Download, Camera, MousePointerClick, Layers, Eye } from "lucide-react";
 
 export function BatchRestrictionsManager() {
   const { toast } = useToast();
@@ -34,6 +34,7 @@ export function BatchRestrictionsManager() {
   const [percentagePages, setPercentagePages] = useState<number[]>([]);
   const [showPercentagePages, setShowPercentagePages] = useState(false);
   const [totalPages, setTotalPages] = useState(100);
+  const [percentageDistribution, setPercentageDistribution] = useState<"start" | "end" | "distributed">("start");
   const [allowPhysicalConsultation, setAllowPhysicalConsultation] = useState(false);
   
   // Paramètres de sécurité
@@ -232,15 +233,31 @@ export function BatchRestrictionsManager() {
   // Calculer les pages basées sur le pourcentage
   const calculatePercentagePages = () => {
     const numPages = Math.ceil((totalPages * percentageValue) / 100);
-    const pages = [];
-    for (let i = 1; i <= numPages; i++) {
-      pages.push(i);
+    const pages: number[] = [];
+    
+    if (percentageDistribution === "start") {
+      // Pages du début
+      for (let i = 1; i <= numPages; i++) {
+        pages.push(i);
+      }
+    } else if (percentageDistribution === "end") {
+      // Pages de la fin
+      for (let i = totalPages - numPages + 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Distribution équilibrée
+      const interval = Math.floor(totalPages / numPages);
+      for (let i = 0; i < numPages; i++) {
+        pages.push(Math.min(1 + (i * interval), totalPages));
+      }
     }
-    setPercentagePages(pages);
+    
+    setPercentagePages(pages.sort((a, b) => a - b));
     setShowPercentagePages(true);
     toast({
       title: "Pages calculées",
-      description: `${numPages} pages ont été sélectionnées selon le pourcentage de ${percentageValue}%`,
+      description: `${numPages} pages ont été sélectionnées selon le pourcentage de ${percentageValue}% (${percentageDistribution === "start" ? "début" : percentageDistribution === "end" ? "fin" : "réparties"})`,
     });
   };
 
@@ -623,90 +640,127 @@ export function BatchRestrictionsManager() {
                     {/* Mode pourcentage */}
                     {restrictionMode === 'percentage' && (
                       <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="percentage">Pourcentage de pages accessibles</Label>
-                          <div className="flex gap-2 items-center">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="percentage">Pourcentage de pages accessibles</Label>
+                            <div className="flex gap-2 items-center">
+                              <Input
+                                id="percentage"
+                                type="number"
+                                min="1"
+                                max="100"
+                                value={percentageValue}
+                                onChange={(e) => setPercentageValue(parseInt(e.target.value) || 10)}
+                                className="flex-1"
+                              />
+                              <span className="text-sm text-muted-foreground font-medium">%</span>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="total-pages">Nombre total de pages (référence)</Label>
                             <Input
-                              id="percentage"
+                              id="total-pages"
                               type="number"
                               min="1"
-                              max="100"
-                              value={percentageValue}
-                              onChange={(e) => setPercentageValue(parseInt(e.target.value) || 10)}
-                              className="flex-1"
+                              value={totalPages}
+                              onChange={(e) => setTotalPages(parseInt(e.target.value) || 100)}
+                              placeholder="Ex: 245"
                             />
-                            <span className="text-sm text-muted-foreground">%</span>
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="total-pages">Nombre total de pages (pour référence)</Label>
-                          <Input
-                            id="total-pages"
-                            type="number"
-                            min="1"
-                            value={totalPages}
-                            onChange={(e) => setTotalPages(parseInt(e.target.value) || 100)}
-                            placeholder="Exemple: 245"
-                          />
+                          <Label htmlFor="distribution">Mode de distribution des pages</Label>
+                          <Select value={percentageDistribution} onValueChange={(value: any) => setPercentageDistribution(value)}>
+                            <SelectTrigger id="distribution">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="start">Pages du début</SelectItem>
+                              <SelectItem value="end">Pages de la fin</SelectItem>
+                              <SelectItem value="distributed">Répartition équilibrée</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <p className="text-xs text-muted-foreground">
-                            Ce nombre sert de référence pour calculer les pages. Le calcul sera fait individuellement pour chaque document.
+                            {percentageDistribution === "start" && "Les premières pages seront accessibles (1, 2, 3, ...)"}
+                            {percentageDistribution === "end" && "Les dernières pages seront accessibles (..., n-2, n-1, n)"}
+                            {percentageDistribution === "distributed" && "Les pages seront réparties de manière équilibrée dans tout le document"}
                           </p>
+                        </div>
+
+                        <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Nombre de pages calculé:</span>
+                            <span className="font-bold text-lg">{Math.ceil((totalPages * percentageValue) / 100)} pages</span>
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            Sur un document de {totalPages} pages, {percentageValue}% représente {Math.ceil((totalPages * percentageValue) / 100)} pages accessibles
+                          </div>
                         </div>
 
                         <Button
                           type="button"
-                          variant="outline"
+                          variant="default"
                           onClick={calculatePercentagePages}
                           className="w-full"
                         >
-                          Calculer les pages ({Math.ceil((totalPages * percentageValue) / 100)} pages)
+                          Calculer et prévisualiser les pages
                         </Button>
 
                         {showPercentagePages && percentagePages.length > 0 && (
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <Label className="text-sm font-medium">
-                                Pages sélectionnées ({percentagePages.length})
-                              </Label>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setPercentagePages([]);
-                                  setShowPercentagePages(false);
-                                }}
-                              >
-                                <X className="h-4 w-4 mr-1" />
-                                Réinitialiser
-                              </Button>
-                            </div>
-                            
-                            <div className="p-4 bg-muted rounded-lg max-h-48 overflow-y-auto">
-                              <div className="flex flex-wrap gap-2">
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                                  const isSelected = percentagePages.includes(page);
-                                  return (
-                                    <Button
-                                      key={page}
-                                      type="button"
-                                      variant={isSelected ? "default" : "outline"}
-                                      size="sm"
-                                      onClick={() => togglePercentagePage(page)}
-                                      className="w-12 h-12"
-                                    >
-                                      {page}
-                                    </Button>
-                                  );
-                                })}
+                          <Card className="border-primary">
+                            <CardHeader className="pb-3">
+                              <div className="flex items-center justify-between">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                  <Eye className="h-4 w-4" />
+                                  Pages sélectionnées ({percentagePages.length} sur {totalPages})
+                                </CardTitle>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setPercentagePages([]);
+                                    setShowPercentagePages(false);
+                                  }}
+                                >
+                                  <X className="h-4 w-4 mr-1" />
+                                  Réinitialiser
+                                </Button>
                               </div>
-                            </div>
-
-                            <p className="text-xs text-muted-foreground">
-                              Cliquez sur un numéro de page pour l'ajouter ou la retirer de la sélection
-                            </p>
-                          </div>
+                              <CardDescription>
+                                Cliquez sur les numéros pour ajouter/retirer des pages
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="max-h-64 overflow-y-auto">
+                                <div className="grid grid-cols-10 gap-2">
+                                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                                    const isSelected = percentagePages.includes(page);
+                                    return (
+                                      <Button
+                                        key={page}
+                                        type="button"
+                                        variant={isSelected ? "default" : "outline"}
+                                        size="sm"
+                                        onClick={() => togglePercentagePage(page)}
+                                        className="h-10 text-xs"
+                                      >
+                                        {page}
+                                      </Button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                              
+                              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                                <p className="text-xs text-blue-900 dark:text-blue-100">
+                                  💡 <strong>Astuce:</strong> Cette sélection servira de modèle. Le calcul réel sera fait individuellement pour chaque document selon son nombre de pages.
+                                </p>
+                              </div>
+                            </CardContent>
+                          </Card>
                         )}
                       </div>
                     )}
