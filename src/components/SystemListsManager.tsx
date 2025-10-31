@@ -50,11 +50,11 @@ export const SystemListsManager = () => {
   const [loading, setLoading] = useState(true);
   
   // Filtres hiérarchiques
-  const [selectedPortal, setSelectedPortal] = useState<string>("");
-  const [selectedPlatform, setSelectedPlatform] = useState<string>("");
-  const [selectedService, setSelectedService] = useState<string>("");
-  const [selectedSubService, setSelectedSubService] = useState<string>("");
-  const [selectedForm, setSelectedForm] = useState<string>("");
+  const [selectedPortal, setSelectedPortal] = useState<string>("all");
+  const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
+  const [selectedService, setSelectedService] = useState<string>("all");
+  const [selectedSubService, setSelectedSubService] = useState<string>("all");
+  const [selectedForm, setSelectedForm] = useState<string>("all");
   
   // État des sections expandables
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
@@ -114,22 +114,22 @@ export const SystemListsManager = () => {
   const portals = Array.from(new Set(lists.map(l => l.portal).filter(Boolean))).sort();
   const platforms = Array.from(new Set(
     lists
-      .filter(l => !selectedPortal || l.portal === selectedPortal)
+      .filter(l => selectedPortal === "all" || l.portal === selectedPortal)
       .map(l => l.platform)
       .filter(Boolean)
   )).sort();
   const services = Array.from(new Set(
     lists
-      .filter(l => (!selectedPortal || l.portal === selectedPortal) && (!selectedPlatform || l.platform === selectedPlatform))
+      .filter(l => (selectedPortal === "all" || l.portal === selectedPortal) && (selectedPlatform === "all" || l.platform === selectedPlatform))
       .map(l => l.service)
       .filter(Boolean)
   )).sort();
   const subServices = Array.from(new Set(
     lists
       .filter(l => 
-        (!selectedPortal || l.portal === selectedPortal) && 
-        (!selectedPlatform || l.platform === selectedPlatform) &&
-        (!selectedService || l.service === selectedService)
+        (selectedPortal === "all" || l.portal === selectedPortal) && 
+        (selectedPlatform === "all" || l.platform === selectedPlatform) &&
+        (selectedService === "all" || l.service === selectedService)
       )
       .map(l => l.sub_service)
       .filter(Boolean)
@@ -137,10 +137,10 @@ export const SystemListsManager = () => {
   const forms = Array.from(new Set(
     lists
       .filter(l => 
-        (!selectedPortal || l.portal === selectedPortal) && 
-        (!selectedPlatform || l.platform === selectedPlatform) &&
-        (!selectedService || l.service === selectedService) &&
-        (!selectedSubService || l.sub_service === selectedSubService)
+        (selectedPortal === "all" || l.portal === selectedPortal) && 
+        (selectedPlatform === "all" || l.platform === selectedPlatform) &&
+        (selectedService === "all" || l.service === selectedService) &&
+        (selectedSubService === "all" || l.sub_service === selectedSubService)
       )
       .map(l => l.form_name)
       .filter(Boolean)
@@ -148,11 +148,11 @@ export const SystemListsManager = () => {
   
   // Filtrer les listes selon la hiérarchie sélectionnée
   const filteredLists = lists.filter(list => {
-    if (selectedPortal && list.portal !== selectedPortal) return false;
-    if (selectedPlatform && list.platform !== selectedPlatform) return false;
-    if (selectedService && list.service !== selectedService) return false;
-    if (selectedSubService && list.sub_service !== selectedSubService) return false;
-    if (selectedForm && list.form_name !== selectedForm) return false;
+    if (selectedPortal !== "all" && list.portal !== selectedPortal) return false;
+    if (selectedPlatform !== "all" && list.platform !== selectedPlatform) return false;
+    if (selectedService !== "all" && list.service !== selectedService) return false;
+    if (selectedSubService !== "all" && list.sub_service !== selectedSubService) return false;
+    if (selectedForm !== "all" && list.form_name !== selectedForm) return false;
     return true;
   });
   
@@ -185,11 +185,11 @@ export const SystemListsManager = () => {
   };
   
   const resetFilters = () => {
-    setSelectedPortal("");
-    setSelectedPlatform("");
-    setSelectedService("");
-    setSelectedSubService("");
-    setSelectedForm("");
+    setSelectedPortal("all");
+    setSelectedPlatform("all");
+    setSelectedService("all");
+    setSelectedSubService("all");
+    setSelectedForm("all");
   };
 
   const fetchLists = async () => {
@@ -564,7 +564,7 @@ export const SystemListsManager = () => {
             <h3 className="text-lg font-semibold">Listes système</h3>
             <Badge variant="secondary">{listsCount} liste{listsCount > 1 ? 's' : ''}</Badge>
           </div>
-          {(selectedPortal || selectedPlatform || selectedService || selectedSubService || selectedForm) && (
+          {(selectedPortal !== "all" || selectedPlatform !== "all" || selectedService !== "all" || selectedSubService !== "all" || selectedForm !== "all") && (
             <Button variant="ghost" size="sm" onClick={resetFilters}>
               Réinitialiser les filtres
             </Button>
@@ -896,7 +896,7 @@ export const SystemListsManager = () => {
                   <SelectValue placeholder="Tous" />
                 </SelectTrigger>
                 <SelectContent className="bg-background">
-                  <SelectItem value="">Tous</SelectItem>
+                  <SelectItem value="all">Tous</SelectItem>
                   {portals.map((p) => (
                     <SelectItem key={p} value={p}>{p}</SelectItem>
                   ))}
@@ -906,12 +906,12 @@ export const SystemListsManager = () => {
 
             <div>
               <Label className="text-xs">Plateforme</Label>
-              <Select value={selectedPlatform} onValueChange={setSelectedPlatform} disabled={!selectedPortal}>
+              <Select value={selectedPlatform} onValueChange={setSelectedPlatform} disabled={selectedPortal === "all"}>
                 <SelectTrigger className="bg-background">
                   <SelectValue placeholder="Toutes" />
                 </SelectTrigger>
                 <SelectContent className="bg-background">
-                  <SelectItem value="">Toutes</SelectItem>
+                  <SelectItem value="all">Toutes</SelectItem>
                   {platforms.map((p) => (
                     <SelectItem key={p} value={p}>{p}</SelectItem>
                   ))}
@@ -921,12 +921,12 @@ export const SystemListsManager = () => {
 
             <div>
               <Label className="text-xs">Service</Label>
-              <Select value={selectedService} onValueChange={setSelectedService} disabled={!selectedPlatform}>
+              <Select value={selectedService} onValueChange={setSelectedService} disabled={selectedPlatform === "all"}>
                 <SelectTrigger className="bg-background">
                   <SelectValue placeholder="Tous" />
                 </SelectTrigger>
                 <SelectContent className="bg-background">
-                  <SelectItem value="">Tous</SelectItem>
+                  <SelectItem value="all">Tous</SelectItem>
                   {services.map((s) => (
                     <SelectItem key={s} value={s}>{s}</SelectItem>
                   ))}
@@ -936,12 +936,12 @@ export const SystemListsManager = () => {
 
             <div>
               <Label className="text-xs">Sous-service</Label>
-              <Select value={selectedSubService} onValueChange={setSelectedSubService} disabled={!selectedService}>
+              <Select value={selectedSubService} onValueChange={setSelectedSubService} disabled={selectedService === "all"}>
                 <SelectTrigger className="bg-background">
                   <SelectValue placeholder="Tous" />
                 </SelectTrigger>
                 <SelectContent className="bg-background">
-                  <SelectItem value="">Tous</SelectItem>
+                  <SelectItem value="all">Tous</SelectItem>
                   {subServices.map((s) => (
                     <SelectItem key={s} value={s}>{s}</SelectItem>
                   ))}
@@ -951,12 +951,12 @@ export const SystemListsManager = () => {
 
             <div>
               <Label className="text-xs">Formulaire</Label>
-              <Select value={selectedForm} onValueChange={setSelectedForm} disabled={!selectedSubService}>
+              <Select value={selectedForm} onValueChange={setSelectedForm} disabled={selectedSubService === "all"}>
                 <SelectTrigger className="bg-background">
                   <SelectValue placeholder="Tous" />
                 </SelectTrigger>
                 <SelectContent className="bg-background">
-                  <SelectItem value="">Tous</SelectItem>
+                  <SelectItem value="all">Tous</SelectItem>
                   {forms.map((f) => (
                     <SelectItem key={f} value={f}>{f}</SelectItem>
                   ))}
