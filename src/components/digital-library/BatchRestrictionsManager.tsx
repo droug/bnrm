@@ -31,6 +31,9 @@ export function BatchRestrictionsManager() {
   const [pageRanges, setPageRanges] = useState<Array<{start: number, end: number}>>([{start: 1, end: 10}]);
   const [manualPages, setManualPages] = useState("");
   const [percentageValue, setPercentageValue] = useState(10);
+  const [percentagePages, setPercentagePages] = useState<number[]>([]);
+  const [showPercentagePages, setShowPercentagePages] = useState(false);
+  const [totalPages, setTotalPages] = useState(100);
   const [allowPhysicalConsultation, setAllowPhysicalConsultation] = useState(false);
   
   // Paramètres de sécurité
@@ -94,8 +97,8 @@ export function BatchRestrictionsManager() {
         });
         allowedPages.sort((a, b) => a - b);
       } else if (data.restrictionMode === 'percentage') {
-        // Le pourcentage sera calculé individuellement pour chaque document
-        allowedPages = [];
+        // Utiliser les pages du pourcentage (modifiées manuellement ou calculées)
+        allowedPages = data.percentagePages.length > 0 ? data.percentagePages : [];
       } else {
         // Mode manuel: convertir la chaîne en tableau
         const pages = data.manualPages.split(',').map((p: string) => parseInt(p.trim())).filter((p: number) => !isNaN(p));
@@ -218,11 +221,36 @@ export function BatchRestrictionsManager() {
       pageRanges,
       manualPages,
       percentageValue,
+      percentagePages,
       allowPhysicalConsultation,
       allowDownload,
       allowScreenshot,
       allowRightClick,
     });
+  };
+
+  // Calculer les pages basées sur le pourcentage
+  const calculatePercentagePages = () => {
+    const numPages = Math.ceil((totalPages * percentageValue) / 100);
+    const pages = [];
+    for (let i = 1; i <= numPages; i++) {
+      pages.push(i);
+    }
+    setPercentagePages(pages);
+    setShowPercentagePages(true);
+    toast({
+      title: "Pages calculées",
+      description: `${numPages} pages ont été sélectionnées selon le pourcentage de ${percentageValue}%`,
+    });
+  };
+
+  // Basculer une page dans la liste percentage
+  const togglePercentagePage = (page: number) => {
+    if (percentagePages.includes(page)) {
+      setPercentagePages(percentagePages.filter(p => p !== page));
+    } else {
+      setPercentagePages([...percentagePages, page].sort((a, b) => a - b));
+    }
   };
 
   const handleRemoveBatchRestrictions = () => {
@@ -594,23 +622,92 @@ export function BatchRestrictionsManager() {
 
                     {/* Mode pourcentage */}
                     {restrictionMode === 'percentage' && (
-                      <div className="space-y-2">
-                        <Label htmlFor="percentage">Pourcentage de pages accessibles</Label>
-                        <div className="flex gap-2 items-center">
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="percentage">Pourcentage de pages accessibles</Label>
+                          <div className="flex gap-2 items-center">
+                            <Input
+                              id="percentage"
+                              type="number"
+                              min="1"
+                              max="100"
+                              value={percentageValue}
+                              onChange={(e) => setPercentageValue(parseInt(e.target.value) || 10)}
+                              className="flex-1"
+                            />
+                            <span className="text-sm text-muted-foreground">%</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="total-pages">Nombre total de pages (pour référence)</Label>
                           <Input
-                            id="percentage"
+                            id="total-pages"
                             type="number"
                             min="1"
-                            max="100"
-                            value={percentageValue}
-                            onChange={(e) => setPercentageValue(parseInt(e.target.value) || 10)}
-                            className="flex-1"
+                            value={totalPages}
+                            onChange={(e) => setTotalPages(parseInt(e.target.value) || 100)}
+                            placeholder="Exemple: 245"
                           />
-                          <span className="text-sm text-muted-foreground">%</span>
+                          <p className="text-xs text-muted-foreground">
+                            Ce nombre sert de référence pour calculer les pages. Le calcul sera fait individuellement pour chaque document.
+                          </p>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          Les pages accessibles seront calculées individuellement pour chaque document selon son nombre total de pages
-                        </p>
+
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={calculatePercentagePages}
+                          className="w-full"
+                        >
+                          Calculer les pages ({Math.ceil((totalPages * percentageValue) / 100)} pages)
+                        </Button>
+
+                        {showPercentagePages && percentagePages.length > 0 && (
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <Label className="text-sm font-medium">
+                                Pages sélectionnées ({percentagePages.length})
+                              </Label>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setPercentagePages([]);
+                                  setShowPercentagePages(false);
+                                }}
+                              >
+                                <X className="h-4 w-4 mr-1" />
+                                Réinitialiser
+                              </Button>
+                            </div>
+                            
+                            <div className="p-4 bg-muted rounded-lg max-h-48 overflow-y-auto">
+                              <div className="flex flex-wrap gap-2">
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                                  const isSelected = percentagePages.includes(page);
+                                  return (
+                                    <Button
+                                      key={page}
+                                      type="button"
+                                      variant={isSelected ? "default" : "outline"}
+                                      size="sm"
+                                      onClick={() => togglePercentagePage(page)}
+                                      className="w-12 h-12"
+                                    >
+                                      {page}
+                                    </Button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            <p className="text-xs text-muted-foreground">
+                              Cliquez sur un numéro de page pour l'ajouter ou la retirer de la sélection
+                            </p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </CardContent>
