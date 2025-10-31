@@ -468,17 +468,6 @@ export default function DocumentDetails() {
                   Partager
                 </Button>
 
-                {canReserve && (
-                  <Button 
-                    onClick={() => setShowReservationDialog(true)} 
-                    variant="secondary" 
-                    className="w-full"
-                  >
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Réserver ce document
-                  </Button>
-                )}
-
                 {canRequestDigitization && (
                   <Button 
                     onClick={() => setShowDigitizationDialog(true)} 

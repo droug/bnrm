@@ -227,16 +227,11 @@ export default function DigitalLibraryHome() {
                                <h3 className="text-2xl font-bold mb-2 text-white">{item.title}</h3>
                                <p className="text-white/80 mb-4">{item.author}</p>
                                <p className="text-sm text-white/70 mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
-                               <div className="flex gap-2">
-                                 <Button size="lg" variant="outline" className="text-black hover:text-black" onClick={() => handleConsultDocument(item)}>
-                                   Consulter
-                                 </Button>
-                                 {!item.isAvailable && session && userProfile && (
-                                   <Button size="lg" onClick={() => handleReservationClick(item)}>
-                                     🗓️ Réserver
-                                   </Button>
-                                 )}
-                              </div>
+                                <div className="flex gap-2">
+                                  <Button size="lg" variant="outline" className="text-black hover:text-black" onClick={() => handleConsultDocument(item)}>
+                                    Consulter
+                                  </Button>
+                               </div>
                             </div>
                             <div className="w-full md:w-48 h-64 rounded-lg overflow-hidden hover-scale shadow-xl">
                               <img 
@@ -305,11 +300,6 @@ export default function DigitalLibraryHome() {
                     <Button className="w-full" variant="outline" onClick={() => handleConsultDocument(item)}>
                       Consulter
                     </Button>
-                    {!item.isAvailable && session && userProfile && (
-                      <Button className="w-full" onClick={() => handleReservationClick(item)}>
-                        🗓️ Réserver
-                      </Button>
-                    )}
                   </div>
                 </CardContent>
               </Card>
