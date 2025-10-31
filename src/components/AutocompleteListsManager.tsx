@@ -8,8 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Plus, Upload, Download, FileSpreadsheet } from "lucide-react";
+import { Trash2, Plus, Upload, Download, FileSpreadsheet, ChevronDown, ChevronRight, Zap, Filter } from "lucide-react";
+import { cn } from "@/lib/utils";
 import * as XLSX from 'xlsx';
+import { AutocompleteListsSyncButton } from "@/components/admin/AutocompleteListsSyncButton";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { AutocompleteList, AutocompleteListValue } from "@/hooks/useAutocompleteList";
 
 interface ExtendedValue extends Omit<AutocompleteListValue, 'id'> {

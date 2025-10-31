@@ -261,10 +261,12 @@ export type Database = {
           is_active: boolean | null
           level: number
           list_id: string
+          metadata: Json | null
           parent_value_code: string | null
           sort_order: number | null
           value_code: string
           value_label: string
+          value_label_ar: string | null
         }
         Insert: {
           created_at?: string | null
@@ -272,10 +274,12 @@ export type Database = {
           is_active?: boolean | null
           level?: number
           list_id: string
+          metadata?: Json | null
           parent_value_code?: string | null
           sort_order?: number | null
           value_code: string
           value_label: string
+          value_label_ar?: string | null
         }
         Update: {
           created_at?: string | null
@@ -283,10 +287,12 @@ export type Database = {
           is_active?: boolean | null
           level?: number
           list_id?: string
+          metadata?: Json | null
           parent_value_code?: string | null
           sort_order?: number | null
           value_code?: string
           value_label?: string
+          value_label_ar?: string | null
         }
         Relationships: [
           {
@@ -309,6 +315,11 @@ export type Database = {
           list_name: string
           max_levels: number | null
           module: string | null
+          platform: string | null
+          portal: string | null
+          service: string | null
+          sub_service: string | null
+          sync_hash: string | null
           updated_at: string | null
         }
         Insert: {
@@ -321,6 +332,11 @@ export type Database = {
           list_name: string
           max_levels?: number | null
           module?: string | null
+          platform?: string | null
+          portal?: string | null
+          service?: string | null
+          sub_service?: string | null
+          sync_hash?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -333,6 +349,11 @@ export type Database = {
           list_name?: string
           max_levels?: number | null
           module?: string | null
+          platform?: string | null
+          portal?: string | null
+          service?: string | null
+          sub_service?: string | null
+          sync_hash?: string | null
           updated_at?: string | null
         }
         Relationships: []
