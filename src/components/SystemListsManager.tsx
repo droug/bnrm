@@ -133,6 +133,50 @@ export const SystemListsManager = () => {
     setExpandedSections(newExpanded);
   };
 
+  const handleCleanDuplicateServices = async () => {
+    try {
+      setLoading(true);
+      
+      // Uniformiser "digital_library" et "Bibliothèque" vers "Bibliothèque Numérique"
+      const { error: updateError } = await supabase
+        .from('system_lists')
+        .update({ 
+          service: 'Bibliothèque Numérique',
+          updated_at: new Date().toISOString()
+        })
+        .in('service', ['digital_library', 'Bibliothèque']);
+
+      if (updateError) throw updateError;
+
+      // Ajouter sub_service pour les listes navigation
+      const { error: subServiceError } = await supabase
+        .from('system_lists')
+        .update({ 
+          sub_service: 'Navigation',
+          updated_at: new Date().toISOString()
+        })
+        .in('list_code', ['digital_library_collections', 'digital_library_themes'])
+        .is('sub_service', null);
+
+      if (subServiceError) throw subServiceError;
+
+      toast({
+        title: "Succès",
+        description: "Services uniformisés avec succès",
+      });
+
+      await fetchLists();
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchLists = async () => {
     try {
       const { data, error } = await supabase
@@ -806,13 +850,36 @@ export const SystemListsManager = () => {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Synchronisation */}
-        <div className="p-4 bg-muted/50 rounded-lg border space-y-2">
-          <h4 className="text-sm font-semibold">🔄 Synchronisation</h4>
-          <p className="text-xs text-muted-foreground">
-            Synchronisez toutes les listes prédéfinies avec la base de données
-          </p>
-          <SystemListsSyncButton />
+        {/* Synchronisation et Nettoyage */}
+        <div className="p-4 bg-muted/50 rounded-lg border space-y-3">
+          <div>
+            <h4 className="text-sm font-semibold">🔄 Synchronisation</h4>
+            <p className="text-xs text-muted-foreground">
+              Synchronisez toutes les listes prédéfinies avec la base de données
+            </p>
+            <div className="mt-2">
+              <SystemListsSyncButton />
+            </div>
+          </div>
+          
+          <Separator />
+          
+          <div>
+            <h4 className="text-sm font-semibold">🧹 Nettoyage</h4>
+            <p className="text-xs text-muted-foreground">
+              Uniformiser les noms de services (digital_library, Bibliothèque → Bibliothèque Numérique)
+            </p>
+            <Button 
+              onClick={handleCleanDuplicateServices} 
+              variant="outline" 
+              size="sm"
+              className="mt-2"
+              disabled={loading}
+            >
+              <Zap className="w-4 h-4 mr-2" />
+              Nettoyer les doublons
+            </Button>
+          </div>
         </div>
         
         <Separator />
