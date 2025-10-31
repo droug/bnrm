@@ -472,35 +472,84 @@ const BookReader = () => {
 
                   <Separator />
 
-                  {/* Metadata */}
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Date:</span>
-                      <span className="font-medium">{bookInfo.date}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Langue:</span>
-                      <span className="font-medium">{bookInfo.language}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Pages:</span>
-                      <span className="font-medium">{bookInfo.pages}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Format:</span>
-                      <span className="font-medium">{bookInfo.format}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Taille:</span>
-                      <span className="font-medium">{bookInfo.size}</span>
-                    </div>
+                  {/* Accordion pour les métadonnées détaillées */}
+                  <Accordion type="multiple" defaultValue={["basic", "format"]} className="w-full">
+                    {/* Informations de base */}
+                    <AccordionItem value="basic">
+                      <AccordionTrigger className="text-sm font-semibold">
+                        <div className="flex items-center gap-2">
+                          <Info className="h-4 w-4" />
+                          Informations de base
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Date:</span>
+                            <span className="font-medium">{bookInfo.date}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Langue:</span>
+                            <span className="font-medium">{bookInfo.language}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Pages:</span>
+                            <span className="font-medium">{bookInfo.pages}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Collection:</span>
+                            <Badge variant="secondary" className="text-xs">{bookInfo.collection}</Badge>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    {/* Format et fichier */}
+                    <AccordionItem value="format">
+                      <AccordionTrigger className="text-sm font-semibold">
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Format et fichier
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Format:</span>
+                            <span className="font-medium">{bookInfo.format}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Taille:</span>
+                            <span className="font-medium">{bookInfo.size}</span>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    {/* Audio (si disponible) */}
                     {bookInfo.hasAudio && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Audio:</span>
-                        <span className="font-medium">{bookInfo.audioDuration}</span>
-                      </div>
+                      <AccordionItem value="audio">
+                        <AccordionTrigger className="text-sm font-semibold">
+                          <div className="flex items-center gap-2">
+                            <Volume2 className="h-4 w-4" />
+                            Audio
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Durée:</span>
+                              <span className="font-medium">{bookInfo.audioDuration}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Disponible:</span>
+                              <Badge variant="default" className="text-xs">Oui</Badge>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
                     )}
-                  </div>
+                  </Accordion>
 
                   <Separator />
 
