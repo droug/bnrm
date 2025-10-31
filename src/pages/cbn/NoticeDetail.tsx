@@ -435,7 +435,7 @@ export default function NoticeDetail() {
                     <Button 
                       className="w-full" 
                       variant="default"
-                      onClick={() => navigate(`/book-reader/${document.id}`)}
+                      onClick={() => navigate(`/digital-library/book-reader/${document.id}`)}
                     >
                       <Download className="h-4 w-4 mr-2" />
                       Consulter en ligne

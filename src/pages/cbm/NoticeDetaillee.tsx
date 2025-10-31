@@ -257,7 +257,7 @@ export default function NoticeDetaillee() {
     // Rediriger vers le lecteur de livres avec l'ID du document
     // Pour les documents numérisés, ouvrir le book-reader
     if (documentData.supportStatus === "numerise" || documentData.isFreeAccess) {
-      navigate(`/book-reader/${documentData.id}`);
+      navigate(`/digital-library/book-reader/${documentData.id}`);
     } else {
       toast.info("Document non numérisé", {
         description: "Ce document n'est pas encore disponible en version numérique"

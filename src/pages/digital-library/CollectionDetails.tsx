@@ -408,7 +408,7 @@ export default function CollectionDetails() {
                           {collectionType !== 'manuscripts' && doc.file_url && (
                             <Button 
                               variant="outline"
-                              onClick={() => navigate(`/book-reader/${doc.id}`)}
+                              onClick={() => navigate(`/digital-library/book-reader/${doc.id}`)}
                               size="sm"
                             >
                               Consulter

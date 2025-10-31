@@ -22,7 +22,7 @@ export default function MyLoans() {
     // Pour l'instant, utiliser book-reader pour les prêts
     // Dans une vraie implémentation, vous auriez un loan_id qui référence un document/manuscrit
     if (loan.id) {
-      navigate(`/book-reader/${loan.id}`);
+      navigate(`/digital-library/book-reader/${loan.id}`);
     } else {
       navigate('/digital-library');
     }

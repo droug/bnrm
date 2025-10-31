@@ -29,7 +29,7 @@ export default function MySpace() {
       navigate(`/manuscript-reader/${manuscriptId}`);
     } else {
       const documentId = item.content_id || item.id;
-      navigate(`/book-reader/${documentId}`);
+      navigate(`/digital-library/book-reader/${documentId}`);
     }
   };
 

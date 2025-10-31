@@ -143,7 +143,7 @@ export default function DocumentDetails() {
     if (isManuscript) {
       navigate(`/manuscript-reader/${documentId}`);
     } else {
-      navigate(`/book-reader/${documentId}`);
+      navigate(`/digital-library/book-reader/${documentId}`);
     }
   };
 

@@ -256,7 +256,7 @@ const App = () => {
           <Route path="/digital-library/mes-demandes-numerisation" element={<UserDigitizationRequests />} />
           <Route path="/digital-library/mes-demandes" element={<MyRequests />} />
           <Route path="/digital-library/account-settings" element={<AccountSettings />} />
-        <Route path="/book-reader/:id" element={<BookReader />} />
+          <Route path="/digital-library/book-reader/:id" element={<BookReader />} />
         <Route path="/reproduction" element={<ReproductionPage />} />
         <Route path="/reproduction/:action" element={<ReproductionPage />} />
         <Route path="/reproduction/details/:id" element={<ReproductionDetailsPage />} />

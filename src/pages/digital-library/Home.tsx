@@ -142,7 +142,7 @@ export default function DigitalLibraryHome() {
     if (isManuscript) {
       navigate(`/manuscript-reader/${item.id}`);
     } else {
-      navigate(`/book-reader/${item.id}`);
+      navigate(`/digital-library/book-reader/${item.id}`);
     }
   };
 

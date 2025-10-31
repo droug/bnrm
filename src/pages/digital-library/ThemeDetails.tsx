@@ -53,7 +53,7 @@ export default function ThemeDetails() {
               <CardContent className="pt-6">
                 <h3 className="font-semibold text-lg">{doc.title}</h3>
                 <p className="text-sm text-muted-foreground">{doc.author}</p>
-                <Button className="mt-4" onClick={() => navigate(`/book-reader/${doc.id}`)}>
+                <Button className="mt-4" onClick={() => navigate(`/digital-library/book-reader/${doc.id}`)}>
                   <BookOpen className="h-4 w-4 mr-2" />
                   Consulter
                 </Button>

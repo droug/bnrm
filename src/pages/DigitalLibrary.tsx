@@ -489,7 +489,7 @@ const DigitalLibrary = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredWorks.slice(0, 3).map((work, index) => (
-              <Link key={index} to={`/book-reader/${index}`}>
+              <Link key={index} to={`/digital-library/book-reader/${index}`}>
                 <Card className="h-full hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer border-3 border-gold/30 hover:border-primary group overflow-hidden">
                   {/* Image */}
                   <div className="aspect-[3/4] relative overflow-hidden">
@@ -547,7 +547,7 @@ const DigitalLibrary = () => {
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                     {featuredWorks.slice(0, 4).map((work, item) => (
-                      <Link key={item} to={`/book-reader/${item}`}>
+                      <Link key={item} to={`/digital-library/book-reader/${item}`}>
                         <div className="aspect-[3/4] rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer shadow-md hover:shadow-xl relative group">
                           <img 
                             src={work.image} 
@@ -573,7 +573,7 @@ const DigitalLibrary = () => {
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                     {[...featuredWorks].sort((a, b) => parseInt(b.views.replace(',', '')) - parseInt(a.views.replace(',', ''))).slice(0, 4).map((work, item) => (
-                      <Link key={item} to={`/book-reader/${item}`}>
+                      <Link key={item} to={`/digital-library/book-reader/${item}`}>
                         <div className="aspect-[3/4] rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer shadow-md hover:shadow-xl relative group">
                           <img 
                             src={work.image} 
@@ -603,7 +603,7 @@ const DigitalLibrary = () => {
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                     {featuredWorks.slice(2, 6).map((work, item) => (
-                      <Link key={item} to={`/book-reader/${item + 2}`}>
+                      <Link key={item} to={`/digital-library/book-reader/${item + 2}`}>
                         <div className="aspect-[3/4] rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer shadow-md hover:shadow-xl relative group">
                           <img 
                             src={work.image} 
