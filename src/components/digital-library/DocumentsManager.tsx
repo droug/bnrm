@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown } from "lucide-react";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -46,6 +47,7 @@ export default function DocumentsManager() {
   const [filterDownload, setFilterDownload] = useState<string>("all");
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("documents");
 
   const form = useForm<z.infer<typeof documentSchema>>({
     resolver: zodResolver(documentSchema),
@@ -456,11 +458,20 @@ export default function DocumentsManager() {
             Ajoutez, modifiez et gérez vos documents de la bibliothèque numérique
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={downloadTemplate}>
-            <FileDown className="h-4 w-4 mr-2" />
-            Télécharger le modèle
-          </Button>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="duplicates">Gestion des doublons</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="documents" className="space-y-6">
+          <div className="flex gap-2 justify-end mb-6">
+            <Button variant="outline" onClick={downloadTemplate}>
+              <FileDown className="h-4 w-4 mr-2" />
+              Télécharger le modèle
+            </Button>
           <Dialog open={showBulkDialog} onOpenChange={setShowBulkDialog}>
             <DialogTrigger asChild>
               <Button variant="outline">
@@ -762,7 +773,6 @@ export default function DocumentsManager() {
             </DialogContent>
           </Dialog>
         </div>
-      </div>
 
       {/* Filters */}
       <Card>
@@ -1087,6 +1097,27 @@ export default function DocumentsManager() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+        </TabsContent>
+
+        <TabsContent value="duplicates" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Gestion des doublons</CardTitle>
+              <CardDescription>
+                Identifiez et gérez les documents en double dans la bibliothèque numérique
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12 text-muted-foreground">
+                <p className="text-lg font-semibold mb-2">Fonctionnalité en cours de développement</p>
+                <p className="text-sm">
+                  La détection automatique des doublons basée sur les métadonnées (ISBN, ISSN, ISMN, titre, auteur) sera bientôt disponible.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
