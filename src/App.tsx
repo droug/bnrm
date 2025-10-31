@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/hooks/useLanguage";
 import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ScrollToTop from "@/components/ScrollToTop";
+import { useAutoSync } from "@/hooks/useAutoSync";
 
 // Always loaded (critical routes)
 import Index from "./pages/Index";
@@ -181,14 +182,18 @@ const PageLoader = () => (
   </div>
 );
 
-const App = () => (
-  <TooltipProvider>
-    <LanguageProvider>
-      <ScrollToTop />
-      <Toaster />
-      <Sonner />
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
+const App = () => {
+  // Synchronisation automatique des listes système au démarrage
+  useAutoSync(true);
+  
+  return (
+    <TooltipProvider>
+      <LanguageProvider>
+        <ScrollToTop />
+        <Toaster />
+        <Sonner />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/auth" element={<Auth />} />
@@ -395,6 +400,7 @@ const App = () => (
       </Suspense>
     </LanguageProvider>
   </TooltipProvider>
-);
+  );
+};
 
 export default App;
