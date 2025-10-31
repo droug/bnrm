@@ -472,22 +472,51 @@ const BookReader = () => {
 
                   <Separator />
 
-                  {/* Accordion pour les métadonnées détaillées */}
-                  <Accordion type="multiple" defaultValue={["basic", "format"]} className="w-full">
-                    {/* Informations de base */}
-                    <AccordionItem value="basic">
+                  {/* Accordion pour les informations essentielles */}
+                  <Accordion type="multiple" defaultValue={["essential"]} className="w-full">
+                    {/* Informations essentielles */}
+                    <AccordionItem value="essential">
                       <AccordionTrigger className="text-sm font-semibold">
                         <div className="flex items-center gap-2">
                           <Info className="h-4 w-4" />
-                          Informations de base
+                          Informations essentielles
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-3 text-sm">
+                          <div>
+                            <span className="text-muted-foreground font-medium">Auteur:</span>
+                            <p className="font-semibold text-foreground mt-1">{bookInfo.author}</p>
+                          </div>
+                          
+                          <div>
+                            <span className="text-muted-foreground font-medium">Année:</span>
+                            <p className="font-semibold text-foreground mt-1">{bookInfo.date}</p>
+                          </div>
+
+                          <div>
+                            <span className="text-muted-foreground font-medium">Identifiant:</span>
+                            <p className="font-mono text-xs bg-muted px-2 py-1 rounded mt-1">{id}</p>
+                          </div>
+
+                          <div>
+                            <span className="text-muted-foreground font-medium">Résumé:</span>
+                            <p className="text-foreground mt-1 leading-relaxed">{bookInfo.description}</p>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    {/* Détails techniques */}
+                    <AccordionItem value="technical">
+                      <AccordionTrigger className="text-sm font-semibold">
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Détails techniques
                         </div>
                       </AccordionTrigger>
                       <AccordionContent>
                         <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Date:</span>
-                            <span className="font-medium">{bookInfo.date}</span>
-                          </div>
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Langue:</span>
                             <span className="font-medium">{bookInfo.language}</span>
@@ -497,30 +526,16 @@ const BookReader = () => {
                             <span className="font-medium">{bookInfo.pages}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Collection:</span>
-                            <Badge variant="secondary" className="text-xs">{bookInfo.collection}</Badge>
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-
-                    {/* Format et fichier */}
-                    <AccordionItem value="format">
-                      <AccordionTrigger className="text-sm font-semibold">
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          Format et fichier
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
                             <span className="text-muted-foreground">Format:</span>
                             <span className="font-medium">{bookInfo.format}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Taille:</span>
                             <span className="font-medium">{bookInfo.size}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Collection:</span>
+                            <Badge variant="secondary" className="text-xs">{bookInfo.collection}</Badge>
                           </div>
                         </div>
                       </AccordionContent>
@@ -532,7 +547,7 @@ const BookReader = () => {
                         <AccordionTrigger className="text-sm font-semibold">
                           <div className="flex items-center gap-2">
                             <Volume2 className="h-4 w-4" />
-                            Audio
+                            Version audio
                           </div>
                         </AccordionTrigger>
                         <AccordionContent>
