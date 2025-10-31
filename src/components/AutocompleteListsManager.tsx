@@ -29,10 +29,17 @@ export const AutocompleteListsManager = () => {
   const [listValues, setListValues] = useState<ExtendedValue[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [moduleFilter, setModuleFilter] = useState<string>("");
+  
+  // État des sections expandables
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  
   const [newListData, setNewListData] = useState({
     list_name: "",
     list_code: "",
+    portal: "",
+    platform: "",
+    service: "",
+    sub_service: "",
     module: "",
     form_name: "",
     max_levels: 2,
@@ -89,6 +96,16 @@ export const AutocompleteListsManager = () => {
     }
   };
 
+  const toggleSection = (key: string) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(key)) {
+      newExpanded.delete(key);
+    } else {
+      newExpanded.add(key);
+    }
+    setExpandedSections(newExpanded);
+  };
+
   const handleCreateList = async () => {
     if (!newListData.list_name || !newListData.list_code) {
       toast({
@@ -105,6 +122,10 @@ export const AutocompleteListsManager = () => {
         .insert({
           list_name: newListData.list_name,
           list_code: newListData.list_code,
+          portal: newListData.portal,
+          platform: newListData.platform,
+          service: newListData.service,
+          sub_service: newListData.sub_service,
           module: newListData.module,
           form_name: newListData.form_name,
           max_levels: newListData.max_levels,
@@ -122,6 +143,10 @@ export const AutocompleteListsManager = () => {
       setNewListData({
         list_name: "",
         list_code: "",
+        portal: "",
+        platform: "",
+        service: "",
+        sub_service: "",
         module: "",
         form_name: "",
         max_levels: 2,
@@ -344,11 +369,191 @@ export const AutocompleteListsManager = () => {
     });
   };
 
-  const filteredLists = moduleFilter
-    ? lists.filter(l => l.module === moduleFilter)
-    : lists;
+  // Organiser les listes en hiérarchie (exclure les valeurs nulles/vides)
+  const groupedLists = lists
+    .filter(list => list.portal && list.platform && list.service) // Exclure les listes sans hiérarchie complète
+    .reduce((acc, list) => {
+      const portalKey = list.portal!;
+      const platformKey = list.platform!;
+      const serviceKey = list.service!;
+      const subServiceKey = list.sub_service || "Général";
+      const formKey = list.form_name || "Général";
+      
+      if (!acc[portalKey]) acc[portalKey] = {};
+      if (!acc[portalKey][platformKey]) acc[portalKey][platformKey] = {};
+      if (!acc[portalKey][platformKey][serviceKey]) acc[portalKey][platformKey][serviceKey] = {};
+      if (!acc[portalKey][platformKey][serviceKey][subServiceKey]) acc[portalKey][platformKey][serviceKey][subServiceKey] = {};
+      if (!acc[portalKey][platformKey][serviceKey][subServiceKey][formKey]) acc[portalKey][platformKey][serviceKey][subServiceKey][formKey] = [];
+      
+      acc[portalKey][platformKey][serviceKey][subServiceKey][formKey].push(list);
+      return acc;
+    }, {} as Record<string, Record<string, Record<string, Record<string, Record<string, AutocompleteList[]>>>>>);
 
-  const modules = Array.from(new Set(lists.map(l => l.module).filter(Boolean)));
+  const renderListHierarchy = () => {
+    const listsCount = lists.filter(list => list.portal && list.platform && list.service).length;
+    
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold">Listes auto-complètes</h3>
+          <Badge variant="secondary">{listsCount} liste{listsCount > 1 ? 's' : ''}</Badge>
+        </div>
+
+        {Object.entries(groupedLists).map(([portalName, platforms]) => (
+          <Card key={portalName} className="border-2">
+            <CardHeader 
+              className="cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => toggleSection(`portal-${portalName}`)}
+            >
+              <div className="flex items-center gap-2">
+                {expandedSections.has(`portal-${portalName}`) ? (
+                  <ChevronDown className="w-5 h-5" />
+                ) : (
+                  <ChevronRight className="w-5 h-5" />
+                )}
+                <CardTitle className="text-base">{portalName}</CardTitle>
+                <Badge variant="outline">
+                  {Object.values(platforms).flatMap(services => 
+                    Object.values(services).flatMap(subServices =>
+                      Object.values(subServices).flatMap(forms =>
+                        Object.values(forms).flat()
+                      )
+                    )
+                  ).length} listes
+                </Badge>
+              </div>
+            </CardHeader>
+            
+            {expandedSections.has(`portal-${portalName}`) && (
+              <CardContent className="space-y-3">
+                {Object.entries(platforms).map(([platformName, services]) => (
+                  <div key={platformName} className="ml-4 border-l-2 border-muted pl-4">
+                    <div 
+                      className="flex items-center gap-2 py-2 cursor-pointer hover:bg-muted/50 rounded px-2"
+                      onClick={() => toggleSection(`platform-${portalName}-${platformName}`)}
+                    >
+                      {expandedSections.has(`platform-${portalName}-${platformName}`) ? (
+                        <ChevronDown className="w-4 h-4" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4" />
+                      )}
+                      <span className="font-medium">{platformName}</span>
+                      <Badge variant="secondary" className="text-xs">
+                        {Object.values(services).flatMap(subServices =>
+                          Object.values(subServices).flatMap(forms =>
+                            Object.values(forms).flat()
+                          )
+                        ).length}
+                      </Badge>
+                    </div>
+                    
+                    {expandedSections.has(`platform-${portalName}-${platformName}`) && (
+                      <div className="ml-4 space-y-2 mt-2">
+                        {Object.entries(services).map(([serviceName, subServices]) => (
+                          <div key={serviceName} className="border-l-2 border-muted pl-4">
+                            <div 
+                              className="flex items-center gap-2 py-2 cursor-pointer hover:bg-muted/50 rounded px-2"
+                              onClick={() => toggleSection(`service-${portalName}-${platformName}-${serviceName}`)}
+                            >
+                              {expandedSections.has(`service-${portalName}-${platformName}-${serviceName}`) ? (
+                                <ChevronDown className="w-4 h-4" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4" />
+                              )}
+                              <span className="text-sm font-medium">{serviceName}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {Object.values(subServices).flatMap(forms =>
+                                  Object.values(forms).flat()
+                                ).length}
+                              </Badge>
+                            </div>
+                            
+                            {expandedSections.has(`service-${portalName}-${platformName}-${serviceName}`) && (
+                              <div className="ml-4 space-y-2 mt-2">
+                                {Object.entries(subServices).map(([subServiceName, forms]) => (
+                                  <div key={subServiceName} className="border-l-2 border-muted pl-4">
+                                    <div 
+                                      className="flex items-center gap-2 py-1 cursor-pointer hover:bg-muted/50 rounded px-2"
+                                      onClick={() => toggleSection(`subservice-${portalName}-${platformName}-${serviceName}-${subServiceName}`)}
+                                    >
+                                      {expandedSections.has(`subservice-${portalName}-${platformName}-${serviceName}-${subServiceName}`) ? (
+                                        <ChevronDown className="w-3 h-3" />
+                                      ) : (
+                                        <ChevronRight className="w-3 h-3" />
+                                      )}
+                                      <span className="text-sm">{subServiceName}</span>
+                                      <Badge variant="secondary" className="text-xs">
+                                        {Object.values(forms).flat().length}
+                                      </Badge>
+                                    </div>
+                                    
+                                    {expandedSections.has(`subservice-${portalName}-${platformName}-${serviceName}-${subServiceName}`) && (
+                                      <div className="ml-4 space-y-1 mt-1">
+                                        {Object.entries(forms).map(([formName, listItems]) => (
+                                          <div key={formName} className="border-l-2 border-muted pl-4">
+                                            <div 
+                                              className="flex items-center gap-2 py-1 cursor-pointer hover:bg-muted/50 rounded px-2"
+                                              onClick={() => toggleSection(`form-${portalName}-${platformName}-${serviceName}-${subServiceName}-${formName}`)}
+                                            >
+                                              {expandedSections.has(`form-${portalName}-${platformName}-${serviceName}-${subServiceName}-${formName}`) ? (
+                                                <ChevronDown className="w-3 h-3" />
+                                              ) : (
+                                                <ChevronRight className="w-3 h-3" />
+                                              )}
+                                              <span className="text-xs font-medium">{formName}</span>
+                                              <Badge variant="outline" className="text-xs">
+                                                {listItems.length}
+                                              </Badge>
+                                            </div>
+                                            
+                                            {expandedSections.has(`form-${portalName}-${platformName}-${serviceName}-${subServiceName}-${formName}`) && (
+                                              <div className="ml-4 space-y-1 mt-1">
+                                                {listItems.map((list) => (
+                                                  <div 
+                                                    key={list.id}
+                                                    className={cn(
+                                                      "p-2 rounded border cursor-pointer transition-colors",
+                                                      selectedList === list.id 
+                                                        ? "bg-primary/10 border-primary" 
+                                                        : "hover:bg-muted/50 border-border"
+                                                    )}
+                                                    onClick={() => setSelectedList(list.id)}
+                                                  >
+                                                    <div className="flex items-center gap-2">
+                                                      <Zap className="w-3 h-3 text-amber-500" />
+                                                      <span className="text-xs font-medium">{list.list_name}</span>
+                                                      <code className="text-xs text-muted-foreground">{list.list_code}</code>
+                                                    </div>
+                                                    {list.description && (
+                                                      <p className="text-xs text-muted-foreground mt-1 ml-5">
+                                                        {list.description}
+                                                      </p>
+                                                    )}
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            )}
+          </Card>
+        ))}
+      </div>
+    );
+  };
 
   if (loading) {
     return <div>Chargement...</div>;
@@ -390,7 +595,7 @@ export const AutocompleteListsManager = () => {
                       <Input
                         value={newListData.list_name}
                         onChange={(e) => setNewListData({ ...newListData, list_name: e.target.value })}
-                        placeholder="Ex: Disciplines académiques"
+                        placeholder="Ex: Pays du monde"
                       />
                     </div>
                     <div>
@@ -398,34 +603,81 @@ export const AutocompleteListsManager = () => {
                       <Input
                         value={newListData.list_code}
                         onChange={(e) => setNewListData({ ...newListData, list_code: e.target.value })}
-                        placeholder="Ex: book_disciplines"
+                        placeholder="Ex: world_countries"
                       />
                     </div>
+
+                    <Separator />
+                    <h4 className="text-sm font-semibold">Hiérarchie</h4>
+                    
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label>Module</Label>
+                        <Label>Portail *</Label>
+                        <Select value={newListData.portal} onValueChange={(v) => setNewListData({ ...newListData, portal: v })}>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue placeholder="Choisir..." />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background">
+                            <SelectItem value="BNRM">BNRM</SelectItem>
+                            <SelectItem value="Kitab">Kitab</SelectItem>
+                            <SelectItem value="CBM">CBM</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Plateforme *</Label>
+                        <Select value={newListData.platform} onValueChange={(v) => setNewListData({ ...newListData, platform: v })}>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue placeholder="Choisir..." />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background">
+                            <SelectItem value="BNRM">BNRM</SelectItem>
+                            <SelectItem value="Dépôt Légal">Dépôt Légal</SelectItem>
+                            <SelectItem value="Activités Culturelles">Activités Culturelles</SelectItem>
+                            <SelectItem value="Bibliothèque Numérique">Bibliothèque Numérique</SelectItem>
+                            <SelectItem value="Manuscrits">Manuscrits</SelectItem>
+                            <SelectItem value="Reproduction">Reproduction</SelectItem>
+                            <SelectItem value="CBM">CBM</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Service *</Label>
                         <Input
-                          value={newListData.module}
-                          onChange={(e) => setNewListData({ ...newListData, module: e.target.value })}
-                          placeholder="Ex: Dépôt Légal"
+                          value={newListData.service}
+                          onChange={(e) => setNewListData({ ...newListData, service: e.target.value })}
+                          placeholder="Ex: Données de référence"
                         />
                       </div>
                       <div>
-                        <Label>Formulaire</Label>
+                        <Label>Sous-service</Label>
                         <Input
-                          value={newListData.form_name}
-                          onChange={(e) => setNewListData({ ...newListData, form_name: e.target.value })}
-                          placeholder="Ex: Publications périodiques"
+                          value={newListData.sub_service}
+                          onChange={(e) => setNewListData({ ...newListData, sub_service: e.target.value })}
+                          placeholder="Ex: Géographie"
                         />
                       </div>
                     </div>
+
+                    <div>
+                      <Label>Formulaire *</Label>
+                      <Input
+                        value={newListData.form_name}
+                        onChange={(e) => setNewListData({ ...newListData, form_name: e.target.value })}
+                        placeholder="Ex: Général"
+                      />
+                    </div>
+
                     <div>
                       <Label>Nombre de niveaux</Label>
                       <Select
                         value={newListData.max_levels.toString()}
                         onValueChange={(v) => setNewListData({ ...newListData, max_levels: parseInt(v) })}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-background">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-background">
@@ -434,14 +686,16 @@ export const AutocompleteListsManager = () => {
                         </SelectContent>
                       </Select>
                     </div>
+
                     <div>
                       <Label>Description</Label>
                       <Input
-                        value={newListData.description}
+                        value={newListData.description || ""}
                         onChange={(e) => setNewListData({ ...newListData, description: e.target.value })}
-                        placeholder="Description de la liste"
+                        placeholder="Description optionnelle"
                       />
                     </div>
+
                     <Button onClick={handleCreateList} className="w-full">
                       Créer la liste
                     </Button>
@@ -451,45 +705,24 @@ export const AutocompleteListsManager = () => {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {modules.length > 0 && (
-              <div>
-                <Label>Filtrer par module</Label>
-                <Select value={moduleFilter || "all"} onValueChange={(v) => setModuleFilter(v === "all" ? "" : v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Tous les modules" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background">
-                    <SelectItem value="all">Tous les modules</SelectItem>
-                    {modules.map((module) => (
-                      <SelectItem key={module} value={module!}>
-                        {module}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+        <CardContent className="space-y-6">
+          {/* Synchronisation */}
+          <div className="p-4 bg-muted/50 rounded-lg border space-y-2">
+            <h4 className="text-sm font-semibold">🔄 Synchronisation</h4>
+            <p className="text-xs text-muted-foreground">
+              Synchronisez toutes les listes auto-complètes prédéfinies avec la base de données
+            </p>
+            <AutocompleteListsSyncButton />
+          </div>
+          
+          <Separator />
 
-            <div>
-              <Label>Sélectionner une liste</Label>
-              <Select value={selectedList || "none"} onValueChange={(v) => setSelectedList(v === "none" ? null : v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir une liste" />
-                </SelectTrigger>
-                <SelectContent className="bg-background">
-                  <SelectItem value="none">Choisir une liste</SelectItem>
-                  {filteredLists.map((list) => (
-                    <SelectItem key={list.id} value={list.id}>
-                      {list.list_name} ({list.list_code}) - {list.max_levels} niveau(x)
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {selectedList && (
+          {/* Vue hiérarchique des listes */}
+          {renderListHierarchy()}
+          {/* Gestion des valeurs de la liste sélectionnée */}
+          {selectedList && (
+            <>
+              <Separator className="my-6" />
               <div className="space-y-4">
                 <div className="flex gap-2 flex-wrap">
                   <Button variant="outline" onClick={() => document.getElementById('excel-import')?.click()}>
@@ -573,8 +806,8 @@ export const AutocompleteListsManager = () => {
                   </Table>
                 </div>
               </div>
-            )}
-          </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

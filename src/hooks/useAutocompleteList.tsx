@@ -14,6 +14,10 @@ export interface AutocompleteList {
   list_code: string;
   list_name: string;
   description?: string;
+  portal?: string;
+  platform?: string;
+  service?: string;
+  sub_service?: string;
   module?: string;
   form_name?: string;
   max_levels: number;
