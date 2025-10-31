@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye } from "lucide-react";
+import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen } from "lucide-react";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,6 +37,7 @@ const documentSchema = z.object({
 export default function DocumentsManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showBulkDialog, setShowBulkDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -749,7 +751,17 @@ export default function DocumentsManager() {
             </div>
           )}
           <DialogFooter>
-            <Button onClick={() => setShowDetailsDialog(false)}>
+            <Button 
+              variant="default" 
+              onClick={() => {
+                navigate(`/digital-library/book-reader/${selectedDocument.id}`);
+                setShowDetailsDialog(false);
+              }}
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              Consulter
+            </Button>
+            <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
               Fermer
             </Button>
           </DialogFooter>
