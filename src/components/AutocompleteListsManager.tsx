@@ -647,10 +647,6 @@ export const AutocompleteListsManager = () => {
               </CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={handleDownloadTemplate}>
-                <FileSpreadsheet className="w-4 h-4 mr-2" />
-                Télécharger modèle Excel
-              </Button>
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                 <DialogTrigger asChild>
                   <Button>
