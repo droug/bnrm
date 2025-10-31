@@ -179,18 +179,6 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                   />
                 </div>
               )}
-              
-              {formData.reproductionType !== "papier" && formData.reproductionType !== "microfilm" && (
-                <div>
-                  <Label htmlFor="quality">Qualité</Label>
-                  <Input
-                    id="quality"
-                    disabled
-                    value="Haute qualité (300 DPI)"
-                    className="bg-muted cursor-not-allowed"
-                  />
-                </div>
-              )}
             </div>
 
             {formData.reproductionType === "microfilm" && (
