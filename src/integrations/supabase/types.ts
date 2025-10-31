@@ -1053,6 +1053,92 @@ export type Database = {
           },
         ]
       }
+      cbm_catalog: {
+        Row: {
+          author: string | null
+          author_ar: string | null
+          availability_status: string | null
+          cbm_record_id: string
+          cbn_document_id: string | null
+          created_at: string | null
+          deleted_at: string | null
+          dewey_classification: string | null
+          document_type: string | null
+          id: string
+          isbn: string | null
+          last_sync_date: string | null
+          library_code: string
+          library_name: string
+          metadata_source: string | null
+          publication_year: number | null
+          publisher: string | null
+          shelf_location: string | null
+          source_library: string
+          subject_headings: string[] | null
+          title: string
+          title_ar: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          author?: string | null
+          author_ar?: string | null
+          availability_status?: string | null
+          cbm_record_id: string
+          cbn_document_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          dewey_classification?: string | null
+          document_type?: string | null
+          id?: string
+          isbn?: string | null
+          last_sync_date?: string | null
+          library_code: string
+          library_name: string
+          metadata_source?: string | null
+          publication_year?: number | null
+          publisher?: string | null
+          shelf_location?: string | null
+          source_library: string
+          subject_headings?: string[] | null
+          title: string
+          title_ar?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          author?: string | null
+          author_ar?: string | null
+          availability_status?: string | null
+          cbm_record_id?: string
+          cbn_document_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          dewey_classification?: string | null
+          document_type?: string | null
+          id?: string
+          isbn?: string | null
+          last_sync_date?: string | null
+          library_code?: string
+          library_name?: string
+          metadata_source?: string | null
+          publication_year?: number | null
+          publisher?: string | null
+          shelf_location?: string | null
+          source_library?: string
+          subject_headings?: string[] | null
+          title?: string
+          title_ar?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_cbm_catalog_cbn_document"
+            columns: ["cbn_document_id"]
+            isOneToOne: false
+            referencedRelation: "cbn_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cbn_catalog_documents: {
         Row: {
           allow_physical_consultation: boolean | null
@@ -1145,6 +1231,144 @@ export type Database = {
           year?: string
         }
         Relationships: []
+      }
+      cbn_documents: {
+        Row: {
+          access_level: string | null
+          author: string | null
+          author_ar: string | null
+          cbm_catalog_id: string | null
+          collection_name: string | null
+          consultation_mode: string | null
+          cote: string
+          created_at: string | null
+          deleted_at: string | null
+          dewey_classification: string | null
+          digital_library_document_id: string | null
+          dimensions: string | null
+          document_type: string
+          edition: string | null
+          id: string
+          internal_notes: string | null
+          is_digitized: boolean | null
+          isbn: string | null
+          issn: string | null
+          keywords: string[] | null
+          location: string | null
+          notes: string | null
+          pages_count: number | null
+          physical_description: string | null
+          physical_status: string | null
+          publication_place: string | null
+          publication_year: number | null
+          publisher: string | null
+          secondary_authors: string[] | null
+          shelf_location: string | null
+          subject_headings: string[] | null
+          subtitle: string | null
+          subtitle_ar: string | null
+          support_type: string | null
+          title: string
+          title_ar: string | null
+          unimarc_record_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_level?: string | null
+          author?: string | null
+          author_ar?: string | null
+          cbm_catalog_id?: string | null
+          collection_name?: string | null
+          consultation_mode?: string | null
+          cote: string
+          created_at?: string | null
+          deleted_at?: string | null
+          dewey_classification?: string | null
+          digital_library_document_id?: string | null
+          dimensions?: string | null
+          document_type: string
+          edition?: string | null
+          id?: string
+          internal_notes?: string | null
+          is_digitized?: boolean | null
+          isbn?: string | null
+          issn?: string | null
+          keywords?: string[] | null
+          location?: string | null
+          notes?: string | null
+          pages_count?: number | null
+          physical_description?: string | null
+          physical_status?: string | null
+          publication_place?: string | null
+          publication_year?: number | null
+          publisher?: string | null
+          secondary_authors?: string[] | null
+          shelf_location?: string | null
+          subject_headings?: string[] | null
+          subtitle?: string | null
+          subtitle_ar?: string | null
+          support_type?: string | null
+          title: string
+          title_ar?: string | null
+          unimarc_record_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_level?: string | null
+          author?: string | null
+          author_ar?: string | null
+          cbm_catalog_id?: string | null
+          collection_name?: string | null
+          consultation_mode?: string | null
+          cote?: string
+          created_at?: string | null
+          deleted_at?: string | null
+          dewey_classification?: string | null
+          digital_library_document_id?: string | null
+          dimensions?: string | null
+          document_type?: string
+          edition?: string | null
+          id?: string
+          internal_notes?: string | null
+          is_digitized?: boolean | null
+          isbn?: string | null
+          issn?: string | null
+          keywords?: string[] | null
+          location?: string | null
+          notes?: string | null
+          pages_count?: number | null
+          physical_description?: string | null
+          physical_status?: string | null
+          publication_place?: string | null
+          publication_year?: number | null
+          publisher?: string | null
+          secondary_authors?: string[] | null
+          shelf_location?: string | null
+          subject_headings?: string[] | null
+          subtitle?: string | null
+          subtitle_ar?: string | null
+          support_type?: string | null
+          title?: string
+          title_ar?: string | null
+          unimarc_record_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_cbn_documents_cbm_catalog"
+            columns: ["cbm_catalog_id"]
+            isOneToOne: false
+            referencedRelation: "cbm_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_cbn_documents_digital_library"
+            columns: ["digital_library_document_id"]
+            isOneToOne: false
+            referencedRelation: "digital_library_documents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       chat_conversations: {
         Row: {
@@ -2049,6 +2273,126 @@ export type Database = {
             columns: ["request_id"]
             isOneToOne: false
             referencedRelation: "legal_deposit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      digital_library_documents: {
+        Row: {
+          access_level: string | null
+          author: string | null
+          cbn_document_id: string
+          cover_image_url: string | null
+          created_at: string | null
+          deleted_at: string | null
+          digital_collections: string[] | null
+          digitization_date: string | null
+          digitization_quality: string | null
+          document_type: string | null
+          download_enabled: boolean | null
+          downloads_count: number | null
+          file_format: string | null
+          file_size_mb: number | null
+          id: string
+          is_manuscript: boolean | null
+          language: string | null
+          manuscript_id: string | null
+          ocr_processed: boolean | null
+          pages_count: number
+          pdf_url: string | null
+          print_enabled: boolean | null
+          publication_status: string | null
+          publication_year: number | null
+          published_at: string | null
+          requires_authentication: boolean | null
+          themes: string[] | null
+          thumbnail_url: string | null
+          title: string
+          title_ar: string | null
+          updated_at: string | null
+          views_count: number | null
+        }
+        Insert: {
+          access_level?: string | null
+          author?: string | null
+          cbn_document_id: string
+          cover_image_url?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          digital_collections?: string[] | null
+          digitization_date?: string | null
+          digitization_quality?: string | null
+          document_type?: string | null
+          download_enabled?: boolean | null
+          downloads_count?: number | null
+          file_format?: string | null
+          file_size_mb?: number | null
+          id?: string
+          is_manuscript?: boolean | null
+          language?: string | null
+          manuscript_id?: string | null
+          ocr_processed?: boolean | null
+          pages_count: number
+          pdf_url?: string | null
+          print_enabled?: boolean | null
+          publication_status?: string | null
+          publication_year?: number | null
+          published_at?: string | null
+          requires_authentication?: boolean | null
+          themes?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          title_ar?: string | null
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Update: {
+          access_level?: string | null
+          author?: string | null
+          cbn_document_id?: string
+          cover_image_url?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          digital_collections?: string[] | null
+          digitization_date?: string | null
+          digitization_quality?: string | null
+          document_type?: string | null
+          download_enabled?: boolean | null
+          downloads_count?: number | null
+          file_format?: string | null
+          file_size_mb?: number | null
+          id?: string
+          is_manuscript?: boolean | null
+          language?: string | null
+          manuscript_id?: string | null
+          ocr_processed?: boolean | null
+          pages_count?: number
+          pdf_url?: string | null
+          print_enabled?: boolean | null
+          publication_status?: string | null
+          publication_year?: number | null
+          published_at?: string | null
+          requires_authentication?: boolean | null
+          themes?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          title_ar?: string | null
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_digital_library_cbn_document"
+            columns: ["cbn_document_id"]
+            isOneToOne: false
+            referencedRelation: "cbn_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_digital_library_manuscript"
+            columns: ["manuscript_id"]
+            isOneToOne: false
+            referencedRelation: "manuscripts"
             referencedColumns: ["id"]
           },
         ]
@@ -3524,6 +3868,7 @@ export type Database = {
           block_right_click: boolean | null
           block_screenshot: boolean | null
           category_id: string | null
+          cbn_document_id: string | null
           collection_id: string | null
           condition_notes: string | null
           cote: string | null
@@ -3531,6 +3876,7 @@ export type Database = {
           created_by: string | null
           description: string | null
           digital_copy_url: string | null
+          digital_library_document_id: string | null
           dimensions: string | null
           file_url: string | null
           full_text_content: string | null
@@ -3569,6 +3915,7 @@ export type Database = {
           block_right_click?: boolean | null
           block_screenshot?: boolean | null
           category_id?: string | null
+          cbn_document_id?: string | null
           collection_id?: string | null
           condition_notes?: string | null
           cote?: string | null
@@ -3576,6 +3923,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           digital_copy_url?: string | null
+          digital_library_document_id?: string | null
           dimensions?: string | null
           file_url?: string | null
           full_text_content?: string | null
@@ -3614,6 +3962,7 @@ export type Database = {
           block_right_click?: boolean | null
           block_screenshot?: boolean | null
           category_id?: string | null
+          cbn_document_id?: string | null
           collection_id?: string | null
           condition_notes?: string | null
           cote?: string | null
@@ -3621,6 +3970,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           digital_copy_url?: string | null
+          digital_library_document_id?: string | null
           dimensions?: string | null
           file_url?: string | null
           full_text_content?: string | null
@@ -3651,6 +4001,20 @@ export type Database = {
           versions?: Json | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_manuscripts_cbn_document"
+            columns: ["cbn_document_id"]
+            isOneToOne: false
+            referencedRelation: "cbn_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_manuscripts_digital_library"
+            columns: ["digital_library_document_id"]
+            isOneToOne: false
+            referencedRelation: "digital_library_documents"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "manuscripts_category_id_fkey"
             columns: ["category_id"]
