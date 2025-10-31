@@ -310,34 +310,6 @@ export function BatchRestrictionsManager() {
         </div>
       </div>
 
-      {/* Actions en lot */}
-      {selectedDocuments.size > 0 && (
-        <Card className="border-primary shadow-lg">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Layers className="h-5 w-5 text-primary" />
-                <span className="font-semibold">{selectedDocuments.size} document(s) sélectionné(s)</span>
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={handleApplyBatchRestrictions} className="gap-2">
-                  <Lock className="h-4 w-4" />
-                  Appliquer des restrictions
-                </Button>
-                <Button variant="destructive" onClick={handleRemoveBatchRestrictions} className="gap-2">
-                  <Unlock className="h-4 w-4" />
-                  Supprimer les restrictions
-                </Button>
-                <Button variant="outline" onClick={() => setSelectedDocuments(new Set())}>
-                  <X className="h-4 w-4 mr-2" />
-                  Désélectionner tout
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Filtres de recherche */}
       <Card className="shadow-lg">
         <CardHeader className="bg-muted/30">
@@ -420,6 +392,34 @@ export function BatchRestrictionsManager() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Actions en lot */}
+      {selectedDocuments.size > 0 && (
+        <Card className="border-primary shadow-lg">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Layers className="h-5 w-5 text-primary" />
+                <span className="font-semibold">{selectedDocuments.size} document(s) sélectionné(s)</span>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleApplyBatchRestrictions} className="gap-2">
+                  <Lock className="h-4 w-4" />
+                  Appliquer des restrictions
+                </Button>
+                <Button variant="destructive" onClick={handleRemoveBatchRestrictions} className="gap-2">
+                  <Unlock className="h-4 w-4" />
+                  Supprimer les restrictions
+                </Button>
+                <Button variant="outline" onClick={() => setSelectedDocuments(new Set())}>
+                  <X className="h-4 w-4 mr-2" />
+                  Désélectionner tout
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Liste des documents */}
       <Card className="shadow-lg">
