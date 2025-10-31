@@ -509,6 +509,36 @@ export const SystemListsManager = () => {
     event.target.value = "";
   };
 
+  const handleDownloadTemplate = () => {
+    // Créer un modèle Excel avec les colonnes nécessaires
+    const templateData = [
+      {
+        Code: "exemple_1",
+        Libellé: "Exemple 1",
+        Ordre: 1
+      },
+      {
+        Code: "exemple_2",
+        Libellé: "Exemple 2",
+        Ordre: 2
+      }
+    ];
+
+    const worksheet = XLSX.utils.json_to_sheet(templateData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Modèle");
+    
+    const selectedListData = lists.find(l => l.id === selectedList);
+    const fileName = `modele_${selectedListData?.list_code || 'liste'}.xlsx`;
+    
+    XLSX.writeFile(workbook, fileName);
+    
+    toast({
+      title: "Modèle téléchargé",
+      description: "Remplissez le fichier Excel et importez-le",
+    });
+  };
+
   const handleExportExcel = () => {
     if (!listValues.length) {
       toast({
@@ -934,9 +964,14 @@ export const SystemListsManager = () => {
                     </DialogContent>
                   </Dialog>
 
+                  <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
+                    <Download className="w-4 h-4 mr-2" />
+                    Télécharger modèle
+                  </Button>
+
                   <Button variant="outline" size="sm" onClick={() => document.getElementById('excel-import')?.click()}>
                     <Upload className="w-4 h-4 mr-2" />
-                    Import
+                    Importer Excel
                   </Button>
                   <input
                     id="excel-import"
@@ -948,7 +983,7 @@ export const SystemListsManager = () => {
 
                   <Button variant="outline" size="sm" onClick={handleExportExcel}>
                     <Download className="w-4 h-4 mr-2" />
-                    Export
+                    Exporter Excel
                   </Button>
                 </div>
               </div>
