@@ -369,9 +369,11 @@ export const AutocompleteListsManager = () => {
     });
   };
 
-  // Organiser les listes en hiérarchie (exclure les valeurs nulles/vides)
-  const groupedLists = lists
-    .filter(list => list.portal && list.platform && list.service) // Exclure les listes sans hiérarchie complète
+  // Organiser les listes en hiérarchie
+  const listsWithHierarchy = lists.filter(list => list.portal && list.platform && list.service);
+  const listsWithoutHierarchy = lists.filter(list => !list.portal || !list.platform || !list.service);
+  
+  const groupedLists = listsWithHierarchy
     .reduce((acc, list) => {
       const portalKey = list.portal!;
       const platformKey = list.platform!;
@@ -390,14 +392,88 @@ export const AutocompleteListsManager = () => {
     }, {} as Record<string, Record<string, Record<string, Record<string, Record<string, AutocompleteList[]>>>>>);
 
   const renderListHierarchy = () => {
-    const listsCount = lists.filter(list => list.portal && list.platform && list.service).length;
+    const categorizedCount = listsWithHierarchy.length;
+    const uncategorizedCount = listsWithoutHierarchy.length;
     
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-semibold">Listes auto-complètes</h3>
-          <Badge variant="secondary">{listsCount} liste{listsCount > 1 ? 's' : ''}</Badge>
+          <Badge variant="secondary">
+            {categorizedCount + uncategorizedCount} liste{(categorizedCount + uncategorizedCount) > 1 ? 's' : ''}
+          </Badge>
+          {categorizedCount > 0 && (
+            <Badge variant="outline">{categorizedCount} catégorisée{categorizedCount > 1 ? 's' : ''}</Badge>
+          )}
+          {uncategorizedCount > 0 && (
+            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+              {uncategorizedCount} non catégorisée{uncategorizedCount > 1 ? 's' : ''}
+            </Badge>
+          )}
         </div>
+
+        {/* Listes non catégorisées */}
+        {uncategorizedCount > 0 && (
+          <Card className="border-2 border-amber-200 bg-amber-50/30">
+            <CardHeader 
+              className="cursor-pointer hover:bg-amber-100/50 transition-colors"
+              onClick={() => toggleSection('uncategorized')}
+            >
+              <div className="flex items-center gap-2">
+                {expandedSections.has('uncategorized') ? (
+                  <ChevronDown className="w-5 h-5" />
+                ) : (
+                  <ChevronRight className="w-5 h-5" />
+                )}
+                <CardTitle className="text-base text-amber-900">⚠️ Listes non catégorisées</CardTitle>
+                <Badge variant="outline" className="bg-amber-100 text-amber-700">
+                  {uncategorizedCount}
+                </Badge>
+              </div>
+              <p className="text-xs text-amber-700 mt-1">
+                Ces listes n'ont pas de hiérarchie définie (Portal/Plateforme/Service)
+              </p>
+            </CardHeader>
+            
+            {expandedSections.has('uncategorized') && (
+              <CardContent className="space-y-2">
+                {listsWithoutHierarchy.map((list) => (
+                  <div 
+                    key={list.id}
+                    className={cn(
+                      "p-3 rounded border cursor-pointer transition-colors",
+                      selectedList === list.id 
+                        ? "bg-primary/10 border-primary" 
+                        : "hover:bg-muted/50 border-border"
+                    )}
+                    onClick={() => setSelectedList(list.id)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-amber-500" />
+                      <span className="font-medium">{list.list_name}</span>
+                      <code className="text-xs text-muted-foreground">{list.list_code}</code>
+                      <Badge variant="outline" className="text-xs">
+                        {list.max_levels} niveau{list.max_levels > 1 ? 'x' : ''}
+                      </Badge>
+                    </div>
+                    {list.description && (
+                      <p className="text-sm text-muted-foreground mt-1 ml-6">
+                        {list.description}
+                      </p>
+                    )}
+                    {list.module && (
+                      <p className="text-xs text-muted-foreground mt-1 ml-6">
+                        Module: {list.module} {list.form_name ? `→ ${list.form_name}` : ''}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            )}
+          </Card>
+        )}
+
+        {/* Listes catégorisées */}
 
         {Object.entries(groupedLists).map(([portalName, platforms]) => (
           <Card key={portalName} className="border-2">
