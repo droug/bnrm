@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen } from "lucide-react";
+import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown } from "lucide-react";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -158,6 +158,74 @@ export default function DocumentsManager() {
     return matchesSearch && matchesVisible && matchesDownload;
   });
 
+  // Download CSV template
+  const downloadTemplate = () => {
+    const headers = [
+      'titre',
+      'auteur',
+      'type_fichier',
+      'date_publication',
+      'description',
+      'url_fichier',
+      'telechargement_actif',
+      'visible',
+      'partage_social',
+      'partage_email',
+      'derogation_copyright',
+      'date_expiration_copyright'
+    ];
+    
+    const exampleRows = [
+      [
+        'Exemple de livre',
+        'Auteur Exemple',
+        'livre',
+        '2024-01-15',
+        'Description du document exemple',
+        'https://example.com/fichier.pdf',
+        'true',
+        'true',
+        'true',
+        'true',
+        'false',
+        ''
+      ],
+      [
+        'Manuscrit ancien',
+        'Auteur Inconnu',
+        'manuscrit',
+        '1850-06-20',
+        'Un manuscrit historique',
+        'https://example.com/manuscrit.pdf',
+        'false',
+        'true',
+        'true',
+        'false',
+        'true',
+        '2026-12-31'
+      ]
+    ];
+
+    // Create CSV content
+    const csvContent = [
+      headers.join(','),
+      ...exampleRows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    // Create blob and download
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'modele_import_documents.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({ title: "Modèle téléchargé avec succès" });
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
@@ -169,6 +237,10 @@ export default function DocumentsManager() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={downloadTemplate}>
+            <FileDown className="h-4 w-4 mr-2" />
+            Télécharger le modèle
+          </Button>
           <Dialog open={showBulkDialog} onOpenChange={setShowBulkDialog}>
             <DialogTrigger asChild>
               <Button variant="outline">
@@ -197,12 +269,27 @@ export default function DocumentsManager() {
                 </div>
                 <div className="bg-muted p-4 rounded-lg">
                   <p className="text-sm font-semibold mb-2">Format CSV attendu :</p>
-                  <code className="text-xs block">
-                    titre,auteur,type,date_publication,url_fichier,description,telechargement_actif,visible,partage_social,partage_email
+                  <code className="text-xs block whitespace-pre-wrap break-all">
+                    titre,auteur,type_fichier,date_publication,description,url_fichier,telechargement_actif,visible,partage_social,partage_email,derogation_copyright,date_expiration_copyright
                   </code>
                   <p className="text-xs text-muted-foreground mt-2">
                     Les colonnes booléennes acceptent : true/false, oui/non, 1/0
                   </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Types de fichier acceptés : livre, article, video, audio, manuscrit, periodique
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Format des dates : YYYY-MM-DD (ex: 2024-01-15)
+                  </p>
+                  <Button 
+                    variant="link" 
+                    size="sm" 
+                    onClick={downloadTemplate}
+                    className="mt-2 h-auto p-0"
+                  >
+                    <FileDown className="h-3 w-3 mr-1" />
+                    Télécharger le modèle avec exemples
+                  </Button>
                 </div>
               </div>
             </DialogContent>
