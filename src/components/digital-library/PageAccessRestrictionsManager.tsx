@@ -13,7 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, ChevronLeft, ChevronRight, Plus, Trash2, Shield, Download, Camera, MousePointerClick } from "lucide-react";
 import { PageFlipBook } from "@/components/book-reader/PageFlipBook";
 
 export function PageAccessRestrictionsManager() {
@@ -41,6 +41,11 @@ export function PageAccessRestrictionsManager() {
   const [viewMode, setViewMode] = useState<"single" | "double">("single");
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
+  
+  // Paramètres de sécurité
+  const [allowDownload, setAllowDownload] = useState(true);
+  const [allowScreenshot, setAllowScreenshot] = useState(true);
+  const [allowRightClick, setAllowRightClick] = useState(true);
 
   // Fetch documents
   const { data: documents, isLoading } = useQuery({
@@ -121,6 +126,9 @@ export function PageAccessRestrictionsManager() {
         end_page: data.restrictionMode === 'range' && data.pageRanges.length > 0 ? data.pageRanges[data.pageRanges.length - 1].end : 10,
         manual_pages: allowedPages,
         allow_physical_consultation: data.allowPhysicalConsultation,
+        allow_download: data.allowDownload,
+        allow_screenshot: data.allowScreenshot,
+        allow_right_click: data.allowRightClick,
       };
 
       const { error } = await supabase
@@ -173,6 +181,9 @@ export function PageAccessRestrictionsManager() {
       setIsRestricted(restriction.is_restricted);
       setRestrictionMode(restriction.restriction_mode);
       setAllowPhysicalConsultation(restriction.allow_physical_consultation || false);
+      setAllowDownload(restriction.allow_download !== false);
+      setAllowScreenshot(restriction.allow_screenshot !== false);
+      setAllowRightClick(restriction.allow_right_click !== false);
       
       // Reconstruire les plages à partir des pages manuelles
       if (restriction.restriction_mode === 'range' && restriction.manual_pages?.length > 0) {
@@ -215,6 +226,9 @@ export function PageAccessRestrictionsManager() {
       setPercentagePages([]);
       setShowPercentagePages(false);
       setAllowPhysicalConsultation(false);
+      setAllowDownload(true);
+      setAllowScreenshot(true);
+      setAllowRightClick(true);
     }
     
     setCurrentPreviewPage(1);
@@ -247,6 +261,9 @@ export function PageAccessRestrictionsManager() {
       percentageValue,
       percentagePages,
       allowPhysicalConsultation,
+      allowDownload,
+      allowScreenshot,
+      allowRightClick,
     });
   };
 
@@ -1170,6 +1187,83 @@ export function PageAccessRestrictionsManager() {
                       </CardContent>
                     </Card>
                   )}
+                  
+                  {/* Paramètres de sécurité */}
+                  <Card className="shadow-md border-2 border-primary/20">
+                    <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 pb-3">
+                      <div className="flex items-center gap-2">
+                        <Shield className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-base">Paramètres de sécurité</CardTitle>
+                      </div>
+                      <CardDescription className="text-xs">
+                        Contrôlez les actions autorisées pour les utilisateurs
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4 pt-4">
+                      <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="p-2 rounded-lg bg-primary/10">
+                            <Download className="h-4 w-4 text-primary" />
+                          </div>
+                          <div>
+                            <Label className="text-sm font-semibold cursor-pointer">Téléchargement</Label>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              Autoriser le téléchargement du document
+                            </p>
+                          </div>
+                        </div>
+                        <Switch
+                          checked={allowDownload}
+                          onCheckedChange={setAllowDownload}
+                          className="ml-4"
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="p-2 rounded-lg bg-primary/10">
+                            <Camera className="h-4 w-4 text-primary" />
+                          </div>
+                          <div>
+                            <Label className="text-sm font-semibold cursor-pointer">Capture d'écran</Label>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              Autoriser les captures d'écran
+                            </p>
+                          </div>
+                        </div>
+                        <Switch
+                          checked={allowScreenshot}
+                          onCheckedChange={setAllowScreenshot}
+                          className="ml-4"
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="p-2 rounded-lg bg-primary/10">
+                            <MousePointerClick className="h-4 w-4 text-primary" />
+                          </div>
+                          <div>
+                            <Label className="text-sm font-semibold cursor-pointer">Clic droit</Label>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              Autoriser le menu contextuel du clic droit
+                            </p>
+                          </div>
+                        </div>
+                        <Switch
+                          checked={allowRightClick}
+                          onCheckedChange={setAllowRightClick}
+                          className="ml-4"
+                        />
+                      </div>
+                      
+                      <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
+                        <p className="text-xs text-amber-900 dark:text-amber-100">
+                          ⚠️ <strong>Note :</strong> Ces paramètres de sécurité s'appliquent au niveau du navigateur et peuvent être contournés par des utilisateurs techniques.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </>
               )}
             </div>
