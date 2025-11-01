@@ -33,6 +33,8 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
   const [manuscriptData, setManuscriptData] = useState<any>(null);
   const [loadingManuscript, setLoadingManuscript] = useState(false);
   const [tariffs, setTariffs] = useState<any[]>([]);
+  const [isOwner, setIsOwner] = useState(false);
+  const [loadingOwnership, setLoadingOwnership] = useState(true);
   const [pricing, setPricing] = useState({
     baseCost: 0,
     qualityCost: 0,
@@ -109,6 +111,52 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     loadTariffs();
   }, []);
 
+  // Vérifier si l'utilisateur est le propriétaire du document
+  useEffect(() => {
+    const checkOwnership = async () => {
+      if (!document.id) {
+        setLoadingOwnership(false);
+        return;
+      }
+      
+      setLoadingOwnership(true);
+      try {
+        // Récupérer l'utilisateur connecté
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          setIsOwner(false);
+          setLoadingOwnership(false);
+          return;
+        }
+        
+        // Vérifier si l'utilisateur est le déposant du document
+        const { data: docData, error } = await supabase
+          .from('cbn_documents')
+          .select('depositor_id')
+          .eq('id', document.id)
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Erreur vérification propriété:', error);
+          setIsOwner(false);
+        } else if (docData && docData.depositor_id === user.id) {
+          setIsOwner(true);
+          console.log('✅ L\'utilisateur est le propriétaire du document');
+        } else {
+          setIsOwner(false);
+        }
+      } catch (err) {
+        console.error('Erreur:', err);
+        setIsOwner(false);
+      } finally {
+        setLoadingOwnership(false);
+      }
+    };
+    
+    checkOwnership();
+  }, [document.id]);
+
   // Charger les données du manuscrit si c'est un manuscrit
   useEffect(() => {
     const loadManuscriptData = async () => {
@@ -153,6 +201,9 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
   // Calculer les tarifs en temps réel
   useEffect(() => {
     const calculatePricing = () => {
+      // Si l'utilisateur est propriétaire, appliquer une réduction de 50%
+      const ownerDiscount = isOwner ? 0.5 : 1;
+      
       let baseCost = 0;
       let qualityCost = 0;
       let formatCost = 0;
@@ -161,69 +212,69 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
       
       // Tarif de base selon le type de reproduction
       if (formData.reproductionType === "numerique") {
-        baseCost = 50; // Tarif de base numérique
+        baseCost = 50 * ownerDiscount; // Tarif de base numérique
         
         // Coût selon la qualité
         if (formData.quality === "haute") {
-          qualityCost = 30;
+          qualityCost = 30 * ownerDiscount;
         } else if (formData.quality === "tres_haute") {
-          qualityCost = 60;
+          qualityCost = 60 * ownerDiscount;
         }
         
         // Coût selon le format
         if (formData.format === "tiff") {
-          formatCost = 20;
+          formatCost = 20 * ownerDiscount;
         } else if (formData.format === "pdf") {
-          formatCost = 10;
+          formatCost = 10 * ownerDiscount;
         }
       } else if (formData.reproductionType === "papier") {
-        baseCost = 30; // Tarif de base papier
+        baseCost = 30 * ownerDiscount; // Tarif de base papier
         
         // Coût selon le format papier
         if (formData.paperFormat === "A3") {
-          formatCost = 20;
+          formatCost = 20 * ownerDiscount;
         } else if (formData.paperFormat === "A4") {
-          formatCost = 10;
+          formatCost = 10 * ownerDiscount;
         }
         
         // Coût selon le mode d'affichage
         if (formData.displayMode === "couleur") {
-          qualityCost = 15;
+          qualityCost = 15 * ownerDiscount;
         } else {
-          qualityCost = 5;
+          qualityCost = 5 * ownerDiscount;
         }
         
         // Coût par copie supplémentaire
         const copies = parseInt(formData.numberOfCopies) || 1;
         if (copies > 1) {
-          copiesCost = (copies - 1) * 10;
+          copiesCost = (copies - 1) * 10 * ownerDiscount;
         }
       } else if (formData.reproductionType === "microfilm") {
-        baseCost = 100; // Tarif de base microfilm
+        baseCost = 100 * ownerDiscount; // Tarif de base microfilm
         
         if (formData.format === "35mm") {
-          formatCost = 50;
+          formatCost = 50 * ownerDiscount;
         } else if (formData.format === "16mm") {
-          formatCost = 40;
+          formatCost = 40 * ownerDiscount;
         } else if (formData.format === "microfiche") {
-          formatCost = 30;
+          formatCost = 30 * ownerDiscount;
         }
       }
       
       // Calculer le coût par page (estimation de 50 pages pour partiel)
       if (formData.reproductionScope === "partielle") {
         const estimatedPages = 50;
-        pageCost = estimatedPages * 0.5;
+        pageCost = estimatedPages * 0.5 * ownerDiscount;
       } else {
         // Estimation de 200 pages pour un document complet
         const estimatedPages = 200;
-        pageCost = estimatedPages * 0.5;
+        pageCost = estimatedPages * 0.5 * ownerDiscount;
       }
       
-      // Coût pour demande urgente
+      // Coût pour demande urgente (pas de réduction pour propriétaire)
       const urgentCost = formData.urgentRequest ? 50 : 0;
       
-      // Coût pour copie certifiée
+      // Coût pour copie certifiée (pas de réduction pour propriétaire)
       const certifiedCost = formData.certifiedCopy ? 30 : 0;
       
       const total = baseCost + qualityCost + formatCost + pageCost + copiesCost + urgentCost + certifiedCost;
@@ -241,7 +292,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     };
     
     calculatePricing();
-  }, [formData]);
+  }, [formData, isOwner]);
 
   // Forcer A4 pour les manuscrits en tirage papier
   useEffect(() => {
@@ -314,6 +365,28 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             )}
           </DialogDescription>
         </DialogHeader>
+
+        {/* Alerte propriétaire */}
+        {!loadingOwnership && isOwner && (
+          <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                  ✓
+                </div>
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold text-green-900 mb-1">
+                  Vous êtes le propriétaire de ce document
+                </h4>
+                <p className="text-sm text-green-800">
+                  En tant que déposant/propriétaire de ce document, vous bénéficiez d'une <strong>réduction de 50%</strong> sur tous les frais de reproduction.
+                  Le traitement de votre demande sera prioritaire.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Informations du demandeur */}
@@ -703,6 +776,11 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
             <h4 className="font-semibold mb-3 flex items-center gap-2">
               💰 Tarification estimative
+              {isOwner && (
+                <Badge variant="secondary" className="bg-green-100 text-green-800 ml-2">
+                  -50% Propriétaire
+                </Badge>
+              )}
             </h4>
             <div className="space-y-2 text-sm">
               <div className="space-y-1.5">
@@ -775,6 +853,11 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
               )}
               
               <div className="pt-2 border-t text-xs text-muted-foreground mt-3">
+                {isOwner && (
+                  <div className="bg-green-50 p-2 rounded mb-2 text-green-800">
+                    ✓ <strong>Réduction de 50% appliquée</strong> en tant que propriétaire du document
+                  </div>
+                )}
                 ℹ️ Tarifs indicatifs. Un devis définitif vous sera communiqué par email sous 48h.
                 <br />
                 Les liens de téléchargement des documents numériques seront valables pendant 2 mois.

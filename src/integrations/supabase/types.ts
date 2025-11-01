@@ -1243,6 +1243,7 @@ export type Database = {
           cote: string
           created_at: string | null
           deleted_at: string | null
+          depositor_id: string | null
           dewey_classification: string | null
           digital_library_document_id: string | null
           dimensions: string | null
@@ -1283,6 +1284,7 @@ export type Database = {
           cote: string
           created_at?: string | null
           deleted_at?: string | null
+          depositor_id?: string | null
           dewey_classification?: string | null
           digital_library_document_id?: string | null
           dimensions?: string | null
@@ -1323,6 +1325,7 @@ export type Database = {
           cote?: string
           created_at?: string | null
           deleted_at?: string | null
+          depositor_id?: string | null
           dewey_classification?: string | null
           digital_library_document_id?: string | null
           dimensions?: string | null
