@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, FileText, Calendar, User, Mail, Phone, MessageSquare } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { SimpleDropdown } from "@/components/ui/simple-dropdown";
 
 export default function RestorationRequest() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,12 +19,55 @@ export default function RestorationRequest() {
   const [formData, setFormData] = useState({
     statutDemandeur: "",
     name: "",
+    cnie: "",
     email: "",
     phone: "",
+    region: "",
+    ville: "",
     documentType: "",
     description: "",
     urgency: "normal"
   });
+
+  // Options pour les régions du Maroc
+  const regionsMaroc = [
+    { value: "tanger-tetouan-al-hoceima", label: "Tanger-Tétouan-Al Hoceïma" },
+    { value: "oriental", label: "L'Oriental" },
+    { value: "fes-meknes", label: "Fès-Meknès" },
+    { value: "rabat-sale-kenitra", label: "Rabat-Salé-Kénitra" },
+    { value: "beni-mellal-khenifra", label: "Béni Mellal-Khénifra" },
+    { value: "casablanca-settat", label: "Casablanca-Settat" },
+    { value: "marrakech-safi", label: "Marrakech-Safi" },
+    { value: "draa-tafilalet", label: "Drâa-Tafilalet" },
+    { value: "souss-massa", label: "Souss-Massa" },
+    { value: "guelmim-oued-noun", label: "Guelmim-Oued Noun" },
+    { value: "laayoune-sakia-el-hamra", label: "Laâyoune-Sakia El Hamra" },
+    { value: "dakhla-oued-ed-dahab", label: "Dakhla-Oued Ed-Dahab" }
+  ];
+
+  // Options pour les villes (exemple simplifié, à compléter selon les besoins)
+  const villesMaroc = [
+    { value: "rabat", label: "Rabat" },
+    { value: "casablanca", label: "Casablanca" },
+    { value: "fes", label: "Fès" },
+    { value: "marrakech", label: "Marrakech" },
+    { value: "tanger", label: "Tanger" },
+    { value: "agadir", label: "Agadir" },
+    { value: "meknes", label: "Meknès" },
+    { value: "oujda", label: "Oujda" },
+    { value: "kenitra", label: "Kénitra" },
+    { value: "tetouan", label: "Tétouan" },
+    { value: "sale", label: "Salé" },
+    { value: "temara", label: "Témara" },
+    { value: "safi", label: "Safi" },
+    { value: "mohammedia", label: "Mohammedia" },
+    { value: "khouribga", label: "Khouribga" },
+    { value: "beni-mellal", label: "Béni Mellal" },
+    { value: "el-jadida", label: "El Jadida" },
+    { value: "nador", label: "Nador" },
+    { value: "settat", label: "Settat" },
+    { value: "larache", label: "Larache" }
+  ];
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -75,6 +119,13 @@ export default function RestorationRequest() {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleDropdownChange = (name: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
     }));
   };
 
@@ -186,6 +237,19 @@ export default function RestorationRequest() {
                   />
                 </div>
 
+                {formData.statutDemandeur === "particulier" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="cnie">Numéro CNIE</Label>
+                    <Input
+                      id="cnie"
+                      name="cnie"
+                      value={formData.cnie}
+                      onChange={handleInputChange}
+                      placeholder="Ex: AB123456"
+                    />
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label htmlFor="email">Email *</Label>
                   <Input
@@ -210,6 +274,30 @@ export default function RestorationRequest() {
                     placeholder="+212 600 000 000"
                   />
                 </div>
+
+                {formData.statutDemandeur === "particulier" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="region">Région</Label>
+                      <SimpleDropdown
+                        value={formData.region}
+                        onChange={(value) => handleDropdownChange("region", value)}
+                        options={regionsMaroc}
+                        placeholder="Sélectionnez une région"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="ville">Ville</Label>
+                      <SimpleDropdown
+                        value={formData.ville}
+                        onChange={(value) => handleDropdownChange("ville", value)}
+                        options={villesMaroc}
+                        placeholder="Sélectionnez une ville"
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="urgency">Urgence</Label>
