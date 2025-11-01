@@ -19,6 +19,7 @@ import { LanguageAutocomplete } from '@/components/ui/language-autocomplete';
 import { CountryAutocomplete } from '@/components/ui/country-autocomplete';
 import { CoteAutocomplete } from '@/components/ui/cote-autocomplete';
 import { supabase } from '@/integrations/supabase/client';
+import { SearchPagination } from '@/components/ui/search-pagination';
 
 interface SearchCriteria {
   keywords: string;
@@ -67,6 +68,9 @@ const RechercheAvancee = () => {
   const [yearRange, setYearRange] = useState([1900, 2025]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [totalResults, setTotalResults] = useState(0);
 
   // Restaurer l'état de recherche au retour de la notice
   useEffect(() => {
@@ -151,9 +155,14 @@ const RechercheAvancee = () => {
         query = query.eq('availability_status', 'Disponible');
       }
       
-      const { data, error } = await query;
+      const { data, error, count } = await query.range(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage - 1
+      );
       
       if (error) throw error;
+      
+      setTotalResults(count || 0);
       
       const results = (data || []).map(doc => ({
         id: doc.id,
@@ -212,13 +221,7 @@ const RechercheAvancee = () => {
     });
     setYearRange([1900, 2025]);
     setSearchResults([]);
-  };
-
-  const handleExport = (format: string) => {
-    toast({
-      title: "Export",
-      description: `Export en ${format} en cours...`,
-    });
+    setCurrentPage(1);
   };
 
   const toggleNature = (nature: string) => {
@@ -728,24 +731,6 @@ const RechercheAvancee = () => {
             <Save className="mr-2 h-4 w-4" />
             Sauvegarder la requête
           </Button>
-          <div className="ml-auto flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => handleExport('CSV')}>
-              <Download className="mr-2 h-4 w-4" />
-              CSV
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => handleExport('RIS')}>
-              <Download className="mr-2 h-4 w-4" />
-              RIS
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => handleExport('BibTeX')}>
-              <Download className="mr-2 h-4 w-4" />
-              BibTeX
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => handleExport('PDF')}>
-              <Download className="mr-2 h-4 w-4" />
-              PDF
-            </Button>
-          </div>
         </div>
 
         {/* Résultats */}
@@ -753,9 +738,24 @@ const RechercheAvancee = () => {
           <Card>
             <CardHeader>
               <CardTitle>Résultats de recherche</CardTitle>
-              <CardDescription>{searchResults.length} résultats trouvés</CardDescription>
+              <CardDescription>{totalResults} résultats trouvés</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <SearchPagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(totalResults / itemsPerPage)}
+                totalItems={totalResults}
+                itemsPerPage={itemsPerPage}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  handleSearch();
+                }}
+                onItemsPerPageChange={(items) => {
+                  setItemsPerPage(items);
+                  setCurrentPage(1);
+                  handleSearch();
+                }}
+              />
               {searchResults.map((doc: any) => (
                 <Card key={doc.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-6">
@@ -819,6 +819,22 @@ const RechercheAvancee = () => {
                   </CardContent>
                 </Card>
               ))}
+              
+              <SearchPagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(totalResults / itemsPerPage)}
+                totalItems={totalResults}
+                itemsPerPage={itemsPerPage}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  handleSearch();
+                }}
+                onItemsPerPageChange={(items) => {
+                  setItemsPerPage(items);
+                  setCurrentPage(1);
+                  handleSearch();
+                }}
+              />
             </CardContent>
           </Card>
         )}

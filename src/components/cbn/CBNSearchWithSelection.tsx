@@ -8,6 +8,7 @@ import { BookOpen } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { SearchPagination } from "@/components/ui/search-pagination";
 
 interface SearchResult {
   id: string;
@@ -38,6 +39,9 @@ export function CBNSearchWithSelection({
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [documentsCache, setDocumentsCache] = useState<Record<string, any>>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [totalResults, setTotalResults] = useState(0);
 
   // Charger les résultats sauvegardés au montage du composant
   useEffect(() => {
@@ -67,11 +71,14 @@ export function CBNSearchWithSelection({
   const handleSearch = async (criteria: any) => {
     setIsSearching(true);
     
+    // Sauvegarder les critères pour la pagination
+    sessionStorage.setItem('last_search_criteria', JSON.stringify(criteria));
+    
     try {
       // Construire la requête Supabase
       let query = supabase
         .from('cbn_documents')
-        .select('*');
+        .select('*', { count: 'exact' });
       
       // Recherche simple (query)
       if (criteria.query) {
@@ -119,7 +126,10 @@ export function CBNSearchWithSelection({
         }
       }
       
-      const { data, error } = await query;
+      const { data, error, count } = await query.range(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage - 1
+      );
       
       if (error) {
         console.error('Error searching documents:', error);
@@ -148,6 +158,7 @@ export function CBNSearchWithSelection({
         cote: doc.cote
       }));
       
+      setTotalResults(count || 0);
       setSearchResults(results);
       sessionStorage.setItem('cbn_search_results', JSON.stringify(results));
     } catch (error) {
@@ -173,10 +184,30 @@ export function CBNSearchWithSelection({
         <Card className="border-2 border-primary/10">
           <CardHeader>
             <CardTitle className="text-lg">
-              Résultats de recherche ({searchResults.length})
+              Résultats de recherche ({totalResults})
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <SearchPagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(totalResults / itemsPerPage)}
+              totalItems={totalResults}
+              itemsPerPage={itemsPerPage}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                handleSearch(sessionStorage.getItem('last_search_criteria') 
+                  ? JSON.parse(sessionStorage.getItem('last_search_criteria')!)
+                  : {});
+              }}
+              onItemsPerPageChange={(items) => {
+                setItemsPerPage(items);
+                setCurrentPage(1);
+                handleSearch(sessionStorage.getItem('last_search_criteria') 
+                  ? JSON.parse(sessionStorage.getItem('last_search_criteria')!)
+                  : {});
+              }}
+            />
+            
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-4">
                 {searchResults.map((result) => (

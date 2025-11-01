@@ -19,6 +19,7 @@ import { LanguageAutocomplete } from '@/components/ui/language-autocomplete';
 import { CountryAutocomplete } from '@/components/ui/country-autocomplete';
 import { CoteAutocomplete } from '@/components/ui/cote-autocomplete';
 import { supabase } from '@/integrations/supabase/client';
+import { SearchPagination } from '@/components/ui/search-pagination';
 
 interface SearchCriteria {
   keywords: string;
@@ -67,6 +68,9 @@ const DemandeNumerisation = () => {
   const [yearRange, setYearRange] = useState([1900, 2025]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [totalResults, setTotalResults] = useState(0);
 
   // Restaurer l'état de recherche au retour de la notice
   useEffect(() => {
@@ -118,9 +122,14 @@ const DemandeNumerisation = () => {
         query = query.ilike('cote', `%${criteria.cote}%`);
       }
       
-      const { data, error } = await query;
+      const { data, error, count } = await query.range(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage - 1
+      );
       
       if (error) throw error;
+      
+      setTotalResults(count || 0);
       
       let results = (data || []).map(doc => ({
         id: doc.id,
@@ -366,10 +375,26 @@ const DemandeNumerisation = () => {
             {searchResults.length > 0 && (
               <Card className="border-2 shadow-xl">
                 <CardHeader className="bg-gradient-to-r from-primary/5 to-secondary/5 border-b">
-                  <CardTitle>Résultats de recherche ({searchResults.length})</CardTitle>
+                  <CardTitle>Résultats de recherche ({totalResults})</CardTitle>
                   <CardDescription>Documents non numérisés disponibles pour numérisation</CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
+                  <SearchPagination
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalResults / itemsPerPage)}
+                    totalItems={totalResults}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      handleSearch();
+                    }}
+                    onItemsPerPageChange={(items) => {
+                      setItemsPerPage(items);
+                      setCurrentPage(1);
+                      handleSearch();
+                    }}
+                  />
+                  
                   <div className="space-y-4">
                     {searchResults.map((doc) => (
                       <Card

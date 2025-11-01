@@ -6,6 +6,7 @@ import { BookOpen, MapPin } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { SearchPagination } from "@/components/ui/search-pagination";
 
 interface SearchResult {
   id: string;
@@ -25,12 +26,24 @@ interface CBMSearchWithSelectionProps {
   searchResults: SearchResult[];
   isSearching: boolean;
   onResultsChange?: (results: SearchResult[]) => void;
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  onPageChange: (page: number) => void;
+  onItemsPerPageChange: (itemsPerPage: number) => void;
 }
 
 export function CBMSearchWithSelection({ 
   searchResults, 
   isSearching,
-  onResultsChange 
+  onResultsChange,
+  currentPage,
+  totalPages,
+  totalItems,
+  itemsPerPage,
+  onPageChange,
+  onItemsPerPageChange
 }: CBMSearchWithSelectionProps) {
   const { toast } = useToast();
   const [documentsCache, setDocumentsCache] = useState<Record<string, any>>({});
@@ -60,10 +73,19 @@ export function CBMSearchWithSelection({
         <Card className="border-2 border-cbm-primary/10">
           <CardHeader>
             <CardTitle className="text-lg text-cbm-primary">
-              Résultats de recherche ({searchResults.length})
+              Résultats de recherche ({totalItems})
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <SearchPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={onPageChange}
+              onItemsPerPageChange={onItemsPerPageChange}
+            />
+            
             <ScrollArea className="h-[500px] pr-4">
               <div className="space-y-4">
                 {searchResults.map((result) => (

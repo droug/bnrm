@@ -12,12 +12,17 @@ import { CBMSearchWithSelection } from "@/components/cbm/CBMSearchWithSelection"
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+import { SearchPagination } from "@/components/ui/search-pagination";
+
 export default function CBMRecherche() {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchField, setSearchField] = useState("all");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [totalResults, setTotalResults] = useState(0);
   
   // Advanced search fields
   const [title, setTitle] = useState("");
@@ -33,16 +38,21 @@ export default function CBMRecherche() {
     setIsSearching(true);
     
     try {
-      let query = supabase.from('cbm_catalog').select('*').limit(100);
+      let query = supabase.from('cbm_catalog').select('*', { count: 'exact' });
       
       if (searchQuery) {
         const searchTerm = searchQuery.toLowerCase();
         query = query.or(`title.ilike.%${searchTerm}%,author.ilike.%${searchTerm}%,publisher.ilike.%${searchTerm}%,isbn.ilike.%${searchTerm}%`);
       }
       
-      const { data, error } = await query;
+      const { data, error, count } = await query.range(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage - 1
+      );
       
       if (error) throw error;
+      
+      setTotalResults(count || 0);
       
       const results = (data || []).map(doc => ({
         id: doc.id,
@@ -75,7 +85,7 @@ export default function CBMRecherche() {
     setIsSearching(true);
     
     try {
-      let query = supabase.from('cbm_catalog').select('*').limit(100);
+      let query = supabase.from('cbm_catalog').select('*', { count: 'exact' });
       
       if (title) {
         query = query.ilike('title', `%${title}%`);
@@ -101,9 +111,14 @@ export default function CBMRecherche() {
         query = query.eq('library_code', library);
       }
       
-      const { data, error } = await query;
+      const { data, error, count } = await query.range(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage - 1
+      );
       
       if (error) throw error;
+      
+      setTotalResults(count || 0);
       
       const results = (data || []).map(doc => ({
         id: doc.id,
@@ -397,6 +412,23 @@ export default function CBMRecherche() {
         <CBMSearchWithSelection 
           searchResults={searchResults}
           isSearching={isSearching}
+          currentPage={currentPage}
+          totalPages={Math.ceil(totalResults / itemsPerPage)}
+          totalItems={totalResults}
+          itemsPerPage={itemsPerPage}
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            if (searchQuery || title || author || publisher || year) {
+              title || author || publisher || year ? handleAdvancedSearch() : handleSimpleSearch();
+            }
+          }}
+          onItemsPerPageChange={(items) => {
+            setItemsPerPage(items);
+            setCurrentPage(1);
+            if (searchQuery || title || author || publisher || year) {
+              title || author || publisher || year ? handleAdvancedSearch() : handleSimpleSearch();
+            }
+          }}
         />
 
         {/* Bibliothèques Membres */}
