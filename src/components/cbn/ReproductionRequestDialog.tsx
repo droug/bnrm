@@ -36,6 +36,9 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
   // Pour les manuscrits avec tirage papier, forcer A4
   const isManuscript = document.type === "Manuscrit" || document.supportType === "Manuscrit";
   
+  // Pour les cartes et plans en numérique, forcer JPEG
+  const isMapOrPlan = document.type === "Cartes et Plans" || document.supportType === "Cartes et Plans";
+  
   // Charger les données du manuscrit si c'est un manuscrit
   useEffect(() => {
     const loadManuscriptData = async () => {
@@ -120,6 +123,13 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
       setFormData(prev => ({ ...prev, paperFormat: "A4" }));
     }
   }, [formData.reproductionType, isManuscript, formData.paperFormat]);
+
+  // Forcer JPEG pour les cartes et plans en numérique
+  useEffect(() => {
+    if (isMapOrPlan && formData.reproductionType === "numerique" && formData.format !== "jpeg") {
+      setFormData(prev => ({ ...prev, format: "jpeg" }));
+    }
+  }, [formData.reproductionType, isMapOrPlan, formData.format]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -344,12 +354,23 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                   <SimpleSelect
                     value={formData.format}
                     onChange={(value) => setFormData({ ...formData, format: value })}
-                    options={[
-                      { value: "pdf", label: "PDF" },
-                      { value: "jpeg", label: "JPEG" },
-                      { value: "tiff", label: "TIFF" }
-                    ]}
+                    options={
+                      isMapOrPlan 
+                        ? [{ value: "jpeg", label: "JPEG" }]
+                        : [
+                            { value: "pdf", label: "PDF" },
+                            { value: "jpeg", label: "JPEG" },
+                            { value: "tiff", label: "TIFF" }
+                          ]
+                    }
+                    disabled={isMapOrPlan}
+                    className={isMapOrPlan ? "bg-muted cursor-not-allowed" : ""}
                   />
+                  {isMapOrPlan && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Pour les cartes et plans, seul le format JPEG est disponible
+                    </p>
+                  )}
                 </div>
               )}
             </div>
