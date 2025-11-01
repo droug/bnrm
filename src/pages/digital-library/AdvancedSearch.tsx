@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,15 +7,25 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Search, X, BookOpen, User, FileText, Tag, Calendar, Hash, Library } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Search, X, BookOpen, User, FileText, Tag, Calendar, Hash, Library, Loader2 } from "lucide-react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
 import { AuthorAutocomplete } from "@/components/ui/author-autocomplete";
 import { LanguageAutocomplete } from "@/components/ui/language-autocomplete";
 import { CoteAutocomplete } from "@/components/ui/cote-autocomplete";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { SearchPagination } from "@/components/ui/search-pagination";
 
 export default function AdvancedSearch() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { toast } = useToast();
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [totalResults, setTotalResults] = useState(0);
   const [formData, setFormData] = useState({
     // Tous les champs
     keyword: "",
@@ -51,6 +61,118 @@ export default function AdvancedSearch() {
     edition: "",
   });
 
+  // Charger les paramètres de l'URL et effectuer la recherche
+  const performSearch = useCallback(async (searchData: Record<string, string>) => {
+    setIsSearching(true);
+    try {
+      // @ts-ignore - Éviter l'erreur de type profond avec Supabase query builder
+      let baseQuery = supabase.from('cbn_documents').select('*', { count: 'exact' });
+      
+      // Construire les conditions de recherche
+      const conditions: string[] = [];
+      
+      // Recherche générale
+      if (searchData.keyword) {
+        conditions.push(`title.ilike.%${searchData.keyword}%`);
+        conditions.push(`author.ilike.%${searchData.keyword}%`);
+        conditions.push(`description.ilike.%${searchData.keyword}%`);
+      }
+      
+      // Appliquer les conditions OR
+      if (conditions.length > 0) {
+        baseQuery = baseQuery.or(conditions.join(','));
+      }
+      
+      // Recherche par auteur
+      if (searchData.author) {
+        baseQuery = baseQuery.ilike('author', `%${searchData.author}%`);
+      }
+      
+      // Recherche par titre
+      if (searchData.title) {
+        baseQuery = baseQuery.ilike('title', `%${searchData.title}%`);
+      }
+      
+      // Recherche par éditeur
+      if (searchData.publisher) {
+        baseQuery = baseQuery.ilike('publisher', `%${searchData.publisher}%`);
+      }
+      
+      // Recherche par sujet
+      if (searchData.subject) {
+        baseQuery = baseQuery.ilike('subject', `%${searchData.subject}%`);
+      }
+      
+      // Recherche par cote
+      if (searchData.cote) {
+        baseQuery = baseQuery.ilike('cote', `%${searchData.cote}%`);
+      }
+      
+      // Recherche par ISBN
+      if (searchData.isbn) {
+        baseQuery = baseQuery.ilike('isbn', `%${searchData.isbn}%`);
+      }
+      
+      // Recherche par ISSN
+      if (searchData.issn) {
+        baseQuery = baseQuery.ilike('issn', `%${searchData.issn}%`);
+      }
+      
+      // Filtrer par langue
+      if (searchData.language) {
+        baseQuery = baseQuery.eq('language', searchData.language);
+      }
+      
+      // Filtrer par type de document
+      if (searchData.documentType) {
+        baseQuery = baseQuery.eq('document_type', searchData.documentType);
+      }
+      
+      // Filtrer par date
+      if (searchData.dateFrom) {
+        baseQuery = baseQuery.gte('publication_year', parseInt(searchData.dateFrom));
+      }
+      if (searchData.dateTo) {
+        baseQuery = baseQuery.lte('publication_year', parseInt(searchData.dateTo));
+      }
+      
+      const { data, error, count } = await baseQuery.range(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage - 1
+      );
+      
+      if (error) throw error;
+      
+      setTotalResults(count || 0);
+      setSearchResults(data || []);
+      
+      if ((data || []).length === 0) {
+        toast({
+          title: "Aucun résultat",
+          description: "Aucun document ne correspond à vos critères de recherche.",
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la recherche.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  }, [currentPage, itemsPerPage, toast]);
+
+  useEffect(() => {
+    const params = Object.fromEntries(searchParams.entries());
+    if (Object.keys(params).length > 0) {
+      setFormData(prev => ({ ...prev, ...params }));
+      performSearch(params);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
@@ -59,7 +181,8 @@ export default function AdvancedSearch() {
       if (value) params.append(key, value);
     });
     
-    navigate(`/search?${params.toString()}`);
+    // Rester sur la page de recherche avancée avec les paramètres
+    navigate(`/digital-library/search?${params.toString()}`);
   };
 
   const handleReset = () => {
@@ -504,6 +627,103 @@ export default function AdvancedSearch() {
             </CardContent>
           </Card>
         </form>
+
+        {/* Search Results */}
+        {isSearching && (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-3 text-lg">Recherche en cours...</span>
+          </div>
+        )}
+
+        {!isSearching && searchResults.length > 0 && (
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle>Résultats de recherche</CardTitle>
+              <CardDescription>{totalResults} document(s) trouvé(s)</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <SearchPagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(totalResults / itemsPerPage)}
+                totalItems={totalResults}
+                itemsPerPage={itemsPerPage}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  performSearch(formData);
+                }}
+                onItemsPerPageChange={(items) => {
+                  setItemsPerPage(items);
+                  setCurrentPage(1);
+                  performSearch(formData);
+                }}
+              />
+
+              {searchResults.map((doc) => (
+                <Card key={doc.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-start gap-3 mb-3">
+                          <BookOpen className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                          <div>
+                            <h3 className="font-bold text-lg text-foreground mb-1">
+                              {doc.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              Par {doc.author || 'Auteur inconnu'} • {doc.publication_year || 'Date inconnue'}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {doc.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                            {doc.description}
+                          </p>
+                        )}
+                        
+                        <div className="flex flex-wrap gap-2">
+                          {doc.cote && (
+                            <span className="text-xs px-2 py-1 bg-muted rounded">
+                              Cote: {doc.cote}
+                            </span>
+                          )}
+                          {doc.document_type && (
+                            <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded">
+                              {doc.document_type}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <Link to={`/digital-library/document/${doc.id}`}>
+                        <Button variant="default" size="lg">
+                          Voir la notice
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
+              <SearchPagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(totalResults / itemsPerPage)}
+                totalItems={totalResults}
+                itemsPerPage={itemsPerPage}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  performSearch(formData);
+                }}
+                onItemsPerPageChange={(items) => {
+                  setItemsPerPage(items);
+                  setCurrentPage(1);
+                  performSearch(formData);
+                }}
+              />
+            </CardContent>
+          </Card>
+        )}
       </div>
     </DigitalLibraryLayout>
   );
