@@ -25,6 +25,7 @@ const PracticalInfo = lazy(() => import("./pages/PracticalInfo"));
 // Manuscripts Platform (lazy)
 const Manuscripts = lazy(() => import("./pages/Manuscripts"));
 const ManuscriptsPlatform = lazy(() => import("./pages/ManuscriptsPlatform"));
+const ManuscriptAdvancedSearch = lazy(() => import("./pages/manuscripts/AdvancedSearch"));
 const ManuscriptReader = lazy(() => import("./pages/ManuscriptReader"));
 const MyManuscriptsSpace = lazy(() => import("./pages/MyManuscriptsSpace"));
 const ManuscriptsHelp = lazy(() => import("./pages/ManuscriptsHelp"));
@@ -202,6 +203,7 @@ const App = () => {
         <Route path="/manuscripts" element={<Manuscripts />} />
         <Route path="/manuscripts-platform" element={<ManuscriptsPlatform />} />
         <Route path="/plateforme-manuscrits" element={<ManuscriptsPlatform />} />
+        <Route path="/manuscripts/search" element={<ManuscriptAdvancedSearch />} />
         <Route path="/manuscripts/help" element={<ManuscriptsHelp />} />
         <Route path="/aide-manuscrits" element={<ManuscriptsHelp />} />
         <Route path="/admin/manuscripts-backoffice" element={<ManuscriptsBackoffice />} />

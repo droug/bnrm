@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Lock, AlertCircle, Star, Sparkles, Filter, ChevronDown, X, Users, Building2, HelpCircle } from "lucide-react";
+import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Lock, AlertCircle, Star, Sparkles, Filter, ChevronDown, X, Users, Building2, HelpCircle, SlidersHorizontal } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
@@ -21,7 +21,6 @@ import { PartnerCollectionForm } from "@/components/partner/PartnerCollectionFor
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ManuscriptGrid } from "@/components/manuscripts/ManuscriptGrid";
 import { useManuscriptSearch, SearchFilters } from "@/hooks/useManuscriptSearch";
-import { AdvancedSearchPanel } from "@/components/manuscripts/AdvancedSearchPanel";
 import { SearchResultsPanel } from "@/components/manuscripts/SearchResultsPanel";
 import { SearchPagination } from "@/components/manuscripts/SearchPagination";
 import { ManuscriptSearchBar } from "@/components/manuscripts/ManuscriptSearchBar";
@@ -68,7 +67,6 @@ export default function ManuscriptsPlatform() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<SearchFilters>({});
-  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [partnerDialogOpen, setPartnerDialogOpen] = useState(false);
   
   const { 
@@ -287,19 +285,20 @@ export default function ManuscriptsPlatform() {
                 setSearchQuery={setSearchQuery}
               />
               
+              {/* Bouton Recherche Avancée */}
+              <div className="mt-4">
+                <Button 
+                  size="lg" 
+                  variant="secondary"
+                  onClick={() => navigate('/manuscripts/search')}
+                  className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all"
+                >
+                  <SlidersHorizontal className="h-5 w-5 mr-2" />
+                  Recherche Avancée
+                </Button>
+              </div>
+              
               <div className="w-48 h-2 bg-gradient-berber mx-auto rounded-full shadow-gold mt-6"></div>
-            </div>
-          </section>
-
-          {/* Filtres avancés - Version compacte */}
-          <section className="mb-6">
-            <div className="flex gap-3 items-center justify-between">
-              <AdvancedSearchPanel
-                filters={filters}
-                setFilters={setFilters}
-                onSearch={handleSearch}
-                facets={facets}
-              />
             </div>
           </section>
 
