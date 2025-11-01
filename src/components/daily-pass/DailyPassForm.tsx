@@ -12,13 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { BasicDropdown } from "@/components/ui/basic-dropdown";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -162,20 +156,20 @@ export function DailyPassForm({ onClose }: DailyPassFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Type de profil *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionnez votre profil" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="chercheur">Chercheur</SelectItem>
-                      <SelectItem value="etudiant_3eme">Étudiant 3ème année (PFE)</SelectItem>
-                      <SelectItem value="etudiant_autre">Étudiant (autre niveau)</SelectItem>
-                      <SelectItem value="professionnel">Professionnel</SelectItem>
-                      <SelectItem value="autre">Autre</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <BasicDropdown
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder="Sélectionnez votre profil"
+                      options={[
+                        { value: "chercheur", label: "Chercheur" },
+                        { value: "etudiant_3eme", label: "Étudiant 3ème année (PFE)" },
+                        { value: "etudiant_autre", label: "Étudiant (autre niveau)" },
+                        { value: "professionnel", label: "Professionnel" },
+                        { value: "autre", label: "Autre" },
+                      ]}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
