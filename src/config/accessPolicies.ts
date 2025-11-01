@@ -204,7 +204,7 @@ export function canReproduceContentType(
     if (restrictedTypes.some(type => contentType.toLowerCase().includes(type) || contentType === type)) {
       return {
         allowed: false,
-        message: 'La reproduction des manuscrits et collections spécialisées nécessite un abonnement. Les détenteurs de pass journalier peuvent reproduire les autres documents.',
+        message: 'La reproduction des manuscrits et collections spécialisées est interdite pour les pass-journaliers conformément à la politique interne de la BNRM.',
       };
     }
   }
