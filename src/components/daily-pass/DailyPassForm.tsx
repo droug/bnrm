@@ -23,7 +23,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/png"];
 
 const formSchema = z.object({
-  profileType: z.enum(["chercheur", "etudiant_3eme", "etudiant_autre", "professionnel", "autre"], {
+  profileType: z.enum(["chercheur", "chercheur_retraite", "etudiant_3eme", "etudiant_autre", "professionnel", "autre"], {
     required_error: "Veuillez sélectionner votre profil",
   }),
   firstName: z.string().trim().min(2, "Le prénom doit contenir au moins 2 caractères").max(100),
@@ -163,6 +163,7 @@ export function DailyPassForm({ onClose }: DailyPassFormProps) {
                       placeholder="Sélectionnez votre profil"
                       options={[
                         { value: "chercheur", label: "Chercheur" },
+                        { value: "chercheur_retraite", label: "Chercheur en retraite" },
                         { value: "etudiant_3eme", label: "Étudiant 3ème année (PFE)" },
                         { value: "etudiant_autre", label: "Étudiant (autre niveau)" },
                         { value: "professionnel", label: "Professionnel" },
