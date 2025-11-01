@@ -64,12 +64,17 @@ export default function AdvancedSearch() {
   // Fonction de recherche
   const performSearch = useCallback(async () => {
     const params = Object.fromEntries(searchParams.entries());
-    if (Object.keys(params).length === 0) return;
+    console.log('🔍 performSearch called with params:', params);
+    
+    // Si aucun paramètre, afficher tous les documents
+    const hasFilters = Object.keys(params).length > 0;
+    console.log('📊 Has filters:', hasFilters);
 
     setIsSearching(true);
     try {
       // Utiliser any pour éviter l'erreur de type profond avec Supabase
       let baseQuery: any = supabase.from('cbn_documents').select('*', { count: 'exact' });
+      console.log('🗄️ Base query created');
       
       // Recherche générale
       if (params.keyword) {
@@ -130,17 +135,25 @@ export default function AdvancedSearch() {
         baseQuery = baseQuery.lte('publication_year', parseInt(params.dateTo));
       }
       
+      console.log('🚀 Executing query...');
       const { data, error, count } = await baseQuery.range(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage - 1
       );
       
-      if (error) throw error;
+      console.log('✅ Query result:', { data: data?.length, error, count });
+      
+      if (error) {
+        console.error('❌ Query error:', error);
+        throw error;
+      }
       
       setTotalResults(count || 0);
       setSearchResults(data || []);
       
-      if ((data || []).length === 0) {
+      console.log('📝 Results set:', { total: count, results: data?.length });
+      
+      if ((data || []).length === 0 && hasFilters) {
         toast({
           title: "Aucun résultat",
           description: "Aucun document ne correspond à vos critères de recherche.",
@@ -158,10 +171,20 @@ export default function AdvancedSearch() {
     }
   }, [searchParams, currentPage, itemsPerPage, toast]);
 
-  // Effectuer la recherche quand les params changent
+  // Effectuer la recherche quand les params changent ou au chargement
   useEffect(() => {
+    console.log('🔄 useEffect triggered, searchParams:', searchParams.toString());
     performSearch();
   }, [performSearch]);
+
+  // Charger tous les documents au premier chargement
+  useEffect(() => {
+    console.log('🎬 Component mounted');
+    if (searchParams.toString() === '') {
+      console.log('📋 No search params, loading all documents');
+      performSearch();
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
