@@ -485,6 +485,7 @@ export default function NoticeDetailReproduction() {
             author: document.author,
             year: document.year,
             supportType: document.type,
+            type: document.type,
             cote: document.cote
           }}
         />

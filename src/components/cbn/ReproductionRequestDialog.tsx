@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,11 +20,16 @@ interface ReproductionRequestDialogProps {
     cote: string;
     year: string;
     supportType?: string;
+    type?: string;
   };
 }
 
 export function ReproductionRequestDialog({ isOpen, onClose, document }: ReproductionRequestDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Pour les manuscrits avec tirage papier, forcer A4
+  const isManuscript = document.type === "Manuscrit" || document.supportType === "Manuscrit";
+  
   const [formData, setFormData] = useState({
     // Informations du demandeur (pré-remplies depuis le compte adhérent)
     lastName: "Nom Adhérent",
@@ -37,7 +42,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     deliveryMode: "email", // email, telechargement, sous_support
     supportType: "cd", // cd, usb, ssd, autre
     numberOfCopies: "1", // pour papier
-    paperFormat: "A4", // A4, A3, autre pour papier
+    paperFormat: "A4", // A4, A3, autre pour papier (forcé à A4 pour manuscrits)
     displayMode: "couleur", // couleur, noir_blanc
     
     // Détails de la reproduction
@@ -61,6 +66,13 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     termsAccepted: false,
     copyrightAcknowledged: false,
   });
+
+  // Forcer A4 pour les manuscrits en tirage papier
+  useEffect(() => {
+    if (isManuscript && formData.reproductionType === "papier" && formData.paperFormat !== "A4") {
+      setFormData(prev => ({ ...prev, paperFormat: "A4" }));
+    }
+  }, [formData.reproductionType, isManuscript, formData.paperFormat]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -243,7 +255,14 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                         { value: "A3", label: "A3" },
                         { value: "autre", label: "Autre" }
                       ]}
+                      disabled={document.type === "Manuscrit" || document.supportType === "Manuscrit"}
+                      className={document.type === "Manuscrit" || document.supportType === "Manuscrit" ? "bg-muted cursor-not-allowed" : ""}
                     />
+                    {(document.type === "Manuscrit" || document.supportType === "Manuscrit") && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Pour les manuscrits, seul le format A4 est disponible
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div>

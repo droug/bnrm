@@ -14,9 +14,10 @@ interface SimpleSelectProps {
   placeholder?: string;
   className?: string;
   id?: string;
+  disabled?: boolean;
 }
 
-export function SimpleSelect({ value, options, onChange, placeholder, className, id }: SimpleSelectProps) {
+export function SimpleSelect({ value, options, onChange, placeholder, className, id, disabled = false }: SimpleSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -34,6 +35,7 @@ export function SimpleSelect({ value, options, onChange, placeholder, className,
   }, []);
 
   const handleSelect = (optionValue: string) => {
+    if (disabled) return;
     onChange(optionValue);
     setIsOpen(false);
   };
@@ -43,8 +45,12 @@ export function SimpleSelect({ value, options, onChange, placeholder, className,
       <button
         id={id}
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 border border-input bg-background rounded-md text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        disabled={disabled}
+        className={cn(
+          "w-full flex items-center justify-between px-3 py-2 border border-input bg-background rounded-md text-sm transition-colors",
+          disabled ? "cursor-not-allowed opacity-50" : "hover:bg-accent hover:text-accent-foreground"
+        )}
       >
         <span className={cn(!selectedOption && "text-muted-foreground")}>
           {selectedOption ? selectedOption.label : placeholder || "Sélectionner..."}
@@ -52,7 +58,7 @@ export function SimpleSelect({ value, options, onChange, placeholder, className,
         <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
       </button>
 
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-input rounded-md shadow-lg z-50">
           <div className="max-h-60 overflow-y-auto py-1">
             {options.map((option) => (
