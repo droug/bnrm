@@ -161,14 +161,6 @@ export default function RestorationRequest() {
       return;
     }
 
-    if (selectedFiles.length === 0) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez uploader au moins une image de l'œuvre",
-        variant: "destructive"
-      });
-      return;
-    }
 
     // Simulate submission
     toast({
@@ -446,7 +438,7 @@ export default function RestorationRequest() {
             <div className="space-y-4">
               <h3 className="font-semibold text-lg flex items-center gap-2">
                 <Upload className="h-5 w-5" />
-                Photos de l'œuvre *
+                Photos de l'œuvre
               </h3>
               
               <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
