@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { 
   Wallet, 
   CreditCard, 
@@ -23,11 +24,14 @@ import {
   Wrench,
   Scan
 } from "lucide-react";
+import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
+import { DailyPassForm } from "@/components/daily-pass/DailyPassForm";
 
 export default function PaymentServices() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [isDailyPassFormOpen, setIsDailyPassFormOpen] = useState(false);
 
   const services = [
     {
@@ -57,7 +61,7 @@ export default function PaymentServices() {
         "100% GRATUIT",
         "Limité à 1 fois par an"
       ],
-      action: () => navigate("/bnrm"),
+      action: () => setIsDailyPassFormOpen(true),
       available: true
     },
     {
@@ -431,6 +435,16 @@ export default function PaymentServices() {
       </main>
 
       <Footer />
+      
+      {/* Dialog pour le formulaire Pass journalier */}
+      <Dialog open={isDailyPassFormOpen} onOpenChange={setIsDailyPassFormOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DailyPassForm onClose={() => setIsDailyPassFormOpen(false)} />
+        </DialogContent>
+      </Dialog>
+      
+      {/* Outils globaux (Accessibilité + Chatbot) */}
+      <GlobalAccessibilityTools />
     </div>
   );
 }
