@@ -165,7 +165,14 @@ export default function ManuscriptAdvancedSearch() {
       if (value) params.append(key, value);
     });
     
-    navigate(`/manuscripts/search?${params.toString()}`);
+    const queryString = params.toString();
+    if (queryString) {
+      navigate(`/manuscripts/search?${queryString}`);
+    } else {
+      // Si aucun paramètre, relancer la recherche directement
+      setCurrentPage(1);
+      performSearch();
+    }
   };
 
   const handleReset = () => {
