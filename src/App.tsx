@@ -323,7 +323,6 @@ const App = () => {
           
           {/* Payment & Wallet Routes */}
           <Route path="/services-bnrm" element={<PaymentServices />} />
-          <Route path="/payment-services" element={<PaymentServices />} />
           <Route path="/services-paiement" element={<PaymentServices />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/portefeuille" element={<Wallet />} />
