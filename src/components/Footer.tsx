@@ -87,7 +87,7 @@ const Footer = () => {
 
   const paymentLinks = [
     { title: "e-Wallet BNRM", href: "/wallet" },
-    { title: "Services BNRM", href: "/bnrm" },
+    { title: "Services BNRM", href: "/tarifs-bnrm" },
     { title: "Reproduction", href: "/reproduction" },
     { title: "Dépôt légal", href: "/admin/legal-deposit" }
   ];

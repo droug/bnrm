@@ -151,7 +151,7 @@ export default function PaymentServices() {
         "Paiement flexible",
         "Support client"
       ],
-      action: () => navigate("/bnrm"),
+      action: () => navigate("/tarifs-bnrm"),
       available: true
     },
     {

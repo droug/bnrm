@@ -228,7 +228,7 @@ const App = () => {
         <Route path="/wysiwyg" element={<WysiwygPage />} />
             <Route path="/admin/bnrm-tariffs" element={<BNRMTariffsPage />} />
             <Route path="/admin/wysiwyg" element={<WysiwygPage />} />
-        <Route path="/bnrm" element={<BNRMPortal />} />
+        <Route path="/tarifs-bnrm" element={<BNRMPortal />} />
         <Route path="/services-tarifs" element={<ServicesCatalog />} />
         <Route path="/admin/legal-deposit" element={<LegalDepositPage />} />
         <Route path="/admin/archiving" element={<ArchivingPage />} />

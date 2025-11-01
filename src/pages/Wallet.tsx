@@ -307,7 +307,7 @@ export default function Wallet() {
                 <Button
                   variant="outline"
                   className="h-auto py-6 flex flex-col items-center gap-2"
-                  onClick={() => navigate("/bnrm")}
+                  onClick={() => navigate("/tarifs-bnrm")}
                 >
                   <WalletIcon className="h-8 w-8" />
                   <span className="font-medium">Services BNRM</span>
