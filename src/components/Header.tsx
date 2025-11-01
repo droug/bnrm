@@ -40,7 +40,7 @@ const Header = () => {
   
   // Vérifier si on est sur une des plateformes spéciales
   const isDigitalLibrary = location.pathname.startsWith("/digital-library");
-  const isManuscriptsPlatform = location.pathname === "/plateforme-manuscrits" || location.pathname === "/manuscripts-platform";
+  const isManuscriptsPlatform = location.pathname === "/plateforme-manuscrits" || location.pathname === "/manuscripts-platform" || location.pathname.startsWith("/manuscripts/");
   const isManuscriptsHelp = location.pathname === "/manuscripts/help" || location.pathname === "/aide-manuscrits";
   const isBackoffice = location.pathname.startsWith("/admin/manuscripts-backoffice") || location.pathname.startsWith("/admin/digital-library");
   const isCBMPortal = location.pathname.startsWith("/cbm");
