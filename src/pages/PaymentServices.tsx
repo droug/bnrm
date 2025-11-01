@@ -234,7 +234,7 @@ export default function PaymentServices() {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold mb-4">Nos services de paiement</h2>
+                <h2 className="text-3xl font-bold mb-4">Nos services</h2>
                 <p className="text-muted-foreground text-lg">
                   Choisissez le service adapté à vos besoins
                 </p>
