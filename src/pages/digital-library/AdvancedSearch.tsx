@@ -102,19 +102,22 @@ export default function AdvancedSearch() {
         baseQuery = baseQuery.ilike('subject', `%${params.subject}%`);
       }
       
-      // Recherche par cote
+      // Recherche par cote (avec ou sans tirets)
       if (params.cote) {
-        baseQuery = baseQuery.ilike('cote', `%${params.cote}%`);
+        const normalizedCote = params.cote.replace(/[-\s]/g, '');
+        baseQuery = baseQuery.or(`cote.ilike.%${params.cote}%,cote.ilike.%${normalizedCote}%`);
       }
       
-      // Recherche par ISBN
+      // Recherche par ISBN (avec ou sans tirets)
       if (params.isbn) {
-        baseQuery = baseQuery.ilike('isbn', `%${params.isbn}%`);
+        const normalizedIsbn = params.isbn.replace(/[-\s]/g, '');
+        baseQuery = baseQuery.or(`isbn.ilike.%${params.isbn}%,isbn.ilike.%${normalizedIsbn}%`);
       }
       
-      // Recherche par ISSN
+      // Recherche par ISSN (avec ou sans tirets)
       if (params.issn) {
-        baseQuery = baseQuery.ilike('issn', `%${params.issn}%`);
+        const normalizedIssn = params.issn.replace(/[-\s]/g, '');
+        baseQuery = baseQuery.or(`issn.ilike.%${params.issn}%,issn.ilike.%${normalizedIssn}%`);
       }
       
       // Filtrer par langue
