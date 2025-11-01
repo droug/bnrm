@@ -415,30 +415,36 @@ export type Database = {
           created_at: string | null
           description: string
           id_service: string
+          is_free: boolean | null
           nom_service: string
           public_cible: string
           reference_legale: string
           updated_at: string | null
+          usage_limit_per_year: number | null
         }
         Insert: {
           categorie: string
           created_at?: string | null
           description: string
           id_service: string
+          is_free?: boolean | null
           nom_service: string
           public_cible: string
           reference_legale: string
           updated_at?: string | null
+          usage_limit_per_year?: number | null
         }
         Update: {
           categorie?: string
           created_at?: string | null
           description?: string
           id_service?: string
+          is_free?: boolean | null
           nom_service?: string
           public_cible?: string
           reference_legale?: string
           updated_at?: string | null
+          usage_limit_per_year?: number | null
         }
         Relationships: []
       }
@@ -2147,6 +2153,41 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      daily_pass_usage: {
+        Row: {
+          created_at: string
+          id: string
+          service_id: string
+          usage_date: string
+          usage_year: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          service_id: string
+          usage_date?: string
+          usage_year?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          service_id?: string
+          usage_date?: string
+          usage_year?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_pass_usage_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "bnrm_services"
+            referencedColumns: ["id_service"]
+          },
+        ]
       }
       deposit_activity_log: {
         Row: {
@@ -8164,6 +8205,10 @@ export type Database = {
         Args: { p_start_date: string; p_subscription_type: string }
         Returns: string
       }
+      can_use_daily_pass: {
+        Args: { p_service_id?: string; p_user_id: string }
+        Returns: boolean
+      }
       can_user_download: {
         Args: { p_content_id: string; p_user_id: string }
         Returns: boolean
@@ -8298,6 +8343,10 @@ export type Database = {
         Returns: string
       }
       perform_automatic_archiving: { Args: never; Returns: Json }
+      record_daily_pass_usage: {
+        Args: { p_service_id?: string; p_user_id: string }
+        Returns: Json
+      }
       search_knowledge_base: {
         Args: {
           limit_results?: number

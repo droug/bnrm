@@ -54,8 +54,8 @@ export default function PaymentServices() {
       features: [
         "Accès toutes salles de lecture",
         "Espaces de travail inclus",
-        "Tarif étudiant disponible",
-        "Dès 30 MAD"
+        "100% GRATUIT",
+        "Limité à 1 fois par an"
       ],
       action: () => navigate("/bnrm"),
       available: true

@@ -357,7 +357,7 @@ const Header = () => {
                       <NavigationMenuLink asChild>
                         <Link to="/services-bnrm" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
                           <div className="font-semibold">Pass journalier</div>
-                          <div className="text-xs text-muted-foreground mt-1">Accès illimité pour une journée - Dès 30 MAD</div>
+                          <div className="text-xs text-muted-foreground mt-1">Accès illimité gratuit - 1 fois par an</div>
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
