@@ -118,7 +118,8 @@ export function CBNSearchWithSelection({
           "thesis": "Thèse",
           "manuscript": "Manuscrit",
           "microfilm": "Microfilm",
-          "digital": "CD-ROM"
+          "digital": "CD-ROM",
+          "maps": "Cartes et Plans"
         };
         const targetType = typeMap[criteria.documentType];
         if (targetType) {

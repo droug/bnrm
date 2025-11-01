@@ -168,6 +168,7 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
     { value: "manuscript", label: "Manuscrit" },
     { value: "microfilm", label: "Microfilm" },
     { value: "digital", label: "Numérique" },
+    { value: "maps", label: "Cartes et Plans" },
   ];
 
   return (
@@ -265,6 +266,13 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                 onClick={() => handleQuickFilter("digital")}
               >
                 <Filter className="h-3 w-3 mr-1" /> Documents numériques
+              </Badge>
+              <Badge 
+                variant="outline" 
+                className="cursor-pointer hover:bg-primary/10 transition-colors"
+                onClick={() => handleQuickFilter("maps")}
+              >
+                <Filter className="h-3 w-3 mr-1" /> 🗺️ Cartes et Plans
               </Badge>
             </div>
           </TabsContent>
