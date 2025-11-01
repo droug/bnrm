@@ -16,6 +16,7 @@ export default function RestorationRequest() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [formData, setFormData] = useState({
+    statutDemandeur: "",
     name: "",
     email: "",
     phone: "",
@@ -42,7 +43,7 @@ export default function RestorationRequest() {
     e.preventDefault();
     
     // Validation
-    if (!formData.name || !formData.email || !formData.description) {
+    if (!formData.statutDemandeur || !formData.name || !formData.email || !formData.description) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -156,6 +157,23 @@ export default function RestorationRequest() {
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="statutDemandeur">Statut demandeur *</Label>
+                  <select
+                    id="statutDemandeur"
+                    name="statutDemandeur"
+                    value={formData.statutDemandeur}
+                    onChange={handleInputChange}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    required
+                  >
+                    <option value="">Sélectionnez un statut</option>
+                    <option value="particulier">Particulier</option>
+                    <option value="institution">Institution</option>
+                    <option value="autre">Autre</option>
+                  </select>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="name">Nom complet *</Label>
                   <Input
