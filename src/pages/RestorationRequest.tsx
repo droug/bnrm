@@ -20,6 +20,7 @@ export default function RestorationRequest() {
     statutDemandeur: "",
     name: "",
     cnie: "",
+    typeInstitution: "",
     email: "",
     phone: "",
     region: "",
@@ -313,6 +314,31 @@ export default function RestorationRequest() {
                       onChange={handleInputChange}
                       placeholder="Ex: AB123456"
                     />
+                  </div>
+                )}
+
+                {formData.statutDemandeur === "institution" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="typeInstitution">Type d'institution *</Label>
+                    <select
+                      id="typeInstitution"
+                      name="typeInstitution"
+                      value={formData.typeInstitution}
+                      onChange={handleInputChange}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      required
+                    >
+                      <option value="">Sélectionnez un type</option>
+                      <option value="bibliotheque-patrimoniale">Bibliothèque patrimoniale</option>
+                      <option value="musee">Musée</option>
+                      <option value="archive">Archive</option>
+                      <option value="centre-culturel">Centre culturel</option>
+                      <option value="universite">Université/Institut de recherche</option>
+                      <option value="fondation">Fondation</option>
+                      <option value="association-culturelle">Association culturelle</option>
+                      <option value="ministere">Ministère</option>
+                      <option value="autre">Autre</option>
+                    </select>
                   </div>
                 )}
 
