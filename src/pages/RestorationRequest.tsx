@@ -45,29 +45,93 @@ export default function RestorationRequest() {
     { value: "dakhla-oued-ed-dahab", label: "Dakhla-Oued Ed-Dahab" }
   ];
 
-  // Options pour les villes (exemple simplifié, à compléter selon les besoins)
-  const villesMaroc = [
-    { value: "rabat", label: "Rabat" },
-    { value: "casablanca", label: "Casablanca" },
-    { value: "fes", label: "Fès" },
-    { value: "marrakech", label: "Marrakech" },
-    { value: "tanger", label: "Tanger" },
-    { value: "agadir", label: "Agadir" },
-    { value: "meknes", label: "Meknès" },
-    { value: "oujda", label: "Oujda" },
-    { value: "kenitra", label: "Kénitra" },
-    { value: "tetouan", label: "Tétouan" },
-    { value: "sale", label: "Salé" },
-    { value: "temara", label: "Témara" },
-    { value: "safi", label: "Safi" },
-    { value: "mohammedia", label: "Mohammedia" },
-    { value: "khouribga", label: "Khouribga" },
-    { value: "beni-mellal", label: "Béni Mellal" },
-    { value: "el-jadida", label: "El Jadida" },
-    { value: "nador", label: "Nador" },
-    { value: "settat", label: "Settat" },
-    { value: "larache", label: "Larache" }
-  ];
+  // Villes par région
+  const villesParRegion: Record<string, { value: string; label: string }[]> = {
+    "tanger-tetouan-al-hoceima": [
+      { value: "tanger", label: "Tanger" },
+      { value: "tetouan", label: "Tétouan" },
+      { value: "al-hoceima", label: "Al Hoceïma" },
+      { value: "larache", label: "Larache" },
+      { value: "ksar-el-kebir", label: "Ksar El Kébir" },
+      { value: "chefchaouen", label: "Chefchaouen" }
+    ],
+    "oriental": [
+      { value: "oujda", label: "Oujda" },
+      { value: "nador", label: "Nador" },
+      { value: "berkane", label: "Berkane" },
+      { value: "taourirt", label: "Taourirt" },
+      { value: "jerada", label: "Jerada" }
+    ],
+    "fes-meknes": [
+      { value: "fes", label: "Fès" },
+      { value: "meknes", label: "Meknès" },
+      { value: "taza", label: "Taza" },
+      { value: "sefrou", label: "Sefrou" },
+      { value: "el-hajeb", label: "El Hajeb" },
+      { value: "ifrane", label: "Ifrane" }
+    ],
+    "rabat-sale-kenitra": [
+      { value: "rabat", label: "Rabat" },
+      { value: "sale", label: "Salé" },
+      { value: "kenitra", label: "Kénitra" },
+      { value: "temara", label: "Témara" },
+      { value: "skhirat", label: "Skhirat" },
+      { value: "khemisset", label: "Khémisset" }
+    ],
+    "beni-mellal-khenifra": [
+      { value: "beni-mellal", label: "Béni Mellal" },
+      { value: "khouribga", label: "Khouribga" },
+      { value: "khenifra", label: "Khénifra" },
+      { value: "azilal", label: "Azilal" },
+      { value: "fquih-ben-salah", label: "Fquih Ben Salah" }
+    ],
+    "casablanca-settat": [
+      { value: "casablanca", label: "Casablanca" },
+      { value: "mohammedia", label: "Mohammedia" },
+      { value: "el-jadida", label: "El Jadida" },
+      { value: "settat", label: "Settat" },
+      { value: "berrechid", label: "Berrechid" },
+      { value: "benslimane", label: "Benslimane" }
+    ],
+    "marrakech-safi": [
+      { value: "marrakech", label: "Marrakech" },
+      { value: "safi", label: "Safi" },
+      { value: "essaouira", label: "Essaouira" },
+      { value: "el-kelaa-des-sraghna", label: "El Kelâa des Sraghna" },
+      { value: "youssoufia", label: "Youssoufia" }
+    ],
+    "draa-tafilalet": [
+      { value: "errachidia", label: "Errachidia" },
+      { value: "ouarzazate", label: "Ouarzazate" },
+      { value: "zagora", label: "Zagora" },
+      { value: "tinghir", label: "Tinghir" },
+      { value: "midelt", label: "Midelt" }
+    ],
+    "souss-massa": [
+      { value: "agadir", label: "Agadir" },
+      { value: "inezgane", label: "Inezgane" },
+      { value: "tiznit", label: "Tiznit" },
+      { value: "taroudant", label: "Taroudant" },
+      { value: "ouled-teima", label: "Ouled Teïma" }
+    ],
+    "guelmim-oued-noun": [
+      { value: "guelmim", label: "Guelmim" },
+      { value: "tan-tan", label: "Tan-Tan" },
+      { value: "sidi-ifni", label: "Sidi Ifni" }
+    ],
+    "laayoune-sakia-el-hamra": [
+      { value: "laayoune", label: "Laâyoune" },
+      { value: "boujdour", label: "Boujdour" },
+      { value: "tarfaya", label: "Tarfaya" }
+    ],
+    "dakhla-oued-ed-dahab": [
+      { value: "dakhla", label: "Dakhla" },
+      { value: "aousserd", label: "Aousserd" }
+    ]
+  };
+
+  // Obtenir les villes de la région sélectionnée
+  const villesDisponibles = formData.region ? villesParRegion[formData.region] || [] : [];
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -125,7 +189,9 @@ export default function RestorationRequest() {
   const handleDropdownChange = (name: string, value: string) => {
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
+      // Réinitialiser la ville si on change de région
+      ...(name === "region" && { ville: "" })
     }));
   };
 
@@ -292,8 +358,9 @@ export default function RestorationRequest() {
                       <SimpleDropdown
                         value={formData.ville}
                         onChange={(value) => handleDropdownChange("ville", value)}
-                        options={villesMaroc}
-                        placeholder="Sélectionnez une ville"
+                        options={villesDisponibles}
+                        placeholder={formData.region ? "Sélectionnez une ville" : "Sélectionnez d'abord une région"}
+                        disabled={!formData.region}
                       />
                     </div>
                   </>
