@@ -65,22 +65,13 @@ export default function AdvancedSearch() {
   const performSearch = useCallback(async (searchData: Record<string, string>) => {
     setIsSearching(true);
     try {
-      // @ts-ignore - Éviter l'erreur de type profond avec Supabase query builder
-      let baseQuery = supabase.from('cbn_documents').select('*', { count: 'exact' });
-      
-      // Construire les conditions de recherche
-      const conditions: string[] = [];
+      // Utiliser any pour éviter l'erreur de type profond avec Supabase
+      let baseQuery: any = supabase.from('cbn_documents').select('*', { count: 'exact' });
       
       // Recherche générale
       if (searchData.keyword) {
-        conditions.push(`title.ilike.%${searchData.keyword}%`);
-        conditions.push(`author.ilike.%${searchData.keyword}%`);
-        conditions.push(`description.ilike.%${searchData.keyword}%`);
-      }
-      
-      // Appliquer les conditions OR
-      if (conditions.length > 0) {
-        baseQuery = baseQuery.or(conditions.join(','));
+        const term = searchData.keyword;
+        baseQuery = baseQuery.or(`title.ilike.%${term}%,author.ilike.%${term}%,description.ilike.%${term}%`);
       }
       
       // Recherche par auteur
