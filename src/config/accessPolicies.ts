@@ -180,3 +180,38 @@ export function getRoleDescription(role: UserRole): string {
   };
   return descriptions[role];
 }
+
+/**
+ * Vérifie si un utilisateur peut demander la reproduction d'un type de contenu
+ * Les détenteurs de pass journalier peuvent reproduire sauf les manuscrits et collections spécialisées
+ */
+export function canReproduceContentType(
+  userRole: UserRole | null,
+  contentType: ContentType | string
+): { allowed: boolean; message: string } {
+  // Visiteurs non authentifiés ne peuvent pas faire de reproductions
+  if (!userRole) {
+    return {
+      allowed: false,
+      message: 'Veuillez vous connecter pour demander une reproduction.',
+    };
+  }
+
+  // Les détenteurs de pass journalier ont des restrictions
+  if (userRole === 'visitor') {
+    const restrictedTypes = ['manuscript', 'collection_specialisee'];
+    
+    if (restrictedTypes.some(type => contentType.toLowerCase().includes(type) || contentType === type)) {
+      return {
+        allowed: false,
+        message: 'La reproduction des manuscrits et collections spécialisées nécessite un abonnement. Les détenteurs de pass journalier peuvent reproduire les autres documents.',
+      };
+    }
+  }
+
+  // Tous les autres rôles peuvent reproduire tous les types de contenu
+  return {
+    allowed: true,
+    message: '',
+  };
+}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useAccessControl } from "@/hooks/useAccessControl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,7 @@ export function ReproductionRequestForm() {
   const { user } = useAuth();
   const { language } = useLanguage();
   const navigate = useNavigate();
+  const { checkReproductionByContentType } = useAccessControl();
 
   const [modality, setModality] = useState<string>("numerique_mail");
   const [items, setItems] = useState<ReproductionItem[]>([]);
@@ -47,6 +49,25 @@ export function ReproductionRequestForm() {
   ];
 
   const addItem = (selectedDoc: any) => {
+    // Déterminer le type de contenu
+    const contentType = selectedDoc.manuscript_id 
+      ? 'manuscript' 
+      : selectedDoc.type === 'collection_specialisee' || selectedDoc.type?.toLowerCase().includes('spécial')
+      ? 'collection_specialisee'
+      : selectedDoc.type || 'document';
+
+    // Vérifier si l'utilisateur peut reproduire ce type de contenu
+    const reproductionCheck = checkReproductionByContentType(contentType);
+    
+    if (!reproductionCheck.allowed) {
+      toast.error(
+        language === "ar" 
+          ? "غير مسموح بإعادة إنتاج هذا النوع من المحتوى" 
+          : reproductionCheck.message
+      );
+      return;
+    }
+
     const newItem: ReproductionItem = {
       title: selectedDoc.title,
       reference: selectedDoc.cote || selectedDoc.reference || "",
