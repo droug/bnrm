@@ -8,22 +8,143 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Database, Search, BookOpen, MapPin, Filter, FileText } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { CBMSearchWithSelection } from "@/components/cbm/CBMSearchWithSelection";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CBMRecherche() {
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchField, setSearchField] = useState("all");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  
+  // Advanced search fields
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [publisher, setPublisher] = useState("");
+  const [year, setYear] = useState("");
+  const [subject, setSubject] = useState("");
+  const [language, setLanguage] = useState("all");
+  const [documentType, setDocumentType] = useState("all");
+  const [library, setLibrary] = useState("all");
+
+  const handleSimpleSearch = async () => {
+    setIsSearching(true);
+    
+    try {
+      let query = supabase.from('cbm_catalog').select('*');
+      
+      if (searchQuery) {
+        const searchTerm = searchQuery.toLowerCase();
+        query = query.or(`title.ilike.%${searchTerm}%,author.ilike.%${searchTerm}%,publisher.ilike.%${searchTerm}%,isbn.ilike.%${searchTerm}%`);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      
+      const results = (data || []).map(doc => ({
+        id: doc.id,
+        title: doc.title,
+        author: doc.author,
+        publisher: doc.publisher,
+        year: doc.publication_year?.toString(),
+        type: doc.document_type,
+        isbn: doc.isbn,
+        library_name: doc.library_name,
+        library_code: doc.library_code,
+        availability_status: doc.availability_status,
+        shelf_location: doc.shelf_location
+      }));
+      
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Error searching:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la recherche",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleAdvancedSearch = async () => {
+    setIsSearching(true);
+    
+    try {
+      let query = supabase.from('cbm_catalog').select('*');
+      
+      if (title) {
+        query = query.ilike('title', `%${title}%`);
+      }
+      
+      if (author) {
+        query = query.ilike('author', `%${author}%`);
+      }
+      
+      if (publisher) {
+        query = query.ilike('publisher', `%${publisher}%`);
+      }
+      
+      if (year) {
+        query = query.eq('publication_year', parseInt(year));
+      }
+      
+      if (documentType && documentType !== "all") {
+        query = query.ilike('document_type', `%${documentType}%`);
+      }
+      
+      if (library && library !== "all") {
+        query = query.eq('library_code', library);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      
+      const results = (data || []).map(doc => ({
+        id: doc.id,
+        title: doc.title,
+        author: doc.author,
+        publisher: doc.publisher,
+        year: doc.publication_year?.toString(),
+        type: doc.document_type,
+        isbn: doc.isbn,
+        library_name: doc.library_name,
+        library_code: doc.library_code,
+        availability_status: doc.availability_status,
+        shelf_location: doc.shelf_location
+      }));
+      
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Error searching:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la recherche",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const statistiques = [
-    { label: "Bibliothèques connectées", value: "152", icon: MapPin, color: "cbm-primary" },
-    { label: "Documents catalogués", value: "2.3M", icon: BookOpen, color: "cbm-secondary" },
+    { label: "Bibliothèques connectées", value: "6", icon: MapPin, color: "cbm-primary" },
+    { label: "Documents catalogués", value: "64", icon: BookOpen, color: "cbm-secondary" },
     { label: "Recherches ce mois", value: "45,780", icon: Search, color: "cbm-accent" }
   ];
 
   const bibliothequesMembres = [
-    { nom: "Bibliothèque Nationale du Royaume du Maroc", ville: "Rabat", documents: 350000 },
-    { nom: "BU Hassan II Casablanca", ville: "Casablanca", documents: 280000 },
-    { nom: "Médiathèque de Marrakech", ville: "Marrakech", documents: 95000 },
-    { nom: "BU Mohammed V Rabat", ville: "Rabat", documents: 420000 },
-    { nom: "Bibliothèque Municipale de Fès", ville: "Fès", documents: 65000 }
+    { nom: "Bibliothèque Nationale du Royaume du Maroc", ville: "Rabat", documents: 42, code: "BNRM" },
+    { nom: "BU Hassan II Casablanca", ville: "Casablanca", documents: 5, code: "BUH2C" },
+    { nom: "BU Mohammed V Rabat", ville: "Rabat", documents: 5, code: "BUMVR" },
+    { nom: "Médiathèque de Marrakech", ville: "Marrakech", documents: 4, code: "MEDMRK" },
+    { nom: "Bibliothèque Municipale de Fès", ville: "Fès", documents: 4, code: "BMFES" },
+    { nom: "Bibliothèque Nationale de Tanger", ville: "Tanger", documents: 3, code: "BNTNG" }
   ];
 
   return (
@@ -95,8 +216,9 @@ export default function CBMRecherche() {
                     className="flex-1"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSimpleSearch()}
                   />
-                  <Select>
+                  <Select value={searchField} onValueChange={setSearchField}>
                     <SelectTrigger className="w-48">
                       <SelectValue placeholder="Tous les champs" />
                     </SelectTrigger>
@@ -108,23 +230,54 @@ export default function CBMRecherche() {
                       <SelectItem value="isbn">ISBN/ISSN</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button className="bg-cbm-primary hover:bg-cbm-primary/90 px-8">
+                  <Button 
+                    className="bg-cbm-primary hover:bg-cbm-primary/90 px-8"
+                    onClick={handleSimpleSearch}
+                  >
                     <Search className="h-4 w-4 mr-2" />
                     Rechercher
                   </Button>
                 </div>
                 
                 <div className="flex gap-2">
-                  <Badge variant="outline" className="cursor-pointer hover:bg-cbm-primary/10">
+                  <Badge 
+                    variant="outline" 
+                    className="cursor-pointer hover:bg-cbm-primary/10"
+                    onClick={() => {
+                      setDocumentType("Livre");
+                      handleAdvancedSearch();
+                    }}
+                  >
                     <Filter className="h-3 w-3 mr-1" /> Livres
                   </Badge>
-                  <Badge variant="outline" className="cursor-pointer hover:bg-cbm-primary/10">
+                  <Badge 
+                    variant="outline" 
+                    className="cursor-pointer hover:bg-cbm-primary/10"
+                    onClick={() => {
+                      setDocumentType("Périodique");
+                      handleAdvancedSearch();
+                    }}
+                  >
                     <Filter className="h-3 w-3 mr-1" /> Périodiques
                   </Badge>
-                  <Badge variant="outline" className="cursor-pointer hover:bg-cbm-primary/10">
+                  <Badge 
+                    variant="outline" 
+                    className="cursor-pointer hover:bg-cbm-primary/10"
+                    onClick={() => {
+                      setDocumentType("Thèse");
+                      handleAdvancedSearch();
+                    }}
+                  >
                     <Filter className="h-3 w-3 mr-1" /> Thèses
                   </Badge>
-                  <Badge variant="outline" className="cursor-pointer hover:bg-cbm-primary/10">
+                  <Badge 
+                    variant="outline" 
+                    className="cursor-pointer hover:bg-cbm-primary/10"
+                    onClick={() => {
+                      setDocumentType("Numérique");
+                      handleAdvancedSearch();
+                    }}
+                  >
                     <Filter className="h-3 w-3 mr-1" /> Documents numériques
                   </Badge>
                 </div>
@@ -135,34 +288,55 @@ export default function CBMRecherche() {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Titre</label>
-                      <Input placeholder="Titre de l'ouvrage" />
+                      <Input 
+                        placeholder="Titre de l'ouvrage" 
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                      />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Auteur</label>
-                      <Input placeholder="Nom de l'auteur" />
+                      <Input 
+                        placeholder="Nom de l'auteur" 
+                        value={author}
+                        onChange={(e) => setAuthor(e.target.value)}
+                      />
                     </div>
                   </div>
                   
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Éditeur</label>
-                      <Input placeholder="Maison d'édition" />
+                      <Input 
+                        placeholder="Maison d'édition" 
+                        value={publisher}
+                        onChange={(e) => setPublisher(e.target.value)}
+                      />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Année de publication</label>
-                      <Input type="number" placeholder="AAAA" />
+                      <Input 
+                        type="number" 
+                        placeholder="AAAA" 
+                        value={year}
+                        onChange={(e) => setYear(e.target.value)}
+                      />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Sujet / Mots-clés</label>
-                    <Input placeholder="Thématique, discipline..." />
+                    <Input 
+                      placeholder="Thématique, discipline..." 
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                    />
                   </div>
 
                   <div className="grid md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Langue</label>
-                      <Select>
+                      <Select value={language} onValueChange={setLanguage}>
                         <SelectTrigger>
                           <SelectValue placeholder="Toutes" />
                         </SelectTrigger>
@@ -177,36 +351,39 @@ export default function CBMRecherche() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Type de document</label>
-                      <Select>
+                      <Select value={documentType} onValueChange={setDocumentType}>
                         <SelectTrigger>
                           <SelectValue placeholder="Tous" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">Tous</SelectItem>
-                          <SelectItem value="book">Livre</SelectItem>
-                          <SelectItem value="periodical">Périodique</SelectItem>
-                          <SelectItem value="thesis">Thèse</SelectItem>
-                          <SelectItem value="digital">Numérique</SelectItem>
+                          <SelectItem value="Livre">Livre</SelectItem>
+                          <SelectItem value="Périodique">Périodique</SelectItem>
+                          <SelectItem value="Thèse">Thèse</SelectItem>
+                          <SelectItem value="Numérique">Numérique</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Bibliothèque</label>
-                      <Select>
+                      <Select value={library} onValueChange={setLibrary}>
                         <SelectTrigger>
                           <SelectValue placeholder="Toutes" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">Toutes</SelectItem>
-                          {bibliothequesMembres.slice(0, 3).map((bib, i) => (
-                            <SelectItem key={i} value={bib.nom}>{bib.ville}</SelectItem>
+                          {bibliothequesMembres.map((bib, i) => (
+                            <SelectItem key={i} value={bib.code}>{bib.ville} - {bib.nom}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
 
-                  <Button className="w-full bg-cbm-secondary hover:bg-cbm-secondary/90">
+                  <Button 
+                    className="w-full bg-cbm-secondary hover:bg-cbm-secondary/90"
+                    onClick={handleAdvancedSearch}
+                  >
                     <Search className="h-4 w-4 mr-2" />
                     Lancer la Recherche Avancée
                   </Button>
@@ -215,6 +392,12 @@ export default function CBMRecherche() {
             </Tabs>
           </CardContent>
         </Card>
+
+        {/* Search Results */}
+        <CBMSearchWithSelection 
+          searchResults={searchResults}
+          isSearching={isSearching}
+        />
 
         {/* Bibliothèques Membres */}
         <Card className="border-2 border-cbm-secondary/20">
