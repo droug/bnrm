@@ -27,7 +27,8 @@ export default function RestorationRequest() {
     ville: "",
     documentType: "",
     description: "",
-    urgency: "normal"
+    urgency: "normal",
+    autorisation: ""
   });
 
   // Options pour les régions du Maroc
@@ -493,6 +494,43 @@ export default function RestorationRequest() {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Autorisation */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg">Autorisation</h3>
+              
+              <div className="space-y-3">
+                <Label className="text-base">
+                  Autorisez-vous la BNRM à conserver et exploiter une copie de l'œuvre reproduite à des fins de consultation ?
+                </Label>
+                
+                <div className="flex gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="autorisation"
+                      value="oui"
+                      checked={formData.autorisation === "oui"}
+                      onChange={handleInputChange}
+                      className="w-4 h-4 text-primary border-input focus:ring-2 focus:ring-ring"
+                    />
+                    <span>Oui</span>
+                  </label>
+                  
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="autorisation"
+                      value="non"
+                      checked={formData.autorisation === "non"}
+                      onChange={handleInputChange}
+                      className="w-4 h-4 text-primary border-input focus:ring-2 focus:ring-ring"
+                    />
+                    <span>Non</span>
+                  </label>
+                </div>
+              </div>
             </div>
 
             {/* Buttons */}
