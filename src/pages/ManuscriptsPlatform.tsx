@@ -114,6 +114,11 @@ export default function ManuscriptsPlatform() {
     return () => clearTimeout(timer);
   }, [searchQuery, filters]);
 
+  // Charger tous les manuscrits au premier chargement
+  useEffect(() => {
+    search("", {}, 1);
+  }, []);
+
   const handleSearch = () => {
     search(searchQuery, filters, 1);
   };
@@ -338,14 +343,19 @@ export default function ManuscriptsPlatform() {
           )}
 
 
-          {results.length === 0 && !searchLoading && searchQuery && (
+          {results.length === 0 && !searchLoading && (
             <div className="text-center py-16 relative">
               <div className="absolute inset-0 bg-pattern-zellige-complex opacity-10 rounded-3xl"></div>
               <div className="relative z-10">
                 <BookOpen className="h-16 w-16 text-gold mx-auto mb-6 animate-pulse" />
-                <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">Aucun manuscrit trouvé</h3>
+                <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">
+                  {searchQuery ? "Aucun manuscrit trouvé" : "Chargement des manuscrits..."}
+                </h3>
                 <p className="text-muted-foreground text-lg mb-6 max-w-md mx-auto">
-                  Essayez de modifier vos critères de recherche ou de filtrage.
+                  {searchQuery 
+                    ? "Essayez de modifier vos critères de recherche ou de filtrage."
+                    : "Les manuscrits seront affichés dans un instant."
+                  }
                 </p>
               </div>
             </div>
