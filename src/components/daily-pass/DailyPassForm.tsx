@@ -65,7 +65,7 @@ export function DailyPassForm({ onClose }: DailyPassFormProps) {
 
   const profileType = form.watch("profileType");
 
-  const requiresJustification = ["chercheur", "etudiant_3eme"].includes(profileType || "");
+  const requiresJustification = ["chercheur", "chercheur_retraite", "etudiant_3eme"].includes(profileType || "");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -358,6 +358,8 @@ export function DailyPassForm({ onClose }: DailyPassFormProps) {
                     <p className="text-sm text-amber-800 dark:text-amber-200">
                       {profileType === "chercheur"
                         ? "Document requis : Attestation officielle de votre sujet de recherche délivrée par votre institution"
+                        : profileType === "chercheur_retraite"
+                        ? "Document requis : Attestation de retraite ou document justifiant votre statut de chercheur retraité"
                         : "Document requis : Attestation d'inscription en 3ème année et sujet de PFE validé"}
                     </p>
                   </div>
