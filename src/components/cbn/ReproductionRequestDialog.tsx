@@ -32,6 +32,17 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [manuscriptData, setManuscriptData] = useState<any>(null);
   const [loadingManuscript, setLoadingManuscript] = useState(false);
+  const [tariffs, setTariffs] = useState<any[]>([]);
+  const [pricing, setPricing] = useState({
+    baseCost: 0,
+    qualityCost: 0,
+    formatCost: 0,
+    pageCost: 0,
+    copiesCost: 0,
+    urgentCost: 0,
+    certifiedCost: 0,
+    total: 0
+  });
   
   // Pour les manuscrits avec tirage papier, forcer A4
   const isManuscript = document.type === "Manuscrit" || document.supportType === "Manuscrit";
@@ -39,6 +50,65 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
   // Pour les cartes et plans en numérique, forcer JPEG
   const isMapOrPlan = document.type === "Cartes et Plans" || document.supportType === "Cartes et Plans";
   
+  const [formData, setFormData] = useState({
+    // Informations du demandeur (pré-remplies depuis le compte adhérent)
+    lastName: "Nom Adhérent",
+    firstName: "Prénom Adhérent",
+    
+    // Type de reproduction
+    reproductionType: document.supportType === "Microfilm" ? "microfilm" : "numerique", // numerique, papier, microfilm
+    format: document.supportType === "Microfilm" ? "35mm" : "pdf", // pdf, jpeg, tiff pour numérique | A4, A3 pour papier | 35mm, 16mm, microfiche pour microfilm
+    quality: "haute", // standard, haute
+    deliveryMode: "email", // email, telechargement, sous_support
+    supportType: "cd", // cd, usb, ssd, autre
+    numberOfCopies: "1", // pour papier
+    paperFormat: "A4", // A4, A3, autre pour papier (forcé à A4 pour manuscrits)
+    displayMode: "couleur", // couleur, noir_blanc
+    
+    // Détails de la reproduction
+    reproductionScope: "partielle", // complete, partielle
+    pages: "",
+    sections: "",
+    
+    // Usage
+    usageType: "personnel", // personnel, recherche, commercial, enseignement
+    usageDescription: "",
+    
+    // Livraison
+    deliveryMethod: "email", // email, courrier, retrait
+    deliveryAddress: "",
+    
+    // Options
+    urgentRequest: false,
+    certifiedCopy: false,
+    
+    // Accord
+    termsAccepted: false,
+    copyrightAcknowledged: false,
+  });
+  
+  // Charger les tarifs
+  useEffect(() => {
+    const loadTariffs = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('bnrm_tarifs')
+          .select('*')
+          .eq('is_active', true);
+        
+        if (error) {
+          console.error('Erreur chargement tarifs:', error);
+        } else if (data) {
+          setTariffs(data);
+        }
+      } catch (err) {
+        console.error('Erreur:', err);
+      }
+    };
+    
+    loadTariffs();
+  }, []);
+
   // Charger les données du manuscrit si c'est un manuscrit
   useEffect(() => {
     const loadManuscriptData = async () => {
@@ -79,43 +149,99 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     
     loadManuscriptData();
   }, [isManuscript, document.id, document.cote]);
-  
-  const [formData, setFormData] = useState({
-    // Informations du demandeur (pré-remplies depuis le compte adhérent)
-    lastName: "Nom Adhérent",
-    firstName: "Prénom Adhérent",
+
+  // Calculer les tarifs en temps réel
+  useEffect(() => {
+    const calculatePricing = () => {
+      let baseCost = 0;
+      let qualityCost = 0;
+      let formatCost = 0;
+      let pageCost = 0;
+      let copiesCost = 0;
+      
+      // Tarif de base selon le type de reproduction
+      if (formData.reproductionType === "numerique") {
+        baseCost = 50; // Tarif de base numérique
+        
+        // Coût selon la qualité
+        if (formData.quality === "haute") {
+          qualityCost = 30;
+        } else if (formData.quality === "tres_haute") {
+          qualityCost = 60;
+        }
+        
+        // Coût selon le format
+        if (formData.format === "tiff") {
+          formatCost = 20;
+        } else if (formData.format === "pdf") {
+          formatCost = 10;
+        }
+      } else if (formData.reproductionType === "papier") {
+        baseCost = 30; // Tarif de base papier
+        
+        // Coût selon le format papier
+        if (formData.paperFormat === "A3") {
+          formatCost = 20;
+        } else if (formData.paperFormat === "A4") {
+          formatCost = 10;
+        }
+        
+        // Coût selon le mode d'affichage
+        if (formData.displayMode === "couleur") {
+          qualityCost = 15;
+        } else {
+          qualityCost = 5;
+        }
+        
+        // Coût par copie supplémentaire
+        const copies = parseInt(formData.numberOfCopies) || 1;
+        if (copies > 1) {
+          copiesCost = (copies - 1) * 10;
+        }
+      } else if (formData.reproductionType === "microfilm") {
+        baseCost = 100; // Tarif de base microfilm
+        
+        if (formData.format === "35mm") {
+          formatCost = 50;
+        } else if (formData.format === "16mm") {
+          formatCost = 40;
+        } else if (formData.format === "microfiche") {
+          formatCost = 30;
+        }
+      }
+      
+      // Calculer le coût par page (estimation de 50 pages pour partiel)
+      if (formData.reproductionScope === "partielle") {
+        const estimatedPages = 50;
+        pageCost = estimatedPages * 0.5;
+      } else {
+        // Estimation de 200 pages pour un document complet
+        const estimatedPages = 200;
+        pageCost = estimatedPages * 0.5;
+      }
+      
+      // Coût pour demande urgente
+      const urgentCost = formData.urgentRequest ? 50 : 0;
+      
+      // Coût pour copie certifiée
+      const certifiedCost = formData.certifiedCopy ? 30 : 0;
+      
+      const total = baseCost + qualityCost + formatCost + pageCost + copiesCost + urgentCost + certifiedCost;
+      
+      setPricing({
+        baseCost,
+        qualityCost,
+        formatCost,
+        pageCost,
+        copiesCost,
+        urgentCost,
+        certifiedCost,
+        total
+      });
+    };
     
-    // Type de reproduction
-    reproductionType: document.supportType === "Microfilm" ? "microfilm" : "numerique", // numerique, papier, microfilm
-    format: document.supportType === "Microfilm" ? "35mm" : "pdf", // pdf, jpeg, tiff pour numérique | A4, A3 pour papier | 35mm, 16mm, microfiche pour microfilm
-    quality: "haute", // standard, haute
-    deliveryMode: "email", // email, telechargement, sous_support
-    supportType: "cd", // cd, usb, ssd, autre
-    numberOfCopies: "1", // pour papier
-    paperFormat: "A4", // A4, A3, autre pour papier (forcé à A4 pour manuscrits)
-    displayMode: "couleur", // couleur, noir_blanc
-    
-    // Détails de la reproduction
-    reproductionScope: "partielle", // complete, partielle
-    pages: "",
-    sections: "",
-    
-    // Usage
-    usageType: "personnel", // personnel, recherche, commercial, enseignement
-    usageDescription: "",
-    
-    // Livraison
-    deliveryMethod: "email", // email, courrier, retrait
-    deliveryAddress: "",
-    
-    // Options
-    urgentRequest: false,
-    certifiedCopy: false,
-    
-    // Accord
-    termsAccepted: false,
-    copyrightAcknowledged: false,
-  });
+    calculatePricing();
+  }, [formData]);
 
   // Forcer A4 pour les manuscrits en tirage papier
   useEffect(() => {
@@ -575,16 +701,70 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
 
           {/* Informations tarifaires */}
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-            <h4 className="font-semibold mb-3">💰 Tarification estimative</h4>
+            <h4 className="font-semibold mb-3 flex items-center gap-2">
+              💰 Tarification estimative
+            </h4>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span>Type de reproduction :</span>
-                <span className="font-medium">
-                  {formData.reproductionType === "numerique" && "Numérique"}
-                  {formData.reproductionType === "papier" && "Papier"}
-                  {formData.reproductionType === "microfilm" && "Microfilm"}
-                </span>
+              <div className="space-y-1.5">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Type de reproduction (base)</span>
+                  <span className="font-medium">{pricing.baseCost.toFixed(2)} MAD</span>
+                </div>
+                
+                {pricing.qualityCost > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      {formData.reproductionType === "papier" ? "Mode d'affichage" : "Qualité"}
+                    </span>
+                    <span className="font-medium">{pricing.qualityCost.toFixed(2)} MAD</span>
+                  </div>
+                )}
+                
+                {pricing.formatCost > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Format</span>
+                    <span className="font-medium">{pricing.formatCost.toFixed(2)} MAD</span>
+                  </div>
+                )}
+                
+                {pricing.pageCost > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Pages ({formData.reproductionScope === "complete" ? "Document complet" : "Reproduction partielle"})
+                    </span>
+                    <span className="font-medium">{pricing.pageCost.toFixed(2)} MAD</span>
+                  </div>
+                )}
+                
+                {pricing.copiesCost > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Copies supplémentaires</span>
+                    <span className="font-medium">{pricing.copiesCost.toFixed(2)} MAD</span>
+                  </div>
+                )}
+                
+                {pricing.urgentCost > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Traitement urgent</span>
+                    <span className="font-medium text-amber-600">{pricing.urgentCost.toFixed(2)} MAD</span>
+                  </div>
+                )}
+                
+                {pricing.certifiedCost > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Copie certifiée conforme</span>
+                    <span className="font-medium">{pricing.certifiedCost.toFixed(2)} MAD</span>
+                  </div>
+                )}
               </div>
+              
+              <Separator className="my-3" />
+              
+              <div className="flex justify-between text-base pt-1">
+                <span className="font-semibold">Total estimé</span>
+                <span className="font-bold text-primary text-lg">{pricing.total.toFixed(2)} MAD</span>
+              </div>
+              
               {formData.reproductionType === "microfilm" && (
                 <div className="bg-amber-50 border border-amber-200 rounded p-3 mt-2">
                   <p className="text-xs text-amber-900 font-medium">
@@ -593,16 +773,11 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                   </p>
                 </div>
               )}
-              <div className="flex justify-between text-muted-foreground">
-                <span>Qualité :</span>
-                <span>
-                  {formData.quality === "standard" && "Standard"}
-                  {formData.quality === "haute" && "Haute qualité"}
-                  {formData.quality === "tres_haute" && "Très haute qualité"}
-                </span>
-              </div>
-              <div className="pt-2 border-t text-xs text-muted-foreground">
-                Les liens de téléchargement des documents seront valables pendant 2 mois.
+              
+              <div className="pt-2 border-t text-xs text-muted-foreground mt-3">
+                ℹ️ Tarifs indicatifs. Un devis définitif vous sera communiqué par email sous 48h.
+                <br />
+                Les liens de téléchargement des documents numériques seront valables pendant 2 mois.
               </div>
             </div>
           </div>
