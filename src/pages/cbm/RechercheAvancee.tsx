@@ -562,10 +562,10 @@ const RechercheAvancee = () => {
                     </AccordionContent>
                   </AccordionItem>
 
-                  {/* Par date de publication */}
+                  {/* Par date de parution */}
                   <AccordionItem value="pub-date" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
                     <AccordionTrigger className="hover:no-underline py-4">
-                      <span className="font-semibold text-base">Par date de publication</span>
+                      <span className="font-semibold text-base">Par date de parution</span>
                     </AccordionTrigger>
                     <AccordionContent className="space-y-4 pb-4">
                       <div className="grid grid-cols-2 gap-4">
