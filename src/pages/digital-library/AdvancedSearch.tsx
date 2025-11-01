@@ -61,70 +61,73 @@ export default function AdvancedSearch() {
     edition: "",
   });
 
-  // Charger les paramètres de l'URL et effectuer la recherche
-  const performSearch = useCallback(async (searchData: Record<string, string>) => {
+  // Fonction de recherche
+  const performSearch = useCallback(async () => {
+    const params = Object.fromEntries(searchParams.entries());
+    if (Object.keys(params).length === 0) return;
+
     setIsSearching(true);
     try {
       // Utiliser any pour éviter l'erreur de type profond avec Supabase
       let baseQuery: any = supabase.from('cbn_documents').select('*', { count: 'exact' });
       
       // Recherche générale
-      if (searchData.keyword) {
-        const term = searchData.keyword;
+      if (params.keyword) {
+        const term = params.keyword;
         baseQuery = baseQuery.or(`title.ilike.%${term}%,author.ilike.%${term}%,description.ilike.%${term}%`);
       }
       
       // Recherche par auteur
-      if (searchData.author) {
-        baseQuery = baseQuery.ilike('author', `%${searchData.author}%`);
+      if (params.author) {
+        baseQuery = baseQuery.ilike('author', `%${params.author}%`);
       }
       
       // Recherche par titre
-      if (searchData.title) {
-        baseQuery = baseQuery.ilike('title', `%${searchData.title}%`);
+      if (params.title) {
+        baseQuery = baseQuery.ilike('title', `%${params.title}%`);
       }
       
       // Recherche par éditeur
-      if (searchData.publisher) {
-        baseQuery = baseQuery.ilike('publisher', `%${searchData.publisher}%`);
+      if (params.publisher) {
+        baseQuery = baseQuery.ilike('publisher', `%${params.publisher}%`);
       }
       
       // Recherche par sujet
-      if (searchData.subject) {
-        baseQuery = baseQuery.ilike('subject', `%${searchData.subject}%`);
+      if (params.subject) {
+        baseQuery = baseQuery.ilike('subject', `%${params.subject}%`);
       }
       
       // Recherche par cote
-      if (searchData.cote) {
-        baseQuery = baseQuery.ilike('cote', `%${searchData.cote}%`);
+      if (params.cote) {
+        baseQuery = baseQuery.ilike('cote', `%${params.cote}%`);
       }
       
       // Recherche par ISBN
-      if (searchData.isbn) {
-        baseQuery = baseQuery.ilike('isbn', `%${searchData.isbn}%`);
+      if (params.isbn) {
+        baseQuery = baseQuery.ilike('isbn', `%${params.isbn}%`);
       }
       
       // Recherche par ISSN
-      if (searchData.issn) {
-        baseQuery = baseQuery.ilike('issn', `%${searchData.issn}%`);
+      if (params.issn) {
+        baseQuery = baseQuery.ilike('issn', `%${params.issn}%`);
       }
       
       // Filtrer par langue
-      if (searchData.language) {
-        baseQuery = baseQuery.eq('language', searchData.language);
+      if (params.language) {
+        baseQuery = baseQuery.eq('language', params.language);
       }
       
       // Filtrer par type de document
-      if (searchData.documentType) {
-        baseQuery = baseQuery.eq('document_type', searchData.documentType);
+      if (params.documentType) {
+        baseQuery = baseQuery.eq('document_type', params.documentType);
       }
       
       // Filtrer par date
-      if (searchData.dateFrom) {
-        baseQuery = baseQuery.gte('publication_year', parseInt(searchData.dateFrom));
+      if (params.dateFrom) {
+        baseQuery = baseQuery.gte('publication_year', parseInt(params.dateFrom));
       }
-      if (searchData.dateTo) {
-        baseQuery = baseQuery.lte('publication_year', parseInt(searchData.dateTo));
+      if (params.dateTo) {
+        baseQuery = baseQuery.lte('publication_year', parseInt(params.dateTo));
       }
       
       const { data, error, count } = await baseQuery.range(
@@ -153,16 +156,12 @@ export default function AdvancedSearch() {
     } finally {
       setIsSearching(false);
     }
-  }, [currentPage, itemsPerPage, toast]);
+  }, [searchParams, currentPage, itemsPerPage, toast]);
 
+  // Effectuer la recherche quand les params changent
   useEffect(() => {
-    const params = Object.fromEntries(searchParams.entries());
-    if (Object.keys(params).length > 0) {
-      setFormData(prev => ({ ...prev, ...params }));
-      performSearch(params);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+    performSearch();
+  }, [performSearch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -641,12 +640,10 @@ export default function AdvancedSearch() {
                 itemsPerPage={itemsPerPage}
                 onPageChange={(page) => {
                   setCurrentPage(page);
-                  performSearch(formData);
                 }}
                 onItemsPerPageChange={(items) => {
                   setItemsPerPage(items);
                   setCurrentPage(1);
-                  performSearch(formData);
                 }}
               />
 
@@ -704,12 +701,10 @@ export default function AdvancedSearch() {
                 itemsPerPage={itemsPerPage}
                 onPageChange={(page) => {
                   setCurrentPage(page);
-                  performSearch(formData);
                 }}
                 onItemsPerPageChange={(items) => {
                   setItemsPerPage(items);
                   setCurrentPage(1);
-                  performSearch(formData);
                 }}
               />
             </CardContent>
