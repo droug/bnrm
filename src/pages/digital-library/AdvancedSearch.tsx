@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Search, X, BookOpen, User, FileText, Tag, Calendar, Hash, Library, Loader2 } from "lucide-react";
+import { Search, RotateCcw, BookOpen, User, FileText, Tag, Calendar, Hash, Library, Loader2 } from "lucide-react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
 import { AuthorAutocomplete } from "@/components/ui/author-autocomplete";
@@ -223,6 +223,10 @@ export default function AdvancedSearch() {
       collection: "",
       edition: "",
     });
+    setSearchResults([]);
+    setTotalResults(0);
+    setCurrentPage(1);
+    navigate('/digital-library/search');
   };
 
   return (
@@ -602,7 +606,7 @@ export default function AdvancedSearch() {
               onClick={handleReset} 
               className="sm:w-auto h-14 text-base font-semibold"
             >
-              <X className="h-5 w-5 mr-2" />
+              <RotateCcw className="h-5 w-5 mr-2" />
               Réinitialiser
             </Button>
           </div>
