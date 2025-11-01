@@ -8,7 +8,11 @@ import { SimpleSelect } from "@/components/ui/simple-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText, Loader2, BookOpen, Calendar, Palette } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { Separator } from "@/components/ui/separator";
 
 interface ReproductionRequestDialogProps {
   isOpen: boolean;
@@ -26,9 +30,52 @@ interface ReproductionRequestDialogProps {
 
 export function ReproductionRequestDialog({ isOpen, onClose, document }: ReproductionRequestDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [manuscriptData, setManuscriptData] = useState<any>(null);
+  const [loadingManuscript, setLoadingManuscript] = useState(false);
   
   // Pour les manuscrits avec tirage papier, forcer A4
   const isManuscript = document.type === "Manuscrit" || document.supportType === "Manuscrit";
+  
+  // Charger les données du manuscrit si c'est un manuscrit
+  useEffect(() => {
+    const loadManuscriptData = async () => {
+      if (!isManuscript || !document.id) return;
+      
+      setLoadingManuscript(true);
+      try {
+        // Essayer d'abord de trouver le manuscrit par cbn_document_id
+        let { data, error } = await supabase
+          .from('manuscripts')
+          .select('*')
+          .eq('cbn_document_id', document.id)
+          .maybeSingle();
+        
+        // Si pas trouvé, chercher par cote
+        if (!data && document.cote) {
+          const result = await supabase
+            .from('manuscripts')
+            .select('*')
+            .eq('cote', document.cote)
+            .maybeSingle();
+          data = result.data;
+          error = result.error;
+        }
+        
+        if (error) {
+          console.error('Erreur chargement manuscrit:', error);
+        } else if (data) {
+          setManuscriptData(data);
+          console.log('📜 Données manuscrit chargées:', data);
+        }
+      } catch (err) {
+        console.error('Erreur:', err);
+      } finally {
+        setLoadingManuscript(false);
+      }
+    };
+    
+    loadManuscriptData();
+  }, [isManuscript, document.id, document.cote]);
   
   const [formData, setFormData] = useState({
     // Informations du demandeur (pré-remplies depuis le compte adhérent)
@@ -107,6 +154,11 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
           <DialogTitle className="flex items-center gap-2 text-xl">
             <FileText className="h-5 w-5 text-primary" />
             Demande de Reproduction
+            {isManuscript && (
+              <Badge variant="default" className="ml-2">
+                📜 Manuscrit
+              </Badge>
+            )}
           </DialogTitle>
           <DialogDescription>
             Document : <span className="font-semibold text-foreground">{document.title}</span>
@@ -116,6 +168,13 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
               <span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full font-medium">
                 📼 Microfilm
               </span>
+            )}
+            {isManuscript && manuscriptData && (
+              <div className="mt-2 text-xs">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md font-medium">
+                  ℹ️ Données enrichies depuis la plateforme Manuscrits
+                </span>
+              </div>
             )}
           </DialogDescription>
         </DialogHeader>
@@ -148,6 +207,108 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
               </div>
             </div>
           </div>
+
+
+          {/* Informations du manuscrit - Section enrichie */}
+          {isManuscript && manuscriptData && (
+            <Card className="border-primary/20 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <BookOpen className="h-5 w-5 text-primary" />
+                  Détails du Manuscrit
+                </CardTitle>
+                <CardDescription>
+                  Informations provenant de la plateforme Manuscrits
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  {manuscriptData.language && (
+                    <div className="space-y-1">
+                      <Label className="text-sm font-semibold flex items-center gap-1">
+                        <FileText className="h-3 w-3" />
+                        Langue
+                      </Label>
+                      <Badge variant="secondary" className="font-normal">
+                        {manuscriptData.language}
+                      </Badge>
+                    </div>
+                  )}
+                  
+                  {manuscriptData.period && (
+                    <div className="space-y-1">
+                      <Label className="text-sm font-semibold flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        Période
+                      </Label>
+                      <Badge variant="secondary" className="font-normal">
+                        {manuscriptData.period}
+                      </Badge>
+                    </div>
+                  )}
+                  
+                  {manuscriptData.material && (
+                    <div className="space-y-1">
+                      <Label className="text-sm font-semibold flex items-center gap-1">
+                        <Palette className="h-3 w-3" />
+                        Support
+                      </Label>
+                      <Badge variant="secondary" className="font-normal">
+                        {manuscriptData.material}
+                      </Badge>
+                    </div>
+                  )}
+                  
+                  {manuscriptData.dimensions && (
+                    <div className="space-y-1">
+                      <Label className="text-sm font-semibold">Dimensions</Label>
+                      <Badge variant="secondary" className="font-normal">
+                        {manuscriptData.dimensions}
+                      </Badge>
+                    </div>
+                  )}
+                </div>
+
+                {manuscriptData.inventory_number && (
+                  <div className="space-y-1">
+                    <Label className="text-sm font-semibold">Numéro d'inventaire</Label>
+                    <p className="text-sm text-muted-foreground font-mono">
+                      {manuscriptData.inventory_number}
+                    </p>
+                  </div>
+                )}
+                
+                {manuscriptData.description && (
+                  <div className="space-y-1">
+                    <Label className="text-sm font-semibold">Description</Label>
+                    <p className="text-sm text-muted-foreground">
+                      {manuscriptData.description}
+                    </p>
+                  </div>
+                )}
+
+                {manuscriptData.condition_notes && (
+                  <div className="space-y-1 pt-2 border-t">
+                    <Label className="text-sm font-semibold">État de conservation</Label>
+                    <p className="text-sm text-muted-foreground">
+                      {manuscriptData.condition_notes}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {isManuscript && loadingManuscript && (
+            <Card className="border-primary/20 bg-primary/5">
+              <CardContent className="py-6">
+                <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">Chargement des détails du manuscrit...</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
 
           {/* Type de reproduction */}
