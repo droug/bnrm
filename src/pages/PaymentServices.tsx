@@ -46,6 +46,21 @@ export default function PaymentServices() {
       available: true
     },
     {
+      id: "daily-pass",
+      title: "Pass journalier",
+      description: "Accès illimité à la bibliothèque nationale pour une journée",
+      icon: CreditCard,
+      color: "from-indigo-500 to-indigo-600",
+      features: [
+        "Accès toutes salles de lecture",
+        "Espaces de travail inclus",
+        "Tarif étudiant disponible",
+        "Dès 30 MAD"
+      ],
+      action: () => navigate("/bnrm"),
+      available: true
+    },
+    {
       id: "reproduction",
       title: "Reproduction de documents",
       description: "Demandez la reproduction de documents et manuscrits",
