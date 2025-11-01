@@ -119,7 +119,7 @@ const RechercheAvancee = () => {
     setIsSearching(true);
     try {
       // Rechercher dans la base de données cbm_catalog
-      let query = supabase.from('cbm_catalog').select('*').limit(100);
+      let query = supabase.from('cbm_catalog').select('*', { count: 'exact' });
       
       // Filtrer par mots-clés si présents
       if (criteria.keywords) {
@@ -222,6 +222,7 @@ const RechercheAvancee = () => {
     setYearRange([1900, 2025]);
     setSearchResults([]);
     setCurrentPage(1);
+    setTotalResults(0);
   };
 
   const toggleNature = (nature: string) => {
