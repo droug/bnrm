@@ -21,6 +21,9 @@ interface SearchCriteria {
   isbn?: string;
   cote?: string;
   collection?: string;
+  digitizationStatus?: string;
+  physicalStatus?: string;
+  supportType?: string;
 }
 
 interface CBNAdvancedSearchProps {
@@ -45,6 +48,9 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
   const [isbn, setIsbn] = useState("");
   const [cote, setCote] = useState("");
   const [collection, setCollection] = useState("");
+  const [digitizationStatus, setDigitizationStatus] = useState("all");
+  const [physicalStatus, setPhysicalStatus] = useState("all");
+  const [supportType, setSupportType] = useState("all");
 
   const handleSimpleSearch = () => {
     onSearch({
@@ -66,6 +72,9 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
       isbn: isbn || undefined,
       cote: cote || undefined,
       collection: collection || undefined,
+      digitizationStatus: digitizationStatus !== "all" ? digitizationStatus : undefined,
+      physicalStatus: physicalStatus !== "all" ? physicalStatus : undefined,
+      supportType: supportType !== "all" ? supportType : undefined,
     });
   };
 
@@ -169,6 +178,28 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
     { value: "microfilm", label: "Microfilm" },
     { value: "digital", label: "Numérique" },
     { value: "maps", label: "Cartes et Plans" },
+  ];
+
+  const digitizationStatusOptions = [
+    { value: "all", label: "Tous" },
+    { value: "digitized", label: "Numérisé" },
+    { value: "not_digitized", label: "Non numérisé" },
+  ];
+
+  const physicalStatusOptions = [
+    { value: "all", label: "Tous" },
+    { value: "bon", label: "Bon état" },
+    { value: "moyen", label: "État moyen" },
+    { value: "restauration", label: "En restauration" },
+    { value: "fragile", label: "Fragile" },
+  ];
+
+  const supportTypeOptions = [
+    { value: "all", label: "Tous" },
+    { value: "Papier", label: "Papier" },
+    { value: "Microfilm", label: "Microfilm" },
+    { value: "CD-ROM", label: "CD-ROM" },
+    { value: "Numérique", label: "Numérique" },
   ];
 
   return (
@@ -384,6 +415,34 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                     options={documentTypeOptions}
                   />
                 </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">État de numérisation</label>
+                  <SimpleDropdown
+                    value={digitizationStatus}
+                    onChange={setDigitizationStatus}
+                    options={digitizationStatusOptions}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">État physique</label>
+                  <SimpleDropdown
+                    value={physicalStatus}
+                    onChange={setPhysicalStatus}
+                    options={physicalStatusOptions}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Type de support</label>
+                <SimpleDropdown
+                  value={supportType}
+                  onChange={setSupportType}
+                  options={supportTypeOptions}
+                />
               </div>
 
               <Button 

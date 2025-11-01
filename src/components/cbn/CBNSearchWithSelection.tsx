@@ -126,6 +126,22 @@ export function CBNSearchWithSelection({
           query = query.ilike('document_type', `%${targetType}%`);
         }
       }
+
+      if (criteria.digitizationStatus && criteria.digitizationStatus !== "all") {
+        if (criteria.digitizationStatus === "digitized") {
+          query = query.eq('is_digitized', true);
+        } else if (criteria.digitizationStatus === "not_digitized") {
+          query = query.eq('is_digitized', false);
+        }
+      }
+
+      if (criteria.physicalStatus && criteria.physicalStatus !== "all") {
+        query = query.eq('physical_status', criteria.physicalStatus);
+      }
+
+      if (criteria.supportType && criteria.supportType !== "all") {
+        query = query.ilike('support_type', `%${criteria.supportType}%`);
+      }
       
       const { data, error, count } = await query.range(
         (currentPage - 1) * itemsPerPage,
