@@ -33,7 +33,7 @@ export default function CBMRecherche() {
     setIsSearching(true);
     
     try {
-      let query = supabase.from('cbm_catalog').select('*');
+      let query = supabase.from('cbm_catalog').select('*').limit(100);
       
       if (searchQuery) {
         const searchTerm = searchQuery.toLowerCase();
@@ -75,7 +75,7 @@ export default function CBMRecherche() {
     setIsSearching(true);
     
     try {
-      let query = supabase.from('cbm_catalog').select('*');
+      let query = supabase.from('cbm_catalog').select('*').limit(100);
       
       if (title) {
         query = query.ilike('title', `%${title}%`);

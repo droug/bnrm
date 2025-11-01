@@ -18,7 +18,7 @@ import Footer from '@/components/Footer';
 import { LanguageAutocomplete } from '@/components/ui/language-autocomplete';
 import { CountryAutocomplete } from '@/components/ui/country-autocomplete';
 import { CoteAutocomplete } from '@/components/ui/cote-autocomplete';
-import { mockDocuments } from '@/data/mockDocuments';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SearchCriteria {
   keywords: string;
@@ -114,45 +114,54 @@ const DemandeReproduction = () => {
   const handleSearch = async () => {
     setIsSearching(true);
     try {
-      // Simuler une recherche (à remplacer par l'appel API réel)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Utiliser les documents mockés réels avec tous les exemples
-      let results = [...mockDocuments];
+      // Rechercher dans la base de données cbm_catalog
+      let query = supabase.from('cbm_catalog').select('*').limit(100);
       
       // Filtrer par mots-clés si présents
       if (criteria.keywords) {
         const keywords = criteria.keywords.toLowerCase();
-        results = results.filter(doc => 
-          doc.title.toLowerCase().includes(keywords) ||
-          doc.author.toLowerCase().includes(keywords) ||
-          doc.description.toLowerCase().includes(keywords) ||
-          doc.keywords?.some(k => k.toLowerCase().includes(keywords))
-        );
+        query = query.or(`title.ilike.%${keywords}%,author.ilike.%${keywords}%,publisher.ilike.%${keywords}%`);
       }
       
       // Filtrer par nature de document
       if (criteria.nature.length > 0) {
-        results = results.filter(doc => 
-          criteria.nature.includes(doc.supportType)
-        );
+        query = query.in('document_type', criteria.nature);
       }
       
-      // Filtrer par langue
-      if (criteria.languages.length > 0) {
-        results = results.filter(doc => 
-          doc.language && criteria.languages.some(lang => 
-            doc.language?.includes(lang)
-          )
-        );
+      // Filtrer par date de publication
+      if (criteria.pubDateFrom) {
+        query = query.gte('publication_year', parseInt(criteria.pubDateFrom));
+      }
+      if (criteria.pubDateTo) {
+        query = query.lte('publication_year', parseInt(criteria.pubDateTo));
       }
       
       // Filtrer par cote si présente
       if (criteria.cote) {
-        results = results.filter(doc => 
-          doc.cote.toLowerCase().includes(criteria.cote.toLowerCase())
-        );
+        query = query.ilike('shelf_location', `%${criteria.cote}%`);
       }
+      
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      
+      const results = (data || []).map(doc => ({
+        id: doc.id,
+        title: doc.title,
+        titleAr: doc.title_ar,
+        author: doc.author || 'Auteur inconnu',
+        year: doc.publication_year?.toString() || '',
+        publisher: doc.publisher || '',
+        cote: doc.shelf_location || '',
+        supportType: doc.document_type || 'Livre',
+        supportStatus: 'numerise',
+        isFreeAccess: false,
+        description: `${doc.title} - ${doc.library_name}`,
+        library_name: doc.library_name,
+        library_code: doc.library_code,
+        availability_status: doc.availability_status,
+        isbn: doc.isbn
+      }));
       
       setSearchResults(results);
       

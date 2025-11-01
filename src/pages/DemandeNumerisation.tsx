@@ -18,7 +18,7 @@ import Footer from '@/components/Footer';
 import { LanguageAutocomplete } from '@/components/ui/language-autocomplete';
 import { CountryAutocomplete } from '@/components/ui/country-autocomplete';
 import { CoteAutocomplete } from '@/components/ui/cote-autocomplete';
-import { mockDocuments } from '@/data/mockDocuments';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SearchCriteria {
   keywords: string;
@@ -102,20 +102,41 @@ const DemandeNumerisation = () => {
     'Autre'
   ];
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     setIsSearching(true);
     
-    setTimeout(() => {
-      // Filtrer uniquement les documents non numérisés
-      let results = mockDocuments.filter(doc => doc.supportStatus === "non_numerise");
+    try {
+      // Rechercher dans CBN pour les documents non numérisés
+      let query = supabase.from('cbn_documents').select('*').eq('is_digitized', false).limit(100);
       
       if (criteria.keywords) {
-        results = results.filter(doc => 
-          doc.title.toLowerCase().includes(criteria.keywords.toLowerCase()) ||
-          doc.author.toLowerCase().includes(criteria.keywords.toLowerCase()) ||
-          doc.description.toLowerCase().includes(criteria.keywords.toLowerCase())
-        );
+        const keywords = criteria.keywords.toLowerCase();
+        query = query.or(`title.ilike.%${keywords}%,author.ilike.%${keywords}%,publisher.ilike.%${keywords}%`);
       }
+      
+      if (criteria.cote) {
+        query = query.ilike('cote', `%${criteria.cote}%`);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      
+      let results = (data || []).map(doc => ({
+        id: doc.id,
+        title: doc.title,
+        titleAr: doc.title_ar,
+        author: doc.author || 'Auteur inconnu',
+        year: doc.publication_year?.toString() || '',
+        publisher: doc.publisher || '',
+        cote: doc.cote,
+        supportType: doc.document_type || 'Livre',
+        supportStatus: 'non_numerise',
+        isFreeAccess: false,
+        description: doc.physical_description || `${doc.title}`,
+        language: '',
+        keywords: doc.keywords || []
+      }));
       
       if (criteria.languages.length > 0 && results.some(doc => doc.language)) {
         results = results.filter(doc => 
@@ -127,20 +148,22 @@ const DemandeNumerisation = () => {
         results = results.filter(doc => criteria.support.includes(doc.supportType));
       }
       
-      if (criteria.cote) {
-        results = results.filter(doc => 
-          doc.cote.toLowerCase().includes(criteria.cote.toLowerCase())
-        );
-      }
-      
       setSearchResults(results);
-      setIsSearching(false);
       
       toast({
         title: "Recherche terminée",
         description: `${results.length} document(s) non numérisé(s) trouvé(s)`,
       });
-    }, 1000);
+    } catch (error) {
+      console.error('Error searching:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la recherche",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleReset = () => {
