@@ -54,7 +54,7 @@ export default function NoticeDetailReproduction() {
 
       try {
         const { data, error } = await supabase
-          .from('cbn_catalog_documents')
+          .from('cbn_documents')
           .select('*')
           .eq('id', id)
           .maybeSingle();
@@ -69,20 +69,20 @@ export default function NoticeDetailReproduction() {
             title: data.title,
             author: data.author,
             publisher: data.publisher,
-            year: data.year,
-            type: data.support_type,
-            status: data.support_status === "libre_acces" ? "Libre accès" : 
-                    data.support_status === "numerise" ? "Numérisé" : 
+            year: data.publication_year?.toString(),
+            type: data.document_type || data.support_type,
+            status: data.is_digitized ? "Numérisé" : 
+                    data.physical_status === "bon" ? "Disponible" : 
                     "Non numérisé",
             cote: data.cote,
             isbn: data.isbn || "Absent",
-            pages: data.pages || data.physical_description || "Non spécifié",
-            pageCount: data.pages, // Nombre de pages (integer)
-            collection: data.collection,
-            language: data.language,
-            resume: data.summary,
-            noteContenu: data.description,
-            sommaire: data.table_of_contents || [],
+            pages: data.pages_count?.toString() || data.physical_description || "Non spécifié",
+            pageCount: data.pages_count, // Nombre de pages (integer)
+            collection: data.collection_name,
+            language: '', // Pas de champ language dans cbn_documents
+            resume: '', // Pas de champ summary dans cbn_documents
+            noteContenu: data.physical_description,
+            sommaire: [], // Pas de champ table_of_contents
             keywords: data.keywords || [],
             relatedDocs: []
           });

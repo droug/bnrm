@@ -343,10 +343,10 @@ export const mockDocuments: MockDocument[] = [
 // Fonction utilitaire pour récupérer un document par ID depuis Supabase
 export const getDocumentById = async (id: string): Promise<MockDocument | null> => {
   const { data, error } = await supabase
-    .from('cbn_catalog_documents')
+    .from('cbn_documents')
     .select('*')
     .eq('id', id)
-    .single();
+    .maybeSingle();
   
   if (error || !data) {
     console.error('Error fetching document:', error);
@@ -359,28 +359,28 @@ export const getDocumentById = async (id: string): Promise<MockDocument | null> 
     title: data.title,
     titleAr: data.title_ar,
     author: data.author,
-    secondaryAuthors: data.secondary_authors,
-    year: data.year,
+    secondaryAuthors: data.secondary_authors || [],
+    year: data.publication_year?.toString(),
     publisher: data.publisher,
-    publishPlace: data.publish_place,
-    pages: data.pages,
+    publishPlace: data.publication_place,
+    pages: data.pages_count,
     isbn: data.isbn,
     issn: data.issn,
     cote: data.cote,
-    internalId: data.internal_id,
-    supportType: data.support_type,
-    supportStatus: data.support_status as "numerise" | "non_numerise" | "libre_acces",
-    isFreeAccess: data.is_free_access,
-    allowPhysicalConsultation: data.allow_physical_consultation,
-    description: data.description,
-    summary: data.summary,
-    tableOfContents: data.table_of_contents,
-    keywords: data.keywords,
-    collection: data.collection,
-    language: data.language,
+    internalId: data.id, // Utiliser l'ID comme internal_id
+    supportType: data.document_type || data.support_type,
+    supportStatus: data.is_digitized ? "numerise" : "non_numerise" as "numerise" | "non_numerise" | "libre_acces",
+    isFreeAccess: data.access_level === 'public',
+    allowPhysicalConsultation: data.consultation_mode === 'sur_place' || data.physical_status === 'bon',
+    description: data.physical_description,
+    summary: '', // Pas de champ summary dans cbn_documents
+    tableOfContents: [], // Pas de champ table_of_contents dans cbn_documents
+    keywords: data.keywords || [],
+    collection: data.collection_name,
+    language: '', // Pas de champ language direct
     physicalDescription: data.physical_description,
-    noticeOrigin: data.notice_origin,
-    digitalLink: data.digital_link
+    noticeOrigin: 'Bibliothèque Nationale du Royaume du Maroc',
+    digitalLink: data.digital_library_document_id ? `/digital-library/${data.digital_library_document_id}` : undefined
   };
 };
 

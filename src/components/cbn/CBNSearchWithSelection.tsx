@@ -41,22 +41,15 @@ export function CBNSearchWithSelection({
 
   // Charger les résultats sauvegardés au montage du composant
   useEffect(() => {
-    const savedResults = sessionStorage.getItem('cbn_search_results');
-    if (savedResults) {
-      try {
-        const results = JSON.parse(savedResults);
-        setSearchResults(results);
-      } catch (error) {
-        console.error('Error loading saved search results:', error);
-      }
-    }
+    // Nettoyer les anciens résultats du sessionStorage au premier chargement
+    sessionStorage.removeItem('cbn_search_results');
   }, []);
 
   // Charger les documents depuis Supabase pour le cache
   useEffect(() => {
     const loadDocuments = async () => {
       const { data, error } = await supabase
-        .from('cbn_catalog_documents')
+        .from('cbn_documents')
         .select('*');
       
       if (data && !error) {
@@ -77,13 +70,13 @@ export function CBNSearchWithSelection({
     try {
       // Construire la requête Supabase
       let query = supabase
-        .from('cbn_catalog_documents')
+        .from('cbn_documents')
         .select('*');
       
       // Recherche simple (query)
       if (criteria.query) {
         const searchQuery = criteria.query.toLowerCase();
-        query = query.or(`title.ilike.%${searchQuery}%,author.ilike.%${searchQuery}%,cote.ilike.%${searchQuery}%,support_type.ilike.%${searchQuery}%,keywords.cs.{${searchQuery}}`);
+        query = query.or(`title.ilike.%${searchQuery}%,author.ilike.%${searchQuery}%,cote.ilike.%${searchQuery}%,document_type.ilike.%${searchQuery}%,support_type.ilike.%${searchQuery}%,keywords.cs.{${searchQuery}}`);
       }
       
       // Filtres avancés
@@ -100,11 +93,11 @@ export function CBNSearchWithSelection({
       }
       
       if (criteria.year) {
-        query = query.gte('year', criteria.year);
+        query = query.gte('publication_year', criteria.year);
       }
       
       if (criteria.yearEnd) {
-        query = query.lte('year', criteria.yearEnd);
+        query = query.lte('publication_year', criteria.yearEnd);
       }
       
       if (criteria.cote) {
@@ -122,7 +115,7 @@ export function CBNSearchWithSelection({
         };
         const targetType = typeMap[criteria.documentType];
         if (targetType) {
-          query = query.ilike('support_type', `%${targetType}%`);
+          query = query.ilike('document_type', `%${targetType}%`);
         }
       }
       
@@ -146,10 +139,11 @@ export function CBNSearchWithSelection({
         title: doc.title,
         author: doc.author,
         publisher: doc.publisher,
-        year: doc.year,
-        type: doc.support_type,
-        status: doc.support_status === "libre_acces" ? "Libre accès" : 
-                doc.support_status === "numerise" ? "Numérisé" : 
+        year: doc.publication_year?.toString(),
+        type: doc.document_type || doc.support_type,
+        status: doc.is_digitized ? "Numérisé" : 
+                doc.physical_status === "bon" ? "Disponible" : 
+                doc.physical_status === "restauration" ? "En restauration" :
                 "Non numérisé",
         cote: doc.cote
       }));
