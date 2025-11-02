@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   AlertCircle, CheckCircle, XCircle, Clock, Wrench, Eye, Filter, ArrowLeft, 
-  FileCheck, Package, CreditCard, Settings, History 
+  FileCheck, Package, CreditCard, Settings, RotateCcw 
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -198,11 +198,12 @@ export default function RestorationRequests() {
         case 'director_reject':
           updateData.status = 'refusee_direction';
           updateData.director_rejection_reason = data.notes;
+          updateData.rejected_at = new Date().toISOString();
           break;
         case 'receive_artwork':
-          updateData.status = 'oeuvre_recue';
+          updateData.status = 'diagnostic_en_cours';
           updateData.artwork_received_at = new Date().toISOString();
-          updateData.reception_notes = data.notes;
+          updateData.artwork_condition_at_reception = data.notes;
           break;
         case 'complete_diagnosis':
           updateData.status = 'devis_en_attente';
@@ -210,15 +211,25 @@ export default function RestorationRequests() {
           updateData.diagnosis_completed_at = new Date().toISOString();
           break;
         case 'send_quote':
-          updateData.status = 'devis_en_attente';
+          updateData.status = 'devis_accepte';
           updateData.quote_amount = data.quoteAmount ? parseFloat(data.quoteAmount) : null;
           updateData.quote_details = data.quoteDetails;
-          updateData.quote_sent_at = new Date().toISOString();
+          updateData.quote_issued_at = new Date().toISOString();
+          break;
+        case 'accept_quote':
+          updateData.status = 'paiement_en_attente';
+          updateData.quote_accepted_at = new Date().toISOString();
+          break;
+        case 'reject_quote':
+          updateData.status = 'devis_refuse';
+          updateData.quote_rejection_reason = data.notes;
+          updateData.quote_rejected_at = new Date().toISOString();
           break;
         case 'validate_payment':
           updateData.status = 'paiement_valide';
           updateData.payment_reference = data.paymentReference;
-          updateData.payment_validated_at = new Date().toISOString();
+          updateData.payment_date = new Date().toISOString();
+          updateData.payment_validated_by = (await supabase.auth.getUser()).data.user?.id;
           break;
         case 'start_restoration':
           updateData.status = 'restauration_en_cours';
@@ -227,12 +238,40 @@ export default function RestorationRequests() {
         case 'complete_restoration':
           updateData.status = 'terminee';
           updateData.restoration_report = data.restorationReport;
-          updateData.restoration_completed_at = new Date().toISOString();
+          updateData.completed_at = new Date().toISOString();
+          updateData.restoration_completed_by = (await supabase.auth.getUser()).data.user?.id;
           break;
         case 'return_artwork':
           updateData.status = 'cloturee';
           updateData.artwork_returned_at = new Date().toISOString();
-          updateData.completion_notes = data.completionNotes;
+          updateData.return_notes = data.completionNotes;
+          break;
+        case 'reset_request':
+          // Pour les tests - réinitialise la demande au début
+          updateData.status = 'soumise';
+          updateData.director_approval_notes = null;
+          updateData.director_approval_at = null;
+          updateData.director_rejection_reason = null;
+          updateData.rejected_at = null;
+          updateData.artwork_received_at = null;
+          updateData.artwork_condition_at_reception = null;
+          updateData.diagnosis_report = null;
+          updateData.diagnosis_completed_at = null;
+          updateData.quote_amount = null;
+          updateData.quote_details = null;
+          updateData.quote_issued_at = null;
+          updateData.quote_accepted_at = null;
+          updateData.quote_rejected_at = null;
+          updateData.quote_rejection_reason = null;
+          updateData.payment_reference = null;
+          updateData.payment_date = null;
+          updateData.payment_validated_by = null;
+          updateData.restoration_started_at = null;
+          updateData.restoration_report = null;
+          updateData.completed_at = null;
+          updateData.restoration_completed_by = null;
+          updateData.artwork_returned_at = null;
+          updateData.return_notes = null;
           break;
       }
 
@@ -253,9 +292,18 @@ export default function RestorationRequests() {
   };
 
   const getActionButton = (request: RestorationRequest) => {
-    // Statuts terminaux - pas de bouton d'action
+    // Statuts terminaux - pas de bouton d'action (sauf bouton reset pour tests)
     if (['cloturee', 'refusee_direction', 'devis_refuse', 'annulee'].includes(request.status)) {
-      return null;
+      return (
+        <Button 
+          size="sm" 
+          variant="outline"
+          onClick={() => handleWorkflowAction(request, 'reset_request')}
+        >
+          <RotateCcw className="w-4 h-4 mr-1" />
+          Réinitialiser (Test)
+        </Button>
+      );
     }
 
     switch (request.status) {
@@ -288,25 +336,27 @@ export default function RestorationRequests() {
           </Button>
         );
       case 'oeuvre_recue':
+      case 'diagnostic_en_cours':
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'complete_diagnosis')}>
             <FileCheck className="w-4 h-4 mr-1" />
-            Diagnostic
-          </Button>
-        );
-      case 'diagnostic_en_cours':
-        return (
-          <Button size="sm" onClick={() => handleWorkflowAction(request, 'send_quote')}>
-            <CreditCard className="w-4 h-4 mr-1" />
-            Devis
+            Compléter diagnostic
           </Button>
         );
       case 'devis_en_attente':
+        return (
+          <div className="flex gap-2">
+            <Button size="sm" onClick={() => handleWorkflowAction(request, 'send_quote')}>
+              <CreditCard className="w-4 h-4 mr-1" />
+              Envoyer devis
+            </Button>
+          </div>
+        );
       case 'devis_accepte':
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'validate_payment')}>
             <CheckCircle className="w-4 h-4 mr-1" />
-            Paiement
+            Attendre paiement
           </Button>
         );
       case 'paiement_en_attente':
@@ -320,21 +370,21 @@ export default function RestorationRequests() {
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'start_restoration')}>
             <Wrench className="w-4 h-4 mr-1" />
-            Démarrer
+            Démarrer restauration
           </Button>
         );
       case 'restauration_en_cours':
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'complete_restoration')}>
             <CheckCircle className="w-4 h-4 mr-1" />
-            Terminer
+            Terminer restauration
           </Button>
         );
       case 'terminee':
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'return_artwork')}>
-            <History className="w-4 h-4 mr-1" />
-            Retourner
+            <Package className="w-4 h-4 mr-1" />
+            Retourner œuvre
           </Button>
         );
       default:

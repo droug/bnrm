@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, XCircle, FileText, ClipboardCheck, DollarSign, Wrench, CheckCheck, Download } from "lucide-react";
+import { CheckCircle, XCircle, FileText, ClipboardCheck, DollarSign, Wrench, CheckCheck, Download, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -14,7 +14,7 @@ import {
   generateCompletionCertificate,
 } from "@/lib/restorationPdfGenerator";
 
-interface WorkflowDialogProps {
+interface RestorationWorkflowDialogProps {
   open: boolean;
   onClose: () => void;
   request: any | null;
@@ -28,7 +28,7 @@ export function RestorationWorkflowDialog({
   request, 
   onAction, 
   actionType 
-}: WorkflowDialogProps) {
+}: RestorationWorkflowDialogProps) {
   const { toast } = useToast();
   const [notes, setNotes] = useState('');
   const [estimatedCost, setEstimatedCost] = useState('');
@@ -118,6 +118,9 @@ export function RestorationWorkflowDialog({
         break;
       case 'return_artwork':
         data.completionNotes = completionNotes;
+        break;
+      case 'reset_request':
+        // Pas de données nécessaires pour la réinitialisation
         break;
     }
 
@@ -305,6 +308,17 @@ export function RestorationWorkflowDialog({
                 placeholder="Notes finales..."
                 rows={3}
               />
+            </div>
+          )
+        };
+      case 'reset_request':
+        return {
+          title: 'Réinitialiser la demande (Test)',
+          icon: <RotateCcw className="w-6 h-6 text-gray-500" />,
+          fields: (
+            <div className="text-sm text-muted-foreground">
+              <p className="mb-2">Cette action va réinitialiser la demande au statut initial "Soumise" et effacer toutes les données du workflow.</p>
+              <p className="font-semibold text-destructive">⚠️ Cette fonction est destinée aux tests uniquement.</p>
             </div>
           )
         };
