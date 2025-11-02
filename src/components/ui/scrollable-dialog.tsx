@@ -4,6 +4,12 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ScrollableDialog = DialogPrimitive.Root;
+
+const ScrollableDialogNestedRoot = ({ children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Root>) => (
+  <DialogPrimitive.Root modal={false} {...props}>
+    {children}
+  </DialogPrimitive.Root>
+);
 const ScrollableDialogTrigger = DialogPrimitive.Trigger;
 const ScrollableDialogPortal = DialogPrimitive.Portal;
 const ScrollableDialogClose = DialogPrimitive.Close;
@@ -168,6 +174,7 @@ ScrollableDialogDescription.displayName = DialogPrimitive.Description.displayNam
 
 export {
   ScrollableDialog,
+  ScrollableDialogNestedRoot,
   ScrollableDialogPortal,
   ScrollableDialogOverlay,
   ScrollableDialogClose,

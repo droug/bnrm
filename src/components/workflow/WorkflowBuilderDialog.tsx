@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  ScrollableDialog,
+  ScrollableDialogNestedRoot,
   ScrollableDialogContent,
   ScrollableDialogHeader,
   ScrollableDialogTitle,
@@ -69,20 +69,20 @@ export function WorkflowBuilderDialog({
 
   if (loading) {
     return (
-      <ScrollableDialog open={open} onOpenChange={onOpenChange}>
+      <ScrollableDialogNestedRoot open={open} onOpenChange={onOpenChange}>
         <ScrollableDialogContent className="max-w-5xl">
           <div className="flex items-center justify-center p-8">
             Chargement...
           </div>
         </ScrollableDialogContent>
-      </ScrollableDialog>
+      </ScrollableDialogNestedRoot>
     );
   }
 
   if (!workflow) return null;
 
   return (
-    <ScrollableDialog open={open} onOpenChange={onOpenChange}>
+    <ScrollableDialogNestedRoot open={open} onOpenChange={onOpenChange}>
       <ScrollableDialogContent className="max-w-5xl">
         <ScrollableDialogHeader>
           <ScrollableDialogTitle className="text-xl">
@@ -131,6 +131,6 @@ export function WorkflowBuilderDialog({
           </Tabs>
         </ScrollableDialogBody>
       </ScrollableDialogContent>
-    </ScrollableDialog>
+    </ScrollableDialogNestedRoot>
   );
 }
