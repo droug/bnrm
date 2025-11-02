@@ -271,265 +271,357 @@ export default function MyLibrarySpace() {
           </p>
         </div>
 
-        <Tabs defaultValue="history" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="history" className="flex items-center gap-2">
-              <History className="h-4 w-4" />
-              Historique ({readingHistory.length})
-            </TabsTrigger>
-            <TabsTrigger value="favorites" className="flex items-center gap-2">
-              <Heart className="h-4 w-4" />
-              Favoris ({favorites.length})
-            </TabsTrigger>
-            <TabsTrigger value="bookmarks" className="flex items-center gap-2">
-              <Bookmark className="h-4 w-4" />
-              Marque-pages ({bookmarks.length})
-            </TabsTrigger>
-            <TabsTrigger value="reviews" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              Évaluations ({reviews.length})
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-2">
+        <Tabs defaultValue="requests" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="requests" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              Mes Restaurations
+              Suivi Demandes
+            </TabsTrigger>
+            <TabsTrigger value="actions" className="flex items-center gap-2">
+              <History className="h-4 w-4" />
+              Historique Actions
             </TabsTrigger>
           </TabsList>
 
-          {/* Historique Tab */}
-          <TabsContent value="history">
-            <Card>
-              <CardHeader>
-                <CardTitle>Historique de consultation</CardTitle>
-                <CardDescription>
-                  Retrouvez l'historique de vos consultations, lectures et téléchargements
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[600px] pr-4">
-                  {readingHistory.length === 0 ? (
+          {/* Suivi Demandes Tab */}
+          <TabsContent value="requests">
+            <Tabs defaultValue="restoration" className="space-y-4">
+              <TabsList className="w-full grid grid-cols-5">
+                <TabsTrigger value="restoration">Restauration</TabsTrigger>
+                <TabsTrigger value="reproduction">Reproduction</TabsTrigger>
+                <TabsTrigger value="legal-deposit">Dépôt légal</TabsTrigger>
+                <TabsTrigger value="book-reservation">Réservation ouvrage</TabsTrigger>
+                <TabsTrigger value="space-reservation">Réservation espace</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="restoration">
+                <div className="grid gap-6 md:grid-cols-2">
+                  <RestorationNotifications />
+                  <MyRestorationRequests />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="reproduction">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Demandes de reproduction</CardTitle>
+                    <CardDescription>
+                      Suivez vos demandes de reproduction de documents
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
                     <div className="text-center py-12">
-                      <History className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">Aucun historique pour le moment</p>
+                      <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">Aucune demande de reproduction pour le moment</p>
                     </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {readingHistory.map((item) => (
-                        <Card key={item.id} className="hover:shadow-md transition-shadow">
-                          <CardContent className="p-4">
-                            <div className="flex items-start gap-4">
-                              <div className="flex-1">
-                                <div className="flex items-start justify-between mb-2">
-                                  <div>
-                                    <h3 className="font-semibold text-lg">{item.title}</h3>
-                                    {item.author && (
-                                      <p className="text-sm text-muted-foreground">{item.author}</p>
-                                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="legal-deposit">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Dépôt légal</CardTitle>
+                    <CardDescription>
+                      Suivez vos dépôts légaux
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-12">
+                      <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">Aucun dépôt légal pour le moment</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="book-reservation">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Réservation d'ouvrage</CardTitle>
+                    <CardDescription>
+                      Suivez vos réservations d'ouvrages
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-12">
+                      <Book className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">Aucune réservation d'ouvrage pour le moment</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="space-reservation">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Réservation d'espace</CardTitle>
+                    <CardDescription>
+                      Suivez vos réservations d'espaces
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-12">
+                      <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">Aucune réservation d'espace pour le moment</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+
+          {/* Historique Actions Tab */}
+          <TabsContent value="actions">
+            <Tabs defaultValue="history" className="space-y-4">
+              <TabsList className="w-full grid grid-cols-4">
+                <TabsTrigger value="history" className="flex items-center gap-2">
+                  <History className="h-4 w-4" />
+                  Historique ({readingHistory.length})
+                </TabsTrigger>
+                <TabsTrigger value="favorites" className="flex items-center gap-2">
+                  <Heart className="h-4 w-4" />
+                  Favoris ({favorites.length})
+                </TabsTrigger>
+                <TabsTrigger value="bookmarks" className="flex items-center gap-2">
+                  <Bookmark className="h-4 w-4" />
+                  Marque-pages ({bookmarks.length})
+                </TabsTrigger>
+                <TabsTrigger value="reviews" className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Évaluations ({reviews.length})
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Historique */}
+              <TabsContent value="history">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Historique de consultation</CardTitle>
+                    <CardDescription>
+                      Retrouvez l'historique de vos consultations, lectures et téléchargements
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ScrollArea className="h-[600px] pr-4">
+                      {readingHistory.length === 0 ? (
+                        <div className="text-center py-12">
+                          <History className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                          <p className="text-muted-foreground">Aucun historique pour le moment</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {readingHistory.map((item) => (
+                            <Card key={item.id} className="hover:shadow-md transition-shadow">
+                              <CardContent className="p-4">
+                                <div className="flex items-start gap-4">
+                                  <div className="flex-1">
+                                    <div className="flex items-start justify-between mb-2">
+                                      <div>
+                                        <h3 className="font-semibold text-lg">{item.title}</h3>
+                                        {item.author && (
+                                          <p className="text-sm text-muted-foreground">{item.author}</p>
+                                        )}
+                                      </div>
+                                      <Badge variant="outline" className="flex items-center gap-1">
+                                        {getActionIcon(item.action_type)}
+                                        {getActionLabel(item.action_type)}
+                                      </Badge>
+                                    </div>
+                                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                      <span className="flex items-center gap-1">
+                                        <Clock className="h-3 w-3" />
+                                        {formatDate(item.created_at)}
+                                      </span>
+                                      {item.last_page_read && (
+                                        <span>Page {item.last_page_read}</span>
+                                      )}
+                                      {item.reading_progress > 0 && (
+                                        <Badge variant="secondary">
+                                          {Math.round(item.reading_progress)}% lu
+                                        </Badge>
+                                      )}
+                                    </div>
                                   </div>
-                                  <Badge variant="outline" className="flex items-center gap-1">
-                                    {getActionIcon(item.action_type)}
-                                    {getActionLabel(item.action_type)}
-                                  </Badge>
                                 </div>
-                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                  <span className="flex items-center gap-1">
-                                    <Clock className="h-3 w-3" />
-                                    {formatDate(item.created_at)}
-                                  </span>
-                                  {item.last_page_read && (
-                                    <span>Page {item.last_page_read}</span>
-                                  )}
-                                  {item.reading_progress > 0 && (
-                                    <Badge variant="secondary">
-                                      {Math.round(item.reading_progress)}% lu
-                                    </Badge>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-          {/* Favoris Tab */}
-          <TabsContent value="favorites">
-            <Card>
-              <CardHeader>
-                <CardTitle>Mes Favoris</CardTitle>
-                <CardDescription>
-                  Documents et manuscrits que vous avez marqués comme favoris
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[600px] pr-4">
-                  {favorites.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">Aucun favori pour le moment</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {favorites.map((item) => (
-                        <Card key={item.id} className="hover:shadow-md transition-shadow">
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex-1">
-                                <h3 className="font-semibold text-lg mb-1">{item.title}</h3>
-                                {item.author && (
-                                  <p className="text-sm text-muted-foreground mb-2">{item.author}</p>
-                                )}
-                                <Badge variant="outline">{item.content_type}</Badge>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeFavorite(item.id)}
-                              >
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </div>
-                            {item.notes && (
-                              <p className="text-sm text-muted-foreground mb-2 italic">
-                                "{item.notes}"
-                              </p>
-                            )}
-                            <p className="text-xs text-muted-foreground">
-                              Ajouté le {formatDate(item.created_at)}
-                            </p>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Marque-pages Tab */}
-          <TabsContent value="bookmarks">
-            <Card>
-              <CardHeader>
-                <CardTitle>Mes Marque-pages</CardTitle>
-                <CardDescription>
-                  Pages marquées pour reprendre votre lecture plus tard
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[600px] pr-4">
-                  {bookmarks.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Bookmark className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">Aucun marque-page pour le moment</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {bookmarks.map((item) => (
-                        <Card key={item.id} className="hover:shadow-md transition-shadow">
-                          <CardContent className="p-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <Badge>Page {item.page_number}</Badge>
-                                  <span className="text-sm text-muted-foreground">
-                                    {formatDate(item.created_at)}
-                                  </span>
+              {/* Favoris */}
+              <TabsContent value="favorites">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Mes Favoris</CardTitle>
+                    <CardDescription>
+                      Documents et manuscrits que vous avez marqués comme favoris
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ScrollArea className="h-[600px] pr-4">
+                      {favorites.length === 0 ? (
+                        <div className="text-center py-12">
+                          <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                          <p className="text-muted-foreground">Aucun favori pour le moment</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {favorites.map((item) => (
+                            <Card key={item.id} className="hover:shadow-md transition-shadow">
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="flex-1">
+                                    <h3 className="font-semibold text-lg mb-1">{item.title}</h3>
+                                    {item.author && (
+                                      <p className="text-sm text-muted-foreground mb-2">{item.author}</p>
+                                    )}
+                                    <Badge variant="outline">{item.content_type}</Badge>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeFavorite(item.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                  </Button>
                                 </div>
-                                {item.note && (
-                                  <p className="text-sm text-muted-foreground italic">
-                                    {item.note}
+                                {item.notes && (
+                                  <p className="text-sm text-muted-foreground mb-2 italic">
+                                    "{item.notes}"
                                   </p>
                                 )}
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => deleteBookmark(item.id)}
-                              >
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                                <p className="text-xs text-muted-foreground">
+                                  Ajouté le {formatDate(item.created_at)}
+                                </p>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-          {/* Évaluations Tab */}
-          <TabsContent value="reviews">
-            <Card>
-              <CardHeader>
-                <CardTitle>Mes Évaluations et Commentaires</CardTitle>
-                <CardDescription>
-                  Partagez vos impressions avec les gestionnaires de la BNRM (privé)
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[600px] pr-4">
-                  {reviews.length === 0 ? (
-                    <div className="text-center py-12">
-                      <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">Aucune évaluation pour le moment</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {reviews.map((review) => (
-                        <Card key={review.id} className="hover:shadow-md transition-shadow">
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex items-center gap-2">
-                                <div className="flex">
-                                  {[...Array(5)].map((_, i) => (
-                                    <Star
-                                      key={i}
-                                      className={`h-4 w-4 ${
-                                        i < review.rating
-                                          ? 'fill-yellow-400 text-yellow-400'
-                                          : 'text-gray-300'
-                                      }`}
-                                    />
-                                  ))}
+              {/* Marque-pages */}
+              <TabsContent value="bookmarks">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Mes Marque-pages</CardTitle>
+                    <CardDescription>
+                      Pages marquées pour reprendre votre lecture plus tard
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ScrollArea className="h-[600px] pr-4">
+                      {bookmarks.length === 0 ? (
+                        <div className="text-center py-12">
+                          <Bookmark className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                          <p className="text-muted-foreground">Aucun marque-page pour le moment</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {bookmarks.map((item) => (
+                            <Card key={item.id} className="hover:shadow-md transition-shadow">
+                              <CardContent className="p-4">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-3 mb-2">
+                                      <Badge>Page {item.page_number}</Badge>
+                                      <span className="text-sm text-muted-foreground">
+                                        {formatDate(item.created_at)}
+                                      </span>
+                                    </div>
+                                    {item.note && (
+                                      <p className="text-sm text-muted-foreground italic">
+                                        {item.note}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => deleteBookmark(item.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                  </Button>
                                 </div>
-                                {review.is_reviewed_by_admin && (
-                                  <Badge variant="secondary">Répondu</Badge>
-                                )}
-                              </div>
-                              <span className="text-xs text-muted-foreground">
-                                {formatDate(review.created_at)}
-                              </span>
-                            </div>
-                            <p className="text-sm mb-3">{review.comment}</p>
-                            {review.admin_response && (
-                              <div className="bg-muted p-3 rounded-md">
-                                <p className="text-xs font-semibold mb-1">Réponse de l'administrateur :</p>
-                                <p className="text-sm">{review.admin_response}</p>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-          {/* Notifications Tab */}
-          <TabsContent value="notifications">
-            <div className="grid gap-6 md:grid-cols-2">
-              <RestorationNotifications />
-              <MyRestorationRequests />
-            </div>
+              {/* Évaluations */}
+              <TabsContent value="reviews">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Mes Évaluations et Commentaires</CardTitle>
+                    <CardDescription>
+                      Partagez vos impressions avec les gestionnaires de la BNRM (privé)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ScrollArea className="h-[600px] pr-4">
+                      {reviews.length === 0 ? (
+                        <div className="text-center py-12">
+                          <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                          <p className="text-muted-foreground">Aucune évaluation pour le moment</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {reviews.map((review) => (
+                            <Card key={review.id} className="hover:shadow-md transition-shadow">
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex">
+                                      {[...Array(5)].map((_, i) => (
+                                        <Star
+                                          key={i}
+                                          className={`h-4 w-4 ${
+                                            i < review.rating
+                                              ? 'fill-yellow-400 text-yellow-400'
+                                              : 'text-gray-300'
+                                          }`}
+                                        />
+                                      ))}
+                                    </div>
+                                    {review.is_reviewed_by_admin && (
+                                      <Badge variant="secondary">Répondu</Badge>
+                                    )}
+                                  </div>
+                                  <span className="text-xs text-muted-foreground">
+                                    {formatDate(review.created_at)}
+                                  </span>
+                                </div>
+                                <p className="text-sm mb-3">{review.comment}</p>
+                                {review.admin_response && (
+                                  <div className="bg-muted p-3 rounded-md">
+                                    <p className="text-xs font-semibold mb-1">Réponse de l'administrateur :</p>
+                                    <p className="text-sm">{review.admin_response}</p>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
       </main>
