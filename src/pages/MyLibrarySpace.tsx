@@ -267,7 +267,7 @@ export default function MyLibrarySpace() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Mon Espace</h1>
           <p className="text-muted-foreground">
-            Gérez vos lectures, favoris, marque-pages et évaluations
+            Gérez vos demandes, vos lectures, favoris, marque-pages et évaluations
           </p>
         </div>
 
