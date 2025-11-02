@@ -229,7 +229,7 @@ export default function RestorationRequests() {
           updateData.diagnosis_completed_at = new Date().toISOString();
           break;
         case 'send_quote':
-          updateData.status = 'devis_accepte';
+          updateData.status = 'devis_en_attente';
           updateData.quote_amount = data.quoteAmount ? parseFloat(data.quoteAmount) : null;
           updateData.quote_details = data.quoteDetails;
           updateData.quote_issued_at = new Date().toISOString();
@@ -364,9 +364,17 @@ export default function RestorationRequests() {
       case 'devis_en_attente':
         return (
           <div className="flex gap-2">
-            <Button size="sm" onClick={() => handleWorkflowAction(request, 'send_quote')}>
-              <CreditCard className="w-4 h-4 mr-1" />
-              Envoyer devis
+            <Button size="sm" onClick={() => handleWorkflowAction(request, 'accept_quote')}>
+              <CheckCircle className="w-4 h-4 mr-1" />
+              Accepter devis
+            </Button>
+            <Button 
+              size="sm" 
+              variant="destructive"
+              onClick={() => handleWorkflowAction(request, 'reject_quote')}
+            >
+              <XCircle className="w-4 h-4 mr-1" />
+              Refuser devis
             </Button>
           </div>
         );
@@ -374,7 +382,7 @@ export default function RestorationRequests() {
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'validate_payment')}>
             <CheckCircle className="w-4 h-4 mr-1" />
-            Attendre paiement
+            Valider paiement
           </Button>
         );
       case 'paiement_en_attente':

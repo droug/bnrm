@@ -110,6 +110,12 @@ export function RestorationWorkflowDialog({
         data.quoteAmount = quoteAmount;
         data.quoteDetails = quoteDetails;
         break;
+      case 'accept_quote':
+        // Pas de données supplémentaires nécessaires
+        break;
+      case 'reject_quote':
+        data.notes = notes;
+        break;
       case 'validate_payment':
         data.paymentReference = paymentReference;
         break;
@@ -252,6 +258,32 @@ export function RestorationWorkflowDialog({
                 />
               </div>
             </>
+          )
+        };
+      case 'accept_quote':
+        return {
+          title: 'Accepter le devis',
+          icon: <CheckCircle className="w-6 h-6 text-green-500" />,
+          fields: (
+            <p className="text-sm text-muted-foreground">
+              Confirmer l'acceptation du devis. Le statut passera en attente de paiement.
+            </p>
+          )
+        };
+      case 'reject_quote':
+        return {
+          title: 'Refuser le devis',
+          icon: <XCircle className="w-6 h-6 text-red-500" />,
+          fields: (
+            <div>
+              <Label>Motif du refus</Label>
+              <Textarea 
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Raison du refus du devis..."
+                rows={4}
+              />
+            </div>
           )
         };
       case 'validate_payment':
