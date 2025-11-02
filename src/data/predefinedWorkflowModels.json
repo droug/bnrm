@@ -911,5 +911,217 @@
       {"name": "Directeur Conservation", "level": "admin"},
       {"name": "Restaurateur", "level": "module"}
     ]
+  },
+  {
+    "code": "WF_REPRO_01",
+    "name": "Workflow Demandes de Reproduction",
+    "module": "reproduction",
+    "workflow_type": "reproduction",
+    "version": "1.0",
+    "description": "Gestion des demandes de reproduction de documents avec tarification et validation.",
+    "color": "rose",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Soumission de la demande",
+        "type": "creation",
+        "required_role": "Utilisateur",
+        "description": "Création de la demande de reproduction par l'utilisateur"
+      },
+      {
+        "order": 2,
+        "name": "Vérification et tarification",
+        "type": "validation",
+        "required_role": "Agent Reproduction",
+        "description": "Vérification de la faisabilité et calcul du tarif"
+      },
+      {
+        "order": 3,
+        "name": "Validation Direction",
+        "type": "validation",
+        "required_role": "Responsable Service",
+        "description": "Validation par le responsable du service"
+      },
+      {
+        "order": 4,
+        "name": "Traitement et réalisation",
+        "type": "execution",
+        "required_role": "Technicien Reproduction",
+        "description": "Reproduction et numérisation des documents"
+      },
+      {
+        "order": 5,
+        "name": "Contrôle qualité",
+        "type": "validation",
+        "required_role": "Agent Reproduction",
+        "description": "Vérification de la qualité des reproductions"
+      },
+      {
+        "order": 6,
+        "name": "Livraison",
+        "type": "transmission",
+        "required_role": "Agent Reproduction",
+        "description": "Remise des documents au demandeur"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Soumettre la demande",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Soumettre"
+      },
+      {
+        "name": "Tarifier et valider",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Tarifier"
+      },
+      {
+        "name": "Approuver",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Approuver"
+      },
+      {
+        "name": "Commencer reproduction",
+        "from_step": 3,
+        "to_step": 4,
+        "trigger_type": "manual",
+        "action": "Démarrer"
+      },
+      {
+        "name": "Contrôler",
+        "from_step": 4,
+        "to_step": 5,
+        "trigger_type": "manual",
+        "action": "Contrôler"
+      },
+      {
+        "name": "Livrer",
+        "from_step": 5,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Livrer"
+      },
+      {
+        "name": "Rejeter demande",
+        "from_step": 1,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      },
+      {
+        "name": "Refuser",
+        "from_step": 2,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Refuser"
+      },
+      {
+        "name": "Retour qualité",
+        "from_step": 5,
+        "to_step": 4,
+        "trigger_type": "manual",
+        "action": "Reprendre"
+      }
+    ],
+    "roles": [
+      {"name": "Utilisateur", "level": "module"},
+      {"name": "Agent Reproduction", "level": "module"},
+      {"name": "Responsable Service", "level": "module"},
+      {"name": "Technicien Reproduction", "level": "module"}
+    ]
+  },
+  {
+    "code": "WF_VISIT_01",
+    "name": "Workflow Réservations de Visite",
+    "module": "visits",
+    "workflow_type": "visit_booking",
+    "version": "1.0",
+    "description": "Gestion des réservations de visites guidées avec gestion des créneaux et confirmation.",
+    "color": "amber",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Réservation en ligne",
+        "type": "creation",
+        "required_role": "Visiteur",
+        "description": "Création de la réservation par le visiteur"
+      },
+      {
+        "order": 2,
+        "name": "Vérification disponibilité",
+        "type": "validation",
+        "required_role": "Gestionnaire Visites",
+        "description": "Vérification de la disponibilité du créneau"
+      },
+      {
+        "order": 3,
+        "name": "Confirmation",
+        "type": "validation",
+        "required_role": "Gestionnaire Visites",
+        "description": "Confirmation de la réservation et envoi de la notification"
+      },
+      {
+        "order": 4,
+        "name": "Réalisation de la visite",
+        "type": "execution",
+        "required_role": "Guide",
+        "description": "Accueil et visite guidée"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Réserver",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Réserver"
+      },
+      {
+        "name": "Vérifier",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "automatic",
+        "action": "Vérifier"
+      },
+      {
+        "name": "Confirmer",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Confirmer"
+      },
+      {
+        "name": "Terminer",
+        "from_step": 3,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Terminer"
+      },
+      {
+        "name": "Annuler",
+        "from_step": 1,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Annuler"
+      },
+      {
+        "name": "Annuler confirmation",
+        "from_step": 2,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Annuler"
+      }
+    ],
+    "roles": [
+      {"name": "Visiteur", "level": "module"},
+      {"name": "Gestionnaire Visites", "level": "module"},
+      {"name": "Guide", "level": "module"}
+    ]
   }
 ]

@@ -12,6 +12,7 @@ import { WorkflowRolesManager } from "@/components/workflow/WorkflowRolesManager
 import { WorkflowModelsManager } from "@/components/workflow/WorkflowModelsManager";
 import { WorkflowDynamicSelects } from "@/components/workflow/WorkflowDynamicSelects";
 import { PredefinedWorkflowsImporter } from "@/components/workflow/PredefinedWorkflowsImporter";
+import { WorkflowSyncManager } from "@/components/workflow/WorkflowSyncManager";
 import { Activity, GitBranch, Settings, TrendingUp, Users, ArrowLeft, FolderKanban, ListFilter, Package, CalendarRange } from "lucide-react";
 import { BookingWorkflowStepsManager } from "@/components/workflow/BookingWorkflowStepsManager";
 
@@ -103,7 +104,10 @@ export default function WorkflowBPM() {
           </TabsList>
 
           <TabsContent value="predefined" className="mt-6">
-            <PredefinedWorkflowsImporter />
+            <div className="space-y-6">
+              <WorkflowSyncManager />
+              <PredefinedWorkflowsImporter />
+            </div>
           </TabsContent>
 
           <TabsContent value="configurator" className="mt-6">
