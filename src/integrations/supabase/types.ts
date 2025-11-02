@@ -6090,21 +6090,141 @@ export type Database = {
         }
         Relationships: []
       }
+      restoration_documents: {
+        Row: {
+          created_at: string
+          document_name: string | null
+          document_type: string
+          document_url: string
+          id: string
+          notes: string | null
+          request_id: string
+          uploaded_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          document_name?: string | null
+          document_type: string
+          document_url: string
+          id?: string
+          notes?: string | null
+          request_id: string
+          uploaded_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          document_name?: string | null
+          document_type?: string
+          document_url?: string
+          id?: string
+          notes?: string | null
+          request_id?: string
+          uploaded_at?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restoration_documents_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "restoration_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      restoration_request_history: {
+        Row: {
+          changed_at: string
+          changed_by: string
+          created_at: string
+          id: string
+          new_status: string
+          notes: string | null
+          previous_status: string
+          request_id: string
+        }
+        Insert: {
+          changed_at?: string
+          changed_by: string
+          created_at?: string
+          id?: string
+          new_status: string
+          notes?: string | null
+          previous_status: string
+          request_id: string
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string
+          created_at?: string
+          id?: string
+          new_status?: string
+          notes?: string | null
+          previous_status?: string
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restoration_request_history_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "restoration_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       restoration_requests: {
         Row: {
+          artwork_condition_at_reception: string | null
+          artwork_received_at: string | null
+          artwork_received_by: string | null
+          artwork_returned_at: string | null
+          artwork_returned_by: string | null
           assigned_restorer: string | null
+          authorization_document_url: string | null
           completed_at: string | null
           created_at: string
           damage_description: string
+          diagnosis_completed_at: string | null
+          diagnosis_completed_by: string | null
+          diagnosis_document_url: string | null
+          diagnosis_photos_before: Json | null
+          diagnosis_report: string | null
+          director_approval_at: string | null
+          director_approval_id: string | null
+          director_approval_notes: string | null
+          director_rejection_reason: string | null
           estimated_cost: number | null
           estimated_duration: number | null
           id: string
+          invoice_document_url: string | null
+          invoice_number: string | null
           manuscript_cote: string
           manuscript_title: string
+          payment_amount: number | null
+          payment_date: string | null
+          payment_reference: string | null
+          payment_validated_by: string | null
+          quote_accepted_at: string | null
+          quote_amount: number | null
+          quote_document_url: string | null
+          quote_issued_at: string | null
+          quote_rejected_at: string | null
+          quote_rejection_reason: string | null
+          reception_document_url: string | null
           rejected_at: string | null
           rejected_by: string | null
           rejection_reason: string | null
           request_number: string
+          restoration_completed_by: string | null
+          restoration_photos_after: Json | null
+          restoration_report: string | null
+          restoration_report_document_url: string | null
+          restoration_started_at: string | null
+          return_document_url: string | null
+          return_notes: string | null
           started_at: string | null
           status: string
           submitted_at: string
@@ -6117,19 +6237,54 @@ export type Database = {
           validation_notes: string | null
         }
         Insert: {
+          artwork_condition_at_reception?: string | null
+          artwork_received_at?: string | null
+          artwork_received_by?: string | null
+          artwork_returned_at?: string | null
+          artwork_returned_by?: string | null
           assigned_restorer?: string | null
+          authorization_document_url?: string | null
           completed_at?: string | null
           created_at?: string
           damage_description: string
+          diagnosis_completed_at?: string | null
+          diagnosis_completed_by?: string | null
+          diagnosis_document_url?: string | null
+          diagnosis_photos_before?: Json | null
+          diagnosis_report?: string | null
+          director_approval_at?: string | null
+          director_approval_id?: string | null
+          director_approval_notes?: string | null
+          director_rejection_reason?: string | null
           estimated_cost?: number | null
           estimated_duration?: number | null
           id?: string
+          invoice_document_url?: string | null
+          invoice_number?: string | null
           manuscript_cote: string
           manuscript_title: string
+          payment_amount?: number | null
+          payment_date?: string | null
+          payment_reference?: string | null
+          payment_validated_by?: string | null
+          quote_accepted_at?: string | null
+          quote_amount?: number | null
+          quote_document_url?: string | null
+          quote_issued_at?: string | null
+          quote_rejected_at?: string | null
+          quote_rejection_reason?: string | null
+          reception_document_url?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
           request_number: string
+          restoration_completed_by?: string | null
+          restoration_photos_after?: Json | null
+          restoration_report?: string | null
+          restoration_report_document_url?: string | null
+          restoration_started_at?: string | null
+          return_document_url?: string | null
+          return_notes?: string | null
           started_at?: string | null
           status?: string
           submitted_at?: string
@@ -6142,19 +6297,54 @@ export type Database = {
           validation_notes?: string | null
         }
         Update: {
+          artwork_condition_at_reception?: string | null
+          artwork_received_at?: string | null
+          artwork_received_by?: string | null
+          artwork_returned_at?: string | null
+          artwork_returned_by?: string | null
           assigned_restorer?: string | null
+          authorization_document_url?: string | null
           completed_at?: string | null
           created_at?: string
           damage_description?: string
+          diagnosis_completed_at?: string | null
+          diagnosis_completed_by?: string | null
+          diagnosis_document_url?: string | null
+          diagnosis_photos_before?: Json | null
+          diagnosis_report?: string | null
+          director_approval_at?: string | null
+          director_approval_id?: string | null
+          director_approval_notes?: string | null
+          director_rejection_reason?: string | null
           estimated_cost?: number | null
           estimated_duration?: number | null
           id?: string
+          invoice_document_url?: string | null
+          invoice_number?: string | null
           manuscript_cote?: string
           manuscript_title?: string
+          payment_amount?: number | null
+          payment_date?: string | null
+          payment_reference?: string | null
+          payment_validated_by?: string | null
+          quote_accepted_at?: string | null
+          quote_amount?: number | null
+          quote_document_url?: string | null
+          quote_issued_at?: string | null
+          quote_rejected_at?: string | null
+          quote_rejection_reason?: string | null
+          reception_document_url?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
           request_number?: string
+          restoration_completed_by?: string | null
+          restoration_photos_after?: Json | null
+          restoration_report?: string | null
+          restoration_report_document_url?: string | null
+          restoration_started_at?: string | null
+          return_document_url?: string | null
+          return_notes?: string | null
           started_at?: string | null
           status?: string
           submitted_at?: string

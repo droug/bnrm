@@ -12,8 +12,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertCircle, CheckCircle, XCircle, Clock, Wrench, Eye, Filter, ArrowLeft } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { 
+  AlertCircle, CheckCircle, XCircle, Clock, Wrench, Eye, Filter, ArrowLeft, 
+  FileCheck, Package, CreditCard, Settings, History 
+} from "lucide-react";
 import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
 import { useNavigate } from "react-router-dom";
@@ -160,18 +166,26 @@ export default function RestorationRequests() {
   });
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; variant: any }> = {
-      'soumise': { label: 'Soumise', variant: 'secondary' },
-      'en_evaluation': { label: 'En évaluation', variant: 'default' },
-      'validee': { label: 'Validée', variant: 'default' },
-      'refusee': { label: 'Refusée', variant: 'destructive' },
-      'en_cours': { label: 'En cours', variant: 'default' },
-      'terminee': { label: 'Terminée', variant: 'default' },
-      'annulee': { label: 'Annulée', variant: 'destructive' }
+    const statusConfig: Record<string, { label: string; variant: any; color: string }> = {
+      'soumise': { label: 'Soumise', variant: 'secondary', color: 'bg-gray-100 text-gray-800' },
+      'en_attente_autorisation': { label: 'En attente d\'autorisation', variant: 'secondary', color: 'bg-yellow-100 text-yellow-800' },
+      'autorisee': { label: 'Autorisée', variant: 'default', color: 'bg-green-100 text-green-800' },
+      'refusee_direction': { label: 'Refusée Direction', variant: 'destructive', color: 'bg-red-100 text-red-800' },
+      'oeuvre_recue': { label: 'Œuvre reçue', variant: 'default', color: 'bg-blue-100 text-blue-800' },
+      'diagnostic_en_cours': { label: 'Diagnostic en cours', variant: 'default', color: 'bg-purple-100 text-purple-800' },
+      'devis_en_attente': { label: 'Devis en attente', variant: 'secondary', color: 'bg-orange-100 text-orange-800' },
+      'devis_accepte': { label: 'Devis accepté', variant: 'default', color: 'bg-teal-100 text-teal-800' },
+      'devis_refuse': { label: 'Devis refusé', variant: 'destructive', color: 'bg-red-100 text-red-800' },
+      'paiement_en_attente': { label: 'Paiement en attente', variant: 'secondary', color: 'bg-amber-100 text-amber-800' },
+      'paiement_valide': { label: 'Paiement validé', variant: 'default', color: 'bg-green-100 text-green-800' },
+      'restauration_en_cours': { label: 'Restauration en cours', variant: 'default', color: 'bg-indigo-100 text-indigo-800' },
+      'terminee': { label: 'Terminée', variant: 'default', color: 'bg-emerald-100 text-emerald-800' },
+      'cloturee': { label: 'Clôturée', variant: 'default', color: 'bg-slate-100 text-slate-800' },
+      'annulee': { label: 'Annulée', variant: 'destructive', color: 'bg-red-100 text-red-800' }
     };
 
-    const config = statusConfig[status] || { label: status, variant: 'outline' };
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    const config = statusConfig[status] || { label: status, variant: 'outline', color: 'bg-gray-100 text-gray-800' };
+    return <Badge variant={config.variant} className={config.color}>{config.label}</Badge>;
   };
 
   const getUrgencyBadge = (urgency: string) => {
@@ -190,16 +204,16 @@ export default function RestorationRequests() {
     const submittedDate = new Date(request.submitted_at);
     const daysSinceSubmission = Math.floor((Date.now() - submittedDate.getTime()) / (1000 * 60 * 60 * 24));
     return daysSinceSubmission > alertThresholdDays && 
-           !['validee', 'refusee', 'terminee', 'annulee'].includes(request.status);
+           !['terminee', 'cloturee', 'refusee_direction', 'devis_refuse', 'annulee'].includes(request.status);
   };
 
   const delayedRequests = requests?.filter(isRequestDelayed) || [];
 
   // Stats
   const totalRequests = requests?.length || 0;
-  const pendingRequests = requests?.filter(r => ['soumise', 'en_evaluation'].includes(r.status)).length || 0;
-  const inProgressRequests = requests?.filter(r => r.status === 'en_cours').length || 0;
-  const completedRequests = requests?.filter(r => r.status === 'terminee').length || 0;
+  const pendingRequests = requests?.filter(r => ['soumise', 'en_attente_autorisation', 'devis_en_attente', 'paiement_en_attente'].includes(r.status)).length || 0;
+  const inProgressRequests = requests?.filter(r => ['autorisee', 'oeuvre_recue', 'diagnostic_en_cours', 'devis_accepte', 'paiement_valide', 'restauration_en_cours'].includes(r.status)).length || 0;
+  const completedRequests = requests?.filter(r => ['terminee', 'cloturee'].includes(r.status)).length || 0;
 
   const handleAction = (request: RestorationRequest, type: "approve" | "reject" | "assign") => {
     setSelectedRequest(request);
@@ -403,15 +417,21 @@ export default function RestorationRequests() {
                       <SelectTrigger className="w-[200px]">
                         <SelectValue placeholder="Filtrer par statut" />
                       </SelectTrigger>
-                      <SelectContent className="bg-background z-50">
-                        <SelectItem value="all">Tous les statuts</SelectItem>
-                        <SelectItem value="soumise">Soumise</SelectItem>
-                        <SelectItem value="en_evaluation">En évaluation</SelectItem>
-                        <SelectItem value="validee">Validée</SelectItem>
-                        <SelectItem value="en_cours">En cours</SelectItem>
-                        <SelectItem value="terminee">Terminée</SelectItem>
-                        <SelectItem value="refusee">Refusée</SelectItem>
-                      </SelectContent>
+                <SelectContent className="bg-background z-50">
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="soumise">Soumise</SelectItem>
+                  <SelectItem value="en_attente_autorisation">En attente d'autorisation</SelectItem>
+                  <SelectItem value="autorisee">Autorisée</SelectItem>
+                  <SelectItem value="oeuvre_recue">Œuvre reçue</SelectItem>
+                  <SelectItem value="diagnostic_en_cours">Diagnostic en cours</SelectItem>
+                  <SelectItem value="devis_en_attente">Devis en attente</SelectItem>
+                  <SelectItem value="devis_accepte">Devis accepté</SelectItem>
+                  <SelectItem value="paiement_valide">Paiement validé</SelectItem>
+                  <SelectItem value="restauration_en_cours">Restauration en cours</SelectItem>
+                  <SelectItem value="terminee">Terminée</SelectItem>
+                  <SelectItem value="cloturee">Clôturée</SelectItem>
+                  <SelectItem value="refusee_direction">Refusée</SelectItem>
+                </SelectContent>
                     </Select>
                   </div>
                 </div>
@@ -466,13 +486,14 @@ export default function RestorationRequests() {
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
-                              {['soumise', 'en_evaluation'].includes(request.status) && (
+                              {['soumise', 'en_attente_autorisation'].includes(request.status) && (
                                 <>
                                   <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => handleAction(request, "approve")}
                                     className="text-green-600 hover:text-green-700"
+                                    title="Autoriser"
                                   >
                                     <CheckCircle className="h-4 w-4" />
                                   </Button>
@@ -481,6 +502,7 @@ export default function RestorationRequests() {
                                     size="sm"
                                     onClick={() => handleAction(request, "reject")}
                                     className="text-red-600 hover:text-red-700"
+                                    title="Refuser"
                                   >
                                     <XCircle className="h-4 w-4" />
                                   </Button>
