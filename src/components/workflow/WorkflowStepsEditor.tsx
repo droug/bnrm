@@ -5,22 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { SimpleRoleSelector } from "./SimpleRoleSelector";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,7 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Plus, Edit, Trash2, ArrowLeftRight } from "lucide-react";
+import { Plus, Edit, Trash2, ArrowLeftRight, Save, X } from "lucide-react";
 import { useWorkflowAutoSync } from "@/hooks/useWorkflowAutoSync";
 
 interface WorkflowStep {
@@ -51,11 +41,12 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
   const [steps, setSteps] = useState<WorkflowStep[]>([]);
   const [roles, setRoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [editingStep, setEditingStep] = useState<WorkflowStep | null>(null);
+  const [editingStepId, setEditingStepId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [stepToDelete, setStepToDelete] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [openAccordion, setOpenAccordion] = useState<string>("");
+  const [isCreatingNew, setIsCreatingNew] = useState(false);
 
   // Auto-sync hook
   const { syncWorkflow, syncStatus, syncing } = useWorkflowAutoSync({
@@ -63,13 +54,13 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
     enabled: true
   });
 
-  // Form state
-  const [formData, setFormData] = useState({
-    step_name: "",
-    step_type: "approval",
-    required_role: "",
-    description: "",
-  });
+  // Form state for each step
+  const [formData, setFormData] = useState<Record<string, {
+    step_name: string;
+    step_type: string;
+    required_role: string;
+    description: string;
+  }>>({});
 
   useEffect(() => {
     loadSteps();
@@ -77,22 +68,25 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
   }, [workflowId]);
 
   useEffect(() => {
-    if (editingStep) {
-      setFormData({
-        step_name: editingStep.step_name,
-        step_type: editingStep.step_type || "approval",
-        required_role: editingStep.required_role || "",
+    // Initialize form data for all steps
+    const initialFormData: Record<string, any> = {};
+    steps.forEach(step => {
+      initialFormData[step.id] = {
+        step_name: step.step_name,
+        step_type: step.step_type || "approval",
+        required_role: step.required_role || "",
         description: "",
-      });
-    } else {
-      setFormData({
-        step_name: "",
-        step_type: "approval",
-        required_role: "",
-        description: "",
-      });
-    }
-  }, [editingStep]);
+      };
+    });
+    // Add new step form
+    initialFormData['new'] = {
+      step_name: "",
+      step_type: "approval",
+      required_role: "",
+      description: "",
+    };
+    setFormData(initialFormData);
+  }, [steps]);
 
   const loadSteps = async () => {
     try {
@@ -126,37 +120,58 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
     }
   };
 
-  const handleOpenSheet = (step?: WorkflowStep) => {
-    if (step) {
-      setEditingStep(step);
-    } else {
-      setEditingStep(null);
-    }
-    setSheetOpen(true);
+  const handleStartEdit = (stepId: string) => {
+    setEditingStepId(stepId);
+    setOpenAccordion(stepId);
   };
 
-  const handleSaveStep = async () => {
-    if (!formData.step_name.trim()) {
+  const handleStartCreate = () => {
+    setIsCreatingNew(true);
+    setOpenAccordion('new');
+  };
+
+  const handleCancelEdit = (stepId: string) => {
+    if (stepId === 'new') {
+      setIsCreatingNew(false);
+      // Reset new form
+      setFormData(prev => ({
+        ...prev,
+        new: {
+          step_name: "",
+          step_type: "approval",
+          required_role: "",
+          description: "",
+        }
+      }));
+    } else {
+      // Reset to original values
+      const step = steps.find(s => s.id === stepId);
+      if (step) {
+        setFormData(prev => ({
+          ...prev,
+          [stepId]: {
+            step_name: step.step_name,
+            step_type: step.step_type || "approval",
+            required_role: step.required_role || "",
+            description: "",
+          }
+        }));
+      }
+    }
+    setEditingStepId(null);
+    setOpenAccordion("");
+  };
+
+  const handleSaveStep = async (stepId: string) => {
+    const data = formData[stepId];
+    if (!data?.step_name.trim()) {
       toast.error("Le nom de l'étape est requis");
       return;
     }
 
     setSaving(true);
     try {
-      if (editingStep) {
-        // Modifier une étape existante
-        const { error } = await supabase
-          .from('workflow_steps_new')
-          .update({
-            step_name: formData.step_name,
-            step_type: formData.step_type,
-            required_role: formData.required_role || null,
-          })
-          .eq('id', editingStep.id);
-
-        if (error) throw error;
-        toast.success("Étape modifiée avec succès");
-      } else {
+      if (stepId === 'new') {
         // Créer une nouvelle étape
         const nextStepNumber = steps.length > 0 
           ? Math.max(...steps.map(s => s.step_number)) + 1 
@@ -166,19 +181,33 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
           .from('workflow_steps_new')
           .insert({
             workflow_id: workflowId,
-            step_name: formData.step_name,
+            step_name: data.step_name,
             step_number: nextStepNumber,
-            step_type: formData.step_type,
-            required_role: formData.required_role || null,
+            step_type: data.step_type,
+            required_role: data.required_role || null,
           });
 
         if (error) throw error;
         toast.success("Étape créée avec succès");
+        setIsCreatingNew(false);
+      } else {
+        // Modifier une étape existante
+        const { error } = await supabase
+          .from('workflow_steps_new')
+          .update({
+            step_name: data.step_name,
+            step_type: data.step_type,
+            required_role: data.required_role || null,
+          })
+          .eq('id', stepId);
+
+        if (error) throw error;
+        toast.success("Étape modifiée avec succès");
       }
 
       loadSteps();
-      setSheetOpen(false);
-      setEditingStep(null);
+      setEditingStepId(null);
+      setOpenAccordion("");
       
       // Synchroniser automatiquement vers JSON
       await syncWorkflow(workflowId);
@@ -214,6 +243,16 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
     }
   };
 
+  const updateFormField = (stepId: string, field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [stepId]: {
+        ...prev[stepId],
+        [field]: value
+      }
+    }));
+  };
+
   if (loading) {
     return <div className="text-center p-4">Chargement...</div>;
   }
@@ -230,40 +269,111 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
             </span>
           )}
         </div>
-        <Button size="sm" onClick={() => handleOpenSheet()}>
+        <Button size="sm" onClick={handleStartCreate} disabled={isCreatingNew}>
           <Plus className="h-4 w-4 mr-2" />
           Ajouter une étape
         </Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-16">#</TableHead>
-            <TableHead>Nom de l'étape</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Rôle requis</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {steps.map((step) => (
-            <TableRow key={step.id}>
-              <TableCell className="font-medium">{step.step_number}</TableCell>
-              <TableCell>{step.step_name}</TableCell>
-              <TableCell>{step.step_type || "-"}</TableCell>
-              <TableCell>{step.required_role || "-"}</TableCell>
-              <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-2">
-                  <Button
-                    variant="outline"
+      <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
+        {/* New step accordion */}
+        {isCreatingNew && (
+          <AccordionItem value="new" className="border rounded-lg mb-2 px-4">
+            <AccordionTrigger className="hover:no-underline">
+              <div className="flex items-center justify-between w-full pr-4">
+                <span className="font-medium">Nouvelle étape</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="new-step_name">Nom de l'étape *</Label>
+                  <Input
+                    id="new-step_name"
+                    placeholder="Ex: Validation du document"
+                    value={formData['new']?.step_name || ""}
+                    onChange={(e) => updateFormField('new', 'step_name', e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="new-step_type">Type d'étape *</Label>
+                  <SimpleRoleSelector
+                    value={formData['new']?.step_type || "approval"}
+                    onChange={(value) => updateFormField('new', 'step_type', value)}
+                    roles={[
+                      { id: "approval", role_name: "Approbation" },
+                      { id: "review", role_name: "Révision" },
+                      { id: "validation", role_name: "Validation" },
+                      { id: "processing", role_name: "Traitement" },
+                      { id: "notification", role_name: "Notification" },
+                      { id: "decision", role_name: "Décision" },
+                    ]}
+                    placeholder="Sélectionner un type..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="new-required_role">Rôle requis</Label>
+                  <SimpleRoleSelector
+                    value={formData['new']?.required_role || ""}
+                    onChange={(value) => updateFormField('new', 'required_role', value || "")}
+                    roles={roles.map(r => ({ id: r.role_name, role_name: r.role_name }))}
+                    placeholder="Aucun rôle spécifique"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="new-description">Description</Label>
+                  <Textarea
+                    id="new-description"
+                    placeholder="Description de l'étape..."
+                    value={formData['new']?.description || ""}
+                    onChange={(e) => updateFormField('new', 'description', e.target.value)}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <Button onClick={() => handleSaveStep('new')} disabled={saving} size="sm">
+                    <Save className="h-4 w-4 mr-2" />
+                    {saving ? "Enregistrement..." : "Créer"}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleCancelEdit('new')} 
+                    disabled={saving}
                     size="sm"
-                    onClick={() => handleOpenSheet(step)}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Annuler
+                  </Button>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        )}
+
+        {/* Existing steps */}
+        {steps.map((step) => (
+          <AccordionItem key={step.id} value={step.id} className="border rounded-lg mb-2 px-4">
+            <AccordionTrigger className="hover:no-underline">
+              <div className="flex items-center justify-between w-full pr-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-semibold text-muted-foreground">#{step.step_number}</span>
+                  <span className="font-medium">{step.step_name}</span>
+                  <span className="text-sm text-muted-foreground">({step.step_type || "-"})</span>
+                </div>
+                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleStartEdit(step.id)}
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     onClick={() => {
                       setStepToDelete(step.id);
@@ -273,102 +383,90 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-              </TableCell>
-            </TableRow>
-          ))}
-          {steps.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center text-muted-foreground">
-                Aucune étape définie
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label htmlFor={`${step.id}-step_name`}>Nom de l'étape *</Label>
+                  <Input
+                    id={`${step.id}-step_name`}
+                    placeholder="Ex: Validation du document"
+                    value={formData[step.id]?.step_name || ""}
+                    onChange={(e) => updateFormField(step.id, 'step_name', e.target.value)}
+                    disabled={editingStepId !== step.id}
+                  />
+                </div>
 
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>
-              {editingStep ? "Modifier l'étape" : "Nouvelle étape"}
-            </SheetTitle>
-            <SheetDescription>
-              Configurez les paramètres de l'étape du workflow
-            </SheetDescription>
-          </SheetHeader>
+                <div className="space-y-2">
+                  <Label htmlFor={`${step.id}-step_type`}>Type d'étape *</Label>
+                  <SimpleRoleSelector
+                    value={formData[step.id]?.step_type || "approval"}
+                    onChange={(value) => updateFormField(step.id, 'step_type', value)}
+                    roles={[
+                      { id: "approval", role_name: "Approbation" },
+                      { id: "review", role_name: "Révision" },
+                      { id: "validation", role_name: "Validation" },
+                      { id: "processing", role_name: "Traitement" },
+                      { id: "notification", role_name: "Notification" },
+                      { id: "decision", role_name: "Décision" },
+                    ]}
+                    placeholder="Sélectionner un type..."
+                    disabled={editingStepId !== step.id}
+                  />
+                </div>
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="step_name">Nom de l'étape *</Label>
-              <Input
-                id="step_name"
-                placeholder="Ex: Validation du document"
-                value={formData.step_name}
-                onChange={(e) =>
-                  setFormData({ ...formData, step_name: e.target.value })
-                }
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`${step.id}-required_role`}>Rôle requis</Label>
+                  <SimpleRoleSelector
+                    value={formData[step.id]?.required_role || ""}
+                    onChange={(value) => updateFormField(step.id, 'required_role', value || "")}
+                    roles={roles.map(r => ({ id: r.role_name, role_name: r.role_name }))}
+                    placeholder="Aucun rôle spécifique"
+                    disabled={editingStepId !== step.id}
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="step_type">Type d'étape *</Label>
-              <SimpleRoleSelector
-                value={formData.step_type}
-                onChange={(value) =>
-                  setFormData({ ...formData, step_type: value })
-                }
-                roles={[
-                  { id: "approval", role_name: "Approbation" },
-                  { id: "review", role_name: "Révision" },
-                  { id: "validation", role_name: "Validation" },
-                  { id: "processing", role_name: "Traitement" },
-                  { id: "notification", role_name: "Notification" },
-                  { id: "decision", role_name: "Décision" },
-                ]}
-                placeholder="Sélectionner un type..."
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`${step.id}-description`}>Description</Label>
+                  <Textarea
+                    id={`${step.id}-description`}
+                    placeholder="Description de l'étape..."
+                    value={formData[step.id]?.description || ""}
+                    onChange={(e) => updateFormField(step.id, 'description', e.target.value)}
+                    rows={3}
+                    disabled={editingStepId !== step.id}
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="required_role">Rôle requis</Label>
-              <SimpleRoleSelector
-                value={formData.required_role || ""}
-                onChange={(value) =>
-                  setFormData({ ...formData, required_role: value || null })
-                }
-                roles={roles.map(r => ({ id: r.role_name, role_name: r.role_name }))}
-                placeholder="Aucun rôle spécifique"
-              />
-            </div>
+                {editingStepId === step.id && (
+                  <div className="flex gap-2 pt-2">
+                    <Button onClick={() => handleSaveStep(step.id)} disabled={saving} size="sm">
+                      <Save className="h-4 w-4 mr-2" />
+                      {saving ? "Enregistrement..." : "Enregistrer"}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleCancelEdit(step.id)} 
+                      disabled={saving}
+                      size="sm"
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Annuler
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Description de l'étape..."
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                rows={3}
-              />
-            </div>
+        {steps.length === 0 && !isCreatingNew && (
+          <div className="text-center p-8 text-muted-foreground border rounded-lg">
+            Aucune étape définie. Cliquez sur "Ajouter une étape" pour commencer.
           </div>
-
-          <SheetFooter>
-            <Button
-              variant="outline"
-              onClick={() => setSheetOpen(false)}
-              disabled={saving}
-            >
-              Annuler
-            </Button>
-            <Button onClick={handleSaveStep} disabled={saving}>
-              {saving ? "Enregistrement..." : editingStep ? "Modifier" : "Créer"}
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+        )}
+      </Accordion>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
