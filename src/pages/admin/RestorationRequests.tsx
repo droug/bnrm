@@ -59,6 +59,7 @@ export default function RestorationRequests() {
   const [currentActionType, setCurrentActionType] = useState<string>('director_approve');
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [alertThresholdDays, setAlertThresholdDays] = useState(7);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -97,6 +98,18 @@ export default function RestorationRequests() {
   const requests = allRequests?.filter(r => {
     if (statusFilter !== 'all' && r.status !== statusFilter) return false;
     if (urgencyFilter !== 'all' && r.urgency_level !== urgencyFilter) return false;
+    
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const matchesNumber = r.request_number?.toLowerCase().includes(query);
+      const matchesTitle = r.manuscript_title?.toLowerCase().includes(query);
+      const matchesCote = r.manuscript_cote?.toLowerCase().includes(query);
+      const matchesUser = `${r.profiles?.first_name} ${r.profiles?.last_name}`.toLowerCase().includes(query);
+      
+      if (!matchesNumber && !matchesTitle && !matchesCote && !matchesUser) return false;
+    }
+    
     return true;
   });
 
@@ -621,45 +634,68 @@ export default function RestorationRequests() {
             {/* Requests List */}
             <Card>
               <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle>Liste des Demandes</CardTitle>
-                    <CardDescription>Toutes les demandes de restauration de manuscrits</CardDescription>
+                <div className="flex flex-col gap-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle>Liste des Demandes</CardTitle>
+                      <CardDescription>Toutes les demandes de restauration de manuscrits</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Filter className="h-4 w-4" />
+                      <Select value={urgencyFilter} onValueChange={(value) => handleFilterChange('urgency', value)}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Urgence" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background z-50">
+                          <SelectItem value="all">Toutes urgences</SelectItem>
+                          <SelectItem value="faible">Faible</SelectItem>
+                          <SelectItem value="moyenne">Moyenne</SelectItem>
+                          <SelectItem value="elevee">Élevée</SelectItem>
+                          <SelectItem value="critique">Critique</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
+                        <SelectTrigger className="w-[200px]">
+                          <SelectValue placeholder="Filtrer par statut" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background z-50">
+                          <SelectItem value="all">Tous les statuts</SelectItem>
+                          <SelectItem value="soumise">Soumise</SelectItem>
+                          <SelectItem value="en_attente_autorisation">En attente d'autorisation</SelectItem>
+                          <SelectItem value="autorisee">Autorisée</SelectItem>
+                          <SelectItem value="oeuvre_recue">Œuvre reçue</SelectItem>
+                          <SelectItem value="diagnostic_en_cours">Diagnostic en cours</SelectItem>
+                          <SelectItem value="devis_en_attente">Devis en attente</SelectItem>
+                          <SelectItem value="devis_accepte">Devis accepté</SelectItem>
+                          <SelectItem value="paiement_valide">Paiement validé</SelectItem>
+                          <SelectItem value="restauration_en_cours">Restauration en cours</SelectItem>
+                          <SelectItem value="terminee">Terminée</SelectItem>
+                          <SelectItem value="cloturee">Clôturée</SelectItem>
+                          <SelectItem value="refusee_direction">Refusée</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4" />
-                    <Select value={urgencyFilter} onValueChange={(value) => handleFilterChange('urgency', value)}>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Urgence" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background z-50">
-                        <SelectItem value="all">Toutes urgences</SelectItem>
-                        <SelectItem value="faible">Faible</SelectItem>
-                        <SelectItem value="moyenne">Moyenne</SelectItem>
-                        <SelectItem value="elevee">Élevée</SelectItem>
-                        <SelectItem value="critique">Critique</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
-                      <SelectTrigger className="w-[200px]">
-                        <SelectValue placeholder="Filtrer par statut" />
-                      </SelectTrigger>
-                <SelectContent className="bg-background z-50">
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="soumise">Soumise</SelectItem>
-                  <SelectItem value="en_attente_autorisation">En attente d'autorisation</SelectItem>
-                  <SelectItem value="autorisee">Autorisée</SelectItem>
-                  <SelectItem value="oeuvre_recue">Œuvre reçue</SelectItem>
-                  <SelectItem value="diagnostic_en_cours">Diagnostic en cours</SelectItem>
-                  <SelectItem value="devis_en_attente">Devis en attente</SelectItem>
-                  <SelectItem value="devis_accepte">Devis accepté</SelectItem>
-                  <SelectItem value="paiement_valide">Paiement validé</SelectItem>
-                  <SelectItem value="restauration_en_cours">Restauration en cours</SelectItem>
-                  <SelectItem value="terminee">Terminée</SelectItem>
-                  <SelectItem value="cloturee">Clôturée</SelectItem>
-                  <SelectItem value="refusee_direction">Refusée</SelectItem>
-                </SelectContent>
-                    </Select>
+                  
+                  {/* Search bar */}
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      placeholder="Rechercher par n° demande, titre, cote ou utilisateur..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-4 pr-10"
+                    />
+                    {searchQuery && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                        onClick={() => setSearchQuery('')}
+                      >
+                        <XCircle className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardHeader>

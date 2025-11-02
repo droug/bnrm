@@ -45,6 +45,8 @@ export function WorkflowModelsManager() {
   const [filterType, setFilterType] = useState<string>("all");
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [builderOpen, setBuilderOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadModels();
@@ -115,6 +117,12 @@ export function WorkflowModelsManager() {
   const modules = Array.from(new Set(models.map((m) => m.module)));
   const types = Array.from(new Set(models.map((m) => m.workflow_type)));
 
+  // Pagination
+  const totalPages = Math.ceil(filteredModels.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedModels = filteredModels.slice(startIndex, endIndex);
+
   return (
     <>
       <Card>
@@ -168,67 +176,124 @@ export function WorkflowModelsManager() {
             </div>
 
             {/* Table des modèles */}
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nom du modèle</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Module</TableHead>
-                  <TableHead>Version</TableHead>
-                  <TableHead>Dernière MAJ</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredModels.map((model) => (
-                  <TableRow key={model.id}>
-                    <TableCell className="font-medium">{model.name}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{model.workflow_type}</Badge>
-                    </TableCell>
-                    <TableCell>{model.module}</TableCell>
-                    <TableCell>v{model.version}</TableCell>
-                    <TableCell>
-                      {format(new Date(model.updated_at), "dd MMM yyyy", {
-                        locale: fr,
-                      })}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(model.is_active)}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditModel(model.id)}
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          Voir
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditModel(model.id)}
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {filteredModels.length === 0 && (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <p className="text-sm text-muted-foreground">
+                  {filteredModels.length} modèle(s) trouvé(s)
+                </p>
+              </div>
+
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      className="text-center text-muted-foreground"
-                    >
-                      Aucun modèle trouvé
-                    </TableCell>
+                    <TableHead>Nom du modèle</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Module</TableHead>
+                    <TableHead>Version</TableHead>
+                    <TableHead>Dernière MAJ</TableHead>
+                    <TableHead>Statut</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {paginatedModels.map((model) => (
+                    <TableRow key={model.id}>
+                      <TableCell className="font-medium">{model.name}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{model.workflow_type}</Badge>
+                      </TableCell>
+                      <TableCell>{model.module}</TableCell>
+                      <TableCell>v{model.version}</TableCell>
+                      <TableCell>
+                        {format(new Date(model.updated_at), "dd MMM yyyy", {
+                          locale: fr,
+                        })}
+                      </TableCell>
+                      <TableCell>{getStatusBadge(model.is_active)}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditModel(model.id)}
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            Voir
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditModel(model.id)}
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Modifier
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {paginatedModels.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={7}
+                        className="text-center text-muted-foreground"
+                      >
+                        {filteredModels.length === 0
+                          ? "Aucun modèle trouvé"
+                          : "Aucun résultat sur cette page"}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Précédent
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 7) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 4) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 3) {
+                        pageNum = totalPages - 6 + i;
+                      } else {
+                        pageNum = currentPage - 3 + i;
+                      }
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(pageNum)}
+                          className="w-8 h-8 p-0"
+                        >
+                          {pageNum}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Suivant
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

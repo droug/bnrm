@@ -28,6 +28,8 @@ export function WorkflowInstances() {
   const [instances, setInstances] = useState<WorkflowInstance[]>([]);
   const [loading, setLoading] = useState(true);
   const [startDialogOpen, setStartDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [stats, setStats] = useState({
     pending: 0,
     in_progress: 0,
@@ -91,6 +93,12 @@ export function WorkflowInstances() {
     return <div className="text-center p-8">Chargement...</div>;
   }
 
+  // Pagination
+  const totalPages = Math.ceil(instances.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedInstances = instances.slice(startIndex, endIndex);
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-4">
@@ -139,14 +147,19 @@ export function WorkflowInstances() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Instances Actives</CardTitle>
+            <div>
+              <CardTitle>Instances Actives</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                {instances.length} instance(s) au total
+              </p>
+            </div>
             <Button onClick={() => setStartDialogOpen(true)}>
               <Play className="h-4 w-4 mr-2" />
               Lancer un workflow
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <Table>
             <TableHeader>
               <TableRow>
@@ -159,7 +172,7 @@ export function WorkflowInstances() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {instances.map((instance) => (
+              {paginatedInstances.map((instance) => (
                 <TableRow key={instance.id}>
                   <TableCell className="font-medium">
                     {instance.instance_number || "-"}
@@ -179,7 +192,7 @@ export function WorkflowInstances() {
                   </TableCell>
                 </TableRow>
               ))}
-              {instances.length === 0 && (
+              {paginatedInstances.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center text-muted-foreground">
                     Aucune instance de workflow en cours
@@ -188,6 +201,53 @@ export function WorkflowInstances() {
               )}
             </TableBody>
           </Table>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                Précédent
+              </Button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 7) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 4) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 3) {
+                    pageNum = totalPages - 6 + i;
+                  } else {
+                    pageNum = currentPage - 3 + i;
+                  }
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(pageNum)}
+                      className="w-8 h-8 p-0"
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Suivant
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 

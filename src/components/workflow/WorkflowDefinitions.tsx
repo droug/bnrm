@@ -37,6 +37,8 @@ export function WorkflowDefinitions() {
   const [selectedWorkflowId, setSelectedWorkflowId] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [workflowToDelete, setWorkflowToDelete] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   useEffect(() => {
     loadWorkflows();
@@ -122,10 +124,21 @@ export function WorkflowDefinitions() {
     return <div className="text-center p-8">Chargement...</div>;
   }
 
+  // Pagination calculation
+  const totalPages = Math.ceil(workflows.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedWorkflows = workflows.slice(startIndex, endIndex);
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Définitions de Workflows</h2>
+        <div>
+          <h2 className="text-2xl font-bold">Définitions de Workflows</h2>
+          <p className="text-sm text-muted-foreground">
+            {workflows.length} workflow(s) au total
+          </p>
+        </div>
         <Button onClick={() => setCreateDialogOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Nouveau Workflow
@@ -133,7 +146,7 @@ export function WorkflowDefinitions() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {workflows.map((workflow) => (
+        {paginatedWorkflows.map((workflow) => (
           <Card key={workflow.id} className={!workflow.is_active ? "opacity-60" : ""}>
             <CardHeader>
               <div className="flex justify-between items-start">
@@ -191,12 +204,49 @@ export function WorkflowDefinitions() {
           </Card>
         ))}
 
-        {workflows.length === 0 && (
+        {paginatedWorkflows.length === 0 && (
           <div className="col-span-full text-center p-8 text-muted-foreground">
-            Aucun workflow défini. Créez-en un pour commencer.
+            {workflows.length === 0 
+              ? "Aucun workflow défini. Créez-en un pour commencer."
+              : "Aucun résultat sur cette page."}
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            Précédent
+          </Button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                variant={currentPage === page ? "default" : "outline"}
+                size="sm"
+                onClick={() => setCurrentPage(page)}
+                className="w-8 h-8 p-0"
+              >
+                {page}
+              </Button>
+            ))}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Suivant
+          </Button>
+        </div>
+      )}
 
       <CreateWorkflowDialog
         open={createDialogOpen}
