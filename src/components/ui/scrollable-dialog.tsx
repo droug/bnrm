@@ -15,10 +15,9 @@ const ScrollableDialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "dialog-overlay fixed inset-0 bg-black/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "dialog-overlay fixed inset-0 bg-black/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-50",
       className
     )}
-    style={{ zIndex: 1000 }}
     {...props}
   />
 ));
@@ -69,9 +68,9 @@ const ScrollableDialogContent = React.forwardRef<
         "max-h-[90vh] h-auto",
         "flex flex-col",
         "overflow-hidden",
+        "z-50",
         className
       )}
-      style={{ zIndex: 1001 }}
       {...props}
     >
       {children}
