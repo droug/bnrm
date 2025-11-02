@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Search, Edit, Eye, GitBranch } from "lucide-react";
+import { Search, Edit, GitBranch } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { WorkflowBuilderDialog } from "./WorkflowBuilderDialog";
@@ -211,24 +211,14 @@ export function WorkflowModelsManager() {
                       </TableCell>
                       <TableCell>{getStatusBadge(model.is_active)}</TableCell>
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditModel(model.id)}
-                          >
-                            <Eye className="h-4 w-4 mr-1" />
-                            Voir
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditModel(model.id)}
-                          >
-                            <Edit className="h-4 w-4 mr-1" />
-                            Modifier
-                          </Button>
-                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditModel(model.id)}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
