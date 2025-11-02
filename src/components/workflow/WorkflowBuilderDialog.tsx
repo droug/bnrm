@@ -5,6 +5,7 @@ import {
   ScrollableDialogContent,
   ScrollableDialogHeader,
   ScrollableDialogTitle,
+  ScrollableDialogDescription,
   ScrollableDialogBody,
 } from "@/components/ui/scrollable-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -87,9 +88,10 @@ export function WorkflowBuilderDialog({
           <ScrollableDialogTitle className="text-xl">
             {workflow.name} - v{workflow.version}
           </ScrollableDialogTitle>
-          <div className="text-sm text-muted-foreground">
+          <ScrollableDialogDescription>
             {workflow.module} • {workflow.workflow_type}
-          </div>
+            {workflow.description && ` - ${workflow.description}`}
+          </ScrollableDialogDescription>
         </ScrollableDialogHeader>
 
         <ScrollableDialogBody>
