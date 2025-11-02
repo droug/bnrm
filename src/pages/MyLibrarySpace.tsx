@@ -265,7 +265,7 @@ export default function MyLibrarySpace() {
       
       <main className="container py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Mon Espace Bibliothèque Numérique</h1>
+          <h1 className="text-3xl font-bold mb-2">Mon Espace</h1>
           <p className="text-muted-foreground">
             Gérez vos lectures, favoris, marque-pages et évaluations
           </p>
