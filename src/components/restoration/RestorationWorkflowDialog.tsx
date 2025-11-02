@@ -50,7 +50,6 @@ export function RestorationWorkflowDialog({
         ...request,
         diagnosis_report: diagnosisReport || request.diagnosis_report,
         quote_amount: quoteAmount ? parseFloat(quoteAmount) : request.quote_amount,
-        quote_details: quoteDetails || request.quote_details,
         restoration_report: restorationReport || request.restoration_report,
       };
       
@@ -108,7 +107,6 @@ export function RestorationWorkflowDialog({
         break;
       case 'send_quote':
         data.quoteAmount = quoteAmount;
-        data.quoteDetails = quoteDetails;
         break;
       case 'accept_quote':
         // Pas de données supplémentaires nécessaires
@@ -238,26 +236,15 @@ export function RestorationWorkflowDialog({
           title: 'Envoyer le devis',
           icon: <DollarSign className="w-6 h-6 text-green-500" />,
           fields: (
-            <>
-              <div>
-                <Label>Montant du devis (DH)</Label>
-                <Input 
-                  type="number"
-                  value={quoteAmount}
-                  onChange={(e) => setQuoteAmount(e.target.value)}
-                  placeholder="12000"
-                />
-              </div>
-              <div>
-                <Label>Détails du devis</Label>
-                <Textarea 
-                  value={quoteDetails}
-                  onChange={(e) => setQuoteDetails(e.target.value)}
-                  placeholder="Détails des travaux et coûts..."
-                  rows={5}
-                />
-              </div>
-            </>
+            <div>
+              <Label>Montant du devis (DH)</Label>
+              <Input 
+                type="number"
+                value={quoteAmount}
+                onChange={(e) => setQuoteAmount(e.target.value)}
+                placeholder="12000"
+              />
+            </div>
           )
         };
       case 'accept_quote':

@@ -211,7 +211,7 @@ export default function RestorationRequests() {
           updateData.director_approval_notes = data.notes;
           updateData.director_approval_at = new Date().toISOString();
           updateData.estimated_cost = data.estimatedCost ? parseFloat(data.estimatedCost) : null;
-          updateData.estimated_duration_days = data.estimatedDuration ? parseInt(data.estimatedDuration) : null;
+          updateData.estimated_duration = data.estimatedDuration ? parseInt(data.estimatedDuration) : null;
           break;
         case 'director_reject':
           updateData.status = 'refusee_direction';
@@ -231,7 +231,6 @@ export default function RestorationRequests() {
         case 'send_quote':
           updateData.status = 'devis_en_attente';
           updateData.quote_amount = data.quoteAmount ? parseFloat(data.quoteAmount) : null;
-          updateData.quote_details = data.quoteDetails;
           updateData.quote_issued_at = new Date().toISOString();
           break;
         case 'accept_quote':
@@ -276,7 +275,6 @@ export default function RestorationRequests() {
           updateData.diagnosis_report = null;
           updateData.diagnosis_completed_at = null;
           updateData.quote_amount = null;
-          updateData.quote_details = null;
           updateData.quote_issued_at = null;
           updateData.quote_accepted_at = null;
           updateData.quote_rejected_at = null;
