@@ -69,14 +69,15 @@ export function RestorationWorkflowStepper({ currentStatus, className }: Restora
 
   return (
     <div className={cn("w-full py-4 overflow-x-auto", className)}>
-      <div className="flex items-center min-w-max px-4 gap-1">
+      {/* Conteneur pour les cercles alignés */}
+      <div className="flex items-center min-w-max px-4 gap-1 mb-2">
         {steps.map((step, index) => (
-          <div key={step.id} className="flex flex-col items-center relative" style={{ minWidth: '80px' }}>
+          <div key={step.id} className="flex items-center relative" style={{ width: '80px' }}>
             {/* Ligne de connexion */}
             {index < steps.length - 1 && (
               <div 
                 className={cn(
-                  "absolute top-4 left-[50%] h-0.5 -z-10",
+                  "absolute top-1/2 left-[50%] h-0.5 -z-10 -translate-y-1/2",
                   step.status === 'completed' ? "bg-primary" : "bg-muted"
                 )}
                 style={{ width: '80px' }}
@@ -86,7 +87,7 @@ export function RestorationWorkflowStepper({ currentStatus, className }: Restora
             {/* Cercle de l'étape */}
             <div
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all mb-2 shrink-0",
+                "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all shrink-0 mx-auto",
                 step.status === 'completed' && "bg-primary border-primary text-primary-foreground",
                 step.status === 'current' && "bg-background border-primary text-primary animate-pulse",
                 step.status === 'rejected' && "bg-destructive border-destructive text-destructive-foreground",
@@ -98,8 +99,14 @@ export function RestorationWorkflowStepper({ currentStatus, className }: Restora
               {step.status === 'rejected' && <XCircle className="w-4 h-4" />}
               {step.status === 'upcoming' && <span className="text-[10px] font-medium">{index + 1}</span>}
             </div>
-            
-            {/* Label de l'étape */}
+          </div>
+        ))}
+      </div>
+      
+      {/* Conteneur pour les labels */}
+      <div className="flex min-w-max px-4 gap-1">
+        {steps.map((step, index) => (
+          <div key={`label-${step.id}`} className="flex justify-center" style={{ width: '80px' }}>
             <span
               className={cn(
                 "text-[10px] text-center font-medium leading-tight",
