@@ -23,31 +23,29 @@ interface RequestData {
 const addHeader = (doc: jsPDF, title: string) => {
   doc.setFontSize(10);
   doc.setTextColor(100);
-  doc.text('Bibliothèque Nationale du Royaume du Maroc', doc.internal.pageSize.width / 2, 15, { align: 'center' });
-  doc.text('BNRM', doc.internal.pageSize.width / 2, 20, { align: 'center' });
+  doc.text('Bibliotheque Nationale du Royaume du Maroc - BNRM', doc.internal.pageSize.width / 2, 15, { align: 'center' });
   
   doc.setFontSize(16);
   doc.setTextColor(41, 128, 185);
-  doc.text(title, doc.internal.pageSize.width / 2, 30, { align: 'center' });
+  doc.text(title, doc.internal.pageSize.width / 2, 25, { align: 'center' });
   
   doc.setDrawColor(41, 128, 185);
   doc.setLineWidth(0.5);
-  doc.line(20, 35, doc.internal.pageSize.width - 20, 35);
+  doc.line(20, 30, doc.internal.pageSize.width - 20, 30);
 };
 
 const addFooter = (doc: jsPDF) => {
   const pageHeight = doc.internal.pageSize.height;
   doc.setFontSize(8);
   doc.setTextColor(150);
-  doc.text(`Document généré le ${new Date().toLocaleDateString('fr-FR')}`, doc.internal.pageSize.width / 2, pageHeight - 10, { align: 'center' });
+  doc.text(`Document genere le ${new Date().toLocaleDateString('fr-FR')}`, doc.internal.pageSize.width / 2, pageHeight - 10, { align: 'center' });
 };
 
 export const generateAuthorizationLetter = (request: RequestData): void => {
   const doc = new jsPDF();
+  addHeader(doc, "LETTRE D'AUTORISATION DE RESTAURATION");
   
-  addHeader(doc, 'LETTRE D\'AUTORISATION DE RESTAURATION');
-  
-  let y = 45;
+  let y = 40;
   doc.setFontSize(11);
   doc.setTextColor(0);
   
@@ -63,25 +61,24 @@ export const generateAuthorizationLetter = (request: RequestData): void => {
   
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(11);
-  const introText = 'La Bibliothèque Nationale du Royaume du Maroc autorise par la présente la restauration du manuscrit suivant:';
-  doc.text(introText, 20, y, { maxWidth: 170 });
-  y += 15;
+  const introText = 'La Bibliotheque Nationale du Royaume du Maroc autorise par la presente la restauration du manuscrit suivant:';
+  const introLines = doc.splitTextToSize(introText, 170);
+  doc.text(introLines, 20, y);
+  y += 7 * introLines.length + 10;
   
-  // Table
   const tableData = [
-    ['Titre', request.manuscript_title],
+    ['Titre (Arabic)', '[Texte arabe - voir demande originale]'],
     ['Cote', request.manuscript_cote],
-    ['Description des dommages', request.damage_description],
+    ['Description (Arabic)', '[Texte arabe - voir demande originale]'],
     ['Niveau d\'urgence', request.urgency_level],
-    ['Durée estimée', request.estimated_duration ? `${request.estimated_duration} jours` : 'À déterminer'],
-    ['Coût estimé', request.estimated_cost ? `${request.estimated_cost.toLocaleString('fr-FR')} DH` : 'À déterminer']
+    ['Duree estimee', request.estimated_duration ? `${request.estimated_duration} jours` : 'A determiner'],
+    ['Cout estime', request.estimated_cost ? `${request.estimated_cost.toLocaleString('fr-FR')} DH` : 'A determiner']
   ];
   
   tableData.forEach(([label, value]) => {
     doc.setFont('helvetica', 'bold');
     doc.text(label + ':', 20, y);
     doc.setFont('helvetica', 'normal');
-    
     const lines = doc.splitTextToSize(value, 130);
     doc.text(lines, 70, y);
     y += 7 * lines.length;
@@ -95,13 +92,12 @@ export const generateAuthorizationLetter = (request: RequestData): void => {
     doc.setFont('helvetica', 'normal');
     const notesLines = doc.splitTextToSize(request.director_approval_notes, 170);
     doc.text(notesLines, 20, y);
-    y += 7 * notesLines.length;
   }
   
   y += 20;
   doc.text('Le Directeur', 150, y);
   y += 5;
-  doc.text('Bibliothèque Nationale du Royaume du Maroc', 125, y);
+  doc.text('BNRM', 160, y);
   
   addFooter(doc);
   doc.save(`autorisation_${request.request_number}.pdf`);
@@ -109,31 +105,29 @@ export const generateAuthorizationLetter = (request: RequestData): void => {
 
 export const generateReceptionDocument = (request: RequestData): void => {
   const doc = new jsPDF();
+  addHeader(doc, "PROCES-VERBAL DE RECEPTION D'OEUVRE");
   
-  addHeader(doc, 'PROCÈS-VERBAL DE RÉCEPTION D\'ŒUVRE');
-  
-  let y = 45;
+  let y = 40;
   doc.setFontSize(11);
   doc.setTextColor(0);
   
-  const introText = 'Je soussigné(e), représentant de la Bibliothèque Nationale du Royaume du Maroc, certifie avoir reçu ce jour le manuscrit suivant pour restauration:';
+  const introText = 'Je soussigne, representant de la BNRM, certifie avoir recu ce jour le manuscrit suivant pour restauration:';
   const introLines = doc.splitTextToSize(introText, 170);
   doc.text(introLines, 20, y);
   y += 7 * introLines.length + 10;
   
   const tableData = [
     ['N° de demande', request.request_number],
-    ['Titre du manuscrit', request.manuscript_title],
+    ['Titre (Arabic)', '[Texte arabe - voir demande originale]'],
     ['Cote', request.manuscript_cote],
-    ['Date de réception', new Date().toLocaleDateString('fr-FR')],
-    ['État lors de la réception', request.damage_description]
+    ['Date de reception', new Date().toLocaleDateString('fr-FR')],
+    ['Etat', '[Texte arabe - voir demande originale]']
   ];
   
   tableData.forEach(([label, value]) => {
     doc.setFont('helvetica', 'bold');
     doc.text(label + ':', 20, y);
     doc.setFont('helvetica', 'normal');
-    
     const lines = doc.splitTextToSize(value, 130);
     doc.text(lines, 70, y);
     y += 7 * lines.length;
@@ -150,16 +144,15 @@ export const generateReceptionDocument = (request: RequestData): void => {
 
 export const generateDiagnosisReport = (request: RequestData): void => {
   const doc = new jsPDF();
-  
   addHeader(doc, 'RAPPORT DE DIAGNOSTIC');
   
-  let y = 45;
+  let y = 40;
   doc.setFontSize(11);
   doc.setTextColor(0);
   
   doc.text(`N° de demande: ${request.request_number}`, 20, y);
   y += 7;
-  doc.text(`Manuscrit: ${request.manuscript_title}`, 20, y);
+  doc.text(`Manuscrit: [Texte arabe - voir demande originale]`, 20, y);
   y += 7;
   doc.text(`Cote: ${request.manuscript_cote}`, 20, y);
   y += 7;
@@ -167,11 +160,11 @@ export const generateDiagnosisReport = (request: RequestData): void => {
   y += 15;
   
   doc.setFont('helvetica', 'bold');
-  doc.text('ÉVALUATION DES DOMMAGES', 20, y);
+  doc.text('EVALUATION DES DOMMAGES', 20, y);
   y += 10;
   doc.setFont('helvetica', 'normal');
   
-  const diagnosisText = request.diagnosis_report || request.damage_description;
+  const diagnosisText = request.diagnosis_report || '[Texte arabe - voir demande originale]';
   const diagnosisLines = doc.splitTextToSize(diagnosisText, 170);
   doc.text(diagnosisLines, 20, y);
   y += 7 * diagnosisLines.length + 15;
@@ -183,9 +176,9 @@ export const generateDiagnosisReport = (request: RequestData): void => {
   
   doc.text(`Niveau d'urgence: ${request.urgency_level}`, 20, y);
   y += 7;
-  doc.text(`Durée estimée: ${request.estimated_duration || 'À déterminer'} jours`, 20, y);
+  doc.text(`Duree estimee: ${request.estimated_duration || 'A determiner'} jours`, 20, y);
   y += 7;
-  doc.text(`Coût estimé: ${request.estimated_cost ? request.estimated_cost.toLocaleString('fr-FR') + ' DH' : 'À déterminer'}`, 20, y);
+  doc.text(`Cout estime: ${request.estimated_cost ? request.estimated_cost.toLocaleString('fr-FR') + ' DH' : 'A determiner'}`, 20, y);
   
   addFooter(doc);
   doc.save(`diagnostic_${request.request_number}.pdf`);
@@ -193,18 +186,17 @@ export const generateDiagnosisReport = (request: RequestData): void => {
 
 export const generateQuoteDocument = (request: RequestData): void => {
   const doc = new jsPDF();
-  
   addHeader(doc, 'DEVIS DE RESTAURATION');
   
-  let y = 45;
+  let y = 40;
   doc.setFontSize(11);
   doc.setTextColor(0);
   
   doc.text(`N° de demande: ${request.request_number}`, 20, y);
   y += 7;
-  doc.text(`Date d'émission: ${new Date().toLocaleDateString('fr-FR')}`, 20, y);
+  doc.text(`Date d'emission: ${new Date().toLocaleDateString('fr-FR')}`, 20, y);
   y += 7;
-  doc.text('Validité: 30 jours', 20, y);
+  doc.text('Validite: 30 jours', 20, y);
   y += 15;
   
   doc.setFont('helvetica', 'bold');
@@ -213,7 +205,7 @@ export const generateQuoteDocument = (request: RequestData): void => {
   y += 10;
   
   doc.setFont('helvetica', 'normal');
-  const descLines = doc.splitTextToSize(`Restauration du manuscrit: ${request.manuscript_title}`, 120);
+  const descLines = doc.splitTextToSize(`Restauration du manuscrit: [Texte arabe]`, 120);
   doc.text(descLines, 20, y);
   doc.text(`${request.quote_amount?.toLocaleString('fr-FR')} DH`, 150, y);
   y += 7 * descLines.length + 10;
@@ -225,7 +217,7 @@ export const generateQuoteDocument = (request: RequestData): void => {
   
   if (request.quote_details) {
     doc.setFont('helvetica', 'bold');
-    doc.text('Détails:', 20, y);
+    doc.text('Details:', 20, y);
     y += 7;
     doc.setFont('helvetica', 'normal');
     const detailsLines = doc.splitTextToSize(request.quote_details, 170);
@@ -238,24 +230,23 @@ export const generateQuoteDocument = (request: RequestData): void => {
 
 export const generateCompletionCertificate = (request: RequestData): void => {
   const doc = new jsPDF();
+  addHeader(doc, "CERTIFICAT D'ACHEVEMENT DE RESTAURATION");
   
-  addHeader(doc, 'CERTIFICAT D\'ACHÈVEMENT DE RESTAURATION');
-  
-  let y = 45;
+  let y = 40;
   doc.setFontSize(11);
   doc.setTextColor(0);
   
-  const introText = 'La Bibliothèque Nationale du Royaume du Maroc certifie que les travaux de restauration du manuscrit suivant ont été menés à bien:';
+  const introText = 'La BNRM certifie que les travaux de restauration du manuscrit suivant ont ete menes a bien:';
   const introLines = doc.splitTextToSize(introText, 170);
   doc.text(introLines, 20, y);
   y += 7 * introLines.length + 10;
   
   const tableData = [
     ['N° de demande', request.request_number],
-    ['Titre', request.manuscript_title],
+    ['Titre', '[Texte arabe - voir demande originale]'],
     ['Cote', request.manuscript_cote],
-    ['Date de début', new Date(request.submitted_at).toLocaleDateString('fr-FR')],
-    ['Date d\'achèvement', new Date().toLocaleDateString('fr-FR')],
+    ['Date de debut', new Date(request.submitted_at).toLocaleDateString('fr-FR')],
+    ['Date d\'achevement', new Date().toLocaleDateString('fr-FR')],
     ['Montant total', request.quote_amount ? `${request.quote_amount.toLocaleString('fr-FR')} DH` : 'N/A']
   ];
   
@@ -279,10 +270,10 @@ export const generateCompletionCertificate = (request: RequestData): void => {
   }
   
   y += 20;
-  doc.text(`Fait à Rabat, le ${new Date().toLocaleDateString('fr-FR')}`, 20, y);
+  doc.text(`Fait a Rabat, le ${new Date().toLocaleDateString('fr-FR')}`, 20, y);
   y += 15;
   doc.text('Le Directeur de la BNRM', 140, y);
   
   addFooter(doc);
-  doc.save(`achèvement_${request.request_number}.pdf`);
+  doc.save(`achevement_${request.request_number}.pdf`);
 };
