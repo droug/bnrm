@@ -865,6 +865,24 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             </div>
           </div>
 
+          {/* Informations importantes */}
+          <div className="space-y-3 p-4 bg-muted/50 rounded-lg border">
+            <div className="space-y-3 text-sm">
+              <p>
+                • Votre demande sera satisfaite dans les plus brefs délais, à condition que le nombre de manuscrits demandés ne dépasse pas cinq manuscrits par demande et par jour.
+              </p>
+              <p>
+                • En cas de non-réception ou de perte de votre demande, et afin de pouvoir vous la renvoyer, veuillez transmettre le numéro du reçu de paiement à l'adresse électronique de l'institution : <a href="mailto:demande.numerisation@bnrm.ma" className="text-primary hover:underline">demande.numerisation@bnrm.ma</a>, dans un délai ne dépassant pas deux mois.
+              </p>
+              <p>
+                • Conformément à la loi n°09-08 promulguée par le dahir n°1-09-15 du 18 février 2009 relative à la protection des personnes physiques à l'égard du traitement des données à caractère personnel, vous disposez d'un droit d'accès et de rectification des informations vous concernant, ainsi que d'un droit d'opposition pour des motifs légitimes. Vous pouvez exercer ces droits en vous adressant à l'adresse suivante : <a href="mailto:manuscrits@bnrm.ma" className="text-primary hover:underline">manuscrits@bnrm.ma</a>.
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Ce traitement a été approuvé par la Commission Nationale de Contrôle de la Protection des Données à Caractère Personnel (CNDP) sous le numéro : A-PO-205/2023.
+              </p>
+            </div>
+          </div>
+
           {/* Boutons d'action */}
           <div className="flex gap-3 pt-4">
             <Button
