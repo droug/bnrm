@@ -253,6 +253,11 @@ export default function RestorationRequests() {
   };
 
   const getActionButton = (request: RestorationRequest) => {
+    // Statuts terminaux - pas de bouton d'action
+    if (['cloturee', 'refusee_direction', 'devis_refuse', 'annulee'].includes(request.status)) {
+      return null;
+    }
+
     switch (request.status) {
       case 'soumise':
       case 'en_attente_autorisation':
@@ -278,43 +283,58 @@ export default function RestorationRequests() {
       case 'autorisee':
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'receive_artwork')}>
-            Réceptionner l'œuvre
+            <Package className="w-4 h-4 mr-1" />
+            Réceptionner
           </Button>
         );
       case 'oeuvre_recue':
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'complete_diagnosis')}>
-            Compléter diagnostic
+            <FileCheck className="w-4 h-4 mr-1" />
+            Diagnostic
           </Button>
         );
       case 'diagnostic_en_cours':
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'send_quote')}>
-            Envoyer devis
+            <CreditCard className="w-4 h-4 mr-1" />
+            Devis
           </Button>
         );
       case 'devis_en_attente':
+      case 'devis_accepte':
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'validate_payment')}>
+            <CheckCircle className="w-4 h-4 mr-1" />
+            Paiement
+          </Button>
+        );
+      case 'paiement_en_attente':
+        return (
+          <Button size="sm" onClick={() => handleWorkflowAction(request, 'validate_payment')}>
+            <CheckCircle className="w-4 h-4 mr-1" />
             Valider paiement
           </Button>
         );
       case 'paiement_valide':
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'start_restoration')}>
-            Démarrer restauration
+            <Wrench className="w-4 h-4 mr-1" />
+            Démarrer
           </Button>
         );
       case 'restauration_en_cours':
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'complete_restoration')}>
-            Terminer restauration
+            <CheckCircle className="w-4 h-4 mr-1" />
+            Terminer
           </Button>
         );
       case 'terminee':
         return (
           <Button size="sm" onClick={() => handleWorkflowAction(request, 'return_artwork')}>
-            Retourner l'œuvre
+            <History className="w-4 h-4 mr-1" />
+            Retourner
           </Button>
         );
       default:

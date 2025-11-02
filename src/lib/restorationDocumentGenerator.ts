@@ -22,17 +22,20 @@ interface RestorationRequest {
   completion_notes?: string;
 }
 
-// Fonction utilitaire pour ajouter du texte avec gestion automatique des retours à la ligne
+// Fonction utilitaire pour ajouter du texte avec gestion automatique des retours à la ligne et support de l'arabe
 const addWrappedText = (
   doc: jsPDF,
   text: string,
   x: number,
   y: number,
   maxWidth: number,
-  lineHeight: number = 7
+  lineHeight: number = 7,
+  align: 'left' | 'right' | 'center' = 'left'
 ): number => {
   const lines = doc.splitTextToSize(text, maxWidth);
-  doc.text(lines, x, y);
+  lines.forEach((line: string, index: number) => {
+    doc.text(line, x, y + (index * lineHeight), { align });
+  });
   return y + (lines.length * lineHeight);
 };
 
@@ -66,7 +69,7 @@ export const generateAuthorizationLetter = async (request: RestorationRequest): 
   // Corps de la lettre
   doc.setFont('helvetica', 'normal');
   const bodyText = `La Bibliothèque Nationale du Royaume du Maroc autorise par la présente la restauration du manuscrit suivant:`;
-  currentY = addWrappedText(doc, bodyText, 20, currentY, 170);
+  currentY = addWrappedText(doc, bodyText, 20, currentY, 170, 7, 'left');
   currentY += 5;
   
   // Détails du manuscrit
@@ -82,7 +85,12 @@ export const generateAuthorizationLetter = async (request: RestorationRequest): 
       ['Coût estimé', request.estimated_cost ? `${request.estimated_cost.toLocaleString('fr-FR')} DH` : 'À déterminer'],
     ],
     theme: 'grid',
-    styles: { font: 'helvetica', fontSize: 9 },
+    styles: { 
+      font: 'helvetica', 
+      fontSize: 9,
+      halign: 'right',
+      cellPadding: 3
+    },
     headStyles: { fillColor: [41, 128, 185] },
     margin: { left: 20, right: 20 },
   });
@@ -95,7 +103,7 @@ export const generateAuthorizationLetter = async (request: RestorationRequest): 
     doc.text('Notes de la direction:', 20, currentY);
     currentY += 7;
     doc.setFont('helvetica', 'normal');
-    currentY = addWrappedText(doc, request.director_notes, 20, currentY, 170);
+    currentY = addWrappedText(doc, request.director_notes, 20, currentY, 170, 7, 'left');
     currentY += 10;
   }
   
@@ -191,7 +199,7 @@ export const generateDiagnosisReport = async (request: RestorationRequest): Prom
   currentY += 7;
   
   doc.setFont('helvetica', 'normal');
-  currentY = addWrappedText(doc, request.diagnosis_report || request.damage_description, 20, currentY, 170);
+  currentY = addWrappedText(doc, request.diagnosis_report || request.damage_description, 20, currentY, 170, 7, 'right');
   currentY += 10;
   
   doc.setFont('helvetica', 'bold');
@@ -200,7 +208,7 @@ export const generateDiagnosisReport = async (request: RestorationRequest): Prom
   
   doc.setFont('helvetica', 'normal');
   const recommendations = `Niveau d'urgence: ${request.urgency_level}\nDurée estimée: ${request.estimated_duration_days || 'À déterminer'} jours\nCoût estimé: ${request.estimated_cost ? request.estimated_cost.toLocaleString('fr-FR') + ' DH' : 'À déterminer'}`;
-  currentY = addWrappedText(doc, recommendations, 20, currentY, 170);
+  currentY = addWrappedText(doc, recommendations, 20, currentY, 170, 7, 'left');
   
   addBNRMFooter(doc, 1);
   
@@ -249,7 +257,7 @@ export const generateQuoteDocument = async (request: RestorationRequest): Promis
     doc.text('Détails:', 20, currentY);
     currentY += 7;
     doc.setFont('helvetica', 'normal');
-    currentY = addWrappedText(doc, request.quote_details, 20, currentY, 170);
+    currentY = addWrappedText(doc, request.quote_details, 20, currentY, 170, 7, 'right');
   }
   
   addBNRMFooter(doc, 1);
@@ -299,7 +307,7 @@ export const generateCompletionCertificate = async (request: RestorationRequest)
     doc.text('Rapport final:', 20, currentY);
     currentY += 7;
     doc.setFont('helvetica', 'normal');
-    currentY = addWrappedText(doc, request.restoration_report, 20, currentY, 170);
+    currentY = addWrappedText(doc, request.restoration_report, 20, currentY, 170, 7, 'right');
     currentY += 10;
   }
   
