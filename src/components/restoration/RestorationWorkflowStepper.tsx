@@ -1,0 +1,128 @@
+import { Check, Clock, XCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface Step {
+  id: string;
+  label: string;
+  status: 'completed' | 'current' | 'upcoming' | 'rejected';
+}
+
+interface RestorationWorkflowStepperProps {
+  currentStatus: string;
+  className?: string;
+}
+
+const statusToStepMapping: Record<string, number> = {
+  'soumise': 0,
+  'en_attente_autorisation': 1,
+  'autorisee': 2,
+  'refusee_direction': -1,
+  'oeuvre_recue': 3,
+  'diagnostic_en_cours': 4,
+  'devis_en_attente': 5,
+  'devis_accepte': 6,
+  'devis_refuse': -2,
+  'paiement_en_attente': 7,
+  'paiement_valide': 8,
+  'restauration_en_cours': 9,
+  'terminee': 10,
+  'cloturee': 11,
+};
+
+const workflowSteps: Step[] = [
+  { id: 'soumise', label: 'Demande soumise', status: 'upcoming' },
+  { id: 'en_attente_autorisation', label: 'En attente autorisation', status: 'upcoming' },
+  { id: 'autorisee', label: 'Autorisée', status: 'upcoming' },
+  { id: 'oeuvre_recue', label: 'Œuvre reçue', status: 'upcoming' },
+  { id: 'diagnostic_en_cours', label: 'Diagnostic', status: 'upcoming' },
+  { id: 'devis_en_attente', label: 'Devis en attente', status: 'upcoming' },
+  { id: 'devis_accepte', label: 'Devis accepté', status: 'upcoming' },
+  { id: 'paiement_valide', label: 'Paiement validé', status: 'upcoming' },
+  { id: 'restauration_en_cours', label: 'Restauration', status: 'upcoming' },
+  { id: 'terminee', label: 'Terminée', status: 'upcoming' },
+  { id: 'cloturee', label: 'Clôturée', status: 'upcoming' },
+];
+
+export function RestorationWorkflowStepper({ currentStatus, className }: RestorationWorkflowStepperProps) {
+  const currentStepIndex = statusToStepMapping[currentStatus] ?? 0;
+  const isRejected = currentStepIndex < 0;
+
+  const steps = workflowSteps.map((step, index) => {
+    let status: Step['status'] = 'upcoming';
+    
+    if (isRejected) {
+      if (index < Math.abs(currentStepIndex) + 1) {
+        status = 'completed';
+      } else if (index === Math.abs(currentStepIndex) + 1) {
+        status = 'rejected';
+      }
+    } else {
+      if (index < currentStepIndex) {
+        status = 'completed';
+      } else if (index === currentStepIndex) {
+        status = 'current';
+      }
+    }
+    
+    return { ...step, status };
+  });
+
+  return (
+    <div className={cn("w-full py-6", className)}>
+      <div className="flex items-center justify-between">
+        {steps.map((step, index) => (
+          <div key={step.id} className="flex flex-col items-center flex-1 relative">
+            {/* Ligne de connexion */}
+            {index < steps.length - 1 && (
+              <div 
+                className={cn(
+                  "absolute top-5 left-1/2 w-full h-0.5 -z-10",
+                  step.status === 'completed' ? "bg-primary" : "bg-muted"
+                )}
+              />
+            )}
+            
+            {/* Cercle de l'étape */}
+            <div
+              className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all mb-2",
+                step.status === 'completed' && "bg-primary border-primary text-primary-foreground",
+                step.status === 'current' && "bg-background border-primary text-primary animate-pulse",
+                step.status === 'rejected' && "bg-destructive border-destructive text-destructive-foreground",
+                step.status === 'upcoming' && "bg-muted border-muted-foreground/30 text-muted-foreground"
+              )}
+            >
+              {step.status === 'completed' && <Check className="w-5 h-5" />}
+              {step.status === 'current' && <Clock className="w-5 h-5" />}
+              {step.status === 'rejected' && <XCircle className="w-5 h-5" />}
+              {step.status === 'upcoming' && <span className="text-xs font-medium">{index + 1}</span>}
+            </div>
+            
+            {/* Label de l'étape */}
+            <span
+              className={cn(
+                "text-xs text-center font-medium max-w-[100px]",
+                step.status === 'completed' && "text-primary",
+                step.status === 'current' && "text-primary font-semibold",
+                step.status === 'rejected' && "text-destructive",
+                step.status === 'upcoming' && "text-muted-foreground"
+              )}
+            >
+              {step.label}
+            </span>
+          </div>
+        ))}
+      </div>
+      
+      {/* Message de rejet */}
+      {isRejected && (
+        <div className="mt-4 p-3 bg-destructive/10 border border-destructive/30 rounded-md">
+          <p className="text-sm text-destructive font-medium text-center">
+            {currentStatus === 'refusee_direction' && "Demande refusée par la direction"}
+            {currentStatus === 'devis_refuse' && "Devis refusé"}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -7,10 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -23,6 +22,8 @@ import { fr } from "date-fns/locale";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
 import { useNavigate } from "react-router-dom";
+import { RestorationWorkflowStepper } from "@/components/restoration/RestorationWorkflowStepper";
+import { RestorationWorkflowDialog } from "@/components/restoration/RestorationWorkflowDialog";
 
 interface RestorationRequest {
   id: string;
@@ -53,12 +54,8 @@ export default function RestorationRequests() {
   const navigate = useNavigate();
   const [selectedRequest, setSelectedRequest] = useState<RestorationRequest | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
-  const [showActionDialog, setShowActionDialog] = useState(false);
-  const [actionType, setActionType] = useState<"approve" | "reject" | "assign">("approve");
-  const [actionNotes, setActionNotes] = useState("");
-  const [estimatedCost, setEstimatedCost] = useState("");
-  const [estimatedDuration, setEstimatedDuration] = useState("");
-  const [assignedRestorer, setAssignedRestorer] = useState("");
+  const [workflowDialogOpen, setWorkflowDialogOpen] = useState(false);
+  const [currentActionType, setCurrentActionType] = useState<string>('director_approve');
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("all");
   const [alertThresholdDays, setAlertThresholdDays] = useState(7);
@@ -100,60 +97,23 @@ export default function RestorationRequests() {
     return true;
   });
 
-  // Update request status
+  //Update request status mutation
   const updateStatus = useMutation({
-    mutationFn: async ({ 
-      requestId, 
-      status, 
-      notes, 
-      cost, 
-      duration, 
-      restorer 
-    }: { 
-      requestId: string; 
-      status: string; 
-      notes: string;
-      cost?: number;
-      duration?: number;
-      restorer?: string;
-    }) => {
-      const updateData: any = {
-        status,
-        updated_at: new Date().toISOString(),
-      };
-
-      if (status === 'validee') {
-        updateData.validated_by = user?.id;
-        updateData.validated_at = new Date().toISOString();
-        updateData.validation_notes = notes;
-        if (cost) updateData.estimated_cost = cost;
-        if (duration) updateData.estimated_duration = duration;
-        if (restorer) updateData.assigned_restorer = restorer;
-      } else if (status === 'refusee') {
-        updateData.rejected_by = user?.id;
-        updateData.rejected_at = new Date().toISOString();
-        updateData.rejection_reason = notes;
-      } else if (status === 'en_cours') {
-        updateData.started_at = new Date().toISOString();
-      } else if (status === 'terminee') {
-        updateData.completed_at = new Date().toISOString();
-      }
-
+    mutationFn: async (updateData: any) => {
       const { error } = await supabase
         .from('restoration_requests')
-        .update(updateData)
-        .eq('id', requestId);
+        .update({
+          ...updateData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', updateData.id);
       
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restoration-requests-admin'] });
-      setShowActionDialog(false);
+      setWorkflowDialogOpen(false);
       setSelectedRequest(null);
-      setActionNotes("");
-      setEstimatedCost("");
-      setEstimatedDuration("");
-      setAssignedRestorer("");
       toast({ title: "Statut mis à jour avec succès" });
     },
     onError: () => {
@@ -215,32 +175,151 @@ export default function RestorationRequests() {
   const inProgressRequests = requests?.filter(r => ['autorisee', 'oeuvre_recue', 'diagnostic_en_cours', 'devis_accepte', 'paiement_valide', 'restauration_en_cours'].includes(r.status)).length || 0;
   const completedRequests = requests?.filter(r => ['terminee', 'cloturee'].includes(r.status)).length || 0;
 
-  const handleAction = (request: RestorationRequest, type: "approve" | "reject" | "assign") => {
+  const handleWorkflowAction = (request: RestorationRequest, action: string) => {
     setSelectedRequest(request);
-    setActionType(type);
-    setShowActionDialog(true);
+    setCurrentActionType(action);
+    setWorkflowDialogOpen(true);
   };
 
-  const handleSubmitAction = () => {
+  const handleWorkflowSubmit = async (actionType: string, data: any) => {
     if (!selectedRequest) return;
-    
-    let newStatus = selectedRequest.status;
-    if (actionType === "approve") {
-      newStatus = "validee";
-    } else if (actionType === "reject") {
-      newStatus = "refusee";
-    } else if (actionType === "assign") {
-      newStatus = "en_cours";
-    }
 
-    updateStatus.mutate({
-      requestId: selectedRequest.id,
-      status: newStatus,
-      notes: actionNotes,
-      cost: estimatedCost ? parseFloat(estimatedCost) : undefined,
-      duration: estimatedDuration ? parseInt(estimatedDuration) : undefined,
-      restorer: assignedRestorer || undefined
-    });
+    try {
+      let updateData: any = { id: selectedRequest.id };
+
+      switch (actionType) {
+        case 'director_approve':
+          updateData.status = 'autorisee';
+          updateData.director_notes = data.notes;
+          updateData.director_approval_at = new Date().toISOString();
+          updateData.estimated_cost = data.estimatedCost ? parseFloat(data.estimatedCost) : null;
+          updateData.estimated_duration_days = data.estimatedDuration ? parseInt(data.estimatedDuration) : null;
+          break;
+        case 'director_reject':
+          updateData.status = 'refusee_direction';
+          updateData.director_notes = data.notes;
+          break;
+        case 'receive_artwork':
+          updateData.status = 'oeuvre_recue';
+          updateData.artwork_received_at = new Date().toISOString();
+          updateData.reception_notes = data.notes;
+          break;
+        case 'complete_diagnosis':
+          updateData.status = 'devis_en_attente';
+          updateData.diagnosis_report = data.diagnosisReport;
+          updateData.diagnosis_completed_at = new Date().toISOString();
+          break;
+        case 'send_quote':
+          updateData.status = 'devis_en_attente';
+          updateData.quote_amount = data.quoteAmount ? parseFloat(data.quoteAmount) : null;
+          updateData.quote_details = data.quoteDetails;
+          updateData.quote_sent_at = new Date().toISOString();
+          break;
+        case 'validate_payment':
+          updateData.status = 'paiement_valide';
+          updateData.payment_reference = data.paymentReference;
+          updateData.payment_validated_at = new Date().toISOString();
+          break;
+        case 'start_restoration':
+          updateData.status = 'restauration_en_cours';
+          updateData.restoration_started_at = new Date().toISOString();
+          break;
+        case 'complete_restoration':
+          updateData.status = 'terminee';
+          updateData.restoration_report = data.restorationReport;
+          updateData.restoration_completed_at = new Date().toISOString();
+          break;
+        case 'return_artwork':
+          updateData.status = 'cloturee';
+          updateData.artwork_returned_at = new Date().toISOString();
+          updateData.completion_notes = data.completionNotes;
+          break;
+      }
+
+      await updateStatus.mutateAsync(updateData);
+      
+      toast({
+        title: "Succès",
+        description: "L'action a été effectuée avec succès.",
+      });
+    } catch (error) {
+      console.error('Error submitting action:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'action.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getActionButton = (request: RestorationRequest) => {
+    switch (request.status) {
+      case 'soumise':
+      case 'en_attente_autorisation':
+        return (
+          <div className="flex gap-2">
+            <Button 
+              size="sm" 
+              onClick={() => handleWorkflowAction(request, 'director_approve')}
+            >
+              <CheckCircle className="w-4 h-4 mr-1" />
+              Approuver
+            </Button>
+            <Button 
+              size="sm" 
+              variant="destructive"
+              onClick={() => handleWorkflowAction(request, 'director_reject')}
+            >
+              <XCircle className="w-4 h-4 mr-1" />
+              Refuser
+            </Button>
+          </div>
+        );
+      case 'autorisee':
+        return (
+          <Button size="sm" onClick={() => handleWorkflowAction(request, 'receive_artwork')}>
+            Réceptionner l'œuvre
+          </Button>
+        );
+      case 'oeuvre_recue':
+        return (
+          <Button size="sm" onClick={() => handleWorkflowAction(request, 'complete_diagnosis')}>
+            Compléter diagnostic
+          </Button>
+        );
+      case 'diagnostic_en_cours':
+        return (
+          <Button size="sm" onClick={() => handleWorkflowAction(request, 'send_quote')}>
+            Envoyer devis
+          </Button>
+        );
+      case 'devis_en_attente':
+        return (
+          <Button size="sm" onClick={() => handleWorkflowAction(request, 'validate_payment')}>
+            Valider paiement
+          </Button>
+        );
+      case 'paiement_valide':
+        return (
+          <Button size="sm" onClick={() => handleWorkflowAction(request, 'start_restoration')}>
+            Démarrer restauration
+          </Button>
+        );
+      case 'restauration_en_cours':
+        return (
+          <Button size="sm" onClick={() => handleWorkflowAction(request, 'complete_restoration')}>
+            Terminer restauration
+          </Button>
+        );
+      case 'terminee':
+        return (
+          <Button size="sm" onClick={() => handleWorkflowAction(request, 'return_artwork')}>
+            Retourner l'œuvre
+          </Button>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -476,38 +555,18 @@ export default function RestorationRequests() {
                           <TableCell>{format(new Date(request.submitted_at), 'dd/MM/yyyy')}</TableCell>
                           <TableCell>
                             <div className="flex gap-2">
+                              {getActionButton(request)}
                               <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="sm"
                                 onClick={() => {
                                   setSelectedRequest(request);
                                   setShowDetailsDialog(true);
                                 }}
                               >
-                                <Eye className="h-4 w-4" />
+                                <Eye className="h-4 h-4 mr-1" />
+                                Voir
                               </Button>
-                              {['soumise', 'en_attente_autorisation'].includes(request.status) && (
-                                <>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleAction(request, "approve")}
-                                    className="text-green-600 hover:text-green-700"
-                                    title="Autoriser"
-                                  >
-                                    <CheckCircle className="h-4 w-4" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleAction(request, "reject")}
-                                    className="text-red-600 hover:text-red-700"
-                                    title="Refuser"
-                                  >
-                                    <XCircle className="h-4 w-4" />
-                                  </Button>
-                                </>
-                              )}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -518,17 +577,23 @@ export default function RestorationRequests() {
               </CardContent>
             </Card>
 
-            {/* Details Dialog */}
+            {/* Details Dialog avec stepper */}
             <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Détails de la demande {selectedRequest?.request_number}</DialogTitle>
                   <DialogDescription>
                     Informations complètes sur la demande de restauration
                   </DialogDescription>
                 </DialogHeader>
+                
                 {selectedRequest && (
-                  <div className="space-y-4">
+                  <>
+                    <RestorationWorkflowStepper 
+                      currentStatus={selectedRequest.status} 
+                      className="mb-6"
+                    />
+                    <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label>Titre du manuscrit</Label>
@@ -598,92 +663,24 @@ export default function RestorationRequests() {
                       </div>
                     )}
                   </div>
-                )}
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
-                    Fermer
-                  </Button>
-                </DialogFooter>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
+                      Fermer
+                    </Button>
+                  </DialogFooter>
+                </>
+              )}
               </DialogContent>
             </Dialog>
 
-            {/* Action Dialog */}
-            <Dialog open={showActionDialog} onOpenChange={setShowActionDialog}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>
-                    {actionType === "approve" ? "Valider la demande" : 
-                     actionType === "reject" ? "Refuser la demande" : 
-                     "Assigner la restauration"}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {actionType === "approve" ? "Validez cette demande de restauration et fournissez une estimation" :
-                     actionType === "reject" ? "Indiquez la raison du refus" :
-                     "Assignez un restaurateur et planifiez la restauration"}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  {actionType === "approve" && (
-                    <>
-                      <div>
-                        <Label>Coût estimé (DH)</Label>
-                        <Input
-                          type="number"
-                          value={estimatedCost}
-                          onChange={(e) => setEstimatedCost(e.target.value)}
-                          placeholder="Ex: 5000"
-                        />
-                      </div>
-                      <div>
-                        <Label>Durée estimée (jours)</Label>
-                        <Input
-                          type="number"
-                          value={estimatedDuration}
-                          onChange={(e) => setEstimatedDuration(e.target.value)}
-                          placeholder="Ex: 30"
-                        />
-                      </div>
-                    </>
-                  )}
-                  
-                  {actionType === "assign" && (
-                    <div>
-                      <Label>Restaurateur</Label>
-                      <Input
-                        value={assignedRestorer}
-                        onChange={(e) => setAssignedRestorer(e.target.value)}
-                        placeholder="Nom du restaurateur"
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <Label>Notes</Label>
-                    <Textarea
-                      value={actionNotes}
-                      onChange={(e) => setActionNotes(e.target.value)}
-                      placeholder={
-                        actionType === "approve" ? "Notes de validation (optionnel)" :
-                        actionType === "reject" ? "Raison du refus (requis)" :
-                        "Instructions pour le restaurateur"
-                      }
-                      rows={4}
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setShowActionDialog(false)}>
-                    Annuler
-                  </Button>
-                  <Button 
-                    onClick={handleSubmitAction}
-                    disabled={actionType === "reject" && !actionNotes}
-                  >
-                    Confirmer
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            {/* Workflow Dialog avec génération de documents */}
+            <RestorationWorkflowDialog
+              open={workflowDialogOpen}
+              onClose={() => setWorkflowDialogOpen(false)}
+              request={selectedRequest}
+              onAction={handleWorkflowSubmit}
+              actionType={currentActionType}
+            />
           </div>
         </main>
       </div>
