@@ -30,6 +30,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from "@/components/ui/label";
 import { RestorationNotifications } from "@/components/restoration/RestorationNotifications";
 import { MyRestorationRequests } from "@/components/restoration/MyRestorationRequests";
+import { MyReproductionRequests } from "@/components/my-space/MyReproductionRequests";
+import { MyLegalDeposits } from "@/components/my-space/MyLegalDeposits";
+import { MyBookReservations } from "@/components/my-space/MyBookReservations";
+import { MySpaceReservations } from "@/components/my-space/MySpaceReservations";
 
 interface ReadingHistoryItem {
   id: string;
@@ -302,71 +306,19 @@ export default function MyLibrarySpace() {
               </TabsContent>
 
               <TabsContent value="reproduction">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Demandes de reproduction</CardTitle>
-                    <CardDescription>
-                      Suivez vos demandes de reproduction de documents
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-12">
-                      <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">Aucune demande de reproduction pour le moment</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <MyReproductionRequests />
               </TabsContent>
 
               <TabsContent value="legal-deposit">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Dépôt légal</CardTitle>
-                    <CardDescription>
-                      Suivez vos dépôts légaux
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-12">
-                      <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">Aucun dépôt légal pour le moment</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <MyLegalDeposits />
               </TabsContent>
 
               <TabsContent value="book-reservation">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Réservation d'ouvrage</CardTitle>
-                    <CardDescription>
-                      Suivez vos réservations d'ouvrages
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-12">
-                      <Book className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">Aucune réservation d'ouvrage pour le moment</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <MyBookReservations />
               </TabsContent>
 
               <TabsContent value="space-reservation">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Réservation d'espace</CardTitle>
-                    <CardDescription>
-                      Suivez vos réservations d'espaces
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-12">
-                      <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">Aucune réservation d'espace pour le moment</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <MySpaceReservations />
               </TabsContent>
             </Tabs>
           </TabsContent>
