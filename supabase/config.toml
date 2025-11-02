@@ -74,3 +74,6 @@ verify_jwt = false
 
 [functions.seed-manuscripts]
 verify_jwt = false
+
+[functions.generate-restoration-pdf]
+verify_jwt = false
