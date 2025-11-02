@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, Edit, Library, UserCog, Calendar } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, Edit, Library, UserCog, Calendar, Wrench } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useNavigate } from "react-router-dom";
@@ -78,6 +78,13 @@ export function AdminSettingsCards() {
       title: "Administration AC",
       description: "Gestion de la plateforme d'activités culturelles",
       href: "/admin/activites-culturelles",
+      permission: "content.manage"
+    },
+    {
+      icon: Wrench,
+      title: "Demandes de restauration",
+      description: "Gestion des demandes de restauration de manuscrits",
+      href: "/admin/restoration-requests",
       permission: "content.manage"
     }
   ];
