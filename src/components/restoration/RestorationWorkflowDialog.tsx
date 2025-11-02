@@ -6,6 +6,13 @@ import { Label } from "@/components/ui/label";
 import { CheckCircle, XCircle, FileText, ClipboardCheck, DollarSign, Wrench, CheckCheck, Download } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  generateAuthorizationLetter,
+  generateReceptionDocument,
+  generateDiagnosisReport,
+  generateQuoteDocument,
+  generateCompletionCertificate,
+} from "@/lib/restorationPdfGenerator";
 
 interface WorkflowDialogProps {
   open: boolean;
@@ -34,69 +41,38 @@ export function RestorationWorkflowDialog({
   const [completionNotes, setCompletionNotes] = useState('');
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
 
-  const handleGenerateDocument = async () => {
+  const handleGenerateDocument = () => {
     if (!request) return;
     
     setIsGeneratingDoc(true);
     try {
-      let documentType: string;
+      const requestData = {
+        ...request,
+        diagnosis_report: diagnosisReport || request.diagnosis_report,
+        quote_amount: quoteAmount ? parseFloat(quoteAmount) : request.quote_amount,
+        quote_details: quoteDetails || request.quote_details,
+        restoration_report: restorationReport || request.restoration_report,
+      };
       
       switch (actionType) {
         case 'director_approve':
-          documentType = 'authorization';
+          generateAuthorizationLetter(requestData);
           break;
         case 'receive_artwork':
-          documentType = 'reception';
+          generateReceptionDocument(requestData);
           break;
         case 'complete_diagnosis':
-          documentType = 'diagnosis';
+          generateDiagnosisReport(requestData);
           break;
         case 'send_quote':
-          documentType = 'quote';
+          generateQuoteDocument(requestData);
           break;
         case 'complete_restoration':
-          documentType = 'completion';
+          generateCompletionCertificate(requestData);
           break;
         default:
           return;
       }
-      
-      // Appeler l'edge function pour générer le PDF
-      const response = await fetch(
-        'https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/generate-restoration-pdf',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            documentType,
-            request: {
-              ...request,
-              diagnosis_report: diagnosisReport || request.diagnosis_report,
-              quote_amount: quoteAmount ? parseFloat(quoteAmount) : request.quote_amount,
-              quote_details: quoteDetails || request.quote_details,
-              restoration_report: restorationReport || request.restoration_report,
-            }
-          })
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Erreur lors de la génération du PDF');
-      }
-
-      const blob = await response.blob();
-      const filename = `${documentType}_${request.request_number}.pdf`;
-      
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
       
       toast({
         title: "Document généré",

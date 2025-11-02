@@ -190,14 +190,14 @@ export default function RestorationRequests() {
       switch (actionType) {
         case 'director_approve':
           updateData.status = 'autorisee';
-          updateData.director_notes = data.notes;
+          updateData.director_approval_notes = data.notes;
           updateData.director_approval_at = new Date().toISOString();
           updateData.estimated_cost = data.estimatedCost ? parseFloat(data.estimatedCost) : null;
           updateData.estimated_duration_days = data.estimatedDuration ? parseInt(data.estimatedDuration) : null;
           break;
         case 'director_reject':
           updateData.status = 'refusee_direction';
-          updateData.director_notes = data.notes;
+          updateData.director_rejection_reason = data.notes;
           break;
         case 'receive_artwork':
           updateData.status = 'oeuvre_recue';
