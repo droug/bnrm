@@ -737,5 +737,179 @@
       {"name": "Service Financier", "level": "module"},
       {"name": "Gestionnaire Espaces", "level": "module"}
     ]
+  },
+  {
+    "code": "WF_REST_01",
+    "name": "Workflow Demandes de Restauration",
+    "module": "restoration",
+    "workflow_type": "restoration",
+    "version": "1.0",
+    "description": "Gestion complète des demandes de restauration de manuscrits et documents patrimoniaux avec validation multi-niveaux.",
+    "color": "indigo",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Soumission de la demande",
+        "type": "creation",
+        "required_role": "Utilisateur",
+        "description": "Création et soumission de la demande de restauration par l'utilisateur"
+      },
+      {
+        "order": 2,
+        "name": "Validation initiale",
+        "type": "validation",
+        "required_role": "Gestionnaire Restauration",
+        "description": "Vérification de la recevabilité de la demande et des informations fournies"
+      },
+      {
+        "order": 3,
+        "name": "Évaluation technique",
+        "type": "validation",
+        "required_role": "Expert Restauration",
+        "description": "Évaluation technique de l'état du document et estimation des coûts et délais"
+      },
+      {
+        "order": 4,
+        "name": "Validation Direction",
+        "type": "validation",
+        "required_role": "Directeur Conservation",
+        "description": "Validation finale par la direction de la conservation"
+      },
+      {
+        "order": 5,
+        "name": "Attribution au restaurateur",
+        "type": "transmission",
+        "required_role": "Gestionnaire Restauration",
+        "description": "Attribution de la demande à un restaurateur qualifié"
+      },
+      {
+        "order": 6,
+        "name": "Travaux de restauration",
+        "type": "execution",
+        "required_role": "Restaurateur",
+        "description": "Réalisation des travaux de restauration"
+      },
+      {
+        "order": 7,
+        "name": "Contrôle qualité",
+        "type": "validation",
+        "required_role": "Expert Restauration",
+        "description": "Vérification de la qualité des travaux effectués"
+      },
+      {
+        "order": 8,
+        "name": "Clôture et archivage",
+        "type": "archivage",
+        "required_role": "Gestionnaire Restauration",
+        "description": "Clôture du dossier et archivage des documents"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Soumettre la demande",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Soumettre"
+      },
+      {
+        "name": "Valider la recevabilité",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Valider"
+      },
+      {
+        "name": "Effectuer évaluation",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Évaluer"
+      },
+      {
+        "name": "Approuver la restauration",
+        "from_step": 3,
+        "to_step": 4,
+        "trigger_type": "manual",
+        "action": "Approuver"
+      },
+      {
+        "name": "Attribuer au restaurateur",
+        "from_step": 4,
+        "to_step": 5,
+        "trigger_type": "manual",
+        "action": "Attribuer"
+      },
+      {
+        "name": "Démarrer les travaux",
+        "from_step": 5,
+        "to_step": 6,
+        "trigger_type": "manual",
+        "action": "Démarrer"
+      },
+      {
+        "name": "Contrôler la qualité",
+        "from_step": 6,
+        "to_step": 7,
+        "trigger_type": "manual",
+        "action": "Contrôler"
+      },
+      {
+        "name": "Clôturer le dossier",
+        "from_step": 7,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Clôturer"
+      },
+      {
+        "name": "Rejeter la demande",
+        "from_step": 1,
+        "to_step": 8,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      },
+      {
+        "name": "Refus après évaluation",
+        "from_step": 2,
+        "to_step": 8,
+        "trigger_type": "manual",
+        "action": "Refuser"
+      },
+      {
+        "name": "Refus Direction",
+        "from_step": 3,
+        "to_step": 8,
+        "trigger_type": "manual",
+        "action": "Refuser"
+      },
+      {
+        "name": "Retour pour correction",
+        "from_step": 2,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Corriger"
+      },
+      {
+        "name": "Retour expertise",
+        "from_step": 3,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Réviser"
+      },
+      {
+        "name": "Retour qualité insuffisante",
+        "from_step": 7,
+        "to_step": 6,
+        "trigger_type": "manual",
+        "action": "Reprendre"
+      }
+    ],
+    "roles": [
+      {"name": "Utilisateur", "level": "module"},
+      {"name": "Gestionnaire Restauration", "level": "module"},
+      {"name": "Expert Restauration", "level": "module"},
+      {"name": "Directeur Conservation", "level": "admin"},
+      {"name": "Restaurateur", "level": "module"}
+    ]
   }
 ]
