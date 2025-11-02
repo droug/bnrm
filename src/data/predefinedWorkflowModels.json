@@ -744,64 +744,85 @@
     "module": "restoration",
     "workflow_type": "restoration",
     "version": "1.0",
-    "description": "Gestion complète des demandes de restauration de manuscrits et documents patrimoniaux avec validation multi-niveaux.",
+    "description": "Gestion complète des demandes de restauration de manuscrits avec circuit complet incluant autorisation, réception, diagnostic, devis, paiement et travaux de restauration.",
     "color": "indigo",
     "steps": [
       {
         "order": 1,
-        "name": "Soumission de la demande",
+        "name": "Demande soumise",
         "type": "creation",
         "required_role": "Utilisateur",
-        "description": "Création et soumission de la demande de restauration par l'utilisateur"
+        "description": "Soumission initiale de la demande de restauration"
       },
       {
         "order": 2,
-        "name": "Validation initiale",
+        "name": "En attente autorisation",
         "type": "validation",
-        "required_role": "Gestionnaire Restauration",
-        "description": "Vérification de la recevabilité de la demande et des informations fournies"
+        "required_role": "Directeur Conservation",
+        "description": "Attente de l'autorisation de la direction"
       },
       {
         "order": 3,
-        "name": "Évaluation technique",
+        "name": "Autorisée",
         "type": "validation",
-        "required_role": "Expert Restauration",
-        "description": "Évaluation technique de l'état du document et estimation des coûts et délais"
+        "required_role": "Gestionnaire Restauration",
+        "description": "Demande autorisée par la direction"
       },
       {
         "order": 4,
-        "name": "Validation Direction",
-        "type": "validation",
-        "required_role": "Directeur Conservation",
-        "description": "Validation finale par la direction de la conservation"
+        "name": "Œuvre reçue",
+        "type": "transmission",
+        "required_role": "Gestionnaire Restauration",
+        "description": "Réception physique de l'œuvre à restaurer"
       },
       {
         "order": 5,
-        "name": "Attribution au restaurateur",
-        "type": "transmission",
-        "required_role": "Gestionnaire Restauration",
-        "description": "Attribution de la demande à un restaurateur qualifié"
+        "name": "Diagnostic",
+        "type": "validation",
+        "required_role": "Expert Restauration",
+        "description": "Diagnostic technique de l'état de l'œuvre"
       },
       {
         "order": 6,
-        "name": "Travaux de restauration",
-        "type": "execution",
-        "required_role": "Restaurateur",
-        "description": "Réalisation des travaux de restauration"
+        "name": "Devis en attente",
+        "type": "validation",
+        "required_role": "Expert Restauration",
+        "description": "Établissement et envoi du devis"
       },
       {
         "order": 7,
-        "name": "Contrôle qualité",
+        "name": "Devis accepté",
         "type": "validation",
-        "required_role": "Expert Restauration",
-        "description": "Vérification de la qualité des travaux effectués"
+        "required_role": "Utilisateur",
+        "description": "Acceptation du devis par le demandeur"
       },
       {
         "order": 8,
-        "name": "Clôture et archivage",
+        "name": "Paiement validé",
+        "type": "validation",
+        "required_role": "Service Financier",
+        "description": "Validation du paiement par le service financier"
+      },
+      {
+        "order": 9,
+        "name": "Restauration en cours",
+        "type": "execution",
+        "required_role": "Restaurateur",
+        "description": "Travaux de restauration en cours"
+      },
+      {
+        "order": 10,
+        "name": "Terminée",
+        "type": "validation",
+        "required_role": "Expert Restauration",
+        "description": "Restauration terminée et contrôle qualité effectué"
+      },
+      {
+        "order": 11,
+        "name": "Clôturée",
         "type": "archivage",
         "required_role": "Gestionnaire Restauration",
-        "description": "Clôture du dossier et archivage des documents"
+        "description": "Dossier clôturé et archivé"
       }
     ],
     "transitions": [
@@ -813,102 +834,117 @@
         "action": "Soumettre"
       },
       {
-        "name": "Valider la recevabilité",
+        "name": "Demander autorisation",
         "from_step": 1,
         "to_step": 2,
         "trigger_type": "manual",
-        "action": "Valider"
+        "action": "Transmettre"
       },
       {
-        "name": "Effectuer évaluation",
+        "name": "Autoriser",
         "from_step": 2,
         "to_step": 3,
         "trigger_type": "manual",
-        "action": "Évaluer"
+        "action": "Autoriser"
       },
       {
-        "name": "Approuver la restauration",
+        "name": "Refuser (Direction)",
+        "from_step": 2,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Refuser"
+      },
+      {
+        "name": "Confirmer réception",
         "from_step": 3,
         "to_step": 4,
         "trigger_type": "manual",
-        "action": "Approuver"
+        "action": "Recevoir"
       },
       {
-        "name": "Attribuer au restaurateur",
+        "name": "Établir diagnostic",
         "from_step": 4,
         "to_step": 5,
         "trigger_type": "manual",
-        "action": "Attribuer"
+        "action": "Diagnostiquer"
       },
       {
-        "name": "Démarrer les travaux",
+        "name": "Établir devis",
         "from_step": 5,
         "to_step": 6,
+        "trigger_type": "manual",
+        "action": "Établir devis"
+      },
+      {
+        "name": "Accepter devis",
+        "from_step": 6,
+        "to_step": 7,
+        "trigger_type": "manual",
+        "action": "Accepter"
+      },
+      {
+        "name": "Refuser devis",
+        "from_step": 6,
+        "to_step": null,
+        "trigger_type": "manual",
+        "action": "Refuser"
+      },
+      {
+        "name": "Valider paiement",
+        "from_step": 7,
+        "to_step": 8,
+        "trigger_type": "manual",
+        "action": "Valider paiement"
+      },
+      {
+        "name": "Démarrer restauration",
+        "from_step": 8,
+        "to_step": 9,
         "trigger_type": "manual",
         "action": "Démarrer"
       },
       {
-        "name": "Contrôler la qualité",
-        "from_step": 6,
-        "to_step": 7,
+        "name": "Terminer restauration",
+        "from_step": 9,
+        "to_step": 10,
         "trigger_type": "manual",
-        "action": "Contrôler"
+        "action": "Terminer"
       },
       {
         "name": "Clôturer le dossier",
-        "from_step": 7,
-        "to_step": null,
+        "from_step": 10,
+        "to_step": 11,
         "trigger_type": "manual",
         "action": "Clôturer"
       },
       {
-        "name": "Rejeter la demande",
-        "from_step": 1,
-        "to_step": 8,
-        "trigger_type": "manual",
-        "action": "Rejeter"
-      },
-      {
-        "name": "Refus après évaluation",
-        "from_step": 2,
-        "to_step": 8,
-        "trigger_type": "manual",
-        "action": "Refuser"
-      },
-      {
-        "name": "Refus Direction",
-        "from_step": 3,
-        "to_step": 8,
-        "trigger_type": "manual",
-        "action": "Refuser"
+        "name": "Archiver",
+        "from_step": 11,
+        "to_step": null,
+        "trigger_type": "automatic",
+        "action": "Archiver"
       },
       {
         "name": "Retour pour correction",
-        "from_step": 2,
-        "to_step": 1,
+        "from_step": 3,
+        "to_step": 2,
         "trigger_type": "manual",
         "action": "Corriger"
       },
       {
-        "name": "Retour expertise",
-        "from_step": 3,
-        "to_step": 2,
+        "name": "Retour après diagnostic",
+        "from_step": 5,
+        "to_step": 4,
         "trigger_type": "manual",
         "action": "Réviser"
-      },
-      {
-        "name": "Retour qualité insuffisante",
-        "from_step": 7,
-        "to_step": 6,
-        "trigger_type": "manual",
-        "action": "Reprendre"
       }
     ],
     "roles": [
       {"name": "Utilisateur", "level": "module"},
+      {"name": "Directeur Conservation", "level": "admin"},
       {"name": "Gestionnaire Restauration", "level": "module"},
       {"name": "Expert Restauration", "level": "module"},
-      {"name": "Directeur Conservation", "level": "admin"},
+      {"name": "Service Financier", "level": "module"},
       {"name": "Restaurateur", "level": "module"}
     ]
   },
