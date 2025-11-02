@@ -68,45 +68,47 @@ export function RestorationWorkflowStepper({ currentStatus, className }: Restora
   });
 
   return (
-    <div className={cn("w-full py-6", className)}>
-      <div className="flex items-center justify-between">
+    <div className={cn("w-full py-4 overflow-x-auto", className)}>
+      <div className="flex items-center min-w-max px-4 gap-1">
         {steps.map((step, index) => (
-          <div key={step.id} className="flex flex-col items-center flex-1 relative">
+          <div key={step.id} className="flex flex-col items-center relative" style={{ minWidth: '80px' }}>
             {/* Ligne de connexion */}
             {index < steps.length - 1 && (
               <div 
                 className={cn(
-                  "absolute top-5 left-1/2 w-full h-0.5 -z-10",
+                  "absolute top-4 left-[50%] h-0.5 -z-10",
                   step.status === 'completed' ? "bg-primary" : "bg-muted"
                 )}
+                style={{ width: '80px' }}
               />
             )}
             
             {/* Cercle de l'étape */}
             <div
               className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all mb-2",
+                "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all mb-2 shrink-0",
                 step.status === 'completed' && "bg-primary border-primary text-primary-foreground",
                 step.status === 'current' && "bg-background border-primary text-primary animate-pulse",
                 step.status === 'rejected' && "bg-destructive border-destructive text-destructive-foreground",
                 step.status === 'upcoming' && "bg-muted border-muted-foreground/30 text-muted-foreground"
               )}
             >
-              {step.status === 'completed' && <Check className="w-5 h-5" />}
-              {step.status === 'current' && <Clock className="w-5 h-5" />}
-              {step.status === 'rejected' && <XCircle className="w-5 h-5" />}
-              {step.status === 'upcoming' && <span className="text-xs font-medium">{index + 1}</span>}
+              {step.status === 'completed' && <Check className="w-4 h-4" />}
+              {step.status === 'current' && <Clock className="w-4 h-4" />}
+              {step.status === 'rejected' && <XCircle className="w-4 h-4" />}
+              {step.status === 'upcoming' && <span className="text-[10px] font-medium">{index + 1}</span>}
             </div>
             
             {/* Label de l'étape */}
             <span
               className={cn(
-                "text-xs text-center font-medium max-w-[100px]",
+                "text-[10px] text-center font-medium leading-tight",
                 step.status === 'completed' && "text-primary",
                 step.status === 'current' && "text-primary font-semibold",
                 step.status === 'rejected' && "text-destructive",
                 step.status === 'upcoming' && "text-muted-foreground"
               )}
+              style={{ maxWidth: '75px', wordWrap: 'break-word' }}
             >
               {step.label}
             </span>
