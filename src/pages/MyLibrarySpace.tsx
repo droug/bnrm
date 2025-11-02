@@ -29,6 +29,7 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { RestorationNotifications } from "@/components/restoration/RestorationNotifications";
+import { MyRestorationRequests } from "@/components/restoration/MyRestorationRequests";
 
 interface ReadingHistoryItem {
   id: string;
@@ -525,7 +526,10 @@ export default function MyLibrarySpace() {
 
           {/* Notifications Tab */}
           <TabsContent value="notifications">
-            <RestorationNotifications />
+            <div className="grid gap-6 md:grid-cols-2">
+              <RestorationNotifications />
+              <MyRestorationRequests />
+            </div>
           </TabsContent>
         </Tabs>
       </main>
