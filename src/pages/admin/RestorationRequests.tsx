@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   AlertCircle, CheckCircle, XCircle, Clock, Wrench, Eye, Filter, ArrowLeft, 
-  FileCheck, Package, CreditCard, Settings, RotateCcw 
+  FileCheck, Package, CreditCard, Settings, RotateCcw, ChevronLeft, ChevronRight 
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -59,6 +59,8 @@ export default function RestorationRequests() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("all");
   const [alertThresholdDays, setAlertThresholdDays] = useState(7);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Fetch all restoration requests
   const { data: allRequests, isLoading } = useQuery({
@@ -168,6 +170,22 @@ export default function RestorationRequests() {
   };
 
   const delayedRequests = requests?.filter(isRequestDelayed) || [];
+
+  // Pagination
+  const totalPages = Math.ceil((requests?.length || 0) / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedRequests = requests?.slice(startIndex, endIndex) || [];
+
+  // Reset to first page when filters change
+  const handleFilterChange = (filterType: 'status' | 'urgency', value: string) => {
+    setCurrentPage(1);
+    if (filterType === 'status') {
+      setStatusFilter(value);
+    } else {
+      setUrgencyFilter(value);
+    }
+  };
 
   // Stats
   const totalRequests = requests?.length || 0;
@@ -550,7 +568,7 @@ export default function RestorationRequests() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4" />
-                    <Select value={urgencyFilter} onValueChange={setUrgencyFilter}>
+                    <Select value={urgencyFilter} onValueChange={(value) => handleFilterChange('urgency', value)}>
                       <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Urgence" />
                       </SelectTrigger>
@@ -562,7 +580,7 @@ export default function RestorationRequests() {
                         <SelectItem value="critique">Critique</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
                       <SelectTrigger className="w-[200px]">
                         <SelectValue placeholder="Filtrer par statut" />
                       </SelectTrigger>
@@ -602,7 +620,7 @@ export default function RestorationRequests() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {requests?.map((request) => (
+                      {paginatedRequests.map((request) => (
                         <TableRow key={request.id}>
                           <TableCell className="font-medium">{request.request_number}</TableCell>
                           <TableCell>
@@ -643,6 +661,80 @@ export default function RestorationRequests() {
                       ))}
                     </TableBody>
                   </Table>
+                )}
+                
+                {/* Pagination Controls */}
+                {!isLoading && requests && requests.length > 0 && (
+                  <div className="flex items-center justify-between px-2 py-4 border-t">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        Affichage de {startIndex + 1} à {Math.min(endIndex, requests.length)} sur {requests.length} résultats
+                      </span>
+                      <Select value={itemsPerPage.toString()} onValueChange={(value) => {
+                        setItemsPerPage(Number(value));
+                        setCurrentPage(1);
+                      }}>
+                        <SelectTrigger className="w-[100px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background z-50">
+                          <SelectItem value="5">5 / page</SelectItem>
+                          <SelectItem value="10">10 / page</SelectItem>
+                          <SelectItem value="20">20 / page</SelectItem>
+                          <SelectItem value="50">50 / page</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                        Précédent
+                      </Button>
+                      
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          let pageNumber;
+                          if (totalPages <= 5) {
+                            pageNumber = i + 1;
+                          } else if (currentPage <= 3) {
+                            pageNumber = i + 1;
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNumber = totalPages - 4 + i;
+                          } else {
+                            pageNumber = currentPage - 2 + i;
+                          }
+                          
+                          return (
+                            <Button
+                              key={pageNumber}
+                              variant={currentPage === pageNumber ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(pageNumber)}
+                              className="w-8 h-8 p-0"
+                            >
+                              {pageNumber}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                      >
+                        Suivant
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                 )}
               </CardContent>
             </Card>
