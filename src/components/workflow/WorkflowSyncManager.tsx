@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { RefreshCw, Database, AlertCircle, CheckCircle2, Activity } from "lucide-react";
+import { RefreshCw, Database, AlertCircle, CheckCircle2, Activity, ArrowLeftRight } from "lucide-react";
+import { useWorkflowAutoSync } from "@/hooks/useWorkflowAutoSync";
 
 interface WorkflowSyncStatus {
   total: number;
@@ -21,6 +22,10 @@ export function WorkflowSyncManager() {
     status: 'idle'
   });
   const [missingWorkflows, setMissingWorkflows] = useState<string[]>([]);
+  const { syncStatus: autoSyncStatus, syncAllWorkflows: autoSyncAll } = useWorkflowAutoSync({
+    enabled: true,
+    onSync: () => checkSyncStatus()
+  });
 
   useEffect(() => {
     checkSyncStatus();
@@ -184,30 +189,44 @@ export function WorkflowSyncManager() {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Database className="h-5 w-5" />
-              Synchronisation Automatique
+              <ArrowLeftRight className="h-5 w-5" />
+              Synchronisation Automatique Bidirectionnelle
             </CardTitle>
             <CardDescription>
-              Synchronisation des workflows du système avec la base de données
+              Synchronisation automatique entre la base de données et les définitions de workflows
+              {autoSyncStatus.lastSync && (
+                <span className="block text-xs mt-1">
+                  Dernière synchro: {autoSyncStatus.lastSync.toLocaleTimeString('fr-FR')}
+                </span>
+              )}
             </CardDescription>
           </div>
-          <Button
-            onClick={syncAllWorkflows}
-            disabled={syncStatus.status === 'syncing'}
-            variant={syncStatus.missing > 0 ? "default" : "outline"}
-          >
-            {syncStatus.status === 'syncing' ? (
-              <>
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                Synchronisation...
-              </>
-            ) : (
-              <>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Synchroniser maintenant
-              </>
-            )}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={syncAllWorkflows}
+              disabled={syncStatus.status === 'syncing'}
+              variant={syncStatus.missing > 0 ? "default" : "outline"}
+            >
+              {syncStatus.status === 'syncing' ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Synchronisation...
+                </>
+              ) : (
+                <>
+                  <Database className="h-4 w-4 mr-2" />
+                  Sync JSON → BD
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={autoSyncAll}
+              variant="outline"
+            >
+              <ArrowLeftRight className="h-4 w-4 mr-2" />
+              Sync BD → JSON
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

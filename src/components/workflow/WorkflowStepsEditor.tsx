@@ -32,7 +32,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, ArrowLeftRight } from "lucide-react";
+import { useWorkflowAutoSync } from "@/hooks/useWorkflowAutoSync";
 
 interface WorkflowStep {
   id: string;
@@ -55,6 +56,12 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [stepToDelete, setStepToDelete] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Auto-sync hook
+  const { syncWorkflow, syncStatus, syncing } = useWorkflowAutoSync({
+    workflowId,
+    enabled: true
+  });
 
   // Form state
   const [formData, setFormData] = useState({
@@ -172,6 +179,9 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
       loadSteps();
       setSheetOpen(false);
       setEditingStep(null);
+      
+      // Synchroniser automatiquement vers JSON
+      await syncWorkflow(workflowId);
     } catch (error) {
       console.error('Error saving step:', error);
       toast.error("Erreur lors de l'enregistrement");
@@ -195,6 +205,9 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
       loadSteps();
       setDeleteDialogOpen(false);
       setStepToDelete(null);
+      
+      // Synchroniser automatiquement vers JSON
+      await syncWorkflow(workflowId);
     } catch (error) {
       console.error('Error deleting step:', error);
       toast.error("Erreur lors de la suppression");
@@ -208,7 +221,15 @@ export function WorkflowStepsEditor({ workflowId }: WorkflowStepsEditorProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Étapes du Workflow</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold">Étapes du Workflow</h3>
+          {syncStatus.hasChanges && (
+            <span className="text-xs text-orange-600 flex items-center gap-1">
+              <ArrowLeftRight className="h-3 w-3" />
+              {syncStatus.changes.length} changement(s) détecté(s)
+            </span>
+          )}
+        </div>
         <Button size="sm" onClick={() => handleOpenSheet()}>
           <Plus className="h-4 w-4 mr-2" />
           Ajouter une étape
