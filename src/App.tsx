@@ -113,6 +113,7 @@ const ReproductionPage = lazy(() => import("./pages/ReproductionPage"));
 const ReproductionBackofficePage = lazy(() => import("./pages/ReproductionBackofficePage"));
 const ReproductionDetailsPage = lazy(() => import("./pages/ReproductionDetailsPage"));
 const RestorationRequest = lazy(() => import("./pages/RestorationRequest"));
+const RestorationRequests = lazy(() => import("./pages/admin/RestorationRequests"));
 const DemandeNumerisation = lazy(() => import("./pages/DemandeNumerisation"));
 
 // CBM Portal (lazy)
@@ -395,6 +396,9 @@ const App = () => {
         {/* System Lists Management */}
         <Route path="/admin/system-lists" element={<SystemListsPage />} />
         <Route path="/admin/listes-systeme" element={<SystemListsPage />} />
+
+        {/* Restoration Requests Management */}
+        <Route path="/admin/restoration-requests" element={<RestorationRequests />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

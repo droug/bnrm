@@ -37,7 +37,6 @@ interface RestorationRequest {
   profiles?: {
     first_name: string;
     last_name: string;
-    email: string;
   };
 }
 
@@ -64,17 +63,26 @@ export default function RestorationRequests() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('restoration_requests')
-        .select(`
-          *,
-          profiles (
-            first_name,
-            last_name,
-            email
-          )
-        `)
+        .select('*')
         .order('submitted_at', { ascending: false });
 
       if (error) throw error;
+
+      // Fetch user profiles separately
+      if (data && data.length > 0) {
+        const userIds = [...new Set(data.map(r => r.user_id))];
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('user_id, first_name, last_name')
+          .in('user_id', userIds);
+
+        // Map profiles to requests
+        return data.map(request => ({
+          ...request,
+          profiles: profilesData?.find(p => p.user_id === request.user_id)
+        })) as RestorationRequest[];
+      }
+
       return data as RestorationRequest[];
     }
   });
@@ -438,7 +446,6 @@ export default function RestorationRequests() {
                             {request.profiles ? (
                               <div>
                                 <p className="text-sm">{request.profiles.first_name} {request.profiles.last_name}</p>
-                                <p className="text-xs text-muted-foreground">{request.profiles.email}</p>
                               </div>
                             ) : (
                               <span className="text-muted-foreground">-</span>

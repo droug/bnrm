@@ -6090,6 +6090,84 @@ export type Database = {
         }
         Relationships: []
       }
+      restoration_requests: {
+        Row: {
+          assigned_restorer: string | null
+          completed_at: string | null
+          created_at: string
+          damage_description: string
+          estimated_cost: number | null
+          estimated_duration: number | null
+          id: string
+          manuscript_cote: string
+          manuscript_title: string
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
+          request_number: string
+          started_at: string | null
+          status: string
+          submitted_at: string
+          updated_at: string
+          urgency_level: string
+          user_id: string
+          user_notes: string | null
+          validated_at: string | null
+          validated_by: string | null
+          validation_notes: string | null
+        }
+        Insert: {
+          assigned_restorer?: string | null
+          completed_at?: string | null
+          created_at?: string
+          damage_description: string
+          estimated_cost?: number | null
+          estimated_duration?: number | null
+          id?: string
+          manuscript_cote: string
+          manuscript_title: string
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          request_number: string
+          started_at?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+          urgency_level: string
+          user_id: string
+          user_notes?: string | null
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_notes?: string | null
+        }
+        Update: {
+          assigned_restorer?: string | null
+          completed_at?: string | null
+          created_at?: string
+          damage_description?: string
+          estimated_cost?: number | null
+          estimated_duration?: number | null
+          id?: string
+          manuscript_cote?: string
+          manuscript_title?: string
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          request_number?: string
+          started_at?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+          urgency_level?: string
+          user_id?: string
+          user_notes?: string | null
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_notes?: string | null
+        }
+        Relationships: []
+      }
       role_permissions: {
         Row: {
           created_at: string | null
@@ -8238,6 +8316,7 @@ export type Database = {
       generate_proposal_number: { Args: never; Returns: string }
       generate_reproduction_request_number: { Args: never; Returns: string }
       generate_request_number: { Args: never; Returns: string }
+      generate_restoration_request_number: { Args: never; Returns: string }
       generate_transaction_number: { Args: never; Returns: string }
       generate_validation_code: { Args: never; Returns: string }
       generate_workflow_instance_number: {
