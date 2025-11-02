@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  ScrollableDialogNestedRoot,
-  ScrollableDialogContent,
-  ScrollableDialogHeader,
-  ScrollableDialogTitle,
-  ScrollableDialogDescription,
-  ScrollableDialogBody,
-} from "@/components/ui/scrollable-dialog";
+  ScrollableDialogNested,
+  ScrollableDialogNestedContent,
+  ScrollableDialogNestedHeader,
+  ScrollableDialogNestedTitle,
+  ScrollableDialogNestedDescription,
+  ScrollableDialogNestedBody,
+} from "@/components/ui/scrollable-dialog-nested";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -69,32 +69,32 @@ export function WorkflowBuilderDialog({
 
   if (loading) {
     return (
-      <ScrollableDialogNestedRoot open={open} onOpenChange={onOpenChange}>
-        <ScrollableDialogContent className="max-w-5xl">
+      <ScrollableDialogNested open={open} onOpenChange={onOpenChange}>
+        <ScrollableDialogNestedContent className="max-w-5xl">
           <div className="flex items-center justify-center p-8">
             Chargement...
           </div>
-        </ScrollableDialogContent>
-      </ScrollableDialogNestedRoot>
+        </ScrollableDialogNestedContent>
+      </ScrollableDialogNested>
     );
   }
 
   if (!workflow) return null;
 
   return (
-    <ScrollableDialogNestedRoot open={open} onOpenChange={onOpenChange}>
-      <ScrollableDialogContent className="max-w-5xl">
-        <ScrollableDialogHeader>
-          <ScrollableDialogTitle className="text-xl">
+    <ScrollableDialogNested open={open} onOpenChange={onOpenChange}>
+      <ScrollableDialogNestedContent className="max-w-5xl">
+        <ScrollableDialogNestedHeader>
+          <ScrollableDialogNestedTitle className="text-xl">
             {workflow.name} - v{workflow.version}
-          </ScrollableDialogTitle>
-          <ScrollableDialogDescription>
+          </ScrollableDialogNestedTitle>
+          <ScrollableDialogNestedDescription>
             {workflow.module} • {workflow.workflow_type}
             {workflow.description && ` - ${workflow.description}`}
-          </ScrollableDialogDescription>
-        </ScrollableDialogHeader>
+          </ScrollableDialogNestedDescription>
+        </ScrollableDialogNestedHeader>
 
-        <ScrollableDialogBody>
+        <ScrollableDialogNestedBody>
           <Tabs defaultValue="steps">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="steps">
@@ -129,8 +129,8 @@ export function WorkflowBuilderDialog({
               </Card>
             </TabsContent>
           </Tabs>
-        </ScrollableDialogBody>
-      </ScrollableDialogContent>
-    </ScrollableDialogNestedRoot>
+        </ScrollableDialogNestedBody>
+      </ScrollableDialogNestedContent>
+    </ScrollableDialogNested>
   );
 }
