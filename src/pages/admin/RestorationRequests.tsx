@@ -41,6 +41,7 @@ interface RestorationRequest {
   estimated_cost?: number;
   estimated_duration?: number;
   assigned_restorer?: string;
+  quote_amount?: number;
   profiles?: {
     first_name: string;
     last_name: string;
@@ -199,11 +200,51 @@ export default function RestorationRequests() {
     setWorkflowDialogOpen(true);
   };
 
+  const sendNotification = async (actionType: string, additionalData?: any) => {
+    if (!selectedRequest) return;
+
+    const notificationTypeMap: Record<string, string> = {
+      'director_approve': 'request_authorized',
+      'director_reject': 'request_rejected',
+      'receive_artwork': 'provide_artwork',
+      'send_quote': 'quote_sent',
+      'validate_payment': 'payment_link',
+      'start_restoration': 'restoration_started',
+      'complete_restoration': 'restoration_completed',
+      'return_artwork': 'artwork_ready',
+    };
+
+    const notificationType = notificationTypeMap[actionType];
+    if (!notificationType) return;
+
+    try {
+      // Récupérer l'email de l'utilisateur
+      const { data: userData } = await supabase.auth.admin.getUserById(selectedRequest.user_id);
+      if (!userData?.user?.email) return;
+
+      await supabase.functions.invoke('send-restoration-notification', {
+        body: {
+          requestId: selectedRequest.id,
+          recipientEmail: userData.user.email,
+          recipientId: selectedRequest.user_id,
+          notificationType,
+          requestNumber: selectedRequest.request_number,
+          manuscriptTitle: selectedRequest.manuscript_title,
+          additionalData
+        }
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi de la notification:', error);
+      // Ne pas bloquer le workflow si la notification échoue
+    }
+  };
+
   const handleWorkflowSubmit = async (actionType: string, data: any) => {
     if (!selectedRequest) return;
 
     try {
       let updateData: any = { id: selectedRequest.id };
+      let notificationData: any = {};
 
       switch (actionType) {
         case 'director_approve':
@@ -212,16 +253,20 @@ export default function RestorationRequests() {
           updateData.director_approval_at = new Date().toISOString();
           updateData.estimated_cost = data.estimatedCost ? parseFloat(data.estimatedCost) : null;
           updateData.estimated_duration = data.estimatedDuration ? parseInt(data.estimatedDuration) : null;
+          notificationData.estimatedCost = data.estimatedCost;
+          notificationData.estimatedDuration = data.estimatedDuration;
           break;
         case 'director_reject':
           updateData.status = 'refusee_direction';
           updateData.director_rejection_reason = data.notes;
           updateData.rejected_at = new Date().toISOString();
+          notificationData.rejectionReason = data.notes;
           break;
         case 'receive_artwork':
           updateData.status = 'diagnostic_en_cours';
           updateData.artwork_received_at = new Date().toISOString();
           updateData.artwork_condition_at_reception = data.notes;
+          notificationData.instructions = data.notes;
           break;
         case 'complete_diagnosis':
           updateData.status = 'devis_en_attente';
@@ -232,6 +277,7 @@ export default function RestorationRequests() {
           updateData.status = 'devis_en_attente';
           updateData.quote_amount = data.quoteAmount ? parseFloat(data.quoteAmount) : null;
           updateData.quote_issued_at = new Date().toISOString();
+          notificationData.quoteAmount = data.quoteAmount;
           break;
         case 'accept_quote':
           updateData.status = 'paiement_en_attente';
@@ -247,10 +293,13 @@ export default function RestorationRequests() {
           updateData.payment_reference = data.paymentReference;
           updateData.payment_date = new Date().toISOString();
           updateData.payment_validated_by = (await supabase.auth.getUser()).data.user?.id;
+          notificationData.quoteAmount = selectedRequest.quote_amount;
+          notificationData.paymentLink = data.paymentLink || '';
           break;
         case 'start_restoration':
           updateData.status = 'restauration_en_cours';
           updateData.restoration_started_at = new Date().toISOString();
+          notificationData.estimatedDuration = selectedRequest.estimated_duration;
           break;
         case 'complete_restoration':
           updateData.status = 'terminee';
@@ -292,6 +341,11 @@ export default function RestorationRequests() {
       }
 
       await updateStatus.mutateAsync(updateData);
+      
+      // Envoyer la notification
+      if (actionType !== 'reset_request' && actionType !== 'complete_diagnosis' && actionType !== 'accept_quote' && actionType !== 'reject_quote') {
+        await sendNotification(actionType, notificationData);
+      }
       
       toast({
         title: "Succès",

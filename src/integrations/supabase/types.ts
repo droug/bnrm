@@ -6134,6 +6134,50 @@ export type Database = {
           },
         ]
       }
+      restoration_notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          notification_type: string
+          recipient_id: string
+          request_id: string
+          sent_at: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          notification_type: string
+          recipient_id: string
+          request_id: string
+          sent_at?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          notification_type?: string
+          recipient_id?: string
+          request_id?: string
+          sent_at?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restoration_notifications_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "restoration_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       restoration_request_history: {
         Row: {
           changed_at: string
@@ -8499,6 +8543,16 @@ export type Database = {
         Returns: boolean
       }
       cleanup_old_activity_logs: { Args: never; Returns: number }
+      create_restoration_notification: {
+        Args: {
+          p_message: string
+          p_notification_type: string
+          p_recipient_id: string
+          p_request_id: string
+          p_title: string
+        }
+        Returns: string
+      }
       generate_content_slug: { Args: { title: string }; Returns: string }
       generate_deposit_number: { Args: never; Returns: string }
       generate_document_number: { Args: { doc_type: string }; Returns: string }

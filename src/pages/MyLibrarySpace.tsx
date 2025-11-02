@@ -28,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { RestorationNotifications } from "@/components/restoration/RestorationNotifications";
 
 interface ReadingHistoryItem {
   id: string;
@@ -270,7 +271,7 @@ export default function MyLibrarySpace() {
         </div>
 
         <Tabs defaultValue="history" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="history" className="flex items-center gap-2">
               <History className="h-4 w-4" />
               Historique ({readingHistory.length})
@@ -286,6 +287,10 @@ export default function MyLibrarySpace() {
             <TabsTrigger value="reviews" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Évaluations ({reviews.length})
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Mes Restaurations
             </TabsTrigger>
           </TabsList>
 
@@ -516,6 +521,11 @@ export default function MyLibrarySpace() {
                 </ScrollArea>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Notifications Tab */}
+          <TabsContent value="notifications">
+            <RestorationNotifications />
           </TabsContent>
         </Tabs>
       </main>
