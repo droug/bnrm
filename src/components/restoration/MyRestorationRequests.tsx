@@ -28,6 +28,7 @@ interface RestorationRequest {
   quote_amount?: number;
   estimated_duration?: number;
   restoration_report?: string;
+  signed_quote_url?: string;
 }
 
 export function MyRestorationRequests() {
@@ -405,6 +406,18 @@ export function MyRestorationRequests() {
                         <div className="space-y-3 pt-2 border-t">
                           {request.quote_amount ? (
                             <>
+                              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-3">
+                                <div className="flex items-start gap-3">
+                                  <FileText className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                                  <div className="flex-1">
+                                    <h4 className="font-semibold text-amber-900 mb-1">Devis disponible</h4>
+                                    <p className="text-sm text-amber-800">
+                                      Veuillez télécharger le devis, le signer et le renvoyer avant de confirmer.
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
                               {/* Bouton pour télécharger le devis */}
                               <Button 
                                 size="sm" 
@@ -419,42 +432,49 @@ export function MyRestorationRequests() {
 
                               {/* Upload du devis signé */}
                               <div className="space-y-2">
-                                <Label htmlFor={`signed-quote-${request.id}`} className="text-sm">
-                                  Uploader le devis signé (optionnel)
+                                <Label htmlFor={`signed-quote-${request.id}`} className="text-sm font-semibold">
+                                  Uploader le devis signé <span className="text-destructive">*</span>
                                 </Label>
-                                <div className="flex gap-2">
-                                  <Input
-                                    id={`signed-quote-${request.id}`}
-                                    type="file"
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                                      if (file) {
-                                        if (file.size > 10 * 1024 * 1024) {
-                                          toast({
-                                            title: "Erreur",
-                                            description: "La taille du fichier ne doit pas dépasser 10 MB.",
-                                            variant: "destructive"
-                                          });
-                                          return;
+                                {request.signed_quote_url ? (
+                                  <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded">
+                                    <CheckCircle className="h-4 w-4 text-green-600" />
+                                    <span className="text-sm text-green-800 flex-1">Devis signé reçu</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex gap-2">
+                                    <Input
+                                      id={`signed-quote-${request.id}`}
+                                      type="file"
+                                      accept=".pdf,.jpg,.jpeg,.png"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          if (file.size > 10 * 1024 * 1024) {
+                                            toast({
+                                              title: "Erreur",
+                                              description: "La taille du fichier ne doit pas dépasser 10 MB.",
+                                              variant: "destructive"
+                                            });
+                                            return;
+                                          }
+                                          setSignedQuoteFile(file);
+                                          setSelectedRequest(request);
                                         }
-                                        setSignedQuoteFile(file);
-                                        setSelectedRequest(request);
-                                      }
-                                    }}
-                                    className="flex-1"
-                                  />
-                                  {signedQuoteFile && selectedRequest?.id === request.id && (
-                                    <Button 
-                                      size="sm"
-                                      onClick={() => handleUploadSignedQuote(request.id, signedQuoteFile)}
-                                      disabled={isUploadingQuote}
-                                    >
-                                      <Upload className="h-4 w-4 mr-1" />
-                                      {isUploadingQuote ? 'Upload...' : 'Envoyer'}
-                                    </Button>
-                                  )}
-                                </div>
+                                      }}
+                                      className="flex-1"
+                                    />
+                                    {signedQuoteFile && selectedRequest?.id === request.id && (
+                                      <Button 
+                                        size="sm"
+                                        onClick={() => handleUploadSignedQuote(request.id, signedQuoteFile)}
+                                        disabled={isUploadingQuote}
+                                      >
+                                        <Upload className="h-4 w-4 mr-1" />
+                                        {isUploadingQuote ? 'Upload...' : 'Envoyer'}
+                                      </Button>
+                                    )}
+                                  </div>
+                                )}
                               </div>
 
                               {/* Boutons d'acceptation/refus */}
@@ -463,10 +483,10 @@ export function MyRestorationRequests() {
                                   size="sm" 
                                   className="flex-1"
                                   onClick={() => acceptQuote.mutate(request)}
-                                  disabled={acceptQuote.isPending}
+                                  disabled={acceptQuote.isPending || !request.signed_quote_url}
                                 >
                                   <Check className="h-4 w-4 mr-1" />
-                                  Accepter le devis
+                                  Confirmer
                                 </Button>
                                 <Button 
                                   size="sm" 
@@ -482,6 +502,12 @@ export function MyRestorationRequests() {
                                   Refuser
                                 </Button>
                               </div>
+
+                              {!request.signed_quote_url && (
+                                <p className="text-xs text-muted-foreground text-center">
+                                  Le bouton "Confirmer" sera activé après l'envoi du devis signé
+                                </p>
+                              )}
                             </>
                           ) : (
                             <div className="text-sm text-muted-foreground bg-muted p-3 rounded">
