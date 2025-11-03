@@ -6221,6 +6221,8 @@ export type Database = {
       }
       restoration_requests: {
         Row: {
+          actual_cost: number | null
+          actual_duration: number | null
           artwork_condition_at_reception: string | null
           artwork_received_at: string | null
           artwork_received_by: string | null
@@ -6229,6 +6231,7 @@ export type Database = {
           assigned_restorer: string | null
           authorization_document_url: string | null
           completed_at: string | null
+          conservation_state: string | null
           created_at: string
           damage_description: string
           diagnosis_completed_at: string | null
@@ -6242,11 +6245,15 @@ export type Database = {
           director_rejection_reason: string | null
           estimated_cost: number | null
           estimated_duration: number | null
+          final_condition: string | null
           id: string
+          identified_damages: string | null
+          initial_condition: string | null
           invoice_document_url: string | null
           invoice_number: string | null
           manuscript_cote: string
           manuscript_title: string
+          materials_used: string | null
           payment_amount: number | null
           payment_date: string | null
           payment_reference: string | null
@@ -6258,10 +6265,13 @@ export type Database = {
           quote_rejected_at: string | null
           quote_rejection_reason: string | null
           reception_document_url: string | null
+          recommendations: string | null
+          recommended_works: string | null
           rejected_at: string | null
           rejected_by: string | null
           rejection_reason: string | null
           request_number: string
+          required_materials: string | null
           restoration_completed_by: string | null
           restoration_photos_after: Json | null
           restoration_report: string | null
@@ -6273,6 +6283,7 @@ export type Database = {
           started_at: string | null
           status: string
           submitted_at: string
+          techniques_applied: string | null
           updated_at: string
           urgency_level: string
           user_id: string
@@ -6280,8 +6291,11 @@ export type Database = {
           validated_at: string | null
           validated_by: string | null
           validation_notes: string | null
+          works_performed: string | null
         }
         Insert: {
+          actual_cost?: number | null
+          actual_duration?: number | null
           artwork_condition_at_reception?: string | null
           artwork_received_at?: string | null
           artwork_received_by?: string | null
@@ -6290,6 +6304,7 @@ export type Database = {
           assigned_restorer?: string | null
           authorization_document_url?: string | null
           completed_at?: string | null
+          conservation_state?: string | null
           created_at?: string
           damage_description: string
           diagnosis_completed_at?: string | null
@@ -6303,11 +6318,15 @@ export type Database = {
           director_rejection_reason?: string | null
           estimated_cost?: number | null
           estimated_duration?: number | null
+          final_condition?: string | null
           id?: string
+          identified_damages?: string | null
+          initial_condition?: string | null
           invoice_document_url?: string | null
           invoice_number?: string | null
           manuscript_cote: string
           manuscript_title: string
+          materials_used?: string | null
           payment_amount?: number | null
           payment_date?: string | null
           payment_reference?: string | null
@@ -6319,10 +6338,13 @@ export type Database = {
           quote_rejected_at?: string | null
           quote_rejection_reason?: string | null
           reception_document_url?: string | null
+          recommendations?: string | null
+          recommended_works?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
           request_number: string
+          required_materials?: string | null
           restoration_completed_by?: string | null
           restoration_photos_after?: Json | null
           restoration_report?: string | null
@@ -6334,6 +6356,7 @@ export type Database = {
           started_at?: string | null
           status?: string
           submitted_at?: string
+          techniques_applied?: string | null
           updated_at?: string
           urgency_level: string
           user_id: string
@@ -6341,8 +6364,11 @@ export type Database = {
           validated_at?: string | null
           validated_by?: string | null
           validation_notes?: string | null
+          works_performed?: string | null
         }
         Update: {
+          actual_cost?: number | null
+          actual_duration?: number | null
           artwork_condition_at_reception?: string | null
           artwork_received_at?: string | null
           artwork_received_by?: string | null
@@ -6351,6 +6377,7 @@ export type Database = {
           assigned_restorer?: string | null
           authorization_document_url?: string | null
           completed_at?: string | null
+          conservation_state?: string | null
           created_at?: string
           damage_description?: string
           diagnosis_completed_at?: string | null
@@ -6364,11 +6391,15 @@ export type Database = {
           director_rejection_reason?: string | null
           estimated_cost?: number | null
           estimated_duration?: number | null
+          final_condition?: string | null
           id?: string
+          identified_damages?: string | null
+          initial_condition?: string | null
           invoice_document_url?: string | null
           invoice_number?: string | null
           manuscript_cote?: string
           manuscript_title?: string
+          materials_used?: string | null
           payment_amount?: number | null
           payment_date?: string | null
           payment_reference?: string | null
@@ -6380,10 +6411,13 @@ export type Database = {
           quote_rejected_at?: string | null
           quote_rejection_reason?: string | null
           reception_document_url?: string | null
+          recommendations?: string | null
+          recommended_works?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
           request_number?: string
+          required_materials?: string | null
           restoration_completed_by?: string | null
           restoration_photos_after?: Json | null
           restoration_report?: string | null
@@ -6395,6 +6429,7 @@ export type Database = {
           started_at?: string | null
           status?: string
           submitted_at?: string
+          techniques_applied?: string | null
           updated_at?: string
           urgency_level?: string
           user_id?: string
@@ -6402,6 +6437,7 @@ export type Database = {
           validated_at?: string | null
           validated_by?: string | null
           validation_notes?: string | null
+          works_performed?: string | null
         }
         Relationships: []
       }
