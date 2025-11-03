@@ -459,21 +459,11 @@ export default function RestorationRequests() {
             </Button>
           );
         }
-        // Sinon, afficher les boutons accept/reject pour l'admin (cas où l'admin gère aussi la validation)
+        // Une fois le devis envoyé, l'admin attend la réponse du demandeur
         return (
-          <div className="flex gap-2">
-            <Button size="sm" onClick={() => handleWorkflowAction(request, 'accept_quote')}>
-              <CheckCircle className="w-4 h-4 mr-1" />
-              Accepter devis
-            </Button>
-            <Button 
-              size="sm" 
-              variant="destructive"
-              onClick={() => handleWorkflowAction(request, 'reject_quote')}
-            >
-              <XCircle className="w-4 h-4 mr-1" />
-              Refuser devis
-            </Button>
+          <div className="text-sm text-muted-foreground italic flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            En attente de la réponse du demandeur
           </div>
         );
       case 'devis_accepte':
