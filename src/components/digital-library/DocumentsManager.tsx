@@ -20,6 +20,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import * as XLSX from 'xlsx';
+import documentPreview1 from "@/assets/document-preview-1.jpg";
+import documentPreview2 from "@/assets/document-preview-2.jpg";
+import documentPreview3 from "@/assets/document-preview-3.jpg";
 
 const documentSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
@@ -49,13 +52,14 @@ export default function DocumentsManager() {
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("documents");
   const [showCompareDialog, setShowCompareDialog] = useState(false);
-  const [compareDocs, setCompareDocs] = useState<{ existing: any; imported: any } | null>(null);
+  const [compareDocs, setCompareDocs] = useState<{ existing: any; imported: any; previewImage?: string } | null>(null);
   const [keepSelection, setKeepSelection] = useState<"existing" | "imported" | "both">("both");
 
   // Exemple de doublons détectés
   const sampleDuplicates = [
     {
       id: 1,
+      previewImage: documentPreview1,
       existing: {
         id: "DOC-001",
         title: "Introduction à la philosophie",
@@ -83,6 +87,7 @@ export default function DocumentsManager() {
     },
     {
       id: 2,
+      previewImage: documentPreview2,
       existing: {
         id: "DOC-042",
         title: "Revue scientifique - Vol. 12",
@@ -110,6 +115,7 @@ export default function DocumentsManager() {
     },
     {
       id: 3,
+      previewImage: documentPreview3,
       existing: {
         id: "DOC-089",
         title: "Partition musicale - Symphonie n°5",
@@ -1366,11 +1372,17 @@ export default function DocumentsManager() {
                           Visualiser le document
                         </Button>
                         
-                        {/* Aperçu visuel simulé */}
-                        <div className="border rounded-lg p-4 bg-muted/30 text-center">
-                          <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-2" />
-                          <p className="text-xs text-muted-foreground">Aperçu du document</p>
-                          <p className="text-xs font-mono mt-1">{compareDocs.existing.id}</p>
+                        {/* Aperçu visuel du document */}
+                        <div className="border rounded-lg overflow-hidden bg-muted/30">
+                          <img 
+                            src={compareDocs.previewImage} 
+                            alt={`Aperçu - ${compareDocs.existing.title}`}
+                            className="w-full h-48 object-cover"
+                          />
+                          <div className="p-2 text-center">
+                            <p className="text-xs text-muted-foreground">Document existant</p>
+                            <p className="text-xs font-mono mt-1">{compareDocs.existing.id}</p>
+                          </div>
                         </div>
                         
                         <div className="space-y-3">
@@ -1437,11 +1449,17 @@ export default function DocumentsManager() {
                           Visualiser le document
                         </Button>
                         
-                        {/* Aperçu visuel simulé */}
-                        <div className="border rounded-lg p-4 bg-muted/30 text-center">
-                          <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-2" />
-                          <p className="text-xs text-muted-foreground">Aperçu du document</p>
-                          <p className="text-xs font-mono mt-1">{compareDocs.imported.id}</p>
+                        {/* Aperçu visuel du document */}
+                        <div className="border rounded-lg overflow-hidden bg-muted/30">
+                          <img 
+                            src={compareDocs.previewImage} 
+                            alt={`Aperçu - ${compareDocs.imported.title}`}
+                            className="w-full h-48 object-cover"
+                          />
+                          <div className="p-2 text-center">
+                            <p className="text-xs text-muted-foreground">Document importé</p>
+                            <p className="text-xs font-mono mt-1">{compareDocs.imported.id}</p>
+                          </div>
                         </div>
                         
                         <div className="space-y-3">
