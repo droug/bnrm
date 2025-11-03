@@ -389,7 +389,22 @@ export function RestorationWorkflowDialog({
                     id="signedQuote"
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={(e) => setSignedQuoteFile(e.target.files?.[0] || null)}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        // Vérifier la taille du fichier (max 10MB)
+                        if (file.size > 10 * 1024 * 1024) {
+                          toast({
+                            title: "Erreur",
+                            description: "Le fichier est trop volumineux (max 10MB).",
+                            variant: "destructive",
+                          });
+                          e.target.value = '';
+                          return;
+                        }
+                        setSignedQuoteFile(file);
+                      }
+                    }}
                     className="cursor-pointer"
                   />
                   {signedQuoteFile && (
