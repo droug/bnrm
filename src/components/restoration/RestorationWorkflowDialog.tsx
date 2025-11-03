@@ -38,6 +38,9 @@ export function RestorationWorkflowDialog({
   const [notes, setNotes] = useState('');
   const [quoteAmount, setQuoteAmount] = useState('');
   const [quoteDetails, setQuoteDetails] = useState('');
+  const [quoteItems, setQuoteItems] = useState<Array<{description: string, quantity: number, unitPrice: number}>>([
+    { description: '', quantity: 1, unitPrice: 0 }
+  ]);
   const [diagnosisReport, setDiagnosisReport] = useState('');
   const [conservationState, setConservationState] = useState('');
   const [identifiedDamages, setIdentifiedDamages] = useState('');
@@ -194,17 +197,20 @@ export function RestorationWorkflowDialog({
         data.urgencyLevel = urgencyLevel;
         break;
       case 'send_quote':
-        // Valider que le montant est rempli et positif
-        const amount = parseFloat(quoteAmount);
-        if (!quoteAmount || isNaN(amount) || amount <= 0) {
+        // Calculer le montant total à partir des items
+        const totalAmount = quoteItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+        
+        if (totalAmount <= 0) {
           toast({
             title: "Erreur",
-            description: "Veuillez saisir un montant valide pour le devis.",
+            description: "Le montant total du devis doit être supérieur à 0.",
             variant: "destructive",
           });
           return;
         }
-        data.quoteAmount = amount;
+        
+        data.quoteAmount = totalAmount;
+        data.quoteItems = quoteItems;
         break;
       case 'accept_quote':
         // Upload le fichier du devis signé si présent
@@ -272,6 +278,7 @@ export function RestorationWorkflowDialog({
     setNotes('');
     setQuoteAmount('');
     setQuoteDetails('');
+    setQuoteItems([{ description: '', quantity: 1, unitPrice: 0 }]);
     setDiagnosisReport('');
     setConservationState('');
     setIdentifiedDamages('');
@@ -439,18 +446,117 @@ export function RestorationWorkflowDialog({
           )
         };
       case 'send_quote':
+        const totalQuote = quoteItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+        
         return {
           title: 'Envoyer le devis',
           icon: <DollarSign className="w-6 h-6 text-green-500" />,
           fields: (
-            <div>
-              <Label>Montant du devis (DH)</Label>
-              <Input 
-                type="number"
-                value={quoteAmount}
-                onChange={(e) => setQuoteAmount(e.target.value)}
-                placeholder="12000"
-              />
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <Label className="text-base font-semibold">Items du devis</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setQuoteItems([...quoteItems, { description: '', quantity: 1, unitPrice: 0 }])}
+                  >
+                    + Ajouter une ligne
+                  </Button>
+                </div>
+                
+                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                  {quoteItems.map((item, index) => (
+                    <div key={index} className="border rounded-lg p-3 space-y-2 bg-muted/30">
+                      <div className="flex justify-between items-start">
+                        <Label className="text-sm">Ligne {index + 1}</Label>
+                        {quoteItems.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              const newItems = quoteItems.filter((_, i) => i !== index);
+                              setQuoteItems(newItems);
+                            }}
+                            className="h-6 px-2 text-destructive hover:text-destructive"
+                          >
+                            Supprimer
+                          </Button>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <Label className="text-xs">Description</Label>
+                        <Input
+                          value={item.description}
+                          onChange={(e) => {
+                            const newItems = [...quoteItems];
+                            newItems[index].description = e.target.value;
+                            setQuoteItems(newItems);
+                          }}
+                          placeholder="Ex: Nettoyage et consolidation"
+                          className="mt-1"
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <Label className="text-xs">Quantité</Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            step="1"
+                            value={item.quantity}
+                            onChange={(e) => {
+                              const newItems = [...quoteItems];
+                              newItems[index].quantity = parseFloat(e.target.value) || 1;
+                              setQuoteItems(newItems);
+                            }}
+                            className="mt-1"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-xs">Prix unitaire (DH)</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={item.unitPrice}
+                            onChange={(e) => {
+                              const newItems = [...quoteItems];
+                              newItems[index].unitPrice = parseFloat(e.target.value) || 0;
+                              setQuoteItems(newItems);
+                            }}
+                            className="mt-1"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-xs">Total (DH)</Label>
+                          <Input
+                            type="text"
+                            value={(item.quantity * item.unitPrice).toFixed(2)}
+                            readOnly
+                            className="mt-1 bg-muted"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="border-t pt-3">
+                <div className="flex justify-between items-center">
+                  <Label className="text-base font-bold">Montant total du devis</Label>
+                  <span className="text-lg font-bold text-primary">
+                    {totalQuote.toFixed(2)} DH
+                  </span>
+                </div>
+              </div>
             </div>
           )
         };

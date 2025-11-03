@@ -215,7 +215,7 @@ export const generateDiagnosisReport = async (request: RequestData): Promise<voi
 
 export const generateQuoteDocument = async (request: RequestData): Promise<void> => {
   const doc = new jsPDF();
-  await addHeader(doc, 'DEVIS DE RESTAURATION');
+  await addHeader(doc, 'DEVIS DÉTAILLÉ DE RESTAURATION');
   
   let y = 70;
   doc.setFontSize(11);
@@ -223,28 +223,71 @@ export const generateQuoteDocument = async (request: RequestData): Promise<void>
   
   doc.text(`N° de demande: ${request.request_number}`, 20, y);
   y += 7;
+  doc.text(`Manuscrit: [Texte arabe - voir demande originale]`, 20, y);
+  y += 7;
+  doc.text(`Cote: ${request.manuscript_cote}`, 20, y);
+  y += 7;
   doc.text(`Date d'emission: ${new Date().toLocaleDateString('fr-FR')}`, 20, y);
   y += 7;
   doc.text('Validite: 30 jours', 20, y);
   y += 15;
   
+  // En-tête du tableau détaillé
   doc.setFont('helvetica', 'bold');
   doc.text('Description', 20, y);
-  doc.text('Montant', 150, y);
-  y += 10;
+  doc.text('Qté', 115, y);
+  doc.text('P.U. (DH)', 135, y);
+  doc.text('Total (DH)', 165, y);
+  y += 3;
+  doc.setDrawColor(200);
+  doc.line(20, y, 190, y);
+  y += 7;
   
+  // Lignes du devis
   doc.setFont('helvetica', 'normal');
-  const descLines = doc.splitTextToSize(`Restauration du manuscrit: [Texte arabe]`, 120);
-  doc.text(descLines, 20, y);
-  doc.text(`${request.quote_amount?.toLocaleString('fr-FR')} DH`, 150, y);
-  y += 7 * descLines.length + 10;
+  const quoteItems = (request as any).quote_items || [];
   
+  if (quoteItems.length > 0) {
+    quoteItems.forEach((item: any) => {
+      const descLines = doc.splitTextToSize(item.description || 'Restauration', 90);
+      doc.text(descLines, 20, y);
+      doc.text(item.quantity?.toString() || '1', 115, y);
+      doc.text((item.unitPrice || 0).toLocaleString('fr-FR'), 135, y);
+      doc.text(((item.quantity || 1) * (item.unitPrice || 0)).toLocaleString('fr-FR'), 165, y);
+      y += 7 * descLines.length;
+    });
+  } else {
+    // Fallback si pas d'items détaillés
+    const descLines = doc.splitTextToSize(`Restauration du manuscrit`, 90);
+    doc.text(descLines, 20, y);
+    doc.text('1', 115, y);
+    doc.text((request.quote_amount || 0).toLocaleString('fr-FR'), 135, y);
+    doc.text((request.quote_amount || 0).toLocaleString('fr-FR'), 165, y);
+    y += 7 * descLines.length;
+  }
+  
+  y += 5;
+  doc.line(20, y, 190, y);
+  y += 7;
+  
+  // Total
   doc.setFont('helvetica', 'bold');
-  doc.text('TOTAL', 20, y);
-  doc.text(`${request.quote_amount?.toLocaleString('fr-FR')} DH`, 150, y);
+  doc.text('TOTAL HT', 20, y);
+  doc.text(`${(request.quote_amount || 0).toLocaleString('fr-FR')} DH`, 165, y);
+  y += 7;
+  doc.text('TVA (0%)', 20, y);
+  doc.text('0.00 DH', 165, y);
+  y += 3;
+  doc.setLineWidth(0.8);
+  doc.line(20, y, 190, y);
+  y += 7;
+  doc.setFontSize(12);
+  doc.text('TOTAL TTC', 20, y);
+  doc.text(`${(request.quote_amount || 0).toLocaleString('fr-FR')} DH`, 165, y);
   y += 15;
   
   if (request.quote_details) {
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.text('Details:', 20, y);
     y += 7;
