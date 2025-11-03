@@ -257,12 +257,9 @@ export function RestorationWorkflowDialog({
         data.restorationReport = restorationReport;
         data.initialCondition = initialCondition;
         data.worksPerformed = worksPerformed;
-        data.materialsUsed = materialsUsed;
         data.techniquesApplied = techniquesApplied;
         data.finalCondition = finalCondition;
         data.recommendations = recommendations;
-        data.actualDuration = actualDuration;
-        data.actualCost = actualCost;
         break;
       case 'complete_restoration':
         data.restorationReport = restorationReport;
@@ -665,11 +662,11 @@ export function RestorationWorkflowDialog({
           fields: (
             <div className="space-y-4">
               <div>
-                <Label>Dommages identifiés</Label>
+                <Label>Dégradations identifiées</Label>
                 <Textarea 
                   value={initialCondition}
                   onChange={(e) => setInitialCondition(e.target.value)}
-                  placeholder="Dommages constatés sur le manuscrit..."
+                  placeholder="Dégradations constatées sur le manuscrit..."
                   rows={3}
                 />
               </div>
@@ -695,16 +692,6 @@ export function RestorationWorkflowDialog({
               </div>
               
               <div>
-                <Label>Matériaux utilisés</Label>
-                <Textarea 
-                  value={materialsUsed}
-                  onChange={(e) => setMaterialsUsed(e.target.value)}
-                  placeholder="Liste des matériaux utilisés..."
-                  rows={3}
-                />
-              </div>
-              
-              <div>
                 <Label>État final du manuscrit</Label>
                 <Textarea 
                   value={finalCondition}
@@ -722,27 +709,6 @@ export function RestorationWorkflowDialog({
                   placeholder="Recommandations pour préserver le manuscrit..."
                   rows={3}
                 />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Durée réelle (jours)</Label>
-                  <Input 
-                    type="number"
-                    value={actualDuration}
-                    onChange={(e) => setActualDuration(e.target.value)}
-                    placeholder="Nombre de jours"
-                  />
-                </div>
-                <div>
-                  <Label>Coût réel (DH)</Label>
-                  <Input 
-                    type="number"
-                    value={actualCost}
-                    onChange={(e) => setActualCost(e.target.value)}
-                    placeholder="Coût total"
-                  />
-                </div>
               </div>
 
               <div className="flex justify-end gap-2">

@@ -334,12 +334,9 @@ export default function RestorationRequests() {
           updateData.restoration_report = data.restorationReport;
           updateData.initial_condition = data.initialCondition;
           updateData.works_performed = data.worksPerformed;
-          updateData.materials_used = data.materialsUsed;
           updateData.techniques_applied = data.techniquesApplied;
           updateData.final_condition = data.finalCondition;
           updateData.recommendations = data.recommendations;
-          updateData.actual_duration = data.actualDuration ? parseInt(data.actualDuration) : null;
-          updateData.actual_cost = data.actualCost ? parseFloat(data.actualCost) : null;
           updateData.completed_at = new Date().toISOString();
           updateData.restoration_completed_by = (await supabase.auth.getUser()).data.user?.id;
           notificationData.estimatedDuration = selectedRequest.estimated_duration;
