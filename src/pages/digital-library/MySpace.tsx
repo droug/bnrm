@@ -4,11 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Heart, Download, Clock, Eye, BarChart3 } from "lucide-react";
+import { BookOpen, Heart, Download, Clock, Eye, FileText, BarChart3 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { MyRestorationRequests } from "@/components/restoration/MyRestorationRequests";
 
 export default function MySpace() {
   const navigate = useNavigate();
@@ -237,6 +238,10 @@ export default function MySpace() {
               <Download className="h-4 w-4" />
               Téléchargements
             </TabsTrigger>
+            <TabsTrigger value="requests" className="gap-2">
+              <FileText className="h-4 w-4" />
+              Suivi Demandes
+            </TabsTrigger>
           </TabsList>
 
           {/* Reading History */}
@@ -396,6 +401,30 @@ export default function MySpace() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Suivi Demandes */}
+          <TabsContent value="requests">
+            <Card>
+              <CardHeader>
+                <CardTitle>Suivi de mes demandes</CardTitle>
+                <CardDescription>Gérez vos demandes de restauration et autres services</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="restoration" className="space-y-4">
+                  <TabsList>
+                    <TabsTrigger value="restoration">Restauration</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="restoration" className="space-y-4">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">Liste de mes demandes</h3>
+                      <MyRestorationRequests />
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </TabsContent>
