@@ -34,6 +34,13 @@ export function RestorationWorkflowDialog({
   const [quoteAmount, setQuoteAmount] = useState('');
   const [quoteDetails, setQuoteDetails] = useState('');
   const [diagnosisReport, setDiagnosisReport] = useState('');
+  const [conservationState, setConservationState] = useState('');
+  const [identifiedDamages, setIdentifiedDamages] = useState('');
+  const [recommendedWorks, setRecommendedWorks] = useState('');
+  const [estimatedCost, setEstimatedCost] = useState('');
+  const [estimatedDuration, setEstimatedDuration] = useState('');
+  const [requiredMaterials, setRequiredMaterials] = useState('');
+  const [urgencyLevel, setUrgencyLevel] = useState('');
   const [paymentReference, setPaymentReference] = useState('');
   const [restorationReport, setRestorationReport] = useState('');
   const [completionNotes, setCompletionNotes] = useState('');
@@ -100,6 +107,13 @@ export function RestorationWorkflowDialog({
         break;
       case 'complete_diagnosis':
         data.diagnosisReport = diagnosisReport;
+        data.conservationState = conservationState;
+        data.identifiedDamages = identifiedDamages;
+        data.recommendedWorks = recommendedWorks;
+        data.estimatedCost = estimatedCost;
+        data.estimatedDuration = estimatedDuration;
+        data.requiredMaterials = requiredMaterials;
+        data.urgencyLevel = urgencyLevel;
         break;
       case 'send_quote':
         data.quoteAmount = quoteAmount;
@@ -132,6 +146,13 @@ export function RestorationWorkflowDialog({
     setQuoteAmount('');
     setQuoteDetails('');
     setDiagnosisReport('');
+    setConservationState('');
+    setIdentifiedDamages('');
+    setRecommendedWorks('');
+    setEstimatedCost('');
+    setEstimatedDuration('');
+    setRequiredMaterials('');
+    setUrgencyLevel('');
     setPaymentReference('');
     setRestorationReport('');
     setCompletionNotes('');
@@ -192,14 +213,98 @@ export function RestorationWorkflowDialog({
           title: 'Compléter le diagnostic',
           icon: <ClipboardCheck className="w-6 h-6 text-purple-500" />,
           fields: (
-            <div>
-              <Label>Rapport de diagnostic</Label>
-              <Textarea 
-                value={diagnosisReport}
-                onChange={(e) => setDiagnosisReport(e.target.value)}
-                placeholder="Détails du diagnostic..."
-                rows={6}
-              />
+            <div className="space-y-4">
+              <div>
+                <Label>État de conservation</Label>
+                <select
+                  className="w-full mt-1 px-3 py-2 border rounded-md"
+                  value={conservationState}
+                  onChange={(e) => setConservationState(e.target.value)}
+                >
+                  <option value="">Sélectionner...</option>
+                  <option value="excellent">Excellent</option>
+                  <option value="bon">Bon</option>
+                  <option value="moyen">Moyen</option>
+                  <option value="mauvais">Mauvais</option>
+                  <option value="critique">Critique</option>
+                </select>
+              </div>
+              
+              <div>
+                <Label>Dommages identifiés</Label>
+                <Textarea 
+                  value={identifiedDamages}
+                  onChange={(e) => setIdentifiedDamages(e.target.value)}
+                  placeholder="Décrire les dommages constatés (déchirures, taches, moisissures, etc.)..."
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <Label>Rapport de diagnostic détaillé</Label>
+                <Textarea 
+                  value={diagnosisReport}
+                  onChange={(e) => setDiagnosisReport(e.target.value)}
+                  placeholder="Analyse complète de l'état du manuscrit..."
+                  rows={4}
+                />
+              </div>
+              
+              <div>
+                <Label>Travaux recommandés</Label>
+                <Textarea 
+                  value={recommendedWorks}
+                  onChange={(e) => setRecommendedWorks(e.target.value)}
+                  placeholder="Décrire les interventions nécessaires..."
+                  rows={3}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Coût estimé (DH)</Label>
+                  <Input 
+                    type="number"
+                    value={estimatedCost}
+                    onChange={(e) => setEstimatedCost(e.target.value)}
+                    placeholder="5000"
+                  />
+                </div>
+                <div>
+                  <Label>Durée estimée (jours)</Label>
+                  <Input 
+                    type="number"
+                    value={estimatedDuration}
+                    onChange={(e) => setEstimatedDuration(e.target.value)}
+                    placeholder="30"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label>Matériaux nécessaires</Label>
+                <Textarea 
+                  value={requiredMaterials}
+                  onChange={(e) => setRequiredMaterials(e.target.value)}
+                  placeholder="Liste des matériaux et fournitures requis..."
+                  rows={2}
+                />
+              </div>
+              
+              <div>
+                <Label>Niveau d'urgence</Label>
+                <select
+                  className="w-full mt-1 px-3 py-2 border rounded-md"
+                  value={urgencyLevel}
+                  onChange={(e) => setUrgencyLevel(e.target.value)}
+                >
+                  <option value="">Sélectionner...</option>
+                  <option value="faible">Faible</option>
+                  <option value="moyenne">Moyenne</option>
+                  <option value="haute">Haute</option>
+                  <option value="urgente">Urgente</option>
+                </select>
+              </div>
             </div>
           )
         };
