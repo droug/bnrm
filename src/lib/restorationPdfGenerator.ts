@@ -772,7 +772,6 @@ export const generateDischargeDocument = async (request: RequestData): Promise<v
   const manuscriptInfo = [
     ['N° de demande', request.request_number],
     ['Titre', '[Texte arabe - voir demande originale]'],
-    ['Cote', request.manuscript_cote],
     ['Date de restitution', new Date().toLocaleDateString('fr-FR')]
   ];
   
