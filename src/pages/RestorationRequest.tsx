@@ -30,7 +30,8 @@ export default function RestorationRequest() {
     documentType: "",
     description: "",
     urgency: "normal",
-    autorisation: ""
+    autorisation: "",
+    autorisationPhoto: ""
   });
 
   // Options pour les régions du Maroc
@@ -569,7 +570,7 @@ export default function RestorationRequest() {
               
               <div className="space-y-3">
                 <Label className="text-base">
-                  Autorisez-vous la BNRM à conserver et exploiter une copie de l'œuvre reproduite à des fins de consultation ?
+                  Autorisez-vous la BNRM à conserver et exploiter une copie numérique de l'œuvre ?
                 </Label>
                 
                 <div className="flex gap-6">
@@ -598,6 +599,40 @@ export default function RestorationRequest() {
                   </label>
                 </div>
               </div>
+
+              {formData.autorisation === "non" && (
+                <div className="space-y-3 pt-4 border-t border-border">
+                  <Label className="text-base">
+                    Autorisez-vous la prise d'une photographie de l'état de l'œuvre avant sa restauration, à des fins de comparaison avec l'état après restauration et d'utilisation non lucrative ?
+                  </Label>
+                  
+                  <div className="flex gap-6">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="autorisationPhoto"
+                        value="oui"
+                        checked={formData.autorisationPhoto === "oui"}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-primary border-input focus:ring-2 focus:ring-ring"
+                      />
+                      <span>Oui</span>
+                    </label>
+                    
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="autorisationPhoto"
+                        value="non"
+                        checked={formData.autorisationPhoto === "non"}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-primary border-input focus:ring-2 focus:ring-ring"
+                      />
+                      <span>Non</span>
+                    </label>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Buttons */}
