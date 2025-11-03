@@ -13,7 +13,8 @@ interface NotificationRequest {
   recipientEmail: string;
   recipientId: string;
   notificationType: 'request_received' | 'quote_sent' | 'quote_accepted' | 'quote_rejected' | 
-                    'payment_confirmed' | 'restoration_started' | 'restoration_completed' | 'artwork_ready';
+                    'payment_confirmed' | 'restoration_started' | 'restoration_completed' | 'artwork_ready' |
+                    'authorized_deposit_request' | 'quote_rejected';
   requestNumber: string;
   manuscriptTitle: string;
   quoteAmount?: number;
@@ -62,6 +63,35 @@ const getEmailContent = (notification: NotificationRequest) => {
         `
       };
     
+    case 'authorized_deposit_request':
+      return {
+        subject: `Demande autorisée - Dépôt de l'œuvre requis - ${requestNumber}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #2c5aa0;">Demande de restauration autorisée</h2>
+            <p>Bonjour,</p>
+            <p>Votre demande de restauration a été autorisée par la direction.</p>
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p><strong>Numéro de demande :</strong> ${requestNumber}</p>
+              <p><strong>Manuscrit :</strong> ${manuscriptTitle}</p>
+            </div>
+            <div style="background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
+              <p><strong>Prochaine étape :</strong></p>
+              <p>Vous devez déposer l'œuvre à la BNRM pour qu'un diagnostic approfondi soit réalisé par notre équipe de restauration.</p>
+              <p>Ce diagnostic nous permettra d'établir un devis détaillé des travaux nécessaires.</p>
+            </div>
+            <p><strong>Informations pratiques :</strong></p>
+            <ul>
+              <li>Horaires : Du lundi au vendredi, de 9h à 17h</li>
+              <li>Lieu : Service de restauration - BNRM</li>
+              <li>Documents à apporter : Votre pièce d'identité et ce numéro de demande</li>
+            </ul>
+            <p>Pour toute question, n'hésitez pas à nous contacter.</p>
+            <p>Cordialement,<br>L'équipe de restauration - BNRM</p>
+          </div>
+        `
+      };
+    
     case 'quote_accepted':
       return {
         subject: `Devis accepté - ${requestNumber}`,
@@ -76,6 +106,25 @@ const getEmailContent = (notification: NotificationRequest) => {
               ${quoteAmount ? `<p><strong>Montant à régler :</strong> ${quoteAmount} DH</p>` : ''}
             </div>
             <p>Vous recevrez prochainement les informations de paiement.</p>
+            <p>Cordialement,<br>L'équipe de restauration - BNRM</p>
+          </div>
+        `
+      };
+    
+    case 'quote_rejected':
+      return {
+        subject: `Devis refusé - ${requestNumber}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #2c5aa0;">Devis refusé</h2>
+            <p>Bonjour,</p>
+            <p>Votre refus du devis a bien été enregistré.</p>
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p><strong>Numéro de demande :</strong> ${requestNumber}</p>
+              <p><strong>Manuscrit :</strong> ${manuscriptTitle}</p>
+            </div>
+            ${additionalInfo ? `<p><strong>Raison du refus :</strong> ${additionalInfo}</p>` : ''}
+            <p>Votre demande a été clôturée. Vous pouvez soumettre une nouvelle demande à tout moment.</p>
             <p>Cordialement,<br>L'équipe de restauration - BNRM</p>
           </div>
         `
