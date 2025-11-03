@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   AlertCircle, CheckCircle, XCircle, Clock, Wrench, Eye, Filter, ArrowLeft, 
-  FileCheck, Package, CreditCard, Settings, RotateCcw, ChevronLeft, ChevronRight 
+  FileCheck, Package, CreditCard, Settings, RotateCcw, ChevronLeft, ChevronRight, DollarSign 
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -450,6 +450,16 @@ export default function RestorationRequests() {
           </Button>
         );
       case 'devis_en_attente':
+        // Si le montant du devis n'est pas encore défini, montrer le bouton "Envoyer le devis"
+        if (!request.quote_amount) {
+          return (
+            <Button size="sm" onClick={() => handleWorkflowAction(request, 'send_quote')}>
+              <DollarSign className="w-4 h-4 mr-1" />
+              Envoyer le devis
+            </Button>
+          );
+        }
+        // Sinon, afficher les boutons accept/reject pour l'admin (cas où l'admin gère aussi la validation)
         return (
           <div className="flex gap-2">
             <Button size="sm" onClick={() => handleWorkflowAction(request, 'accept_quote')}>
