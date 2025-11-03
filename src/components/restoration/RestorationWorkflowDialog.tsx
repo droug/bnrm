@@ -750,7 +750,16 @@ export function RestorationWorkflowDialog({
                 {generatingDocType === 'delivery' ? 'Génération...' : 'Bon de livraison'}
               </Button>
             </>
-          ) : ['director_approve', 'receive_artwork', 'send_quote'].includes(actionType) ? (
+          ) : actionType === 'send_quote' ? (
+            <Button 
+              variant="secondary" 
+              onClick={() => handleGenerateDocument('quote')}
+              disabled={isGeneratingDoc}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              {generatingDocType === 'quote' ? 'Génération...' : 'Générer Devis'}
+            </Button>
+          ) : ['director_approve', 'receive_artwork'].includes(actionType) ? (
             <Button 
               variant="secondary" 
               onClick={() => handleGenerateDocument()}
