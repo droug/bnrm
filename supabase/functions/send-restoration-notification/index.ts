@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -209,13 +210,30 @@ const handler = async (req: Request): Promise<Response> => {
       subject: emailContent.subject
     });
 
-    // TODO: Intégrer Resend pour l'envoi d'emails
-    // Nécessite la configuration de RESEND_API_KEY
+    // Envoyer l'email via Resend
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    if (resendApiKey) {
+      try {
+        const resend = new Resend(resendApiKey);
+        const emailResult = await resend.emails.send({
+          from: "BNRM Restauration <noreply@resend.dev>",
+          to: [notification.recipientEmail],
+          subject: emailContent.subject,
+          html: emailContent.html,
+        });
+        console.log('Email sent successfully:', emailResult);
+      } catch (emailError) {
+        console.error('Error sending email:', emailError);
+        // Ne pas bloquer si l'email échoue
+      }
+    } else {
+      console.warn('RESEND_API_KEY not configured, email not sent');
+    }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Notification créée avec succès' 
+        message: 'Notification créée et email envoyé avec succès' 
       }), 
       {
         status: 200,
