@@ -12,10 +12,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Upload, FileText, Calendar, User, Mail, Phone, MessageSquare } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SimpleDropdown } from "@/components/ui/simple-dropdown";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function RestorationRequest() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     statutDemandeur: "",
     name: "",
@@ -162,15 +164,61 @@ export default function RestorationRequest() {
       return;
     }
 
+    if (!user) {
+      toast({
+        title: "Erreur",
+        description: "Vous devez être connecté pour soumettre une demande",
+        variant: "destructive"
+      });
+      navigate("/auth");
+      return;
+    }
 
-    // Simulate submission
-    toast({
-      title: "Demande envoyée",
-      description: "Votre demande de restauration a été envoyée avec succès. Nous vous contacterons bientôt.",
-    });
+    setIsSubmitting(true);
 
-    setIsOpen(false);
-    setTimeout(() => navigate("/"), 2000);
+    try {
+      // Map urgency to database format
+      const urgencyMap: Record<string, string> = {
+        'normal': 'faible',
+        'urgent': 'moyenne',
+        'very-urgent': 'elevee'
+      };
+
+      // Insert into database
+      const { data, error } = await supabase
+        .from('restoration_requests')
+        .insert([{
+          user_id: user.id,
+          manuscript_title: formData.documentType,
+          manuscript_cote: '',
+          damage_description: formData.description,
+          urgency_level: urgencyMap[formData.urgency] || 'faible',
+          status: 'soumise',
+          user_notes: `Nom: ${formData.name}\nEmail: ${formData.email}\nTéléphone: ${formData.phone || 'Non fourni'}\nStatut: ${formData.statutDemandeur}${formData.typeInstitution ? `\nType institution: ${formData.typeInstitution}` : ''}${formData.region ? `\nRégion: ${formData.region}` : ''}${formData.ville ? `\nVille: ${formData.ville}` : ''}`,
+          submitted_at: new Date().toISOString()
+        }] as any)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Demande envoyée",
+        description: "Votre demande de restauration a été envoyée avec succès. Nous vous contacterons bientôt.",
+      });
+
+      setIsOpen(false);
+      setTimeout(() => navigate("/my-library-space"), 2000);
+    } catch (error: any) {
+      console.error('Erreur lors de la soumission:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de l'envoi de la demande",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -545,8 +593,11 @@ export default function RestorationRequest() {
               >
                 Annuler
               </Button>
-              <Button type="submit">
-                Envoyer la demande
+              <Button 
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Envoi en cours..." : "Envoyer la demande"}
               </Button>
             </div>
           </form>
