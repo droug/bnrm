@@ -45,43 +45,56 @@ export function RestorationWorkflowDialog({
   const [restorationReport, setRestorationReport] = useState('');
   const [completionNotes, setCompletionNotes] = useState('');
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
+  const [generatingDocType, setGeneratingDocType] = useState<'diagnosis' | 'quote' | null>(null);
 
-  const handleGenerateDocument = () => {
+  const handleGenerateDocument = (docType?: 'diagnosis' | 'quote') => {
     if (!request) return;
     
     setIsGeneratingDoc(true);
+    setGeneratingDocType(docType || null);
     try {
       const requestData = {
         ...request,
         diagnosis_report: diagnosisReport || request.diagnosis_report,
         quote_amount: quoteAmount ? parseFloat(quoteAmount) : request.quote_amount,
         restoration_report: restorationReport || request.restoration_report,
+        estimated_cost: estimatedCost ? parseFloat(estimatedCost) : request.estimated_cost,
+        estimated_duration: estimatedDuration ? parseFloat(estimatedDuration) : request.estimated_duration,
       };
       
-      switch (actionType) {
-        case 'director_approve':
-          generateAuthorizationLetter(requestData);
-          break;
-        case 'receive_artwork':
-          generateReceptionDocument(requestData);
-          break;
-        case 'complete_diagnosis':
-          generateDiagnosisReport(requestData);
-          break;
-        case 'send_quote':
-          generateQuoteDocument(requestData);
-          break;
-        case 'complete_restoration':
-          generateCompletionCertificate(requestData);
-          break;
-        default:
-          return;
+      if (docType === 'diagnosis') {
+        generateDiagnosisReport(requestData);
+        toast({
+          title: "Rapport de diagnostic généré",
+          description: "Le rapport a été téléchargé avec succès.",
+        });
+      } else if (docType === 'quote') {
+        generateQuoteDocument(requestData);
+        toast({
+          title: "Devis généré",
+          description: "Le devis a été téléchargé avec succès.",
+        });
+      } else {
+        // Logique pour les autres types de documents
+        switch (actionType) {
+          case 'director_approve':
+            generateAuthorizationLetter(requestData);
+            break;
+          case 'receive_artwork':
+            generateReceptionDocument(requestData);
+            break;
+          case 'complete_restoration':
+            generateCompletionCertificate(requestData);
+            break;
+          default:
+            return;
+        }
+        
+        toast({
+          title: "Document généré",
+          description: "Le document a été téléchargé avec succès.",
+        });
       }
-      
-      toast({
-        title: "Document généré",
-        description: "Le document a été téléchargé avec succès.",
-      });
     } catch (error) {
       console.error('Erreur lors de la génération du document:', error);
       toast({
@@ -91,6 +104,7 @@ export function RestorationWorkflowDialog({
       });
     } finally {
       setIsGeneratingDoc(false);
+      setGeneratingDocType(null);
     }
   };
 
@@ -446,16 +460,35 @@ export function RestorationWorkflowDialog({
           <Button variant="outline" onClick={onClose}>
             Annuler
           </Button>
-          {['director_approve', 'receive_artwork', 'complete_diagnosis', 'send_quote', 'complete_restoration'].includes(actionType) && (
+          {actionType === 'complete_diagnosis' ? (
+            <>
+              <Button 
+                variant="secondary" 
+                onClick={() => handleGenerateDocument('diagnosis')}
+                disabled={isGeneratingDoc}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                {generatingDocType === 'diagnosis' ? 'Génération...' : 'Générer Rapport Diagnostic'}
+              </Button>
+              <Button 
+                variant="secondary" 
+                onClick={() => handleGenerateDocument('quote')}
+                disabled={isGeneratingDoc}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                {generatingDocType === 'quote' ? 'Génération...' : 'Générer Devis'}
+              </Button>
+            </>
+          ) : ['director_approve', 'receive_artwork', 'send_quote', 'complete_restoration'].includes(actionType) ? (
             <Button 
               variant="secondary" 
-              onClick={handleGenerateDocument}
+              onClick={() => handleGenerateDocument()}
               disabled={isGeneratingDoc}
             >
               <Download className="w-4 h-4 mr-2" />
               {isGeneratingDoc ? 'Génération...' : 'Générer document'}
             </Button>
-          )}
+          ) : null}
           <Button onClick={handleSubmit}>
             Confirmer
           </Button>
