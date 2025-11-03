@@ -100,6 +100,36 @@ const getEmailContent = (type: string, data: any) => {
         `
       };
     
+    case 'quote_accepted':
+      return {
+        subject: `Devis accepté - ${data.requestNumber}`,
+        html: `
+          <h2>Devis accepté</h2>
+          <p>Bonjour,</p>
+          <p>Nous avons bien reçu votre acceptation du devis.</p>
+          <p><strong>Numéro de demande :</strong> ${data.requestNumber}</p>
+          <p><strong>Manuscrit :</strong> ${data.manuscriptTitle}</p>
+          <p><strong>Montant :</strong> ${data.quoteAmount} DH</p>
+          <p>Vous recevrez prochainement un lien pour effectuer le paiement.</p>
+          <p><a href="${frontendUrl}/my-library-space" style="background-color: #4F46E5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Suivre ma demande</a></p>
+          <p>Cordialement,<br>L'équipe de restauration</p>
+        `
+      };
+    
+    case 'quote_rejected':
+      return {
+        subject: `Devis refusé - ${data.requestNumber}`,
+        html: `
+          <h2>Devis refusé</h2>
+          <p>Bonjour,</p>
+          <p>Nous avons bien pris en compte votre refus du devis de restauration.</p>
+          <p><strong>Numéro de demande :</strong> ${data.requestNumber}</p>
+          <p><strong>Manuscrit :</strong> ${data.manuscriptTitle}</p>
+          <p>Votre demande a été clôturée. N'hésitez pas à nous contacter si vous souhaitez discuter d'autres options.</p>
+          <p>Cordialement,<br>L'équipe de restauration</p>
+        `
+      };
+    
     case 'payment_link':
       return {
         subject: `Lien de paiement - Restauration ${data.requestNumber}`,

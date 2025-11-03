@@ -222,6 +222,8 @@ export default function RestorationRequests() {
       'director_reject': 'request_rejected',
       'receive_artwork': 'provide_artwork',
       'send_quote': 'quote_sent',
+      'accept_quote': 'quote_accepted',
+      'reject_quote': 'quote_rejected',
       'validate_payment': 'payment_link',
       'start_restoration': 'restoration_started',
       'complete_restoration': 'restoration_completed',
@@ -305,11 +307,14 @@ export default function RestorationRequests() {
         case 'accept_quote':
           updateData.status = 'paiement_en_attente';
           updateData.quote_accepted_at = new Date().toISOString();
+          notificationData.quoteAmount = selectedRequest.quote_amount;
           break;
         case 'reject_quote':
           updateData.status = 'devis_refuse';
           updateData.quote_rejection_reason = data.notes;
           updateData.quote_rejected_at = new Date().toISOString();
+          notificationData.quoteAmount = selectedRequest.quote_amount;
+          notificationData.rejectionReason = data.notes;
           break;
         case 'validate_payment':
           updateData.status = 'paiement_valide';
@@ -373,8 +378,8 @@ export default function RestorationRequests() {
 
       await updateStatus.mutateAsync(updateData);
       
-      // Envoyer la notification
-      if (actionType !== 'reset_request' && actionType !== 'complete_diagnosis' && actionType !== 'accept_quote' && actionType !== 'reject_quote') {
+      // Envoyer la notification email et créer notification portail
+      if (actionType !== 'reset_request' && actionType !== 'complete_diagnosis') {
         await sendNotification(actionType, notificationData);
       }
       
