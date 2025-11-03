@@ -31,8 +31,6 @@ export function RestorationWorkflowDialog({
 }: RestorationWorkflowDialogProps) {
   const { toast } = useToast();
   const [notes, setNotes] = useState('');
-  const [estimatedCost, setEstimatedCost] = useState('');
-  const [estimatedDuration, setEstimatedDuration] = useState('');
   const [quoteAmount, setQuoteAmount] = useState('');
   const [quoteDetails, setQuoteDetails] = useState('');
   const [diagnosisReport, setDiagnosisReport] = useState('');
@@ -96,8 +94,6 @@ export function RestorationWorkflowDialog({
       case 'director_approve':
       case 'director_reject':
         data.notes = notes;
-        data.estimatedCost = estimatedCost;
-        data.estimatedDuration = estimatedDuration;
         break;
       case 'receive_artwork':
         data.notes = notes;
@@ -133,8 +129,6 @@ export function RestorationWorkflowDialog({
     
     // Reset fields
     setNotes('');
-    setEstimatedCost('');
-    setEstimatedDuration('');
     setQuoteAmount('');
     setQuoteDetails('');
     setDiagnosisReport('');
@@ -150,37 +144,15 @@ export function RestorationWorkflowDialog({
           title: 'Approuver la demande',
           icon: <CheckCircle className="w-6 h-6 text-green-500" />,
           fields: (
-            <>
-              <div>
-                <Label>Notes de la direction</Label>
-                <Textarea 
-                  value={notes} 
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Commentaires..."
-                  rows={3}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Coût estimé (DH)</Label>
-                  <Input 
-                    type="number" 
-                    value={estimatedCost}
-                    onChange={(e) => setEstimatedCost(e.target.value)}
-                    placeholder="5000"
-                  />
-                </div>
-                <div>
-                  <Label>Durée estimée (jours)</Label>
-                  <Input 
-                    type="number"
-                    value={estimatedDuration}
-                    onChange={(e) => setEstimatedDuration(e.target.value)}
-                    placeholder="30"
-                  />
-                </div>
-              </div>
-            </>
+            <div>
+              <Label>Notes de la direction</Label>
+              <Textarea 
+                value={notes} 
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Commentaires..."
+                rows={3}
+              />
+            </div>
           )
         };
       case 'director_reject':
