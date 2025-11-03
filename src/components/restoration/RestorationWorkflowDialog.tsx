@@ -62,16 +62,10 @@ export function RestorationWorkflowDialog({
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
   const [generatingDocType, setGeneratingDocType] = useState<'diagnosis' | 'quote' | 'invoice' | 'restoration_report' | 'discharge' | 'delivery' | null>(null);
 
-  // Pré-remplir l'état initial du manuscrit avec les données du diagnostic
+  // Pré-remplir les dommages identifiés avec les données du diagnostic
   useEffect(() => {
     if (open && actionType === 'complete_restoration' && request) {
-      const initialStateText = [
-        request.conservation_state ? `État de conservation: ${request.conservation_state}` : '',
-        request.identified_damages ? `Dommages identifiés: ${request.identified_damages}` : '',
-        request.diagnosis_report || ''
-      ].filter(Boolean).join('\n\n');
-      
-      setInitialCondition(initialStateText || request.initial_condition || '');
+      setInitialCondition(request.identified_damages || request.initial_condition || '');
     }
   }, [open, actionType, request]);
 
@@ -543,11 +537,11 @@ export function RestorationWorkflowDialog({
           fields: (
             <div className="space-y-4">
               <div>
-                <Label>État initial du manuscrit</Label>
+                <Label>Dommages identifiés</Label>
                 <Textarea 
                   value={initialCondition}
                   onChange={(e) => setInitialCondition(e.target.value)}
-                  placeholder="Décrire l'état du manuscrit avant restauration..."
+                  placeholder="Dommages constatés sur le manuscrit..."
                   rows={3}
                 />
               </div>
