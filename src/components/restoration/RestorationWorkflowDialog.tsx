@@ -47,7 +47,7 @@ export function RestorationWorkflowDialog({
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
   const [generatingDocType, setGeneratingDocType] = useState<'diagnosis' | 'quote' | null>(null);
 
-  const handleGenerateDocument = (docType?: 'diagnosis' | 'quote') => {
+  const handleGenerateDocument = async (docType?: 'diagnosis' | 'quote') => {
     if (!request) return;
     
     setIsGeneratingDoc(true);
@@ -63,13 +63,13 @@ export function RestorationWorkflowDialog({
       };
       
       if (docType === 'diagnosis') {
-        generateDiagnosisReport(requestData);
+        await generateDiagnosisReport(requestData);
         toast({
           title: "Rapport de diagnostic généré",
           description: "Le rapport a été téléchargé avec succès.",
         });
       } else if (docType === 'quote') {
-        generateQuoteDocument(requestData);
+        await generateQuoteDocument(requestData);
         toast({
           title: "Devis généré",
           description: "Le devis a été téléchargé avec succès.",
@@ -78,13 +78,13 @@ export function RestorationWorkflowDialog({
         // Logique pour les autres types de documents
         switch (actionType) {
           case 'director_approve':
-            generateAuthorizationLetter(requestData);
+            await generateAuthorizationLetter(requestData);
             break;
           case 'receive_artwork':
-            generateReceptionDocument(requestData);
+            await generateReceptionDocument(requestData);
             break;
           case 'complete_restoration':
-            generateCompletionCertificate(requestData);
+            await generateCompletionCertificate(requestData);
             break;
           default:
             return;

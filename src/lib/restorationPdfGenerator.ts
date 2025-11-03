@@ -20,40 +20,38 @@ interface RequestData {
   };
 }
 
-const addHeader = (doc: jsPDF, title: string) => {
-  // En-tête officiel BNRM
-  doc.setFontSize(12);
-  doc.setTextColor(0);
-  doc.setFont('helvetica', 'bold');
-  doc.text('ROYAUME DU MAROC', doc.internal.pageSize.width / 2, 10, { align: 'center' });
+const addHeader = async (doc: jsPDF, title: string) => {
+  // Charger et ajouter l'image de l'en-tête BNRM
+  const headerImg = new Image();
+  headerImg.src = '/images/entete-bnrm.png';
   
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Ministere de la Jeunesse, de la Culture et de la Communication', doc.internal.pageSize.width / 2, 16, { align: 'center' });
+  await new Promise((resolve) => {
+    headerImg.onload = resolve;
+  });
   
-  doc.setFont('helvetica', 'bold');
-  doc.text('BIBLIOTHEQUE NATIONALE DU ROYAUME DU MAROC', doc.internal.pageSize.width / 2, 22, { align: 'center' });
+  // Ajouter l'image en haut du document (ajustée à la largeur)
+  const imgWidth = doc.internal.pageSize.width - 40; // Marges de 20 de chaque côté
+  const imgHeight = (headerImg.height * imgWidth) / headerImg.width;
+  doc.addImage(headerImg, 'PNG', 20, 5, imgWidth, imgHeight);
   
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Avenue Ibn Batouta, B.P. 1003, Rabat - Maroc', doc.internal.pageSize.width / 2, 27, { align: 'center' });
-  doc.text('Tel: +212 (0)5 37 27 15 23 / Fax: +212 (0)5 37 27 46 88', doc.internal.pageSize.width / 2, 32, { align: 'center' });
+  // Position du titre après l'image
+  const yPosition = 5 + imgHeight + 10;
   
   // Ligne de séparation
   doc.setDrawColor(41, 128, 185);
   doc.setLineWidth(0.8);
-  doc.line(20, 37, doc.internal.pageSize.width - 20, 37);
+  doc.line(20, yPosition, doc.internal.pageSize.width - 20, yPosition);
   
   // Titre du document
   doc.setFontSize(16);
   doc.setTextColor(41, 128, 185);
   doc.setFont('helvetica', 'bold');
-  doc.text(title, doc.internal.pageSize.width / 2, 47, { align: 'center' });
+  doc.text(title, doc.internal.pageSize.width / 2, yPosition + 10, { align: 'center' });
   
   // Ligne sous le titre
   doc.setDrawColor(41, 128, 185);
   doc.setLineWidth(0.5);
-  doc.line(40, 50, doc.internal.pageSize.width - 40, 50);
+  doc.line(40, yPosition + 13, doc.internal.pageSize.width - 40, yPosition + 13);
 };
 
 const addFooter = (doc: jsPDF) => {
@@ -63,11 +61,11 @@ const addFooter = (doc: jsPDF) => {
   doc.text(`Document genere le ${new Date().toLocaleDateString('fr-FR')}`, doc.internal.pageSize.width / 2, pageHeight - 10, { align: 'center' });
 };
 
-export const generateAuthorizationLetter = (request: RequestData): void => {
+export const generateAuthorizationLetter = async (request: RequestData): Promise<void> => {
   const doc = new jsPDF();
-  addHeader(doc, "LETTRE D'AUTORISATION DE RESTAURATION");
+  await addHeader(doc, "LETTRE D'AUTORISATION DE RESTAURATION");
   
-  let y = 40;
+  let y = 70;
   doc.setFontSize(11);
   doc.setTextColor(0);
   
@@ -125,11 +123,11 @@ export const generateAuthorizationLetter = (request: RequestData): void => {
   doc.save(`autorisation_${request.request_number}.pdf`);
 };
 
-export const generateReceptionDocument = (request: RequestData): void => {
+export const generateReceptionDocument = async (request: RequestData): Promise<void> => {
   const doc = new jsPDF();
-  addHeader(doc, "PROCES-VERBAL DE RECEPTION D'OEUVRE");
+  await addHeader(doc, "PROCES-VERBAL DE RECEPTION D'OEUVRE");
   
-  let y = 40;
+  let y = 70;
   doc.setFontSize(11);
   doc.setTextColor(0);
   
@@ -164,11 +162,11 @@ export const generateReceptionDocument = (request: RequestData): void => {
   doc.save(`reception_${request.request_number}.pdf`);
 };
 
-export const generateDiagnosisReport = (request: RequestData): void => {
+export const generateDiagnosisReport = async (request: RequestData): Promise<void> => {
   const doc = new jsPDF();
-  addHeader(doc, 'RAPPORT DE DIAGNOSTIC');
+  await addHeader(doc, 'RAPPORT DE DIAGNOSTIC');
   
-  let y = 60;
+  let y = 70;
   doc.setFontSize(11);
   doc.setTextColor(0);
   
@@ -206,11 +204,11 @@ export const generateDiagnosisReport = (request: RequestData): void => {
   doc.save(`diagnostic_${request.request_number}.pdf`);
 };
 
-export const generateQuoteDocument = (request: RequestData): void => {
+export const generateQuoteDocument = async (request: RequestData): Promise<void> => {
   const doc = new jsPDF();
-  addHeader(doc, 'DEVIS DE RESTAURATION');
+  await addHeader(doc, 'DEVIS DE RESTAURATION');
   
-  let y = 40;
+  let y = 70;
   doc.setFontSize(11);
   doc.setTextColor(0);
   
@@ -250,11 +248,11 @@ export const generateQuoteDocument = (request: RequestData): void => {
   doc.save(`devis_${request.request_number}.pdf`);
 };
 
-export const generateCompletionCertificate = (request: RequestData): void => {
+export const generateCompletionCertificate = async (request: RequestData): Promise<void> => {
   const doc = new jsPDF();
-  addHeader(doc, "CERTIFICAT D'ACHEVEMENT DE RESTAURATION");
+  await addHeader(doc, "CERTIFICAT D'ACHEVEMENT DE RESTAURATION");
   
-  let y = 40;
+  let y = 70;
   doc.setFontSize(11);
   doc.setTextColor(0);
   
