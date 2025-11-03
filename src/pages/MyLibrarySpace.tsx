@@ -34,6 +34,7 @@ import { MyReproductionRequests } from "@/components/my-space/MyReproductionRequ
 import { MyLegalDeposits } from "@/components/my-space/MyLegalDeposits";
 import { MyBookReservations } from "@/components/my-space/MyBookReservations";
 import { MySpaceReservations } from "@/components/my-space/MySpaceReservations";
+import { CreateTestData } from "@/components/restoration/CreateTestData";
 
 interface ReadingHistoryItem {
   id: string;
@@ -299,6 +300,9 @@ export default function MyLibrarySpace() {
               </TabsList>
 
               <TabsContent value="restoration">
+                <div className="mb-4 flex justify-end">
+                  <CreateTestData />
+                </div>
                 <div className="grid gap-6 md:grid-cols-2">
                   <RestorationNotifications />
                   <MyRestorationRequests />
