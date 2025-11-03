@@ -138,8 +138,57 @@ export function MyRestorationRequests() {
     }
   };
 
-  // Mutation pour accepter le devis
+  // Mutation pour accepter le devis (sans paiement à cette étape)
   const acceptQuote = useMutation({
+    mutationFn: async (request: RestorationRequest) => {
+      // Mettre à jour le statut vers devis_accepte (la restauration démarrera automatiquement)
+      const { error } = await supabase
+        .from('restoration_requests')
+        .update({
+          status: 'devis_accepte',
+          quote_accepted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', request.id);
+      
+      if (error) throw error;
+
+      // Envoyer la notification d'acceptation
+      try {
+        await supabase.functions.invoke('send-restoration-notification', {
+          body: {
+            requestId: request.id,
+            recipientEmail: user?.email,
+            recipientId: user?.id,
+            notificationType: 'quote_accepted',
+            requestNumber: request.request_number,
+            manuscriptTitle: request.manuscript_title,
+            quoteAmount: request.quote_amount
+          }
+        });
+      } catch (emailError) {
+        console.error('Erreur notification email:', emailError);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-restoration-requests', user?.id] });
+      toast({
+        title: "Devis accepté",
+        description: "La restauration va démarrer. Le paiement vous sera demandé après la fin de la restauration.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'accepter le devis.",
+        variant: "destructive"
+      });
+      console.error(error);
+    }
+  });
+
+  // Mutation pour effectuer le paiement (après restauration terminée)
+  const processPayment = useMutation({
     mutationFn: async (request: RestorationRequest) => {
       // Générer le lien de paiement Stripe
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke(
@@ -159,61 +208,22 @@ export function MyRestorationRequests() {
         throw new Error('Impossible de créer le lien de paiement');
       }
 
-      const paymentUrl = paymentData?.url;
-      
-      // Mettre à jour le statut
-      const { error } = await supabase
-        .from('restoration_requests')
-        .update({
-          status: 'paiement_en_attente',
-          quote_accepted_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', request.id);
-      
-      if (error) throw error;
-
-      // Envoyer la notification avec le lien de paiement
-      try {
-        await supabase.functions.invoke('send-restoration-notification', {
-          body: {
-            requestId: request.id,
-            recipientEmail: user?.email,
-            recipientId: user?.id,
-            notificationType: 'quote_accepted',
-            requestNumber: request.request_number,
-            manuscriptTitle: request.manuscript_title,
-            quoteAmount: request.quote_amount,
-            paymentUrl: paymentUrl
-          }
-        });
-      } catch (emailError) {
-        console.error('Erreur notification email:', emailError);
-      }
-
-      return { paymentUrl };
+      return { paymentUrl: paymentData?.url };
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['my-restoration-requests', user?.id] });
-      
       // Ouvrir le lien de paiement dans un nouvel onglet
       if (data?.paymentUrl) {
         window.open(data.paymentUrl, '_blank');
         toast({
-          title: "Devis accepté",
-          description: "Le lien de paiement s'ouvre dans un nouvel onglet. Vous recevrez également un email avec le lien.",
-        });
-      } else {
-        toast({
-          title: "Devis accepté",
-          description: "Vous recevrez un lien de paiement par email.",
+          title: "Lien de paiement généré",
+          description: "Le lien de paiement s'ouvre dans un nouvel onglet.",
         });
       }
     },
     onError: (error) => {
       toast({
         title: "Erreur",
-        description: "Impossible d'accepter le devis.",
+        description: "Impossible de générer le lien de paiement.",
         variant: "destructive"
       });
       console.error(error);
@@ -571,6 +581,38 @@ export function MyRestorationRequests() {
                               Le devis est en cours de préparation. Vous recevrez une notification dès qu'il sera disponible.
                             </div>
                           )}
+                        </div>
+                      )}
+
+                      {/* Section paiement - après restauration terminée */}
+                      {request.status === 'paiement_en_attente' && (
+                        <div className="space-y-3 pt-2 border-t">
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div className="flex items-start gap-3">
+                              <DollarSign className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-blue-900 mb-2">Restauration terminée - Paiement requis</h4>
+                                <p className="text-sm text-blue-800 mb-3">
+                                  La restauration de votre manuscrit est terminée. Veuillez procéder au paiement pour récupérer votre œuvre.
+                                </p>
+                                {request.quote_amount && (
+                                  <div className="bg-white rounded p-3 mb-3">
+                                    <p className="text-sm font-semibold text-gray-700">Montant à payer : {request.quote_amount} DH</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <Button 
+                            size="sm" 
+                            className="w-full"
+                            onClick={() => processPayment.mutate(request)}
+                            disabled={processPayment.isPending}
+                          >
+                            <DollarSign className="h-4 w-4 mr-2" />
+                            {processPayment.isPending ? 'Génération...' : 'Procéder au paiement'}
+                          </Button>
                         </div>
                       )}
 
