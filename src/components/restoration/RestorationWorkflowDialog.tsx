@@ -554,7 +554,7 @@ export function RestorationWorkflowDialog({
                 </div>
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -562,7 +562,7 @@ export function RestorationWorkflowDialog({
                   disabled={isGeneratingDoc && generatingDocType === 'quote'}
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  {isGeneratingDoc && generatingDocType === 'quote' ? 'Génération...' : 'Générer le devis PDF'}
+                  {isGeneratingDoc && generatingDocType === 'quote' ? 'Génération...' : 'Générer Devis'}
                 </Button>
               </div>
             </div>
@@ -877,15 +877,6 @@ export function RestorationWorkflowDialog({
                 {generatingDocType === 'delivery' ? 'Génération...' : 'Bon de livraison'}
               </Button>
             </>
-          ) : actionType === 'send_quote' ? (
-            <Button 
-              variant="secondary" 
-              onClick={() => handleGenerateDocument('quote')}
-              disabled={isGeneratingDoc}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              {generatingDocType === 'quote' ? 'Génération...' : 'Générer Devis'}
-            </Button>
           ) : ['director_approve', 'receive_artwork'].includes(actionType) ? (
             <Button 
               variant="secondary" 
@@ -897,7 +888,7 @@ export function RestorationWorkflowDialog({
             </Button>
           ) : null}
           <Button onClick={handleSubmit} disabled={isUploadingFile}>
-            {isUploadingFile ? 'Upload en cours...' : 'Confirmer'}
+            {isUploadingFile ? 'Upload en cours...' : actionType === 'send_quote' ? 'Enregistrer' : 'Confirmer'}
           </Button>
         </DialogFooter>
       </DialogContent>

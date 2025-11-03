@@ -29,6 +29,11 @@ interface RequestData {
   };
 }
 
+// Fonction pour formater les nombres correctement en français
+const formatCurrency = (value: number): string => {
+  return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ').replace('.', ',');
+};
+
 const addHeader = async (doc: jsPDF, title: string) => {
   // Charger et ajouter l'image de l'en-tête BNRM
   const headerImg = new Image();
@@ -252,8 +257,8 @@ export const generateQuoteDocument = async (request: RequestData): Promise<void>
       const descLines = doc.splitTextToSize(item.description || 'Restauration', 90);
       doc.text(descLines, 20, y);
       doc.text(item.quantity?.toString() || '1', 115, y);
-      doc.text((item.unitPrice || 0).toLocaleString('fr-FR'), 135, y);
-      doc.text(((item.quantity || 1) * (item.unitPrice || 0)).toLocaleString('fr-FR'), 165, y);
+      doc.text(formatCurrency(item.unitPrice || 0), 135, y);
+      doc.text(formatCurrency((item.quantity || 1) * (item.unitPrice || 0)), 165, y);
       y += 7 * descLines.length;
     });
   } else {
@@ -261,8 +266,8 @@ export const generateQuoteDocument = async (request: RequestData): Promise<void>
     const descLines = doc.splitTextToSize(`Restauration du manuscrit`, 90);
     doc.text(descLines, 20, y);
     doc.text('1', 115, y);
-    doc.text((request.quote_amount || 0).toLocaleString('fr-FR'), 135, y);
-    doc.text((request.quote_amount || 0).toLocaleString('fr-FR'), 165, y);
+    doc.text(formatCurrency(request.quote_amount || 0), 135, y);
+    doc.text(formatCurrency(request.quote_amount || 0), 165, y);
     y += 7 * descLines.length;
   }
   
@@ -273,17 +278,17 @@ export const generateQuoteDocument = async (request: RequestData): Promise<void>
   // Total
   doc.setFont('helvetica', 'bold');
   doc.text('TOTAL HT', 20, y);
-  doc.text(`${(request.quote_amount || 0).toLocaleString('fr-FR')} DH`, 165, y);
+  doc.text(`${formatCurrency(request.quote_amount || 0)} DH`, 165, y);
   y += 7;
   doc.text('TVA (0%)', 20, y);
-  doc.text('0.00 DH', 165, y);
+  doc.text('0,00 DH', 165, y);
   y += 3;
   doc.setLineWidth(0.8);
   doc.line(20, y, 190, y);
   y += 7;
   doc.setFontSize(12);
   doc.text('TOTAL TTC', 20, y);
-  doc.text(`${(request.quote_amount || 0).toLocaleString('fr-FR')} DH`, 165, y);
+  doc.text(`${formatCurrency(request.quote_amount || 0)} DH`, 165, y);
   y += 15;
   
   if (request.quote_details) {
