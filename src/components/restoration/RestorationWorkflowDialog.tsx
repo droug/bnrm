@@ -712,16 +712,6 @@ export function RestorationWorkflowDialog({
                   rows={3}
                 />
               </div>
-              
-              <div>
-                <Label>Rapport final synthétique</Label>
-                <Textarea 
-                  value={restorationReport}
-                  onChange={(e) => setRestorationReport(e.target.value)}
-                  placeholder="Résumé global de la restauration..."
-                  rows={4}
-                />
-              </div>
             </div>
           )
         };
