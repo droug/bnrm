@@ -185,7 +185,17 @@ export function RestorationWorkflowDialog({
         data.urgencyLevel = urgencyLevel;
         break;
       case 'send_quote':
-        data.quoteAmount = quoteAmount;
+        // Valider que le montant est rempli et positif
+        const amount = parseFloat(quoteAmount);
+        if (!quoteAmount || isNaN(amount) || amount <= 0) {
+          toast({
+            title: "Erreur",
+            description: "Veuillez saisir un montant valide pour le devis.",
+            variant: "destructive",
+          });
+          return;
+        }
+        data.quoteAmount = amount;
         break;
       case 'accept_quote':
         // Upload le fichier du devis signé si présent
