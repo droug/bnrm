@@ -5,14 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AlertCircle, CheckCircle, Clock, DollarSign, FileText, Package, Wrench, Download, Check, X } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, DollarSign, FileText, Package, Wrench, Download, Check, X, Upload } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { generateQuoteDocument } from "@/lib/restorationPdfGenerator";
 
 interface RestorationRequest {
   id: string;
@@ -35,6 +37,9 @@ export function MyRestorationRequests() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [showRejectionDialog, setShowRejectionDialog] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+  const [signedQuoteFile, setSignedQuoteFile] = useState<File | null>(null);
+  const [isUploadingQuote, setIsUploadingQuote] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const { data: requests, isLoading } = useQuery({
     queryKey: ['my-restoration-requests', user?.id],
@@ -62,6 +67,75 @@ export function MyRestorationRequests() {
     },
     enabled: !!user
   });
+
+  // Télécharger le devis PDF
+  const handleDownloadQuote = async (request: RestorationRequest) => {
+    setIsGeneratingPdf(true);
+    try {
+      await generateQuoteDocument(request);
+      toast({
+        title: "Devis téléchargé",
+        description: "Le devis a été téléchargé avec succès.",
+      });
+    } catch (error) {
+      console.error('Erreur lors de la génération du devis:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le devis.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
+  // Uploader le devis signé
+  const handleUploadSignedQuote = async (requestId: string, file: File) => {
+    setIsUploadingQuote(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user?.id}/${requestId}/signed-quote-${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('restoration-documents')
+        .upload(fileName, file);
+      
+      if (uploadError) throw uploadError;
+      
+      // Obtenir l'URL publique
+      const { data: urlData } = supabase.storage
+        .from('restoration-documents')
+        .getPublicUrl(fileName);
+      
+      // Mettre à jour la demande avec l'URL du devis signé
+      const { error: updateError } = await supabase
+        .from('restoration_requests')
+        .update({
+          signed_quote_url: urlData.publicUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', requestId);
+      
+      if (updateError) throw updateError;
+      
+      toast({
+        title: "Devis signé uploadé",
+        description: "Votre devis signé a été envoyé avec succès.",
+      });
+      
+      setSignedQuoteFile(null);
+      queryClient.invalidateQueries({ queryKey: ['my-restoration-requests', user?.id] });
+    } catch (error) {
+      console.error('Erreur lors de l\'upload:', error);
+      toast({
+        title: "Erreur d'upload",
+        description: "Impossible de télécharger le fichier.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploadingQuote(false);
+    }
+  };
 
   // Mutation pour accepter le devis
   const acceptQuote = useMutation({
@@ -266,32 +340,87 @@ export function MyRestorationRequests() {
 
                       {/* Actions pour devis en attente */}
                       {request.status === 'devis_en_attente' && (
-                        <div className="space-y-2 pt-2 border-t">
+                        <div className="space-y-3 pt-2 border-t">
                           {request.quote_amount ? (
-                            <div className="flex gap-2">
+                            <>
+                              {/* Bouton pour télécharger le devis */}
                               <Button 
                                 size="sm" 
-                                className="flex-1"
-                                onClick={() => acceptQuote.mutate(request.id)}
-                                disabled={acceptQuote.isPending}
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => handleDownloadQuote(request)}
+                                disabled={isGeneratingPdf}
                               >
-                                <Check className="h-4 w-4 mr-1" />
-                                Accepter le devis
+                                <Download className="h-4 w-4 mr-2" />
+                                {isGeneratingPdf ? 'Génération...' : 'Télécharger le devis'}
                               </Button>
-                              <Button 
-                                size="sm" 
-                                variant="destructive"
-                                className="flex-1"
-                                onClick={() => {
-                                  setSelectedRequestId(request.id);
-                                  setShowRejectionDialog(true);
-                                }}
-                                disabled={rejectQuote.isPending}
-                              >
-                                <X className="h-4 w-4 mr-1" />
-                                Refuser
-                              </Button>
-                            </div>
+
+                              {/* Upload du devis signé */}
+                              <div className="space-y-2">
+                                <Label htmlFor={`signed-quote-${request.id}`} className="text-sm">
+                                  Uploader le devis signé (optionnel)
+                                </Label>
+                                <div className="flex gap-2">
+                                  <Input
+                                    id={`signed-quote-${request.id}`}
+                                    type="file"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                        if (file.size > 10 * 1024 * 1024) {
+                                          toast({
+                                            title: "Erreur",
+                                            description: "La taille du fichier ne doit pas dépasser 10 MB.",
+                                            variant: "destructive"
+                                          });
+                                          return;
+                                        }
+                                        setSignedQuoteFile(file);
+                                        setSelectedRequestId(request.id);
+                                      }
+                                    }}
+                                    className="flex-1"
+                                  />
+                                  {signedQuoteFile && selectedRequestId === request.id && (
+                                    <Button 
+                                      size="sm"
+                                      onClick={() => handleUploadSignedQuote(request.id, signedQuoteFile)}
+                                      disabled={isUploadingQuote}
+                                    >
+                                      <Upload className="h-4 w-4 mr-1" />
+                                      {isUploadingQuote ? 'Upload...' : 'Envoyer'}
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Boutons d'acceptation/refus */}
+                              <div className="flex gap-2">
+                                <Button 
+                                  size="sm" 
+                                  className="flex-1"
+                                  onClick={() => acceptQuote.mutate(request.id)}
+                                  disabled={acceptQuote.isPending}
+                                >
+                                  <Check className="h-4 w-4 mr-1" />
+                                  Accepter le devis
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="destructive"
+                                  className="flex-1"
+                                  onClick={() => {
+                                    setSelectedRequestId(request.id);
+                                    setShowRejectionDialog(true);
+                                  }}
+                                  disabled={rejectQuote.isPending}
+                                >
+                                  <X className="h-4 w-4 mr-1" />
+                                  Refuser
+                                </Button>
+                              </div>
+                            </>
                           ) : (
                             <div className="text-sm text-muted-foreground bg-muted p-3 rounded">
                               <Clock className="h-4 w-4 inline mr-2" />
