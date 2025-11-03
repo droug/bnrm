@@ -24,6 +24,7 @@ import { AdminHeader } from "@/components/AdminHeader";
 import { useNavigate } from "react-router-dom";
 import { RestorationWorkflowStepper } from "@/components/restoration/RestorationWorkflowStepper";
 import { RestorationWorkflowDialog } from "@/components/restoration/RestorationWorkflowDialog";
+import { SampleDataManager } from "@/components/admin/SampleDataManager";
 
 interface RestorationRequest {
   id: string;
@@ -645,6 +646,9 @@ export default function RestorationRequests() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Gestion des données d'exemple */}
+            <SampleDataManager />
 
             {/* Requests List */}
             <Card>
