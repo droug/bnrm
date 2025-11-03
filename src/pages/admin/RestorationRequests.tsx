@@ -291,7 +291,9 @@ export default function RestorationRequests() {
           updateData.estimated_cost = data.estimatedCost ? parseFloat(data.estimatedCost) : null;
           updateData.estimated_duration = data.estimatedDuration ? parseInt(data.estimatedDuration) : null;
           updateData.required_materials = data.requiredMaterials;
-          updateData.urgency_level = data.urgencyLevel;
+          if (data.urgencyLevel && data.urgencyLevel !== '') {
+            updateData.urgency_level = data.urgencyLevel;
+          }
           updateData.diagnosis_completed_at = new Date().toISOString();
           break;
         case 'send_quote':
