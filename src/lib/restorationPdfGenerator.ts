@@ -265,24 +265,29 @@ export const generateCompletionReport = async (request: RequestData): Promise<vo
   doc.setFontSize(11);
   doc.setTextColor(0);
   
-  doc.text(`N° de demande: ${request.request_number}`, 20, y);
+  // Informations principales
+  doc.setFont('helvetica', 'bold');
+  doc.text('N° de demande:', 20, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(request.request_number, 80, y);
   y += 7;
-  doc.text(`Date de réalisation: ${new Date().toLocaleDateString('fr-FR')}`, 20, y);
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Date d\'émission:', 20, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(new Date().toLocaleDateString('fr-FR'), 80, y);
   y += 15;
   
   // Informations sur le manuscrit
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.text('INFORMATIONS SUR LE MANUSCRIT', 20, y);
+  doc.text('IDENTIFICATION DU MANUSCRIT', 20, y);
   y += 10;
   
   doc.setFontSize(11);
-  doc.setFont('helvetica', 'normal');
   const manuscriptInfo = [
     ['Titre', '[Texte arabe - voir demande originale]'],
     ['Cote', request.manuscript_cote],
-    ['Date de début des travaux', new Date(request.submitted_at).toLocaleDateString('fr-FR')],
-    ['Date de fin des travaux', new Date().toLocaleDateString('fr-FR')]
   ];
   
   manuscriptInfo.forEach(([label, value]) => {
@@ -290,108 +295,40 @@ export const generateCompletionReport = async (request: RequestData): Promise<vo
     doc.text(label + ':', 20, y);
     doc.setFont('helvetica', 'normal');
     const valueLines = doc.splitTextToSize(value, 130);
-    doc.text(valueLines, 70, y);
+    doc.text(valueLines, 80, y);
     y += 7 * valueLines.length;
   });
   
   y += 10;
   
-  // État initial
+  // Dates principales
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.text('ÉTAT INITIAL', 20, y);
+  doc.text('DATES DE RÉALISATION', 20, y);
   y += 10;
   
   doc.setFontSize(11);
-  doc.setFont('helvetica', 'normal');
-  if (request.initial_condition) {
-    const initialLines = doc.splitTextToSize(request.initial_condition, 170);
-    doc.text(initialLines, 20, y);
-    y += 7 * initialLines.length + 10;
-  } else {
-    doc.text('[Description de l\'état initial du manuscrit]', 20, y);
-    y += 15;
-  }
-  
-  // Travaux réalisés détaillés
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12);
-  doc.text('TRAVAUX RÉALISÉS', 20, y);
-  y += 10;
-  
-  doc.setFontSize(11);
+  doc.text('Date de début:', 20, y);
   doc.setFont('helvetica', 'normal');
-  if (request.works_performed) {
-    const worksLines = doc.splitTextToSize(request.works_performed, 170);
-    doc.text(worksLines, 20, y);
-    y += 7 * worksLines.length + 10;
-  } else if (request.restoration_report) {
-    const reportLines = doc.splitTextToSize(request.restoration_report, 170);
-    doc.text(reportLines, 20, y);
-    y += 7 * reportLines.length + 10;
-  } else {
-    doc.text('[Description des travaux de restauration effectués]', 20, y);
-    y += 15;
-  }
+  doc.text(new Date(request.submitted_at).toLocaleDateString('fr-FR'), 80, y);
+  y += 7;
   
-  // Matériaux utilisés
-  if (request.materials_used) {
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('MATÉRIAUX UTILISÉS', 20, y);
-    y += 10;
-    
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    const materialsLines = doc.splitTextToSize(request.materials_used, 170);
-    doc.text(materialsLines, 20, y);
-    y += 7 * materialsLines.length + 10;
-  }
-  
-  // Techniques appliquées
-  if (request.techniques_applied) {
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('TECHNIQUES APPLIQUÉES', 20, y);
-    y += 10;
-    
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    const techniquesLines = doc.splitTextToSize(request.techniques_applied, 170);
-    doc.text(techniquesLines, 20, y);
-    y += 7 * techniquesLines.length + 10;
-  }
-  
-  // État final
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12);
-  doc.text('ÉTAT FINAL', 20, y);
-  y += 10;
-  
-  doc.setFontSize(11);
+  doc.text('Date de fin:', 20, y);
   doc.setFont('helvetica', 'normal');
-  if (request.final_condition) {
-    const finalLines = doc.splitTextToSize(request.final_condition, 170);
-    doc.text(finalLines, 20, y);
-    y += 7 * finalLines.length + 10;
-  } else {
-    doc.text('[Description de l\'état final du manuscrit]', 20, y);
-    y += 15;
+  doc.text(new Date().toLocaleDateString('fr-FR'), 80, y);
+  y += 7;
+  
+  if (request.actual_duration) {
+    doc.setFont('helvetica', 'bold');
+    doc.text('Durée effective:', 20, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${request.actual_duration} jours`, 80, y);
+    y += 7;
   }
   
-  // Observations et recommandations
-  if (request.recommendations) {
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('OBSERVATIONS ET RECOMMANDATIONS', 20, y);
-    y += 10;
-    
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    const recoLines = doc.splitTextToSize(request.recommendations, 170);
-    doc.text(recoLines, 20, y);
-    y += 7 * recoLines.length + 10;
-  }
+  y += 10;
   
   // Informations financières
   doc.setFont('helvetica', 'bold');
@@ -400,41 +337,26 @@ export const generateCompletionReport = async (request: RequestData): Promise<vo
   y += 10;
   
   doc.setFontSize(11);
-  doc.setFont('helvetica', 'normal');
-  
-  // Coût estimé vs coût réel
-  if (request.estimated_cost) {
-    doc.text('Coût estimé:', 20, y);
-    doc.text(`${request.estimated_cost.toLocaleString('fr-FR')} DH`, 70, y);
-    y += 7;
-  }
   
   if (request.actual_cost) {
-    doc.text('Coût réel:', 20, y);
-    doc.text(`${parseFloat(request.actual_cost).toLocaleString('fr-FR')} DH`, 70, y);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Coût total:', 20, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${parseFloat(request.actual_cost).toLocaleString('fr-FR')} DH`, 80, y);
     y += 7;
   } else if (request.quote_amount) {
-    doc.text('Montant total:', 20, y);
-    doc.text(`${request.quote_amount.toLocaleString('fr-FR')} DH`, 70, y);
-    y += 7;
-  }
-  
-  // Durée estimée vs durée réelle
-  if (request.estimated_duration) {
-    doc.text('Durée estimée:', 20, y);
-    doc.text(`${request.estimated_duration} jours`, 70, y);
-    y += 7;
-  }
-  
-  if (request.actual_duration) {
-    doc.text('Durée effective:', 20, y);
-    doc.text(`${request.actual_duration} jours`, 70, y);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Coût total:', 20, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${request.quote_amount.toLocaleString('fr-FR')} DH`, 80, y);
     y += 7;
   }
   
   if (request.payment_reference) {
+    doc.setFont('helvetica', 'bold');
     doc.text('Référence paiement:', 20, y);
-    doc.text(request.payment_reference, 70, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(request.payment_reference, 80, y);
     y += 7;
   }
   
@@ -448,7 +370,7 @@ export const generateCompletionReport = async (request: RequestData): Promise<vo
   
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  const certificationText = 'Nous certifions que les travaux de restauration mentionnés ci-dessus ont été réalisés conformément aux normes professionnelles en vigueur et que le manuscrit est prêt à être restitué.';
+  const certificationText = 'Nous certifions que les travaux de restauration ont été réalisés conformément aux normes professionnelles en vigueur.';
   const certLines = doc.splitTextToSize(certificationText, 170);
   doc.text(certLines, 20, y);
   y += 7 * certLines.length + 20;
