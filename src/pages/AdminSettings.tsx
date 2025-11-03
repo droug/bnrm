@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail, GitBranch, List, Sliders, FolderTree, Wrench } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail, GitBranch, List, Sliders, FolderTree, Wrench, Home } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -191,14 +191,25 @@ export default function AdminSettings() {
         {/* Main Content */}
         <main className="container py-8">
           <div className="space-y-6">
-            <div className="flex items-center space-x-2 mb-8">
-              <Settings className="h-8 w-8 text-primary" />
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight">Administration et Paramétrage</h1>
-                <p className="text-muted-foreground mt-2">
-                  Gérez les paramètres système et les fonctionnalités administratives
-                </p>
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center space-x-2">
+                <Settings className="h-8 w-8 text-primary" />
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight">Administration et Paramétrage</h1>
+                  <p className="text-muted-foreground mt-2">
+                    Gérez les paramètres système et les fonctionnalités administratives
+                  </p>
+                </div>
               </div>
+              <Button 
+                onClick={() => navigate('/my-library-space')}
+                variant="outline"
+                size="lg"
+                className="flex items-center gap-2"
+              >
+                <Home className="h-5 w-5" />
+                Mon Espace
+              </Button>
             </div>
             
             {/* Bouton de création de test */}
