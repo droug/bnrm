@@ -22,10 +22,10 @@ const statusToStepMapping: Record<string, number> = {
   'devis_en_attente': 5,
   'devis_accepte': 6,
   'devis_refuse': -2,
-  'paiement_en_attente': 7,
-  'paiement_valide': 8,
-  'restauration_en_cours': 9,
-  'terminee': 10,
+  'restauration_en_cours': 7,
+  'terminee': 8,
+  'paiement_en_attente': 9,
+  'paiement_valide': 10,
   'cloturee': 11,
 };
 
@@ -37,9 +37,9 @@ const workflowSteps: Step[] = [
   { id: 'diagnostic_en_cours', label: 'Diagnostic', status: 'upcoming' },
   { id: 'devis_en_attente', label: 'Devis en attente', status: 'upcoming' },
   { id: 'devis_accepte', label: 'Devis accepté', status: 'upcoming' },
-  { id: 'paiement_valide', label: 'Paiement validé', status: 'upcoming' },
   { id: 'restauration_en_cours', label: 'Restauration', status: 'upcoming' },
   { id: 'terminee', label: 'Terminée', status: 'upcoming' },
+  { id: 'paiement_valide', label: 'Paiement validé', status: 'upcoming' },
   { id: 'cloturee', label: 'Clôturée', status: 'upcoming' },
 ];
 

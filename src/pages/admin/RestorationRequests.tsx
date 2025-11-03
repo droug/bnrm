@@ -204,9 +204,9 @@ export default function RestorationRequests() {
 
   // Stats
   const totalRequests = requests?.length || 0;
-  const pendingRequests = requests?.filter(r => ['soumise', 'en_attente_autorisation', 'devis_en_attente', 'paiement_en_attente'].includes(r.status)).length || 0;
-  const inProgressRequests = requests?.filter(r => ['autorisee', 'oeuvre_recue', 'diagnostic_en_cours', 'devis_accepte', 'paiement_valide', 'restauration_en_cours'].includes(r.status)).length || 0;
-  const completedRequests = requests?.filter(r => ['terminee', 'cloturee'].includes(r.status)).length || 0;
+  const pendingRequests = requests?.filter(r => ['soumise', 'en_attente_autorisation', 'devis_en_attente'].includes(r.status)).length || 0;
+  const inProgressRequests = requests?.filter(r => ['autorisee', 'oeuvre_recue', 'diagnostic_en_cours', 'devis_accepte', 'restauration_en_cours', 'terminee', 'paiement_en_attente', 'paiement_valide'].includes(r.status)).length || 0;
+  const completedRequests = requests?.filter(r => ['cloturee'].includes(r.status)).length || 0;
 
   const handleWorkflowAction = (request: RestorationRequest, action: string) => {
     setSelectedRequest(request);
@@ -306,9 +306,11 @@ export default function RestorationRequests() {
           notificationData.quoteAmount = data.quoteAmount;
           break;
         case 'accept_quote':
-          updateData.status = 'paiement_en_attente';
+          updateData.status = 'restauration_en_cours';
           updateData.quote_accepted_at = new Date().toISOString();
+          updateData.restoration_started_at = new Date().toISOString();
           notificationData.quoteAmount = selectedRequest.quote_amount;
+          notificationData.estimatedDuration = selectedRequest.estimated_duration;
           break;
         case 'reject_quote':
           updateData.status = 'devis_refuse';
@@ -326,12 +328,13 @@ export default function RestorationRequests() {
           notificationData.paymentLink = data.paymentLink || '';
           break;
         case 'start_restoration':
+          // Cette action n'est plus utilisée, la restauration démarre automatiquement après acceptation du devis
           updateData.status = 'restauration_en_cours';
           updateData.restoration_started_at = new Date().toISOString();
           notificationData.estimatedDuration = selectedRequest.estimated_duration;
           break;
         case 'complete_restoration':
-          updateData.status = 'terminee';
+          updateData.status = 'paiement_en_attente';
           updateData.restoration_report = data.restorationReport;
           updateData.initial_condition = data.initialCondition;
           updateData.works_performed = data.worksPerformed;
@@ -469,10 +472,10 @@ export default function RestorationRequests() {
         );
       case 'devis_accepte':
         return (
-          <Button size="sm" onClick={() => handleWorkflowAction(request, 'validate_payment')}>
-            <CheckCircle className="w-4 h-4 mr-1" />
-            Valider paiement
-          </Button>
+          <div className="text-sm text-muted-foreground italic flex items-center gap-2">
+            <Wrench className="w-4 h-4" />
+            Restauration démarrée automatiquement
+          </div>
         );
       case 'paiement_en_attente':
         return (
@@ -483,9 +486,9 @@ export default function RestorationRequests() {
         );
       case 'paiement_valide':
         return (
-          <Button size="sm" onClick={() => handleWorkflowAction(request, 'start_restoration')}>
-            <Wrench className="w-4 h-4 mr-1" />
-            Démarrer restauration
+          <Button size="sm" onClick={() => handleWorkflowAction(request, 'return_artwork')}>
+            <Package className="w-4 h-4 mr-1" />
+            Retourner œuvre
           </Button>
         );
       case 'restauration_en_cours':
@@ -497,10 +500,10 @@ export default function RestorationRequests() {
         );
       case 'terminee':
         return (
-          <Button size="sm" onClick={() => handleWorkflowAction(request, 'return_artwork')}>
-            <Package className="w-4 h-4 mr-1" />
-            Retourner œuvre
-          </Button>
+          <div className="text-sm text-muted-foreground italic flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            En attente du paiement
+          </div>
         );
       default:
         return null;
