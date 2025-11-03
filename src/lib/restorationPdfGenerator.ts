@@ -14,6 +14,7 @@ interface RequestData {
   quote_details?: string;
   restoration_report?: string;
   submitted_at: string;
+  payment_reference?: string;
   profiles?: {
     first_name: string;
     last_name: string;
@@ -296,4 +297,125 @@ export const generateCompletionCertificate = async (request: RequestData): Promi
   
   addFooter(doc);
   doc.save(`achevement_${request.request_number}.pdf`);
+};
+
+export const generateInvoice = async (request: RequestData): Promise<void> => {
+  const doc = new jsPDF();
+  await addHeader(doc, 'FACTURE DE RESTAURATION');
+  
+  let y = 70;
+  doc.setFontSize(11);
+  doc.setTextColor(0);
+  
+  // Informations de facturation
+  doc.setFont('helvetica', 'bold');
+  doc.text('FACTURE N°:', 20, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`FACT-${request.request_number}`, 70, y);
+  y += 7;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Date d\'émission:', 20, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(new Date().toLocaleDateString('fr-FR'), 70, y);
+  y += 7;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Référence paiement:', 20, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(request.payment_reference || 'N/A', 70, y);
+  y += 15;
+  
+  // Informations client
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('FACTURÉ À:', 20, y);
+  y += 7;
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  
+  if (request.profiles) {
+    doc.text(`${request.profiles.first_name} ${request.profiles.last_name}`, 20, y);
+    y += 7;
+  }
+  
+  y += 10;
+  
+  // Détails de la facture
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('DÉTAILS DE LA PRESTATION', 20, y);
+  y += 10;
+  
+  // En-tête du tableau
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Description', 20, y);
+  doc.text('Montant (DH)', 150, y);
+  y += 5;
+  
+  // Ligne de séparation
+  doc.setDrawColor(200);
+  doc.line(20, y, 190, y);
+  y += 7;
+  
+  // Lignes de détail
+  doc.setFont('helvetica', 'normal');
+  const description = `Restauration du manuscrit: ${request.manuscript_title}`;
+  const descLines = doc.splitTextToSize(description, 120);
+  doc.text(descLines, 20, y);
+  doc.text((request.quote_amount || 0).toLocaleString('fr-FR'), 150, y);
+  y += 7 * descLines.length + 3;
+  
+  doc.text(`Cote: ${request.manuscript_cote}`, 20, y);
+  y += 7;
+  
+  doc.text(`N° demande: ${request.request_number}`, 20, y);
+  y += 10;
+  
+  // Ligne de séparation
+  doc.line(20, y, 190, y);
+  y += 7;
+  
+  // Total
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('TOTAL HT', 20, y);
+  doc.text(`${(request.quote_amount || 0).toLocaleString('fr-FR')} DH`, 150, y);
+  y += 7;
+  
+  doc.text('TVA (0%)', 20, y);
+  doc.text('0.00 DH', 150, y);
+  y += 10;
+  
+  // Ligne double
+  doc.setLineWidth(0.5);
+  doc.line(20, y, 190, y);
+  y += 1;
+  doc.line(20, y, 190, y);
+  y += 7;
+  
+  doc.setFontSize(14);
+  doc.text('TOTAL TTC', 20, y);
+  doc.text(`${(request.quote_amount || 0).toLocaleString('fr-FR')} DH`, 150, y);
+  
+  // Conditions de paiement
+  y += 20;
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('CONDITIONS DE PAIEMENT:', 20, y);
+  y += 7;
+  doc.setFont('helvetica', 'normal');
+  doc.text('Paiement comptant lors de la restitution de l\'œuvre.', 20, y);
+  
+  // Notes
+  y += 15;
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(9);
+  const noteText = 'Cette facture est établie conformément aux services de restauration effectués par la BNRM.';
+  const noteLines = doc.splitTextToSize(noteText, 170);
+  doc.text(noteLines, 20, y);
+  
+  addFooter(doc);
+  doc.save(`facture_${request.request_number}.pdf`);
 };

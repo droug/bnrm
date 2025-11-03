@@ -13,6 +13,7 @@ import {
   generateDiagnosisReport,
   generateQuoteDocument,
   generateCompletionCertificate,
+  generateInvoice,
 } from "@/lib/restorationPdfGenerator";
 
 interface RestorationWorkflowDialogProps {
@@ -48,21 +49,22 @@ export function RestorationWorkflowDialog({
   const [restorationReport, setRestorationReport] = useState('');
   const [completionNotes, setCompletionNotes] = useState('');
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
-  const [generatingDocType, setGeneratingDocType] = useState<'diagnosis' | 'quote' | null>(null);
+  const [generatingDocType, setGeneratingDocType] = useState<'diagnosis' | 'quote' | 'invoice' | null>(null);
 
-  const handleGenerateDocument = async (docType?: 'diagnosis' | 'quote') => {
+  const handleGenerateDocument = async (docType?: 'diagnosis' | 'quote' | 'invoice') => {
     if (!request) return;
     
     setIsGeneratingDoc(true);
     setGeneratingDocType(docType || null);
     try {
-      const requestData = {
+        const requestData = {
         ...request,
         diagnosis_report: diagnosisReport || request.diagnosis_report,
         quote_amount: quoteAmount ? parseFloat(quoteAmount) : request.quote_amount,
         restoration_report: restorationReport || request.restoration_report,
         estimated_cost: estimatedCost ? parseFloat(estimatedCost) : request.estimated_cost,
         estimated_duration: estimatedDuration ? parseFloat(estimatedDuration) : request.estimated_duration,
+        payment_reference: paymentReference || request.payment_reference,
       };
       
       if (docType === 'diagnosis') {
@@ -76,6 +78,12 @@ export function RestorationWorkflowDialog({
         toast({
           title: "Devis généré",
           description: "Le devis a été téléchargé avec succès.",
+        });
+      } else if (docType === 'invoice') {
+        await generateInvoice(requestData);
+        toast({
+          title: "Facture générée",
+          description: "La facture a été téléchargée avec succès.",
         });
       } else {
         // Logique pour les autres types de documents
@@ -549,9 +557,18 @@ export function RestorationWorkflowDialog({
                 disabled={isGeneratingDoc}
               >
                 <Download className="w-4 h-4 mr-2" />
-                {generatingDocType === 'quote' ? 'Génération...' : 'Générer Devis'}
+              {generatingDocType === 'quote' ? 'Génération...' : 'Générer Devis'}
               </Button>
             </>
+          ) : actionType === 'validate_payment' ? (
+            <Button 
+              variant="secondary" 
+              onClick={() => handleGenerateDocument('invoice')}
+              disabled={isGeneratingDoc}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              {generatingDocType === 'invoice' ? 'Génération...' : 'Générer Facture'}
+            </Button>
           ) : ['director_approve', 'receive_artwork', 'send_quote', 'complete_restoration'].includes(actionType) ? (
             <Button 
               variant="secondary" 
