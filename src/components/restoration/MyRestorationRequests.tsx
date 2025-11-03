@@ -29,6 +29,7 @@ interface RestorationRequest {
   estimated_duration?: number;
   restoration_report?: string;
   signed_quote_url?: string;
+  payment_method?: string;
 }
 
 export function MyRestorationRequests() {
@@ -794,6 +795,19 @@ export function MyRestorationRequests() {
                                 {getUrgencyBadge(request.urgency_level)}
                               </div>
                             </div>
+                            {request.payment_method && (
+                              <div>
+                                <h4 className="font-semibold mb-2">Modalité de paiement</h4>
+                                <Badge variant="outline" className="text-sm">
+                                  {request.payment_method === 'en_ligne' && 'Paiement en ligne'}
+                                  {request.payment_method === 'virement' && 'Virement bancaire'}
+                                  {request.payment_method === 'virement_en_ligne' && 'Virement bancaire en ligne'}
+                                  {request.payment_method === 'carte_guichet' && 'Carte au guichet sur place'}
+                                  {request.payment_method === 'espece' && 'Espèce'}
+                                  {request.payment_method === 'cheque' && 'Chèque'}
+                                </Badge>
+                              </div>
+                            )}
                             {request.restoration_report && (
                               <div>
                                 <h4 className="font-semibold mb-2">Rapport de restauration</h4>
