@@ -21,17 +21,39 @@ interface RequestData {
 }
 
 const addHeader = (doc: jsPDF, title: string) => {
-  doc.setFontSize(10);
-  doc.setTextColor(100);
-  doc.text('Bibliotheque Nationale du Royaume du Maroc - BNRM', doc.internal.pageSize.width / 2, 15, { align: 'center' });
+  // En-tête officiel BNRM
+  doc.setFontSize(12);
+  doc.setTextColor(0);
+  doc.setFont('helvetica', 'bold');
+  doc.text('ROYAUME DU MAROC', doc.internal.pageSize.width / 2, 10, { align: 'center' });
   
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Ministere de la Jeunesse, de la Culture et de la Communication', doc.internal.pageSize.width / 2, 16, { align: 'center' });
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('BIBLIOTHEQUE NATIONALE DU ROYAUME DU MAROC', doc.internal.pageSize.width / 2, 22, { align: 'center' });
+  
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Avenue Ibn Batouta, B.P. 1003, Rabat - Maroc', doc.internal.pageSize.width / 2, 27, { align: 'center' });
+  doc.text('Tel: +212 (0)5 37 27 15 23 / Fax: +212 (0)5 37 27 46 88', doc.internal.pageSize.width / 2, 32, { align: 'center' });
+  
+  // Ligne de séparation
+  doc.setDrawColor(41, 128, 185);
+  doc.setLineWidth(0.8);
+  doc.line(20, 37, doc.internal.pageSize.width - 20, 37);
+  
+  // Titre du document
   doc.setFontSize(16);
   doc.setTextColor(41, 128, 185);
-  doc.text(title, doc.internal.pageSize.width / 2, 25, { align: 'center' });
+  doc.setFont('helvetica', 'bold');
+  doc.text(title, doc.internal.pageSize.width / 2, 47, { align: 'center' });
   
+  // Ligne sous le titre
   doc.setDrawColor(41, 128, 185);
   doc.setLineWidth(0.5);
-  doc.line(20, 30, doc.internal.pageSize.width - 20, 30);
+  doc.line(40, 50, doc.internal.pageSize.width - 40, 50);
 };
 
 const addFooter = (doc: jsPDF) => {
@@ -146,7 +168,7 @@ export const generateDiagnosisReport = (request: RequestData): void => {
   const doc = new jsPDF();
   addHeader(doc, 'RAPPORT DE DIAGNOSTIC');
   
-  let y = 40;
+  let y = 60;
   doc.setFontSize(11);
   doc.setTextColor(0);
   
