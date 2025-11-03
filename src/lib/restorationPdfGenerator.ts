@@ -585,3 +585,194 @@ export const generateInvoice = async (request: RequestData): Promise<void> => {
   addFooter(doc);
   doc.save(`facture_${request.request_number}.pdf`);
 };
+
+export const generateRestitutionReport = async (request: RequestData): Promise<void> => {
+  const doc = new jsPDF();
+  await addHeader(doc, "RAPPORT DE RESTITUTION");
+  
+  let y = 70;
+  doc.setFontSize(11);
+  doc.setTextColor(0);
+  
+  // Informations générales
+  doc.setFont('helvetica', 'bold');
+  doc.text('N° de demande:', 20, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(request.request_number, 70, y);
+  y += 7;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Date de restitution:', 20, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(new Date().toLocaleDateString('fr-FR'), 70, y);
+  y += 15;
+  
+  // Informations sur le manuscrit
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('IDENTIFICATION DU MANUSCRIT', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  const manuscriptInfo = [
+    ['Titre', '[Texte arabe - voir demande originale]'],
+    ['Cote', request.manuscript_cote],
+    ['Date de réception', new Date(request.submitted_at).toLocaleDateString('fr-FR')],
+    ['Date de restitution', new Date().toLocaleDateString('fr-FR')]
+  ];
+  
+  manuscriptInfo.forEach(([label, value]) => {
+    doc.setFont('helvetica', 'bold');
+    doc.text(label + ':', 20, y);
+    doc.setFont('helvetica', 'normal');
+    const valueLines = doc.splitTextToSize(value, 130);
+    doc.text(valueLines, 70, y);
+    y += 7 * valueLines.length;
+  });
+  
+  y += 10;
+  
+  // Bénéficiaire
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('BÉNÉFICIAIRE', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  if (request.profiles) {
+    doc.text(`Nom: ${request.profiles.first_name} ${request.profiles.last_name}`, 20, y);
+    y += 7;
+  }
+  
+  y += 10;
+  
+  // Synthèse des travaux de restauration
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('SYNTHÈSE DES TRAVAUX EFFECTUÉS', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  
+  // État initial
+  doc.setFont('helvetica', 'bold');
+  doc.text('État initial:', 20, y);
+  y += 7;
+  doc.setFont('helvetica', 'normal');
+  if (request.initial_condition) {
+    const initialLines = doc.splitTextToSize(request.initial_condition, 170);
+    doc.text(initialLines, 20, y);
+    y += 7 * initialLines.length + 7;
+  } else {
+    doc.text('[État initial non documenté]', 20, y);
+    y += 14;
+  }
+  
+  // Travaux réalisés
+  doc.setFont('helvetica', 'bold');
+  doc.text('Interventions réalisées:', 20, y);
+  y += 7;
+  doc.setFont('helvetica', 'normal');
+  if (request.works_performed) {
+    const worksLines = doc.splitTextToSize(request.works_performed, 170);
+    doc.text(worksLines, 20, y);
+    y += 7 * worksLines.length + 7;
+  } else if (request.restoration_report) {
+    const reportLines = doc.splitTextToSize(request.restoration_report, 170);
+    doc.text(reportLines, 20, y);
+    y += 7 * reportLines.length + 7;
+  } else {
+    doc.text('[Travaux non documentés]', 20, y);
+    y += 14;
+  }
+  
+  // État final
+  doc.setFont('helvetica', 'bold');
+  doc.text('État final:', 20, y);
+  y += 7;
+  doc.setFont('helvetica', 'normal');
+  if (request.final_condition) {
+    const finalLines = doc.splitTextToSize(request.final_condition, 170);
+    doc.text(finalLines, 20, y);
+    y += 7 * finalLines.length + 10;
+  } else {
+    doc.text('[État final non documenté]', 20, y);
+    y += 17;
+  }
+  
+  // Recommandations de conservation
+  if (request.recommendations) {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('RECOMMANDATIONS DE CONSERVATION', 20, y);
+    y += 10;
+    
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    const recoLines = doc.splitTextToSize(request.recommendations, 170);
+    doc.text(recoLines, 20, y);
+    y += 7 * recoLines.length + 10;
+  }
+  
+  // Informations financières
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('INFORMATIONS FINANCIÈRES', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  
+  const costText = request.actual_cost 
+    ? `${parseFloat(request.actual_cost).toLocaleString('fr-FR')} DH`
+    : request.quote_amount 
+    ? `${request.quote_amount.toLocaleString('fr-FR')} DH`
+    : 'Non spécifié';
+  
+  doc.text('Montant total:', 20, y);
+  doc.text(costText, 70, y);
+  y += 7;
+  
+  if (request.payment_reference) {
+    doc.text('Référence paiement:', 20, y);
+    doc.text(request.payment_reference, 70, y);
+    y += 7;
+  }
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Statut:', 20, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Paiement effectué', 70, y);
+  y += 15;
+  
+  // Certification de restitution
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('CERTIFICATION DE RESTITUTION', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  const certificationText = 'Nous certifions que le manuscrit mentionné ci-dessus a été restauré conformément aux normes professionnelles et qu\'il est restitué en bon état à son bénéficiaire. Le présent rapport atteste de la bonne exécution des travaux et de la remise du bien.';
+  const certLines = doc.splitTextToSize(certificationText, 170);
+  doc.text(certLines, 20, y);
+  y += 7 * certLines.length + 15;
+  
+  // Signatures
+  doc.text(`Fait à Rabat, le ${new Date().toLocaleDateString('fr-FR')}`, 20, y);
+  y += 20;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Le Responsable de Restauration', 20, y);
+  doc.text('Le Bénéficiaire', 120, y);
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text('(signature et cachet)', 20, y);
+  doc.text('(signature)', 120, y);
+  
+  addFooter(doc);
+  doc.save(`rapport_restitution_${request.request_number}.pdf`);
+};

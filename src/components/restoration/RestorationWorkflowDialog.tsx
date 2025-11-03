@@ -14,6 +14,7 @@ import {
   generateQuoteDocument,
   generateCompletionReport,
   generateInvoice,
+  generateRestitutionReport,
 } from "@/lib/restorationPdfGenerator";
 
 interface RestorationWorkflowDialogProps {
@@ -115,9 +116,9 @@ export function RestorationWorkflowDialog({
           description: "La facture a été téléchargée avec succès.",
         });
       } else if (docType === 'restoration_report') {
-        await generateCompletionReport(requestData);
+        await generateRestitutionReport(requestData);
         toast({
-          title: "Rapport de Restauration généré",
+          title: "Rapport de Restitution généré",
           description: "Le rapport a été téléchargé avec succès.",
         });
       } else {
@@ -719,7 +720,7 @@ export function RestorationWorkflowDialog({
                 disabled={isGeneratingDoc}
               >
                 <Download className="w-4 h-4 mr-2" />
-                {generatingDocType === 'restoration_report' ? 'Génération...' : 'Générer le Rapport de Restauration'}
+                {generatingDocType === 'restoration_report' ? 'Génération...' : 'Rapport de Restauration'}
               </Button>
             </>
           ) : ['director_approve', 'receive_artwork', 'send_quote'].includes(actionType) ? (
