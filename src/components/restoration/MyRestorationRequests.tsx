@@ -1,15 +1,18 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AlertCircle, CheckCircle, Clock, DollarSign, FileText, Package, Wrench } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, DollarSign, FileText, Package, Wrench, Download, Check, X } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 interface RestorationRequest {
   id: string;
@@ -28,6 +31,10 @@ interface RestorationRequest {
 export function MyRestorationRequests() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [showRejectionDialog, setShowRejectionDialog] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
   const { data: requests, isLoading } = useQuery({
     queryKey: ['my-restoration-requests', user?.id],
@@ -54,6 +61,72 @@ export function MyRestorationRequests() {
       return data as RestorationRequest[];
     },
     enabled: !!user
+  });
+
+  // Mutation pour accepter le devis
+  const acceptQuote = useMutation({
+    mutationFn: async (requestId: string) => {
+      const { error } = await supabase
+        .from('restoration_requests')
+        .update({
+          status: 'paiement_en_attente',
+          quote_accepted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', requestId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-restoration-requests', user?.id] });
+      toast({
+        title: "Devis accepté",
+        description: "Vous recevrez prochainement un lien de paiement par email.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'accepter le devis.",
+        variant: "destructive"
+      });
+      console.error(error);
+    }
+  });
+
+  // Mutation pour refuser le devis
+  const rejectQuote = useMutation({
+    mutationFn: async ({ requestId, reason }: { requestId: string; reason: string }) => {
+      const { error } = await supabase
+        .from('restoration_requests')
+        .update({
+          status: 'devis_refuse',
+          quote_rejected_at: new Date().toISOString(),
+          quote_rejection_reason: reason,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', requestId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-restoration-requests', user?.id] });
+      setShowRejectionDialog(false);
+      setRejectionReason("");
+      setSelectedRequestId(null);
+      toast({
+        title: "Devis refusé",
+        description: "Le devis a été refusé. Votre demande a été clôturée.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de refuser le devis.",
+        variant: "destructive"
+      });
+      console.error(error);
+    }
   });
 
   // Subscribe to real-time updates for restoration requests
@@ -191,6 +264,36 @@ export function MyRestorationRequests() {
                         </div>
                       )}
 
+                      {/* Actions pour devis en attente */}
+                      {request.status === 'devis_en_attente' && request.quote_amount && (
+                        <div className="space-y-2 pt-2 border-t">
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              className="flex-1"
+                              onClick={() => acceptQuote.mutate(request.id)}
+                              disabled={acceptQuote.isPending}
+                            >
+                              <Check className="h-4 w-4 mr-1" />
+                              Accepter le devis
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="destructive"
+                              className="flex-1"
+                              onClick={() => {
+                                setSelectedRequestId(request.id);
+                                setShowRejectionDialog(true);
+                              }}
+                              disabled={rejectQuote.isPending}
+                            >
+                              <X className="h-4 w-4 mr-1" />
+                              Refuser
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="sm" className="w-full">
@@ -242,6 +345,56 @@ export function MyRestorationRequests() {
             </div>
           </ScrollArea>
         )}
+
+        {/* Dialog de refus du devis */}
+        <Dialog open={showRejectionDialog} onOpenChange={setShowRejectionDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Refuser le devis</DialogTitle>
+              <DialogDescription>
+                Veuillez indiquer la raison du refus du devis.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="rejection_reason">Raison du refus</Label>
+                <Textarea
+                  id="rejection_reason"
+                  placeholder="Ex: Le montant est trop élevé, je souhaite obtenir d'autres devis..."
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowRejectionDialog(false);
+                    setRejectionReason("");
+                    setSelectedRequestId(null);
+                  }}
+                >
+                  Annuler
+                </Button>
+                <Button 
+                  variant="destructive"
+                  onClick={() => {
+                    if (selectedRequestId && rejectionReason.trim()) {
+                      rejectQuote.mutate({ 
+                        requestId: selectedRequestId, 
+                        reason: rejectionReason 
+                      });
+                    }
+                  }}
+                  disabled={!rejectionReason.trim() || rejectQuote.isPending}
+                >
+                  Confirmer le refus
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );
