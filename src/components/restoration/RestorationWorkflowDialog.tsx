@@ -253,6 +253,17 @@ export function RestorationWorkflowDialog({
       case 'validate_payment':
         data.paymentReference = paymentReference;
         break;
+      case 'start_restoration':
+        data.restorationReport = restorationReport;
+        data.initialCondition = initialCondition;
+        data.worksPerformed = worksPerformed;
+        data.materialsUsed = materialsUsed;
+        data.techniquesApplied = techniquesApplied;
+        data.finalCondition = finalCondition;
+        data.recommendations = recommendations;
+        data.actualDuration = actualDuration;
+        data.actualCost = actualCost;
+        break;
       case 'complete_restoration':
         data.restorationReport = restorationReport;
         data.initialCondition = initialCondition;
@@ -649,12 +660,103 @@ export function RestorationWorkflowDialog({
         };
       case 'start_restoration':
         return {
-          title: 'Démarrer la restauration',
-          icon: <Wrench className="w-6 h-6 text-orange-500" />,
+          title: 'Terminer la restauration',
+          icon: <CheckCheck className="w-6 h-6 text-green-500" />,
           fields: (
-            <p className="text-sm text-muted-foreground">
-              Confirmer le démarrage des travaux de restauration
-            </p>
+            <div className="space-y-4">
+              <div>
+                <Label>Dommages identifiés</Label>
+                <Textarea 
+                  value={initialCondition}
+                  onChange={(e) => setInitialCondition(e.target.value)}
+                  placeholder="Dommages constatés sur le manuscrit..."
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <Label>Travaux réalisés (détaillé)</Label>
+                <Textarea 
+                  value={worksPerformed}
+                  onChange={(e) => setWorksPerformed(e.target.value)}
+                  placeholder="Décrire en détail les interventions effectuées..."
+                  rows={4}
+                />
+              </div>
+              
+              <div>
+                <Label>Techniques appliquées</Label>
+                <Textarea 
+                  value={techniquesApplied}
+                  onChange={(e) => setTechniquesApplied(e.target.value)}
+                  placeholder="Techniques de restauration appliquées..."
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <Label>Matériaux utilisés</Label>
+                <Textarea 
+                  value={materialsUsed}
+                  onChange={(e) => setMaterialsUsed(e.target.value)}
+                  placeholder="Liste des matériaux utilisés..."
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <Label>État final du manuscrit</Label>
+                <Textarea 
+                  value={finalCondition}
+                  onChange={(e) => setFinalCondition(e.target.value)}
+                  placeholder="Description de l'état après restauration..."
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <Label>Recommandations pour la conservation</Label>
+                <Textarea 
+                  value={recommendations}
+                  onChange={(e) => setRecommendations(e.target.value)}
+                  placeholder="Recommandations pour préserver le manuscrit..."
+                  rows={3}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Durée réelle (jours)</Label>
+                  <Input 
+                    type="number"
+                    value={actualDuration}
+                    onChange={(e) => setActualDuration(e.target.value)}
+                    placeholder="Nombre de jours"
+                  />
+                </div>
+                <div>
+                  <Label>Coût réel (DH)</Label>
+                  <Input 
+                    type="number"
+                    value={actualCost}
+                    onChange={(e) => setActualCost(e.target.value)}
+                    placeholder="Coût total"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleGenerateDocument('restoration_report')}
+                  disabled={isGeneratingDoc && generatingDocType === 'restoration_report'}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  {isGeneratingDoc && generatingDocType === 'restoration_report' ? 'Génération...' : 'Générer Rapport'}
+                </Button>
+              </div>
+            </div>
           )
         };
       case 'complete_restoration':
