@@ -6,6 +6,7 @@ import { BNRMStatistics } from "@/components/bnrm/BNRMStatistics";
 import { BNRMHistory } from "@/components/bnrm/BNRMHistory";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -73,20 +74,24 @@ export default function BNRMTariffsPage() {
               <div>
                 <h2 className="text-xl font-semibold mb-2">Gestion des Services Ponctuels</h2>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Services à la demande et tarifs associés (hors restauration)
+                  Services à la demande et tarifs associés
                 </p>
               </div>
               <BNRMServices filterCategory="exclude-Inscription-Restauration" />
               <BNRMTariffs filterCategory="exclude-Inscription-Restauration" />
               
-              <div className="mt-8">
-                <h2 className="text-xl font-semibold mb-2">Gestion des Services de Restauration</h2>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Services de restauration de documents et tarifs associés
-                </p>
-              </div>
-              <BNRMServices filterCategory="Restauration" />
-              <BNRMTariffs filterCategory="Restauration" />
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Restauration</CardTitle>
+                  <CardDescription>Service de restauration de documents</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-primary">
+                    1 500,00 DH
+                  </div>
+                  <p className="text-muted-foreground mt-2">Pour 1J/H</p>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="statistics" className="space-y-6 mt-6">
