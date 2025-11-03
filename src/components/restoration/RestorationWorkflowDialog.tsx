@@ -358,7 +358,7 @@ export function RestorationWorkflowDialog({
               </div>
               
               <div>
-                <Label>Dommages identifiés</Label>
+                <Label>Dégradations identifiées</Label>
                 <Textarea 
                   value={identifiedDamages}
                   onChange={(e) => setIdentifiedDamages(e.target.value)}
@@ -368,7 +368,7 @@ export function RestorationWorkflowDialog({
               </div>
               
               <div>
-                <Label>Rapport de diagnostic détaillé</Label>
+                <Label>Diagnostic de l'oeuvre</Label>
                 <Textarea 
                   value={diagnosisReport}
                   onChange={(e) => setDiagnosisReport(e.target.value)}
