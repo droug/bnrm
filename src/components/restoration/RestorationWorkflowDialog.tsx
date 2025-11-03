@@ -888,7 +888,7 @@ export function RestorationWorkflowDialog({
             </Button>
           ) : null}
           <Button onClick={handleSubmit} disabled={isUploadingFile}>
-            {isUploadingFile ? 'Upload en cours...' : actionType === 'send_quote' ? 'Enregistrer' : 'Confirmer'}
+            {isUploadingFile ? 'Upload en cours...' : 'Confirmer'}
           </Button>
         </DialogFooter>
       </DialogContent>
