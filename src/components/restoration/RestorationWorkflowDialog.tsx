@@ -47,6 +47,14 @@ export function RestorationWorkflowDialog({
   const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [paymentReference, setPaymentReference] = useState('');
   const [restorationReport, setRestorationReport] = useState('');
+  const [initialCondition, setInitialCondition] = useState('');
+  const [worksPerformed, setWorksPerformed] = useState('');
+  const [materialsUsed, setMaterialsUsed] = useState('');
+  const [techniquesApplied, setTechniquesApplied] = useState('');
+  const [finalCondition, setFinalCondition] = useState('');
+  const [recommendations, setRecommendations] = useState('');
+  const [actualDuration, setActualDuration] = useState('');
+  const [actualCost, setActualCost] = useState('');
   const [completionNotes, setCompletionNotes] = useState('');
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
   const [generatingDocType, setGeneratingDocType] = useState<'diagnosis' | 'quote' | 'invoice' | null>(null);
@@ -57,7 +65,7 @@ export function RestorationWorkflowDialog({
     setIsGeneratingDoc(true);
     setGeneratingDocType(docType || null);
     try {
-        const requestData = {
+      const requestData = {
         ...request,
         diagnosis_report: diagnosisReport || request.diagnosis_report,
         quote_amount: quoteAmount ? parseFloat(quoteAmount) : request.quote_amount,
@@ -65,6 +73,14 @@ export function RestorationWorkflowDialog({
         estimated_cost: estimatedCost ? parseFloat(estimatedCost) : request.estimated_cost,
         estimated_duration: estimatedDuration ? parseFloat(estimatedDuration) : request.estimated_duration,
         payment_reference: paymentReference || request.payment_reference,
+        initial_condition: initialCondition || request.initial_condition,
+        works_performed: worksPerformed || request.works_performed,
+        materials_used: materialsUsed || request.materials_used,
+        techniques_applied: techniquesApplied || request.techniques_applied,
+        final_condition: finalCondition || request.final_condition,
+        recommendations: recommendations || request.recommendations,
+        actual_duration: actualDuration || request.actual_duration,
+        actual_cost: actualCost || request.actual_cost,
       };
       
       if (docType === 'diagnosis') {
@@ -185,6 +201,14 @@ export function RestorationWorkflowDialog({
         break;
       case 'complete_restoration':
         data.restorationReport = restorationReport;
+        data.initialCondition = initialCondition;
+        data.worksPerformed = worksPerformed;
+        data.materialsUsed = materialsUsed;
+        data.techniquesApplied = techniquesApplied;
+        data.finalCondition = finalCondition;
+        data.recommendations = recommendations;
+        data.actualDuration = actualDuration;
+        data.actualCost = actualCost;
         break;
       case 'return_artwork':
         data.completionNotes = completionNotes;
@@ -211,6 +235,14 @@ export function RestorationWorkflowDialog({
     setUrgencyLevel('');
     setPaymentReference('');
     setRestorationReport('');
+    setInitialCondition('');
+    setWorksPerformed('');
+    setMaterialsUsed('');
+    setTechniquesApplied('');
+    setFinalCondition('');
+    setRecommendations('');
+    setActualDuration('');
+    setActualCost('');
     setCompletionNotes('');
     setSignedQuoteFile(null);
   };
@@ -475,14 +507,97 @@ export function RestorationWorkflowDialog({
           title: 'Terminer la restauration',
           icon: <CheckCheck className="w-6 h-6 text-green-500" />,
           fields: (
-            <div>
-              <Label>Rapport final de restauration</Label>
-              <Textarea 
-                value={restorationReport}
-                onChange={(e) => setRestorationReport(e.target.value)}
-                placeholder="Travaux effectués, résultats..."
-                rows={6}
-              />
+            <div className="space-y-4">
+              <div>
+                <Label>État initial du manuscrit</Label>
+                <Textarea 
+                  value={initialCondition}
+                  onChange={(e) => setInitialCondition(e.target.value)}
+                  placeholder="Décrire l'état du manuscrit avant restauration..."
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <Label>Travaux réalisés (détaillé)</Label>
+                <Textarea 
+                  value={worksPerformed}
+                  onChange={(e) => setWorksPerformed(e.target.value)}
+                  placeholder="Décrire en détail les interventions effectuées..."
+                  rows={4}
+                />
+              </div>
+              
+              <div>
+                <Label>Matériaux utilisés</Label>
+                <Textarea 
+                  value={materialsUsed}
+                  onChange={(e) => setMaterialsUsed(e.target.value)}
+                  placeholder="Liste des matériaux et produits utilisés..."
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <Label>Techniques appliquées</Label>
+                <Textarea 
+                  value={techniquesApplied}
+                  onChange={(e) => setTechniquesApplied(e.target.value)}
+                  placeholder="Techniques de restauration appliquées..."
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <Label>État final du manuscrit</Label>
+                <Textarea 
+                  value={finalCondition}
+                  onChange={(e) => setFinalCondition(e.target.value)}
+                  placeholder="Décrire l'état du manuscrit après restauration..."
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <Label>Observations et recommandations</Label>
+                <Textarea 
+                  value={recommendations}
+                  onChange={(e) => setRecommendations(e.target.value)}
+                  placeholder="Recommandations pour la conservation future..."
+                  rows={3}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Durée effective (jours)</Label>
+                  <Input 
+                    type="number"
+                    value={actualDuration}
+                    onChange={(e) => setActualDuration(e.target.value)}
+                    placeholder="30"
+                  />
+                </div>
+                <div>
+                  <Label>Coût réel (DH)</Label>
+                  <Input 
+                    type="number"
+                    value={actualCost}
+                    onChange={(e) => setActualCost(e.target.value)}
+                    placeholder="12000"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label>Rapport final synthétique</Label>
+                <Textarea 
+                  value={restorationReport}
+                  onChange={(e) => setRestorationReport(e.target.value)}
+                  placeholder="Résumé global de la restauration..."
+                  rows={4}
+                />
+              </div>
             </div>
           )
         };
