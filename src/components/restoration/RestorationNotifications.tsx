@@ -5,11 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bell, CheckCircle, Clock, AlertCircle, Package, DollarSign, Wrench, FileCheck } from "lucide-react";
+import { Bell, CheckCircle, Clock, AlertCircle, Package, DollarSign, Wrench, FileCheck, ExternalLink, Eye, ThumbsUp, ThumbsDown } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
 
 interface Notification {
   id: string;
@@ -22,6 +26,8 @@ interface Notification {
   restoration_requests?: {
     request_number: string;
     manuscript_title: string;
+    status: string;
+    quote_amount?: number;
   };
 }
 
@@ -29,6 +35,11 @@ export function RestorationNotifications() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [actionDialogOpen, setActionDialogOpen] = useState(false);
+  const [currentNotification, setCurrentNotification] = useState<Notification | null>(null);
+  const [actionType, setActionType] = useState<'accept' | 'reject'>('accept');
+  const [actionNotes, setActionNotes] = useState('');
 
   const { data: notifications, isLoading } = useQuery({
     queryKey: ['restoration-notifications', user?.id],
@@ -41,7 +52,9 @@ export function RestorationNotifications() {
           *,
           restoration_requests (
             request_number,
-            manuscript_title
+            manuscript_title,
+            status,
+            quote_amount
           )
         `)
         .eq('recipient_id', user.id)
@@ -131,16 +144,61 @@ export function RestorationNotifications() {
     }
   });
 
+  const handleQuoteAction = useMutation({
+    mutationFn: async ({ requestId, accept, notes }: { requestId: string; accept: boolean; notes?: string }) => {
+      const newStatus = accept ? 'paiement_en_attente' : 'devis_refuse';
+      const updateData: any = {
+        status: newStatus,
+        updated_at: new Date().toISOString()
+      };
+
+      if (accept) {
+        updateData.quote_accepted_at = new Date().toISOString();
+      } else {
+        updateData.quote_rejected_at = new Date().toISOString();
+        updateData.quote_rejection_reason = notes;
+      }
+
+      const { error } = await supabase
+        .from('restoration_requests')
+        .update(updateData)
+        .eq('id', requestId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['restoration-notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['my-restoration-requests'] });
+      setActionDialogOpen(false);
+      setActionNotes('');
+      toast({
+        title: "Succès",
+        description: actionType === 'accept' 
+          ? "Devis accepté. Vous recevrez prochainement le lien de paiement." 
+          : "Devis refusé. Votre demande a été clôturée.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de traiter votre réponse",
+        variant: "destructive",
+      });
+    }
+  });
+
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'request_received':
       case 'request_authorized':
         return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'request_rejected':
+      case 'quote_rejected':
         return <AlertCircle className="h-5 w-5 text-red-500" />;
       case 'provide_artwork':
         return <Package className="h-5 w-5 text-blue-500" />;
       case 'quote_sent':
+      case 'quote_accepted':
       case 'payment_link':
         return <DollarSign className="h-5 w-5 text-yellow-500" />;
       case 'restoration_started':
@@ -150,6 +208,102 @@ export function RestorationNotifications() {
         return <FileCheck className="h-5 w-5 text-green-500" />;
       default:
         return <Bell className="h-5 w-5 text-gray-500" />;
+    }
+  };
+
+  const getActionButtons = (notification: Notification) => {
+    switch (notification.notification_type) {
+      case 'quote_sent':
+        if (notification.restoration_requests?.status === 'devis_en_attente') {
+          return (
+            <div className="flex gap-2 mt-3">
+              <Button
+                size="sm"
+                onClick={() => {
+                  setCurrentNotification(notification);
+                  setActionType('accept');
+                  setActionDialogOpen(true);
+                }}
+              >
+                <ThumbsUp className="h-4 w-4 mr-1" />
+                Accepter le devis
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => {
+                  setCurrentNotification(notification);
+                  setActionType('reject');
+                  setActionDialogOpen(true);
+                }}
+              >
+                <ThumbsDown className="h-4 w-4 mr-1" />
+                Refuser
+              </Button>
+            </div>
+          );
+        }
+        return null;
+
+      case 'payment_link':
+        if (notification.restoration_requests?.status === 'paiement_en_attente') {
+          return (
+            <Button
+              size="sm"
+              className="mt-3"
+              onClick={() => {
+                // Rediriger vers la page de paiement ou ouvrir le lien
+                toast({
+                  title: "Paiement",
+                  description: "Fonctionnalité de paiement à implémenter",
+                });
+              }}
+            >
+              <DollarSign className="h-4 w-4 mr-1" />
+              Procéder au paiement
+            </Button>
+          );
+        }
+        return null;
+
+      case 'restoration_completed':
+        return (
+          <Button
+            size="sm"
+            variant="outline"
+            className="mt-3"
+            onClick={() => {
+              toast({
+                title: "Rapport de restauration",
+                description: "Consultez les détails dans l'onglet 'Mes demandes'",
+              });
+            }}
+          >
+            <Eye className="h-4 w-4 mr-1" />
+            Voir le rapport
+          </Button>
+        );
+
+      case 'artwork_ready':
+        return (
+          <Button
+            size="sm"
+            variant="outline"
+            className="mt-3"
+            onClick={() => {
+              toast({
+                title: "Informations de retrait",
+                description: "Consultez les détails dans l'onglet 'Mes demandes'",
+              });
+            }}
+          >
+            <Package className="h-4 w-4 mr-1" />
+            Voir les détails de retrait
+          </Button>
+        );
+
+      default:
+        return null;
     }
   };
 
@@ -242,9 +396,18 @@ export function RestorationNotifications() {
                           {format(new Date(notification.sent_at), "d MMMM yyyy 'à' HH:mm", { locale: fr })}
                         </p>
                       </div>
-                      <div className="text-sm text-foreground mt-2 line-clamp-3">
+                       <div className="text-sm text-foreground mt-2">
                         {notification.message}
                       </div>
+                      {notification.restoration_requests?.quote_amount && 
+                       notification.notification_type === 'quote_sent' && (
+                        <div className="mt-2">
+                          <Badge variant="secondary" className="text-base font-semibold">
+                            Montant: {notification.restoration_requests.quote_amount} DH
+                          </Badge>
+                        </div>
+                      )}
+                      {getActionButtons(notification)}
                     </div>
                   </div>
                 </div>
@@ -253,6 +416,71 @@ export function RestorationNotifications() {
           </ScrollArea>
         )}
       </CardContent>
+
+      {/* Dialog pour accepter/refuser le devis */}
+      <Dialog open={actionDialogOpen} onOpenChange={setActionDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {actionType === 'accept' ? 'Accepter le devis' : 'Refuser le devis'}
+            </DialogTitle>
+            <DialogDescription>
+              {actionType === 'accept' 
+                ? 'En acceptant ce devis, vous vous engagez à procéder au paiement pour la restauration.'
+                : 'Veuillez indiquer la raison du refus (optionnel).'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {currentNotification && (
+              <div className="space-y-2">
+                <p className="text-sm">
+                  <strong>Demande:</strong> {currentNotification.restoration_requests?.request_number}
+                </p>
+                <p className="text-sm">
+                  <strong>Manuscrit:</strong> {currentNotification.restoration_requests?.manuscript_title}
+                </p>
+                {currentNotification.restoration_requests?.quote_amount && (
+                  <p className="text-sm">
+                    <strong>Montant:</strong> {currentNotification.restoration_requests.quote_amount} DH
+                  </p>
+                )}
+              </div>
+            )}
+            {actionType === 'reject' && (
+              <div className="space-y-2">
+                <Label htmlFor="notes">Raison du refus (optionnel)</Label>
+                <Textarea
+                  id="notes"
+                  value={actionNotes}
+                  onChange={(e) => setActionNotes(e.target.value)}
+                  placeholder="Expliquez pourquoi vous refusez ce devis..."
+                  rows={4}
+                />
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setActionDialogOpen(false)}>
+              Annuler
+            </Button>
+            <Button
+              variant={actionType === 'accept' ? 'default' : 'destructive'}
+              onClick={() => {
+                if (currentNotification) {
+                  handleQuoteAction.mutate({
+                    requestId: currentNotification.request_id,
+                    accept: actionType === 'accept',
+                    notes: actionNotes
+                  });
+                }
+              }}
+              disabled={handleQuoteAction.isPending}
+            >
+              {actionType === 'accept' ? 'Confirmer l\'acceptation' : 'Confirmer le refus'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
