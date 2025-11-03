@@ -1348,7 +1348,32 @@ export default function DocumentsManager() {
                           <Badge variant="secondary">Actuel</Badge>
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-3">
+                      <CardContent className="space-y-4">
+                        {/* Bouton de visualisation */}
+                        <Button 
+                          variant="outline" 
+                          className="w-full"
+                          onClick={() => {
+                            toast({
+                              title: "Aperçu du document",
+                              description: `Ouverture de ${compareDocs.existing.title}...`,
+                            });
+                            // Navigation vers la page de visualisation
+                            // navigate(`/digital-library/document/${compareDocs.existing.id}`);
+                          }}
+                        >
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          Visualiser le document
+                        </Button>
+                        
+                        {/* Aperçu visuel simulé */}
+                        <div className="border rounded-lg p-4 bg-muted/30 text-center">
+                          <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-2" />
+                          <p className="text-xs text-muted-foreground">Aperçu du document</p>
+                          <p className="text-xs font-mono mt-1">{compareDocs.existing.id}</p>
+                        </div>
+                        
+                        <div className="space-y-3">
                         {[
                           { label: "ID", value: compareDocs.existing.id, key: "id", highlight: true },
                           { label: "Cote", value: compareDocs.existing.cote, key: "cote", highlight: true },
@@ -1382,6 +1407,7 @@ export default function DocumentsManager() {
                             </div>
                           );
                         })}
+                        </div>
                       </CardContent>
                     </Card>
 
@@ -1393,7 +1419,32 @@ export default function DocumentsManager() {
                           <Badge variant="outline">Nouveau</Badge>
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-3">
+                      <CardContent className="space-y-4">
+                        {/* Bouton de visualisation */}
+                        <Button 
+                          variant="outline" 
+                          className="w-full"
+                          onClick={() => {
+                            toast({
+                              title: "Aperçu du document",
+                              description: `Ouverture de ${compareDocs.imported.title}...`,
+                            });
+                            // Navigation vers la page de visualisation
+                            // navigate(`/digital-library/document/${compareDocs.imported.id}`);
+                          }}
+                        >
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          Visualiser le document
+                        </Button>
+                        
+                        {/* Aperçu visuel simulé */}
+                        <div className="border rounded-lg p-4 bg-muted/30 text-center">
+                          <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-2" />
+                          <p className="text-xs text-muted-foreground">Aperçu du document</p>
+                          <p className="text-xs font-mono mt-1">{compareDocs.imported.id}</p>
+                        </div>
+                        
+                        <div className="space-y-3">
                         {[
                           { label: "ID", value: compareDocs.imported.id, key: "id", highlight: true },
                           { label: "Cote", value: compareDocs.imported.cote, key: "cote", highlight: true },
@@ -1427,6 +1478,7 @@ export default function DocumentsManager() {
                             </div>
                           );
                         })}
+                        </div>
                       </CardContent>
                     </Card>
                   </div>
