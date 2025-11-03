@@ -657,7 +657,7 @@ export function RestorationWorkflowDialog({
         };
       case 'start_restoration':
         return {
-          title: 'Terminer la restauration',
+          title: 'Restauration',
           icon: <CheckCheck className="w-6 h-6 text-green-500" />,
           fields: (
             <div className="space-y-4">
