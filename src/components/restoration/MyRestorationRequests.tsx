@@ -372,6 +372,34 @@ export function MyRestorationRequests() {
                         </div>
                       )}
 
+                      {/* Message pour demande autorisée - dépôt requis */}
+                      {request.status === 'autorisee' && (
+                        <div className="space-y-3 pt-2 border-t">
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div className="flex items-start gap-3">
+                              <Package className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-blue-900 mb-2">Dépôt de l'œuvre requis</h4>
+                                <p className="text-sm text-blue-800 mb-3">
+                                  Votre demande a été autorisée. Vous devez maintenant déposer l'œuvre à la BNRM pour qu'un diagnostic approfondi soit réalisé par notre équipe de restauration.
+                                </p>
+                                <div className="bg-white rounded p-3 mb-3">
+                                  <p className="text-sm font-semibold text-gray-700 mb-2">Informations pratiques :</p>
+                                  <ul className="text-sm text-gray-600 space-y-1">
+                                    <li>• <strong>Horaires :</strong> Du lundi au vendredi, de 9h à 17h</li>
+                                    <li>• <strong>Lieu :</strong> Service de restauration - BNRM</li>
+                                    <li>• <strong>À apporter :</strong> Votre pièce d'identité et ce numéro de demande</li>
+                                  </ul>
+                                </div>
+                                <p className="text-xs text-blue-700">
+                                  Le diagnostic nous permettra d'établir un devis détaillé des travaux nécessaires.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Actions pour devis en attente */}
                       {request.status === 'devis_en_attente' && (
                         <div className="space-y-3 pt-2 border-t">
