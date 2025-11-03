@@ -39,7 +39,7 @@ export function RestorationWorkflowDialog({
   const [quoteAmount, setQuoteAmount] = useState('');
   const [quoteDetails, setQuoteDetails] = useState('');
   const [quoteItems, setQuoteItems] = useState<Array<{description: string, quantity: number, unitPrice: number}>>([
-    { description: '', quantity: 1, unitPrice: 0 }
+    { description: '', quantity: 1, unitPrice: 1500 }
   ]);
   const [diagnosisReport, setDiagnosisReport] = useState('');
   const [conservationState, setConservationState] = useState('');
@@ -278,7 +278,7 @@ export function RestorationWorkflowDialog({
     setNotes('');
     setQuoteAmount('');
     setQuoteDetails('');
-    setQuoteItems([{ description: '', quantity: 1, unitPrice: 0 }]);
+    setQuoteItems([{ description: '', quantity: 1, unitPrice: 1500 }]);
     setDiagnosisReport('');
     setConservationState('');
     setIdentifiedDamages('');
@@ -460,7 +460,7 @@ export function RestorationWorkflowDialog({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => setQuoteItems([...quoteItems, { description: '', quantity: 1, unitPrice: 0 }])}
+                    onClick={() => setQuoteItems([...quoteItems, { description: '', quantity: 1, unitPrice: DAILY_RATE }])}
                   >
                     + Ajouter une ligne
                   </Button>
@@ -521,17 +521,12 @@ export function RestorationWorkflowDialog({
                         <div>
                           <Label className="text-xs">Prix unitaire (DH)</Label>
                           <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={item.unitPrice}
-                            onChange={(e) => {
-                              const newItems = [...quoteItems];
-                              newItems[index].unitPrice = parseFloat(e.target.value) || 0;
-                              setQuoteItems(newItems);
-                            }}
-                            className="mt-1"
+                            type="text"
+                            value={DAILY_RATE.toFixed(2)}
+                            readOnly
+                            className="mt-1 bg-muted"
                           />
+                          <p className="text-xs text-muted-foreground mt-1">Taux fixe</p>
                         </div>
                         
                         <div>
