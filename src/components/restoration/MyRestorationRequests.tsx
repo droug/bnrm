@@ -265,32 +265,39 @@ export function MyRestorationRequests() {
                       )}
 
                       {/* Actions pour devis en attente */}
-                      {request.status === 'devis_en_attente' && request.quote_amount && (
+                      {request.status === 'devis_en_attente' && (
                         <div className="space-y-2 pt-2 border-t">
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm" 
-                              className="flex-1"
-                              onClick={() => acceptQuote.mutate(request.id)}
-                              disabled={acceptQuote.isPending}
-                            >
-                              <Check className="h-4 w-4 mr-1" />
-                              Accepter le devis
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="destructive"
-                              className="flex-1"
-                              onClick={() => {
-                                setSelectedRequestId(request.id);
-                                setShowRejectionDialog(true);
-                              }}
-                              disabled={rejectQuote.isPending}
-                            >
-                              <X className="h-4 w-4 mr-1" />
-                              Refuser
-                            </Button>
-                          </div>
+                          {request.quote_amount ? (
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                className="flex-1"
+                                onClick={() => acceptQuote.mutate(request.id)}
+                                disabled={acceptQuote.isPending}
+                              >
+                                <Check className="h-4 w-4 mr-1" />
+                                Accepter le devis
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                className="flex-1"
+                                onClick={() => {
+                                  setSelectedRequestId(request.id);
+                                  setShowRejectionDialog(true);
+                                }}
+                                disabled={rejectQuote.isPending}
+                              >
+                                <X className="h-4 w-4 mr-1" />
+                                Refuser
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="text-sm text-muted-foreground bg-muted p-3 rounded">
+                              <Clock className="h-4 w-4 inline mr-2" />
+                              Le devis est en cours de préparation. Vous recevrez une notification dès qu'il sera disponible.
+                            </div>
+                          )}
                         </div>
                       )}
 
