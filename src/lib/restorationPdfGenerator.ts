@@ -510,7 +510,7 @@ export const generateInvoice = async (request: RequestData): Promise<void> => {
 
 export const generateRestitutionReport = async (request: RequestData): Promise<void> => {
   const doc = new jsPDF();
-  await addHeader(doc, "RAPPORT DE RESTITUTION");
+  await addHeader(doc, "RAPPORT DE RESTAURATION");
   
   let y = 70;
   doc.setFontSize(11);
