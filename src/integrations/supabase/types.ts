@@ -6269,6 +6269,7 @@ export type Database = {
           restoration_started_at: string | null
           return_document_url: string | null
           return_notes: string | null
+          signed_quote_url: string | null
           started_at: string | null
           status: string
           submitted_at: string
@@ -6329,6 +6330,7 @@ export type Database = {
           restoration_started_at?: string | null
           return_document_url?: string | null
           return_notes?: string | null
+          signed_quote_url?: string | null
           started_at?: string | null
           status?: string
           submitted_at?: string
@@ -6389,6 +6391,7 @@ export type Database = {
           restoration_started_at?: string | null
           return_document_url?: string | null
           return_notes?: string | null
+          signed_quote_url?: string | null
           started_at?: string | null
           status?: string
           submitted_at?: string

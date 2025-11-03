@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, XCircle, FileText, ClipboardCheck, DollarSign, Wrench, CheckCheck, Download, RotateCcw } from "lucide-react";
+import { CheckCircle, XCircle, FileText, ClipboardCheck, DollarSign, Wrench, CheckCheck, Download, RotateCcw, Upload } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   generateAuthorizationLetter,
   generateReceptionDocument,
@@ -41,6 +42,8 @@ export function RestorationWorkflowDialog({
   const [estimatedDuration, setEstimatedDuration] = useState('');
   const [requiredMaterials, setRequiredMaterials] = useState('');
   const [urgencyLevel, setUrgencyLevel] = useState('');
+  const [signedQuoteFile, setSignedQuoteFile] = useState<File | null>(null);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [paymentReference, setPaymentReference] = useState('');
   const [restorationReport, setRestorationReport] = useState('');
   const [completionNotes, setCompletionNotes] = useState('');
@@ -108,7 +111,7 @@ export function RestorationWorkflowDialog({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const data: any = {};
 
     switch (actionType) {
@@ -133,7 +136,38 @@ export function RestorationWorkflowDialog({
         data.quoteAmount = quoteAmount;
         break;
       case 'accept_quote':
-        // Pas de données supplémentaires nécessaires
+        // Upload le fichier du devis signé si présent
+        if (signedQuoteFile && request) {
+          setIsUploadingFile(true);
+          try {
+            const fileExt = signedQuoteFile.name.split('.').pop();
+            const fileName = `${request.user_id}/${request.id}/signed-quote-${Date.now()}.${fileExt}`;
+            
+            const { error: uploadError, data: uploadData } = await supabase.storage
+              .from('restoration-documents')
+              .upload(fileName, signedQuoteFile);
+            
+            if (uploadError) throw uploadError;
+            
+            // Obtenir l'URL publique
+            const { data: urlData } = supabase.storage
+              .from('restoration-documents')
+              .getPublicUrl(fileName);
+            
+            data.signedQuoteUrl = urlData.publicUrl;
+          } catch (error) {
+            console.error('Erreur lors de l\'upload:', error);
+            toast({
+              title: "Erreur d'upload",
+              description: "Impossible de télécharger le fichier.",
+              variant: "destructive",
+            });
+            setIsUploadingFile(false);
+            return;
+          } finally {
+            setIsUploadingFile(false);
+          }
+        }
         break;
       case 'reject_quote':
         data.notes = notes;
@@ -170,6 +204,7 @@ export function RestorationWorkflowDialog({
     setPaymentReference('');
     setRestorationReport('');
     setCompletionNotes('');
+    setSignedQuoteFile(null);
   };
 
   const getDialogContent = () => {
@@ -343,9 +378,32 @@ export function RestorationWorkflowDialog({
           title: 'Accepter le devis',
           icon: <CheckCircle className="w-6 h-6 text-green-500" />,
           fields: (
-            <p className="text-sm text-muted-foreground">
-              Confirmer l'acceptation du devis. Le statut passera en attente de paiement.
-            </p>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Confirmer l'acceptation du devis. Le statut passera en attente de paiement.
+              </p>
+              <div>
+                <Label htmlFor="signedQuote">Devis signé (optionnel)</Label>
+                <div className="mt-2">
+                  <Input
+                    id="signedQuote"
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => setSignedQuoteFile(e.target.files?.[0] || null)}
+                    className="cursor-pointer"
+                  />
+                  {signedQuoteFile && (
+                    <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                      <Upload className="w-4 h-4" />
+                      <span>{signedQuoteFile.name}</span>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Formats acceptés: PDF, JPG, PNG (max 10 MB)
+                </p>
+              </div>
+            </div>
           )
         };
       case 'reject_quote':
@@ -489,8 +547,8 @@ export function RestorationWorkflowDialog({
               {isGeneratingDoc ? 'Génération...' : 'Générer document'}
             </Button>
           ) : null}
-          <Button onClick={handleSubmit}>
-            Confirmer
+          <Button onClick={handleSubmit} disabled={isUploadingFile}>
+            {isUploadingFile ? 'Upload en cours...' : 'Confirmer'}
           </Button>
         </DialogFooter>
       </DialogContent>
