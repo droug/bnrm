@@ -470,9 +470,31 @@ export function MyRestorationRequests() {
                                   Uploader le devis signé <span className="text-destructive">*</span>
                                 </Label>
                                 {request.signed_quote_url ? (
-                                  <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded">
-                                    <CheckCircle className="h-4 w-4 text-green-600" />
-                                    <span className="text-sm text-green-800 flex-1">Devis signé reçu</span>
+                                  <div className="space-y-2">
+                                    <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded">
+                                      <CheckCircle className="h-4 w-4 text-green-600" />
+                                      <span className="text-sm text-green-800 flex-1">Devis signé reçu</span>
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => {
+                                          // Réinitialiser pour permettre un nouvel upload
+                                          supabase
+                                            .from('restoration_requests')
+                                            .update({ signed_quote_url: null })
+                                            .eq('id', request.id)
+                                            .then(() => {
+                                              queryClient.invalidateQueries({ queryKey: ['my-restoration-requests', user?.id] });
+                                              toast({
+                                                title: "Document supprimé",
+                                                description: "Vous pouvez maintenant uploader un nouveau document.",
+                                              });
+                                            });
+                                        }}
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </Button>
+                                    </div>
                                   </div>
                                 ) : (
                                   <div className="flex gap-2">
