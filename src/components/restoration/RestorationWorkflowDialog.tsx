@@ -15,6 +15,8 @@ import {
   generateCompletionReport,
   generateInvoice,
   generateRestitutionReport,
+  generateDischargeDocument,
+  generateDeliveryNote,
 } from "@/lib/restorationPdfGenerator";
 
 interface RestorationWorkflowDialogProps {
@@ -58,7 +60,7 @@ export function RestorationWorkflowDialog({
   const [actualCost, setActualCost] = useState('');
   const [completionNotes, setCompletionNotes] = useState('');
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
-  const [generatingDocType, setGeneratingDocType] = useState<'diagnosis' | 'quote' | 'invoice' | 'restoration_report' | null>(null);
+  const [generatingDocType, setGeneratingDocType] = useState<'diagnosis' | 'quote' | 'invoice' | 'restoration_report' | 'discharge' | 'delivery' | null>(null);
 
   // Pré-remplir l'état initial du manuscrit avec les données du diagnostic
   useEffect(() => {
@@ -73,7 +75,7 @@ export function RestorationWorkflowDialog({
     }
   }, [open, actionType, request]);
 
-  const handleGenerateDocument = async (docType?: 'diagnosis' | 'quote' | 'invoice' | 'restoration_report') => {
+  const handleGenerateDocument = async (docType?: 'diagnosis' | 'quote' | 'invoice' | 'restoration_report' | 'discharge' | 'delivery') => {
     if (!request) return;
     
     setIsGeneratingDoc(true);
@@ -118,8 +120,20 @@ export function RestorationWorkflowDialog({
       } else if (docType === 'restoration_report') {
         await generateRestitutionReport(requestData);
         toast({
-          title: "Rapport de Restitution généré",
+          title: "Rapport de Restauration généré",
           description: "Le rapport a été téléchargé avec succès.",
+        });
+      } else if (docType === 'discharge') {
+        await generateDischargeDocument(requestData);
+        toast({
+          title: "Décharge de restitution générée",
+          description: "Le document a été téléchargé avec succès.",
+        });
+      } else if (docType === 'delivery') {
+        await generateDeliveryNote(requestData);
+        toast({
+          title: "Bon de livraison généré",
+          description: "Le document a été téléchargé avec succès.",
         });
       } else {
         // Logique pour les autres types de documents
@@ -721,6 +735,25 @@ export function RestorationWorkflowDialog({
               >
                 <Download className="w-4 h-4 mr-2" />
                 {generatingDocType === 'restoration_report' ? 'Génération...' : 'Rapport de Restauration'}
+              </Button>
+            </>
+          ) : actionType === 'return_artwork' ? (
+            <>
+              <Button 
+                variant="secondary" 
+                onClick={() => handleGenerateDocument('discharge')}
+                disabled={isGeneratingDoc}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                {generatingDocType === 'discharge' ? 'Génération...' : 'Décharge de restitution'}
+              </Button>
+              <Button 
+                variant="secondary" 
+                onClick={() => handleGenerateDocument('delivery')}
+                disabled={isGeneratingDoc}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                {generatingDocType === 'delivery' ? 'Génération...' : 'Bon de livraison'}
               </Button>
             </>
           ) : ['director_approve', 'receive_artwork', 'send_quote'].includes(actionType) ? (

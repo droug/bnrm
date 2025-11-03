@@ -698,3 +698,224 @@ export const generateRestitutionReport = async (request: RequestData): Promise<v
   addFooter(doc);
   doc.save(`rapport_restauration_${request.request_number}.pdf`);
 };
+
+export const generateDischargeDocument = async (request: RequestData): Promise<void> => {
+  const doc = new jsPDF();
+  await addHeader(doc, "DÉCHARGE DE RESTITUTION");
+  
+  let y = 70;
+  doc.setFontSize(11);
+  doc.setTextColor(0);
+  
+  // Introduction
+  doc.setFont('helvetica', 'normal');
+  const introText = 'Je soussigné(e), certifie avoir reçu en bon état le manuscrit suivant après restauration par la Bibliothèque Nationale du Royaume du Maroc :';
+  const introLines = doc.splitTextToSize(introText, 170);
+  doc.text(introLines, 20, y);
+  y += 7 * introLines.length + 15;
+  
+  // Informations sur le manuscrit
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('IDENTIFICATION DU MANUSCRIT', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  const manuscriptInfo = [
+    ['N° de demande', request.request_number],
+    ['Titre', '[Texte arabe - voir demande originale]'],
+    ['Cote', request.manuscript_cote],
+    ['Date de restitution', new Date().toLocaleDateString('fr-FR')]
+  ];
+  
+  manuscriptInfo.forEach(([label, value]) => {
+    doc.setFont('helvetica', 'bold');
+    doc.text(label + ':', 20, y);
+    doc.setFont('helvetica', 'normal');
+    const valueLines = doc.splitTextToSize(value, 130);
+    doc.text(valueLines, 80, y);
+    y += 7 * valueLines.length;
+  });
+  
+  y += 15;
+  
+  // Informations du bénéficiaire
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('BÉNÉFICIAIRE', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  if (request.profiles) {
+    doc.text(`Nom complet: ${request.profiles.first_name} ${request.profiles.last_name}`, 20, y);
+    y += 10;
+  } else {
+    doc.text('Nom complet: ________________________________', 20, y);
+    y += 10;
+  }
+  
+  doc.text('Numéro de pièce d\'identité: ________________________________', 20, y);
+  y += 10;
+  doc.text('Téléphone: ________________________________', 20, y);
+  y += 15;
+  
+  // État du manuscrit
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('ÉTAT DU MANUSCRIT À LA RESTITUTION', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  if (request.final_condition) {
+    const finalLines = doc.splitTextToSize(request.final_condition, 170);
+    doc.text(finalLines, 20, y);
+    y += 7 * finalLines.length + 10;
+  } else {
+    doc.text('Bon état - Travaux de restauration conformes', 20, y);
+    y += 15;
+  }
+  
+  // Déclaration
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('DÉCLARATION', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  const declarationText = 'Je déclare avoir pris connaissance de l\'état du manuscrit et n\'avoir aucune réclamation à formuler concernant les travaux de restauration effectués. Je m\'engage à conserver le manuscrit dans les meilleures conditions.';
+  const declarationLines = doc.splitTextToSize(declarationText, 170);
+  doc.text(declarationLines, 20, y);
+  y += 7 * declarationLines.length + 20;
+  
+  // Signatures
+  doc.text(`Fait à Rabat, le ${new Date().toLocaleDateString('fr-FR')}`, 20, y);
+  y += 20;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Le Bénéficiaire', 20, y);
+  doc.text('Le Responsable BNRM', 120, y);
+  y += 5;
+  
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text('(Signature et date)', 20, y);
+  doc.text('(Signature et cachet)', 120, y);
+  
+  addFooter(doc);
+  doc.save(`decharge_restitution_${request.request_number}.pdf`);
+};
+
+export const generateDeliveryNote = async (request: RequestData): Promise<void> => {
+  const doc = new jsPDF();
+  await addHeader(doc, "BON DE LIVRAISON");
+  
+  let y = 70;
+  doc.setFontSize(11);
+  doc.setTextColor(0);
+  
+  // Informations principales
+  doc.setFont('helvetica', 'bold');
+  doc.text('Bon N°:', 20, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`BL-${request.request_number}`, 80, y);
+  y += 7;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Date de livraison:', 20, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(new Date().toLocaleDateString('fr-FR'), 80, y);
+  y += 7;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('N° de demande:', 20, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(request.request_number, 80, y);
+  y += 15;
+  
+  // Destinataire
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('DESTINATAIRE', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  if (request.profiles) {
+    doc.text(`Nom: ${request.profiles.first_name} ${request.profiles.last_name}`, 20, y);
+    y += 7;
+  }
+  y += 10;
+  
+  // Détails de la livraison
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('DÉTAILS DE LA LIVRAISON', 20, y);
+  y += 10;
+  
+  // En-tête du tableau
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setDrawColor(200);
+  doc.line(20, y, 190, y);
+  y += 5;
+  
+  doc.text('Description', 20, y);
+  doc.text('Cote', 120, y);
+  doc.text('Quantité', 170, y);
+  y += 5;
+  doc.line(20, y, 190, y);
+  y += 7;
+  
+  // Ligne de détail
+  doc.setFont('helvetica', 'normal');
+  const description = 'Manuscrit restauré';
+  doc.text(description, 20, y);
+  doc.text(request.manuscript_cote, 120, y);
+  doc.text('1', 170, y);
+  y += 7;
+  
+  doc.line(20, y, 190, y);
+  y += 15;
+  
+  // Observations
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('OBSERVATIONS', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  const observationText = 'Le manuscrit a été restauré conformément aux normes professionnelles et est prêt pour sa restitution définitive.';
+  const observationLines = doc.splitTextToSize(observationText, 170);
+  doc.text(observationLines, 20, y);
+  y += 7 * observationLines.length;
+  
+  if (request.recommendations) {
+    y += 7;
+    const recoLines = doc.splitTextToSize(request.recommendations, 170);
+    doc.text(recoLines, 20, y);
+    y += 7 * recoLines.length;
+  }
+  
+  y += 20;
+  
+  // Signatures
+  doc.text(`Fait à Rabat, le ${new Date().toLocaleDateString('fr-FR')}`, 20, y);
+  y += 20;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Livré par:', 20, y);
+  doc.text('Reçu par:', 120, y);
+  y += 5;
+  
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text('(Nom et signature)', 20, y);
+  doc.text('(Nom et signature)', 120, y);
+  
+  addFooter(doc);
+  doc.save(`bon_livraison_${request.request_number}.pdf`);
+};
