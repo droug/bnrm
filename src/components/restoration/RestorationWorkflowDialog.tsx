@@ -12,7 +12,7 @@ import {
   generateReceptionDocument,
   generateDiagnosisReport,
   generateQuoteDocument,
-  generateCompletionCertificate,
+  generateCompletionReport,
   generateInvoice,
 } from "@/lib/restorationPdfGenerator";
 
@@ -95,7 +95,7 @@ export function RestorationWorkflowDialog({
             await generateReceptionDocument(requestData);
             break;
           case 'complete_restoration':
-            await generateCompletionCertificate(requestData);
+            await generateCompletionReport(requestData);
             break;
           default:
             return;
@@ -569,7 +569,16 @@ export function RestorationWorkflowDialog({
               <Download className="w-4 h-4 mr-2" />
               {generatingDocType === 'invoice' ? 'Génération...' : 'Générer Facture'}
             </Button>
-          ) : ['director_approve', 'receive_artwork', 'send_quote', 'complete_restoration'].includes(actionType) ? (
+          ) : actionType === 'complete_restoration' ? (
+            <Button 
+              variant="secondary" 
+              onClick={() => handleGenerateDocument()}
+              disabled={isGeneratingDoc}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              {isGeneratingDoc ? 'Génération...' : 'Bon de Réalisation'}
+            </Button>
+          ) : ['director_approve', 'receive_artwork', 'send_quote'].includes(actionType) ? (
             <Button 
               variant="secondary" 
               onClick={() => handleGenerateDocument()}

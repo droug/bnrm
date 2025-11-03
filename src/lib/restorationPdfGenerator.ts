@@ -249,54 +249,105 @@ export const generateQuoteDocument = async (request: RequestData): Promise<void>
   doc.save(`devis_${request.request_number}.pdf`);
 };
 
-export const generateCompletionCertificate = async (request: RequestData): Promise<void> => {
+export const generateCompletionReport = async (request: RequestData): Promise<void> => {
   const doc = new jsPDF();
-  await addHeader(doc, "CERTIFICAT D'ACHEVEMENT DE RESTAURATION");
+  await addHeader(doc, "BON DE RÉALISATION");
   
   let y = 70;
   doc.setFontSize(11);
   doc.setTextColor(0);
   
-  const introText = 'La BNRM certifie que les travaux de restauration du manuscrit suivant ont ete menes a bien:';
-  const introLines = doc.splitTextToSize(introText, 170);
-  doc.text(introLines, 20, y);
-  y += 7 * introLines.length + 10;
+  doc.text(`N° de demande: ${request.request_number}`, 20, y);
+  y += 7;
+  doc.text(`Date de réalisation: ${new Date().toLocaleDateString('fr-FR')}`, 20, y);
+  y += 15;
   
-  const tableData = [
-    ['N° de demande', request.request_number],
+  // Informations sur le manuscrit
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('INFORMATIONS SUR LE MANUSCRIT', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  const manuscriptInfo = [
     ['Titre', '[Texte arabe - voir demande originale]'],
     ['Cote', request.manuscript_cote],
-    ['Date de debut', new Date(request.submitted_at).toLocaleDateString('fr-FR')],
-    ['Date d\'achevement', new Date().toLocaleDateString('fr-FR')],
-    ['Montant total', request.quote_amount ? `${request.quote_amount.toLocaleString('fr-FR')} DH` : 'N/A']
+    ['Date de début des travaux', new Date(request.submitted_at).toLocaleDateString('fr-FR')],
+    ['Date de fin des travaux', new Date().toLocaleDateString('fr-FR')]
   ];
   
-  tableData.forEach(([label, value]) => {
+  manuscriptInfo.forEach(([label, value]) => {
     doc.setFont('helvetica', 'bold');
     doc.text(label + ':', 20, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(value, 70, y);
-    y += 7;
+    const valueLines = doc.splitTextToSize(value, 130);
+    doc.text(valueLines, 70, y);
+    y += 7 * valueLines.length;
   });
   
+  y += 10;
+  
+  // Travaux réalisés
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('TRAVAUX RÉALISÉS', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
   if (request.restoration_report) {
-    y += 10;
-    doc.setFont('helvetica', 'bold');
-    doc.text('Rapport final:', 20, y);
-    y += 7;
-    doc.setFont('helvetica', 'normal');
     const reportLines = doc.splitTextToSize(request.restoration_report, 170);
     doc.text(reportLines, 20, y);
-    y += 7 * reportLines.length;
+    y += 7 * reportLines.length + 10;
+  } else {
+    doc.text('[Description des travaux de restauration effectués]', 20, y);
+    y += 15;
   }
   
-  y += 20;
-  doc.text(`Fait a Rabat, le ${new Date().toLocaleDateString('fr-FR')}`, 20, y);
+  // Informations financières
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('INFORMATIONS FINANCIÈRES', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Montant total:', 20, y);
+  doc.text(`${request.quote_amount ? request.quote_amount.toLocaleString('fr-FR') + ' DH' : 'N/A'}`, 70, y);
+  y += 7;
+  
+  if (request.payment_reference) {
+    doc.text('Référence paiement:', 20, y);
+    doc.text(request.payment_reference, 70, y);
+    y += 7;
+  }
+  
   y += 15;
-  doc.text('Le Directeur de la BNRM', 140, y);
+  
+  // Certification
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('CERTIFICATION', 20, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  const certificationText = 'Nous certifions que les travaux de restauration mentionnés ci-dessus ont été réalisés conformément aux normes professionnelles en vigueur et que le manuscrit est prêt à être restitué.';
+  const certLines = doc.splitTextToSize(certificationText, 170);
+  doc.text(certLines, 20, y);
+  y += 7 * certLines.length + 20;
+  
+  // Signatures
+  doc.text(`Fait à Rabat, le ${new Date().toLocaleDateString('fr-FR')}`, 20, y);
+  y += 20;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Le Responsable de Restauration', 20, y);
+  doc.text('Le Directeur de la BNRM', 120, y);
   
   addFooter(doc);
-  doc.save(`achevement_${request.request_number}.pdf`);
+  doc.save(`bon_realisation_${request.request_number}.pdf`);
 };
 
 export const generateInvoice = async (request: RequestData): Promise<void> => {
