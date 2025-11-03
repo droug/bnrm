@@ -202,6 +202,25 @@ export default function RestorationRequest() {
 
       if (error) throw error;
 
+      // Envoyer la notification par email
+      if (data) {
+        try {
+          await supabase.functions.invoke('send-restoration-notification', {
+            body: {
+              requestId: data.id,
+              recipientEmail: user.email,
+              recipientId: user.id,
+              notificationType: 'request_received',
+              requestNumber: data.request_number,
+              manuscriptTitle: formData.documentType
+            }
+          });
+        } catch (emailError) {
+          console.error('Erreur notification email:', emailError);
+          // Ne pas bloquer même si l'email échoue
+        }
+      }
+
       toast({
         title: "Demande envoyée",
         description: "Votre demande de restauration a été envoyée avec succès. Nous vous contacterons bientôt.",
