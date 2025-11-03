@@ -9,6 +9,7 @@ import { Bell, CheckCircle, Clock, AlertCircle, Package, DollarSign, Wrench, Fil
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 interface Notification {
   id: string;
@@ -51,6 +52,42 @@ export function RestorationNotifications() {
     },
     enabled: !!user
   });
+
+  // Subscribe to real-time updates
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('restoration-notifications-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'restoration_notifications',
+          filter: `recipient_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Notification change detected:', payload);
+          // Refresh notifications when any change occurs
+          queryClient.invalidateQueries({ queryKey: ['restoration-notifications', user.id] });
+          
+          // Show toast for new notifications
+          if (payload.eventType === 'INSERT') {
+            const newNotification = payload.new as Notification;
+            toast({
+              title: "Nouvelle notification",
+              description: newNotification.title,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, queryClient, toast]);
 
   const markAsReadMutation = useMutation({
     mutationFn: async (notificationId: string) => {
