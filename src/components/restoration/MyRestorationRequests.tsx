@@ -141,7 +141,7 @@ export function MyRestorationRequests() {
   // Mutation pour accepter le devis (sans paiement à cette étape)
   const acceptQuote = useMutation({
     mutationFn: async (request: RestorationRequest) => {
-      // Mettre à jour le statut vers devis_accepte (la restauration démarrera automatiquement)
+      // Mettre à jour le statut vers devis_accepte (l'admin devra démarrer la restauration manuellement)
       const { error } = await supabase
         .from('restoration_requests')
         .update({

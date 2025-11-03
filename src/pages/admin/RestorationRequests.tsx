@@ -328,7 +328,7 @@ export default function RestorationRequests() {
           notificationData.paymentLink = data.paymentLink || '';
           break;
         case 'start_restoration':
-          // Cette action n'est plus utilisée, la restauration démarre automatiquement après acceptation du devis
+          // L'admin démarre manuellement la restauration après acceptation du devis
           updateData.status = 'restauration_en_cours';
           updateData.restoration_started_at = new Date().toISOString();
           notificationData.estimatedDuration = selectedRequest.estimated_duration;
