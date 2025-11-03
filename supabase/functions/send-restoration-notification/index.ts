@@ -278,7 +278,7 @@ const handler = async (req: Request): Promise<Response> => {
       try {
         const resend = new Resend(resendApiKey);
         const emailResult = await resend.emails.send({
-          from: "BNRM Restauration <noreply@resend.dev>",
+          from: "BNRM Restauration <onboarding@resend.dev>",
           to: [notification.recipientEmail],
           subject: emailContent.subject,
           html: emailContent.html,
