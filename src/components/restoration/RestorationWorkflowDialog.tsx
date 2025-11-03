@@ -62,6 +62,17 @@ export function RestorationWorkflowDialog({
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
   const [generatingDocType, setGeneratingDocType] = useState<'diagnosis' | 'quote' | 'invoice' | 'restoration_report' | 'discharge' | 'delivery' | null>(null);
 
+  // Taux journalier paramétrable (1 J/H = 1500 DH)
+  const DAILY_RATE = 1500;
+
+  // Calcul automatique du coût en fonction de la durée
+  useEffect(() => {
+    if (estimatedDuration && !isNaN(parseFloat(estimatedDuration))) {
+      const calculatedCost = parseFloat(estimatedDuration) * DAILY_RATE;
+      setEstimatedCost(calculatedCost.toFixed(2));
+    }
+  }, [estimatedDuration]);
+
   // Pré-remplir les dommages identifiés avec les données du diagnostic
   useEffect(() => {
     if (open && actionType === 'complete_restoration' && request) {
@@ -389,22 +400,27 @@ export function RestorationWorkflowDialog({
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
+                  <Label>Durée estimée (J/H)</Label>
+                  <Input 
+                    type="number"
+                    step="0.5"
+                    value={estimatedDuration}
+                    onChange={(e) => setEstimatedDuration(e.target.value)}
+                    placeholder="3"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">1 J/H = {DAILY_RATE} DH</p>
+                </div>
+                <div>
                   <Label>Coût estimé (DH)</Label>
                   <Input 
                     type="number"
                     value={estimatedCost}
                     onChange={(e) => setEstimatedCost(e.target.value)}
-                    placeholder="5000"
+                    placeholder="4500"
+                    readOnly
+                    className="bg-muted"
                   />
-                </div>
-                <div>
-                  <Label>Durée estimée (jours)</Label>
-                  <Input 
-                    type="number"
-                    value={estimatedDuration}
-                    onChange={(e) => setEstimatedDuration(e.target.value)}
-                    placeholder="30"
-                  />
+                  <p className="text-xs text-muted-foreground mt-1">Calculé automatiquement</p>
                 </div>
               </div>
               
