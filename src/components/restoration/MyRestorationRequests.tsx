@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { AlertCircle, CheckCircle, Clock, DollarSign, FileText, Package, Wrench 
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useEffect } from "react";
 
 interface RestorationRequest {
   id: string;
@@ -26,6 +27,7 @@ interface RestorationRequest {
 
 export function MyRestorationRequests() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: requests, isLoading } = useQuery({
     queryKey: ['my-restoration-requests', user?.id],
@@ -43,6 +45,33 @@ export function MyRestorationRequests() {
     },
     enabled: !!user
   });
+
+  // Subscribe to real-time updates for restoration requests
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('my-restoration-requests-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'restoration_requests',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Restoration request change detected:', payload);
+          // Refresh requests when any change occurs
+          queryClient.invalidateQueries({ queryKey: ['my-restoration-requests', user.id] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, queryClient]);
 
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: React.ReactNode }> = {
