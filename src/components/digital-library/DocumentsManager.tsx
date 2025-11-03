@@ -23,6 +23,9 @@ import * as XLSX from 'xlsx';
 import documentPreview1 from "@/assets/document-preview-1.jpg";
 import documentPreview2 from "@/assets/document-preview-2.jpg";
 import documentPreview3 from "@/assets/document-preview-3.jpg";
+import documentPreview1Page2 from "@/assets/document-preview-1-page2.jpg";
+import documentPreview2Page2 from "@/assets/document-preview-2-page2.jpg";
+import documentPreview3Page2 from "@/assets/document-preview-3-page2.jpg";
 
 const documentSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
@@ -52,14 +55,17 @@ export default function DocumentsManager() {
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("documents");
   const [showCompareDialog, setShowCompareDialog] = useState(false);
-  const [compareDocs, setCompareDocs] = useState<{ existing: any; imported: any; previewImage?: string } | null>(null);
+  const [compareDocs, setCompareDocs] = useState<{ existing: any; imported: any; previewImage?: string; pages?: string[] } | null>(null);
   const [keepSelection, setKeepSelection] = useState<"existing" | "imported" | "both">("both");
+  const [currentPageExisting, setCurrentPageExisting] = useState(0);
+  const [currentPageImported, setCurrentPageImported] = useState(0);
 
   // Exemple de doublons détectés
   const sampleDuplicates = [
     {
       id: 1,
       previewImage: documentPreview1,
+      pages: [documentPreview1, documentPreview1Page2],
       existing: {
         id: "DOC-001",
         title: "Introduction à la philosophie",
@@ -88,6 +94,7 @@ export default function DocumentsManager() {
     {
       id: 2,
       previewImage: documentPreview2,
+      pages: [documentPreview2, documentPreview2Page2],
       existing: {
         id: "DOC-042",
         title: "Revue scientifique - Vol. 12",
@@ -116,6 +123,7 @@ export default function DocumentsManager() {
     {
       id: 3,
       previewImage: documentPreview3,
+      pages: [documentPreview3, documentPreview3Page2],
       existing: {
         id: "DOC-089",
         title: "Partition musicale - Symphonie n°5",
@@ -146,6 +154,8 @@ export default function DocumentsManager() {
   const handleCompare = (duplicate: any) => {
     setCompareDocs(duplicate);
     setKeepSelection("both");
+    setCurrentPageExisting(0);
+    setCurrentPageImported(0);
     setShowCompareDialog(true);
   };
 
@@ -1372,16 +1382,36 @@ export default function DocumentsManager() {
                           Visualiser le document
                         </Button>
                         
-                        {/* Aperçu visuel du document */}
+                        {/* Aperçu visuel du document avec pagination */}
                         <div className="border rounded-lg overflow-hidden bg-muted/30">
                           <img 
-                            src={compareDocs.previewImage} 
+                            src={compareDocs.pages?.[currentPageExisting] || compareDocs.previewImage} 
                             alt={`Aperçu - ${compareDocs.existing.title}`}
                             className="w-full h-48 object-cover"
                           />
-                          <div className="p-2 text-center">
-                            <p className="text-xs text-muted-foreground">Document existant</p>
-                            <p className="text-xs font-mono mt-1">{compareDocs.existing.id}</p>
+                          <div className="p-2">
+                            <div className="flex items-center justify-between">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setCurrentPageExisting(Math.max(0, currentPageExisting - 1))}
+                                disabled={currentPageExisting === 0}
+                              >
+                                ← Précédent
+                              </Button>
+                              <div className="text-center">
+                                <p className="text-xs text-muted-foreground">Page {currentPageExisting + 1} / {compareDocs.pages?.length || 1}</p>
+                                <p className="text-xs font-mono mt-1">{compareDocs.existing.id}</p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setCurrentPageExisting(Math.min((compareDocs.pages?.length || 1) - 1, currentPageExisting + 1))}
+                                disabled={currentPageExisting >= (compareDocs.pages?.length || 1) - 1}
+                              >
+                                Suivant →
+                              </Button>
+                            </div>
                           </div>
                         </div>
                         
@@ -1449,16 +1479,36 @@ export default function DocumentsManager() {
                           Visualiser le document
                         </Button>
                         
-                        {/* Aperçu visuel du document */}
+                        {/* Aperçu visuel du document avec pagination */}
                         <div className="border rounded-lg overflow-hidden bg-muted/30">
                           <img 
-                            src={compareDocs.previewImage} 
+                            src={compareDocs.pages?.[currentPageImported] || compareDocs.previewImage} 
                             alt={`Aperçu - ${compareDocs.imported.title}`}
                             className="w-full h-48 object-cover"
                           />
-                          <div className="p-2 text-center">
-                            <p className="text-xs text-muted-foreground">Document importé</p>
-                            <p className="text-xs font-mono mt-1">{compareDocs.imported.id}</p>
+                          <div className="p-2">
+                            <div className="flex items-center justify-between">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setCurrentPageImported(Math.max(0, currentPageImported - 1))}
+                                disabled={currentPageImported === 0}
+                              >
+                                ← Précédent
+                              </Button>
+                              <div className="text-center">
+                                <p className="text-xs text-muted-foreground">Page {currentPageImported + 1} / {compareDocs.pages?.length || 1}</p>
+                                <p className="text-xs font-mono mt-1">{compareDocs.imported.id}</p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setCurrentPageImported(Math.min((compareDocs.pages?.length || 1) - 1, currentPageImported + 1))}
+                                disabled={currentPageImported >= (compareDocs.pages?.length || 1) - 1}
+                              >
+                                Suivant →
+                              </Button>
+                            </div>
                           </div>
                         </div>
                         
