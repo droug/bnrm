@@ -32,7 +32,12 @@ export function MyRestorationRequests() {
   const { data: requests, isLoading } = useQuery({
     queryKey: ['my-restoration-requests', user?.id],
     queryFn: async () => {
-      if (!user) return [];
+      if (!user) {
+        console.log('[MyRestorationRequests] No user logged in');
+        return [];
+      }
+      
+      console.log('[MyRestorationRequests] Fetching requests for user:', user.id);
       
       const { data, error } = await supabase
         .from('restoration_requests')
@@ -40,7 +45,12 @@ export function MyRestorationRequests() {
         .eq('user_id', user.id)
         .order('submitted_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[MyRestorationRequests] Error fetching requests:', error);
+        throw error;
+      }
+      
+      console.log('[MyRestorationRequests] Fetched requests:', data);
       return data as RestorationRequest[];
     },
     enabled: !!user
