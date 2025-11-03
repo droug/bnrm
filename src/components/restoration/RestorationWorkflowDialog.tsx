@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CheckCircle, XCircle, FileText, ClipboardCheck, DollarSign, Wrench, CheckCheck, Download, RotateCcw, Upload } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -57,9 +57,22 @@ export function RestorationWorkflowDialog({
   const [actualCost, setActualCost] = useState('');
   const [completionNotes, setCompletionNotes] = useState('');
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
-  const [generatingDocType, setGeneratingDocType] = useState<'diagnosis' | 'quote' | 'invoice' | null>(null);
+  const [generatingDocType, setGeneratingDocType] = useState<'diagnosis' | 'quote' | 'invoice' | 'restoration_report' | null>(null);
 
-  const handleGenerateDocument = async (docType?: 'diagnosis' | 'quote' | 'invoice') => {
+  // Pré-remplir l'état initial du manuscrit avec les données du diagnostic
+  useEffect(() => {
+    if (open && actionType === 'complete_restoration' && request) {
+      const initialStateText = [
+        request.conservation_state ? `État de conservation: ${request.conservation_state}` : '',
+        request.identified_damages ? `Dommages identifiés: ${request.identified_damages}` : '',
+        request.diagnosis_report || ''
+      ].filter(Boolean).join('\n\n');
+      
+      setInitialCondition(initialStateText || request.initial_condition || '');
+    }
+  }, [open, actionType, request]);
+
+  const handleGenerateDocument = async (docType?: 'diagnosis' | 'quote' | 'invoice' | 'restoration_report') => {
     if (!request) return;
     
     setIsGeneratingDoc(true);
@@ -100,6 +113,12 @@ export function RestorationWorkflowDialog({
         toast({
           title: "Facture générée",
           description: "La facture a été téléchargée avec succès.",
+        });
+      } else if (docType === 'restoration_report') {
+        await generateCompletionReport(requestData);
+        toast({
+          title: "Rapport de Restauration généré",
+          description: "Le rapport a été téléchargé avec succès.",
         });
       } else {
         // Logique pour les autres types de documents
@@ -685,14 +704,24 @@ export function RestorationWorkflowDialog({
               {generatingDocType === 'invoice' ? 'Génération...' : 'Générer Facture'}
             </Button>
           ) : actionType === 'complete_restoration' ? (
-            <Button 
-              variant="secondary" 
-              onClick={() => handleGenerateDocument()}
-              disabled={isGeneratingDoc}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              {isGeneratingDoc ? 'Génération...' : 'Bon de Réalisation'}
-            </Button>
+            <>
+              <Button 
+                variant="secondary" 
+                onClick={() => handleGenerateDocument()}
+                disabled={isGeneratingDoc}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                {isGeneratingDoc && !generatingDocType ? 'Génération...' : 'Bon de Réalisation'}
+              </Button>
+              <Button 
+                variant="secondary" 
+                onClick={() => handleGenerateDocument('restoration_report')}
+                disabled={isGeneratingDoc}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                {generatingDocType === 'restoration_report' ? 'Génération...' : 'Générer le Rapport de Restauration'}
+              </Button>
+            </>
           ) : ['director_approve', 'receive_artwork', 'send_quote'].includes(actionType) ? (
             <Button 
               variant="secondary" 
