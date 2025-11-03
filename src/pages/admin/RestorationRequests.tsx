@@ -472,10 +472,10 @@ export default function RestorationRequests() {
         );
       case 'devis_accepte':
         return (
-          <div className="text-sm text-muted-foreground italic flex items-center gap-2">
-            <Wrench className="w-4 h-4" />
-            Restauration démarrée automatiquement
-          </div>
+          <Button size="sm" onClick={() => handleWorkflowAction(request, 'start_restoration')}>
+            <Wrench className="w-4 h-4 mr-1" />
+            Restauration
+          </Button>
         );
       case 'paiement_en_attente':
         return (
