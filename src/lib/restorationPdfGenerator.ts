@@ -696,5 +696,5 @@ export const generateRestitutionReport = async (request: RequestData): Promise<v
   doc.text('(signature)', 120, y);
   
   addFooter(doc);
-  doc.save(`rapport_restitution_${request.request_number}.pdf`);
+  doc.save(`rapport_restauration_${request.request_number}.pdf`);
 };
