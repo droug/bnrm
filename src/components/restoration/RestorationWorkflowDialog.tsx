@@ -91,7 +91,8 @@ export function RestorationWorkflowDialog({
       const requestData = {
         ...request,
         diagnosis_report: diagnosisReport || request.diagnosis_report,
-        quote_amount: quoteAmount ? parseFloat(quoteAmount) : request.quote_amount,
+        quote_amount: quoteAmount ? parseFloat(quoteAmount) : (quoteItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)),
+        quote_items: quoteItems,
         restoration_report: restorationReport || request.restoration_report,
         estimated_cost: estimatedCost ? parseFloat(estimatedCost) : request.estimated_cost,
         estimated_duration: estimatedDuration ? parseFloat(estimatedDuration) : request.estimated_duration,
@@ -551,6 +552,18 @@ export function RestorationWorkflowDialog({
                     {totalQuote.toFixed(2)} DH
                   </span>
                 </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleGenerateDocument('quote')}
+                  disabled={isGeneratingDoc && generatingDocType === 'quote'}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  {isGeneratingDoc && generatingDocType === 'quote' ? 'Génération...' : 'Générer le devis PDF'}
+                </Button>
               </div>
             </div>
           )
