@@ -645,7 +645,7 @@ export function MyRestorationRequests() {
                           {/* Sélection de la méthode de paiement */}
                           {!selectedPaymentMethod[request.id] ? (
                             <div className="space-y-2">
-                              <p className="text-sm font-medium text-gray-700">Choisissez votre méthode de paiement :</p>
+                              <p className="text-sm font-medium text-gray-700">Choisissez votre modalité de paiement :</p>
                               <div className="grid grid-cols-1 gap-2">
                                 <Button
                                   variant="outline"
