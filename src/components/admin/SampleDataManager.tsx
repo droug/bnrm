@@ -158,11 +158,10 @@ export function SampleDataManager() {
             Ajouter ou supprimer des données de test pour le système
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex gap-3">
+        <CardContent className="grid grid-cols-2 gap-3">
           <Button
             onClick={handleAddSampleData}
             disabled={isAdding}
-            className="flex-1"
           >
             <Plus className="w-4 h-4 mr-2" />
             {isAdding ? "Ajout en cours..." : "Ajouter données d'exemple"}
@@ -171,7 +170,6 @@ export function SampleDataManager() {
             onClick={() => setShowDeleteConfirm(true)}
             disabled={isDeleting}
             variant="destructive"
-            className="flex-1"
           >
             <Trash2 className="w-4 h-4 mr-2" />
             Supprimer toutes les données
