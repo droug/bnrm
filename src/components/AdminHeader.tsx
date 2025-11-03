@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Bell, Settings } from "lucide-react";
+import { ArrowLeft, Bell, Settings, Home } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import logoImage from "@/assets/logo-bnrm.png";
@@ -75,6 +75,16 @@ export function AdminHeader({
           </div>
           
           {/* Boutons d'action */}
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => navigate('/my-library-space')}
+            className="flex items-center gap-2"
+          >
+            <Home className="h-4 w-4" />
+            <span className="hidden sm:inline">Mon Espace</span>
+          </Button>
+          
           {showNotifications && (
             <Button 
               variant="ghost" 
