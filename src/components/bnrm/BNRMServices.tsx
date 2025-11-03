@@ -108,14 +108,14 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
     // Appliquer le filtre de catégorie si spécifié
     let matchesFilter = true;
     if (filterCategory === "Inscription") {
-      // Abonnements = services avec ID commençant par I
-      matchesFilter = service.id_service.startsWith('I');
+      // Abonnements = services avec catégorie "Inscription"
+      matchesFilter = service.categorie === 'Inscription';
     } else if (filterCategory === "exclude-Inscription") {
-      // Services = tous sauf ceux commençant par I
-      matchesFilter = !service.id_service.startsWith('I');
+      // Services = tous sauf Inscription
+      matchesFilter = service.categorie !== 'Inscription';
     } else if (filterCategory === "exclude-Inscription-Restauration") {
       // Services ponctuels = tous sauf Inscription et Restauration
-      matchesFilter = !service.id_service.startsWith('I') && service.categorie !== 'Restauration';
+      matchesFilter = service.categorie !== 'Inscription' && service.categorie !== 'Restauration';
     } else if (filterCategory === "Restauration") {
       // Uniquement les services de restauration
       matchesFilter = service.categorie === 'Restauration';
