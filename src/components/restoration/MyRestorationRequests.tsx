@@ -238,6 +238,7 @@ export function MyRestorationRequests() {
         // Afficher un message pour les autres méthodes
         const methodLabels: Record<string, string> = {
           'virement': 'Virement bancaire',
+          'virement_en_ligne': 'Virement bancaire en ligne',
           'carte_guichet': 'Carte au guichet',
           'espece': 'Espèce',
           'cheque': 'Chèque'
@@ -668,6 +669,15 @@ export function MyRestorationRequests() {
                                   variant="outline"
                                   size="sm"
                                   className="justify-start"
+                                  onClick={() => setSelectedPaymentMethod(prev => ({ ...prev, [request.id]: 'virement_en_ligne' }))}
+                                >
+                                  <CreditCard className="h-4 w-4 mr-2" />
+                                  Virement bancaire en ligne
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="justify-start"
                                   onClick={() => setSelectedPaymentMethod(prev => ({ ...prev, [request.id]: 'carte_guichet' }))}
                                 >
                                   <CreditCard className="h-4 w-4 mr-2" />
@@ -700,6 +710,7 @@ export function MyRestorationRequests() {
                                   Méthode sélectionnée : <span className="font-semibold">
                                     {selectedPaymentMethod[request.id] === 'en_ligne' && 'Paiement en ligne'}
                                     {selectedPaymentMethod[request.id] === 'virement' && 'Virement bancaire'}
+                                    {selectedPaymentMethod[request.id] === 'virement_en_ligne' && 'Virement bancaire en ligne'}
                                     {selectedPaymentMethod[request.id] === 'carte_guichet' && 'Carte au guichet'}
                                     {selectedPaymentMethod[request.id] === 'espece' && 'Espèce'}
                                     {selectedPaymentMethod[request.id] === 'cheque' && 'Chèque'}
