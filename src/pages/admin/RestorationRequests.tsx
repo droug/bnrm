@@ -284,6 +284,13 @@ export default function RestorationRequests() {
         case 'complete_diagnosis':
           updateData.status = 'devis_en_attente';
           updateData.diagnosis_report = data.diagnosisReport;
+          updateData.conservation_state = data.conservationState;
+          updateData.identified_damages = data.identifiedDamages;
+          updateData.recommended_works = data.recommendedWorks;
+          updateData.estimated_cost = data.estimatedCost ? parseFloat(data.estimatedCost) : null;
+          updateData.estimated_duration = data.estimatedDuration ? parseInt(data.estimatedDuration) : null;
+          updateData.required_materials = data.requiredMaterials;
+          updateData.urgency_level = data.urgencyLevel;
           updateData.diagnosis_completed_at = new Date().toISOString();
           break;
         case 'send_quote':
@@ -317,6 +324,14 @@ export default function RestorationRequests() {
         case 'complete_restoration':
           updateData.status = 'terminee';
           updateData.restoration_report = data.restorationReport;
+          updateData.initial_condition = data.initialCondition;
+          updateData.works_performed = data.worksPerformed;
+          updateData.materials_used = data.materialsUsed;
+          updateData.techniques_applied = data.techniquesApplied;
+          updateData.final_condition = data.finalCondition;
+          updateData.recommendations = data.recommendations;
+          updateData.actual_duration = data.actualDuration ? parseInt(data.actualDuration) : null;
+          updateData.actual_cost = data.actualCost ? parseFloat(data.actualCost) : null;
           updateData.completed_at = new Date().toISOString();
           updateData.restoration_completed_by = (await supabase.auth.getUser()).data.user?.id;
           break;
