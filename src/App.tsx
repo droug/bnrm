@@ -114,6 +114,7 @@ const ReproductionBackofficePage = lazy(() => import("./pages/ReproductionBackof
 const ReproductionDetailsPage = lazy(() => import("./pages/ReproductionDetailsPage"));
 const RestorationRequest = lazy(() => import("./pages/RestorationRequest"));
 const RestorationRequests = lazy(() => import("./pages/admin/RestorationRequests"));
+const BankTransferInstructions = lazy(() => import("./pages/BankTransferInstructions"));
 const DemandeNumerisation = lazy(() => import("./pages/DemandeNumerisation"));
 
 // CBM Portal (lazy)
@@ -399,6 +400,7 @@ const App = () => {
 
         {/* Restoration Requests Management */}
         <Route path="/admin/restoration-requests" element={<RestorationRequests />} />
+        <Route path="/bank-transfer-instructions" element={<BankTransferInstructions />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

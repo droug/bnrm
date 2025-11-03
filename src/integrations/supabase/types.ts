@@ -6256,6 +6256,7 @@ export type Database = {
           materials_used: string | null
           payment_amount: number | null
           payment_date: string | null
+          payment_method: string | null
           payment_reference: string | null
           payment_validated_by: string | null
           quote_accepted_at: string | null
@@ -6329,6 +6330,7 @@ export type Database = {
           materials_used?: string | null
           payment_amount?: number | null
           payment_date?: string | null
+          payment_method?: string | null
           payment_reference?: string | null
           payment_validated_by?: string | null
           quote_accepted_at?: string | null
@@ -6402,6 +6404,7 @@ export type Database = {
           materials_used?: string | null
           payment_amount?: number | null
           payment_date?: string | null
+          payment_method?: string | null
           payment_reference?: string | null
           payment_validated_by?: string | null
           quote_accepted_at?: string | null

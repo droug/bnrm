@@ -211,6 +211,19 @@ export function MyRestorationRequests() {
         }
 
         return { paymentUrl: paymentData?.url, paymentMethod };
+      } else if (paymentMethod === 'virement_en_ligne') {
+        // Rediriger vers la page d'instructions de virement bancaire
+        const { error } = await supabase
+          .from('restoration_requests')
+          .update({
+            payment_method: paymentMethod,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', request.id);
+
+        if (error) throw error;
+        
+        return { redirectUrl: `/bank-transfer-instructions?requestId=${request.id}&amount=${request.quote_amount}&requestNumber=${request.request_number}`, paymentMethod };
       } else {
         // Pour les autres méthodes, enregistrer la méthode choisie
         const { error } = await supabase
@@ -234,6 +247,9 @@ export function MyRestorationRequests() {
           title: "Lien de paiement généré",
           description: "Le lien de paiement s'ouvre dans un nouvel onglet.",
         });
+      } else if (data?.redirectUrl) {
+        // Rediriger vers la page d'instructions de virement
+        window.location.href = data.redirectUrl;
       } else {
         // Afficher un message pour les autres méthodes
         const methodLabels: Record<string, string> = {
