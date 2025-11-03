@@ -44,6 +44,9 @@ verify_jwt = true
 [functions.send-restoration-notification]
 verify_jwt = false
 
+[functions.create-restoration-payment]
+verify_jwt = true
+
 # Microservices Architecture
 [functions.analytics-service]
 verify_jwt = false

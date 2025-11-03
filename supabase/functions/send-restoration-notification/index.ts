@@ -19,10 +19,11 @@ interface NotificationRequest {
   manuscriptTitle: string;
   quoteAmount?: number;
   additionalInfo?: string;
+  paymentUrl?: string;
 }
 
 const getEmailContent = (notification: NotificationRequest) => {
-  const { notificationType, requestNumber, manuscriptTitle, quoteAmount, additionalInfo } = notification;
+  const { notificationType, requestNumber, manuscriptTitle, quoteAmount, additionalInfo, paymentUrl } = notification;
   
   switch (notificationType) {
     case 'request_received':
@@ -94,18 +95,30 @@ const getEmailContent = (notification: NotificationRequest) => {
     
     case 'quote_accepted':
       return {
-        subject: `Devis accepté - ${requestNumber}`,
+        subject: `Devis accepté - Lien de paiement - ${requestNumber}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #2c5aa0;">Devis accepté - En attente de paiement</h2>
+            <h2 style="color: #2c5aa0;">Devis accepté - Paiement en attente</h2>
             <p>Bonjour,</p>
-            <p>Votre acceptation du devis a bien été enregistrée.</p>
+            <p>Votre acceptation du devis a bien été enregistrée. Vous pouvez maintenant procéder au paiement.</p>
             <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <p><strong>Numéro de demande :</strong> ${requestNumber}</p>
               <p><strong>Manuscrit :</strong> ${manuscriptTitle}</p>
               ${quoteAmount ? `<p><strong>Montant à régler :</strong> ${quoteAmount} DH</p>` : ''}
             </div>
-            <p>Vous recevrez prochainement les informations de paiement.</p>
+            ${paymentUrl ? `
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${paymentUrl}" 
+                 style="background-color: #2c5aa0; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                Procéder au paiement
+              </a>
+            </div>
+            <p style="text-align: center; font-size: 12px; color: #666;">
+              Ou copiez ce lien dans votre navigateur :<br>
+              <a href="${paymentUrl}" style="color: #2c5aa0;">${paymentUrl}</a>
+            </p>
+            ` : '<p>Vous recevrez prochainement les informations de paiement.</p>'}
+            <p>Une fois le paiement effectué, les travaux de restauration pourront commencer.</p>
             <p>Cordialement,<br>L'équipe de restauration - BNRM</p>
           </div>
         `

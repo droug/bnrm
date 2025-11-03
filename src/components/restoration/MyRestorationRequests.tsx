@@ -141,6 +141,27 @@ export function MyRestorationRequests() {
   // Mutation pour accepter le devis
   const acceptQuote = useMutation({
     mutationFn: async (request: RestorationRequest) => {
+      // Générer le lien de paiement Stripe
+      const { data: paymentData, error: paymentError } = await supabase.functions.invoke(
+        'create-restoration-payment',
+        {
+          body: {
+            requestId: request.id,
+            quoteAmount: request.quote_amount,
+            requestNumber: request.request_number,
+            manuscriptTitle: request.manuscript_title
+          }
+        }
+      );
+
+      if (paymentError) {
+        console.error('Erreur création paiement:', paymentError);
+        throw new Error('Impossible de créer le lien de paiement');
+      }
+
+      const paymentUrl = paymentData?.url;
+      
+      // Mettre à jour le statut
       const { error } = await supabase
         .from('restoration_requests')
         .update({
@@ -152,7 +173,7 @@ export function MyRestorationRequests() {
       
       if (error) throw error;
 
-      // Envoyer la notification
+      // Envoyer la notification avec le lien de paiement
       try {
         await supabase.functions.invoke('send-restoration-notification', {
           body: {
@@ -162,19 +183,32 @@ export function MyRestorationRequests() {
             notificationType: 'quote_accepted',
             requestNumber: request.request_number,
             manuscriptTitle: request.manuscript_title,
-            quoteAmount: request.quote_amount
+            quoteAmount: request.quote_amount,
+            paymentUrl: paymentUrl
           }
         });
       } catch (emailError) {
         console.error('Erreur notification email:', emailError);
       }
+
+      return { paymentUrl };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['my-restoration-requests', user?.id] });
-      toast({
-        title: "Devis accepté",
-        description: "Vous recevrez prochainement un lien de paiement par email.",
-      });
+      
+      // Ouvrir le lien de paiement dans un nouvel onglet
+      if (data?.paymentUrl) {
+        window.open(data.paymentUrl, '_blank');
+        toast({
+          title: "Devis accepté",
+          description: "Le lien de paiement s'ouvre dans un nouvel onglet. Vous recevrez également un email avec le lien.",
+        });
+      } else {
+        toast({
+          title: "Devis accepté",
+          description: "Vous recevrez un lien de paiement par email.",
+        });
+      }
     },
     onError: (error) => {
       toast({
