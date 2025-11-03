@@ -684,16 +684,6 @@ export function RestorationWorkflowDialog({
               </div>
               
               <div>
-                <Label>Matériaux utilisés</Label>
-                <Textarea 
-                  value={materialsUsed}
-                  onChange={(e) => setMaterialsUsed(e.target.value)}
-                  placeholder="Liste des matériaux et produits utilisés..."
-                  rows={3}
-                />
-              </div>
-              
-              <div>
                 <Label>Techniques appliquées</Label>
                 <Textarea 
                   value={techniquesApplied}
@@ -721,27 +711,6 @@ export function RestorationWorkflowDialog({
                   placeholder="Recommandations pour la conservation future..."
                   rows={3}
                 />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Durée effective (jours)</Label>
-                  <Input 
-                    type="number"
-                    value={actualDuration}
-                    onChange={(e) => setActualDuration(e.target.value)}
-                    placeholder="30"
-                  />
-                </div>
-                <div>
-                  <Label>Coût réel (DH)</Label>
-                  <Input 
-                    type="number"
-                    value={actualCost}
-                    onChange={(e) => setActualCost(e.target.value)}
-                    placeholder="12000"
-                  />
-                </div>
               </div>
               
               <div>
