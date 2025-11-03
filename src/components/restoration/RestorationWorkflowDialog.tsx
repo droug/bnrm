@@ -418,8 +418,8 @@ export function RestorationWorkflowDialog({
                   <option value="">Sélectionner...</option>
                   <option value="faible">Faible</option>
                   <option value="moyenne">Moyenne</option>
-                  <option value="haute">Haute</option>
-                  <option value="urgente">Urgente</option>
+                  <option value="elevee">Élevée</option>
+                  <option value="critique">Critique</option>
                 </select>
               </div>
             </div>
