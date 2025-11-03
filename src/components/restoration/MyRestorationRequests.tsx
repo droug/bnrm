@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AlertCircle, CheckCircle, Clock, DollarSign, FileText, Package, Wrench, Download, Check, X, Upload, Trash2 } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, DollarSign, FileText, Package, Wrench, Download, Check, X, Upload, Trash2, CreditCard, Building, Coins } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -41,6 +41,7 @@ export function MyRestorationRequests() {
   const [signedQuoteFile, setSignedQuoteFile] = useState<File | null>(null);
   const [isUploadingQuote, setIsUploadingQuote] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<Record<string, string>>({});
 
   const { data: requests, isLoading } = useQuery({
     queryKey: ['my-restoration-requests', user?.id],
@@ -189,41 +190,77 @@ export function MyRestorationRequests() {
 
   // Mutation pour effectuer le paiement (après restauration terminée)
   const processPayment = useMutation({
-    mutationFn: async (request: RestorationRequest) => {
-      // Générer le lien de paiement Stripe
-      const { data: paymentData, error: paymentError } = await supabase.functions.invoke(
-        'create-restoration-payment',
-        {
-          body: {
-            requestId: request.id,
-            quoteAmount: request.quote_amount,
-            requestNumber: request.request_number,
-            manuscriptTitle: request.manuscript_title
+    mutationFn: async ({ request, paymentMethod }: { request: RestorationRequest, paymentMethod: string }) => {
+      if (paymentMethod === 'en_ligne') {
+        // Générer le lien de paiement Stripe
+        const { data: paymentData, error: paymentError } = await supabase.functions.invoke(
+          'create-restoration-payment',
+          {
+            body: {
+              requestId: request.id,
+              quoteAmount: request.quote_amount,
+              requestNumber: request.request_number,
+              manuscriptTitle: request.manuscript_title
+            }
           }
+        );
+
+        if (paymentError) {
+          console.error('Erreur création paiement:', paymentError);
+          throw new Error('Impossible de créer le lien de paiement');
         }
-      );
 
-      if (paymentError) {
-        console.error('Erreur création paiement:', paymentError);
-        throw new Error('Impossible de créer le lien de paiement');
+        return { paymentUrl: paymentData?.url, paymentMethod };
+      } else {
+        // Pour les autres méthodes, enregistrer la méthode choisie
+        const { error } = await supabase
+          .from('restoration_requests')
+          .update({
+            payment_method: paymentMethod,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', request.id);
+
+        if (error) throw error;
+        
+        return { paymentMethod };
       }
-
-      return { paymentUrl: paymentData?.url };
     },
-    onSuccess: (data) => {
-      // Ouvrir le lien de paiement dans un nouvel onglet
+    onSuccess: (data, variables) => {
       if (data?.paymentUrl) {
+        // Ouvrir le lien de paiement dans un nouvel onglet pour paiement en ligne
         window.open(data.paymentUrl, '_blank');
         toast({
           title: "Lien de paiement généré",
           description: "Le lien de paiement s'ouvre dans un nouvel onglet.",
         });
+      } else {
+        // Afficher un message pour les autres méthodes
+        const methodLabels: Record<string, string> = {
+          'virement': 'Virement bancaire',
+          'carte_guichet': 'Carte au guichet',
+          'espece': 'Espèce',
+          'cheque': 'Chèque'
+        };
+        
+        toast({
+          title: "Méthode de paiement enregistrée",
+          description: `Vous avez choisi de payer par ${methodLabels[data.paymentMethod] || data.paymentMethod}. Un agent vous contactera pour finaliser le paiement.`,
+        });
       }
+      
+      queryClient.invalidateQueries({ queryKey: ['my-restoration-requests', user?.id] });
+      // Réinitialiser la sélection
+      setSelectedPaymentMethod(prev => {
+        const newState = { ...prev };
+        delete newState[variables.request.id];
+        return newState;
+      });
     },
     onError: (error) => {
       toast({
         title: "Erreur",
-        description: "Impossible de générer le lien de paiement.",
+        description: "Impossible de traiter votre demande de paiement.",
         variant: "destructive"
       });
       console.error(error);
@@ -593,7 +630,7 @@ export function MyRestorationRequests() {
                               <div className="flex-1">
                                 <h4 className="font-semibold text-blue-900 mb-2">Restauration terminée - Paiement requis</h4>
                                 <p className="text-sm text-blue-800 mb-3">
-                                  La restauration de votre manuscrit est terminée. Veuillez procéder au paiement pour récupérer votre œuvre.
+                                  La restauration de votre manuscrit est terminée. Veuillez choisir votre méthode de paiement pour récupérer votre œuvre.
                                 </p>
                                 {request.quote_amount && (
                                   <div className="bg-white rounded p-3 mb-3">
@@ -604,15 +641,96 @@ export function MyRestorationRequests() {
                             </div>
                           </div>
                           
-                          <Button 
-                            size="sm" 
-                            className="w-full"
-                            onClick={() => processPayment.mutate(request)}
-                            disabled={processPayment.isPending}
-                          >
-                            <DollarSign className="h-4 w-4 mr-2" />
-                            {processPayment.isPending ? 'Génération...' : 'Procéder au paiement'}
-                          </Button>
+                          {/* Sélection de la méthode de paiement */}
+                          {!selectedPaymentMethod[request.id] ? (
+                            <div className="space-y-2">
+                              <p className="text-sm font-medium text-gray-700">Choisissez votre méthode de paiement :</p>
+                              <div className="grid grid-cols-1 gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="justify-start"
+                                  onClick={() => setSelectedPaymentMethod(prev => ({ ...prev, [request.id]: 'en_ligne' }))}
+                                >
+                                  <CreditCard className="h-4 w-4 mr-2" />
+                                  Paiement en ligne
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="justify-start"
+                                  onClick={() => setSelectedPaymentMethod(prev => ({ ...prev, [request.id]: 'virement' }))}
+                                >
+                                  <Building className="h-4 w-4 mr-2" />
+                                  Virement bancaire
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="justify-start"
+                                  onClick={() => setSelectedPaymentMethod(prev => ({ ...prev, [request.id]: 'carte_guichet' }))}
+                                >
+                                  <CreditCard className="h-4 w-4 mr-2" />
+                                  Carte au guichet sur place
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="justify-start"
+                                  onClick={() => setSelectedPaymentMethod(prev => ({ ...prev, [request.id]: 'espece' }))}
+                                >
+                                  <Coins className="h-4 w-4 mr-2" />
+                                  Espèce
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="justify-start"
+                                  onClick={() => setSelectedPaymentMethod(prev => ({ ...prev, [request.id]: 'cheque' }))}
+                                >
+                                  <FileText className="h-4 w-4 mr-2" />
+                                  Chèque
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <div className="bg-green-50 border border-green-200 rounded p-3">
+                                <p className="text-sm text-green-800">
+                                  Méthode sélectionnée : <span className="font-semibold">
+                                    {selectedPaymentMethod[request.id] === 'en_ligne' && 'Paiement en ligne'}
+                                    {selectedPaymentMethod[request.id] === 'virement' && 'Virement bancaire'}
+                                    {selectedPaymentMethod[request.id] === 'carte_guichet' && 'Carte au guichet'}
+                                    {selectedPaymentMethod[request.id] === 'espece' && 'Espèce'}
+                                    {selectedPaymentMethod[request.id] === 'cheque' && 'Chèque'}
+                                  </span>
+                                </p>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  className="flex-1"
+                                  onClick={() => processPayment.mutate({ request, paymentMethod: selectedPaymentMethod[request.id] })}
+                                  disabled={processPayment.isPending}
+                                >
+                                  <DollarSign className="h-4 w-4 mr-2" />
+                                  {processPayment.isPending ? 'Traitement...' : 'Confirmer'}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setSelectedPaymentMethod(prev => {
+                                    const newState = { ...prev };
+                                    delete newState[request.id];
+                                    return newState;
+                                  })}
+                                  disabled={processPayment.isPending}
+                                >
+                                  Modifier
+                                </Button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
 
