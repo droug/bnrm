@@ -218,13 +218,13 @@ export default function RestorationRequests() {
     if (!selectedRequest) return;
 
     const notificationTypeMap: Record<string, string> = {
-      'director_approve': 'request_authorized',
-      'director_reject': 'request_rejected',
-      'receive_artwork': 'provide_artwork',
+      'director_approve': 'request_received',
+      'director_reject': 'request_received',
+      'receive_artwork': 'request_received',
       'send_quote': 'quote_sent',
       'accept_quote': 'quote_accepted',
       'reject_quote': 'quote_rejected',
-      'validate_payment': 'payment_link',
+      'validate_payment': 'payment_confirmed',
       'start_restoration': 'restoration_started',
       'complete_restoration': 'restoration_completed',
       'return_artwork': 'artwork_ready',
@@ -246,7 +246,8 @@ export default function RestorationRequests() {
           notificationType,
           requestNumber: selectedRequest.request_number,
           manuscriptTitle: selectedRequest.manuscript_title,
-          additionalData
+          quoteAmount: selectedRequest.quote_amount,
+          additionalInfo: additionalData?.notes || additionalData?.comment
         }
       });
     } catch (error) {

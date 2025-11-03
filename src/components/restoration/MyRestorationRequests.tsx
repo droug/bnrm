@@ -36,7 +36,7 @@ export function MyRestorationRequests() {
   const { toast } = useToast();
   const [rejectionReason, setRejectionReason] = useState("");
   const [showRejectionDialog, setShowRejectionDialog] = useState(false);
-  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<RestorationRequest | null>(null);
   const [signedQuoteFile, setSignedQuoteFile] = useState<File | null>(null);
   const [isUploadingQuote, setIsUploadingQuote] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
@@ -139,7 +139,7 @@ export function MyRestorationRequests() {
 
   // Mutation pour accepter le devis
   const acceptQuote = useMutation({
-    mutationFn: async (requestId: string) => {
+    mutationFn: async (request: RestorationRequest) => {
       const { error } = await supabase
         .from('restoration_requests')
         .update({
@@ -147,9 +147,26 @@ export function MyRestorationRequests() {
           quote_accepted_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
-        .eq('id', requestId);
+        .eq('id', request.id);
       
       if (error) throw error;
+
+      // Envoyer la notification
+      try {
+        await supabase.functions.invoke('send-restoration-notification', {
+          body: {
+            requestId: request.id,
+            recipientEmail: user?.email,
+            recipientId: user?.id,
+            notificationType: 'quote_accepted',
+            requestNumber: request.request_number,
+            manuscriptTitle: request.manuscript_title,
+            quoteAmount: request.quote_amount
+          }
+        });
+      } catch (emailError) {
+        console.error('Erreur notification email:', emailError);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-restoration-requests', user?.id] });
@@ -170,7 +187,7 @@ export function MyRestorationRequests() {
 
   // Mutation pour refuser le devis
   const rejectQuote = useMutation({
-    mutationFn: async ({ requestId, reason }: { requestId: string; reason: string }) => {
+    mutationFn: async ({ request, reason }: { request: RestorationRequest; reason: string }) => {
       const { error } = await supabase
         .from('restoration_requests')
         .update({
@@ -179,15 +196,32 @@ export function MyRestorationRequests() {
           quote_rejection_reason: reason,
           updated_at: new Date().toISOString()
         })
-        .eq('id', requestId);
+        .eq('id', request.id);
       
       if (error) throw error;
+
+      // Envoyer la notification
+      try {
+        await supabase.functions.invoke('send-restoration-notification', {
+          body: {
+            requestId: request.id,
+            recipientEmail: user?.email,
+            recipientId: user?.id,
+            notificationType: 'quote_rejected',
+            requestNumber: request.request_number,
+            manuscriptTitle: request.manuscript_title,
+            additionalInfo: reason
+          }
+        });
+      } catch (emailError) {
+        console.error('Erreur notification email:', emailError);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-restoration-requests', user?.id] });
       setShowRejectionDialog(false);
       setRejectionReason("");
-      setSelectedRequestId(null);
+      setSelectedRequest(null);
       toast({
         title: "Devis refusé",
         description: "Le devis a été refusé. Votre demande a été clôturée.",
@@ -366,7 +400,7 @@ export function MyRestorationRequests() {
                                     type="file"
                                     accept=".pdf,.jpg,.jpeg,.png"
                                     onChange={(e) => {
-                                      const file = e.target.files?.[0];
+                      const file = e.target.files?.[0];
                                       if (file) {
                                         if (file.size > 10 * 1024 * 1024) {
                                           toast({
@@ -377,12 +411,12 @@ export function MyRestorationRequests() {
                                           return;
                                         }
                                         setSignedQuoteFile(file);
-                                        setSelectedRequestId(request.id);
+                                        setSelectedRequest(request);
                                       }
                                     }}
                                     className="flex-1"
                                   />
-                                  {signedQuoteFile && selectedRequestId === request.id && (
+                                  {signedQuoteFile && selectedRequest?.id === request.id && (
                                     <Button 
                                       size="sm"
                                       onClick={() => handleUploadSignedQuote(request.id, signedQuoteFile)}
@@ -400,7 +434,7 @@ export function MyRestorationRequests() {
                                 <Button 
                                   size="sm" 
                                   className="flex-1"
-                                  onClick={() => acceptQuote.mutate(request.id)}
+                                  onClick={() => acceptQuote.mutate(request)}
                                   disabled={acceptQuote.isPending}
                                 >
                                   <Check className="h-4 w-4 mr-1" />
@@ -411,7 +445,7 @@ export function MyRestorationRequests() {
                                   variant="destructive"
                                   className="flex-1"
                                   onClick={() => {
-                                    setSelectedRequestId(request.id);
+                                    setSelectedRequest(request);
                                     setShowRejectionDialog(true);
                                   }}
                                   disabled={rejectQuote.isPending}
@@ -508,7 +542,7 @@ export function MyRestorationRequests() {
                   onClick={() => {
                     setShowRejectionDialog(false);
                     setRejectionReason("");
-                    setSelectedRequestId(null);
+                    setSelectedRequest(null);
                   }}
                 >
                   Annuler
@@ -516,9 +550,9 @@ export function MyRestorationRequests() {
                 <Button 
                   variant="destructive"
                   onClick={() => {
-                    if (selectedRequestId && rejectionReason.trim()) {
+                    if (selectedRequest && rejectionReason.trim()) {
                       rejectQuote.mutate({ 
-                        requestId: selectedRequestId, 
+                        request: selectedRequest, 
                         reason: rejectionReason 
                       });
                     }
