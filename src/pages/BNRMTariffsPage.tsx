@@ -51,10 +51,9 @@ export default function BNRMTariffsPage() {
           </div>
           
           <Tabs defaultValue="subscriptions" className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
               <TabsTrigger value="services">Services</TabsTrigger>
-              <TabsTrigger value="restoration">Restauration</TabsTrigger>
               <TabsTrigger value="statistics">Statistiques</TabsTrigger>
               <TabsTrigger value="history">Historique</TabsTrigger>
             </TabsList>
@@ -74,15 +73,13 @@ export default function BNRMTariffsPage() {
               <div>
                 <h2 className="text-xl font-semibold mb-2">Gestion des Services Ponctuels</h2>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Services à la demande et tarifs associés
+                  Services à la demande et tarifs associés (hors restauration)
                 </p>
               </div>
-              <BNRMServices filterCategory="exclude-Inscription" />
-              <BNRMTariffs filterCategory="exclude-Inscription" />
-            </TabsContent>
-
-            <TabsContent value="restoration" className="space-y-6 mt-6">
-              <div>
+              <BNRMServices filterCategory="exclude-Inscription-Restauration" />
+              <BNRMTariffs filterCategory="exclude-Inscription-Restauration" />
+              
+              <div className="mt-8">
                 <h2 className="text-xl font-semibold mb-2">Gestion des Services de Restauration</h2>
                 <p className="text-sm text-muted-foreground mb-4">
                   Services de restauration de documents et tarifs associés

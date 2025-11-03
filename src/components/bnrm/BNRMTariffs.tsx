@@ -116,6 +116,12 @@ export function BNRMTariffs({ filterCategory }: BNRMTariffsProps) {
     } else if (filterCategory === "exclude-Inscription") {
       // Services = tous sauf ceux commençant par I
       matchesFilter = !tariff.id_service.startsWith('I');
+    } else if (filterCategory === "exclude-Inscription-Restauration") {
+      // Services ponctuels = tous sauf Inscription et Restauration
+      matchesFilter = !tariff.id_service.startsWith('I') && tariff.bnrm_services?.categorie !== 'Restauration';
+    } else if (filterCategory === "Restauration") {
+      // Uniquement les tarifs de restauration
+      matchesFilter = tariff.bnrm_services?.categorie === 'Restauration';
     }
     
     return matchesSearch && matchesService && matchesFilter;

@@ -113,6 +113,12 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
     } else if (filterCategory === "exclude-Inscription") {
       // Services = tous sauf ceux commençant par I
       matchesFilter = !service.id_service.startsWith('I');
+    } else if (filterCategory === "exclude-Inscription-Restauration") {
+      // Services ponctuels = tous sauf Inscription et Restauration
+      matchesFilter = !service.id_service.startsWith('I') && service.categorie !== 'Restauration';
+    } else if (filterCategory === "Restauration") {
+      // Uniquement les services de restauration
+      matchesFilter = service.categorie === 'Restauration';
     }
     
     return matchesSearch && matchesCategory && matchesFilter;
