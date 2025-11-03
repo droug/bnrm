@@ -38,6 +38,7 @@ export function RestorationWorkflowDialog({
   const [notes, setNotes] = useState('');
   const [quoteAmount, setQuoteAmount] = useState('');
   const [quoteDetails, setQuoteDetails] = useState('');
+  const [dailyRate, setDailyRate] = useState(1500); // Valeur par défaut
   const [quoteItems, setQuoteItems] = useState<Array<{description: string, quantity: number, unitPrice: number}>>([
     { description: '', quantity: 1, unitPrice: 1500 }
   ]);
@@ -64,16 +65,42 @@ export function RestorationWorkflowDialog({
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
   const [generatingDocType, setGeneratingDocType] = useState<'diagnosis' | 'quote' | 'invoice' | 'restoration_report' | 'discharge' | 'delivery' | null>(null);
 
-  // Taux journalier paramétrable (1 J/H = 1500 DH)
-  const DAILY_RATE = 1500;
+  // Récupérer le taux journalier depuis la base de données
+  useEffect(() => {
+    const fetchDailyRate = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('bnrm_tarifs')
+          .select('montant')
+          .eq('id_tarif', 'TR001')
+          .eq('id_service', 'SR001')
+          .maybeSingle();
+
+        if (error) {
+          console.error('Erreur lors de la récupération du tarif:', error);
+          return;
+        }
+
+        if (data) {
+          setDailyRate(data.montant);
+          // Mettre à jour les items du devis avec le nouveau tarif
+          setQuoteItems([{ description: '', quantity: 1, unitPrice: data.montant }]);
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération du tarif:', error);
+      }
+    };
+
+    fetchDailyRate();
+  }, []);
 
   // Calcul automatique du coût en fonction de la durée
   useEffect(() => {
     if (estimatedDuration && !isNaN(parseFloat(estimatedDuration))) {
-      const calculatedCost = parseFloat(estimatedDuration) * DAILY_RATE;
+      const calculatedCost = parseFloat(estimatedDuration) * dailyRate;
       setEstimatedCost(calculatedCost.toFixed(2));
     }
-  }, [estimatedDuration]);
+  }, [estimatedDuration, dailyRate]);
 
   // Pré-remplir les dommages identifiés avec les données du diagnostic
   useEffect(() => {
@@ -287,7 +314,7 @@ export function RestorationWorkflowDialog({
     setNotes('');
     setQuoteAmount('');
     setQuoteDetails('');
-    setQuoteItems([{ description: '', quantity: 1, unitPrice: 1500 }]);
+    setQuoteItems([{ description: '', quantity: 1, unitPrice: dailyRate }]);
     setDiagnosisReport('');
     setConservationState('');
     setIdentifiedDamages('');
@@ -421,7 +448,7 @@ export function RestorationWorkflowDialog({
                     onChange={(e) => setEstimatedDuration(e.target.value)}
                     placeholder="3"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">1 J/H = {DAILY_RATE} DH</p>
+                  <p className="text-xs text-muted-foreground mt-1">1 J/H = {dailyRate} DH</p>
                 </div>
                 <div>
                   <Label>Coût estimé (DH)</Label>
@@ -469,7 +496,7 @@ export function RestorationWorkflowDialog({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => setQuoteItems([...quoteItems, { description: '', quantity: 1, unitPrice: DAILY_RATE }])}
+                    onClick={() => setQuoteItems([...quoteItems, { description: '', quantity: 1, unitPrice: dailyRate }])}
                   >
                     + Ajouter une ligne
                   </Button>
@@ -531,7 +558,7 @@ export function RestorationWorkflowDialog({
                           <Label className="text-xs">Prix unitaire (DH)</Label>
                           <Input
                             type="text"
-                            value={DAILY_RATE.toFixed(2)}
+                            value={dailyRate.toFixed(2)}
                             readOnly
                             className="mt-1 bg-muted"
                           />
