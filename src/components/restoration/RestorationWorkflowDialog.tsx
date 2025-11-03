@@ -44,7 +44,6 @@ export function RestorationWorkflowDialog({
   const [recommendedWorks, setRecommendedWorks] = useState('');
   const [estimatedCost, setEstimatedCost] = useState('');
   const [estimatedDuration, setEstimatedDuration] = useState('');
-  const [requiredMaterials, setRequiredMaterials] = useState('');
   const [urgencyLevel, setUrgencyLevel] = useState('');
   const [signedQuoteFile, setSignedQuoteFile] = useState<File | null>(null);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
@@ -192,7 +191,6 @@ export function RestorationWorkflowDialog({
         data.recommendedWorks = recommendedWorks;
         data.estimatedCost = estimatedCost;
         data.estimatedDuration = estimatedDuration;
-        data.requiredMaterials = requiredMaterials;
         data.urgencyLevel = urgencyLevel;
         break;
       case 'send_quote':
@@ -280,7 +278,6 @@ export function RestorationWorkflowDialog({
     setRecommendedWorks('');
     setEstimatedCost('');
     setEstimatedDuration('');
-    setRequiredMaterials('');
     setUrgencyLevel('');
     setPaymentReference('');
     setRestorationReport('');
@@ -422,16 +419,6 @@ export function RestorationWorkflowDialog({
                   />
                   <p className="text-xs text-muted-foreground mt-1">Calculé automatiquement</p>
                 </div>
-              </div>
-              
-              <div>
-                <Label>Matériaux nécessaires</Label>
-                <Textarea 
-                  value={requiredMaterials}
-                  onChange={(e) => setRequiredMaterials(e.target.value)}
-                  placeholder="Liste des matériaux et fournitures requis..."
-                  rows={2}
-                />
               </div>
               
               <div>
