@@ -1851,6 +1851,71 @@ export type Database = {
           },
         ]
       }
+      conversation_participants: {
+        Row: {
+          conversation_id: string | null
+          id: string
+          is_muted: boolean | null
+          joined_at: string | null
+          last_read_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          conversation_id?: string | null
+          id?: string
+          is_muted?: boolean | null
+          joined_at?: string | null
+          last_read_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          conversation_id?: string | null
+          id?: string
+          is_muted?: boolean | null
+          joined_at?: string | null
+          last_read_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          conversation_type: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          last_message_at: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          conversation_type?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          last_message_at?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          conversation_type?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          last_message_at?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       cookie_consents: {
         Row: {
           analytics_consent: boolean
@@ -4437,6 +4502,50 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          attachments: Json | null
+          content: string
+          conversation_id: string | null
+          created_at: string | null
+          edited_at: string | null
+          id: string
+          is_edited: boolean | null
+          message_type: string | null
+          sender_id: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          content: string
+          conversation_id?: string | null
+          created_at?: string | null
+          edited_at?: string | null
+          id?: string
+          is_edited?: boolean | null
+          message_type?: string | null
+          sender_id?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          content?: string
+          conversation_id?: string | null
+          created_at?: string | null
+          edited_at?: string | null
+          id?: string
+          is_edited?: boolean | null
+          message_type?: string | null
+          sender_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
         ]
@@ -7643,6 +7752,45 @@ export type Database = {
           },
         ]
       }
+      unread_messages: {
+        Row: {
+          conversation_id: string | null
+          created_at: string | null
+          id: string
+          message_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          message_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          message_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unread_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unread_messages_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_bookmarks: {
         Row: {
           content_id: string | null
@@ -9051,6 +9199,13 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_unread_count: {
+        Args: never
+        Returns: {
+          conversation_id: string
+          unread_count: number
+        }[]
+      }
       get_user_email: { Args: never; Returns: string }
       get_user_permissions: { Args: { user_uuid: string }; Returns: Json }
       get_user_primary_role: {
@@ -9108,6 +9263,10 @@ export type Database = {
           p_search_duration_ms?: number
         }
         Returns: string
+      }
+      mark_messages_as_read: {
+        Args: { p_conversation_id: string }
+        Returns: undefined
       }
       perform_automatic_archiving: { Args: never; Returns: Json }
       record_daily_pass_usage: {
