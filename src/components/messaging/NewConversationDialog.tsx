@@ -235,6 +235,12 @@ export default function NewConversationDialog({
               type="submit"
               disabled={!isFormValid || isSubmitting}
               className="bg-[hsl(var(--bnrm-accent))] hover:bg-[hsl(var(--bnrm-accent))]/90 text-[hsl(var(--bnrm-accent-foreground))]"
+              onClick={(e) => {
+                console.log("🔴 Button clicked!");
+                console.log("🔴 isFormValid:", isFormValid);
+                console.log("🔴 isSubmitting:", isSubmitting);
+                console.log("🔴 Button disabled:", !isFormValid || isSubmitting);
+              }}
             >
               {isSubmitting ? "Création..." : "Créer"}
             </Button>
