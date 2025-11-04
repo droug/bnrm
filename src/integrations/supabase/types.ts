@@ -9322,6 +9322,10 @@ export type Database = {
         Args: { permission_name: string; user_uuid: string }
         Returns: boolean
       }
+      user_is_in_conversation: {
+        Args: { _conversation_id: string; _user_id: string }
+        Returns: boolean
+      }
       verify_backup_integrity: { Args: { backup_id: string }; Returns: boolean }
       verify_professional_deposit_number: {
         Args: {
