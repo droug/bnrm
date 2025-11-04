@@ -239,12 +239,12 @@ const Index = () => {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-11 px-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-foreground shadow-lg hover:shadow-xl transition-all"
+                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-11 px-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all"
                           >
-                            <Filter className="h-4 w-4 mr-2" />
-                            <ChevronDown className="h-4 w-4" />
+                            <Filter className="h-4 w-4 mr-2 text-white" />
+                            <ChevronDown className="h-4 w-4 text-white" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start" className="w-56 bg-popover">

@@ -166,7 +166,7 @@ const Header = () => {
             </DropdownMenu>
             
             {/* Accessibilité - icône seulement */}
-            <AccessibilityToolkit />
+            <AccessibilityToolkit className={isHomePage ? 'text-white hover:bg-white/20' : ''} />
             
             {/* Chatbot - icône seulement */}
             <Button

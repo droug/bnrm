@@ -48,7 +48,7 @@ const defaultSettings: AccessibilitySettings = {
   isReading: false,
 };
 
-export const AccessibilityToolkit = () => {
+export const AccessibilityToolkit = ({ className = "" }: { className?: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [settings, setSettings] = useState<AccessibilitySettings>(defaultSettings);
   const { t } = useLanguage();
@@ -126,7 +126,7 @@ export const AccessibilityToolkit = () => {
             }}
             variant="ghost"
             size="sm"
-            className="text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center gap-2 px-2 py-1.5"
+            className={`flex items-center gap-2 px-2 h-11 text-base font-medium ${className}`}
           >
             <Accessibility className="h-4 w-4" />
             <span className="hidden sm:inline text-xs">Accessibilité</span>
