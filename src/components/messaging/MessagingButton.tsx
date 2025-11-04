@@ -3,7 +3,7 @@ import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useUnreadCount } from "@/hooks/useMessaging";
-import MessagingPopup from "./MessagingPopup";
+import MessagingPanel from "./MessagingPanel";
 import { cn } from "@/lib/utils";
 
 interface MessagingButtonProps {
@@ -40,7 +40,7 @@ export default function MessagingButton({ className, isHomePage }: MessagingButt
         )}
       </Button>
 
-      <MessagingPopup isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <MessagingPanel isOpen={isOpen} onClose={() => setIsOpen(false)} mode="overlay" />
     </>
   );
 }

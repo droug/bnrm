@@ -9,11 +9,18 @@ import { cn } from "@/lib/utils";
 interface ConversationsListProps {
   selectedId: string | null;
   onSelect: (id: string) => void;
+  searchQuery?: string;
+  filter?: "all" | "unread" | "priority" | "groups";
 }
 
-export default function ConversationsList({ selectedId, onSelect }: ConversationsListProps) {
+export default function ConversationsList({ 
+  selectedId, 
+  onSelect,
+  searchQuery = "",
+  filter = "all"
+}: ConversationsListProps) {
   const { data: conversations, isLoading } = useQuery({
-    queryKey: ['conversations'],
+    queryKey: ['conversations', searchQuery, filter],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('conversations')
@@ -27,10 +34,21 @@ export default function ConversationsList({ selectedId, onSelect }: Conversation
       if (error) throw error;
       
       // Get last message for each conversation
-      return data?.map(conv => ({
+      let result = data?.map(conv => ({
         ...conv,
         lastMessage: conv.messages?.[conv.messages.length - 1] || null,
       })) || [];
+
+      // Apply search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        result = result.filter(conv => 
+          conv.title?.toLowerCase().includes(query) ||
+          conv.lastMessage?.content?.toLowerCase().includes(query)
+        );
+      }
+
+      return result;
     },
   });
 
@@ -75,9 +93,21 @@ export default function ConversationsList({ selectedId, onSelect }: Conversation
     );
   }
 
+  // Filter conversations based on filter type
+  const filteredConversations = conversations?.filter((conv: any) => {
+    if (filter === "unread") {
+      return getUnreadCount(conv.id) > 0;
+    }
+    if (filter === "groups") {
+      return conv.conversation_type === "group";
+    }
+    // "all" and "priority" show all for now
+    return true;
+  }) || [];
+
   return (
-    <div className="divide-y">
-      {conversations.map((conversation: any) => {
+    <div className="divide-y divide-[hsl(var(--bnrm-border))]">
+      {filteredConversations.map((conversation: any) => {
         const unreadCount = getUnreadCount(conversation.id);
         const isSelected = selectedId === conversation.id;
 
@@ -85,35 +115,47 @@ export default function ConversationsList({ selectedId, onSelect }: Conversation
           <div
             key={conversation.id}
             className={cn(
-              "p-4 cursor-pointer hover:bg-accent/50 transition-all duration-200",
+              "p-4 cursor-pointer hover:bg-white/60 transition-all duration-200",
               "border-l-4 border-transparent",
-              isSelected && "bg-accent border-l-primary"
+              isSelected && "bg-white/80 border-l-[hsl(var(--bnrm-accent))]"
             )}
             onClick={() => onSelect(conversation.id)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onSelect(conversation.id);
+              }
+            }}
+            aria-label={`Conversation ${conversation.title || 'sans titre'}`}
+            aria-pressed={isSelected}
           >
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <MessageCircle className="h-4 w-4 text-primary" />
+                  <div className="w-8 h-8 rounded-full bg-[hsl(var(--bnrm-accent))]/10 flex items-center justify-center flex-shrink-0">
+                    <MessageCircle className="h-4 w-4 text-[hsl(var(--bnrm-accent))]" />
                   </div>
-                  <h3 className="font-semibold truncate flex-1">
+                  <h3 className="font-semibold truncate flex-1 text-[hsl(var(--bnrm-text))]">
                     {conversation.title || 'Conversation'}
                   </h3>
                   {unreadCount > 0 && (
-                    <Badge variant="default" className="h-5 min-w-[20px] px-1.5 animate-scale-in">
+                    <Badge 
+                      className="h-5 min-w-[20px] px-1.5 animate-scale-in bg-[hsl(var(--bnrm-accent))] text-[hsl(var(--bnrm-accent-foreground))]"
+                    >
                       {unreadCount}
                     </Badge>
                   )}
                 </div>
                 {conversation.lastMessage && (
-                  <p className="text-sm text-muted-foreground truncate ml-10">
+                  <p className="text-sm text-[hsl(var(--bnrm-muted))] truncate ml-10">
                     {conversation.lastMessage.content}
                   </p>
                 )}
               </div>
               {conversation.last_message_at && (
-                <span className="text-xs text-muted-foreground whitespace-nowrap ml-2 mt-1">
+                <span className="text-xs text-[hsl(var(--bnrm-timestamp))] whitespace-nowrap ml-2 mt-1">
                   {formatDistanceToNow(new Date(conversation.last_message_at), {
                     addSuffix: true,
                     locale: fr,

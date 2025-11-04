@@ -419,6 +419,17 @@ Enhanced Moroccan Heritage Design System
     --z-dialog-content: var(--z-dialog);
     --z-sheet-overlay: var(--z-overlay);
     --z-sheet-content: var(--z-dialog);
+    
+    /* BNRM Messaging Tokens */
+    --bnrm-bg: 40 15% 97%; /* #F8F7F2 */
+    --bnrm-border: 40 10% 91%; /* #E7E5DF */
+    --bnrm-accent: 42 35% 60%; /* #C6A760 */
+    --bnrm-accent-foreground: 0 0% 100%;
+    --bnrm-text: 0 0% 20%; /* #333333 */
+    --bnrm-muted: 0 0% 40%; /* #666666 */
+    --bnrm-bubble-own: 0 0% 100%;
+    --bnrm-bubble-other: 40 10% 95%;
+    --bnrm-timestamp: 0 0% 54%; /* #8A8A8A */
   }
 
   /* Accessibility: font size, spacing, and line height adjustments */
