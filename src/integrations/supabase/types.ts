@@ -3036,6 +3036,78 @@ export type Database = {
           },
         ]
       }
+      external_integrations: {
+        Row: {
+          auth_credentials: Json | null
+          auth_type: string | null
+          auto_sync_enabled: boolean | null
+          batch_size: number | null
+          created_at: string | null
+          created_by: string | null
+          data_mapping: Json | null
+          description: string | null
+          endpoint_url: string
+          id: string
+          integration_type: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          name: string
+          next_sync_at: string | null
+          retry_attempts: number | null
+          sync_direction: string
+          sync_entities: string[] | null
+          sync_frequency: string | null
+          timeout_seconds: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          auth_credentials?: Json | null
+          auth_type?: string | null
+          auto_sync_enabled?: boolean | null
+          batch_size?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          data_mapping?: Json | null
+          description?: string | null
+          endpoint_url: string
+          id?: string
+          integration_type: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          name: string
+          next_sync_at?: string | null
+          retry_attempts?: number | null
+          sync_direction: string
+          sync_entities?: string[] | null
+          sync_frequency?: string | null
+          timeout_seconds?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          auth_credentials?: Json | null
+          auth_type?: string | null
+          auto_sync_enabled?: boolean | null
+          batch_size?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          data_mapping?: Json | null
+          description?: string | null
+          endpoint_url?: string
+          id?: string
+          integration_type?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          name?: string
+          next_sync_at?: string | null
+          retry_attempts?: number | null
+          sync_direction?: string
+          sync_entities?: string[] | null
+          sync_frequency?: string | null
+          timeout_seconds?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           answer: string
@@ -3364,6 +3436,196 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "help_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integration_sync_errors: {
+        Row: {
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string | null
+          error_code: string | null
+          error_message: string
+          error_stack: string | null
+          error_type: string
+          id: string
+          integration_id: string | null
+          record_data: Json | null
+          resolved: boolean | null
+          resolved_at: string | null
+          resolved_by: string | null
+          retry_count: number | null
+          sync_log_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          error_code?: string | null
+          error_message: string
+          error_stack?: string | null
+          error_type: string
+          id?: string
+          integration_id?: string | null
+          record_data?: Json | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          retry_count?: number | null
+          sync_log_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          error_code?: string | null
+          error_message?: string
+          error_stack?: string | null
+          error_type?: string
+          id?: string
+          integration_id?: string | null
+          record_data?: Json | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          retry_count?: number | null
+          sync_log_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_sync_errors_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "external_integrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "integration_sync_errors_sync_log_id_fkey"
+            columns: ["sync_log_id"]
+            isOneToOne: false
+            referencedRelation: "integration_sync_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integration_sync_logs: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          duration_ms: number | null
+          entity_type: string | null
+          error_details: Json | null
+          error_message: string | null
+          id: string
+          integration_id: string | null
+          records_failed: number | null
+          records_processed: number | null
+          records_skipped: number | null
+          records_success: number | null
+          records_total: number | null
+          started_at: string | null
+          status: string
+          sync_details: Json | null
+          sync_direction: string
+          sync_type: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          duration_ms?: number | null
+          entity_type?: string | null
+          error_details?: Json | null
+          error_message?: string | null
+          id?: string
+          integration_id?: string | null
+          records_failed?: number | null
+          records_processed?: number | null
+          records_skipped?: number | null
+          records_success?: number | null
+          records_total?: number | null
+          started_at?: string | null
+          status: string
+          sync_details?: Json | null
+          sync_direction: string
+          sync_type: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          duration_ms?: number | null
+          entity_type?: string | null
+          error_details?: Json | null
+          error_message?: string | null
+          id?: string
+          integration_id?: string | null
+          records_failed?: number | null
+          records_processed?: number | null
+          records_skipped?: number | null
+          records_success?: number | null
+          records_total?: number | null
+          started_at?: string | null
+          status?: string
+          sync_details?: Json | null
+          sync_direction?: string
+          sync_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_sync_logs_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "external_integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integration_webhooks: {
+        Row: {
+          allowed_ips: string[] | null
+          created_at: string | null
+          event_types: string[]
+          id: string
+          integration_id: string | null
+          is_active: boolean | null
+          signature_algorithm: string | null
+          signature_header: string | null
+          updated_at: string | null
+          webhook_name: string
+          webhook_secret: string | null
+        }
+        Insert: {
+          allowed_ips?: string[] | null
+          created_at?: string | null
+          event_types: string[]
+          id?: string
+          integration_id?: string | null
+          is_active?: boolean | null
+          signature_algorithm?: string | null
+          signature_header?: string | null
+          updated_at?: string | null
+          webhook_name: string
+          webhook_secret?: string | null
+        }
+        Update: {
+          allowed_ips?: string[] | null
+          created_at?: string | null
+          event_types?: string[]
+          id?: string
+          integration_id?: string | null
+          is_active?: boolean | null
+          signature_algorithm?: string | null
+          signature_header?: string | null
+          updated_at?: string | null
+          webhook_name?: string
+          webhook_secret?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_webhooks_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "external_integrations"
             referencedColumns: ["id"]
           },
         ]
@@ -7817,6 +8079,56 @@ export type Database = {
             columns: ["wallet_id"]
             isOneToOne: false
             referencedRelation: "bnrm_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_events: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          event_data: Json
+          event_type: string
+          headers: Json | null
+          id: string
+          processed_at: string | null
+          signature_valid: boolean | null
+          source_ip: string | null
+          status: string
+          webhook_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          event_data: Json
+          event_type: string
+          headers?: Json | null
+          id?: string
+          processed_at?: string | null
+          signature_valid?: boolean | null
+          source_ip?: string | null
+          status: string
+          webhook_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          event_data?: Json
+          event_type?: string
+          headers?: Json | null
+          id?: string
+          processed_at?: string | null
+          signature_valid?: boolean | null
+          source_ip?: string | null
+          status?: string
+          webhook_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_events_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "integration_webhooks"
             referencedColumns: ["id"]
           },
         ]

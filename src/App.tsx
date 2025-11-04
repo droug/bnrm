@@ -182,6 +182,7 @@ const SpaceGalleryPage = lazy(() => import("./pages/cultural-activities/SpaceGal
 
 // Admin - Cookie Settings
 const CookieSettingsPage = lazy(() => import("./pages/admin/CookieSettingsPage"));
+const IntegrationsPage = lazy(() => import("./pages/admin/IntegrationsPage"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -241,7 +242,8 @@ const App = () => {
         <Route path="/admin/legal-deposit" element={<LegalDepositPage />} />
         <Route path="/admin/archiving" element={<ArchivingPage />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
-        <Route path="/admin/cookie-settings" element={<CookieSettingsPage />} />
+            <Route path="/admin/cookie-settings" element={<CookieSettingsPage />} />
+            <Route path="/admin/integrations" element={<IntegrationsPage />} />
         <Route path="/admin/cote-management" element={<CoteManagementPage />} />
         <Route path="/admin/bnrm-backoffice" element={<BNRMBackOffice />} />
         <Route path="/admin/reservations-ouvrages" element={<GestionReservationsOuvrages />} />
