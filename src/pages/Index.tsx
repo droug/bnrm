@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
+import SEOHead from "@/components/seo/SEOHead";
+import SEOImage from "@/components/seo/SEOImage";
 import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Gem, Filter, ChevronDown, X, Network } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { Button } from "@/components/ui/button";
@@ -97,6 +99,12 @@ const Index = () => {
 
   return (
     <>
+      <SEOHead
+        title="Accueil"
+        description="Bibliothèque Nationale du Royaume du Maroc - Gardienne du patrimoine écrit marocain et porte d'accès au savoir universel. Collections de manuscrits, livres rares et ressources numériques."
+        keywords={["bibliothèque maroc", "BNRM", "manuscrits marocains", "patrimoine culturel", "bibliothèque numérique", "dépôt légal", "recherche documentaire"]}
+      />
+      
       {/* Popup d'accueil */}
       <WelcomePopup 
         isOpen={showWelcomePopup} 

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, FileText, Image, Music, Calendar, Sparkles } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import SEOHead from "@/components/seo/SEOHead";
+import SEOImage from "@/components/seo/SEOImage";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
 import { useAuth } from "@/hooks/useAuth";
@@ -185,6 +187,12 @@ export default function DigitalLibraryHome() {
 
   return (
     <DigitalLibraryLayout>
+      <SEOHead
+        title="Bibliothèque Numérique"
+        description="Accédez à plus de 100,000 documents numérisés du patrimoine marocain : livres, manuscrits, revues, photographies et archives audiovisuelles."
+        keywords={["bibliothèque numérique", "documents numérisés", "patrimoine marocain", "livres électroniques", "archives numériques", "collections BNRM"]}
+      />
+      
       {/* Hero Section with Background Image */}
       <section 
         className="relative py-16 overflow-hidden"

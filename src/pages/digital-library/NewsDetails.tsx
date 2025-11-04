@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Calendar } from "lucide-react";
+import SEOHead from "@/components/seo/SEOHead";
+import { generateArticleSchema } from "@/utils/seoUtils";
 
 export default function NewsDetails() {
   const { newsId } = useParams();
@@ -20,6 +22,19 @@ export default function NewsDetails() {
 
   return (
     <DigitalLibraryLayout>
+      <SEOHead
+        title={newsItem.title}
+        description={newsItem.content}
+        keywords={["actualités BNRM", "nouvelles bibliothèque", newsItem.category, "événements culturels"]}
+        ogType="article"
+        structuredData={generateArticleSchema({
+          title: newsItem.title,
+          description: newsItem.content,
+          author: newsItem.author,
+          datePublished: newsItem.date,
+        })}
+      />
+      
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Button variant="ghost" onClick={() => navigate("/digital-library/news")} className="mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />

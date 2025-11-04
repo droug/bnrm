@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useAutoSync } from "@/hooks/useAutoSync";
+import { PerformanceOptimizer } from "@/components/seo/PerformanceOptimizer";
 
 // Always loaded (critical routes)
 import Index from "./pages/Index";
@@ -192,6 +193,7 @@ const App = () => {
   return (
     <TooltipProvider>
       <LanguageProvider>
+        <PerformanceOptimizer />
         <ScrollToTop />
         <Toaster />
         <Sonner />

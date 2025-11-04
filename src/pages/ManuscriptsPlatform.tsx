@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import { supabase } from "@/integrations/supabase/client";
+import SEOHead from "@/components/seo/SEOHead";
+import SEOImage from "@/components/seo/SEOImage";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -202,6 +204,12 @@ export default function ManuscriptsPlatform() {
         opacity: 0.03
       }}
     >
+      <SEOHead
+        title="Plateforme des Manuscrits Numérisés"
+        description="Découvrez les trésors manuscrits de la BNRM et des institutions partenaires marocaines. Collections de manuscrits arabes, berbères, latins et français numérisés."
+        keywords={["manuscrits marocains", "manuscrits arabes", "manuscrits berbères", "patrimoine manuscrit", "numérisation manuscrits", "BNRM manuscrits"]}
+      />
+      
       <div className="min-h-screen bg-background relative">
         <ProtectedWatermark 
           userRole={profile?.role || "visitor"}

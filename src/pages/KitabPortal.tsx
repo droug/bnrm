@@ -5,6 +5,7 @@ import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import SEOHead from "@/components/seo/SEOHead";
 import { BookText, Lightbulb, Sparkles, BookMarked, Library, Mail, ArrowRight, FileText, Clock } from "lucide-react";
 import kitabBanner from "@/assets/kitab-banner.jpg";
 
@@ -50,7 +51,14 @@ export default function KitabPortal() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEOHead
+        title="Kitab - Portail des Publications Marocaines"
+        description="Kitab est le portail national des publications marocaines. Découvrez les nouvelles parutions, bibliographie nationale, répertoires d'éditeurs et auteurs marocains."
+        keywords={["Kitab", "publications marocaines", "édition maroc", "bibliographie nationale", "auteurs marocains", "éditeurs marocains", "livres maroc"]}
+      />
+      
+      <div className="min-h-screen bg-background">
       <KitabHeader />
       
       {/* Hero Section - Kitab Style */}
@@ -281,5 +289,6 @@ export default function KitabPortal() {
       {/* Outils globaux (Accessibilité + Chatbot) */}
       <GlobalAccessibilityTools />
     </div>
+    </>
   );
 }
