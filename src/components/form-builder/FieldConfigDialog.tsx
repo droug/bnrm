@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -70,6 +70,44 @@ export function FieldConfigDialog({
           default_value: "",
         },
   });
+
+  // Reset form when existingField changes
+  useEffect(() => {
+    if (existingField) {
+      form.reset({
+        field_key: existingField.field_key,
+        field_type: existingField.field_type as any,
+        section_key: existingField.section_key,
+        order_index: existingField.order_index,
+        label_fr: existingField.label_fr,
+        label_ar: existingField.label_ar || "",
+        description_fr: existingField.description_fr || "",
+        description_ar: existingField.description_ar || "",
+        is_required: existingField.is_required,
+        is_visible: existingField.is_visible,
+        is_readonly: existingField.is_readonly,
+        default_value: existingField.default_value || "",
+        validation_rules: existingField.validation_rules as any,
+        visibility_conditions: existingField.visibility_conditions as any,
+        config: existingField.config,
+      });
+    } else {
+      form.reset({
+        field_key: "",
+        field_type: fieldType as any,
+        section_key: sections[0]?.key || "",
+        order_index: existingFields.length,
+        label_fr: "",
+        label_ar: "",
+        description_fr: "",
+        description_ar: "",
+        is_required: false,
+        is_visible: true,
+        is_readonly: false,
+        default_value: "",
+      });
+    }
+  }, [existingField, fieldType, sections, existingFields, form]);
 
   const handleSubmit = async (data: CustomFieldConfig) => {
     setIsSubmitting(true);
