@@ -8,8 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SmartChatBot from "@/components/SmartChatBot";
 import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
-import { useUnreadCount } from "@/hooks/useMessaging";
-import { Badge } from "@/components/ui/badge";
+import MessagingButton from "@/components/messaging/MessagingButton";
 // import { WatermarkContainer, Watermark } from "@/components/ui/watermark"; // Removed to fix runtime error
 import logoImage from "@/assets/logo-bnrm.png";
 import {
@@ -32,7 +31,6 @@ const Header = () => {
   const [isChatBotOpen, setIsChatBotOpen] = useState(false);
   const { language, setLanguage, t, isRTL } = useLanguage();
   const { user, profile, signOut } = useAuth();
-  const { data: unreadData } = useUnreadCount();
   const location = useLocation();
   const navigate = useNavigate();
   const isHomePage = location.pathname === "/";
@@ -185,25 +183,7 @@ const Header = () => {
             </Button>
             
             {/* Messagerie */}
-            {user && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/messaging')}
-                className={`px-2 relative ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}
-                title="Messagerie"
-              >
-                <MessageCircle className="h-4 w-4" />
-                {unreadData && unreadData.total > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-1 -right-1 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
-                  >
-                    {unreadData.total > 99 ? '99+' : unreadData.total}
-                  </Badge>
-                )}
-              </Button>
-            )}
+            {user && <MessagingButton isHomePage={isHomePage} />}
             
             {/* Utilisateur */}
             {user ? (

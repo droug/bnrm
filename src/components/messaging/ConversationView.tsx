@@ -66,15 +66,18 @@ export default function ConversationView({ conversationId }: ConversationViewPro
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <CardHeader className="border-b">
-        <CardTitle className="text-lg">
+    <div className="flex flex-col h-full bg-gradient-to-b from-background to-muted/20">
+      <div className="border-b px-4 py-3 bg-background">
+        <h3 className="font-semibold text-base">
           {conversation?.title || getParticipantsNames() || 'Conversation'}
-        </CardTitle>
-      </CardHeader>
+        </h3>
+        <p className="text-xs text-muted-foreground">
+          {conversation?.conversation_participants?.length || 0} participant(s)
+        </p>
+      </div>
 
       <ScrollArea ref={scrollRef} className="flex-1 p-4">
-        <div className="space-y-4">
+        <div className="space-y-3">
           {messages?.map((message: any) => {
             const isOwn = message.sender_id === user?.id;
             const senderName = isOwn
@@ -85,27 +88,30 @@ export default function ConversationView({ conversationId }: ConversationViewPro
               <div
                 key={message.id}
                 className={cn(
-                  "flex flex-col",
+                  "flex flex-col animate-fade-in",
                   isOwn ? "items-end" : "items-start"
                 )}
               >
+                {!isOwn && (
+                  <span className="text-xs font-medium text-muted-foreground mb-1 ml-1">
+                    {senderName}
+                  </span>
+                )}
                 <div
                   className={cn(
-                    "max-w-[70%] rounded-lg p-3",
+                    "max-w-[75%] rounded-2xl px-4 py-2.5 shadow-sm",
+                    "transition-all duration-200 hover:shadow-md",
                     isOwn
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                      ? "bg-primary text-primary-foreground rounded-br-sm"
+                      : "bg-card border rounded-bl-sm"
                   )}
                 >
-                  {!isOwn && (
-                    <p className="text-xs font-semibold mb-1 opacity-70">
-                      {senderName}
-                    </p>
-                  )}
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                    {message.content}
+                  </p>
                   <p
                     className={cn(
-                      "text-xs mt-1 opacity-70",
+                      "text-xs mt-1.5 opacity-60",
                       isOwn ? "text-right" : "text-left"
                     )}
                   >
@@ -121,22 +127,25 @@ export default function ConversationView({ conversationId }: ConversationViewPro
         </div>
       </ScrollArea>
 
-      <CardContent className="border-t p-4">
+      <div className="border-t p-4 bg-background">
         <form onSubmit={handleSend} className="flex gap-2">
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Tapez votre message..."
+            placeholder="Écrivez votre message..."
             disabled={sendMessage.isPending}
+            className="flex-1 rounded-full"
           />
           <Button
             type="submit"
+            size="icon"
             disabled={!newMessage.trim() || sendMessage.isPending}
+            className="rounded-full h-10 w-10"
           >
             <Send className="h-4 w-4" />
           </Button>
         </form>
-      </CardContent>
+      </div>
     </div>
   );
 }
