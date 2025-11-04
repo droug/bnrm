@@ -239,6 +239,7 @@ const Index = () => {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
+                            variant="ghost"
                             size="sm"
                             className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-11 px-3 !bg-white/10 hover:!bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all"
                           >
