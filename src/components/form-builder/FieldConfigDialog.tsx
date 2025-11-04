@@ -41,7 +41,7 @@ export function FieldConfigDialog({
           field_type: existingField.field_type as any,
           section_key: existingField.section_key,
           order_index: existingField.order_index,
-          insert_after: existingField.insert_after,
+          insert_after: existingField.insert_after || "__start__",
           label_fr: existingField.label_fr,
           label_ar: existingField.label_ar || "",
           description_fr: existingField.description_fr || "",
@@ -59,6 +59,7 @@ export function FieldConfigDialog({
           field_type: fieldType as any,
           section_key: sections[0]?.key || "",
           order_index: existingFields.length,
+          insert_after: "__start__",
           label_fr: "",
           label_ar: "",
           description_fr: "",
@@ -73,7 +74,12 @@ export function FieldConfigDialog({
   const handleSubmit = async (data: CustomFieldConfig) => {
     setIsSubmitting(true);
     try {
-      await onSave(data);
+      // Convert __start__ back to undefined for storage
+      const submitData = {
+        ...data,
+        insert_after: data.insert_after === "__start__" ? undefined : data.insert_after,
+      };
+      await onSave(submitData);
       onOpenChange(false);
       form.reset();
     } catch (error) {
@@ -197,7 +203,7 @@ export function FieldConfigDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">En tête de section</SelectItem>
+                        <SelectItem value="__start__">En tête de section</SelectItem>
                         {existingFields
                           .filter((f) => f.section_key === form.watch("section_key"))
                           .map((f) => (
