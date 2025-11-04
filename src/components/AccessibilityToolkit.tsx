@@ -129,7 +129,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
             className={`flex items-center gap-2 px-2 h-11 text-base font-medium ${className}`}
           >
             <Accessibility className="h-4 w-4" />
-            <span className="hidden sm:inline text-xs">Accessibilité</span>
+            <span className="hidden sm:inline">Accessibilité</span>
           </Button>
         </TooltipTrigger>
         <TooltipContent>
