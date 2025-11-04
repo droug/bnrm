@@ -19,6 +19,7 @@ interface FieldConfigDialogProps {
   existingField?: CustomField | null;
   sections: Array<{ key: string; label_fr: string; label_ar?: string }>;
   existingFields: CustomField[];
+  formName?: string;
   onSave: (fieldData: Partial<CustomField>) => Promise<void>;
 }
 
@@ -29,6 +30,7 @@ export function FieldConfigDialog({
   existingField,
   sections,
   existingFields,
+  formName,
   onSave,
 }: FieldConfigDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -94,7 +96,10 @@ export function FieldConfigDialog({
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {existingField ? "Modifier le champ" : "Ajouter un champ de projet"}
+            {existingField 
+              ? `Modifier le champ${formName ? ` - ${formName}` : ""}` 
+              : `Ajouter un champ${formName ? ` - ${formName}` : ""}`
+            }
           </DialogTitle>
         </DialogHeader>
 

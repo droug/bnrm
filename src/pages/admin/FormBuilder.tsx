@@ -280,6 +280,7 @@ export default function FormBuilder() {
           existingField={editingField}
           sections={mockSections}
           existingFields={customFields}
+          formName={currentForm?.form_name}
           onSave={handleSaveField}
         />
       </main>
