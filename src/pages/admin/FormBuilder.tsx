@@ -160,7 +160,7 @@ export default function FormBuilder() {
             <div>
               <Label htmlFor="module">Module</Label>
               <Select
-                value={filter.module}
+                value={filter.module || undefined}
                 onValueChange={handleModuleChange}
                 disabled={availableModules.length === 0}
               >
@@ -180,7 +180,7 @@ export default function FormBuilder() {
             <div>
               <Label htmlFor="formKey">Formulaire</Label>
               <Select
-                value={filter.formKey}
+                value={filter.formKey || undefined}
                 onValueChange={(value) => setFilter({ ...filter, formKey: value })}
                 disabled={availableForms.length === 0}
               >
