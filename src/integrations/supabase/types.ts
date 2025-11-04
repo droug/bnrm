@@ -4024,96 +4024,161 @@ export type Database = {
       }
       legal_deposit_monograph_data: {
         Row: {
-          adresse_editeur: string | null
-          adresse_imprimeur: string | null
-          bordereau_depot_url: string | null
-          cin_auteur: string | null
-          cin_copie_url: string | null
+          abstract_file_url: string | null
+          accompanying_material_type: string | null
+          author_birth_date: string | null
+          author_city: string | null
+          author_email: string | null
+          author_gender: string | null
+          author_name: string | null
+          author_phone: string | null
+          author_pseudonym: string | null
+          author_region: string | null
+          author_sigle: string | null
+          author_status: string | null
+          author_type: string | null
+          cin_file_url: string | null
+          collection_number: string | null
+          collection_title: string | null
+          cover_file_url: string | null
           created_at: string | null
-          date_publication: string | null
-          email_editeur: string | null
-          exemplaires_depot: number | null
-          format: string | null
+          declaration_nature: string | null
+          has_accompanying_material: string | null
           id: string
-          isbn: string | null
-          langue_publication: string | null
-          nationalite_auteur: string | null
-          nom_auteur: string | null
-          nom_editeur: string | null
-          nom_imprimeur: string | null
-          nombre_pages: number | null
-          prenom_auteur: string | null
+          is_periodic: string | null
+          issn_submitted: boolean | null
+          languages: string[] | null
+          multiple_volumes: string | null
+          number_of_pages: number | null
+          number_of_volumes: number | null
+          print_run_number: number | null
+          printer_address: string | null
+          printer_country: string | null
+          printer_email: string | null
+          printer_id: string | null
+          printer_phone: string | null
+          publication_date: string | null
+          publication_discipline: string | null
+          publication_title: string
+          publication_type: string | null
+          publisher_id: string | null
+          quran_authorization_url: string | null
           request_id: string | null
-          sous_titre: string | null
-          telephone_editeur: string | null
-          tirage: number | null
-          titre_publication: string
+          summary_file_url: string | null
+          support_type: string | null
+          thesis_recommendation_url: string | null
           updated_at: string | null
           user_id: string
-          ville_editeur: string | null
-          ville_imprimeur: string | null
         }
         Insert: {
-          adresse_editeur?: string | null
-          adresse_imprimeur?: string | null
-          bordereau_depot_url?: string | null
-          cin_auteur?: string | null
-          cin_copie_url?: string | null
+          abstract_file_url?: string | null
+          accompanying_material_type?: string | null
+          author_birth_date?: string | null
+          author_city?: string | null
+          author_email?: string | null
+          author_gender?: string | null
+          author_name?: string | null
+          author_phone?: string | null
+          author_pseudonym?: string | null
+          author_region?: string | null
+          author_sigle?: string | null
+          author_status?: string | null
+          author_type?: string | null
+          cin_file_url?: string | null
+          collection_number?: string | null
+          collection_title?: string | null
+          cover_file_url?: string | null
           created_at?: string | null
-          date_publication?: string | null
-          email_editeur?: string | null
-          exemplaires_depot?: number | null
-          format?: string | null
+          declaration_nature?: string | null
+          has_accompanying_material?: string | null
           id?: string
-          isbn?: string | null
-          langue_publication?: string | null
-          nationalite_auteur?: string | null
-          nom_auteur?: string | null
-          nom_editeur?: string | null
-          nom_imprimeur?: string | null
-          nombre_pages?: number | null
-          prenom_auteur?: string | null
+          is_periodic?: string | null
+          issn_submitted?: boolean | null
+          languages?: string[] | null
+          multiple_volumes?: string | null
+          number_of_pages?: number | null
+          number_of_volumes?: number | null
+          print_run_number?: number | null
+          printer_address?: string | null
+          printer_country?: string | null
+          printer_email?: string | null
+          printer_id?: string | null
+          printer_phone?: string | null
+          publication_date?: string | null
+          publication_discipline?: string | null
+          publication_title: string
+          publication_type?: string | null
+          publisher_id?: string | null
+          quran_authorization_url?: string | null
           request_id?: string | null
-          sous_titre?: string | null
-          telephone_editeur?: string | null
-          tirage?: number | null
-          titre_publication: string
+          summary_file_url?: string | null
+          support_type?: string | null
+          thesis_recommendation_url?: string | null
           updated_at?: string | null
           user_id: string
-          ville_editeur?: string | null
-          ville_imprimeur?: string | null
         }
         Update: {
-          adresse_editeur?: string | null
-          adresse_imprimeur?: string | null
-          bordereau_depot_url?: string | null
-          cin_auteur?: string | null
-          cin_copie_url?: string | null
+          abstract_file_url?: string | null
+          accompanying_material_type?: string | null
+          author_birth_date?: string | null
+          author_city?: string | null
+          author_email?: string | null
+          author_gender?: string | null
+          author_name?: string | null
+          author_phone?: string | null
+          author_pseudonym?: string | null
+          author_region?: string | null
+          author_sigle?: string | null
+          author_status?: string | null
+          author_type?: string | null
+          cin_file_url?: string | null
+          collection_number?: string | null
+          collection_title?: string | null
+          cover_file_url?: string | null
           created_at?: string | null
-          date_publication?: string | null
-          email_editeur?: string | null
-          exemplaires_depot?: number | null
-          format?: string | null
+          declaration_nature?: string | null
+          has_accompanying_material?: string | null
           id?: string
-          isbn?: string | null
-          langue_publication?: string | null
-          nationalite_auteur?: string | null
-          nom_auteur?: string | null
-          nom_editeur?: string | null
-          nom_imprimeur?: string | null
-          nombre_pages?: number | null
-          prenom_auteur?: string | null
+          is_periodic?: string | null
+          issn_submitted?: boolean | null
+          languages?: string[] | null
+          multiple_volumes?: string | null
+          number_of_pages?: number | null
+          number_of_volumes?: number | null
+          print_run_number?: number | null
+          printer_address?: string | null
+          printer_country?: string | null
+          printer_email?: string | null
+          printer_id?: string | null
+          printer_phone?: string | null
+          publication_date?: string | null
+          publication_discipline?: string | null
+          publication_title?: string
+          publication_type?: string | null
+          publisher_id?: string | null
+          quran_authorization_url?: string | null
           request_id?: string | null
-          sous_titre?: string | null
-          telephone_editeur?: string | null
-          tirage?: number | null
-          titre_publication?: string
+          summary_file_url?: string | null
+          support_type?: string | null
+          thesis_recommendation_url?: string | null
           updated_at?: string | null
           user_id?: string
-          ville_editeur?: string | null
-          ville_imprimeur?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "legal_deposit_monograph_data_printer_id_fkey"
+            columns: ["printer_id"]
+            isOneToOne: false
+            referencedRelation: "printers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "legal_deposit_monograph_data_publisher_id_fkey"
+            columns: ["publisher_id"]
+            isOneToOne: false
+            referencedRelation: "publishers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "legal_deposit_monograph_data_request_id_fkey"
             columns: ["request_id"]
