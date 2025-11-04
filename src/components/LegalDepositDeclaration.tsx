@@ -82,8 +82,11 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const { fields: customFields, loading: customFieldsLoading } = useDynamicForm({ 
     formKey: depositType === "monographie" ? "legal_deposit_monograph" : 
             depositType === "periodique" ? "legal_deposit_periodical" : 
+            depositType === "bd_logiciels" ? "legal_deposit_bd_software" :
+            depositType === "collections_specialisees" ? "legal_deposit_special_collections" :
             "",
-    enabled: depositType === "monographie" || depositType === "periodique"
+    enabled: depositType === "monographie" || depositType === "periodique" || 
+             depositType === "bd_logiciels" || depositType === "collections_specialisees"
   });
 
   // Debug: afficher les champs chargés
@@ -1932,6 +1935,24 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     disabled={!selectedRegion}
                   />
                 </div>
+
+                {/* Champs personnalisés */}
+                {customFields
+                  .filter((field) => field.section_key === "author_info")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
               </div>
             </div>
 
@@ -2112,6 +2133,24 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   )}
                 </div>
 
+                {/* Champs personnalisés */}
+                {customFields
+                  .filter((field) => field.section_key === "work_info")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
+
               </div>
             </div>
 
@@ -2216,6 +2255,24 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   )}
                 </div>
 
+                {/* Champs personnalisés */}
+                {customFields
+                  .filter((field) => field.section_key === "producer_info")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
+                
                 <div className="space-y-2">
                   <Label>Date prévue de parution</Label>
                   <div className="flex gap-2">
@@ -2269,6 +2326,24 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     </Popover>
                   </div>
                 </div>
+
+                {/* Champs personnalisés */}
+                {customFields
+                  .filter((field) => field.section_key === "publisher_info")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
               </div>
             </div>
 
@@ -2432,6 +2507,24 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Label>Adresse</Label>
                   <Textarea placeholder="Adresse complète" />
                 </div>
+
+                {/* Champs personnalisés */}
+                {customFields
+                  .filter((field) => field.section_key === "responsible_info")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
               </div>
             </div>
 
@@ -2531,6 +2624,24 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Label>Mots clés</Label>
                   <Input placeholder="Mots clés" />
                 </div>
+
+                {/* Champs personnalisés */}
+                {customFields
+                  .filter((field) => field.section_key === "collection_info")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
               </div>
             </div>
 
@@ -2864,6 +2975,24 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Label>Nombre de tirage</Label>
                   <Input type="number" placeholder="Nombre de tirage" />
                 </div>
+
+                {/* Champs personnalisés */}
+                {customFields
+                  .filter((field) => field.section_key === "content_description")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
               </div>
             </div>
 
@@ -2920,6 +3049,24 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 "application/pdf"
               )
             )}
+            
+            {/* Champs personnalisés pour documents requis */}
+            {(depositType === "bd_logiciels" || depositType === "collections_specialisees") && customFields
+              .filter((field) => field.section_key === "required_documents")
+              .map((field) => (
+                <DynamicFieldRenderer
+                  key={field.id}
+                  field={field}
+                  language={language}
+                  value={customFieldsData[field.field_key]}
+                  onChange={(value) =>
+                    setCustomFieldsData((prev) => ({
+                      ...prev,
+                      [field.field_key]: value,
+                    }))
+                  }
+                />
+              ))}
           </div>
 
           {/* Résumé des fichiers joints */}
