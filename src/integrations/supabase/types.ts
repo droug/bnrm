@@ -3490,6 +3490,39 @@ export type Database = {
           },
         ]
       }
+      forms: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          form_key: string
+          form_name: string
+          id: string
+          is_active: boolean | null
+          module: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          form_key: string
+          form_name: string
+          id?: string
+          is_active?: boolean | null
+          module?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          form_key?: string
+          form_name?: string
+          id?: string
+          is_active?: boolean | null
+          module?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       fraud_detection_logs: {
         Row: {
           action_taken: string | null
