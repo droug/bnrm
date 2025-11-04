@@ -2,27 +2,56 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface SimpleSelectProps {
+interface FieldSelectProps {
   value?: string;
-  onChange: (value: string) => void;
-  options: Array<{ value: string; label: string }>;
+  onValueChange: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
-  className?: string;
-  id?: string;
+  children: React.ReactNode;
 }
 
-export function SimpleSelect({
+interface FieldSelectItemProps {
+  value: string;
+  children: React.ReactNode;
+}
+
+export function FieldSelectItem({ value, children }: FieldSelectItemProps) {
+  return (
+    <div data-value={value} data-label={children}>
+      {children}
+    </div>
+  );
+}
+
+export function FieldSelect({
   value,
-  onChange,
-  options,
+  onValueChange,
   placeholder = "Sélectionner...",
   disabled = false,
-  className,
-  id,
-}: SimpleSelectProps) {
+  children,
+}: FieldSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
+
+  // Extraire les options depuis les enfants
+  const options: Array<{ value: string; label: React.ReactNode }> = [];
+  
+  const extractOptions = (child: any) => {
+    if (!child) return;
+    
+    if (Array.isArray(child)) {
+      child.forEach(extractOptions);
+    } else if (child.type === FieldSelectItem) {
+      options.push({
+        value: child.props.value,
+        label: child.props.children,
+      });
+    } else if (child.props?.children) {
+      extractOptions(child.props.children);
+    }
+  };
+  
+  extractOptions(children);
 
   // Trouver le label de la valeur sélectionnée
   const selectedOption = options.find((opt) => opt.value === value);
@@ -46,12 +75,12 @@ export function SimpleSelect({
   }, [isOpen]);
 
   const handleSelect = (selectedValue: string) => {
-    onChange(selectedValue);
+    onValueChange(selectedValue);
     setIsOpen(false);
   };
 
   return (
-    <div ref={selectRef} className={cn("relative w-full", className)} id={id}>
+    <div ref={selectRef} className="relative w-full">
       {/* Bouton trigger */}
       <button
         type="button"

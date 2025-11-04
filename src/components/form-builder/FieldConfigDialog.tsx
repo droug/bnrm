@@ -7,7 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FieldSelect, FieldSelectItem } from "@/components/ui/field-select";
 import { customFieldConfigSchema, CustomFieldConfig } from "@/schemas/customFieldSchema";
 import { CustomField } from "@/types/formBuilder";
 import { Loader2 } from "lucide-react";
@@ -169,28 +169,27 @@ export function FieldConfigDialog({
                     <FormLabel className="flex items-center gap-1">
                       Type de champ <span className="text-destructive">*</span>
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner un type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="text">Texte sur seule ligne</SelectItem>
-                        <SelectItem value="textarea">Texte multiligne</SelectItem>
-                        <SelectItem value="number">Nombre</SelectItem>
-                        <SelectItem value="date">Date</SelectItem>
-                        <SelectItem value="select">Liste système</SelectItem>
-                        <SelectItem value="multiselect">Multiple sélection</SelectItem>
-                        <SelectItem value="boolean">Oui/Non (checkbox)</SelectItem>
-                        <SelectItem value="file">Fichier</SelectItem>
-                        <SelectItem value="link">Lien (URL)</SelectItem>
-                        <SelectItem value="location">Emplacement</SelectItem>
-                        <SelectItem value="coordinates">Latitude/Longitude</SelectItem>
-                        <SelectItem value="reference">Référence</SelectItem>
-                        <SelectItem value="group">Groupe de champs</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <FieldSelect
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        placeholder="Sélectionner un type"
+                      >
+                        <FieldSelectItem value="text">Texte sur seule ligne</FieldSelectItem>
+                        <FieldSelectItem value="textarea">Texte multiligne</FieldSelectItem>
+                        <FieldSelectItem value="number">Nombre</FieldSelectItem>
+                        <FieldSelectItem value="date">Date</FieldSelectItem>
+                        <FieldSelectItem value="select">Liste système</FieldSelectItem>
+                        <FieldSelectItem value="multiselect">Multiple sélection</FieldSelectItem>
+                        <FieldSelectItem value="boolean">Oui/Non (checkbox)</FieldSelectItem>
+                        <FieldSelectItem value="file">Fichier</FieldSelectItem>
+                        <FieldSelectItem value="link">Lien (URL)</FieldSelectItem>
+                        <FieldSelectItem value="location">Emplacement</FieldSelectItem>
+                        <FieldSelectItem value="coordinates">Latitude/Longitude</FieldSelectItem>
+                        <FieldSelectItem value="reference">Référence</FieldSelectItem>
+                        <FieldSelectItem value="group">Groupe de champs</FieldSelectItem>
+                      </FieldSelect>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
