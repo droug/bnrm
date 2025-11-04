@@ -33,14 +33,18 @@ export default function ManageSectionFields() {
     queryFn: async () => {
       if (!selectedFormKey) return [];
       
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("form_sections")
         .select("*")
         .eq("form_key", selectedFormKey)
         .eq("is_active", true)
         .order("order_index", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching sections:", error);
+        throw error;
+      }
+      console.log("Sections loaded:", data);
       return data || [];
     },
     enabled: !!selectedFormKey,
