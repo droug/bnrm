@@ -14,17 +14,18 @@ export function useFormBuilder() {
   const loadFormStructure = async (filter: FormFilter) => {
     setLoading(true);
     try {
-      // Charger le formulaire
+      // Charger le formulaire depuis la table forms
       const { data: formData, error: formError } = await supabase
-        .from("configurable_forms")
+        .from("forms")
         .select("*")
-        .eq("platform", filter.platform)
-        .eq("module", filter.module)
         .eq("form_key", filter.formKey)
-        .single();
+        .maybeSingle();
 
       if (formError) throw formError;
-      setCurrentForm(formData);
+      if (!formData) {
+        throw new Error("Formulaire introuvable");
+      }
+      setCurrentForm(formData as any);
 
       // Charger la version actuelle
       const { data: versionData, error: versionError } = await supabase
@@ -33,9 +34,12 @@ export function useFormBuilder() {
         .eq("form_id", formData.id)
         .order("version_number", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (versionError) throw versionError;
+      if (!versionData) {
+        throw new Error("Aucune version trouvée pour ce formulaire");
+      }
       setCurrentStructure(versionData as any);
 
       // Charger les champs personnalisés existants
@@ -491,12 +495,15 @@ export function useFormBuilder() {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .rpc('get_modules_by_platform', { p_platform: platform });
+        .from("forms")
+        .select("module")
+        .order("module");
 
       if (error) throw error;
-      // Filter out any empty strings
-      setAvailableModules(data?.map((m: any) => m.module).filter((m: string) => m && m.trim()) || []);
-    } catch (error: any) {
+      
+      const uniqueModules = [...new Set(data?.map(f => f.module).filter(Boolean) || [])];
+      setAvailableModules(uniqueModules as string[]);
+    } catch (error) {
       console.error("Error loading modules:", error);
       toast.error("Erreur lors du chargement des modules");
     } finally {
@@ -508,16 +515,14 @@ export function useFormBuilder() {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .rpc('get_forms_by_platform', { p_platform: platform });
+        .from("forms")
+        .select("*")
+        .eq("module", module)
+        .order("form_name");
 
       if (error) throw error;
-      
-      // Filter out any forms with empty form_key
-      const filteredForms = data?.filter((f: any) => 
-        f.module === module && f.form_key && f.form_key.trim()
-      ) || [];
-      setAvailableForms(filteredForms as any);
-    } catch (error: any) {
+      setAvailableForms(data as any || []);
+    } catch (error) {
       console.error("Error loading forms:", error);
       toast.error("Erreur lors du chargement des formulaires");
     } finally {

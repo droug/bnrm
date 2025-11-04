@@ -2,12 +2,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 export async function initializeLegalDepositMonographForm() {
   try {
-    // Vérifier si le formulaire existe
+    // Vérifier si le formulaire existe dans la table forms
     const { data: form } = await supabase
-      .from("configurable_forms")
+      .from("forms")
       .select("id")
       .eq("form_key", "legal_deposit_monograph")
-      .single();
+      .maybeSingle();
 
     if (!form) {
       throw new Error("Form not found");
