@@ -169,11 +169,15 @@ export const useSendMessage = () => {
       messageType?: 'text' | 'file' | 'image';
       attachments?: any;
     }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const { data, error } = await supabase
         .from('messages')
         .insert([
           {
             conversation_id: conversationId,
+            sender_id: user.id,
             content,
             message_type: messageType,
             attachments,
