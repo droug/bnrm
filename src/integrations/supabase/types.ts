@@ -3485,7 +3485,7 @@ export type Database = {
             foreignKeyName: "form_versions_form_id_fkey"
             columns: ["form_id"]
             isOneToOne: false
-            referencedRelation: "configurable_forms"
+            referencedRelation: "forms"
             referencedColumns: ["id"]
           },
         ]
