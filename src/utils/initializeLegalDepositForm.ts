@@ -18,7 +18,7 @@ export async function initializeLegalDepositMonographForm() {
       .from("form_versions")
       .select("id")
       .eq("form_id", form.id)
-      .single();
+      .maybeSingle();
 
     if (existingVersion) {
       console.log("Version already exists");

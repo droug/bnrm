@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -20,6 +20,7 @@ import { useFormBuilder } from "@/hooks/useFormBuilder";
 import { FormFilter, CustomField } from "@/types/formBuilder";
 import { Loader2, Upload, Download } from "lucide-react";
 import { toast } from "sonner";
+import { initializeLegalDepositMonographForm } from "@/utils/initializeLegalDepositForm";
 
 export default function FormBuilder() {
   const navigate = useNavigate();
@@ -64,6 +65,14 @@ export default function FormBuilder() {
     setFilter({ ...filter, module, formKey: "" });
     await loadFormsByPlatformAndModule(filter.platform, module);
   };
+
+  // Initialiser le formulaire au chargement
+  useEffect(() => {
+    const init = async () => {
+      await initializeLegalDepositMonographForm();
+    };
+    init();
+  }, []);
 
   if (!user || !profile || (profile.role !== 'admin' && profile.role !== 'librarian')) {
     return <Navigate to="/auth" replace />;
