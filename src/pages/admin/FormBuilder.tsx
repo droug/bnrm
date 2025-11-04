@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,10 +18,11 @@ import { SectionManager } from "@/components/form-builder/SectionManager";
 import { FormGenerator } from "@/components/form-builder/FormGenerator";
 import { useFormBuilder } from "@/hooks/useFormBuilder";
 import { FormFilter, CustomField } from "@/types/formBuilder";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, Download } from "lucide-react";
 import { toast } from "sonner";
 
 export default function FormBuilder() {
+  const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [filter, setFilter] = useState<FormFilter>({
     platform: "bnrm",
@@ -138,10 +140,21 @@ export default function FormBuilder() {
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Gestion des champs</h1>
-          <p className="text-muted-foreground">
-            Personnalisez vos formulaires en ajoutant ou modifiant des champs
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Gestion des champs</h1>
+              <p className="text-muted-foreground">
+                Personnalisez vos formulaires en ajoutant ou modifiant des champs
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/admin/import-form-fields")}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Importer des champs
+            </Button>
+          </div>
         </div>
 
         {/* Filtres */}
