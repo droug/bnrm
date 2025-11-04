@@ -342,6 +342,122 @@ export function useFormBuilder() {
     }
   };
 
+  const generateCompleteForm = async (formKey: string) => {
+    if (!currentForm || !currentStructure) {
+      toast.error("Aucun formulaire chargé");
+      return;
+    }
+
+    try {
+      // 1. Générer et insérer les sections
+      const sections = getFormSections(formKey);
+      
+      const { error: updateError } = await supabase
+        .from("form_versions")
+        .update({
+          structure: {
+            sections: sections,
+          } as any,
+        })
+        .eq("id", currentStructure.id);
+
+      if (updateError) throw updateError;
+
+      // 2. Générer et insérer tous les champs
+      const baseFormFields = getBaseFormFields(formKey);
+      const allFields: CustomField[] = [];
+
+      for (const section of sections) {
+        const sectionFields = baseFormFields[section.key] || [];
+        
+        for (let i = 0; i < sectionFields.length; i++) {
+          const baseField = sectionFields[i];
+          
+          const { data, error } = await supabase
+            .from("custom_fields")
+            .insert({
+              form_version_id: currentStructure.id,
+              field_key: baseField.field_key,
+              field_type: baseField.field_type,
+              section_key: section.key,
+              order_index: i,
+              label_fr: baseField.label_fr,
+              label_ar: baseField.label_ar || "",
+              description_fr: baseField.description_fr || "",
+              is_required: baseField.is_required || false,
+              is_visible: baseField.is_visible !== false,
+              is_readonly: baseField.is_readonly || false,
+            })
+            .select()
+            .single();
+          
+          if (!error && data) {
+            allFields.push(data as any);
+          }
+        }
+      }
+
+      // 3. Mettre à jour l'état local
+      setCurrentStructure({
+        ...currentStructure,
+        structure: {
+          sections: sections,
+        },
+      });
+      setCustomFields(allFields);
+
+      toast.success(`${sections.length} sections et ${allFields.length} champs générés`);
+    } catch (error: any) {
+      console.error("Error generating complete form:", error);
+      toast.error("Erreur lors de la génération du formulaire");
+      throw error;
+    }
+  };
+
+  const getFormSections = (formKey: string): FormSection[] => {
+    const sectionsConfig: Record<string, FormSection[]> = {
+      legal_deposit_monograph: [
+        {
+          key: "identification_auteur",
+          label_fr: "Identification de l'auteur",
+          label_ar: "تعريف المؤلف",
+          order_index: 0,
+          fields: [],
+        },
+        {
+          key: "identification_publication",
+          label_fr: "Identification de la publication",
+          label_ar: "تعريف المنشور",
+          order_index: 1,
+          fields: [],
+        },
+        {
+          key: "identification_editeur",
+          label_fr: "Identification de l'Éditeur",
+          label_ar: "تعريف الناشر",
+          order_index: 2,
+          fields: [],
+        },
+        {
+          key: "identification_imprimeur",
+          label_fr: "Identification de l'imprimeur",
+          label_ar: "تعريف المطبعة",
+          order_index: 3,
+          fields: [],
+        },
+        {
+          key: "pieces_fournir",
+          label_fr: "Pièces à fournir",
+          label_ar: "الوثائق المطلوبة",
+          order_index: 4,
+          fields: [],
+        },
+      ],
+    };
+
+    return sectionsConfig[formKey] || [];
+  };
+
   const reorderFields = async (sectionKey: string, fieldIds: string[]) => {
     try {
       const updates = fieldIds.map((fieldId, index) => ({
@@ -425,5 +541,6 @@ export function useFormBuilder() {
     publishVersion,
     reorderFields,
     updateSections,
+    generateCompleteForm,
   };
 }

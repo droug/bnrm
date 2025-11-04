@@ -14,6 +14,7 @@ import { FieldTypesPalette } from "@/components/form-builder/FieldTypesPalette";
 import { FormFieldsList } from "@/components/form-builder/FormFieldsList";
 import { FieldConfigDialog } from "@/components/form-builder/FieldConfigDialog";
 import { SectionManager } from "@/components/form-builder/SectionManager";
+import { FormGenerator } from "@/components/form-builder/FormGenerator";
 import { useFormBuilder } from "@/hooks/useFormBuilder";
 import { FormFilter, CustomField } from "@/types/formBuilder";
 import { Loader2, Upload } from "lucide-react";
@@ -47,6 +48,7 @@ export default function FormBuilder() {
     publishVersion,
     reorderFields,
     updateSections,
+    generateCompleteForm,
   } = useFormBuilder();
 
   // Charger les modules quand la plateforme change
@@ -248,8 +250,17 @@ export default function FormBuilder() {
           </Card>
         )}
 
+        {/* Générateur automatique de formulaire */}
+        {currentForm && currentStructure && formSections.length === 0 && (
+          <FormGenerator
+            formKey={currentForm.form_key}
+            formName={currentForm.form_name}
+            onGenerate={() => generateCompleteForm(currentForm.form_key)}
+          />
+        )}
+
         {/* Gestionnaire de sections */}
-        {currentForm && currentStructure && (
+        {currentForm && currentStructure && formSections.length > 0 && (
           <SectionManager
             sections={formSections}
             onSectionsUpdate={updateSections}
