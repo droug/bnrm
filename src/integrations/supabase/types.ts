@@ -4022,6 +4022,107 @@ export type Database = {
           },
         ]
       }
+      legal_deposit_monograph_data: {
+        Row: {
+          adresse_editeur: string | null
+          adresse_imprimeur: string | null
+          bordereau_depot_url: string | null
+          cin_auteur: string | null
+          cin_copie_url: string | null
+          created_at: string | null
+          date_publication: string | null
+          email_editeur: string | null
+          exemplaires_depot: number | null
+          format: string | null
+          id: string
+          isbn: string | null
+          langue_publication: string | null
+          nationalite_auteur: string | null
+          nom_auteur: string | null
+          nom_editeur: string | null
+          nom_imprimeur: string | null
+          nombre_pages: number | null
+          prenom_auteur: string | null
+          request_id: string | null
+          sous_titre: string | null
+          telephone_editeur: string | null
+          tirage: number | null
+          titre_publication: string
+          updated_at: string | null
+          user_id: string
+          ville_editeur: string | null
+          ville_imprimeur: string | null
+        }
+        Insert: {
+          adresse_editeur?: string | null
+          adresse_imprimeur?: string | null
+          bordereau_depot_url?: string | null
+          cin_auteur?: string | null
+          cin_copie_url?: string | null
+          created_at?: string | null
+          date_publication?: string | null
+          email_editeur?: string | null
+          exemplaires_depot?: number | null
+          format?: string | null
+          id?: string
+          isbn?: string | null
+          langue_publication?: string | null
+          nationalite_auteur?: string | null
+          nom_auteur?: string | null
+          nom_editeur?: string | null
+          nom_imprimeur?: string | null
+          nombre_pages?: number | null
+          prenom_auteur?: string | null
+          request_id?: string | null
+          sous_titre?: string | null
+          telephone_editeur?: string | null
+          tirage?: number | null
+          titre_publication: string
+          updated_at?: string | null
+          user_id: string
+          ville_editeur?: string | null
+          ville_imprimeur?: string | null
+        }
+        Update: {
+          adresse_editeur?: string | null
+          adresse_imprimeur?: string | null
+          bordereau_depot_url?: string | null
+          cin_auteur?: string | null
+          cin_copie_url?: string | null
+          created_at?: string | null
+          date_publication?: string | null
+          email_editeur?: string | null
+          exemplaires_depot?: number | null
+          format?: string | null
+          id?: string
+          isbn?: string | null
+          langue_publication?: string | null
+          nationalite_auteur?: string | null
+          nom_auteur?: string | null
+          nom_editeur?: string | null
+          nom_imprimeur?: string | null
+          nombre_pages?: number | null
+          prenom_auteur?: string | null
+          request_id?: string | null
+          sous_titre?: string | null
+          telephone_editeur?: string | null
+          tirage?: number | null
+          titre_publication?: string
+          updated_at?: string | null
+          user_id?: string
+          ville_editeur?: string | null
+          ville_imprimeur?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_deposit_monograph_data_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: true
+            referencedRelation: "legal_deposit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_deposit_parties: {
         Row: {
           approval_comments: string | null
