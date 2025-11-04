@@ -9389,6 +9389,23 @@ export type Database = {
           step_name: string
         }[]
       }
+      get_forms_by_platform: {
+        Args: { p_platform: string }
+        Returns: {
+          current_version: number
+          form_key: string
+          form_name: string
+          id: string
+          module: string
+          platform: string
+        }[]
+      }
+      get_modules_by_platform: {
+        Args: { p_platform: string }
+        Returns: {
+          module: string
+        }[]
+      }
       get_professional_role: { Args: { p_user_id: string }; Returns: string }
       get_profile_permissions: { Args: { user_uuid: string }; Returns: Json }
       get_profile_with_contact: {

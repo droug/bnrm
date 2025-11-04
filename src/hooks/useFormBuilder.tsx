@@ -8,6 +8,8 @@ export function useFormBuilder() {
   const [currentForm, setCurrentForm] = useState<ConfigurableForm | null>(null);
   const [currentStructure, setCurrentStructure] = useState<FormStructure | null>(null);
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
+  const [availableModules, setAvailableModules] = useState<string[]>([]);
+  const [availableForms, setAvailableForms] = useState<ConfigurableForm[]>([]);
 
   const loadFormStructure = async (filter: FormFilter) => {
     setLoading(true);
@@ -226,12 +228,50 @@ export function useFormBuilder() {
     }
   };
 
+  const loadModulesByPlatform = async (platform: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .rpc('get_modules_by_platform', { p_platform: platform });
+
+      if (error) throw error;
+      setAvailableModules(data?.map((m: any) => m.module) || []);
+    } catch (error: any) {
+      console.error("Error loading modules:", error);
+      toast.error("Erreur lors du chargement des modules");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadFormsByPlatformAndModule = async (platform: string, module: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .rpc('get_forms_by_platform', { p_platform: platform });
+
+      if (error) throw error;
+      
+      const filteredForms = data?.filter((f: any) => f.module === module) || [];
+      setAvailableForms(filteredForms as any);
+    } catch (error: any) {
+      console.error("Error loading forms:", error);
+      toast.error("Erreur lors du chargement des formulaires");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     currentForm,
     currentStructure,
     customFields,
+    availableModules,
+    availableForms,
     loadFormStructure,
+    loadModulesByPlatform,
+    loadFormsByPlatformAndModule,
     createField,
     updateField,
     deleteField,

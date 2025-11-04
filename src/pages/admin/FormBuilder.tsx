@@ -35,13 +35,29 @@ export default function FormBuilder() {
     currentForm,
     currentStructure,
     customFields,
+    availableModules,
+    availableForms,
     loadFormStructure,
+    loadModulesByPlatform,
+    loadFormsByPlatformAndModule,
     createField,
     updateField,
     deleteField,
     publishVersion,
     reorderFields,
   } = useFormBuilder();
+
+  // Charger les modules quand la plateforme change
+  const handlePlatformChange = async (platform: string) => {
+    setFilter({ ...filter, platform, module: "", formKey: "" });
+    await loadModulesByPlatform(platform);
+  };
+
+  // Charger les formulaires quand le module change
+  const handleModuleChange = async (module: string) => {
+    setFilter({ ...filter, module, formKey: "" });
+    await loadFormsByPlatformAndModule(filter.platform, module);
+  };
 
   if (!user || !profile || (profile.role !== 'admin' && profile.role !== 'librarian')) {
     return <Navigate to="/auth" replace />;
@@ -126,7 +142,7 @@ export default function FormBuilder() {
               <Label htmlFor="platform">Plateforme</Label>
               <Select
                 value={filter.platform}
-                onValueChange={(value) => setFilter({ ...filter, platform: value })}
+                onValueChange={handlePlatformChange}
               >
                 <SelectTrigger id="platform">
                   <SelectValue />
@@ -145,15 +161,18 @@ export default function FormBuilder() {
               <Label htmlFor="module">Module</Label>
               <Select
                 value={filter.module}
-                onValueChange={(value) => setFilter({ ...filter, module: value })}
+                onValueChange={handleModuleChange}
+                disabled={availableModules.length === 0}
               >
                 <SelectTrigger id="module">
                   <SelectValue placeholder="Sélectionner un module" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="monographies">Monographies</SelectItem>
-                  <SelectItem value="periodiques">Périodiques</SelectItem>
-                  <SelectItem value="reservations">Réservations</SelectItem>
+                  {availableModules.map((module) => (
+                    <SelectItem key={module} value={module}>
+                      {module.charAt(0).toUpperCase() + module.slice(1)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -163,13 +182,17 @@ export default function FormBuilder() {
               <Select
                 value={filter.formKey}
                 onValueChange={(value) => setFilter({ ...filter, formKey: value })}
+                disabled={availableForms.length === 0}
               >
                 <SelectTrigger id="formKey">
                   <SelectValue placeholder="Sélectionner un formulaire" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="form1">Formulaire de dépôt</SelectItem>
-                  <SelectItem value="form2">Demande d'accès</SelectItem>
+                  {availableForms.map((form) => (
+                    <SelectItem key={form.id} value={form.form_key}>
+                      {form.form_name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
