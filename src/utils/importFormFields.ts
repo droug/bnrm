@@ -268,6 +268,8 @@ export const legalDepositMonographFields = [
 
 export async function importFormFields(formKey: string) {
   try {
+    console.log("Starting import for formKey:", formKey);
+    
     // 1. Récupérer ou créer le formulaire
     let formsResponse = await (supabase as any)
       .from("forms")
@@ -275,6 +277,7 @@ export async function importFormFields(formKey: string) {
       .eq("form_key", formKey)
       .maybeSingle();
 
+    console.log("Forms response:", formsResponse);
     if (formsResponse.error) throw formsResponse.error;
     
     let form = formsResponse.data;
@@ -306,11 +309,15 @@ export async function importFormFields(formKey: string) {
         .select()
         .single();
       
+      console.log("Create form response:", createFormResponse);
       if (createFormResponse.error) throw createFormResponse.error;
       form = createFormResponse.data;
     }
+    
+    console.log("Using form:", form);
 
     // 2. Récupérer la dernière version (ou en créer une)
+    console.log("Fetching versions for form_id:", form.id);
     let versionsResponse = await (supabase as any)
       .from("form_versions")
       .select("*")
@@ -319,6 +326,7 @@ export async function importFormFields(formKey: string) {
       .limit(1)
       .maybeSingle();
 
+    console.log("Versions response:", versionsResponse);
     let version = versionsResponse.data;
 
     if (!version) {
@@ -332,6 +340,7 @@ export async function importFormFields(formKey: string) {
         ]
       };
 
+      console.log("Creating version with form_id:", form.id);
       const createVersionResponse = await (supabase as any)
         .from("form_versions")
         .insert({
@@ -343,9 +352,15 @@ export async function importFormFields(formKey: string) {
         .select()
         .single();
 
-      if (createVersionResponse.error) throw createVersionResponse.error;
+      console.log("Create version response:", createVersionResponse);
+      if (createVersionResponse.error) {
+        console.error("Error creating version:", createVersionResponse.error);
+        throw createVersionResponse.error;
+      }
       version = createVersionResponse.data;
     }
+    
+    console.log("Using version:", version);
 
     // 3. Importer les champs
     let fieldsData: any[] = [];
