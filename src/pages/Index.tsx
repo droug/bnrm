@@ -241,7 +241,7 @@ const Index = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-11 px-3 bg-white/95 border-2 border-gold/30 hover:bg-primary/5 hover:border-primary/40 text-base font-medium"
+                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-11 px-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-foreground shadow-lg hover:shadow-xl transition-all"
                           >
                             <Filter className="h-4 w-4 mr-2" />
                             <ChevronDown className="h-4 w-4" />
