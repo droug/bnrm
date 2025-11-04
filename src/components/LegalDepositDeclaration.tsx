@@ -78,11 +78,18 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const { language, isRTL } = useLanguage();
   const { user } = useAuth();
   
-  // Charger les champs personnalisés
-  const { fields: customFields } = useDynamicForm({ 
+  // Charger les champs personnalisés - chercher aussi dans les versions non publiées en dev
+  const { fields: customFields, loading: customFieldsLoading } = useDynamicForm({ 
     formKey: "legal_deposit_monograph",
     enabled: depositType === "monographie"
   });
+
+  // Debug: afficher les champs chargés
+  useEffect(() => {
+    if (customFields && customFields.length > 0) {
+      console.log("Custom fields loaded:", customFields);
+    }
+  }, [customFields]);
   
   const [customFieldsData, setCustomFieldsData] = useState<Record<string, any>>({});
   const [currentStep, setCurrentStep] = useState<"type_selection" | "editor_auth" | "printer_auth" | "form_filling" | "confirmation">("type_selection");
@@ -549,7 +556,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 {/* Champs personnalisés */}
                 {customFields
-                  .filter((field) => field.section_key === "identification_auteur")
+                  .filter((field) => field.section_key === "author_identification")
                   .map((field) => (
                     <DynamicFieldRenderer
                       key={field.id}

@@ -34,12 +34,11 @@ export function useDynamicForm({ formKey, enabled = true }: UseDynamicFormOption
       if (!formsResponse.data) return;
       setForm(formsResponse.data);
 
-      // Charger la dernière version publiée
+      // Charger la dernière version (publiée ou non)
       const versionsResponse = await (supabase as any)
         .from("form_versions")
         .select("*")
         .eq("form_id", formsResponse.data.id)
-        .eq("is_published", true)
         .order("version_number", { ascending: false })
         .limit(1)
         .maybeSingle();
