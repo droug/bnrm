@@ -21,6 +21,8 @@ import { toast } from "sonner";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useDynamicForm } from "@/hooks/useDynamicForm";
+import { DynamicFieldRenderer } from "@/components/form-builder/DynamicFieldRenderer";
 import { moroccanRegions, getCitiesByRegion } from "@/data/moroccanRegions";
 import { bookDisciplines } from "@/data/bookDisciplines";
 import { worldLanguages } from "@/data/worldLanguages";
@@ -75,6 +77,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const navigate = useNavigate();
   const { language, isRTL } = useLanguage();
   const { user } = useAuth();
+  
+  // Charger les champs personnalisés
+  const { fields: customFields } = useDynamicForm({ 
+    formKey: "legal_deposit_monograph",
+    enabled: depositType === "monographie"
+  });
+  
+  const [customFieldsData, setCustomFieldsData] = useState<Record<string, any>>({});
   const [currentStep, setCurrentStep] = useState<"type_selection" | "editor_auth" | "printer_auth" | "form_filling" | "confirmation">("type_selection");
   const [userType, setUserType] = useState<"editor" | "printer" | "producer" | "distributor" | null>(null);
   const [partnerConfirmed, setPartnerConfirmed] = useState(false);
@@ -536,6 +546,24 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     disabled={!selectedRegion}
                   />
                 </div>
+
+                {/* Champs personnalisés */}
+                {customFields
+                  .filter((field) => field.section_key === "identification_auteur")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
               </div>
             </div>
 

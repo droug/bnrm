@@ -1,0 +1,142 @@
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { InlineSelect } from "@/components/ui/inline-select";
+import { CustomField } from "@/types/formBuilder";
+
+interface DynamicFieldRendererProps {
+  field: CustomField;
+  language: string;
+  value?: any;
+  onChange: (value: any) => void;
+}
+
+export function DynamicFieldRenderer({ field, language, value, onChange }: DynamicFieldRendererProps) {
+  const label = language === "ar" ? field.label_ar || field.label_fr : field.label_fr;
+  const description = language === "ar" ? field.description_ar : field.description_fr;
+
+  const renderField = () => {
+    switch (field.field_type) {
+      case "text":
+      case "email":
+      case "tel":
+      case "url":
+        return (
+          <Input
+            type={field.field_type}
+            value={value || ""}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={label}
+            required={field.is_required}
+            disabled={field.is_readonly}
+          />
+        );
+
+      case "textarea":
+        return (
+          <Textarea
+            value={value || ""}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={label}
+            required={field.is_required}
+            disabled={field.is_readonly}
+            rows={4}
+          />
+        );
+
+      case "number":
+        return (
+          <Input
+            type="number"
+            value={value || ""}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={label}
+            required={field.is_required}
+            disabled={field.is_readonly}
+          />
+        );
+
+      case "date":
+        return (
+          <Input
+            type="date"
+            value={value || ""}
+            onChange={(e) => onChange(e.target.value)}
+            required={field.is_required}
+            disabled={field.is_readonly}
+          />
+        );
+
+      case "checkbox":
+        return (
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              checked={value || false}
+              onCheckedChange={onChange}
+              disabled={field.is_readonly}
+            />
+            <label className="text-sm">{label}</label>
+          </div>
+        );
+
+      case "select":
+        // Les options doivent être définies dans field.config.options
+        const options = (field.config?.options as any)?.map((opt: string) => ({
+          value: opt,
+          label: opt,
+        })) || [];
+        
+        return (
+          <InlineSelect
+            value={value || ""}
+            onChange={onChange}
+            placeholder={`Sélectionner ${label.toLowerCase()}`}
+            options={options}
+            disabled={field.is_readonly}
+          />
+        );
+
+      case "file":
+        return (
+          <Input
+            type="file"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onChange(file);
+            }}
+            required={field.is_required}
+            disabled={field.is_readonly}
+          />
+        );
+
+      default:
+        return (
+          <Input
+            value={value || ""}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={label}
+            required={field.is_required}
+            disabled={field.is_readonly}
+          />
+        );
+    }
+  };
+
+  if (!field.is_visible) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label>
+        {label}
+        {field.is_required && <span className="text-destructive ml-1">*</span>}
+      </Label>
+      {renderField()}
+      {description && (
+        <p className="text-xs text-muted-foreground">{description}</p>
+      )}
+    </div>
+  );
+}
