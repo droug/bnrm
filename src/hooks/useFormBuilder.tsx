@@ -38,7 +38,7 @@ export function useFormBuilder() {
       if (versionError) throw versionError;
       setCurrentStructure(versionData as any);
 
-      // Charger les champs personnalisés
+      // Charger les champs personnalisés existants
       const { data: fieldsData, error: fieldsError } = await supabase
         .from("custom_fields")
         .select("*")
@@ -48,7 +48,21 @@ export function useFormBuilder() {
         .order("order_index");
 
       if (fieldsError) throw fieldsError;
-      setCustomFields((fieldsData as any) || []);
+      
+      // Générer automatiquement les champs manquants depuis la structure
+      const existingFields = (fieldsData as any) || [];
+      const structure = versionData.structure as any;
+      const sections = structure?.sections || [];
+      
+      // Pour chaque section, vérifier si elle a des champs de base à générer
+      const generatedFields = await generateMissingFields(
+        versionData.id,
+        sections,
+        existingFields,
+        filter.formKey
+      );
+      
+      setCustomFields([...existingFields, ...generatedFields]);
 
       toast.success("Formulaire chargé avec succès");
     } catch (error: any) {
@@ -57,6 +71,102 @@ export function useFormBuilder() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const generateMissingFields = async (
+    versionId: string,
+    sections: FormSection[],
+    existingFields: CustomField[],
+    formKey: string
+  ): Promise<CustomField[]> => {
+    const generatedFields: CustomField[] = [];
+    const baseFormFields = getBaseFormFields(formKey);
+    
+    for (const section of sections) {
+      const sectionBaseFields = baseFormFields[section.key] || [];
+      
+      for (let i = 0; i < sectionBaseFields.length; i++) {
+        const baseField = sectionBaseFields[i];
+        const fieldExists = existingFields.some(
+          (f) => f.field_key === baseField.field_key && f.section_key === section.key
+        );
+        
+        if (!fieldExists) {
+          try {
+            const { data, error } = await supabase
+              .from("custom_fields")
+              .insert({
+                form_version_id: versionId,
+                field_key: baseField.field_key,
+                field_type: baseField.field_type,
+                section_key: section.key,
+                order_index: i,
+                label_fr: baseField.label_fr,
+                label_ar: baseField.label_ar || "",
+                description_fr: baseField.description_fr || "",
+                is_required: baseField.is_required || false,
+                is_visible: baseField.is_visible !== false,
+                is_readonly: baseField.is_readonly || false,
+              })
+              .select()
+              .single();
+            
+            if (!error && data) {
+              generatedFields.push(data as any);
+            }
+          } catch (error) {
+            console.error(`Error creating field ${baseField.field_key}:`, error);
+          }
+        }
+      }
+    }
+    
+    return generatedFields;
+  };
+
+  // Définir les champs de base pour chaque formulaire
+  const getBaseFormFields = (formKey: string): Record<string, any[]> => {
+    // Configuration des champs de base par formulaire
+    const formFieldsConfig: Record<string, Record<string, any[]>> = {
+      legal_deposit_monograph: {
+        identification_auteur: [
+          { field_key: "nom_auteur", field_type: "text", label_fr: "Nom de l'auteur", label_ar: "اسم المؤلف", is_required: true },
+          { field_key: "prenom_auteur", field_type: "text", label_fr: "Prénom de l'auteur", label_ar: "اسم المؤلف الشخصي", is_required: true },
+          { field_key: "nationalite_auteur", field_type: "text", label_fr: "Nationalité de l'auteur", label_ar: "جنسية المؤلف" },
+          { field_key: "cin_auteur", field_type: "text", label_fr: "CIN de l'auteur", label_ar: "البطاقة الوطنية للمؤلف" },
+        ],
+        identification_publication: [
+          { field_key: "titre_publication", field_type: "text", label_fr: "Titre de la publication", label_ar: "عنوان المنشور", is_required: true },
+          { field_key: "sous_titre", field_type: "text", label_fr: "Sous-titre", label_ar: "العنوان الفرعي" },
+          { field_key: "isbn", field_type: "text", label_fr: "ISBN", label_ar: "الرقم الدولي", description_fr: "Numéro ISBN du livre" },
+          { field_key: "nombre_pages", field_type: "number", label_fr: "Nombre de pages", label_ar: "عدد الصفحات" },
+          { field_key: "format", field_type: "select", label_fr: "Format", label_ar: "الشكل" },
+          { field_key: "langue_publication", field_type: "select", label_fr: "Langue de publication", label_ar: "لغة النشر", is_required: true },
+          { field_key: "date_publication", field_type: "date", label_fr: "Date de publication", label_ar: "تاريخ النشر", is_required: true },
+        ],
+        identification_editeur: [
+          { field_key: "nom_editeur", field_type: "text", label_fr: "Nom de l'éditeur", label_ar: "اسم الناشر", is_required: true },
+          { field_key: "adresse_editeur", field_type: "text", label_fr: "Adresse de l'éditeur", label_ar: "عنوان الناشر" },
+          { field_key: "ville_editeur", field_type: "text", label_fr: "Ville de l'éditeur", label_ar: "مدينة الناشر" },
+          { field_key: "telephone_editeur", field_type: "tel", label_fr: "Téléphone de l'éditeur", label_ar: "هاتف الناشر" },
+          { field_key: "email_editeur", field_type: "email", label_fr: "Email de l'éditeur", label_ar: "البريد الإلكتروني للناشر" },
+        ],
+        identification_imprimeur: [
+          { field_key: "nom_imprimeur", field_type: "text", label_fr: "Nom de l'imprimeur", label_ar: "اسم المطبعة" },
+          { field_key: "adresse_imprimeur", field_type: "text", label_fr: "Adresse de l'imprimeur", label_ar: "عنوان المطبعة" },
+          { field_key: "ville_imprimeur", field_type: "text", label_fr: "Ville de l'imprimeur", label_ar: "مدينة المطبعة" },
+          { field_key: "tirage", field_type: "number", label_fr: "Tirage", label_ar: "عدد النسخ المطبوعة", description_fr: "Nombre d'exemplaires imprimés" },
+        ],
+        pieces_fournir: [
+          { field_key: "exemplaires_depot", field_type: "number", label_fr: "Nombre d'exemplaires à déposer", label_ar: "عدد النسخ المودعة", is_required: true, description_fr: "Minimum 3 exemplaires requis" },
+          { field_key: "cin_copie", field_type: "file", label_fr: "Copie CIN", label_ar: "نسخة من البطاقة الوطنية", is_required: true },
+          { field_key: "bordereau_depot", field_type: "file", label_fr: "Bordereau de dépôt", label_ar: "وصل الإيداع" },
+        ],
+      },
+      // On peut ajouter d'autres formulaires ici
+    };
+    
+    return formFieldsConfig[formKey] || {};
   };
 
   const createField = async (fieldData: Partial<CustomField>) => {
