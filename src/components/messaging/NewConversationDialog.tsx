@@ -83,6 +83,8 @@ export default function NewConversationDialog({
     setIsSubmitting(true);
 
     try {
+      console.log("Creating conversation with participants:", selectedUsers);
+      
       // Create conversation
       const conversation = await createConversation.mutateAsync({
         title: title || undefined,
@@ -90,11 +92,15 @@ export default function NewConversationDialog({
         conversationType: selectedUsers.length === 1 ? 'direct' : 'group',
       });
 
+      console.log("Conversation created:", conversation);
+
       // Send initial message
       await sendMessage.mutateAsync({
         conversationId: conversation.id,
         content: initialMessage.trim(),
       });
+
+      console.log("Initial message sent");
 
       // Reset form
       setTitle("");
@@ -104,13 +110,16 @@ export default function NewConversationDialog({
       
       // Notify parent and close
       onConversationCreated(conversation.id);
-      onOpenChange(false);
       
       toast({
         title: "Succès",
         description: "Conversation créée avec succès",
       });
+      
+      // Close modal after successful creation
+      onOpenChange(false);
     } catch (error: any) {
+      console.error("Error creating conversation:", error);
       toast({
         title: "Erreur",
         description: error.message || "Erreur lors de la création de la conversation",
