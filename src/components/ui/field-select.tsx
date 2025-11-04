@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +32,7 @@ export function FieldSelect({
   children,
 }: FieldSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const selectRef = useRef<HTMLDivElement>(null);
 
   // Extraire les options depuis les enfants
@@ -56,6 +58,18 @@ export function FieldSelect({
   // Trouver le label de la valeur sélectionnée
   const selectedOption = options.find((opt) => opt.value === value);
   const displayValue = selectedOption?.label || placeholder;
+
+  // Calculer la position de la liste déroulante
+  useEffect(() => {
+    if (isOpen && selectRef.current) {
+      const rect = selectRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, [isOpen]);
 
   // Fermer la liste si on clique en dehors
   useEffect(() => {
@@ -103,9 +117,16 @@ export function FieldSelect({
         />
       </button>
 
-      {/* Liste déroulante */}
-      {isOpen && (
-        <div className="absolute z-[100] mt-1 w-full rounded-md border border-border bg-background shadow-lg">
+      {/* Liste déroulante via Portal */}
+      {isOpen && createPortal(
+        <div 
+          className="fixed z-[9999] rounded-md border border-border bg-background shadow-lg"
+          style={{
+            top: `${dropdownPosition.top + 4}px`,
+            left: `${dropdownPosition.left}px`,
+            width: `${dropdownPosition.width}px`,
+          }}
+        >
           <div className="max-h-[300px] overflow-y-auto p-1">
             {options.map((option) => (
               <button
@@ -124,7 +145,8 @@ export function FieldSelect({
               </button>
             ))}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
