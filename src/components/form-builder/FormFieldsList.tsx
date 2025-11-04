@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Edit, Trash2, GripVertical } from "lucide-react";
 import { CustomField, FormSection } from "@/types/formBuilder";
 import { useDroppable } from "@dnd-kit/core";
@@ -99,13 +100,10 @@ function DroppableSection({ section, fields, language, onEdit, onDelete }: any) 
   return (
     <div
       ref={setNodeRef}
-      className={`p-4 border-2 rounded-lg transition-colors ${
-        isOver ? "border-primary bg-primary/5" : "border-border bg-background"
+      className={`transition-colors ${
+        isOver ? "bg-primary/5" : ""
       }`}
     >
-      <h4 className="text-base font-semibold mb-3 text-foreground">
-        {language === "fr" ? section.label_fr : section.label_ar || section.label_fr}
-      </h4>
       <div className="space-y-2">
         {sectionFields.length === 0 ? (
           <div className="p-6 text-center text-muted-foreground border-2 border-dashed border-border rounded-lg">
@@ -140,18 +138,48 @@ export function FormFieldsList({
       <h3 className="text-lg font-semibold mb-4 text-foreground">
         {formName ? `Les champs du formulaire : ${formName}` : "Les champs du formulaire"}
       </h3>
-      <div className="space-y-4">
-        {sections.map((section) => (
-          <DroppableSection
-            key={section.key}
-            section={section}
-            fields={fields}
-            language={language}
-            onEdit={onEditField}
-            onDelete={onDeleteField}
-          />
-        ))}
-      </div>
+      
+      <Accordion type="multiple" className="space-y-2" defaultValue={sections.map((s) => s.key)}>
+        {sections.map((section) => {
+          const sectionFields = fields.filter((f) => f.section_key === section.key);
+          
+          return (
+            <AccordionItem 
+              key={section.key} 
+              value={section.key}
+              className="border-2 border-border rounded-lg overflow-hidden"
+            >
+              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
+                <div className="flex items-center gap-3 text-left">
+                  <div className="flex-1">
+                    <span className="font-semibold text-foreground">
+                      {language === "fr" ? section.label_fr : section.label_ar || section.label_fr}
+                    </span>
+                    {section.label_ar && language === "fr" && (
+                      <span className="text-sm text-muted-foreground ml-2" dir="rtl">
+                        ({section.label_ar})
+                      </span>
+                    )}
+                  </div>
+                  <Badge variant="secondary" className="ml-2">
+                    {sectionFields.length} {sectionFields.length > 1 ? "champs" : "champ"}
+                  </Badge>
+                </div>
+              </AccordionTrigger>
+              
+              <AccordionContent className="px-4 pb-4 pt-2">
+                <DroppableSection
+                  section={section}
+                  fields={fields}
+                  language={language}
+                  onEdit={onEditField}
+                  onDelete={onDeleteField}
+                />
+              </AccordionContent>
+            </AccordionItem>
+          );
+        })}
+      </Accordion>
     </Card>
   );
 }
