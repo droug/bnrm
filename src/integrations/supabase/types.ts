@@ -3446,6 +3446,48 @@ export type Database = {
           },
         ]
       }
+      form_sections: {
+        Row: {
+          created_at: string | null
+          description_ar: string | null
+          description_fr: string | null
+          form_key: string
+          id: string
+          is_active: boolean | null
+          order_index: number
+          section_key: string
+          section_name_ar: string | null
+          section_name_fr: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description_ar?: string | null
+          description_fr?: string | null
+          form_key: string
+          id?: string
+          is_active?: boolean | null
+          order_index?: number
+          section_key: string
+          section_name_ar?: string | null
+          section_name_fr: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description_ar?: string | null
+          description_fr?: string | null
+          form_key?: string
+          id?: string
+          is_active?: boolean | null
+          order_index?: number
+          section_key?: string
+          section_name_ar?: string | null
+          section_name_fr?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       form_versions: {
         Row: {
           created_at: string | null
@@ -7248,6 +7290,80 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      section_custom_fields: {
+        Row: {
+          config: Json | null
+          created_at: string | null
+          default_value: string | null
+          description_ar: string | null
+          description_fr: string | null
+          field_key: string
+          field_type: string
+          id: string
+          is_readonly: boolean | null
+          is_required: boolean | null
+          is_visible: boolean | null
+          label_ar: string | null
+          label_fr: string
+          order_index: number
+          placeholder_ar: string | null
+          placeholder_fr: string | null
+          section_id: string
+          updated_at: string | null
+          validation_rules: Json | null
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string | null
+          default_value?: string | null
+          description_ar?: string | null
+          description_fr?: string | null
+          field_key: string
+          field_type: string
+          id?: string
+          is_readonly?: boolean | null
+          is_required?: boolean | null
+          is_visible?: boolean | null
+          label_ar?: string | null
+          label_fr: string
+          order_index?: number
+          placeholder_ar?: string | null
+          placeholder_fr?: string | null
+          section_id: string
+          updated_at?: string | null
+          validation_rules?: Json | null
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string | null
+          default_value?: string | null
+          description_ar?: string | null
+          description_fr?: string | null
+          field_key?: string
+          field_type?: string
+          id?: string
+          is_readonly?: boolean | null
+          is_required?: boolean | null
+          is_visible?: boolean | null
+          label_ar?: string | null
+          label_fr?: string
+          order_index?: number
+          placeholder_ar?: string | null
+          placeholder_fr?: string | null
+          section_id?: string
+          updated_at?: string | null
+          validation_rules?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "section_custom_fields_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "form_sections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_registrations: {
         Row: {

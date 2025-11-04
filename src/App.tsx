@@ -50,6 +50,7 @@ const ContentManagement = lazy(() => import("./pages/ContentManagement"));
 const AdminSettings = lazy(() => import("./pages/AdminSettings"));
 const FormBuilder = lazy(() => import("./pages/admin/FormBuilder"));
 const ImportFormFields = lazy(() => import("./pages/admin/ImportFormFields"));
+const ManageSectionFields = lazy(() => import("./pages/admin/ManageSectionFields"));
 const WysiwygPage = lazy(() => import("./pages/WysiwygPage"));
 const ArchivingPage = lazy(() => import("./pages/ArchivingPage"));
 const PreservationPage = lazy(() => import("./pages/PreservationPage"));
@@ -249,7 +250,8 @@ const App = () => {
             <Route path="/admin/cookie-settings" element={<CookieSettingsPage />} />
             <Route path="/admin/integrations" element={<IntegrationsPage />} />
         <Route path="/admin/form-builder" element={<FormBuilder />} />
-        <Route path="/admin/import-form-fields" element={<ImportFormFields />} />
+          <Route path="/admin/import-form-fields" element={<ImportFormFields />} />
+          <Route path="/admin/manage-section-fields" element={<ManageSectionFields />} />
         <Route path="/admin/cote-management" element={<CoteManagementPage />} />
         <Route path="/admin/bnrm-backoffice" element={<BNRMBackOffice />} />
         <Route path="/admin/reservations-ouvrages" element={<GestionReservationsOuvrages />} />
