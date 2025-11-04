@@ -39,6 +39,13 @@ export default function NewConversationDialog({
   const sendMessage = useSendMessage();
   const { toast } = useToast();
 
+  console.log("🟣 NewConversationDialog render:", {
+    open,
+    selectedUsers,
+    initialMessage,
+    isFormValid: selectedUsers.length > 0 && initialMessage.trim().length > 0
+  });
+
   const { data: users } = useQuery({
     queryKey: ['users-list', searchTerm],
     queryFn: async () => {
