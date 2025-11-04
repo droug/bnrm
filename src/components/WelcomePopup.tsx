@@ -20,10 +20,9 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
   console.log('WelcomePopup rendered, isOpen:', isOpen);
 
   const handleClose = () => {
-    console.log('WelcomePopup handleClose called, dontShowAgain:', dontShowAgain);
-    if (dontShowAgain) {
-      sessionStorage.setItem('bnrm-welcome-popup-dismissed', 'true');
-    }
+    console.log('WelcomePopup handleClose called');
+    // Toujours marquer comme vu pour cette session
+    sessionStorage.setItem('bnrm-welcome-popup-dismissed', 'true');
     onClose();
   };
 
@@ -166,18 +165,7 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
           </Card>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-border">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="dontShowAgain"
-                checked={dontShowAgain}
-                onCheckedChange={(checked) => setDontShowAgain(checked === true)}
-              />
-              <label htmlFor="dontShowAgain" className="text-sm text-muted-foreground cursor-pointer">
-                Ne plus afficher ce message d'accueil
-              </label>
-            </div>
-            
+          <div className="flex justify-end pt-4 border-t border-border">
             <div className="flex space-x-3">
               <Button variant="outline" onClick={handleClose}>
                 Fermer
