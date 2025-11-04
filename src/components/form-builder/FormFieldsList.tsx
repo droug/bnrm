@@ -11,6 +11,7 @@ interface FormFieldsListProps {
   sections: FormSection[];
   fields: CustomField[];
   language: "fr" | "ar";
+  formName?: string;
   onEditField: (field: CustomField) => void;
   onDeleteField: (fieldId: string) => void;
 }
@@ -130,13 +131,14 @@ export function FormFieldsList({
   sections,
   fields,
   language,
+  formName,
   onEditField,
   onDeleteField,
 }: FormFieldsListProps) {
   return (
     <Card className="p-4 bg-background border-2 border-border">
       <h3 className="text-lg font-semibold mb-4 text-foreground">
-        Les champs du projet
+        {formName ? `Les champs du formulaire : ${formName}` : "Les champs du formulaire"}
       </h3>
       <div className="space-y-4">
         {sections.map((section) => (

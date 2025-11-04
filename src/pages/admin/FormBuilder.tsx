@@ -262,6 +262,7 @@ export default function FormBuilder() {
                     sections={mockSections}
                     fields={customFields}
                     language={filter.language}
+                    formName={currentForm.form_name}
                     onEditField={handleEditField}
                     onDeleteField={deleteField}
                   />
