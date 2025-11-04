@@ -213,6 +213,10 @@ export const useCreateConversation = () => {
       participantIds: string[];
       conversationType?: 'direct' | 'group' | 'support';
     }) => {
+      // Get current user first
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       // Create conversation
       const { data: conversation, error: convError } = await supabase
         .from('conversations')
@@ -220,16 +224,13 @@ export const useCreateConversation = () => {
           {
             title,
             conversation_type: conversationType,
+            created_by: user.id,
           },
         ])
         .select()
         .single();
 
       if (convError) throw convError;
-
-      // Add current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
 
       const allParticipants = [user.id, ...participantIds];
 
