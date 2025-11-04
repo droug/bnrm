@@ -47,8 +47,8 @@ export const customFieldConfigSchema = z.object({
     .min(1, "La clé technique est requise")
     .regex(/^[a-z0-9_]+$/, "La clé doit contenir uniquement des lettres minuscules, chiffres et underscores"),
   field_type: fieldTypeEnum,
-  section_key: z.string().min(1, "La section est requise"),
-  order_index: z.number().int().min(0),
+  section_key: z.string().optional(),
+  order_index: z.number().int().min(0).optional(),
   insert_after: z.string().optional(),
   
   label_fr: z.string().min(1, "Le libellé français est requis"),

@@ -43,7 +43,6 @@ export function FieldConfigDialog({
           field_type: existingField.field_type as any,
           section_key: existingField.section_key,
           order_index: existingField.order_index,
-          insert_after: existingField.insert_after || "__start__",
           label_fr: existingField.label_fr,
           label_ar: existingField.label_ar || "",
           description_fr: existingField.description_fr || "",
@@ -61,7 +60,6 @@ export function FieldConfigDialog({
           field_type: fieldType as any,
           section_key: sections[0]?.key || "",
           order_index: existingFields.length,
-          insert_after: "__start__",
           label_fr: "",
           label_ar: "",
           description_fr: "",
@@ -76,12 +74,7 @@ export function FieldConfigDialog({
   const handleSubmit = async (data: CustomFieldConfig) => {
     setIsSubmitting(true);
     try {
-      // Convert __start__ back to undefined for storage
-      const submitData = {
-        ...data,
-        insert_after: data.insert_after === "__start__" ? undefined : data.insert_after,
-      };
-      await onSave(submitData);
+      await onSave(data);
       onOpenChange(false);
       form.reset();
     } catch (error) {
@@ -105,161 +98,223 @@ export function FieldConfigDialog({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="label_fr"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-1">
-                      Label <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="Libellé" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="label_ar"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-1">
-                      Étiquette en arabe <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="التسمية بالعربية" {...field} dir="rtl" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="description_fr"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description:</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Description" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="field_key"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Clé technique (slug unique)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="mon_champ_personnalise" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="section_key"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-1">
-                      Section: <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner une section" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {sections.map((section) => (
-                          <SelectItem key={section.key} value={section.key}>
-                            {section.label_fr}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="insert_after"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Insérer après le champ</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="En tête de section" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="__start__">En tête de section</SelectItem>
-                        {existingFields
-                          .filter((f) => f.section_key === form.watch("section_key"))
-                          .map((f) => (
-                            <SelectItem key={f.id} value={f.field_key}>
-                              {f.label_fr}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
+            {/* Informations de base */}
             <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-foreground border-b pb-2">
+                Informations de base
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="label_fr"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-1">
+                        Label français <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nom du champ" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="label_ar"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Label arabe</FormLabel>
+                      <FormControl>
+                        <Input placeholder="اسم الحقل" {...field} dir="rtl" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
-                name="is_required"
+                name="field_key"
                 render={({ field }) => (
-                  <FormItem className="flex items-center justify-between space-x-4">
-                    <FormLabel>Obligatoire</FormLabel>
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1">
+                      Clé technique <span className="text-destructive">*</span>
+                    </FormLabel>
                     <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Input 
+                        placeholder="nom_champ" 
+                        {...field}
+                        disabled={!!existingField}
+                      />
                     </FormControl>
+                    <FormMessage />
+                    {existingField && (
+                      <p className="text-xs text-muted-foreground">
+                        La clé technique ne peut pas être modifiée après création
+                      </p>
+                    )}
                   </FormItem>
                 )}
               />
 
               <FormField
                 control={form.control}
-                name="is_visible"
+                name="field_type"
                 render={({ field }) => (
-                  <FormItem className="flex items-center justify-between space-x-4">
-                    <FormLabel>Visible</FormLabel>
-                    <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1">
+                      Type de champ <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner un type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="text">Texte sur seule ligne</SelectItem>
+                        <SelectItem value="textarea">Texte multiligne</SelectItem>
+                        <SelectItem value="number">Nombre</SelectItem>
+                        <SelectItem value="date">Date</SelectItem>
+                        <SelectItem value="select">Liste système</SelectItem>
+                        <SelectItem value="multiselect">Multiple sélection</SelectItem>
+                        <SelectItem value="boolean">Oui/Non (checkbox)</SelectItem>
+                        <SelectItem value="file">Fichier</SelectItem>
+                        <SelectItem value="link">Lien (URL)</SelectItem>
+                        <SelectItem value="location">Emplacement</SelectItem>
+                        <SelectItem value="coordinates">Latitude/Longitude</SelectItem>
+                        <SelectItem value="reference">Référence</SelectItem>
+                        <SelectItem value="group">Groupe de champs</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-foreground border-b pb-2">
+                Description
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="description_fr"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description française</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Texte d'aide pour l'utilisateur" 
+                          {...field}
+                          rows={3}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description_ar"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description arabe</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="نص المساعدة للمستخدم" 
+                          {...field}
+                          dir="rtl"
+                          rows={3}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Règles de gestion */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-foreground border-b pb-2">
+                Règles de gestion
+              </h3>
+              
+              <div className="space-y-3 bg-muted/30 p-4 rounded-lg">
+                <FormField
+                  control={form.control}
+                  name="is_required"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between space-x-4">
+                      <div className="space-y-0.5">
+                        <FormLabel>Champ obligatoire</FormLabel>
+                        <p className="text-xs text-muted-foreground">
+                          L'utilisateur doit remplir ce champ
+                        </p>
+                      </div>
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="is_visible"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between space-x-4">
+                      <div className="space-y-0.5">
+                        <FormLabel>Champ visible</FormLabel>
+                        <p className="text-xs text-muted-foreground">
+                          Afficher ce champ dans le formulaire
+                        </p>
+                      </div>
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="is_readonly"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between space-x-4">
+                      <div className="space-y-0.5">
+                        <FormLabel>Lecture seule</FormLabel>
+                        <p className="text-xs text-muted-foreground">
+                          L'utilisateur ne peut pas modifier ce champ
+                        </p>
+                      </div>
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
-                name="is_readonly"
+                name="default_value"
                 render={({ field }) => (
-                  <FormItem className="flex items-center justify-between space-x-4">
-                    <FormLabel>Lecture seule</FormLabel>
+                  <FormItem>
+                    <FormLabel>Valeur par défaut</FormLabel>
                     <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Input placeholder="Valeur pré-remplie" {...field} />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
