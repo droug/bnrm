@@ -54,18 +54,29 @@ export default function NewConversationDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedUsers.length === 0) return;
+    console.log('handleSubmit called', { selectedUsers, title });
+    
+    if (selectedUsers.length === 0) {
+      console.log('No users selected, returning');
+      return;
+    }
 
-    const conversation = await createConversation.mutateAsync({
-      title: title || undefined,
-      participantIds: selectedUsers,
-      conversationType: selectedUsers.length === 1 ? 'direct' : 'group',
-    });
+    try {
+      console.log('Creating conversation...');
+      const conversation = await createConversation.mutateAsync({
+        title: title || undefined,
+        participantIds: selectedUsers,
+        conversationType: selectedUsers.length === 1 ? 'direct' : 'group',
+      });
 
-    onConversationCreated(conversation.id);
-    setTitle("");
-    setSelectedUsers([]);
-    onOpenChange(false);
+      console.log('Conversation created:', conversation);
+      onConversationCreated(conversation.id);
+      setTitle("");
+      setSelectedUsers([]);
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+    }
   };
 
   const toggleUser = (userId: string) => {
