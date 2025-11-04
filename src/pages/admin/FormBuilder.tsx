@@ -89,20 +89,27 @@ export default function FormBuilder() {
     }
     // Réordonnancement de champs existants
     else if (active.id !== over.id) {
-      const sectionKey = over.data.current?.sectionKey;
-      if (sectionKey) {
+      // Trouver la section du champ actif
+      const activeField = customFields.find((f) => f.id === active.id);
+      // Trouver la section du champ survolé (ou depuis les données de over)
+      const overField = customFields.find((f) => f.id === over.id);
+      const sectionKey = over.data.current?.sectionKey || overField?.section_key;
+      
+      if (sectionKey && activeField?.section_key === sectionKey) {
         const sectionFields = customFields
           .filter((f) => f.section_key === sectionKey)
+          .sort((a, b) => a.order_index - b.order_index)
           .map((f) => f.id);
         
         const oldIndex = sectionFields.indexOf(active.id as string);
         const newIndex = sectionFields.indexOf(over.id as string);
         
-        if (oldIndex !== -1 && newIndex !== -1) {
+        if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
           const newOrder = [...sectionFields];
           newOrder.splice(oldIndex, 1);
           newOrder.splice(newIndex, 0, active.id as string);
           reorderFields(sectionKey, newOrder);
+          toast.success("Champ réordonné avec succès");
         }
       }
     }

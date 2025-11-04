@@ -25,7 +25,10 @@ function SortableField({ field, language, onEdit, onDelete }: any) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: field.id });
+  } = useSortable({ 
+    id: field.id,
+    data: { sectionKey: field.section_key }
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
