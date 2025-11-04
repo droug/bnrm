@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { initializeLegalDepositMonographForm } from "@/utils/initializeLegalDepositForm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +35,14 @@ export default function ManageSectionFields() {
   if (!user || !profile || (profile.role !== 'admin' && profile.role !== 'librarian')) {
     return <Navigate to="/auth" replace />;
   }
+
+  // Initialiser le formulaire au chargement
+  useEffect(() => {
+    const init = async () => {
+      await initializeLegalDepositMonographForm();
+    };
+    init();
+  }, []);
 
   // Charger le formulaire et sa version
   const { data: formVersion, isLoading: formLoading } = useQuery({
