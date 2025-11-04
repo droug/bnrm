@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { FieldTypesPalette } from "@/components/form-builder/FieldTypesPalette";
 import { FormFieldsList } from "@/components/form-builder/FormFieldsList";
 import { FieldConfigDialog } from "@/components/form-builder/FieldConfigDialog";
+import { SectionManager } from "@/components/form-builder/SectionManager";
 import { useFormBuilder } from "@/hooks/useFormBuilder";
 import { FormFilter, CustomField } from "@/types/formBuilder";
 import { Loader2, Upload } from "lucide-react";
@@ -45,6 +46,7 @@ export default function FormBuilder() {
     deleteField,
     publishVersion,
     reorderFields,
+    updateSections,
   } = useFormBuilder();
 
   // Charger les modules quand la plateforme change
@@ -244,6 +246,14 @@ export default function FormBuilder() {
               </div>
             </div>
           </Card>
+        )}
+
+        {/* Gestionnaire de sections */}
+        {currentForm && currentStructure && (
+          <SectionManager
+            sections={formSections}
+            onSectionsUpdate={updateSections}
+          />
         )}
 
         {/* Interface drag-and-drop */}

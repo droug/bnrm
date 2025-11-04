@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { FormFilter, FormStructure, CustomField, ConfigurableForm } from "@/types/formBuilder";
+import { FormFilter, FormStructure, CustomField, ConfigurableForm, FormSection } from "@/types/formBuilder";
 
 export function useFormBuilder() {
   const [loading, setLoading] = useState(false);
@@ -199,6 +199,39 @@ export function useFormBuilder() {
     }
   };
 
+  const updateSections = async (sections: FormSection[]) => {
+    if (!currentStructure) {
+      toast.error("Aucune structure de formulaire chargée");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("form_versions")
+        .update({
+          structure: {
+            sections: sections,
+          } as any,
+        })
+        .eq("id", currentStructure.id);
+
+      if (error) throw error;
+
+      setCurrentStructure({
+        ...currentStructure,
+        structure: {
+          sections: sections,
+        },
+      });
+
+      toast.success("Sections mises à jour avec succès");
+    } catch (error: any) {
+      console.error("Error updating sections:", error);
+      toast.error("Erreur lors de la mise à jour des sections");
+      throw error;
+    }
+  };
+
   const reorderFields = async (sectionKey: string, fieldIds: string[]) => {
     try {
       const updates = fieldIds.map((fieldId, index) => ({
@@ -281,5 +314,6 @@ export function useFormBuilder() {
     deleteField,
     publishVersion,
     reorderFields,
+    updateSections,
   };
 }
