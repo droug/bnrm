@@ -70,6 +70,7 @@ const GestionReservationsOuvrages = lazy(() => import("./pages/GestionReservatio
 // Legal Deposit (lazy)
 const LegalDepositPage = lazy(() => import("./pages/LegalDepositPage"));
 const LegalDepositApprovals = lazy(() => import("./pages/LegalDepositApprovals"));
+const DynamicFormPage = lazy(() => import("./pages/DynamicFormPage"));
 const DepositApprovals = lazy(() => import("./pages/DepositApprovals"));
 const CommitteeDashboard = lazy(() => import("./pages/CommitteeDashboard"));
 const ProfessionalManagement = lazy(() => import("./pages/ProfessionalManagement"));
@@ -241,6 +242,7 @@ const App = () => {
         <Route path="/tarifs-bnrm" element={<BNRMPortal />} />
         <Route path="/services-tarifs" element={<ServicesCatalog />} />
         <Route path="/admin/legal-deposit" element={<LegalDepositPage />} />
+        <Route path="/form" element={<DynamicFormPage />} />
         <Route path="/admin/archiving" element={<ArchivingPage />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/cookie-settings" element={<CookieSettingsPage />} />
