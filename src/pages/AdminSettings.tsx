@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail, GitBranch, List, Sliders, FolderTree, Wrench, Home } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail, GitBranch, List, Sliders, FolderTree, Wrench, Home, FormInput } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -169,6 +169,14 @@ export default function AdminSettings() {
       href: "/admin/restoration-requests",
       permission: "content.manage",
       gradient: "from-orange-500 to-orange-600"
+    },
+    {
+      icon: FormInput,
+      title: "Gestion des champs",
+      description: "Builder universel pour ajouter et configurer des champs sur les formulaires",
+      href: "/admin/form-builder",
+      permission: "content.manage",
+      gradient: "from-teal-500 to-teal-600"
     }
   ];
 
