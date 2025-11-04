@@ -118,10 +118,8 @@ export default function FormBuilder() {
     setShowFieldDialog(true);
   };
 
-  const mockSections = [
-    { key: "general", label_fr: "Informations générales", label_ar: "معلومات عامة", order_index: 0, fields: [] },
-    { key: "details", label_fr: "Détails", label_ar: "تفاصيل", order_index: 1, fields: [] },
-  ];
+  // Récupérer les sections réelles depuis la structure du formulaire
+  const formSections = currentStructure?.structure?.sections || [];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -259,7 +257,7 @@ export default function FormBuilder() {
               <div className="lg:col-span-3">
                 <SortableContext items={customFields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
                   <FormFieldsList
-                    sections={mockSections}
+                    sections={formSections}
                     fields={customFields}
                     language={filter.language}
                     formName={currentForm.form_name}
@@ -278,7 +276,7 @@ export default function FormBuilder() {
           onOpenChange={setShowFieldDialog}
           fieldType={selectedFieldType}
           existingField={editingField}
-          sections={mockSections}
+          sections={formSections}
           existingFields={customFields}
           formName={currentForm?.form_name}
           onSave={handleSaveField}
