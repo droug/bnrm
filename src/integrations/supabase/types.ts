@@ -1851,6 +1851,96 @@ export type Database = {
           },
         ]
       }
+      cookie_consents: {
+        Row: {
+          analytics_consent: boolean
+          consent_date: string
+          created_at: string
+          functional_consent: boolean
+          id: string
+          ip_address: string | null
+          marketing_consent: boolean
+          session_id: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          analytics_consent?: boolean
+          consent_date?: string
+          created_at?: string
+          functional_consent?: boolean
+          id?: string
+          ip_address?: string | null
+          marketing_consent?: boolean
+          session_id: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          analytics_consent?: boolean
+          consent_date?: string
+          created_at?: string
+          functional_consent?: boolean
+          id?: string
+          ip_address?: string | null
+          marketing_consent?: boolean
+          session_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      cookie_settings: {
+        Row: {
+          accept_button_text: string
+          cookie_policy_url: string | null
+          created_at: string
+          enabled: boolean
+          id: string
+          message: string
+          position: string
+          privacy_policy_url: string | null
+          reject_button_text: string
+          settings_button_text: string
+          show_settings_button: boolean
+          theme: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          accept_button_text?: string
+          cookie_policy_url?: string | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          message?: string
+          position?: string
+          privacy_policy_url?: string | null
+          reject_button_text?: string
+          settings_button_text?: string
+          show_settings_button?: boolean
+          theme?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          accept_button_text?: string
+          cookie_policy_url?: string | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          message?: string
+          position?: string
+          privacy_policy_url?: string | null
+          reject_button_text?: string
+          settings_button_text?: string
+          show_settings_button?: boolean
+          theme?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cote_collections: {
         Row: {
           code: string

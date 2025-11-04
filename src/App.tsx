@@ -7,6 +7,7 @@ import { lazy, Suspense } from "react";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useAutoSync } from "@/hooks/useAutoSync";
 import { PerformanceOptimizer } from "@/components/seo/PerformanceOptimizer";
+import { CookieBanner } from "@/components/cookies/CookieBanner";
 
 // Always loaded (critical routes)
 import Index from "./pages/Index";
@@ -179,6 +180,9 @@ const SystemSettings = lazy(() => import("./pages/cultural-activities/SystemSett
 const GeneralCategories = lazy(() => import("./pages/cultural-activities/GeneralCategories"));
 const SpaceGalleryPage = lazy(() => import("./pages/cultural-activities/SpaceGalleryPage"));
 
+// Admin - Cookie Settings
+const CookieSettingsPage = lazy(() => import("./pages/admin/CookieSettingsPage"));
+
 // Loading fallback component
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -237,6 +241,7 @@ const App = () => {
         <Route path="/admin/legal-deposit" element={<LegalDepositPage />} />
         <Route path="/admin/archiving" element={<ArchivingPage />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
+        <Route path="/admin/cookie-settings" element={<CookieSettingsPage />} />
         <Route path="/admin/cote-management" element={<CoteManagementPage />} />
         <Route path="/admin/bnrm-backoffice" element={<BNRMBackOffice />} />
         <Route path="/admin/reservations-ouvrages" element={<GestionReservationsOuvrages />} />
@@ -405,11 +410,12 @@ const App = () => {
         <Route path="/bank-transfer-instructions" element={<BankTransferInstructions />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<NotFound />} />
         </Routes>
-      </Suspense>
-    </LanguageProvider>
-  </TooltipProvider>
+        </Suspense>
+        <CookieBanner />
+      </LanguageProvider>
+    </TooltipProvider>
   );
 };
 
