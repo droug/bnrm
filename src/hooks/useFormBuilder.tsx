@@ -235,7 +235,8 @@ export function useFormBuilder() {
         .rpc('get_modules_by_platform', { p_platform: platform });
 
       if (error) throw error;
-      setAvailableModules(data?.map((m: any) => m.module) || []);
+      // Filter out any empty strings
+      setAvailableModules(data?.map((m: any) => m.module).filter((m: string) => m && m.trim()) || []);
     } catch (error: any) {
       console.error("Error loading modules:", error);
       toast.error("Erreur lors du chargement des modules");
@@ -252,7 +253,10 @@ export function useFormBuilder() {
 
       if (error) throw error;
       
-      const filteredForms = data?.filter((f: any) => f.module === module) || [];
+      // Filter out any forms with empty form_key
+      const filteredForms = data?.filter((f: any) => 
+        f.module === module && f.form_key && f.form_key.trim()
+      ) || [];
       setAvailableForms(filteredForms as any);
     } catch (error: any) {
       console.error("Error loading forms:", error);
