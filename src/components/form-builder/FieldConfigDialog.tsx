@@ -124,7 +124,7 @@ export function FieldConfigDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {existingField 
@@ -135,7 +135,8 @@ export function FieldConfigDialog({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 overflow-y-auto space-y-6 pr-2">
             {/* Informations de base */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-foreground border-b pb-2">
@@ -356,8 +357,9 @@ export function FieldConfigDialog({
                 )}
               />
             </div>
+            </div>
 
-            <DialogFooter>
+            <DialogFooter className="mt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>
