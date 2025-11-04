@@ -270,53 +270,27 @@ export async function importFormFields(formKey: string) {
   try {
     console.log("Starting import for formKey:", formKey);
     
-    // 1. Récupérer ou créer le formulaire
-    let formsResponse = await (supabase as any)
+    // 1. Vérifier si le formulaire existe déjà
+    const { data: existingForm, error: selectError } = await (supabase as any)
       .from("forms")
       .select("*")
       .eq("form_key", formKey)
-      .maybeSingle();
+      .single();
 
-    console.log("Forms response:", formsResponse);
-    if (formsResponse.error) throw formsResponse.error;
-    
-    let form = formsResponse.data;
-    
-    // Si le formulaire n'existe pas, le créer
-    if (!form) {
-      const formNames: Record<string, any> = {
-        legal_deposit_monograph: {
-          form_name: "Dépôt légal - Monographies",
-          description: "Formulaire de dépôt légal pour les monographies",
-          module: "legal_deposit"
-        }
-      };
-      
-      const formInfo = formNames[formKey];
-      if (!formInfo) {
-        throw new Error(`Configuration non trouvée pour le formulaire ${formKey}`);
-      }
-      
-      const createFormResponse = await (supabase as any)
-        .from("forms")
-        .insert({
-          form_key: formKey,
-          form_name: formInfo.form_name,
-          description: formInfo.description,
-          module: formInfo.module,
-          is_active: true
-        })
-        .select()
-        .single();
-      
-      console.log("Create form response:", createFormResponse);
-      if (createFormResponse.error) throw createFormResponse.error;
-      form = createFormResponse.data;
+    console.log("Existing form check:", { existingForm, selectError });
+
+    if (selectError && selectError.code !== 'PGRST116') {
+      // PGRST116 = no rows found, c'est normal si le formulaire n'existe pas
+      throw selectError;
     }
-    
-    console.log("Using form:", form);
 
-    // 2. Récupérer la dernière version (ou en créer une)
+    const form = existingForm;
+
+    if (!form) {
+      throw new Error(`Le formulaire ${formKey} n'existe pas dans la base de données. Veuillez d'abord créer le formulaire via la migration.`);
+    }
+
+    console.log("Using form with ID:", form.id);
     console.log("Fetching versions for form_id:", form.id);
     let versionsResponse = await (supabase as any)
       .from("form_versions")
