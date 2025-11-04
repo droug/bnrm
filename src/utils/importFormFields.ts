@@ -268,19 +268,47 @@ export const legalDepositMonographFields = [
 
 export async function importFormFields(formKey: string) {
   try {
-    // 1. Récupérer le formulaire
-    const formsResponse = await (supabase as any)
+    // 1. Récupérer ou créer le formulaire
+    let formsResponse = await (supabase as any)
       .from("forms")
       .select("*")
       .eq("form_key", formKey)
       .maybeSingle();
 
     if (formsResponse.error) throw formsResponse.error;
-    if (!formsResponse.data) {
-      throw new Error(`Formulaire ${formKey} non trouvé`);
+    
+    let form = formsResponse.data;
+    
+    // Si le formulaire n'existe pas, le créer
+    if (!form) {
+      const formNames: Record<string, any> = {
+        legal_deposit_monograph: {
+          form_name: "Dépôt légal - Monographies",
+          description: "Formulaire de dépôt légal pour les monographies",
+          module: "legal_deposit"
+        }
+      };
+      
+      const formInfo = formNames[formKey];
+      if (!formInfo) {
+        throw new Error(`Configuration non trouvée pour le formulaire ${formKey}`);
+      }
+      
+      const createFormResponse = await (supabase as any)
+        .from("forms")
+        .insert({
+          form_key: formKey,
+          form_name: formInfo.form_name,
+          description: formInfo.description,
+          module: formInfo.module,
+          is_active: true
+        })
+        .select()
+        .single();
+      
+      if (createFormResponse.error) throw createFormResponse.error;
+      form = createFormResponse.data;
     }
-
-    const form = formsResponse.data;
 
     // 2. Récupérer la dernière version (ou en créer une)
     let versionsResponse = await (supabase as any)
