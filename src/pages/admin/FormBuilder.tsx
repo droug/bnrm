@@ -1,0 +1,266 @@
+import { useState } from "react";
+import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { useAuth } from "@/hooks/useAuth";
+import { Navigate } from "react-router-dom";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { FieldTypesPalette } from "@/components/form-builder/FieldTypesPalette";
+import { FormFieldsList } from "@/components/form-builder/FormFieldsList";
+import { FieldConfigDialog } from "@/components/form-builder/FieldConfigDialog";
+import { useFormBuilder } from "@/hooks/useFormBuilder";
+import { FormFilter, CustomField } from "@/types/formBuilder";
+import { Loader2, Upload } from "lucide-react";
+import { toast } from "sonner";
+
+export default function FormBuilder() {
+  const { user, profile } = useAuth();
+  const [filter, setFilter] = useState<FormFilter>({
+    platform: "bnrm",
+    module: "",
+    formKey: "",
+    language: "fr",
+  });
+  const [showFieldDialog, setShowFieldDialog] = useState(false);
+  const [selectedFieldType, setSelectedFieldType] = useState<string | undefined>();
+  const [editingField, setEditingField] = useState<CustomField | null>(null);
+
+  const {
+    loading,
+    currentForm,
+    currentStructure,
+    customFields,
+    loadFormStructure,
+    createField,
+    updateField,
+    deleteField,
+    publishVersion,
+    reorderFields,
+  } = useFormBuilder();
+
+  if (!user || !profile || (profile.role !== 'admin' && profile.role !== 'librarian')) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  const handleLoadForm = async () => {
+    if (!filter.platform || !filter.module || !filter.formKey) {
+      toast.error("Veuillez remplir tous les champs de filtre");
+      return;
+    }
+    await loadFormStructure(filter);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    // Nouveau champ glissé depuis la palette
+    if (active.id.toString().startsWith("field-type-")) {
+      const fieldType = active.data.current?.fieldType.type;
+      setSelectedFieldType(fieldType);
+      setEditingField(null);
+      setShowFieldDialog(true);
+    }
+    // Réordonnancement de champs existants
+    else if (active.id !== over.id) {
+      const sectionKey = over.data.current?.sectionKey;
+      if (sectionKey) {
+        const sectionFields = customFields
+          .filter((f) => f.section_key === sectionKey)
+          .map((f) => f.id);
+        
+        const oldIndex = sectionFields.indexOf(active.id as string);
+        const newIndex = sectionFields.indexOf(over.id as string);
+        
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const newOrder = [...sectionFields];
+          newOrder.splice(oldIndex, 1);
+          newOrder.splice(newIndex, 0, active.id as string);
+          reorderFields(sectionKey, newOrder);
+        }
+      }
+    }
+  };
+
+  const handleSaveField = async (fieldData: Partial<CustomField>) => {
+    if (editingField) {
+      await updateField(editingField.id, fieldData);
+    } else {
+      await createField(fieldData);
+    }
+  };
+
+  const handleEditField = (field: CustomField) => {
+    setEditingField(field);
+    setSelectedFieldType(field.field_type);
+    setShowFieldDialog(true);
+  };
+
+  const mockSections = [
+    { key: "general", label_fr: "Informations générales", label_ar: "معلومات عامة", order_index: 0, fields: [] },
+    { key: "details", label_fr: "Détails", label_ar: "تفاصيل", order_index: 1, fields: [] },
+  ];
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+      
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Gestion des champs</h1>
+          <p className="text-muted-foreground">
+            Personnalisez vos formulaires en ajoutant ou modifiant des champs
+          </p>
+        </div>
+
+        {/* Filtres */}
+        <Card className="p-6 mb-6 border-2 border-border">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div>
+              <Label htmlFor="platform">Plateforme</Label>
+              <Select
+                value={filter.platform}
+                onValueChange={(value) => setFilter({ ...filter, platform: value })}
+              >
+                <SelectTrigger id="platform">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bnrm">BNRM</SelectItem>
+                  <SelectItem value="depot_legal">Dépôt légal</SelectItem>
+                  <SelectItem value="bn">Bibliothèque Numérique</SelectItem>
+                  <SelectItem value="activites_culturelles">Activités culturelles</SelectItem>
+                  <SelectItem value="cbn">CBN</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="module">Module</Label>
+              <Select
+                value={filter.module}
+                onValueChange={(value) => setFilter({ ...filter, module: value })}
+              >
+                <SelectTrigger id="module">
+                  <SelectValue placeholder="Sélectionner un module" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="monographies">Monographies</SelectItem>
+                  <SelectItem value="periodiques">Périodiques</SelectItem>
+                  <SelectItem value="reservations">Réservations</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="formKey">Formulaire</Label>
+              <Select
+                value={filter.formKey}
+                onValueChange={(value) => setFilter({ ...filter, formKey: value })}
+              >
+                <SelectTrigger id="formKey">
+                  <SelectValue placeholder="Sélectionner un formulaire" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="form1">Formulaire de dépôt</SelectItem>
+                  <SelectItem value="form2">Demande d'accès</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="language">Langue</Label>
+              <Select
+                value={filter.language}
+                onValueChange={(value) => setFilter({ ...filter, language: value as "fr" | "ar" })}
+              >
+                <SelectTrigger id="language">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="ar">العربية</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <Button onClick={handleLoadForm} disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Charger
+          </Button>
+        </Card>
+
+        {/* Statut et actions */}
+        {currentForm && (
+          <Card className="p-4 mb-6 border-2 border-border">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div>
+                  <span className="text-sm text-muted-foreground">Formulaire:</span>
+                  <span className="ml-2 font-semibold text-foreground">{currentForm.form_name}</span>
+                </div>
+                <div>
+                  <span className="text-sm text-muted-foreground">Version:</span>
+                  <span className="ml-2 font-semibold text-foreground">{currentForm.current_version}</span>
+                </div>
+                {currentStructure && !currentStructure.is_published && (
+                  <Badge variant="outline">Brouillon non publié</Badge>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline">Prévisualiser</Button>
+                <Button onClick={publishVersion} disabled={!currentStructure || currentStructure.is_published}>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Publier
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Interface drag-and-drop */}
+        {currentForm && (
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div className="lg:col-span-1">
+                <FieldTypesPalette language={filter.language} />
+              </div>
+
+              <div className="lg:col-span-3">
+                <SortableContext items={customFields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+                  <FormFieldsList
+                    sections={mockSections}
+                    fields={customFields}
+                    language={filter.language}
+                    onEditField={handleEditField}
+                    onDeleteField={deleteField}
+                  />
+                </SortableContext>
+              </div>
+            </div>
+          </DndContext>
+        )}
+
+        {/* Dialog de configuration */}
+        <FieldConfigDialog
+          open={showFieldDialog}
+          onOpenChange={setShowFieldDialog}
+          fieldType={selectedFieldType}
+          existingField={editingField}
+          sections={mockSections}
+          existingFields={customFields}
+          onSave={handleSaveField}
+        />
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

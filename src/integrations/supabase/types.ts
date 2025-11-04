@@ -1573,6 +1573,42 @@ export type Database = {
           },
         ]
       }
+      configurable_forms: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          current_version: number | null
+          form_key: string
+          form_name: string
+          id: string
+          module: string
+          platform: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          current_version?: number | null
+          form_key: string
+          form_name: string
+          id?: string
+          module: string
+          platform: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          current_version?: number | null
+          form_key?: string
+          form_name?: string
+          id?: string
+          module?: string
+          platform?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       content: {
         Row: {
           author_id: string
@@ -2308,6 +2344,92 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      custom_fields: {
+        Row: {
+          config: Json
+          created_at: string | null
+          created_by: string | null
+          default_value: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          description_ar: string | null
+          description_fr: string | null
+          field_key: string
+          field_type: string
+          form_version_id: string
+          id: string
+          insert_after: string | null
+          is_readonly: boolean | null
+          is_required: boolean | null
+          is_visible: boolean | null
+          label_ar: string | null
+          label_fr: string
+          order_index: number
+          section_key: string
+          updated_at: string | null
+          validation_rules: Json | null
+          visibility_conditions: Json | null
+        }
+        Insert: {
+          config?: Json
+          created_at?: string | null
+          created_by?: string | null
+          default_value?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description_ar?: string | null
+          description_fr?: string | null
+          field_key: string
+          field_type: string
+          form_version_id: string
+          id?: string
+          insert_after?: string | null
+          is_readonly?: boolean | null
+          is_required?: boolean | null
+          is_visible?: boolean | null
+          label_ar?: string | null
+          label_fr: string
+          order_index: number
+          section_key: string
+          updated_at?: string | null
+          validation_rules?: Json | null
+          visibility_conditions?: Json | null
+        }
+        Update: {
+          config?: Json
+          created_at?: string | null
+          created_by?: string | null
+          default_value?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description_ar?: string | null
+          description_fr?: string | null
+          field_key?: string
+          field_type?: string
+          form_version_id?: string
+          id?: string
+          insert_after?: string | null
+          is_readonly?: boolean | null
+          is_required?: boolean | null
+          is_visible?: boolean | null
+          label_ar?: string | null
+          label_fr?: string
+          order_index?: number
+          section_key?: string
+          updated_at?: string | null
+          validation_rules?: Json | null
+          visibility_conditions?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_fields_form_version_id_fkey"
+            columns: ["form_version_id"]
+            isOneToOne: false
+            referencedRelation: "form_versions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       daily_pass_usage: {
         Row: {
@@ -3279,6 +3401,91 @@ export type Database = {
             columns: ["manuscript_id"]
             isOneToOne: false
             referencedRelation: "manuscripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_audit_log: {
+        Row: {
+          action: string
+          diff: Json | null
+          entity_id: string | null
+          entity_type: string
+          form_id: string
+          id: string
+          performed_at: string | null
+          performed_by: string | null
+        }
+        Insert: {
+          action: string
+          diff?: Json | null
+          entity_id?: string | null
+          entity_type: string
+          form_id: string
+          id?: string
+          performed_at?: string | null
+          performed_by?: string | null
+        }
+        Update: {
+          action?: string
+          diff?: Json | null
+          entity_id?: string | null
+          entity_type?: string
+          form_id?: string
+          id?: string
+          performed_at?: string | null
+          performed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_audit_log_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "configurable_forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_versions: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          form_id: string
+          id: string
+          is_published: boolean | null
+          published_at: string | null
+          published_by: string | null
+          structure: Json
+          version_number: number
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          form_id: string
+          id?: string
+          is_published?: boolean | null
+          published_at?: string | null
+          published_by?: string | null
+          structure?: Json
+          version_number: number
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          form_id?: string
+          id?: string
+          is_published?: boolean | null
+          published_at?: string | null
+          published_by?: string | null
+          structure?: Json
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_versions_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "configurable_forms"
             referencedColumns: ["id"]
           },
         ]
