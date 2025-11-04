@@ -61,6 +61,10 @@ export default function NewConversationDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🔵 handleSubmit called");
+    console.log("🔵 Form valid:", isFormValid);
+    console.log("🔵 Selected users:", selectedUsers);
+    console.log("🔵 Initial message:", initialMessage);
     
     if (selectedUsers.length === 0) {
       toast({
@@ -83,7 +87,7 @@ export default function NewConversationDialog({
     setIsSubmitting(true);
 
     try {
-      console.log("Creating conversation with participants:", selectedUsers);
+      console.log("🟢 Creating conversation with participants:", selectedUsers);
       
       // Create conversation
       const conversation = await createConversation.mutateAsync({
@@ -92,7 +96,7 @@ export default function NewConversationDialog({
         conversationType: selectedUsers.length === 1 ? 'direct' : 'group',
       });
 
-      console.log("Conversation created:", conversation);
+      console.log("🟢 Conversation created:", conversation);
 
       // Send initial message
       await sendMessage.mutateAsync({
@@ -100,7 +104,7 @@ export default function NewConversationDialog({
         content: initialMessage.trim(),
       });
 
-      console.log("Initial message sent");
+      console.log("🟢 Initial message sent");
 
       // Reset form
       setTitle("");
@@ -119,7 +123,7 @@ export default function NewConversationDialog({
       // Close modal after successful creation
       onOpenChange(false);
     } catch (error: any) {
-      console.error("Error creating conversation:", error);
+      console.error("🔴 Error creating conversation:", error);
       toast({
         title: "Erreur",
         description: error.message || "Erreur lors de la création de la conversation",
