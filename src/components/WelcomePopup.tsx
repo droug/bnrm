@@ -22,7 +22,7 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
   const handleClose = () => {
     console.log('WelcomePopup handleClose called, dontShowAgain:', dontShowAgain);
     if (dontShowAgain) {
-      localStorage.setItem('bnrm-welcome-popup-dismissed', 'true');
+      sessionStorage.setItem('bnrm-welcome-popup-dismissed', 'true');
     }
     onClose();
   };
