@@ -174,12 +174,12 @@ export function FieldConfigDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1">
-                      Type de projet: <span className="text-destructive">*</span>
+                      Section: <span className="text-destructive">*</span>
                     </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Type de projet" />
+                          <SelectValue placeholder="Sélectionner une section" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
