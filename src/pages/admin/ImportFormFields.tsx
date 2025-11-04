@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertCircle, CheckCircle } from "lucide-react";
-import { importFormFields } from "@/utils/importFormFields";
+import { importFormFields, legalDepositMonographFields } from "@/utils/importFormFields";
 import { toast } from "sonner";
 
 export default function ImportFormFields() {
@@ -144,26 +144,37 @@ export default function ImportFormFields() {
             </CardContent>
           </Card>
 
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Qu'est-ce qui sera importé ?</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p>Pour le formulaire <strong>Dépôt légal - Monographies</strong> :</p>
-                <ul className="list-disc list-inside space-y-1 ml-4">
-                  <li>Section "Identification de l'auteur" (7 champs)</li>
-                  <li>Section "Identification de la publication" (10 champs)</li>
-                  <li>Section "Éditeur" (4 champs)</li>
-                  <li>Section "Imprimeur" (4 champs)</li>
-                </ul>
-                <p className="mt-4">
-                  <strong>Total : environ 25 champs</strong> avec leurs labels français/arabes, 
-                  validations et configurations.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          {selectedForm === "legal_deposit_monograph" && (
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Qu'est-ce qui sera importé ?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <p>Pour le formulaire <strong>Dépôt légal - Monographies</strong> :</p>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    {legalDepositMonographFields.map((section) => {
+                      const sectionLabels: Record<string, string> = {
+                        author_identification: "Identification de l'auteur",
+                        publication_identification: "Identification de la publication",
+                        publisher_info: "Éditeur",
+                        printer_info: "Imprimeur"
+                      };
+                      return (
+                        <li key={section.section_key}>
+                          Section "{sectionLabels[section.section_key]}" ({section.fields.length} champs)
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <p className="mt-4">
+                    <strong>Total : {legalDepositMonographFields.reduce((acc, section) => acc + section.fields.length, 0)} champs</strong> avec leurs labels français/arabes, 
+                    validations et configurations.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
 
