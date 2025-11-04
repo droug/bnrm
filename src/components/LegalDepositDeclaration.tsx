@@ -80,8 +80,10 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   
   // Charger les champs personnalisés - chercher aussi dans les versions non publiées en dev
   const { fields: customFields, loading: customFieldsLoading } = useDynamicForm({ 
-    formKey: "legal_deposit_monograph",
-    enabled: depositType === "monographie"
+    formKey: depositType === "monographie" ? "legal_deposit_monograph" : 
+            depositType === "periodique" ? "legal_deposit_periodical" : 
+            "",
+    enabled: depositType === "monographie" || depositType === "periodique"
   });
 
   // Debug: afficher les champs chargés
@@ -1270,12 +1272,30 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input placeholder="Profession" />
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Date de naissance</Label>
-                  <Input type="date" placeholder="Date de naissance" />
-                </div>
-              </div>
-            </div>
+                 <div className="space-y-2">
+                   <Label>Date de naissance</Label>
+                   <Input type="date" placeholder="Date de naissance" />
+                 </div>
+
+                {/* Champs personnalisés */}
+                {customFields
+                  .filter((field) => field.section_key === "director_info")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
+               </div>
+             </div>
 
             <Separator />
 
@@ -1476,12 +1496,30 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label>URL</Label>
-                  <Input type="url" placeholder="URL du site web" />
-                </div>
-              </div>
-            </div>
+                 <div className="space-y-2">
+                   <Label>URL</Label>
+                   <Input type="url" placeholder="URL du site web" />
+                 </div>
+
+                {/* Champs personnalisés */}
+                {customFields
+                  .filter((field) => field.section_key === "publication_info")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
+               </div>
+             </div>
 
             <Separator />
 
@@ -1640,10 +1678,28 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                         />
                       </PopoverContent>
                     </Popover>
-                  </div>
-                </div>
-              </div>
-            </div>
+                   </div>
+                 </div>
+
+                {/* Champs personnalisés */}
+                {customFields
+                  .filter((field) => field.section_key === "publisher_info")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
+               </div>
+             </div>
 
             <Separator />
 
@@ -1746,14 +1802,60 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Nombre de tirage</Label>
-                  <Input type="number" placeholder="Nombre de tirage" />
-                </div>
-              </div>
-            </div>
+                 <div className="space-y-2">
+                   <Label>Nombre de tirage</Label>
+                   <Input type="number" placeholder="Nombre de tirage" />
+                 </div>
 
-            <Separator />
+                {/* Champs personnalisés */}
+                {customFields
+                  .filter((field) => field.section_key === "printer_info")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
+               </div>
+             </div>
+
+            {/* Champs personnalisés pour la section Documents requis */}
+            {customFields.filter((field) => field.section_key === "required_documents").length > 0 && (
+              <>
+                <Separator />
+                <div>
+                  <h3 className="text-2xl font-semibold mb-4">Documents supplémentaires</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {customFields
+                      .filter((field) => field.section_key === "required_documents")
+                      .map((field) => (
+                        <DynamicFieldRenderer
+                          key={field.id}
+                          field={field}
+                          language={language}
+                          value={customFieldsData[field.field_key]}
+                          onChange={(value) =>
+                            setCustomFieldsData((prev) => ({
+                              ...prev,
+                              [field.field_key]: value,
+                            }))
+                          }
+                        />
+                      ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+             <Separator />
           </>
         );
       }
