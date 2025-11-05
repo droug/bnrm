@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Network, Target, Users, UserPlus, Database, BookOpen, ArrowRight, Library, FileText, GraduationCap, Search } from "lucide-react";
 import cbmHeroBanner from "@/assets/cbm-hero-banner.jpg";
+import EventsCarousel from "@/components/cultural-activities/EventsCarousel";
 
 export default function CBMPortal() {
   const spotlightItems = [
@@ -109,6 +110,22 @@ export default function CBMPortal() {
       </section>
       
       <main className="container mx-auto px-4 py-16">
+        {/* News and Events Section */}
+        <section className="mb-16">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-foreground border-l-4 border-primary pl-4">
+              Actualités et événements
+            </h2>
+            <Link to="/digital-library/news-events">
+              <Button variant="outline" className="gap-2">
+                Voir Tout
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+          <EventsCarousel />
+        </section>
+
         {/* Spotlight Section - NYPL Style */}
         <section className="mb-16">
           <div className="flex items-center justify-between mb-8">
