@@ -41,6 +41,8 @@ interface SearchCriteria {
   includeHybrid: boolean;
   normalizedKeywordsOnly: boolean;
   addedThisYear: boolean;
+  filterCM: boolean;
+  filterCBM: boolean;
 }
 
 const RechercheAvancee = () => {
@@ -66,6 +68,8 @@ const RechercheAvancee = () => {
     includeHybrid: false,
     normalizedKeywordsOnly: false,
     addedThisYear: false,
+    filterCM: false,
+    filterCBM: false,
   });
   const [yearRange, setYearRange] = useState([1900, 2025]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -192,7 +196,7 @@ const RechercheAvancee = () => {
     setIsSearching(true);
     try {
       // Rechercher dans la base de données cbm_catalog
-      let query = supabase.from('cbm_catalog').select('*', { count: 'exact' });
+      let query: any = supabase.from('cbm_catalog').select('*', { count: 'exact' });
       
       // Filtrer par mots-clés si présents
       if (criteria.keywords) {
@@ -226,6 +230,19 @@ const RechercheAvancee = () => {
       // Filtrer pour afficher uniquement les documents disponibles
       if (criteria.availableOnly) {
         query = query.eq('availability_status', 'Disponible');
+      }
+      
+      // Filtrer par CM - Ouvrages concernant le Maroc (sujet géographique)
+      if (criteria.filterCM) {
+        // Utiliser ilike sur le champ subject pour rechercher "Maroc"
+        query = query.ilike('subject', '%Maroc%');
+      }
+      
+      // Filtrer par CBM - Tous les ouvrages des bibliothèques du Maroc
+      if (criteria.filterCBM) {
+        // Le filtre CBM peut être basé sur un champ spécifique de la base
+        // Par exemple, un champ 'catalog_source' ou 'is_cbm'
+        query = query.eq('catalog_source', 'CBM');
       }
       
       const { data, error, count } = await query.range(
@@ -291,6 +308,8 @@ const RechercheAvancee = () => {
       includeHybrid: false,
       normalizedKeywordsOnly: false,
       addedThisYear: false,
+      filterCM: false,
+      filterCBM: false,
     });
     setYearRange([1900, 2025]);
     setSearchResults([]);
@@ -372,6 +391,45 @@ const RechercheAvancee = () => {
               </DialogContent>
             </Dialog>
           </div>
+          
+          {/* Filtres CM et CBM */}
+          <Card className="mb-6">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-6">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="filter-cm"
+                    checked={criteria.filterCM}
+                    onCheckedChange={(checked) => 
+                      setCriteria(prev => ({ ...prev, filterCM: checked as boolean }))
+                    }
+                  />
+                  <label
+                    htmlFor="filter-cm"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                  >
+                    <span className="font-bold text-primary">CM</span> — Ouvrages concernant le Maroc
+                  </label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="filter-cbm"
+                    checked={criteria.filterCBM}
+                    onCheckedChange={(checked) => 
+                      setCriteria(prev => ({ ...prev, filterCBM: checked as boolean }))
+                    }
+                  />
+                  <label
+                    htmlFor="filter-cbm"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                  >
+                    <span className="font-bold text-primary">CBM</span> — Tous les ouvrages des bibliothèques du Maroc
+                  </label>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Onglets principaux */}
