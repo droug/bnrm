@@ -138,15 +138,16 @@ const RechercheAvancee = () => {
       'Université Hassan II de Casablanca'
     ],
     'Ifrane': ['Université Al Akhawayn'],
-    'Tanger': ['Fondation du Roi Abdul-Aziz Al Saoud pour les Etudes Islamiques et les Sciences Humaines'],
-    'Autre': ['Fondation Mohamed VI', 'Autre']
+    'Tanger': ['Fondation du Roi Abdul-Aziz Al Saoud pour les Etudes Islamiques et les Sciences Humaines']
   };
 
   // Obtenir les villes filtrées par région
   const availableCities = selectedRegion ? getCitiesByRegion(selectedRegion) : [];
   
-  // Obtenir les bibliothèques filtrées par ville
-  const availableLibraries = selectedCity ? (librariesByCity[selectedCity] || []) : [];
+  // Obtenir les bibliothèques filtrées par ville (toujours ajouter "Autre" à la fin)
+  const availableLibraries = selectedCity 
+    ? [...(librariesByCity[selectedCity] || []), 'Autre'] 
+    : [];
 
   const handleSearch = async () => {
     setIsSearching(true);
@@ -343,7 +344,7 @@ const RechercheAvancee = () => {
                   🔍 Multi-critères
                 </TabsTrigger>
                 <TabsTrigger value="library" className="flex items-center gap-2">
-                  🏛️ Bibliothèque
+                  🏛️ Bibliothèque source
                 </TabsTrigger>
                 <TabsTrigger value="author-az" className="flex items-center gap-2">
                   📚 Auteur A-Z
