@@ -19,6 +19,16 @@ export default function CBMPortal() {
       gradient: "from-primary/90 to-primary"
     },
     {
+      title: "Plan d'Actions",
+      description: "Étapes d'intégration et feuille de route du réseau CBM",
+      icon: Network,
+      path: "/cbm/plan-actions",
+      gradient: "from-primary/80 to-primary/90"
+    }
+  ];
+
+  const servicesItems = [
+    {
       title: "Adhésion au Réseau",
       description: "Rejoignez le réseau CBM - Formulaire et conditions d'adhésion",
       icon: UserPlus,
@@ -31,13 +41,6 @@ export default function CBMPortal() {
       icon: Database,
       path: "/cbm/recherche",
       gradient: "from-secondary/90 to-secondary"
-    },
-    {
-      title: "Plan d'Actions",
-      description: "Étapes d'intégration et feuille de route du réseau CBM",
-      icon: Network,
-      path: "/cbm/plan-actions",
-      gradient: "from-primary/80 to-primary/90"
     }
   ];
 
@@ -140,8 +143,41 @@ export default function CBMPortal() {
             </Link>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 md:grid-cols-2">
             {spotlightItems.map((item, index) => {
+              const IconComponent = item.icon;
+              return (
+                <Link key={item.path} to={item.path}>
+                  <Card className="group h-full hover:shadow-xl transition-all duration-500 cursor-pointer overflow-hidden border-0 shadow-md">
+                    {/* Icon Header with Gradient */}
+                    <div className={`bg-gradient-to-br ${item.gradient} h-40 flex items-center justify-center relative`}>
+                      <div className="absolute inset-0 bg-pattern-zellige-complex opacity-10"></div>
+                      <IconComponent className="w-20 h-20 text-white relative z-10 group-hover:scale-110 transition-transform duration-300" strokeWidth={1.5} />
+                    </div>
+                    
+                    <CardHeader className="p-6">
+                      <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors mb-2">
+                        {item.title}
+                      </CardTitle>
+                      <CardDescription className="text-sm leading-relaxed">
+                        {item.description}
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Services Section */}
+        <section className="mb-16">
+          <h2 className="text-3xl font-bold text-foreground border-l-4 border-primary pl-4 mb-8">
+            Nos services
+          </h2>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {servicesItems.map((item) => {
               const IconComponent = item.icon;
               return (
                 <Link key={item.path} to={item.path}>
