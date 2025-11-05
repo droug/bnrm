@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { CBMSearchWithSelection } from "@/components/cbm/CBMSearchWithSelection";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
+import { Checkbox } from "@/components/ui/checkbox";
 import { SearchPagination } from "@/components/ui/search-pagination";
 
 export default function CBMRecherche() {
@@ -33,16 +33,28 @@ export default function CBMRecherche() {
   const [language, setLanguage] = useState("all");
   const [documentType, setDocumentType] = useState("all");
   const [library, setLibrary] = useState("all");
+  const [filterCM, setFilterCM] = useState(false);
+  const [filterCBM, setFilterCBM] = useState(false);
 
   const handleSimpleSearch = async () => {
     setIsSearching(true);
     
     try {
-      let query = supabase.from('cbm_catalog').select('*', { count: 'exact' });
+      let query: any = supabase.from('cbm_catalog').select('*', { count: 'exact' });
       
       if (searchQuery) {
         const searchTerm = searchQuery.toLowerCase();
         query = query.or(`title.ilike.%${searchTerm}%,author.ilike.%${searchTerm}%,publisher.ilike.%${searchTerm}%,isbn.ilike.%${searchTerm}%`);
+      }
+      
+      // Filtrer par CM - Ouvrages concernant le Maroc
+      if (filterCM) {
+        query = query.ilike('subject', '%Maroc%');
+      }
+      
+      // Filtrer par CBM - Tous les ouvrages des bibliothèques du Maroc
+      if (filterCBM) {
+        query = query.eq('catalog_source', 'CBM');
       }
       
       const { data, error, count } = await query.range(
@@ -85,7 +97,7 @@ export default function CBMRecherche() {
     setIsSearching(true);
     
     try {
-      let query = supabase.from('cbm_catalog').select('*', { count: 'exact' });
+      let query: any = supabase.from('cbm_catalog').select('*', { count: 'exact' });
       
       if (title) {
         query = query.ilike('title', `%${title}%`);
@@ -109,6 +121,16 @@ export default function CBMRecherche() {
       
       if (library && library !== "all") {
         query = query.eq('library_code', library);
+      }
+      
+      // Filtrer par CM - Ouvrages concernant le Maroc
+      if (filterCM) {
+        query = query.ilike('subject', '%Maroc%');
+      }
+      
+      // Filtrer par CBM - Tous les ouvrages des bibliothèques du Maroc
+      if (filterCBM) {
+        query = query.eq('catalog_source', 'CBM');
       }
       
       const { data, error, count } = await query.range(
@@ -214,6 +236,41 @@ export default function CBMRecherche() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Filtres CM et CBM */}
+            <Card className="mb-6 bg-muted/50">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="filter-cm"
+                      checked={filterCM}
+                      onCheckedChange={(checked) => setFilterCM(checked as boolean)}
+                    />
+                    <label
+                      htmlFor="filter-cm"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      <span className="font-bold text-primary">CM</span> — Ouvrages concernant le Maroc
+                    </label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="filter-cbm"
+                      checked={filterCBM}
+                      onCheckedChange={(checked) => setFilterCBM(checked as boolean)}
+                    />
+                    <label
+                      htmlFor="filter-cbm"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      <span className="font-bold text-primary">CBM</span> — Tous les ouvrages des bibliothèques du Maroc
+                    </label>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
             <Tabs defaultValue="simple" className="w-full">
               <TabsList className="mb-6 bg-cbm-primary/10">
                 <TabsTrigger value="simple" className="data-[state=active]:bg-cbm-primary data-[state=active]:text-white">
