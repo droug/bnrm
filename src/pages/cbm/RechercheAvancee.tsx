@@ -319,7 +319,7 @@ const RechercheAvancee = () => {
                   📰 Périodiques
                 </TabsTrigger>
                 <TabsTrigger value="identifier" className="flex items-center gap-2">
-                  📁 Cote / Identifiant
+                  📁 Identifiant
                 </TabsTrigger>
               </TabsList>
 
@@ -403,21 +403,11 @@ const RechercheAvancee = () => {
                 </div>
               </TabsContent>
 
-              {/* Cote / Identifiant */}
+              {/* Identifiant */}
               <TabsContent value="identifier" className="space-y-4">
                 <div className="py-4">
-                  <h3 className="text-xl font-semibold mb-6">Recherche par cote ou identifiant</h3>
+                  <h3 className="text-xl font-semibold mb-6">Recherche par identifiant</h3>
                   <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                      <CoteAutocomplete
-                        label="Cote"
-                        value={criteria.cote}
-                        onChange={(cote) => setCriteria({ ...criteria, cote })}
-                      />
-                      <p className="text-xs text-muted-foreground mt-2">
-                        💡 Tapez un préfixe (PH2, MAN, DOC...) pour voir les modèles disponibles
-                      </p>
-                    </div>
                     <div>
                       <Label htmlFor="isbn">ISBN</Label>
                       <Input id="isbn" placeholder="Ex: 978-2-1234-5678-9" />
