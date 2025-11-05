@@ -383,7 +383,7 @@ const RechercheAvancee = () => {
                   🔍 Multi-critères
                 </TabsTrigger>
                 <TabsTrigger value="library" className="flex items-center gap-2">
-                  🏛️ Bibliothèque source
+                  🏛️ Bibliothèques sources
                 </TabsTrigger>
                 <TabsTrigger value="author-az" className="flex items-center gap-2">
                   📚 Auteur A-Z
@@ -402,7 +402,7 @@ const RechercheAvancee = () => {
               {/* Bibliothèque */}
               <TabsContent value="library" className="space-y-4">
                 <div className="py-4">
-                  <h3 className="text-xl font-semibold mb-6">Recherche par bibliothèque</h3>
+                  <h3 className="text-xl font-semibold mb-6">Recherche par bibliothèques</h3>
                   <div className="grid gap-6 md:grid-cols-1">
                     <div>
                       <Label htmlFor="region">Région</Label>
