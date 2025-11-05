@@ -11,7 +11,7 @@ import { ExternalSystemsConfig } from "@/components/admin/ExternalSystemsConfig"
 
 export default function AdminSettings() {
   const navigate = useNavigate();
-  const [showInterconnections, setShowInterconnections] = useState(false);
+  const [showInterconnections, setShowInterconnections] = useState(true);
   const adminCards = [
     {
       icon: ShieldCheck,
