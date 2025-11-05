@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Info, Search, RotateCcw, Save, Download, BookOpen } from 'lucide-react';
+import { Info, Search, RotateCcw, Save, Download, BookOpen, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,6 +21,7 @@ import { CoteAutocomplete } from '@/components/ui/cote-autocomplete';
 import { supabase } from '@/integrations/supabase/client';
 import { SearchPagination } from '@/components/ui/search-pagination';
 import { moroccanRegions, getCitiesByRegion } from '@/data/moroccanRegions';
+import { LibraryMapModal } from '@/components/cbm/LibraryMapModal';
 
 interface SearchCriteria {
   keywords: string;
@@ -77,6 +78,7 @@ const RechercheAvancee = () => {
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedLibrary, setSelectedLibrary] = useState('');
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   // Restaurer l'état de recherche au retour de la notice
   useEffect(() => {
@@ -430,9 +432,31 @@ const RechercheAvancee = () => {
                         </SelectContent>
                       </Select>
                     </div>
+                    
+                    {selectedLibrary && selectedLibrary !== 'Autre' && (
+                      <div className="flex justify-end">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="flex items-center gap-2"
+                          onClick={() => setIsMapModalOpen(true)}
+                        >
+                          <MapPin className="h-4 w-4" />
+                          Localiser sur la carte
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </TabsContent>
+              
+              {/* Modale de localisation */}
+              <LibraryMapModal
+                isOpen={isMapModalOpen}
+                onClose={() => setIsMapModalOpen(false)}
+                libraryName={selectedLibrary}
+                city={selectedCity}
+              />
 
               {/* Auteur A-Z */}
               <TabsContent value="author-az" className="space-y-4">
