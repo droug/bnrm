@@ -76,9 +76,10 @@ const RechercheAvancee = () => {
   
   // État pour l'onglet Bibliothèque
   const [selectedRegion, setSelectedRegion] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
-  const [selectedLibrary, setSelectedLibrary] = useState('');
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [selectedLibraries, setSelectedLibraries] = useState<string[]>([]);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [currentMapLibrary, setCurrentMapLibrary] = useState({ name: '', city: '' });
 
   // Restaurer l'état de recherche au retour de la notice
   useEffect(() => {
@@ -146,10 +147,46 @@ const RechercheAvancee = () => {
   // Obtenir les villes filtrées par région
   const availableCities = selectedRegion ? getCitiesByRegion(selectedRegion) : [];
   
-  // Obtenir les bibliothèques filtrées par ville (toujours ajouter "Autre" à la fin)
-  const availableLibraries = selectedCity 
-    ? [...(librariesByCity[selectedCity] || []), 'Autre'] 
+  // Obtenir les bibliothèques de toutes les villes sélectionnées
+  const availableLibraries = selectedCities.length > 0
+    ? [
+        ...selectedCities.flatMap(city => librariesByCity[city] || []),
+        'Autre'
+      ]
     : [];
+  
+  // Fonctions pour gérer la sélection multiple
+  const toggleCity = (city: string) => {
+    setSelectedCities(prev => {
+      if (prev.includes(city)) {
+        // Retirer la ville et ses bibliothèques associées
+        const newCities = prev.filter(c => c !== city);
+        const cityLibraries = librariesByCity[city] || [];
+        setSelectedLibraries(libs => libs.filter(lib => !cityLibraries.includes(lib)));
+        return newCities;
+      } else {
+        return [...prev, city];
+      }
+    });
+  };
+  
+  const toggleLibrary = (library: string) => {
+    setSelectedLibraries(prev => 
+      prev.includes(library)
+        ? prev.filter(lib => lib !== library)
+        : [...prev, library]
+    );
+  };
+  
+  const removeCity = (city: string) => {
+    setSelectedCities(prev => prev.filter(c => c !== city));
+    const cityLibraries = librariesByCity[city] || [];
+    setSelectedLibraries(libs => libs.filter(lib => !cityLibraries.includes(lib)));
+  };
+  
+  const removeLibrary = (library: string) => {
+    setSelectedLibraries(prev => prev.filter(lib => lib !== library));
+  };
 
   const handleSearch = async () => {
     setIsSearching(true);
@@ -373,8 +410,8 @@ const RechercheAvancee = () => {
                         value={selectedRegion} 
                         onValueChange={(value) => {
                           setSelectedRegion(value);
-                          setSelectedCity('');
-                          setSelectedLibrary('');
+                          setSelectedCities([]);
+                          setSelectedLibraries([]);
                         }}
                       >
                         <SelectTrigger id="region">
@@ -391,61 +428,106 @@ const RechercheAvancee = () => {
                     </div>
                     
                     <div>
-                      <Label htmlFor="city">Ville</Label>
-                      <Select 
-                        value={selectedCity} 
-                        onValueChange={(value) => {
-                          setSelectedCity(value);
-                          setSelectedLibrary('');
-                        }}
-                        disabled={!selectedRegion}
-                      >
-                        <SelectTrigger id="city">
-                          <SelectValue placeholder={selectedRegion ? "Sélectionner une ville..." : "Veuillez d'abord sélectionner une région"} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {availableCities.map((city) => (
-                            <SelectItem key={city} value={city}>
-                              {city}
-                            </SelectItem>
+                      <Label>Villes (sélection multiple)</Label>
+                      <Card className="p-4">
+                        {!selectedRegion ? (
+                          <p className="text-sm text-muted-foreground">Veuillez d'abord sélectionner une région</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {availableCities.map((city) => (
+                              <div key={city} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`city-${city}`}
+                                  checked={selectedCities.includes(city)}
+                                  onCheckedChange={() => toggleCity(city)}
+                                />
+                                <label
+                                  htmlFor={`city-${city}`}
+                                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                >
+                                  {city}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </Card>
+                      {selectedCities.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {selectedCities.map((city) => (
+                            <Badge 
+                              key={city} 
+                              variant="secondary" 
+                              className="cursor-pointer"
+                              onClick={() => removeCity(city)}
+                            >
+                              {city} ×
+                            </Badge>
                           ))}
-                        </SelectContent>
-                      </Select>
+                        </div>
+                      )}
                     </div>
                     
                     <div>
-                      <Label htmlFor="library">Bibliothèque adhérente</Label>
-                      <Select 
-                        value={selectedLibrary} 
-                        onValueChange={setSelectedLibrary}
-                        disabled={!selectedCity}
-                      >
-                        <SelectTrigger id="library">
-                          <SelectValue placeholder={selectedCity ? "Sélectionner une bibliothèque..." : "Veuillez d'abord sélectionner une ville"} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {availableLibraries.map((library) => (
-                            <SelectItem key={library} value={library}>
-                              {library}
-                            </SelectItem>
+                      <Label>Bibliothèques adhérentes (sélection multiple)</Label>
+                      <Card className="p-4">
+                        {selectedCities.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">Veuillez d'abord sélectionner au moins une ville</p>
+                        ) : (
+                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {availableLibraries.map((library) => (
+                              <div key={library} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`library-${library}`}
+                                  checked={selectedLibraries.includes(library)}
+                                  onCheckedChange={() => toggleLibrary(library)}
+                                />
+                                <label
+                                  htmlFor={`library-${library}`}
+                                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
+                                >
+                                  {library}
+                                </label>
+                                {library !== 'Autre' && (
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 w-6 p-0"
+                                    onClick={() => {
+                                      // Trouver la ville de cette bibliothèque
+                                      const libraryCity = Object.entries(librariesByCity).find(
+                                        ([_, libs]) => libs.includes(library)
+                                      )?.[0];
+                                      if (libraryCity) {
+                                        setCurrentMapLibrary({ name: library, city: libraryCity });
+                                        setIsMapModalOpen(true);
+                                      }
+                                    }}
+                                  >
+                                    <MapPin className="h-3 w-3" />
+                                  </Button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </Card>
+                      {selectedLibraries.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {selectedLibraries.map((library) => (
+                            <Badge 
+                              key={library} 
+                              variant="secondary" 
+                              className="cursor-pointer"
+                              onClick={() => removeLibrary(library)}
+                            >
+                              {library} ×
+                            </Badge>
                           ))}
-                        </SelectContent>
-                      </Select>
+                        </div>
+                      )}
                     </div>
-                    
-                    {selectedLibrary && selectedLibrary !== 'Autre' && (
-                      <div className="flex justify-end">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="flex items-center gap-2"
-                          onClick={() => setIsMapModalOpen(true)}
-                        >
-                          <MapPin className="h-4 w-4" />
-                          Localiser sur la carte
-                        </Button>
-                      </div>
-                    )}
                   </div>
                 </div>
               </TabsContent>
@@ -454,8 +536,8 @@ const RechercheAvancee = () => {
               <LibraryMapModal
                 isOpen={isMapModalOpen}
                 onClose={() => setIsMapModalOpen(false)}
-                libraryName={selectedLibrary}
-                city={selectedCity}
+                libraryName={currentMapLibrary.name}
+                city={currentMapLibrary.city}
               />
 
               {/* Auteur A-Z */}
