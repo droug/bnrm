@@ -467,10 +467,10 @@ const RechercheAvancee = () => {
                     </AccordionContent>
                   </AccordionItem>
 
-                  {/* Par nature de document */}
+                  {/* Par typologie du document */}
                   <AccordionItem value="nature" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
                     <AccordionTrigger className="hover:no-underline py-4">
-                      <span className="font-semibold text-base">Par nature de document</span>
+                      <span className="font-semibold text-base">Par typologie du document</span>
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
@@ -498,30 +498,6 @@ const RechercheAvancee = () => {
                         <Label htmlFor="hybrid" className="cursor-pointer">
                           Inclure les documents hybrides (papier + numérique)
                         </Label>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  {/* Par typologie */}
-                  <AccordionItem value="typology" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
-                    <AccordionTrigger className="hover:no-underline py-4">
-                      <span className="font-semibold text-base">Par typologie</span>
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-4">
-                      <div>
-                        <Label htmlFor="typology">Type de document</Label>
-                        <Select>
-                          <SelectTrigger id="typology">
-                            <SelectValue placeholder="Sélectionner une typologie..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="roman">Roman</SelectItem>
-                            <SelectItem value="essai">Essai</SelectItem>
-                            <SelectItem value="revue">Revue scientifique</SelectItem>
-                            <SelectItem value="rapport">Rapport</SelectItem>
-                            <SelectItem value="religieux">Ouvrage religieux</SelectItem>
-                          </SelectContent>
-                        </Select>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -562,10 +538,10 @@ const RechercheAvancee = () => {
                     </AccordionContent>
                   </AccordionItem>
 
-                  {/* Par date de parution */}
+                  {/* Par date d'édition */}
                   <AccordionItem value="pub-date" className="border border-border rounded-lg px-4 bg-card hover:border-[#C6A760]/50 transition-colors data-[state=open]:border-[#C6A760] data-[state=open]:bg-[#C6A760]/5">
                     <AccordionTrigger className="hover:no-underline py-4">
-                      <span className="font-semibold text-base">Par date de parution</span>
+                      <span className="font-semibold text-base">Par date d'édition</span>
                     </AccordionTrigger>
                     <AccordionContent className="space-y-4 pb-4">
                       <div className="grid grid-cols-2 gap-4">
