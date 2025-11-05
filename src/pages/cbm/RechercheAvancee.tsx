@@ -20,6 +20,7 @@ import { CountryAutocomplete } from '@/components/ui/country-autocomplete';
 import { CoteAutocomplete } from '@/components/ui/cote-autocomplete';
 import { supabase } from '@/integrations/supabase/client';
 import { SearchPagination } from '@/components/ui/search-pagination';
+import { moroccanRegions, getCitiesByRegion } from '@/data/moroccanRegions';
 
 interface SearchCriteria {
   keywords: string;
@@ -71,6 +72,11 @@ const RechercheAvancee = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [totalResults, setTotalResults] = useState(0);
+  
+  // État pour l'onglet Bibliothèque
+  const [selectedRegion, setSelectedRegion] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedLibrary, setSelectedLibrary] = useState('');
 
   // Restaurer l'état de recherche au retour de la notice
   useEffect(() => {
@@ -114,6 +120,33 @@ const RechercheAvancee = () => {
     'Espagnol',
     'Autres'
   ];
+
+  // Bibliothèques avec leurs villes
+  const librariesByCity: { [key: string]: string[] } = {
+    'Rabat': [
+      'Bibliothèque de l\'école des sciences de l\'information',
+      'Bibliothèque de la Faculté de Médecine et de Pharmacie de Rabat',
+      'Bibliothèque de la Faculté des Sciences Juridiques Economiques et Sociales - Souissi',
+      'Bibliothèque Nationale du Royaume du Maroc',
+      'Catalogue du Ministère de la Culture'
+    ],
+    'Oujda': ['Bibliothèque de l\'Université Mohammed 1'],
+    'Casablanca': [
+      'Bibliothèque de la Faculté des Sciences Juridiques, Economiques et Sociales',
+      'Bibliothèque universitaire Mohammed Sekkat',
+      'Catalogue de la Mosquée Hassan II',
+      'Université Hassan II de Casablanca'
+    ],
+    'Ifrane': ['Université Al Akhawayn'],
+    'Tanger': ['Fondation du Roi Abdul-Aziz Al Saoud pour les Etudes Islamiques et les Sciences Humaines'],
+    'Autre': ['Fondation Mohamed VI', 'Autre']
+  };
+
+  // Obtenir les villes filtrées par région
+  const availableCities = selectedRegion ? getCitiesByRegion(selectedRegion) : [];
+  
+  // Obtenir les bibliothèques filtrées par ville
+  const availableLibraries = selectedCity ? (librariesByCity[selectedCity] || []) : [];
 
   const handleSearch = async () => {
     setIsSearching(true);
@@ -305,9 +338,12 @@ const RechercheAvancee = () => {
         <Card className="mb-6">
           <CardContent className="p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-5 mb-6">
+              <TabsList className="grid w-full grid-cols-6 mb-6">
                 <TabsTrigger value="multi-criteria" className="flex items-center gap-2">
                   🔍 Multi-critères
+                </TabsTrigger>
+                <TabsTrigger value="library" className="flex items-center gap-2">
+                  🏛️ Bibliothèque
                 </TabsTrigger>
                 <TabsTrigger value="author-az" className="flex items-center gap-2">
                   📚 Auteur A-Z
@@ -322,6 +358,80 @@ const RechercheAvancee = () => {
                   📁 Identifiant
                 </TabsTrigger>
               </TabsList>
+
+              {/* Bibliothèque */}
+              <TabsContent value="library" className="space-y-4">
+                <div className="py-4">
+                  <h3 className="text-xl font-semibold mb-6">Recherche par bibliothèque</h3>
+                  <div className="grid gap-6 md:grid-cols-1">
+                    <div>
+                      <Label htmlFor="region">Région</Label>
+                      <Select 
+                        value={selectedRegion} 
+                        onValueChange={(value) => {
+                          setSelectedRegion(value);
+                          setSelectedCity('');
+                          setSelectedLibrary('');
+                        }}
+                      >
+                        <SelectTrigger id="region">
+                          <SelectValue placeholder="Sélectionner une région..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {moroccanRegions.map((region) => (
+                            <SelectItem key={region.name} value={region.name}>
+                              {region.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="city">Ville</Label>
+                      <Select 
+                        value={selectedCity} 
+                        onValueChange={(value) => {
+                          setSelectedCity(value);
+                          setSelectedLibrary('');
+                        }}
+                        disabled={!selectedRegion}
+                      >
+                        <SelectTrigger id="city">
+                          <SelectValue placeholder={selectedRegion ? "Sélectionner une ville..." : "Veuillez d'abord sélectionner une région"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableCities.map((city) => (
+                            <SelectItem key={city} value={city}>
+                              {city}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="library">Bibliothèque</Label>
+                      <Select 
+                        value={selectedLibrary} 
+                        onValueChange={setSelectedLibrary}
+                        disabled={!selectedCity}
+                      >
+                        <SelectTrigger id="library">
+                          <SelectValue placeholder={selectedCity ? "Sélectionner une bibliothèque..." : "Veuillez d'abord sélectionner une ville"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableLibraries.map((library) => (
+                            <SelectItem key={library} value={library}>
+                              {library}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
 
               {/* Auteur A-Z */}
               <TabsContent value="author-az" className="space-y-4">
