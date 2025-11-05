@@ -401,7 +401,11 @@ const RechercheAvancee = () => {
                     id="filter-cm"
                     checked={criteria.filterCM}
                     onCheckedChange={(checked) => 
-                      setCriteria(prev => ({ ...prev, filterCM: checked as boolean }))
+                      setCriteria(prev => ({ 
+                        ...prev, 
+                        filterCM: checked as boolean,
+                        filterCBM: checked ? false : prev.filterCBM
+                      }))
                     }
                   />
                   <label
@@ -417,7 +421,11 @@ const RechercheAvancee = () => {
                     id="filter-cbm"
                     checked={criteria.filterCBM}
                     onCheckedChange={(checked) => 
-                      setCriteria(prev => ({ ...prev, filterCBM: checked as boolean }))
+                      setCriteria(prev => ({ 
+                        ...prev, 
+                        filterCBM: checked as boolean,
+                        filterCM: checked ? false : prev.filterCM
+                      }))
                     }
                   />
                   <label

@@ -244,7 +244,10 @@ export default function CBMRecherche() {
                     <Checkbox
                       id="filter-cm"
                       checked={filterCM}
-                      onCheckedChange={(checked) => setFilterCM(checked as boolean)}
+                      onCheckedChange={(checked) => {
+                        setFilterCM(checked as boolean);
+                        if (checked) setFilterCBM(false);
+                      }}
                     />
                     <label
                       htmlFor="filter-cm"
@@ -258,7 +261,10 @@ export default function CBMRecherche() {
                     <Checkbox
                       id="filter-cbm"
                       checked={filterCBM}
-                      onCheckedChange={(checked) => setFilterCBM(checked as boolean)}
+                      onCheckedChange={(checked) => {
+                        setFilterCBM(checked as boolean);
+                        if (checked) setFilterCM(false);
+                      }}
                     />
                     <label
                       htmlFor="filter-cbm"
