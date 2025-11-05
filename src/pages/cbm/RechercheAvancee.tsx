@@ -414,7 +414,7 @@ const RechercheAvancee = () => {
                     </div>
                     
                     <div>
-                      <Label htmlFor="library">Bibliothèque</Label>
+                      <Label htmlFor="library">Bibliothèque adhérente</Label>
                       <Select 
                         value={selectedLibrary} 
                         onValueChange={setSelectedLibrary}
