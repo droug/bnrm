@@ -1,14 +1,17 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail, GitBranch, List, Sliders, FolderTree, Wrench, Home, FormInput } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail, GitBranch, List, Sliders, FolderTree, Wrench, Home, FormInput, Network } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
 import { useNavigate } from "react-router-dom";
 import { CreateTestDepositButton } from "@/components/admin/CreateTestDepositButton";
+import { ExternalSystemsConfig } from "@/components/admin/ExternalSystemsConfig";
 
 export default function AdminSettings() {
   const navigate = useNavigate();
+  const [showInterconnections, setShowInterconnections] = useState(false);
   const adminCards = [
     {
       icon: ShieldCheck,
@@ -232,6 +235,36 @@ export default function AdminSettings() {
                 <CardContent>
                   <CreateTestDepositButton />
                 </CardContent>
+              </Card>
+            </div>
+            
+            {/* Interconnexions avec systèmes externes */}
+            <div className="mb-8">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Network className="h-6 w-6" />
+                        Interconnexions
+                      </CardTitle>
+                      <CardDescription>
+                        Configuration des interconnexions avec les systèmes externes (MUC, SIGB, Z39.50, OAI-PMH)
+                      </CardDescription>
+                    </div>
+                    <Button 
+                      variant={showInterconnections ? "secondary" : "default"}
+                      onClick={() => setShowInterconnections(!showInterconnections)}
+                    >
+                      {showInterconnections ? 'Masquer' : 'Configurer'}
+                    </Button>
+                  </div>
+                </CardHeader>
+                {showInterconnections && (
+                  <CardContent>
+                    <ExternalSystemsConfig />
+                  </CardContent>
+                )}
               </Card>
             </div>
             

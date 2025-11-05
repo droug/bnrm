@@ -3295,6 +3295,125 @@ export type Database = {
         }
         Relationships: []
       }
+      external_system_configs: {
+        Row: {
+          additional_params: Json | null
+          api_key_encrypted: string | null
+          base_url: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          display_name: string
+          id: string
+          is_active: boolean | null
+          is_configured: boolean | null
+          last_sync_at: string | null
+          last_sync_status: string | null
+          password_encrypted: string | null
+          sync_frequency_minutes: number | null
+          system_name: string
+          system_type: string
+          updated_at: string | null
+          updated_by: string | null
+          username: string | null
+        }
+        Insert: {
+          additional_params?: Json | null
+          api_key_encrypted?: string | null
+          base_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          display_name: string
+          id?: string
+          is_active?: boolean | null
+          is_configured?: boolean | null
+          last_sync_at?: string | null
+          last_sync_status?: string | null
+          password_encrypted?: string | null
+          sync_frequency_minutes?: number | null
+          system_name: string
+          system_type: string
+          updated_at?: string | null
+          updated_by?: string | null
+          username?: string | null
+        }
+        Update: {
+          additional_params?: Json | null
+          api_key_encrypted?: string | null
+          base_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          display_name?: string
+          id?: string
+          is_active?: boolean | null
+          is_configured?: boolean | null
+          last_sync_at?: string | null
+          last_sync_status?: string | null
+          password_encrypted?: string | null
+          sync_frequency_minutes?: number | null
+          system_name?: string
+          system_type?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      external_system_sync_logs: {
+        Row: {
+          created_at: string | null
+          error_details: Json | null
+          error_message: string | null
+          id: string
+          records_added: number | null
+          records_failed: number | null
+          records_processed: number | null
+          records_updated: number | null
+          status: string
+          sync_completed_at: string | null
+          sync_started_at: string | null
+          system_config_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_details?: Json | null
+          error_message?: string | null
+          id?: string
+          records_added?: number | null
+          records_failed?: number | null
+          records_processed?: number | null
+          records_updated?: number | null
+          status: string
+          sync_completed_at?: string | null
+          sync_started_at?: string | null
+          system_config_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_details?: Json | null
+          error_message?: string | null
+          id?: string
+          records_added?: number | null
+          records_failed?: number | null
+          records_processed?: number | null
+          records_updated?: number | null
+          status?: string
+          sync_completed_at?: string | null
+          sync_started_at?: string | null
+          system_config_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_system_sync_logs_system_config_id_fkey"
+            columns: ["system_config_id"]
+            isOneToOne: false
+            referencedRelation: "external_system_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       faqs: {
         Row: {
           answer: string
