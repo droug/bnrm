@@ -416,10 +416,6 @@ const RechercheAvancee = () => {
                       <Label htmlFor="issn-id">ISSN</Label>
                       <Input id="issn-id" placeholder="Ex: 1234-5678" />
                     </div>
-                    <div>
-                      <Label htmlFor="local-id">Identifiant local</Label>
-                      <Input id="local-id" placeholder="Identifiant de l'établissement" />
-                    </div>
                   </div>
                 </div>
               </TabsContent>
