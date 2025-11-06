@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { UserPlus, CheckCircle2, FileText, Shield } from "lucide-react";
+import { UserPlus, CheckCircle2, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function CBMAdhesion() {
@@ -18,8 +18,6 @@ export default function CBMAdhesion() {
   const [typeAdhesion, setTypeAdhesion] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  console.log("CBMAdhesion render - step:", step, "typeAdhesion:", typeAdhesion);
 
   const criteres = [
     "Être une bibliothèque institutionnelle reconnue (publique, universitaire, spécialisée)",
@@ -115,10 +113,10 @@ export default function CBMAdhesion() {
                     </div>
                   )}
                 </CardHeader>
+                
                 <form onSubmit={handleSubmit}>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {step === 0 && (
+                  <CardContent className="space-y-6">
+                    {step === 0 && (
                       <div className="space-y-6">
                         <h3 className="font-semibold text-lg text-cbm-primary">Type d'Adhésion</h3>
                         <p className="text-sm text-muted-foreground">
@@ -316,17 +314,17 @@ export default function CBMAdhesion() {
                         </div>
                       </div>
                     )}
-                    </div>
                   </CardContent>
-                  
-                  {/* Buttons Section - Outside CardContent */}
+
+                  {/* Buttons at the bottom of the Card */}
                   <div className="px-6 pb-6">
-                    <div className="flex justify-between items-center pt-6 border-t">
+                    <div className="flex justify-between items-center pt-4 border-t">
                       {step > 0 && (
                         <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
                           Précédent
                         </Button>
                       )}
+                      
                       {step === 0 && (
                         <Button 
                           type="button" 
@@ -337,11 +335,13 @@ export default function CBMAdhesion() {
                           Suivant
                         </Button>
                       )}
+                      
                       {step > 0 && step < 3 && (
                         <Button type="button" onClick={() => setStep(step + 1)} className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90">
                           Suivant
                         </Button>
                       )}
+                      
                       {step === 3 && (
                         <Button type="submit" className="ml-auto bg-cbm-primary hover:bg-cbm-primary/90">
                           Soumettre la Demande
