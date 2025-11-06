@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Settings, Users, FileText, Database, ArrowRight } from "lucide-react";
+import { Settings, Users, FileText, Database, ArrowRight, GraduationCap } from "lucide-react";
 
 export default function CBMAdmin() {
   const adminCards = [
@@ -12,6 +12,14 @@ export default function CBMAdmin() {
       icon: Users,
       path: "/cbm/admin/adhesions",
       gradient: "from-primary/90 to-primary",
+      count: "En attente"
+    },
+    {
+      title: "Gestion Demandes de Formation",
+      description: "Consulter et traiter les demandes de formation des bibliothèques",
+      icon: GraduationCap,
+      path: "/cbm/admin/formations",
+      gradient: "from-accent/90 to-accent",
       count: "En attente"
     },
     {
