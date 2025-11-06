@@ -13,7 +13,9 @@ import { UserPlus, CheckCircle2, FileText, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function CBMAdhesion() {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
+  const [adhesionReseau, setAdhesionReseau] = useState(false);
+  const [adhesionCatalogue, setAdhesionCatalogue] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -99,18 +101,83 @@ export default function CBMAdhesion() {
                 <CardHeader>
                   <div className="flex items-center justify-between mb-4">
                     <CardTitle className="text-2xl text-cbm-accent">Formulaire d'Adhésion</CardTitle>
-                    <span className="text-sm text-muted-foreground">Étape {step}/3</span>
+                    {step > 0 && <span className="text-sm text-muted-foreground">Étape {step}/3</span>}
                   </div>
                   {/* Progress Bar */}
-                  <div className="w-full h-2 bg-cbm-accent/20 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-cbm-accent to-cbm-secondary transition-all duration-300"
-                      style={{ width: `${(step / 3) * 100}%` }}
-                    />
-                  </div>
+                  {step > 0 && (
+                    <div className="w-full h-2 bg-cbm-accent/20 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-cbm-accent to-cbm-secondary transition-all duration-300"
+                        style={{ width: `${(step / 3) * 100}%` }}
+                      />
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit} className="space-y-6">
+                    {step === 0 && (
+                      <div className="space-y-6">
+                        <h3 className="font-semibold text-lg text-cbm-primary">Type d'Adhésion</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Sélectionnez le ou les types d'adhésion qui correspondent à vos besoins
+                        </p>
+                        
+                        <div className="space-y-4">
+                          <Card className={`border-2 transition-all cursor-pointer ${adhesionReseau ? 'border-cbm-primary bg-cbm-primary/5' : 'border-border hover:border-cbm-primary/50'}`}
+                            onClick={() => setAdhesionReseau(!adhesionReseau)}>
+                            <CardContent className="pt-6">
+                              <div className="flex items-start gap-4">
+                                <Checkbox 
+                                  id="adhesion-reseau" 
+                                  checked={adhesionReseau}
+                                  onCheckedChange={(checked) => setAdhesionReseau(checked as boolean)}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <div className="flex-1">
+                                  <Label htmlFor="adhesion-reseau" className="text-base font-semibold cursor-pointer">
+                                    Adhésion au réseau des Bibliothèques Marocaines
+                                  </Label>
+                                  <p className="text-sm text-muted-foreground mt-2">
+                                    Rejoignez le réseau national CBM pour bénéficier du prêt entre bibliothèques, 
+                                    des formations et du support technique dédié.
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card className={`border-2 transition-all cursor-pointer ${adhesionCatalogue ? 'border-cbm-secondary bg-cbm-secondary/5' : 'border-border hover:border-cbm-secondary/50'}`}
+                            onClick={() => setAdhesionCatalogue(!adhesionCatalogue)}>
+                            <CardContent className="pt-6">
+                              <div className="flex items-start gap-4">
+                                <Checkbox 
+                                  id="adhesion-catalogue" 
+                                  checked={adhesionCatalogue}
+                                  onCheckedChange={(checked) => setAdhesionCatalogue(checked as boolean)}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <div className="flex-1">
+                                  <Label htmlFor="adhesion-catalogue" className="text-base font-semibold cursor-pointer">
+                                    Adhésion au catalogue CBM
+                                  </Label>
+                                  <p className="text-sm text-muted-foreground mt-2">
+                                    Intégrez vos notices bibliographiques au catalogue collectif national 
+                                    et rendez vos collections visibles au niveau national.
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        {!adhesionReseau && !adhesionCatalogue && (
+                          <p className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg">
+                            Veuillez sélectionner au moins un type d'adhésion pour continuer
+                          </p>
+                        )}
+                      </div>
+                    )}
+
                     {step === 1 && (
                       <div className="space-y-4">
                         <h3 className="font-semibold text-lg text-cbm-primary">Informations de l'Institution</h3>
@@ -233,12 +300,21 @@ export default function CBMAdhesion() {
                     )}
 
                     <div className="flex justify-between pt-6">
-                      {step > 1 && (
+                      {step > 0 && (
                         <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
                           Précédent
                         </Button>
                       )}
-                      {step < 3 ? (
+                      {step === 0 ? (
+                        <Button 
+                          type="button" 
+                          onClick={() => setStep(step + 1)} 
+                          className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90"
+                          disabled={!adhesionReseau && !adhesionCatalogue}
+                        >
+                          Suivant
+                        </Button>
+                      ) : step < 3 ? (
                         <Button type="button" onClick={() => setStep(step + 1)} className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90">
                           Suivant
                         </Button>
