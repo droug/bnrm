@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -316,39 +316,36 @@ export default function CBMAdhesion() {
                     )}
                   </CardContent>
 
-                  {/* Buttons at the bottom of the Card */}
-                  <div className="px-6 pb-6">
-                    <div className="flex justify-between items-center pt-4 border-t">
-                      {step > 0 && (
-                        <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
-                          Précédent
-                        </Button>
-                      )}
-                      
-                      {step === 0 && (
-                        <Button 
-                          type="button" 
-                          onClick={() => setStep(1)} 
-                          className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90"
-                          disabled={!typeAdhesion}
-                        >
-                          Suivant
-                        </Button>
-                      )}
-                      
-                      {step > 0 && step < 3 && (
-                        <Button type="button" onClick={() => setStep(step + 1)} className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90">
-                          Suivant
-                        </Button>
-                      )}
-                      
-                      {step === 3 && (
-                        <Button type="submit" className="ml-auto bg-cbm-primary hover:bg-cbm-primary/90">
-                          Soumettre la Demande
-                        </Button>
-                      )}
-                    </div>
-                  </div>
+                  <CardFooter className="flex justify-between">
+                    {step > 0 && (
+                      <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
+                        Précédent
+                      </Button>
+                    )}
+                    
+                    {step === 0 && (
+                      <Button 
+                        type="button" 
+                        onClick={() => setStep(1)} 
+                        className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90"
+                        disabled={!typeAdhesion}
+                      >
+                        Suivant
+                      </Button>
+                    )}
+                    
+                    {step > 0 && step < 3 && (
+                      <Button type="button" onClick={() => setStep(step + 1)} className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90">
+                        Suivant
+                      </Button>
+                    )}
+                    
+                    {step === 3 && (
+                      <Button type="submit" className="ml-auto bg-cbm-primary hover:bg-cbm-primary/90">
+                        Soumettre la Demande
+                      </Button>
+                    )}
+                  </CardFooter>
                 </form>
               </Card>
             ) : (
