@@ -1,102 +1,103 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 interface SimpleSelectProps {
-  value?: string;
-  onChange: (value: string) => void;
-  options: Array<{ value: string; label: string }>;
+  id?: string;
+  label?: string;
   placeholder?: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+  required?: boolean;
   disabled?: boolean;
   className?: string;
-  id?: string;
 }
 
 export function SimpleSelect({
+  id,
+  label,
+  placeholder = "Sélectionnez une option",
   value,
   onChange,
   options,
-  placeholder = "Sélectionner...",
+  required = false,
   disabled = false,
-  className,
-  id,
+  className = "",
 }: SimpleSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const selectRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Trouver le label de la valeur sélectionnée
-  const selectedOption = options.find((opt) => opt.value === value);
-  const displayValue = selectedOption?.label || placeholder;
-
-  // Fermer la liste si on clique en dehors
+  // Fermer au clic extérieur
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
 
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
-
-  const handleSelect = (selectedValue: string) => {
-    onChange(selectedValue);
+  const handleSelect = (optionValue: string) => {
+    onChange(optionValue);
     setIsOpen(false);
   };
 
-  return (
-    <div ref={selectRef} className={cn("relative w-full", className)} id={id}>
-      {/* Bouton trigger */}
-      <button
-        type="button"
-        onClick={() => !disabled && setIsOpen(!isOpen)}
-        disabled={disabled}
-        className={cn(
-          "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm",
-          "ring-offset-background placeholder:text-muted-foreground",
-          "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-          "disabled:cursor-not-allowed disabled:opacity-50",
-          !value && "text-muted-foreground"
-        )}
-      >
-        <span className="truncate">{displayValue}</span>
-        <ChevronDown
-          className={cn(
-            "ml-2 h-4 w-4 shrink-0 opacity-50 transition-transform",
-            isOpen && "rotate-180"
-          )}
-        />
-      </button>
+  const selectedOption = options.find(opt => opt.value === value);
+  const displayValue = selectedOption ? selectedOption.label : placeholder;
 
-      {/* Liste déroulante */}
-      {isOpen && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-popover shadow-md">
-          <div className="max-h-[300px] overflow-y-auto p-1">
-            {options.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => handleSelect(option.value)}
-                className={cn(
-                  "w-full rounded-sm px-2 py-1.5 text-sm text-left",
-                  "hover:bg-accent hover:text-accent-foreground",
-                  "focus:bg-accent focus:text-accent-foreground focus:outline-none",
-                  "transition-colors cursor-pointer",
-                  value === option.value && "bg-accent text-accent-foreground font-medium"
-                )}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
+  return (
+    <div ref={containerRef} className={cn("space-y-2", className)}>
+      {label && (
+        <Label>
+          {label}
+          {required && <span className="text-destructive ml-1">*</span>}
+        </Label>
       )}
+      
+      <div className="relative">
+        <button
+          id={id}
+          type="button"
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          disabled={disabled}
+          className={cn(
+            "w-full flex items-center justify-between rounded-lg border border-input bg-background px-4 py-3 text-[15px] transition-all duration-200",
+            "hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary",
+            !selectedOption && "text-muted-foreground/60",
+            disabled && "opacity-50 cursor-not-allowed"
+          )}
+        >
+          <span>{displayValue}</span>
+          <ChevronDown className={cn(
+            "w-4 h-4 text-muted-foreground transition-transform duration-200",
+            isOpen && "rotate-180"
+          )} />
+        </button>
+
+        {isOpen && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+            <ul className="py-1">
+              {options.map((option) => (
+                <li
+                  key={option.value}
+                  onClick={() => handleSelect(option.value)}
+                  className={cn(
+                    "px-4 py-2.5 text-[15px] cursor-pointer transition-colors",
+                    "hover:bg-accent",
+                    value === option.value && "bg-accent/50 font-medium"
+                  )}
+                >
+                  {option.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

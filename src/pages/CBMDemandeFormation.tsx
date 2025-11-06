@@ -8,10 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BibliothequeAutocomplete } from "@/components/ui/bibliotheque-autocomplete";
 import { FileUpload } from "@/components/ui/file-upload";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { ArrowLeft, GraduationCap, Send } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +24,7 @@ export default function CBMDemandeFormation() {
   const [bibliothequeType, setBibliothequeType] = useState<string | undefined>();
   const [participantsFile, setParticipantsFile] = useState<File | null>(null);
   const [besoinsSpecifiques, setBesoinsSpecifiques] = useState("");
+  const [typeFormation, setTypeFormation] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,7 +61,7 @@ export default function CBMDemandeFormation() {
           fonction_contact: formData.get("fonction_contact") as string,
           email: formData.get("email") as string,
           telephone: formData.get("telephone") as string,
-          type_formation: formData.get("type_formation") as string,
+          type_formation: typeFormation,
           nombre_participants: parseInt(formData.get("nombre_participants") as string),
           besoins_specifiques: besoinsSpecifiques,
           fichier_participants_path: fichierParticipantsPath,
@@ -76,6 +77,7 @@ export default function CBMDemandeFormation() {
       setBibliothequeType(undefined);
       setParticipantsFile(null);
       setBesoinsSpecifiques("");
+      setTypeFormation("");
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Erreur lors de l'envoi de la demande");
@@ -205,23 +207,22 @@ export default function CBMDemandeFormation() {
                     Détails de la formation souhaitée
                   </h3>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="type_formation">Type de formation *</Label>
-                    <Select name="type_formation" required>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionnez le type de formation" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="catalogage">Catalogage et classification</SelectItem>
-                        <SelectItem value="systeme_gestion">Système de gestion de bibliothèque</SelectItem>
-                        <SelectItem value="recherche_documentaire">Recherche documentaire</SelectItem>
-                        <SelectItem value="numerisation">Numérisation et archivage</SelectItem>
-                        <SelectItem value="gestion_collections">Gestion des collections</SelectItem>
-                        <SelectItem value="accueil_usagers">Accueil et services aux usagers</SelectItem>
-                        <SelectItem value="autre">Autre</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <SimpleSelect
+                    label="Type de formation"
+                    placeholder="Sélectionnez le type de formation"
+                    value={typeFormation}
+                    onChange={setTypeFormation}
+                    required
+                    options={[
+                      { value: "catalogage", label: "Catalogage et classification" },
+                      { value: "systeme_gestion", label: "Système de gestion de bibliothèque" },
+                      { value: "recherche_documentaire", label: "Recherche documentaire" },
+                      { value: "numerisation", label: "Numérisation et archivage" },
+                      { value: "gestion_collections", label: "Gestion des collections" },
+                      { value: "accueil_usagers", label: "Accueil et services aux usagers" },
+                      { value: "autre", label: "Autre" },
+                    ]}
+                  />
 
                   <div className="space-y-2">
                     <Label htmlFor="nombre_participants">Nombre de participants *</Label>
