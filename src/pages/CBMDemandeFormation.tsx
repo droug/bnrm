@@ -214,7 +214,11 @@ export default function CBMDemandeFormation() {
                     onChange={setTypeFormation}
                     required
                     options={[
-                      { value: "catalogage", label: "Catalogage et classification" },
+                      { value: "catalogage_normes", label: "Catalogage (Normes)" },
+                      { value: "classification_indexation", label: "Classification - indexation" },
+                      { value: "chaine_documentaire", label: "Chaine documentaire" },
+                      { value: "cotation", label: "Cotation" },
+                      { value: "formats_marc", label: "Formats MARC - UNIMARC" },
                       { value: "systeme_gestion", label: "Système de gestion de bibliothèque" },
                       { value: "recherche_documentaire", label: "Recherche documentaire" },
                       { value: "numerisation", label: "Numérisation et archivage" },
