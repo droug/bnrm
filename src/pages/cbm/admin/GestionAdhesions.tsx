@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Database, Eye, CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
+import { Users, Database, Eye, CheckCircle, XCircle, Clock, AlertCircle, Mail, Phone, Building, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -24,6 +24,7 @@ export default function GestionAdhesions() {
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState<"catalogue" | "reseau">("catalogue");
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [selectedAdhesion, setSelectedAdhesion] = useState<any>(null);
   const [selectedTable, setSelectedTable] = useState<"cbm_adhesions_catalogue" | "cbm_adhesions_reseau">("cbm_adhesions_catalogue");
   const [rejectionReason, setRejectionReason] = useState("");
@@ -39,11 +40,11 @@ export default function GestionAdhesions() {
       
       if (error) throw error;
       
-      // Si aucune donnée, retourner des exemples de test
+      // Si aucune donnée, retourner des exemples de test avec statuts variés
       if (!data || data.length === 0) {
         return [
           {
-            id: "test-1",
+            id: "test-catalogue-1",
             nom_bibliotheque: "Bibliothèque Nationale du Royaume",
             type_bibliotheque: "Nationale",
             tutelle: "Ministère de la Culture",
@@ -54,10 +55,11 @@ export default function GestionAdhesions() {
             sigb: "Koha",
             nombre_documents: 500000,
             statut: "en_attente",
+            motif_refus: null,
             created_at: new Date().toISOString()
           },
           {
-            id: "test-2",
+            id: "test-catalogue-2",
             nom_bibliotheque: "Bibliothèque Municipale de Casablanca",
             type_bibliotheque: "Municipale",
             tutelle: "Commune de Casablanca",
@@ -68,10 +70,11 @@ export default function GestionAdhesions() {
             sigb: "PMB",
             nombre_documents: 75000,
             statut: "en_validation",
+            motif_refus: null,
             created_at: new Date(Date.now() - 86400000).toISOString()
           },
           {
-            id: "test-3",
+            id: "test-catalogue-3",
             nom_bibliotheque: "Bibliothèque Universitaire Mohammed V",
             type_bibliotheque: "Universitaire",
             tutelle: "Université Mohammed V",
@@ -82,10 +85,11 @@ export default function GestionAdhesions() {
             sigb: "Ex Libris",
             nombre_documents: 250000,
             statut: "approuve",
+            motif_refus: null,
             created_at: new Date(Date.now() - 172800000).toISOString()
           },
           {
-            id: "test-4",
+            id: "test-catalogue-4",
             nom_bibliotheque: "Médiathèque de Marrakech",
             type_bibliotheque: "Municipale",
             tutelle: "Commune de Marrakech",
@@ -96,7 +100,7 @@ export default function GestionAdhesions() {
             sigb: "SIGB Marocain",
             nombre_documents: 45000,
             statut: "rejete",
-            motif_refus: "Documents insuffisants pour l'adhésion au catalogue collectif",
+            motif_refus: "Nombre de documents insuffisant pour l'adhésion au catalogue collectif. Minimum requis: 50,000 documents.",
             created_at: new Date(Date.now() - 259200000).toISOString()
           }
         ];
@@ -117,7 +121,7 @@ export default function GestionAdhesions() {
       
       if (error) throw error;
       
-      // Si aucune donnée, retourner des exemples de test
+      // Si aucune donnée, retourner des exemples de test avec statuts variés
       if (!data || data.length === 0) {
         return [
           {
@@ -133,6 +137,7 @@ export default function GestionAdhesions() {
             en_cours_informatisation: "Oui - 60% achevé",
             nombre_documents: 125000,
             statut: "en_attente",
+            motif_refus: null,
             created_at: new Date().toISOString()
           },
           {
@@ -148,6 +153,7 @@ export default function GestionAdhesions() {
             en_cours_informatisation: "Terminé",
             nombre_documents: 85000,
             statut: "en_validation",
+            motif_refus: null,
             created_at: new Date(Date.now() - 86400000).toISOString()
           },
           {
@@ -163,7 +169,24 @@ export default function GestionAdhesions() {
             en_cours_informatisation: "Oui - 80% achevé",
             nombre_documents: 165000,
             statut: "approuve",
+            motif_refus: null,
             created_at: new Date(Date.now() - 172800000).toISOString()
+          },
+          {
+            id: "test-reseau-4",
+            nom_bibliotheque: "Réseau Bibliothèques de Meknès",
+            type_bibliotheque: "Réseau régional",
+            tutelle: "Wilaya de Fès-Meknès",
+            region: "Fès-Meknès",
+            ville: "Meknès",
+            email: "reseau@meknes-bibliotheques.ma",
+            telephone: "+212 5 35 52 34 56",
+            moyens_recensement: "Fiches manuelles uniquement",
+            en_cours_informatisation: "Non démarré",
+            nombre_documents: 35000,
+            statut: "rejete",
+            motif_refus: "Infrastructure informatique insuffisante. L'adhésion au réseau nécessite un système informatisé au minimum en cours de déploiement.",
+            created_at: new Date(Date.now() - 345600000).toISOString()
           }
         ];
       }
@@ -375,6 +398,11 @@ export default function GestionAdhesions() {
               size="sm" 
               variant="outline"
               className="flex-1"
+              onClick={() => {
+                setSelectedAdhesion(adhesion);
+                setSelectedTable(tableName);
+                setShowDetailsDialog(true);
+              }}
             >
               <Eye className="h-4 w-4 mr-2" />
               Détails
@@ -542,6 +570,136 @@ export default function GestionAdhesions() {
             </Button>
             <Button variant="destructive" onClick={handleReject}>
               Confirmer le refus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de détails */}
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Détails de la demande d'adhésion</DialogTitle>
+            <DialogDescription>
+              Informations complètes sur la demande
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedAdhesion && (
+            <div className="space-y-6 py-4">
+              {/* Statut */}
+              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                <span className="font-semibold">Statut actuel:</span>
+                {getStatusBadge(selectedAdhesion.statut || "en_attente")}
+              </div>
+
+              {/* Informations générales */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg border-b pb-2">Informations générales</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                      <Building className="h-4 w-4" />
+                      <span>Nom de la bibliothèque</span>
+                    </div>
+                    <p className="font-medium">{selectedAdhesion.nom_bibliotheque}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-muted-foreground text-sm">Type</p>
+                    <p className="font-medium">{selectedAdhesion.type_bibliotheque}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-muted-foreground text-sm">Tutelle</p>
+                    <p className="font-medium">{selectedAdhesion.tutelle}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                      <MapPin className="h-4 w-4" />
+                      <span>Localisation</span>
+                    </div>
+                    <p className="font-medium">{selectedAdhesion.ville}, {selectedAdhesion.region}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Coordonnées */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg border-b pb-2">Coordonnées</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                      <Mail className="h-4 w-4" />
+                      <span>Email</span>
+                    </div>
+                    <p className="font-medium">{selectedAdhesion.email}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                      <Phone className="h-4 w-4" />
+                      <span>Téléphone</span>
+                    </div>
+                    <p className="font-medium">{selectedAdhesion.telephone}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Informations spécifiques */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg border-b pb-2">Informations spécifiques</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {selectedTable === "cbm_adhesions_catalogue" && selectedAdhesion.sigb && (
+                    <div className="space-y-1">
+                      <p className="text-muted-foreground text-sm">SIGB utilisé</p>
+                      <p className="font-medium">{selectedAdhesion.sigb}</p>
+                    </div>
+                  )}
+                  {selectedTable === "cbm_adhesions_reseau" && (
+                    <>
+                      <div className="space-y-1">
+                        <p className="text-muted-foreground text-sm">Moyens de recensement</p>
+                        <p className="font-medium">{selectedAdhesion.moyens_recensement}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-muted-foreground text-sm">Informatisation</p>
+                        <p className="font-medium">{selectedAdhesion.en_cours_informatisation}</p>
+                      </div>
+                    </>
+                  )}
+                  <div className="space-y-1">
+                    <p className="text-muted-foreground text-sm">Nombre de documents</p>
+                    <p className="font-medium text-lg">{selectedAdhesion.nombre_documents?.toLocaleString()}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-muted-foreground text-sm">Date de demande</p>
+                    <p className="font-medium">
+                      {new Date(selectedAdhesion.created_at).toLocaleDateString('fr-FR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Motif de refus si rejeté */}
+              {selectedAdhesion.statut === "rejete" && selectedAdhesion.motif_refus && (
+                <div className="space-y-2 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                  <h3 className="font-semibold text-destructive flex items-center gap-2">
+                    <XCircle className="h-5 w-5" />
+                    Motif du refus
+                  </h3>
+                  <p className="text-sm">{selectedAdhesion.motif_refus}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
+              Fermer
             </Button>
           </DialogFooter>
         </DialogContent>
