@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BibliothequeAutocomplete } from "@/components/ui/bibliotheque-autocomplete";
 import { FileUpload } from "@/components/ui/file-upload";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { ArrowLeft, GraduationCap, Send } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +23,7 @@ export default function CBMDemandeFormation() {
   const [bibliothequeId, setBibliothequeId] = useState<string | undefined>();
   const [bibliothequeType, setBibliothequeType] = useState<string | undefined>();
   const [participantsFile, setParticipantsFile] = useState<File | null>(null);
+  const [besoinsSpecifiques, setBesoinsSpecifiques] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,7 +62,7 @@ export default function CBMDemandeFormation() {
           telephone: formData.get("telephone") as string,
           type_formation: formData.get("type_formation") as string,
           nombre_participants: parseInt(formData.get("nombre_participants") as string),
-          besoins_specifiques: formData.get("besoins_specifiques") as string,
+          besoins_specifiques: besoinsSpecifiques,
           fichier_participants_path: fichierParticipantsPath,
           statut: "en_attente"
         });
@@ -73,6 +75,7 @@ export default function CBMDemandeFormation() {
       setBibliothequeId(undefined);
       setBibliothequeType(undefined);
       setParticipantsFile(null);
+      setBesoinsSpecifiques("");
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Erreur lors de l'envoi de la demande");
@@ -233,28 +236,30 @@ export default function CBMDemandeFormation() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="besoins_specifiques">Besoins spécifiques</Label>
-                    <Textarea
-                      id="besoins_specifiques"
-                      name="besoins_specifiques"
-                      rows={5}
-                      placeholder="Décrivez vos besoins spécifiques et objectifs de formation..."
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <FileUpload
-                      label="Liste des participants"
-                      accept=".xlsx,.xls,.csv"
-                      maxSize={5}
-                      value={participantsFile}
-                      onChange={setParticipantsFile}
-                      onDownloadTemplate={handleDownloadTemplate}
-                      templateLabel="Télécharger le canevas"
-                    />
+                    <Label htmlFor="participants-file">Liste des participants</Label>
+                    <div className="max-w-xl">
+                      <FileUpload
+                        label=""
+                        accept=".xlsx,.xls,.csv"
+                        maxSize={5}
+                        value={participantsFile}
+                        onChange={setParticipantsFile}
+                        onDownloadTemplate={handleDownloadTemplate}
+                        templateLabel="Télécharger le canevas"
+                      />
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       Téléchargez le canevas, remplissez-le avec les informations des participants, puis importez-le ici
                     </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="besoins_specifiques">Besoins spécifiques</Label>
+                    <RichTextEditor
+                      value={besoinsSpecifiques}
+                      onChange={setBesoinsSpecifiques}
+                      placeholder="Décrivez vos besoins spécifiques et objectifs de formation..."
+                    />
                   </div>
                 </div>
 
