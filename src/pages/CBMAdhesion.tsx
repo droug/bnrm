@@ -124,12 +124,18 @@ export default function CBMAdhesion() {
                         
                         <RadioGroup value={typeAdhesion} onValueChange={setTypeAdhesion}>
                           <div className="space-y-4">
-                            <Card className={`border-2 transition-all cursor-pointer ${typeAdhesion === 'reseau' ? 'border-cbm-primary bg-cbm-primary/5' : 'border-border hover:border-cbm-primary/50'}`}
-                              onClick={() => setTypeAdhesion('reseau')}>
+                            <Card 
+                              className={`border-2 transition-all cursor-pointer ${typeAdhesion === 'reseau' ? 'border-cbm-primary bg-cbm-primary/5' : 'border-border hover:border-cbm-primary/50'}`}
+                              onClick={() => setTypeAdhesion('reseau')}
+                            >
                               <CardContent className="pt-6">
                                 <div className="flex items-start gap-4">
-                                  <RadioGroupItem value="reseau" id="adhesion-reseau" />
-                                  <div className="flex-1">
+                                  <RadioGroupItem 
+                                    value="reseau" 
+                                    id="adhesion-reseau"
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                  <div className="flex-1" onClick={() => setTypeAdhesion('reseau')}>
                                     <Label htmlFor="adhesion-reseau" className="text-base font-semibold cursor-pointer">
                                       Adhésion au réseau des Bibliothèques Marocaines
                                     </Label>
@@ -151,12 +157,18 @@ export default function CBMAdhesion() {
                               </div>
                             </div>
 
-                            <Card className={`border-2 transition-all cursor-pointer ${typeAdhesion === 'catalogue' ? 'border-cbm-secondary bg-cbm-secondary/5' : 'border-border hover:border-cbm-secondary/50'}`}
-                              onClick={() => setTypeAdhesion('catalogue')}>
+                            <Card 
+                              className={`border-2 transition-all cursor-pointer ${typeAdhesion === 'catalogue' ? 'border-cbm-secondary bg-cbm-secondary/5' : 'border-border hover:border-cbm-secondary/50'}`}
+                              onClick={() => setTypeAdhesion('catalogue')}
+                            >
                               <CardContent className="pt-6">
                                 <div className="flex items-start gap-4">
-                                  <RadioGroupItem value="catalogue" id="adhesion-catalogue" />
-                                  <div className="flex-1">
+                                  <RadioGroupItem 
+                                    value="catalogue" 
+                                    id="adhesion-catalogue"
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                  <div className="flex-1" onClick={() => setTypeAdhesion('catalogue')}>
                                     <Label htmlFor="adhesion-catalogue" className="text-base font-semibold cursor-pointer">
                                       Adhésion au catalogue CBM
                                     </Label>
