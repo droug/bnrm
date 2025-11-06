@@ -114,8 +114,9 @@ export default function CBMAdhesion() {
                   )}
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    {step === 0 && (
+                  <form onSubmit={handleSubmit}>
+                    <div className="space-y-6">
+                      {step === 0 && (
                       <div className="space-y-6">
                         <h3 className="font-semibold text-lg text-cbm-primary">Type d'Adhésion</h3>
                         <p className="text-sm text-muted-foreground">
@@ -313,7 +314,9 @@ export default function CBMAdhesion() {
                         </div>
                       </div>
                     )}
+                    </div>
 
+                    {/* Buttons Section - Always visible at bottom */}
                     <div className="flex justify-between items-center pt-6 border-t mt-6">
                       {step > 0 && (
                         <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
