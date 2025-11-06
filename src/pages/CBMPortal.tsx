@@ -165,14 +165,15 @@ export default function CBMPortal() {
           <EventsCarousel />
         </section>
 
-        {/* Spotlight Section - NYPL Style */}
+        {/* Spotlight Section - Professional Design */}
         <section className="mb-16">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-foreground border-l-4 border-primary pl-4">
-              À la Une
-            </h2>
+            <div>
+              <h2 className="text-3xl font-bold text-foreground mb-2">À la Une</h2>
+              <p className="text-muted-foreground">Découvrez les ressources essentielles du réseau CBM</p>
+            </div>
             <Link to="/cbm/recherche">
-              <Button variant="outline" className="gap-2">
+              <Button variant="ghost" className="gap-2 hover:gap-3 transition-all">
                 Voir Plus
                 <ArrowRight className="w-4 h-4" />
               </Button>
@@ -184,18 +185,26 @@ export default function CBMPortal() {
               const IconComponent = item.icon;
               return (
                 <Link key={item.path} to={item.path}>
-                  <Card className="group h-full hover:shadow-xl transition-all duration-500 cursor-pointer overflow-hidden border-0 shadow-md">
-                    {/* Icon Header with Gradient */}
-                    <div className={`bg-gradient-to-br ${item.gradient} h-40 flex items-center justify-center relative`}>
-                      <div className="absolute inset-0 bg-pattern-zellige-complex opacity-10"></div>
-                      <IconComponent className="w-20 h-20 text-white relative z-10 group-hover:scale-110 transition-transform duration-300" strokeWidth={1.5} />
+                  <Card className="group h-full hover:shadow-2xl transition-all duration-300 cursor-pointer overflow-hidden border border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30">
+                    <div className="relative">
+                      {/* Subtle gradient background */}
+                      <div className={`bg-gradient-to-br ${item.gradient} h-32 flex items-center justify-center relative overflow-hidden`}>
+                        <div className="absolute inset-0 bg-pattern-zellige-complex opacity-5"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                        <IconComponent className="w-16 h-16 text-white/90 relative z-10 group-hover:scale-105 group-hover:rotate-3 transition-all duration-500" strokeWidth={1.5} />
+                      </div>
+                      {/* Decorative line */}
+                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
                     </div>
                     
-                    <CardHeader className="p-6">
-                      <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors mb-2">
-                        {item.title}
-                      </CardTitle>
-                      <CardDescription className="text-sm leading-relaxed">
+                    <CardHeader className="p-6 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <CardTitle className="text-xl font-semibold group-hover:text-primary transition-colors flex-1">
+                          {item.title}
+                        </CardTitle>
+                        <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-300 flex-shrink-0 ml-2" />
+                      </div>
+                      <CardDescription className="text-sm leading-relaxed text-muted-foreground">
                         {item.description}
                       </CardDescription>
                     </CardHeader>
@@ -206,32 +215,50 @@ export default function CBMPortal() {
           </div>
         </section>
 
-        {/* Services Section */}
+        {/* Services Section - Enhanced Professional Design */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-foreground border-l-4 border-primary pl-4 mb-8">
-            Nos services
-          </h2>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-foreground mb-2">Nos Services</h2>
+            <p className="text-muted-foreground">Des solutions adaptées à vos besoins documentaires</p>
+          </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {servicesItems.map((item) => {
+          <div className="grid gap-6 md:grid-cols-3">
+            {servicesItems.map((item, index) => {
               const IconComponent = item.icon;
               return (
                 <Link key={item.path} to={item.path}>
-                  <Card className="group h-full hover:shadow-xl transition-all duration-500 cursor-pointer overflow-hidden border-0 shadow-md">
-                    {/* Icon Header with Gradient */}
-                    <div className={`bg-gradient-to-br ${item.gradient} h-40 flex items-center justify-center relative`}>
-                      <div className="absolute inset-0 bg-pattern-zellige-complex opacity-10"></div>
-                      <IconComponent className="w-20 h-20 text-white relative z-10 group-hover:scale-110 transition-transform duration-300" strokeWidth={1.5} />
-                    </div>
+                  <Card className="group relative h-full hover:shadow-2xl transition-all duration-300 cursor-pointer overflow-hidden border border-border/50 bg-card hover:border-primary/30">
+                    {/* Gradient accent on top */}
+                    <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${item.gradient}`}></div>
                     
-                    <CardHeader className="p-6">
-                      <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors mb-2">
-                        {item.title}
-                      </CardTitle>
-                      <CardDescription className="text-sm leading-relaxed">
-                        {item.description}
-                      </CardDescription>
+                    <CardHeader className="p-8 space-y-4">
+                      {/* Icon with background */}
+                      <div className="relative">
+                        <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg`}>
+                          <IconComponent className="w-8 h-8 text-white" strokeWidth={2} />
+                        </div>
+                        {/* Decorative glow effect */}
+                        <div className={`absolute inset-0 w-16 h-16 rounded-xl bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300`}></div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <CardTitle className="text-xl font-semibold group-hover:text-primary transition-colors">
+                          {item.title}
+                        </CardTitle>
+                        <CardDescription className="text-sm leading-relaxed min-h-[3rem]">
+                          {item.description}
+                        </CardDescription>
+                      </div>
+
+                      {/* Call to action */}
+                      <div className="flex items-center text-primary text-sm font-medium pt-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <span>En savoir plus</span>
+                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </div>
                     </CardHeader>
+
+                    {/* Subtle pattern overlay */}
+                    <div className="absolute inset-0 bg-pattern-zellige-complex opacity-[0.02] pointer-events-none"></div>
                   </Card>
                 </Link>
               );
@@ -239,31 +266,34 @@ export default function CBMPortal() {
           </div>
         </section>
 
-        {/* Quick Links Section */}
+        {/* Quick Links Section - Refined Design */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-foreground border-l-4 border-primary pl-4 mb-8">
-            Liens Rapides
-          </h2>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-foreground mb-2">Accès Rapide</h2>
+            <p className="text-muted-foreground">Informations et ressources utiles</p>
+          </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-2">
             {quickLinks.map((item) => {
               const IconComponent = item.icon;
               return (
                 <Link key={item.path} to={item.path}>
-                  <Card className="group hover:shadow-xl transition-all duration-500 cursor-pointer border-0 shadow-md h-full bg-card/50 backdrop-blur-sm">
-                    <CardHeader className="flex flex-row items-start gap-4 p-8">
-                      <div className="bg-gradient-to-br from-primary/20 to-primary/10 p-4 rounded-xl group-hover:scale-105 transition-transform duration-300">
-                        <IconComponent className="w-8 h-8 text-primary" strokeWidth={1.5} />
+                  <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border/50 h-full bg-gradient-to-br from-card to-card/50 hover:border-primary/30">
+                    <CardHeader className="flex flex-row items-center gap-5 p-6">
+                      <div className="relative">
+                        <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
+                          <IconComponent className="w-7 h-7 text-primary group-hover:scale-110 transition-transform duration-300" strokeWidth={2} />
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-xl mb-3 group-hover:text-primary transition-colors font-semibold">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-lg mb-2 group-hover:text-primary transition-colors font-semibold">
                           {item.title}
                         </CardTitle>
                         <CardDescription className="text-sm leading-relaxed">
                           {item.description}
                         </CardDescription>
                       </div>
-                      <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-2 transition-all duration-300" />
+                      <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" />
                     </CardHeader>
                   </Card>
                 </Link>
