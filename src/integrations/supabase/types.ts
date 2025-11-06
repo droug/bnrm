@@ -1068,6 +1068,7 @@ export type Database = {
           engagement_charte: boolean
           engagement_partage_donnees: boolean
           id: string
+          motif_refus: string | null
           nom_bibliotheque: string
           nombre_documents: number
           normes_catalogage: string | null
@@ -1094,6 +1095,7 @@ export type Database = {
           engagement_charte?: boolean
           engagement_partage_donnees?: boolean
           id?: string
+          motif_refus?: string | null
           nom_bibliotheque: string
           nombre_documents: number
           normes_catalogage?: string | null
@@ -1120,6 +1122,7 @@ export type Database = {
           engagement_charte?: boolean
           engagement_partage_donnees?: boolean
           id?: string
+          motif_refus?: string | null
           nom_bibliotheque?: string
           nombre_documents?: number
           normes_catalogage?: string | null
@@ -1150,6 +1153,7 @@ export type Database = {
           engagement_charte: boolean
           engagement_partage_donnees: boolean
           id: string
+          motif_refus: string | null
           moyens_recensement: string
           nom_bibliotheque: string
           nombre_documents: number
@@ -1176,6 +1180,7 @@ export type Database = {
           engagement_charte?: boolean
           engagement_partage_donnees?: boolean
           id?: string
+          motif_refus?: string | null
           moyens_recensement: string
           nom_bibliotheque: string
           nombre_documents: number
@@ -1202,6 +1207,7 @@ export type Database = {
           engagement_charte?: boolean
           engagement_partage_donnees?: boolean
           id?: string
+          motif_refus?: string | null
           moyens_recensement?: string
           nom_bibliotheque?: string
           nombre_documents?: number
@@ -5408,6 +5414,45 @@ export type Database = {
           subscribed_at?: string
           unsubscribed_at?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          id: string
+          is_read: boolean | null
+          link: string | null
+          message: string
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean | null
+          link?: string | null
+          message: string
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean | null
+          link?: string | null
+          message?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
         }
         Relationships: []
       }
