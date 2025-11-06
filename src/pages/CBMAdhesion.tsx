@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { UserPlus, CheckCircle2, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,6 +16,23 @@ export default function CBMAdhesion() {
   const [step, setStep] = useState(0);
   const [typeAdhesion, setTypeAdhesion] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("");
+  const [volumetrie, setVolumetrie] = useState<Record<string, string>>({
+    "Monographies": "",
+    "Périodiques": "",
+    "Manuscrits": "",
+    "BD & Logiciels": "",
+    "Cartes & Plans": "",
+    "Partitions & Audio": "",
+    "Images & Visuels": "",
+    "Documents Électroniques": "",
+    "Thèses & Mémoires": "",
+    "Brochures & Dépliants": "",
+    "Rapports & Documents Officiels": "",
+    "Microformes": "",
+    "Documents Audiovisuels (DVD/CD)": "",
+    "Jeux & Puzzles": "",
+    "Autre": ""
+  });
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -417,6 +435,38 @@ export default function CBMAdhesion() {
                         <div className="space-y-2">
                           <Label htmlFor="normes">Normes de Catalogage Utilisées</Label>
                           <Input id="normes" placeholder="Ex: UNIMARC, RDA, Dewey" />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Nature Fond documentaire et Volumétrie</Label>
+                          <Accordion type="single" collapsible className="w-full border rounded-lg">
+                            <AccordionItem value="volumetrie" className="border-none">
+                              <AccordionTrigger className="px-4 hover:no-underline hover:bg-muted/50">
+                                <span className="text-sm font-medium">Types de documents et volumétrie</span>
+                              </AccordionTrigger>
+                              <AccordionContent className="px-4 pb-4">
+                                <div className="grid gap-3 mt-2">
+                                  {Object.keys(volumetrie).map((type) => (
+                                    <div key={type} className="flex items-center gap-3">
+                                      <Label htmlFor={`vol-${type}`} className="min-w-[200px] text-sm">
+                                        {type}
+                                      </Label>
+                                      <Input
+                                        id={`vol-${type}`}
+                                        type="number"
+                                        min="0"
+                                        placeholder="Quantité"
+                                        value={volumetrie[type]}
+                                        onChange={(e) => setVolumetrie({...volumetrie, [type]: e.target.value})}
+                                        className="max-w-[200px]"
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              </AccordionContent>
+                            </AccordionItem>
+                          </Accordion>
+                          <p className="text-xs text-muted-foreground">Indiquez la volumétrie pour chaque type de document de votre collection</p>
                         </div>
 
                         <div className="space-y-4 pt-4">
