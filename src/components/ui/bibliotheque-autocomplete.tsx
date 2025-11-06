@@ -31,11 +31,48 @@ export function BibliothequeAutocomplete({
   const [inputValue, setInputValue] = useState(value);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredBibliotheques, setFilteredBibliotheques] = useState<BibliothequeItem[]>([]);
+  const [popularBibliotheques, setPopularBibliotheques] = useState<BibliothequeItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Charger les bibliothèques populaires au montage
+  useEffect(() => {
+    const fetchPopularBibliotheques = async () => {
+      try {
+        const { data: catalogueData } = await supabase
+          .from('cbm_adhesions_catalogue')
+          .select('id, nom_bibliotheque, type_bibliotheque, ville')
+          .eq('statut', 'approuve')
+          .limit(5);
+
+        const { data: reseauData } = await supabase
+          .from('cbm_adhesions_reseau')
+          .select('id, nom_bibliotheque, type_bibliotheque, ville')
+          .eq('statut', 'approuve')
+          .limit(5);
+
+        const catalogueResults: BibliothequeItem[] = (catalogueData || []).map(item => ({
+          ...item,
+          source: 'catalogue' as const
+        }));
+
+        const reseauResults: BibliothequeItem[] = (reseauData || []).map(item => ({
+          ...item,
+          source: 'reseau' as const
+        }));
+
+        const combined = [...catalogueResults, ...reseauResults].slice(0, 8);
+        setPopularBibliotheques(combined);
+      } catch (error) {
+        console.error("Error fetching popular bibliotheques:", error);
+      }
+    };
+
+    fetchPopularBibliotheques();
+  }, []);
 
   // Recherche dans les deux tables
   useEffect(() => {
@@ -132,7 +169,9 @@ export function BibliothequeAutocomplete({
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);
     onChange(newValue);
-    setShowSuggestions(true);
+    if (newValue.length === 0 || newValue.length >= 2) {
+      setShowSuggestions(true);
+    }
   };
 
   const handleClear = () => {
@@ -156,7 +195,7 @@ export function BibliothequeAutocomplete({
           type="text"
           value={inputValue}
           onChange={(e) => handleInputChange(e.target.value)}
-          onFocus={() => inputValue.length >= 2 && setShowSuggestions(true)}
+          onFocus={() => setShowSuggestions(true)}
           placeholder={placeholder}
           className="pl-10 pr-10"
         />
@@ -171,7 +210,7 @@ export function BibliothequeAutocomplete({
         )}
       </div>
 
-      {showSuggestions && inputValue.length >= 2 && createPortal(
+      {showSuggestions && createPortal(
         <div
           className="fixed z-50 bg-popover border border-border rounded-md shadow-lg max-h-64 overflow-y-auto"
           style={{
@@ -180,11 +219,15 @@ export function BibliothequeAutocomplete({
             width: `${dropdownPosition.width}px`,
           }}
         >
-          {isLoading ? (
+          {inputValue.length > 0 && inputValue.length < 2 ? (
+            <div className="p-3 text-sm text-muted-foreground text-center">
+              Tapez au moins 2 caractères pour rechercher...
+            </div>
+          ) : isLoading ? (
             <div className="p-3 text-sm text-muted-foreground text-center">
               Recherche en cours...
             </div>
-          ) : filteredBibliotheques.length > 0 ? (
+          ) : inputValue.length >= 2 && filteredBibliotheques.length > 0 ? (
             <ul className="py-1">
               {filteredBibliotheques.map((bibliotheque) => (
                 <li
@@ -207,9 +250,41 @@ export function BibliothequeAutocomplete({
                 </li>
               ))}
             </ul>
-          ) : (
+          ) : inputValue.length >= 2 ? (
             <div className="p-3 text-sm text-muted-foreground text-center">
               Aucune bibliothèque trouvée
+            </div>
+          ) : popularBibliotheques.length > 0 ? (
+            <>
+              <div className="px-3 py-2 text-xs font-medium text-muted-foreground bg-muted/50">
+                Bibliothèques suggérées
+              </div>
+              <ul className="py-1">
+                {popularBibliotheques.map((bibliotheque) => (
+                  <li
+                    key={`${bibliotheque.source}-${bibliotheque.id}`}
+                    onClick={() => handleSelect(bibliotheque)}
+                    className="px-3 py-2 hover:bg-accent cursor-pointer"
+                  >
+                    <div className="font-medium text-sm">{bibliotheque.nom_bibliotheque}</div>
+                    <div className="text-xs text-muted-foreground flex items-center gap-2">
+                      <span>{bibliotheque.type_bibliotheque}</span>
+                      {bibliotheque.ville && (
+                        <>
+                          <span>•</span>
+                          <span>{bibliotheque.ville}</span>
+                        </>
+                      )}
+                      <span>•</span>
+                      <span className="text-primary font-medium">{getSourceLabel(bibliotheque.source)}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <div className="p-3 text-sm text-muted-foreground text-center">
+              Aucune bibliothèque disponible
             </div>
           )}
         </div>,
