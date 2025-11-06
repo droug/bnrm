@@ -7,12 +7,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Database, Eye, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Users, Database, Eye, CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 export default function GestionAdhesions() {
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState<"catalogue" | "reseau">("catalogue");
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [selectedAdhesion, setSelectedAdhesion] = useState<any>(null);
+  const [selectedTable, setSelectedTable] = useState<"cbm_adhesions_catalogue" | "cbm_adhesions_reseau">("cbm_adhesions_catalogue");
+  const [rejectionReason, setRejectionReason] = useState("");
 
   // Récupérer les demandes d'adhésion au catalogue
   const { data: catalogueAdhesions, refetch: refetchCatalogue } = useQuery({
@@ -45,6 +59,7 @@ export default function GestionAdhesions() {
   const getStatusBadge = (statut: string) => {
     const statusMap = {
       en_attente: { label: "En attente", variant: "outline" as const, icon: Clock },
+      en_validation: { label: "En validation", variant: "secondary" as const, icon: AlertCircle },
       approuve: { label: "Approuvé", variant: "default" as const, icon: CheckCircle },
       rejete: { label: "Rejeté", variant: "destructive" as const, icon: XCircle }
     };
@@ -60,28 +75,104 @@ export default function GestionAdhesions() {
     );
   };
 
-  const handleUpdateStatus = async (id: string, table: "cbm_adhesions_catalogue" | "cbm_adhesions_reseau", newStatus: string) => {
+  const handleApprove = async (id: string, table: "cbm_adhesions_catalogue" | "cbm_adhesions_reseau") => {
     try {
-      let error;
-      if (table === "cbm_adhesions_catalogue") {
-        const result = await supabase
-          .from("cbm_adhesions_catalogue")
-          .update({ statut: newStatus })
-          .eq("id", id);
-        error = result.error;
-      } else {
-        const result = await supabase
-          .from("cbm_adhesions_reseau")
-          .update({ statut: newStatus })
-          .eq("id", id);
-        error = result.error;
+      // Mettre le statut en "en_validation" pour attendre la validation du comité
+      const { error: updateError } = await supabase
+        .from(table)
+        .update({ statut: "en_validation" })
+        .eq("id", id);
+
+      if (updateError) throw updateError;
+
+      // Notifier le comité de pilotage
+      const { error: notifyError } = await supabase.functions.invoke('notify-steering-committee', {
+        body: {
+          adhesionId: id,
+          table: table,
+          type: table === "cbm_adhesions_catalogue" ? "catalogue" : "reseau"
+        }
+      });
+
+      if (notifyError) {
+        console.error('Erreur notification:', notifyError);
       }
+
+      toast({
+        title: "Demande envoyée en validation",
+        description: "Le comité de pilotage a été notifié pour valider cette demande.",
+      });
+
+      if (table === "cbm_adhesions_catalogue") {
+        refetchCatalogue();
+      } else {
+        refetchReseau();
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReject = async () => {
+    if (!selectedAdhesion || !rejectionReason.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez saisir un motif de refus.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from(selectedTable)
+        .update({ 
+          statut: "rejete",
+          motif_refus: rejectionReason
+        })
+        .eq("id", selectedAdhesion.id);
 
       if (error) throw error;
 
       toast({
-        title: "Statut mis à jour",
-        description: `La demande a été ${newStatus === "approuve" ? "approuvée" : "rejetée"}.`,
+        title: "Demande rejetée",
+        description: "La demande a été rejetée avec succès.",
+      });
+
+      setShowRejectDialog(false);
+      setRejectionReason("");
+      setSelectedAdhesion(null);
+
+      if (selectedTable === "cbm_adhesions_catalogue") {
+        refetchCatalogue();
+      } else {
+        refetchReseau();
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleValidateByCommittee = async (id: string, table: "cbm_adhesions_catalogue" | "cbm_adhesions_reseau") => {
+    try {
+      const { error } = await supabase
+        .from(table)
+        .update({ statut: "approuve" })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Demande validée",
+        description: "La demande a été approuvée par le comité de pilotage.",
       });
 
       if (table === "cbm_adhesions_catalogue") {
@@ -172,26 +263,41 @@ export default function GestionAdhesions() {
               <Eye className="h-4 w-4 mr-2" />
               Détails
             </Button>
-            {adhesion.statut !== "approuve" && (
+            {adhesion.statut === "en_attente" && (
+              <>
+                <Button 
+                  size="sm" 
+                  variant="default"
+                  className="flex-1"
+                  onClick={() => handleApprove(adhesion.id, tableName)}
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Accepter
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => {
+                    setSelectedAdhesion(adhesion);
+                    setSelectedTable(tableName);
+                    setShowRejectDialog(true);
+                  }}
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Refuser
+                </Button>
+              </>
+            )}
+            {adhesion.statut === "en_validation" && (
               <Button 
                 size="sm" 
                 variant="default"
                 className="flex-1"
-                onClick={() => handleUpdateStatus(adhesion.id, tableName, "approuve")}
+                onClick={() => handleValidateByCommittee(adhesion.id, tableName)}
               >
                 <CheckCircle className="h-4 w-4 mr-2" />
-                Approuver
-              </Button>
-            )}
-            {adhesion.statut !== "rejete" && (
-              <Button 
-                size="sm" 
-                variant="destructive"
-                className="flex-1"
-                onClick={() => handleUpdateStatus(adhesion.id, tableName, "rejete")}
-              >
-                <XCircle className="h-4 w-4 mr-2" />
-                Rejeter
+                Valider (Comité)
               </Button>
             )}
           </div>
@@ -289,6 +395,41 @@ export default function GestionAdhesions() {
       </main>
       
       <Footer />
+
+      {/* Dialog de refus */}
+      <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Refuser la demande d'adhésion</DialogTitle>
+            <DialogDescription>
+              Veuillez indiquer le motif du refus. Cette information sera communiquée au demandeur.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="rejection-reason">Motif du refus</Label>
+              <Textarea
+                id="rejection-reason"
+                placeholder="Saisissez le motif du refus..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setShowRejectDialog(false);
+              setRejectionReason("");
+            }}>
+              Annuler
+            </Button>
+            <Button variant="destructive" onClick={handleReject}>
+              Confirmer le refus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
