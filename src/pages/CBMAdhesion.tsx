@@ -14,8 +14,27 @@ import { useToast } from "@/hooks/use-toast";
 export default function CBMAdhesion() {
   const [step, setStep] = useState(0);
   const [typeAdhesion, setTypeAdhesion] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const regionsData = {
+    "Tanger-Tétouan-Al Hoceïma": ["Tanger", "Tétouan", "Al Hoceïma", "Larache", "Chefchaouen", "Ouazzane", "Asilah"],
+    "L'Oriental": ["Oujda", "Nador", "Berkane", "Taourirt", "Guercif", "Jerada"],
+    "Fès-Meknès": ["Fès", "Meknès", "Ifrane", "Sefrou", "Taza", "El Hajeb", "Boulemane"],
+    "Rabat-Salé-Kénitra": ["Rabat", "Salé", "Kénitra", "Témara", "Khémisset", "Skhirat", "Sidi Kacem"],
+    "Béni Mellal-Khénifra": ["Béni Mellal", "Khénifra", "Khouribga", "Azilal", "Fquih Ben Salah"],
+    "Casablanca-Settat": ["Casablanca", "Mohammedia", "Settat", "El Jadida", "Berrechid", "Benslimane", "Sidi Bennour"],
+    "Marrakech-Safi": ["Marrakech", "Safi", "Essaouira", "El Kelâa des Sraghna", "Youssoufia", "Chichaoua"],
+    "Drâa-Tafilalet": ["Errachidia", "Ouarzazate", "Zagora", "Tinghir", "Midelt"],
+    "Souss-Massa": ["Agadir", "Inezgane", "Tiznit", "Taroudant", "Ouled Teïma", "Tata"],
+    "Guelmim-Oued Noun": ["Guelmim", "Tan-Tan", "Sidi Ifni", "Assa"],
+    "Laâyoune-Sakia El Hamra": ["Laâyoune", "Boujdour", "Tarfaya", "Es-Semara"],
+    "Dakhla-Oued Ed-Dahab": ["Dakhla", "Aousserd"]
+  };
+
+  const regions = Object.keys(regionsData);
+  const villes = selectedRegion ? regionsData[selectedRegion as keyof typeof regionsData] : [];
 
   const criteres = [
     "Être une bibliothèque institutionnelle reconnue (publique, universitaire, spécialisée)",
@@ -243,11 +262,61 @@ export default function CBMAdhesion() {
                         <div className="grid gap-4 md:grid-cols-2">
                           <div className="space-y-2">
                             <Label htmlFor="region">Région *</Label>
-                            <Input id="region" required placeholder="Rabat-Salé-Kénitra" />
+                            <div className="relative">
+                              <Input 
+                                id="region" 
+                                readOnly 
+                                placeholder="Sélectionnez une région"
+                                className="cursor-pointer"
+                                onClick={() => document.getElementById('region-list')?.classList.toggle('hidden')}
+                                value={selectedRegion}
+                              />
+                              <div id="region-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg max-h-60 overflow-y-auto z-10">
+                                {regions.map((region) => (
+                                  <div 
+                                    key={region}
+                                    className="p-2 hover:bg-muted cursor-pointer" 
+                                    onClick={() => {
+                                      setSelectedRegion(region);
+                                      (document.getElementById('region') as HTMLInputElement).value = region;
+                                      (document.getElementById('ville') as HTMLInputElement).value = '';
+                                      document.getElementById('region-list')?.classList.add('hidden');
+                                    }}
+                                  >
+                                    {region}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor="ville">Ville *</Label>
-                            <Input id="ville" required placeholder="Rabat" />
+                            <div className="relative">
+                              <Input 
+                                id="ville" 
+                                readOnly 
+                                placeholder={selectedRegion ? "Sélectionnez une ville" : "Sélectionnez d'abord une région"}
+                                className="cursor-pointer"
+                                onClick={() => selectedRegion && document.getElementById('ville-list')?.classList.toggle('hidden')}
+                                disabled={!selectedRegion}
+                              />
+                              {selectedRegion && (
+                                <div id="ville-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg max-h-60 overflow-y-auto z-10">
+                                  {villes.map((ville) => (
+                                    <div 
+                                      key={ville}
+                                      className="p-2 hover:bg-muted cursor-pointer" 
+                                      onClick={() => {
+                                        (document.getElementById('ville') as HTMLInputElement).value = ville;
+                                        document.getElementById('ville-list')?.classList.add('hidden');
+                                      }}
+                                    >
+                                      {ville}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
 
