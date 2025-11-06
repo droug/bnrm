@@ -329,7 +329,8 @@ export default function CBMAdhesion() {
                         <Button 
                           type="button" 
                           onClick={() => typeAdhesion && setStep(1)} 
-                          className={`ml-auto ${typeAdhesion ? 'bg-cbm-accent hover:bg-cbm-accent/90' : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'}`}
+                          className={`ml-auto px-8 py-3 font-semibold ${typeAdhesion ? '!bg-blue-600 hover:!bg-blue-700 !text-white' : '!bg-gray-400 !text-gray-700 cursor-not-allowed'}`}
+                          style={{ backgroundColor: typeAdhesion ? '#2563eb' : '#9ca3af', color: typeAdhesion ? '#ffffff' : '#374151' }}
                         >
                           Suivant
                         </Button>
