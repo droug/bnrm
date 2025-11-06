@@ -56,13 +56,23 @@ export default function CBMAdhesion() {
   const regions = Object.keys(regionsData);
   const villes = selectedRegion ? regionsData[selectedRegion as keyof typeof regionsData] : [];
 
-  const criteres = [
+  const criteresCatalogue = [
     "Être une bibliothèque institutionnelle reconnue (publique, universitaire, spécialisée)",
     "Disposer d'un système informatisé de gestion bibliothéconomique (SIGB)",
     "S'engager à respecter les normes de catalogage définies par le réseau",
     "Accepter les conditions de partage et d'échange de données",
     "Désigner un référent technique et un responsable de catalogage"
   ];
+
+  const criteresReseau = [
+    "Être une bibliothèque institutionnelle reconnue (publique, universitaire, spécialisée)",
+    "Accepter les conditions de partage et d'échange de données",
+    "Désigner un référent technique et un responsable de catalogage",
+    "S'engager à participer aux activités du réseau",
+    "Participer aux formations et aux échanges d'expérience"
+  ];
+
+  const criteres = typeAdhesion === "reseau" ? criteresReseau : criteresCatalogue;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,43 +169,45 @@ export default function CBMAdhesion() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
-          {/* Sidebar - Conditions */}
-          <div className="lg:col-span-1 space-y-6">
-            <Card className="border-2 border-cbm-primary/20 sticky top-24">
-              <CardHeader>
-                <CardTitle className="text-xl text-cbm-primary flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  Conditions d'Adhésion
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-4">
-                  {criteres.map((critere, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-cbm-secondary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{critere}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+          {/* Sidebar - Conditions (masqué à l'étape 0) */}
+          {step > 0 && (
+            <div className="lg:col-span-1 space-y-6">
+              <Card className="border-2 border-cbm-primary/20 sticky top-24">
+                <CardHeader>
+                  <CardTitle className="text-xl text-cbm-primary flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Conditions d'Adhésion
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-4">
+                    {criteres.map((critere, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <CheckCircle2 className="h-5 w-5 text-cbm-secondary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm">{critere}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
 
-            <Card className="border-2 border-cbm-secondary/20">
-              <CardHeader>
-                <CardTitle className="text-lg">Avantages Membres</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm space-y-2">
-                <p>✓ Accès au catalogue collectif national</p>
-                <p>✓ Prêt entre bibliothèques gratuit</p>
-                <p>✓ Formations continues offertes</p>
-                <p>✓ Support technique dédié</p>
-                <p>✓ Participation aux groupes de travail</p>
-              </CardContent>
-            </Card>
-          </div>
+              <Card className="border-2 border-cbm-secondary/20">
+                <CardHeader>
+                  <CardTitle className="text-lg">Avantages Membres</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-2">
+                  <p>✓ Accès au catalogue collectif national</p>
+                  <p>✓ Prêt entre bibliothèques gratuit</p>
+                  <p>✓ Formations continues offertes</p>
+                  <p>✓ Support technique dédié</p>
+                  <p>✓ Participation aux groupes de travail</p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           {/* Main Content - Formulaire */}
-          <div className="lg:col-span-2">
+          <div className={step > 0 ? "lg:col-span-2" : "lg:col-span-3"}>
             {step !== 4 ? (
               <Card className="border-2 border-cbm-accent/20">
                 <CardHeader>
