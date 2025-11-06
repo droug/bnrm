@@ -13,11 +13,16 @@ import { supabase } from "@/integrations/supabase/client";
 
 export default function CBMPortal() {
   // Vérifier si l'utilisateur est admin ou librarian
-  const { data: userRole } = useQuery({
+  const { data: userRole, isLoading: isLoadingRole } = useQuery({
     queryKey: ["user-role"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      if (!user) {
+        console.log("CBMPortal: No user found");
+        return null;
+      }
+      
+      console.log("CBMPortal: Checking role for user", user.id);
       
       const { data, error } = await supabase
         .from("user_roles")
@@ -26,10 +31,17 @@ export default function CBMPortal() {
         .in("role", ["admin", "librarian"])
         .maybeSingle();
       
-      if (error) return null;
-      return data?.role;
+      if (error) {
+        console.error("CBMPortal: Error fetching user role:", error);
+        return null;
+      }
+      
+      console.log("CBMPortal: User role data:", data);
+      return data?.role || null;
     }
   });
+
+  console.log("CBMPortal: Current userRole state:", userRole, "isLoading:", isLoadingRole);
 
   const spotlightItems = [
     {
