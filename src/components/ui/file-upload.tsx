@@ -106,7 +106,7 @@ export function FileUpload({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`
-          border-2 border-dashed rounded-lg p-6 text-center transition-colors
+          border-2 border-dashed rounded-lg p-4 text-center transition-colors
           ${isDragging 
             ? "border-primary bg-primary/5" 
             : "border-border hover:border-primary/50"
@@ -143,10 +143,10 @@ export function FileUpload({
             </Button>
           </div>
         ) : (
-          <div className="space-y-2">
-            <Upload className="w-8 h-8 mx-auto text-muted-foreground" />
+          <div className="space-y-1.5">
+            <Upload className="w-6 h-6 mx-auto text-muted-foreground" />
             <div>
-              <p className="text-sm text-muted-foreground mb-2">
+              <p className="text-sm text-muted-foreground mb-1.5">
                 Glissez-déposez votre fichier ici ou
               </p>
               <Button

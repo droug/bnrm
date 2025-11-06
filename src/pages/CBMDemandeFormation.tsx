@@ -237,17 +237,15 @@ export default function CBMDemandeFormation() {
 
                   <div className="space-y-2">
                     <Label htmlFor="participants-file">Liste des participants</Label>
-                    <div className="max-w-xl">
-                      <FileUpload
-                        label=""
-                        accept=".xlsx,.xls,.csv"
-                        maxSize={5}
-                        value={participantsFile}
-                        onChange={setParticipantsFile}
-                        onDownloadTemplate={handleDownloadTemplate}
-                        templateLabel="Télécharger le canevas"
-                      />
-                    </div>
+                    <FileUpload
+                      label=""
+                      accept=".xlsx,.xls,.csv"
+                      maxSize={5}
+                      value={participantsFile}
+                      onChange={setParticipantsFile}
+                      onDownloadTemplate={handleDownloadTemplate}
+                      templateLabel="Télécharger le canevas"
+                    />
                     <p className="text-xs text-muted-foreground">
                       Téléchargez le canevas, remplissez-le avec les informations des participants, puis importez-le ici
                     </p>
