@@ -9,13 +9,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserPlus, CheckCircle2, FileText, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function CBMAdhesion() {
   const [step, setStep] = useState(0);
-  const [adhesionReseau, setAdhesionReseau] = useState(false);
-  const [adhesionCatalogue, setAdhesionCatalogue] = useState(false);
+  const [typeAdhesion, setTypeAdhesion] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -119,60 +119,52 @@ export default function CBMAdhesion() {
                       <div className="space-y-6">
                         <h3 className="font-semibold text-lg text-cbm-primary">Type d'Adhésion</h3>
                         <p className="text-sm text-muted-foreground">
-                          Sélectionnez le ou les types d'adhésion qui correspondent à vos besoins
+                          Sélectionnez le type d'adhésion qui correspond à vos besoins
                         </p>
                         
-                        <div className="space-y-4">
-                          <Card className={`border-2 transition-all cursor-pointer ${adhesionReseau ? 'border-cbm-primary bg-cbm-primary/5' : 'border-border hover:border-cbm-primary/50'}`}
-                            onClick={() => setAdhesionReseau(!adhesionReseau)}>
-                            <CardContent className="pt-6">
-                              <div className="flex items-start gap-4">
-                                <Checkbox 
-                                  id="adhesion-reseau" 
-                                  checked={adhesionReseau}
-                                  onCheckedChange={(checked) => setAdhesionReseau(checked as boolean)}
-                                  onClick={(e) => e.stopPropagation()}
-                                />
-                                <div className="flex-1">
-                                  <Label htmlFor="adhesion-reseau" className="text-base font-semibold cursor-pointer">
-                                    Adhésion au réseau des Bibliothèques Marocaines
-                                  </Label>
-                                  <p className="text-sm text-muted-foreground mt-2">
-                                    Rejoignez le réseau national des Bibliothéques Marocaines pour bénéficier du prêt entre bibliothèques, 
-                                    des formations et du support technique dédié.
-                                  </p>
+                        <RadioGroup value={typeAdhesion} onValueChange={setTypeAdhesion}>
+                          <div className="space-y-4">
+                            <Card className={`border-2 transition-all cursor-pointer ${typeAdhesion === 'reseau' ? 'border-cbm-primary bg-cbm-primary/5' : 'border-border hover:border-cbm-primary/50'}`}
+                              onClick={() => setTypeAdhesion('reseau')}>
+                              <CardContent className="pt-6">
+                                <div className="flex items-start gap-4">
+                                  <RadioGroupItem value="reseau" id="adhesion-reseau" />
+                                  <div className="flex-1">
+                                    <Label htmlFor="adhesion-reseau" className="text-base font-semibold cursor-pointer">
+                                      Adhésion au réseau des Bibliothèques Marocaines
+                                    </Label>
+                                    <p className="text-sm text-muted-foreground mt-2">
+                                      Rejoignez le réseau national des Bibliothéques Marocaines pour bénéficier du prêt entre bibliothèques, 
+                                      des formations et du support technique dédié.
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
-                            </CardContent>
-                          </Card>
+                              </CardContent>
+                            </Card>
 
-                          <Card className={`border-2 transition-all cursor-pointer ${adhesionCatalogue ? 'border-cbm-secondary bg-cbm-secondary/5' : 'border-border hover:border-cbm-secondary/50'}`}
-                            onClick={() => setAdhesionCatalogue(!adhesionCatalogue)}>
-                            <CardContent className="pt-6">
-                              <div className="flex items-start gap-4">
-                                <Checkbox 
-                                  id="adhesion-catalogue" 
-                                  checked={adhesionCatalogue}
-                                  onCheckedChange={(checked) => setAdhesionCatalogue(checked as boolean)}
-                                  onClick={(e) => e.stopPropagation()}
-                                />
-                                <div className="flex-1">
-                                  <Label htmlFor="adhesion-catalogue" className="text-base font-semibold cursor-pointer">
-                                    Adhésion au catalogue CBM
-                                  </Label>
-                                  <p className="text-sm text-muted-foreground mt-2">
-                                    Intégrez vos notices bibliographiques au catalogue collectif national 
-                                    et rendez vos collections visibles au niveau national.
-                                  </p>
+                            <Card className={`border-2 transition-all cursor-pointer ${typeAdhesion === 'catalogue' ? 'border-cbm-secondary bg-cbm-secondary/5' : 'border-border hover:border-cbm-secondary/50'}`}
+                              onClick={() => setTypeAdhesion('catalogue')}>
+                              <CardContent className="pt-6">
+                                <div className="flex items-start gap-4">
+                                  <RadioGroupItem value="catalogue" id="adhesion-catalogue" />
+                                  <div className="flex-1">
+                                    <Label htmlFor="adhesion-catalogue" className="text-base font-semibold cursor-pointer">
+                                      Adhésion au catalogue CBM
+                                    </Label>
+                                    <p className="text-sm text-muted-foreground mt-2">
+                                      Intégrez vos notices bibliographiques au catalogue collectif national 
+                                      et rendez vos collections visibles au niveau national.
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        </RadioGroup>
 
-                        {!adhesionReseau && !adhesionCatalogue && (
+                        {!typeAdhesion && (
                           <p className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg">
-                            Veuillez sélectionner au moins un type d'adhésion pour continuer
+                            Veuillez sélectionner un type d'adhésion pour continuer
                           </p>
                         )}
                       </div>
@@ -310,7 +302,7 @@ export default function CBMAdhesion() {
                           type="button" 
                           onClick={() => setStep(step + 1)} 
                           className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90"
-                          disabled={!adhesionReseau && !adhesionCatalogue}
+                          disabled={!typeAdhesion}
                         >
                           Suivant
                         </Button>
