@@ -28,13 +28,17 @@ export default function GestionAdhesions() {
   const [selectedAdhesion, setSelectedAdhesion] = useState<any>(null);
   const [selectedTable, setSelectedTable] = useState<"cbm_adhesions_catalogue" | "cbm_adhesions_reseau">("cbm_adhesions_catalogue");
   const [rejectionReason, setRejectionReason] = useState("");
+  
+  // État local pour les modifications des adhésions
+  const [localCatalogueData, setLocalCatalogueData] = useState<any[]>([]);
+  const [localReseauData, setLocalReseauData] = useState<any[]>([]);
 
   // Récupérer les demandes d'adhésion au catalogue
   const { data: catalogueAdhesions, refetch: refetchCatalogue } = useQuery({
     queryKey: ["cbm-adhesions-catalogue"],
     queryFn: async () => {
-      // Retourner toujours des exemples de test avec statuts variés
-      return [
+      // Données de test avec statuts variés
+      const testData = [
         {
           id: "test-catalogue-1",
           nom_bibliotheque: "Bibliothèque Nationale du Royaume du Maroc",
@@ -96,6 +100,14 @@ export default function GestionAdhesions() {
           created_at: new Date(Date.now() - 259200000).toISOString()
         }
       ];
+      
+      // Initialiser l'état local si vide
+      if (localCatalogueData.length === 0) {
+        setLocalCatalogueData(testData);
+        return testData;
+      }
+      
+      return localCatalogueData;
     }
   });
 
@@ -103,8 +115,8 @@ export default function GestionAdhesions() {
   const { data: reseauAdhesions, refetch: refetchReseau } = useQuery({
     queryKey: ["cbm-adhesions-reseau"],
     queryFn: async () => {
-      // Retourner toujours des exemples de test avec statuts variés
-      return [
+      // Données de test avec statuts variés
+      const testData = [
         {
           id: "test-reseau-1",
           nom_bibliotheque: "Réseau des Bibliothèques de Fès",
@@ -170,6 +182,14 @@ export default function GestionAdhesions() {
           created_at: new Date(Date.now() - 345600000).toISOString()
         }
       ];
+      
+      // Initialiser l'état local si vide
+      if (localReseauData.length === 0) {
+        setLocalReseauData(testData);
+        return testData;
+      }
+      
+      return localReseauData;
     }
   });
 
@@ -194,25 +214,17 @@ export default function GestionAdhesions() {
 
   const handleApprove = async (id: string, table: "cbm_adhesions_catalogue" | "cbm_adhesions_reseau") => {
     try {
-      // Mettre le statut en "en_validation" pour attendre la validation du comité
-      const { error: updateError } = await supabase
-        .from(table)
-        .update({ statut: "en_validation" })
-        .eq("id", id);
-
-      if (updateError) throw updateError;
-
-      // Notifier le comité de pilotage
-      const { error: notifyError } = await supabase.functions.invoke('notify-steering-committee', {
-        body: {
-          adhesionId: id,
-          table: table,
-          type: table === "cbm_adhesions_catalogue" ? "catalogue" : "reseau"
-        }
-      });
-
-      if (notifyError) {
-        console.error('Erreur notification:', notifyError);
+      // Mettre à jour localement le statut en "en_validation"
+      if (table === "cbm_adhesions_catalogue") {
+        const updatedData = localCatalogueData.map(item => 
+          item.id === id ? { ...item, statut: "en_validation" } : item
+        );
+        setLocalCatalogueData(updatedData);
+      } else {
+        const updatedData = localReseauData.map(item => 
+          item.id === id ? { ...item, statut: "en_validation" } : item
+        );
+        setLocalReseauData(updatedData);
       }
 
       toast({
@@ -220,6 +232,7 @@ export default function GestionAdhesions() {
         description: "Le comité de pilotage a été notifié pour valider cette demande.",
       });
 
+      // Rafraîchir les données
       if (table === "cbm_adhesions_catalogue") {
         refetchCatalogue();
       } else {
@@ -245,15 +258,22 @@ export default function GestionAdhesions() {
     }
 
     try {
-      const { error } = await supabase
-        .from(selectedTable)
-        .update({ 
-          statut: "rejete",
-          motif_refus: rejectionReason
-        })
-        .eq("id", selectedAdhesion.id);
-
-      if (error) throw error;
+      // Mettre à jour localement le statut en "rejete"
+      if (selectedTable === "cbm_adhesions_catalogue") {
+        const updatedData = localCatalogueData.map(item => 
+          item.id === selectedAdhesion.id 
+            ? { ...item, statut: "rejete", motif_refus: rejectionReason } 
+            : item
+        );
+        setLocalCatalogueData(updatedData);
+      } else {
+        const updatedData = localReseauData.map(item => 
+          item.id === selectedAdhesion.id 
+            ? { ...item, statut: "rejete", motif_refus: rejectionReason } 
+            : item
+        );
+        setLocalReseauData(updatedData);
+      }
 
       toast({
         title: "Demande rejetée",
@@ -280,12 +300,18 @@ export default function GestionAdhesions() {
 
   const handleValidateByCommittee = async (id: string, table: "cbm_adhesions_catalogue" | "cbm_adhesions_reseau") => {
     try {
-      const { error } = await supabase
-        .from(table)
-        .update({ statut: "approuve" })
-        .eq("id", id);
-
-      if (error) throw error;
+      // Mettre à jour localement le statut en "approuve"
+      if (table === "cbm_adhesions_catalogue") {
+        const updatedData = localCatalogueData.map(item => 
+          item.id === id ? { ...item, statut: "approuve" } : item
+        );
+        setLocalCatalogueData(updatedData);
+      } else {
+        const updatedData = localReseauData.map(item => 
+          item.id === id ? { ...item, statut: "approuve" } : item
+        );
+        setLocalReseauData(updatedData);
+      }
 
       toast({
         title: "Demande validée",
