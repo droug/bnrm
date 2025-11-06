@@ -66,6 +66,7 @@ export default function CBMAdhesion() {
 
   const criteresReseau = [
     "Être une bibliothèque institutionnelle reconnue (publique, universitaire, spécialisée)",
+    "Disponibilité d'un Fond documentaire",
     "Accepter les conditions de partage et d'échange de données",
     "Désigner un référent technique et un responsable de catalogage",
     "S'engager à participer aux activités du réseau",
