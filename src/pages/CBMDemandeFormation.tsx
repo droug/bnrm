@@ -9,12 +9,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { BibliothequeAutocomplete } from "@/components/ui/bibliotheque-autocomplete";
 import { ArrowLeft, GraduationCap, Send } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function CBMDemandeFormation() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bibliotheque, setBibliotheque] = useState("");
+  const [bibliothequeId, setBibliothequeId] = useState<string | undefined>();
+  const [bibliothequeType, setBibliothequeType] = useState<string | undefined>();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,8 +30,8 @@ export default function CBMDemandeFormation() {
       const { error } = await supabase
         .from("cbm_demandes_formation")
         .insert({
-          nom_organisme: formData.get("nom_organisme") as string,
-          type_organisme: formData.get("type_organisme") as string,
+          nom_organisme: bibliotheque,
+          type_organisme: bibliothequeType || "autre",
           nom_contact: formData.get("nom_contact") as string,
           fonction_contact: formData.get("fonction_contact") as string,
           email: formData.get("email") as string,
@@ -42,6 +46,9 @@ export default function CBMDemandeFormation() {
 
       toast.success("Demande de formation envoyée avec succès");
       (e.target as HTMLFormElement).reset();
+      setBibliotheque("");
+      setBibliothequeId(undefined);
+      setBibliothequeType(undefined);
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Erreur lors de l'envoi de la demande");
@@ -82,36 +89,28 @@ export default function CBMDemandeFormation() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Informations de l'organisme */}
+                {/* Organisme */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-foreground">
-                    Informations de l'organisme
+                    Organisme
                   </h3>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="nom_organisme">Nom de l'organisme *</Label>
-                    <Input
-                      id="nom_organisme"
-                      name="nom_organisme"
-                      required
-                      placeholder="Nom de votre bibliothèque ou institution"
+                    <BibliothequeAutocomplete
+                      value={bibliotheque}
+                      onChange={(value, id, type) => {
+                        setBibliotheque(value);
+                        setBibliothequeId(id);
+                        setBibliothequeType(type);
+                      }}
+                      label="Bibliothèque *"
+                      placeholder="Rechercher votre bibliothèque..."
                     />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="type_organisme">Type d'organisme *</Label>
-                    <Select name="type_organisme" required>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionnez le type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="bibliotheque_publique">Bibliothèque Publique</SelectItem>
-                        <SelectItem value="bibliotheque_universitaire">Bibliothèque Universitaire</SelectItem>
-                        <SelectItem value="bibliotheque_specialisee">Bibliothèque Spécialisée</SelectItem>
-                        <SelectItem value="centre_documentation">Centre de Documentation</SelectItem>
-                        <SelectItem value="autre">Autre</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    {!bibliotheque && (
+                      <p className="text-xs text-muted-foreground">
+                        Commencez à taper pour rechercher parmi les bibliothèques adhérentes
+                      </p>
+                    )}
                   </div>
                 </div>
 
