@@ -242,12 +242,12 @@ export default function CBMAdhesion() {
 
                         <div className="grid gap-4 md:grid-cols-2">
                           <div className="space-y-2">
-                            <Label htmlFor="ville">Ville *</Label>
-                            <Input id="ville" required placeholder="Rabat" />
-                          </div>
-                          <div className="space-y-2">
                             <Label htmlFor="region">Région *</Label>
                             <Input id="region" required placeholder="Rabat-Salé-Kénitra" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="ville">Ville *</Label>
+                            <Input id="ville" required placeholder="Rabat" />
                           </div>
                         </div>
 
