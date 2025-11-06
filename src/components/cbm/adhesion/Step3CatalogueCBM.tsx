@@ -11,7 +11,7 @@ interface Step3CatalogueCBMProps {
 export default function Step3CatalogueCBM({ volumetrie, setVolumetrie }: Step3CatalogueCBMProps) {
   return (
     <div className="space-y-4">
-      <h3 className="font-semibold text-lg text-cbm-primary">Infrastructure Technique - Catalogue Collectif CBM</h3>
+      <h3 className="font-semibold text-lg text-cbm-primary">Infrastructure Technique</h3>
       
       <div className="space-y-2">
         <Label htmlFor="sigb">Système de Gestion (SIGB) *</Label>

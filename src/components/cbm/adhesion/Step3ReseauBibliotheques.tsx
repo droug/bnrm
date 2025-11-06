@@ -11,7 +11,7 @@ interface Step3ReseauBibliothequesProps {
 export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: Step3ReseauBibliothequesProps) {
   return (
     <div className="space-y-4">
-      <h3 className="font-semibold text-lg text-cbm-primary">Infrastructure Technique - Réseau des Bibliothèques</h3>
+      <h3 className="font-semibold text-lg text-cbm-primary">Infrastructure Technique</h3>
       
       <div className="space-y-2">
         <Label htmlFor="recensement">Moyens de recensement du fond documentaire *</Label>
