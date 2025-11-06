@@ -139,14 +139,6 @@ export default function CBMPortal() {
                   Recherche Avancée
                 </Button>
               </Link>
-              {!isLoadingRole && userRole && (
-                <Link to="/cbm/admin">
-                  <Button size="lg" variant="outline" className="bg-background/10 text-primary-foreground border-primary-foreground/30 hover:bg-background/20 h-12 px-8 backdrop-blur-sm">
-                    <Settings className="w-5 h-5 mr-2" />
-                    Administration CBM
-                  </Button>
-                </Link>
-              )}
             </div>
           </div>
         </div>
