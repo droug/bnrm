@@ -469,6 +469,16 @@ export default function CBMAdhesion() {
                           <p className="text-xs text-muted-foreground">Indiquez la volumétrie pour chaque type de document de votre collection</p>
                         </div>
 
+                        <div className="space-y-2">
+                          <Label htmlFor="catalogue-url">URL du Catalogue en ligne</Label>
+                          <Input 
+                            id="catalogue-url" 
+                            type="url" 
+                            placeholder="https://exemple.ma/catalogue" 
+                          />
+                          <p className="text-xs text-muted-foreground">Lien vers votre catalogue en ligne (si disponible)</p>
+                        </div>
+
                         <div className="space-y-4 pt-4">
                           <div className="flex items-start gap-3">
                             <Checkbox id="engagement" required />
