@@ -38,6 +38,70 @@ export default function GestionAdhesions() {
         .order("created_at", { ascending: false });
       
       if (error) throw error;
+      
+      // Si aucune donnée, retourner des exemples de test
+      if (!data || data.length === 0) {
+        return [
+          {
+            id: "test-1",
+            nom_bibliotheque: "Bibliothèque Nationale du Royaume",
+            type_bibliotheque: "Nationale",
+            tutelle: "Ministère de la Culture",
+            region: "Rabat-Salé-Kénitra",
+            ville: "Rabat",
+            email: "contact@bnrm.ma",
+            telephone: "+212 5 37 77 18 73",
+            sigb: "Koha",
+            nombre_documents: 500000,
+            statut: "en_attente",
+            created_at: new Date().toISOString()
+          },
+          {
+            id: "test-2",
+            nom_bibliotheque: "Bibliothèque Municipale de Casablanca",
+            type_bibliotheque: "Municipale",
+            tutelle: "Commune de Casablanca",
+            region: "Casablanca-Settat",
+            ville: "Casablanca",
+            email: "biblio@casablanca.ma",
+            telephone: "+212 5 22 26 89 00",
+            sigb: "PMB",
+            nombre_documents: 75000,
+            statut: "en_validation",
+            created_at: new Date(Date.now() - 86400000).toISOString()
+          },
+          {
+            id: "test-3",
+            nom_bibliotheque: "Bibliothèque Universitaire Mohammed V",
+            type_bibliotheque: "Universitaire",
+            tutelle: "Université Mohammed V",
+            region: "Rabat-Salé-Kénitra",
+            ville: "Rabat",
+            email: "bu@um5.ac.ma",
+            telephone: "+212 5 37 27 17 40",
+            sigb: "Ex Libris",
+            nombre_documents: 250000,
+            statut: "approuve",
+            created_at: new Date(Date.now() - 172800000).toISOString()
+          },
+          {
+            id: "test-4",
+            nom_bibliotheque: "Médiathèque de Marrakech",
+            type_bibliotheque: "Municipale",
+            tutelle: "Commune de Marrakech",
+            region: "Marrakech-Safi",
+            ville: "Marrakech",
+            email: "mediatheque@marrakech.ma",
+            telephone: "+212 5 24 43 89 00",
+            sigb: "SIGB Marocain",
+            nombre_documents: 45000,
+            statut: "rejete",
+            motif_refus: "Documents insuffisants pour l'adhésion au catalogue collectif",
+            created_at: new Date(Date.now() - 259200000).toISOString()
+          }
+        ];
+      }
+      
       return data;
     }
   });
@@ -52,6 +116,58 @@ export default function GestionAdhesions() {
         .order("created_at", { ascending: false });
       
       if (error) throw error;
+      
+      // Si aucune donnée, retourner des exemples de test
+      if (!data || data.length === 0) {
+        return [
+          {
+            id: "test-reseau-1",
+            nom_bibliotheque: "Réseau des Bibliothèques de Fès",
+            type_bibliotheque: "Réseau régional",
+            tutelle: "Wilaya de Fès-Meknès",
+            region: "Fès-Meknès",
+            ville: "Fès",
+            email: "reseau@fes-bibliotheques.ma",
+            telephone: "+212 5 35 65 11 23",
+            moyens_recensement: "Fiches manuelles et base de données",
+            en_cours_informatisation: "Oui - 60% achevé",
+            nombre_documents: 125000,
+            statut: "en_attente",
+            created_at: new Date().toISOString()
+          },
+          {
+            id: "test-reseau-2",
+            nom_bibliotheque: "Bibliothèques Communales d'Agadir",
+            type_bibliotheque: "Réseau communal",
+            tutelle: "Commune d'Agadir",
+            region: "Souss-Massa",
+            ville: "Agadir",
+            email: "bibliotheques@agadir.ma",
+            telephone: "+212 5 28 84 26 77",
+            moyens_recensement: "Système informatisé complet",
+            en_cours_informatisation: "Terminé",
+            nombre_documents: 85000,
+            statut: "en_validation",
+            created_at: new Date(Date.now() - 86400000).toISOString()
+          },
+          {
+            id: "test-reseau-3",
+            nom_bibliotheque: "Réseau Bibliothèques Tanger-Tétouan",
+            type_bibliotheque: "Réseau régional",
+            tutelle: "Région Tanger-Tétouan-Al Hoceïma",
+            region: "Tanger-Tétouan-Al Hoceïma",
+            ville: "Tanger",
+            email: "reseau@tanger-bibliotheques.ma",
+            telephone: "+212 5 39 94 05 17",
+            moyens_recensement: "Base de données centralisée",
+            en_cours_informatisation: "Oui - 80% achevé",
+            nombre_documents: 165000,
+            statut: "approuve",
+            created_at: new Date(Date.now() - 172800000).toISOString()
+          }
+        ];
+      }
+      
       return data;
     }
   });
@@ -318,7 +434,7 @@ export default function GestionAdhesions() {
               <Users className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cbm-primary via-cbm-secondary to-cbm-accent bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-bold text-foreground">
                 Gestion Demandes Adhérants
               </h1>
               <p className="text-lg text-muted-foreground mt-2">
