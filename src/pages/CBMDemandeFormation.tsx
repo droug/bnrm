@@ -10,15 +10,18 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BibliothequeAutocomplete } from "@/components/ui/bibliotheque-autocomplete";
+import { FileUpload } from "@/components/ui/file-upload";
 import { ArrowLeft, GraduationCap, Send } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { generateParticipantsTemplate } from "@/utils/generateParticipantsTemplate";
 
 export default function CBMDemandeFormation() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bibliotheque, setBibliotheque] = useState("");
   const [bibliothequeId, setBibliothequeId] = useState<string | undefined>();
   const [bibliothequeType, setBibliothequeType] = useState<string | undefined>();
+  const [participantsFile, setParticipantsFile] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,6 +29,25 @@ export default function CBMDemandeFormation() {
 
     try {
       const formData = new FormData(e.currentTarget);
+      
+      // Upload du fichier participants si présent
+      let fichierParticipantsPath = null;
+      if (participantsFile) {
+        const timestamp = Date.now();
+        const fileName = `${timestamp}_${participantsFile.name}`;
+        const filePath = `participants/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("cbm-formation-files")
+          .upload(filePath, participantsFile);
+
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          throw new Error("Erreur lors de l'upload du fichier");
+        }
+
+        fichierParticipantsPath = filePath;
+      }
       
       const { error } = await supabase
         .from("cbm_demandes_formation")
@@ -39,6 +61,7 @@ export default function CBMDemandeFormation() {
           type_formation: formData.get("type_formation") as string,
           nombre_participants: parseInt(formData.get("nombre_participants") as string),
           besoins_specifiques: formData.get("besoins_specifiques") as string,
+          fichier_participants_path: fichierParticipantsPath,
           statut: "en_attente"
         });
 
@@ -49,12 +72,18 @@ export default function CBMDemandeFormation() {
       setBibliotheque("");
       setBibliothequeId(undefined);
       setBibliothequeType(undefined);
+      setParticipantsFile(null);
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Erreur lors de l'envoi de la demande");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleDownloadTemplate = () => {
+    generateParticipantsTemplate();
+    toast.success("Canevas téléchargé avec succès");
   };
 
   return (
@@ -211,6 +240,21 @@ export default function CBMDemandeFormation() {
                       rows={5}
                       placeholder="Décrivez vos besoins spécifiques et objectifs de formation..."
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <FileUpload
+                      label="Liste des participants"
+                      accept=".xlsx,.xls,.csv"
+                      maxSize={5}
+                      value={participantsFile}
+                      onChange={setParticipantsFile}
+                      onDownloadTemplate={handleDownloadTemplate}
+                      templateLabel="Télécharger le canevas"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Téléchargez le canevas, remplissez-le avec les informations des participants, puis importez-le ici
+                    </p>
                   </div>
                 </div>
 

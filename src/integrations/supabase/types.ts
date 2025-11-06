@@ -1312,6 +1312,7 @@ export type Database = {
           besoins_specifiques: string | null
           created_at: string
           email: string
+          fichier_participants_path: string | null
           fonction_contact: string
           id: string
           nom_contact: string
@@ -1327,6 +1328,7 @@ export type Database = {
           besoins_specifiques?: string | null
           created_at?: string
           email: string
+          fichier_participants_path?: string | null
           fonction_contact: string
           id?: string
           nom_contact: string
@@ -1342,6 +1344,7 @@ export type Database = {
           besoins_specifiques?: string | null
           created_at?: string
           email?: string
+          fichier_participants_path?: string | null
           fonction_contact?: string
           id?: string
           nom_contact?: string
