@@ -458,13 +458,22 @@ export default function CBMAdhesion() {
                       )}
                       
                       {step > 0 && step < 3 && (
-                        <Button type="button" onClick={() => setStep(step + 1)} className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90">
+                        <Button 
+                          type="button" 
+                          onClick={() => setStep(step + 1)} 
+                          className="ml-auto px-8 py-3 font-semibold !bg-blue-600 hover:!bg-blue-700 !text-white"
+                          style={{ backgroundColor: '#2563eb', color: '#ffffff' }}
+                        >
                           Suivant
                         </Button>
                       )}
                       
                       {step === 3 && (
-                        <Button type="submit" className="ml-auto bg-cbm-primary hover:bg-cbm-primary/90">
+                        <Button 
+                          type="submit" 
+                          className="ml-auto px-8 py-3 font-semibold !bg-green-600 hover:!bg-green-700 !text-white"
+                          style={{ backgroundColor: '#16a34a', color: '#ffffff' }}
+                        >
                           Soumettre la Demande
                         </Button>
                       )}
