@@ -314,38 +314,38 @@ export default function CBMAdhesion() {
                         </div>
                       </div>
                     )}
+                    {/* Boutons de navigation - Toujours visibles */}
+                    <div className="flex justify-between items-center pt-6 mt-6 border-t">
+                      {step > 0 && (
+                        <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
+                          Précédent
+                        </Button>
+                      )}
+                      
+                      {step === 0 && (
+                        <Button 
+                          type="button" 
+                          onClick={() => setStep(1)} 
+                          className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90"
+                          disabled={!typeAdhesion}
+                        >
+                          Suivant
+                        </Button>
+                      )}
+                      
+                      {step > 0 && step < 3 && (
+                        <Button type="button" onClick={() => setStep(step + 1)} className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90">
+                          Suivant
+                        </Button>
+                      )}
+                      
+                      {step === 3 && (
+                        <Button type="submit" className="ml-auto bg-cbm-primary hover:bg-cbm-primary/90">
+                          Soumettre la Demande
+                        </Button>
+                      )}
+                    </div>
                   </CardContent>
-
-                  <CardFooter className="flex justify-between">
-                    {step > 0 && (
-                      <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
-                        Précédent
-                      </Button>
-                    )}
-                    
-                    {step === 0 && (
-                      <Button 
-                        type="button" 
-                        onClick={() => setStep(1)} 
-                        className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90"
-                        disabled={!typeAdhesion}
-                      >
-                        Suivant
-                      </Button>
-                    )}
-                    
-                    {step > 0 && step < 3 && (
-                      <Button type="button" onClick={() => setStep(step + 1)} className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90">
-                        Suivant
-                      </Button>
-                    )}
-                    
-                    {step === 3 && (
-                      <Button type="submit" className="ml-auto bg-cbm-primary hover:bg-cbm-primary/90">
-                        Soumettre la Demande
-                      </Button>
-                    )}
-                  </CardFooter>
                 </form>
               </Card>
             ) : (
