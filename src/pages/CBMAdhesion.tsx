@@ -382,59 +382,121 @@ export default function CBMAdhesion() {
                       <div className="space-y-4">
                         <h3 className="font-semibold text-lg text-cbm-primary">Infrastructure Technique</h3>
                         
-                        <div className="space-y-2">
-                          <Label htmlFor="sigb">Système de Gestion (SIGB) *</Label>
-                          <div className="relative">
-                            <Input 
-                              id="sigb" 
-                              readOnly 
-                              placeholder="Sélectionnez votre SIGB"
-                              className="cursor-pointer"
-                              onClick={() => document.getElementById('sigb-list')?.classList.toggle('hidden')}
-                            />
-                            <div id="sigb-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg">
-                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
-                                (document.getElementById('sigb') as HTMLInputElement).value = 'Koha';
-                                document.getElementById('sigb-list')?.classList.add('hidden');
-                              }}>
-                                Koha
-                              </div>
-                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
-                                (document.getElementById('sigb') as HTMLInputElement).value = 'PMB';
-                                document.getElementById('sigb-list')?.classList.add('hidden');
-                              }}>
-                                PMB
-                              </div>
-                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
-                                (document.getElementById('sigb') as HTMLInputElement).value = 'Virtua';
-                                document.getElementById('sigb-list')?.classList.add('hidden');
-                              }}>
-                                Virtua
-                              </div>
-                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
-                                (document.getElementById('sigb') as HTMLInputElement).value = 'Aleph';
-                                document.getElementById('sigb-list')?.classList.add('hidden');
-                              }}>
-                                Aleph
-                              </div>
-                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
-                                (document.getElementById('sigb') as HTMLInputElement).value = 'Autre';
-                                document.getElementById('sigb-list')?.classList.add('hidden');
-                              }}>
-                                Autre
+                        {typeAdhesion !== "Adhésion au réseau des Bibliothèques Marocaines" && (
+                          <>
+                            <div className="space-y-2">
+                              <Label htmlFor="sigb">Système de Gestion (SIGB) *</Label>
+                              <div className="relative">
+                                <Input 
+                                  id="sigb" 
+                                  readOnly 
+                                  placeholder="Sélectionnez votre SIGB"
+                                  className="cursor-pointer"
+                                  onClick={() => document.getElementById('sigb-list')?.classList.toggle('hidden')}
+                                />
+                                <div id="sigb-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg z-50">
+                                  <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                    (document.getElementById('sigb') as HTMLInputElement).value = 'Koha';
+                                    document.getElementById('sigb-list')?.classList.add('hidden');
+                                  }}>
+                                    Koha
+                                  </div>
+                                  <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                    (document.getElementById('sigb') as HTMLInputElement).value = 'PMB';
+                                    document.getElementById('sigb-list')?.classList.add('hidden');
+                                  }}>
+                                    PMB
+                                  </div>
+                                  <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                    (document.getElementById('sigb') as HTMLInputElement).value = 'Virtua';
+                                    document.getElementById('sigb-list')?.classList.add('hidden');
+                                  }}>
+                                    Virtua
+                                  </div>
+                                  <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                    (document.getElementById('sigb') as HTMLInputElement).value = 'Aleph';
+                                    document.getElementById('sigb-list')?.classList.add('hidden');
+                                  }}>
+                                    Aleph
+                                  </div>
+                                  <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                    (document.getElementById('sigb') as HTMLInputElement).value = 'Autre';
+                                    document.getElementById('sigb-list')?.classList.add('hidden');
+                                  }}>
+                                    Autre
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </div>
+
+                            <div className="space-y-2">
+                              <Label htmlFor="normes">Normes de Catalogage Utilisées</Label>
+                              <Input id="normes" placeholder="Ex: UNIMARC, RDA, Dewey" />
+                            </div>
+                          </>
+                        )}
+
+                        {typeAdhesion === "Adhésion au réseau des Bibliothèques Marocaines" && (
+                          <>
+                            <div className="space-y-2">
+                              <Label htmlFor="recensement">Moyens de recensement du fond documentaire *</Label>
+                              <div className="relative">
+                                <Input 
+                                  id="recensement" 
+                                  readOnly 
+                                  placeholder="Sélectionnez le moyen de recensement"
+                                  className="cursor-pointer"
+                                  onClick={() => document.getElementById('recensement-list')?.classList.toggle('hidden')}
+                                />
+                                <div id="recensement-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg z-50">
+                                  {["Fichiers Excel", "BD Access", "Manuel", "Registres papier", "Système local non SIGB", "Tableur Google Sheets", "Base de données simple", "Autre"].map((option) => (
+                                    <div 
+                                      key={option}
+                                      className="p-2 hover:bg-muted cursor-pointer" 
+                                      onClick={() => {
+                                        (document.getElementById('recensement') as HTMLInputElement).value = option;
+                                        document.getElementById('recensement-list')?.classList.add('hidden');
+                                      }}
+                                    >
+                                      {option}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label htmlFor="informatisation">En cours d'informatisation *</Label>
+                              <div className="relative">
+                                <Input 
+                                  id="informatisation" 
+                                  readOnly 
+                                  placeholder="Sélectionnez Oui ou Non"
+                                  className="cursor-pointer"
+                                  onClick={() => document.getElementById('informatisation-list')?.classList.toggle('hidden')}
+                                />
+                                <div id="informatisation-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg z-50">
+                                  {["Oui", "Non"].map((option) => (
+                                    <div 
+                                      key={option}
+                                      className="p-2 hover:bg-muted cursor-pointer" 
+                                      onClick={() => {
+                                        (document.getElementById('informatisation') as HTMLInputElement).value = option;
+                                        document.getElementById('informatisation-list')?.classList.add('hidden');
+                                      }}
+                                    >
+                                      {option}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        )}
 
                         <div className="space-y-2">
                           <Label htmlFor="collection">Nombre de Documents *</Label>
                           <Input id="collection" type="number" required placeholder="Volume approximatif de la collection" />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="normes">Normes de Catalogage Utilisées</Label>
-                          <Input id="normes" placeholder="Ex: UNIMARC, RDA, Dewey" />
                         </div>
 
                         <div className="space-y-2">
