@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserPlus, CheckCircle2, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import Step3CatalogueCBM from "@/components/cbm/adhesion/Step3CatalogueCBM";
 import Step3ReseauBibliotheques from "@/components/cbm/adhesion/Step3ReseauBibliotheques";
 
@@ -63,13 +64,76 @@ export default function CBMAdhesion() {
     "Désigner un référent technique et un responsable de catalogage"
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Demande envoyée avec succès",
-      description: "Votre dossier sera examiné par le Bureau CBM sous 15 jours ouvrables.",
-    });
-    setStep(4);
+    
+    try {
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+      
+      // Récupération des données du formulaire
+      const adhesionData = {
+        nom_bibliotheque: (document.getElementById('nom-bibliotheque') as HTMLInputElement)?.value,
+        type_bibliotheque: (document.getElementById('type-bibliotheque') as HTMLInputElement)?.value,
+        tutelle: (document.getElementById('tutelle') as HTMLInputElement)?.value,
+        adresse: (document.getElementById('adresse') as HTMLInputElement)?.value,
+        region: (document.getElementById('region') as HTMLInputElement)?.value,
+        ville: (document.getElementById('ville') as HTMLInputElement)?.value,
+        url_maps: (document.getElementById('url-maps') as HTMLInputElement)?.value,
+        directeur: (document.getElementById('directeur') as HTMLInputElement)?.value,
+        email: (document.getElementById('email') as HTMLInputElement)?.value,
+        telephone: (document.getElementById('tel') as HTMLInputElement)?.value,
+        referent_technique: (document.getElementById('referent') as HTMLInputElement)?.value,
+        responsable_catalogage: (document.getElementById('catalogueur') as HTMLInputElement)?.value,
+        nombre_documents: parseInt((document.getElementById('collection') as HTMLInputElement)?.value || '0'),
+        volumetrie: volumetrie,
+        url_catalogue: (document.getElementById('catalogue-url') as HTMLInputElement)?.value,
+        engagement_charte: (document.getElementById('engagement') as HTMLInputElement)?.checked,
+        engagement_partage_donnees: (document.getElementById('donnees') as HTMLInputElement)?.checked,
+      };
+
+      // Vérifier l'authentification
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (typeAdhesion === "Adhésion au réseau des Bibliothèques Marocaines") {
+        // Insertion dans cbm_adhesions_reseau
+        const { error } = await supabase
+          .from('cbm_adhesions_reseau')
+          .insert({
+            ...adhesionData,
+            user_id: user?.id,
+            moyens_recensement: (document.getElementById('recensement') as HTMLInputElement)?.value,
+            en_cours_informatisation: (document.getElementById('informatisation') as HTMLInputElement)?.value,
+          });
+        
+        if (error) throw error;
+      } else {
+        // Insertion dans cbm_adhesions_catalogue
+        const { error } = await supabase
+          .from('cbm_adhesions_catalogue')
+          .insert({
+            ...adhesionData,
+            user_id: user?.id,
+            sigb: (document.getElementById('sigb') as HTMLInputElement)?.value,
+            normes_catalogage: (document.getElementById('normes') as HTMLInputElement)?.value,
+          });
+        
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Demande envoyée avec succès",
+        description: "Votre dossier sera examiné par le Bureau CBM sous 15 jours ouvrables.",
+      });
+      setStep(4);
+    } catch (error: any) {
+      console.error('Erreur lors de la soumission:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de la soumission.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
