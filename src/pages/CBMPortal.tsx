@@ -5,11 +5,32 @@ import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Network, Target, Users, UserPlus, Database, BookOpen, ArrowRight, Library, FileText, GraduationCap, Search } from "lucide-react";
+import { Network, Target, Users, UserPlus, Database, BookOpen, ArrowRight, Library, FileText, GraduationCap, Search, Settings } from "lucide-react";
 import cbmHeroBanner from "@/assets/cbm-hero-banner.jpg";
 import EventsCarousel from "@/components/cultural-activities/EventsCarousel";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function CBMPortal() {
+  // Vérifier si l'utilisateur est admin ou librarian
+  const { data: userRole } = useQuery({
+    queryKey: ["user-role"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .in("role", ["admin", "librarian"])
+        .maybeSingle();
+      
+      if (error) return null;
+      return data?.role;
+    }
+  });
+
   const spotlightItems = [
     {
       title: "Objectifs du Réseau CBM",
@@ -107,6 +128,14 @@ export default function CBMPortal() {
                   Recherche Avancée
                 </Button>
               </Link>
+              {userRole && (
+                <Link to="/cbm/admin">
+                  <Button size="lg" variant="outline" className="bg-background/10 text-primary-foreground border-primary-foreground/30 hover:bg-background/20 h-12 px-8 backdrop-blur-sm">
+                    <Settings className="w-5 h-5 mr-2" />
+                    Administration CBM
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
