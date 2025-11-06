@@ -57,6 +57,13 @@ export default function CBMPortal() {
       gradient: "from-accent/90 to-accent"
     },
     {
+      title: "Demande de Formation",
+      description: "Sollicitez une formation adaptée aux besoins de votre établissement",
+      icon: GraduationCap,
+      path: "/cbm/demande-formation",
+      gradient: "from-primary/70 to-primary/90"
+    },
+    {
       title: "Recherche Documentaire",
       description: "Accédez au catalogue unifié des bibliothèques marocaines",
       icon: Database,
