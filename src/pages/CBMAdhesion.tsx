@@ -95,7 +95,7 @@ export default function CBMAdhesion() {
       // Vérifier l'authentification
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (typeAdhesion === "Adhésion au réseau des Bibliothèques Marocaines") {
+      if (typeAdhesion === "reseau") {
         // Insertion dans cbm_adhesions_reseau
         const { error } = await supabase
           .from('cbm_adhesions_reseau')
@@ -445,7 +445,7 @@ export default function CBMAdhesion() {
 
                     {step === 3 && (
                       <>
-                        {typeAdhesion === "Adhésion au réseau des Bibliothèques Marocaines" ? (
+                        {typeAdhesion === "reseau" ? (
                           <Step3ReseauBibliotheques 
                             volumetrie={volumetrie}
                             setVolumetrie={setVolumetrie}
