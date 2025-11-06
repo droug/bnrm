@@ -142,6 +142,15 @@ export default function CBMAdhesion() {
                               </CardContent>
                             </Card>
 
+                            <div className="relative flex items-center justify-center py-2">
+                              <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-border"></div>
+                              </div>
+                              <div className="relative bg-background px-4">
+                                <span className="text-sm font-medium text-muted-foreground">OU</span>
+                              </div>
+                            </div>
+
                             <Card className={`border-2 transition-all cursor-pointer ${typeAdhesion === 'catalogue' ? 'border-cbm-secondary bg-cbm-secondary/5' : 'border-border hover:border-cbm-secondary/50'}`}
                               onClick={() => setTypeAdhesion('catalogue')}>
                               <CardContent className="pt-6">
