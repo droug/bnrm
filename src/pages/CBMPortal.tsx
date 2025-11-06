@@ -328,8 +328,8 @@ export default function CBMPortal() {
                 <div className="text-sm text-primary-foreground/80">Utilisateurs Actifs</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold mb-2">98%</div>
-                <div className="text-sm text-primary-foreground/80">Satisfaction</div>
+                <div className="text-4xl font-bold mb-2">750K+</div>
+                <div className="text-sm text-primary-foreground/80">Consultations</div>
               </div>
             </div>
           </div>
