@@ -17,12 +17,7 @@ export default function CBMPortal() {
     queryKey: ["user-role"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.log("CBMPortal: No user found");
-        return null;
-      }
-      
-      console.log("CBMPortal: Checking role for user", user.id);
+      if (!user) return null;
       
       const { data, error } = await supabase
         .from("user_roles")
@@ -32,16 +27,13 @@ export default function CBMPortal() {
         .maybeSingle();
       
       if (error) {
-        console.error("CBMPortal: Error fetching user role:", error);
+        console.error("Error fetching user role:", error);
         return null;
       }
       
-      console.log("CBMPortal: User role data:", data);
       return data?.role || null;
     }
   });
-
-  console.log("CBMPortal: Current userRole state:", userRole, "isLoading:", isLoadingRole);
 
   const spotlightItems = [
     {
@@ -147,7 +139,7 @@ export default function CBMPortal() {
                   Recherche Avancée
                 </Button>
               </Link>
-              {userRole && (
+              {!isLoadingRole && userRole && (
                 <Link to="/cbm/admin">
                   <Button size="lg" variant="outline" className="bg-background/10 text-primary-foreground border-primary-foreground/30 hover:bg-background/20 h-12 px-8 backdrop-blur-sm">
                     <Settings className="w-5 h-5 mr-2" />
