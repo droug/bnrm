@@ -314,8 +314,11 @@ export default function CBMAdhesion() {
                         </div>
                       </div>
                     )}
-                    {/* Boutons de navigation - Toujours visibles */}
-                    <div className="flex justify-between items-center pt-6 mt-6 border-t">
+                  </CardContent>
+
+                  {/* Boutons de navigation */}
+                  <div className="p-6 border-t bg-background">
+                    <div className="flex justify-between items-center">
                       {step > 0 && (
                         <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
                           Précédent
@@ -325,9 +328,8 @@ export default function CBMAdhesion() {
                       {step === 0 && (
                         <Button 
                           type="button" 
-                          onClick={() => setStep(1)} 
-                          className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90"
-                          disabled={!typeAdhesion}
+                          onClick={() => typeAdhesion && setStep(1)} 
+                          className={`ml-auto ${typeAdhesion ? 'bg-cbm-accent hover:bg-cbm-accent/90' : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'}`}
                         >
                           Suivant
                         </Button>
@@ -345,7 +347,7 @@ export default function CBMAdhesion() {
                         </Button>
                       )}
                     </div>
-                  </CardContent>
+                  </div>
                 </form>
               </Card>
             ) : (
