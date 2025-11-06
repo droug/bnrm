@@ -138,7 +138,7 @@ export default function CBMAdhesion() {
                                     Adhésion au réseau des Bibliothèques Marocaines
                                   </Label>
                                   <p className="text-sm text-muted-foreground mt-2">
-                                    Rejoignez le réseau national CBM pour bénéficier du prêt entre bibliothèques, 
+                                    Rejoignez le réseau national des Bibliothéques Marocaines pour bénéficier du prêt entre bibliothèques, 
                                     des formations et du support technique dédié.
                                   </p>
                                 </div>
