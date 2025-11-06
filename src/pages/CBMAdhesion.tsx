@@ -184,9 +184,11 @@ export default function CBMAdhesion() {
                         </RadioGroup>
 
                         {!typeAdhesion && (
-                          <p className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg">
-                            Veuillez sélectionner un type d'adhésion pour continuer
-                          </p>
+                          <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 text-center">
+                            <p className="text-sm text-amber-800 dark:text-amber-200">
+                              Veuillez sélectionner un type d'adhésion pour continuer
+                            </p>
+                          </div>
                         )}
                       </div>
                     )}
@@ -312,26 +314,28 @@ export default function CBMAdhesion() {
                       </div>
                     )}
 
-                    <div className="flex justify-between pt-6">
+                    <div className="flex justify-between items-center pt-6 border-t mt-6">
                       {step > 0 && (
                         <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
                           Précédent
                         </Button>
                       )}
-                      {step === 0 ? (
+                      {step === 0 && (
                         <Button 
                           type="button" 
-                          onClick={() => setStep(step + 1)} 
+                          onClick={() => setStep(1)} 
                           className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90"
                           disabled={!typeAdhesion}
                         >
                           Suivant
                         </Button>
-                      ) : step < 3 ? (
+                      )}
+                      {step > 0 && step < 3 && (
                         <Button type="button" onClick={() => setStep(step + 1)} className="ml-auto bg-cbm-accent hover:bg-cbm-accent/90">
                           Suivant
                         </Button>
-                      ) : (
+                      )}
+                      {step === 3 && (
                         <Button type="submit" className="ml-auto bg-cbm-primary hover:bg-cbm-primary/90">
                           Soumettre la Demande
                         </Button>
