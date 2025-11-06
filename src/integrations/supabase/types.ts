@@ -1307,6 +1307,54 @@ export type Database = {
           },
         ]
       }
+      cbm_demandes_formation: {
+        Row: {
+          besoins_specifiques: string | null
+          created_at: string
+          email: string
+          fonction_contact: string
+          id: string
+          nom_contact: string
+          nom_organisme: string
+          nombre_participants: number
+          statut: string
+          telephone: string
+          type_formation: string
+          type_organisme: string
+          updated_at: string
+        }
+        Insert: {
+          besoins_specifiques?: string | null
+          created_at?: string
+          email: string
+          fonction_contact: string
+          id?: string
+          nom_contact: string
+          nom_organisme: string
+          nombre_participants: number
+          statut?: string
+          telephone: string
+          type_formation: string
+          type_organisme: string
+          updated_at?: string
+        }
+        Update: {
+          besoins_specifiques?: string | null
+          created_at?: string
+          email?: string
+          fonction_contact?: string
+          id?: string
+          nom_contact?: string
+          nom_organisme?: string
+          nombre_participants?: number
+          statut?: string
+          telephone?: string
+          type_formation?: string
+          type_organisme?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cbn_catalog_documents: {
         Row: {
           allow_physical_consultation: boolean | null
