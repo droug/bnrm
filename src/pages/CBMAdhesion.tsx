@@ -6,8 +6,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserPlus, CheckCircle2, Shield } from "lucide-react";
@@ -205,17 +203,41 @@ export default function CBMAdhesion() {
 
                         <div className="space-y-2">
                           <Label htmlFor="type">Type d'Institution *</Label>
-                          <Select required>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Sélectionnez" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="publique">Bibliothèque Publique</SelectItem>
-                              <SelectItem value="universitaire">Bibliothèque Universitaire</SelectItem>
-                              <SelectItem value="specialisee">Bibliothèque Spécialisée</SelectItem>
-                              <SelectItem value="scolaire">Bibliothèque Scolaire</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <div className="relative">
+                            <Input 
+                              id="type" 
+                              readOnly 
+                              placeholder="Sélectionnez un type"
+                              className="cursor-pointer"
+                              onClick={() => document.getElementById('type-list')?.classList.toggle('hidden')}
+                            />
+                            <div id="type-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg">
+                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                (document.getElementById('type') as HTMLInputElement).value = 'Bibliothèque Publique';
+                                document.getElementById('type-list')?.classList.add('hidden');
+                              }}>
+                                Bibliothèque Publique
+                              </div>
+                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                (document.getElementById('type') as HTMLInputElement).value = 'Bibliothèque Universitaire';
+                                document.getElementById('type-list')?.classList.add('hidden');
+                              }}>
+                                Bibliothèque Universitaire
+                              </div>
+                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                (document.getElementById('type') as HTMLInputElement).value = 'Bibliothèque Spécialisée';
+                                document.getElementById('type-list')?.classList.add('hidden');
+                              }}>
+                                Bibliothèque Spécialisée
+                              </div>
+                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                (document.getElementById('type') as HTMLInputElement).value = 'Bibliothèque Scolaire';
+                                document.getElementById('type-list')?.classList.add('hidden');
+                              }}>
+                                Bibliothèque Scolaire
+                              </div>
+                            </div>
+                          </div>
                         </div>
 
                         <div className="grid gap-4 md:grid-cols-2">
@@ -230,8 +252,9 @@ export default function CBMAdhesion() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="adresse">Adresse Complète *</Label>
-                          <Textarea id="adresse" required placeholder="Adresse postale détaillée" />
+                          <Label htmlFor="url-maps">URL Google Maps</Label>
+                          <Input id="url-maps" type="url" placeholder="https://maps.google.com/..." />
+                          <p className="text-xs text-muted-foreground">Lien vers la localisation de votre bibliothèque sur Google Maps</p>
                         </div>
                       </div>
                     )}
@@ -274,18 +297,47 @@ export default function CBMAdhesion() {
                         
                         <div className="space-y-2">
                           <Label htmlFor="sigb">Système de Gestion (SIGB) *</Label>
-                          <Select required>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Sélectionnez votre SIGB" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="koha">Koha</SelectItem>
-                              <SelectItem value="pmb">PMB</SelectItem>
-                              <SelectItem value="virtua">Virtua</SelectItem>
-                              <SelectItem value="aleph">Aleph</SelectItem>
-                              <SelectItem value="autre">Autre</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <div className="relative">
+                            <Input 
+                              id="sigb" 
+                              readOnly 
+                              placeholder="Sélectionnez votre SIGB"
+                              className="cursor-pointer"
+                              onClick={() => document.getElementById('sigb-list')?.classList.toggle('hidden')}
+                            />
+                            <div id="sigb-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg">
+                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                (document.getElementById('sigb') as HTMLInputElement).value = 'Koha';
+                                document.getElementById('sigb-list')?.classList.add('hidden');
+                              }}>
+                                Koha
+                              </div>
+                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                (document.getElementById('sigb') as HTMLInputElement).value = 'PMB';
+                                document.getElementById('sigb-list')?.classList.add('hidden');
+                              }}>
+                                PMB
+                              </div>
+                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                (document.getElementById('sigb') as HTMLInputElement).value = 'Virtua';
+                                document.getElementById('sigb-list')?.classList.add('hidden');
+                              }}>
+                                Virtua
+                              </div>
+                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                (document.getElementById('sigb') as HTMLInputElement).value = 'Aleph';
+                                document.getElementById('sigb-list')?.classList.add('hidden');
+                              }}>
+                                Aleph
+                              </div>
+                              <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
+                                (document.getElementById('sigb') as HTMLInputElement).value = 'Autre';
+                                document.getElementById('sigb-list')?.classList.add('hidden');
+                              }}>
+                                Autre
+                              </div>
+                            </div>
+                          </div>
                         </div>
 
                         <div className="space-y-2">
