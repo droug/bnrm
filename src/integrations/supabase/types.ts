@@ -1059,6 +1059,168 @@ export type Database = {
           },
         ]
       }
+      cbm_adhesions_catalogue: {
+        Row: {
+          adresse: string
+          created_at: string
+          directeur: string
+          email: string
+          engagement_charte: boolean
+          engagement_partage_donnees: boolean
+          id: string
+          nom_bibliotheque: string
+          nombre_documents: number
+          normes_catalogage: string | null
+          referent_technique: string
+          region: string
+          responsable_catalogage: string
+          sigb: string
+          statut: string | null
+          telephone: string
+          tutelle: string
+          type_bibliotheque: string
+          updated_at: string
+          url_catalogue: string | null
+          url_maps: string | null
+          user_id: string | null
+          ville: string
+          volumetrie: Json | null
+        }
+        Insert: {
+          adresse: string
+          created_at?: string
+          directeur: string
+          email: string
+          engagement_charte?: boolean
+          engagement_partage_donnees?: boolean
+          id?: string
+          nom_bibliotheque: string
+          nombre_documents: number
+          normes_catalogage?: string | null
+          referent_technique: string
+          region: string
+          responsable_catalogage: string
+          sigb: string
+          statut?: string | null
+          telephone: string
+          tutelle: string
+          type_bibliotheque: string
+          updated_at?: string
+          url_catalogue?: string | null
+          url_maps?: string | null
+          user_id?: string | null
+          ville: string
+          volumetrie?: Json | null
+        }
+        Update: {
+          adresse?: string
+          created_at?: string
+          directeur?: string
+          email?: string
+          engagement_charte?: boolean
+          engagement_partage_donnees?: boolean
+          id?: string
+          nom_bibliotheque?: string
+          nombre_documents?: number
+          normes_catalogage?: string | null
+          referent_technique?: string
+          region?: string
+          responsable_catalogage?: string
+          sigb?: string
+          statut?: string | null
+          telephone?: string
+          tutelle?: string
+          type_bibliotheque?: string
+          updated_at?: string
+          url_catalogue?: string | null
+          url_maps?: string | null
+          user_id?: string | null
+          ville?: string
+          volumetrie?: Json | null
+        }
+        Relationships: []
+      }
+      cbm_adhesions_reseau: {
+        Row: {
+          adresse: string
+          created_at: string
+          directeur: string
+          email: string
+          en_cours_informatisation: string
+          engagement_charte: boolean
+          engagement_partage_donnees: boolean
+          id: string
+          moyens_recensement: string
+          nom_bibliotheque: string
+          nombre_documents: number
+          referent_technique: string
+          region: string
+          responsable_catalogage: string
+          statut: string | null
+          telephone: string
+          tutelle: string
+          type_bibliotheque: string
+          updated_at: string
+          url_catalogue: string | null
+          url_maps: string | null
+          user_id: string | null
+          ville: string
+          volumetrie: Json | null
+        }
+        Insert: {
+          adresse: string
+          created_at?: string
+          directeur: string
+          email: string
+          en_cours_informatisation: string
+          engagement_charte?: boolean
+          engagement_partage_donnees?: boolean
+          id?: string
+          moyens_recensement: string
+          nom_bibliotheque: string
+          nombre_documents: number
+          referent_technique: string
+          region: string
+          responsable_catalogage: string
+          statut?: string | null
+          telephone: string
+          tutelle: string
+          type_bibliotheque: string
+          updated_at?: string
+          url_catalogue?: string | null
+          url_maps?: string | null
+          user_id?: string | null
+          ville: string
+          volumetrie?: Json | null
+        }
+        Update: {
+          adresse?: string
+          created_at?: string
+          directeur?: string
+          email?: string
+          en_cours_informatisation?: string
+          engagement_charte?: boolean
+          engagement_partage_donnees?: boolean
+          id?: string
+          moyens_recensement?: string
+          nom_bibliotheque?: string
+          nombre_documents?: number
+          referent_technique?: string
+          region?: string
+          responsable_catalogage?: string
+          statut?: string | null
+          telephone?: string
+          tutelle?: string
+          type_bibliotheque?: string
+          updated_at?: string
+          url_catalogue?: string | null
+          url_maps?: string | null
+          user_id?: string | null
+          ville?: string
+          volumetrie?: Json | null
+        }
+        Relationships: []
+      }
       cbm_catalog: {
         Row: {
           author: string | null
