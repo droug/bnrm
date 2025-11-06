@@ -19,6 +19,8 @@ export default function CBMAdhesion() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  console.log("CBMAdhesion render - step:", step, "typeAdhesion:", typeAdhesion);
+
   const criteres = [
     "Être une bibliothèque institutionnelle reconnue (publique, universitaire, spécialisée)",
     "Disposer d'un système informatisé de gestion bibliothéconomique (SIGB)",
@@ -113,9 +115,9 @@ export default function CBMAdhesion() {
                     </div>
                   )}
                 </CardHeader>
-                <CardContent>
+                <CardContent className="min-h-[500px]">
                   <form onSubmit={handleSubmit}>
-                    <div className="space-y-6">
+                    <div className="space-y-6 pb-4">
                       {step === 0 && (
                       <div className="space-y-6">
                         <h3 className="font-semibold text-lg text-cbm-primary">Type d'Adhésion</h3>
@@ -317,7 +319,7 @@ export default function CBMAdhesion() {
                     </div>
 
                     {/* Buttons Section - Always visible at bottom */}
-                    <div className="flex justify-between items-center pt-6 border-t mt-6">
+                    <div className="flex justify-between items-center pt-6 border-t mt-6 bg-background">
                       {step > 0 && (
                         <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
                           Précédent
