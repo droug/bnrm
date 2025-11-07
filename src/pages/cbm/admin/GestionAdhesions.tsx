@@ -37,77 +37,23 @@ export default function GestionAdhesions() {
   const { data: catalogueAdhesions, refetch: refetchCatalogue } = useQuery({
     queryKey: ["cbm-adhesions-catalogue"],
     queryFn: async () => {
-      // Données de test avec statuts variés
-      const testData = [
-        {
-          id: "test-catalogue-1",
-          nom_bibliotheque: "Bibliothèque Nationale du Royaume du Maroc",
-          type_bibliotheque: "Bibliothèque Nationale",
-          tutelle: "Ministère de la Culture",
-          region: "Rabat-Salé-Kénitra",
-          ville: "Rabat",
-          email: "contact@bnrm.ma",
-          telephone: "+212 537 77 18 88",
-          sigb: "Koha",
-          nombre_documents: 250000,
-          statut: "en_attente",
-          motif_refus: null,
-          created_at: new Date().toISOString()
-        },
-        {
-          id: "test-catalogue-2",
-          nom_bibliotheque: "Bibliothèque Régionale de Tanger",
-          type_bibliotheque: "Bibliothèque Publique",
-          tutelle: "Région de Tanger-Tétouan-Al Hoceïma",
-          region: "Tanger-Tétouan-Al Hoceïma",
-          ville: "Tanger",
-          email: "biblio.tanger@region.ma",
-          telephone: "+212 539 94 12 34",
-          sigb: "PMB",
-          nombre_documents: 65000,
-          statut: "en_validation",
-          motif_refus: null,
-          created_at: new Date(Date.now() - 86400000).toISOString()
-        },
-        {
-          id: "test-catalogue-3",
-          nom_bibliotheque: "Bibliothèque Universitaire Hassan II Casablanca",
-          type_bibliotheque: "Bibliothèque Universitaire",
-          tutelle: "Université Hassan II",
-          region: "Casablanca-Settat",
-          ville: "Casablanca",
-          email: "bu@uh2c.ma",
-          telephone: "+212 522 23 06 80",
-          sigb: "Ex Libris",
-          nombre_documents: 180000,
-          statut: "approuve",
-          motif_refus: null,
-          created_at: new Date(Date.now() - 172800000).toISOString()
-        },
-        {
-          id: "test-catalogue-4",
-          nom_bibliotheque: "Bibliothèque Municipale de Marrakech",
-          type_bibliotheque: "Bibliothèque Municipale",
-          tutelle: "Commune de Marrakech",
-          region: "Marrakech-Safi",
-          ville: "Marrakech",
-          email: "biblio@marrakech.ma",
-          telephone: "+212 524 43 89 00",
-          sigb: "SIGB Local",
-          nombre_documents: 28000,
-          statut: "rejete",
-          motif_refus: "Nombre de documents insuffisant pour l'adhésion au catalogue collectif. Minimum requis: 50,000 documents.",
-          created_at: new Date(Date.now() - 259200000).toISOString()
-        }
-      ];
+      const { data, error } = await supabase
+        .from('cbm_adhesions_catalogue')
+        .select('*')
+        .order('created_at', { ascending: false });
       
-      // Initialiser l'état local si vide
-      if (localCatalogueData.length === 0) {
-        setLocalCatalogueData(testData);
-        return testData;
+      if (error) {
+        console.error('Erreur lors de la récupération des adhésions catalogue:', error);
+        throw error;
       }
       
-      return localCatalogueData;
+      // Initialiser l'état local avec les données réelles
+      if (localCatalogueData.length === 0 && data) {
+        setLocalCatalogueData(data);
+        return data;
+      }
+      
+      return localCatalogueData.length > 0 ? localCatalogueData : data || [];
     }
   });
 
@@ -115,81 +61,23 @@ export default function GestionAdhesions() {
   const { data: reseauAdhesions, refetch: refetchReseau } = useQuery({
     queryKey: ["cbm-adhesions-reseau"],
     queryFn: async () => {
-      // Données de test avec statuts variés
-      const testData = [
-        {
-          id: "test-reseau-1",
-          nom_bibliotheque: "Réseau des Bibliothèques de Fès",
-          type_bibliotheque: "Réseau régional",
-          tutelle: "Wilaya de Fès-Meknès",
-          region: "Fès-Meknès",
-          ville: "Fès",
-          email: "reseau@fes-bibliotheques.ma",
-          telephone: "+212 535 65 11 23",
-          moyens_recensement: "Fiches manuelles et base de données",
-          en_cours_informatisation: "Oui - 60% achevé",
-          nombre_documents: 125000,
-          statut: "en_attente",
-          motif_refus: null,
-          created_at: new Date().toISOString()
-        },
-        {
-          id: "test-reseau-2",
-          nom_bibliotheque: "Bibliothèques Communales d'Agadir",
-          type_bibliotheque: "Réseau communal",
-          tutelle: "Commune d'Agadir",
-          region: "Souss-Massa",
-          ville: "Agadir",
-          email: "bibliotheques@agadir.ma",
-          telephone: "+212 528 84 26 77",
-          moyens_recensement: "Système informatisé complet",
-          en_cours_informatisation: "Terminé",
-          nombre_documents: 85000,
-          statut: "en_validation",
-          motif_refus: null,
-          created_at: new Date(Date.now() - 86400000).toISOString()
-        },
-        {
-          id: "test-reseau-3",
-          nom_bibliotheque: "Réseau Bibliothèques Tanger-Tétouan",
-          type_bibliotheque: "Réseau régional",
-          tutelle: "Région Tanger-Tétouan-Al Hoceïma",
-          region: "Tanger-Tétouan-Al Hoceïma",
-          ville: "Tanger",
-          email: "reseau@tanger-bibliotheques.ma",
-          telephone: "+212 539 94 05 17",
-          moyens_recensement: "Base de données centralisée",
-          en_cours_informatisation: "Oui - 80% achevé",
-          nombre_documents: 165000,
-          statut: "approuve",
-          motif_refus: null,
-          created_at: new Date(Date.now() - 172800000).toISOString()
-        },
-        {
-          id: "test-reseau-4",
-          nom_bibliotheque: "Réseau Bibliothèques de Meknès",
-          type_bibliotheque: "Réseau régional",
-          tutelle: "Wilaya de Fès-Meknès",
-          region: "Fès-Meknès",
-          ville: "Meknès",
-          email: "reseau@meknes-bibliotheques.ma",
-          telephone: "+212 535 52 34 56",
-          moyens_recensement: "Fiches manuelles uniquement",
-          en_cours_informatisation: "Non démarré",
-          nombre_documents: 35000,
-          statut: "rejete",
-          motif_refus: "Infrastructure informatique insuffisante. L'adhésion au réseau nécessite un système informatisé au minimum en cours de déploiement.",
-          created_at: new Date(Date.now() - 345600000).toISOString()
-        }
-      ];
+      const { data, error } = await supabase
+        .from('cbm_adhesions_reseau')
+        .select('*')
+        .order('created_at', { ascending: false });
       
-      // Initialiser l'état local si vide
-      if (localReseauData.length === 0) {
-        setLocalReseauData(testData);
-        return testData;
+      if (error) {
+        console.error('Erreur lors de la récupération des adhésions réseau:', error);
+        throw error;
       }
       
-      return localReseauData;
+      // Initialiser l'état local avec les données réelles
+      if (localReseauData.length === 0 && data) {
+        setLocalReseauData(data);
+        return data;
+      }
+      
+      return localReseauData.length > 0 ? localReseauData : data || [];
     }
   });
 
@@ -214,6 +102,14 @@ export default function GestionAdhesions() {
 
   const handleApprove = async (id: string, table: "cbm_adhesions_catalogue" | "cbm_adhesions_reseau") => {
     try {
+      // Mettre à jour dans Supabase
+      const { error } = await supabase
+        .from(table)
+        .update({ statut: 'en_validation' })
+        .eq('id', id);
+      
+      if (error) throw error;
+
       // Mettre à jour localement le statut en "en_validation"
       if (table === "cbm_adhesions_catalogue") {
         const updatedData = localCatalogueData.map(item => 
@@ -258,6 +154,17 @@ export default function GestionAdhesions() {
     }
 
     try {
+      // Mettre à jour dans Supabase
+      const { error } = await supabase
+        .from(selectedTable)
+        .update({ 
+          statut: 'rejete',
+          motif_refus: rejectionReason
+        })
+        .eq('id', selectedAdhesion.id);
+      
+      if (error) throw error;
+
       // Mettre à jour localement le statut en "rejete"
       if (selectedTable === "cbm_adhesions_catalogue") {
         const updatedData = localCatalogueData.map(item => 
@@ -300,6 +207,14 @@ export default function GestionAdhesions() {
 
   const handleValidateByCommittee = async (id: string, table: "cbm_adhesions_catalogue" | "cbm_adhesions_reseau") => {
     try {
+      // Mettre à jour dans Supabase
+      const { error } = await supabase
+        .from(table)
+        .update({ statut: 'approuve' })
+        .eq('id', id);
+      
+      if (error) throw error;
+
       // Mettre à jour localement le statut en "approuve"
       if (table === "cbm_adhesions_catalogue") {
         const updatedData = localCatalogueData.map(item => 

@@ -79,13 +79,10 @@ export default function CBMAdhesion() {
     e.preventDefault();
     
     try {
-      const form = e.target as HTMLFormElement;
-      const formData = new FormData(form);
-      
-      // Récupération des données du formulaire
+      // Récupération des données du formulaire avec les bons IDs
       const adhesionData = {
-        nom_bibliotheque: (document.getElementById('nom-bibliotheque') as HTMLInputElement)?.value,
-        type_bibliotheque: (document.getElementById('type-bibliotheque') as HTMLInputElement)?.value,
+        nom_bibliotheque: (document.getElementById('nom') as HTMLInputElement)?.value,
+        type_bibliotheque: (document.getElementById('type') as HTMLInputElement)?.value,
         tutelle: (document.getElementById('tutelle') as HTMLInputElement)?.value,
         adresse: (document.getElementById('adresse') as HTMLInputElement)?.value,
         region: (document.getElementById('region') as HTMLInputElement)?.value,
