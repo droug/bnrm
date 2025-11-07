@@ -13,11 +13,22 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Step3CatalogueCBM from "@/components/cbm/adhesion/Step3CatalogueCBM";
 import Step3ReseauBibliotheques from "@/components/cbm/adhesion/Step3ReseauBibliotheques";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function CBMAdhesion() {
   const [step, setStep] = useState(0);
   const [typeAdhesion, setTypeAdhesion] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("");
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [volumetrie, setVolumetrie] = useState<Record<string, string>>({
     "Monographies": "",
     "Périodiques": "",
@@ -35,6 +46,31 @@ export default function CBMAdhesion() {
     "Jeux & Puzzles": "",
     "Autre": ""
   });
+  
+  // State pour stocker les données du formulaire
+  const [formData, setFormData] = useState({
+    nom_bibliotheque: "",
+    type_bibliotheque: "",
+    tutelle: "",
+    adresse: "",
+    region: "",
+    ville: "",
+    url_maps: "",
+    directeur: "",
+    email: "",
+    telephone: "",
+    referent_technique: "",
+    responsable_catalogage: "",
+    nombre_documents: 0,
+    url_catalogue: "",
+    sigb: "",
+    normes_catalogage: "",
+    moyens_recensement: "",
+    en_cours_informatisation: "",
+    engagement_charte: false,
+    engagement_partage_donnees: false,
+  });
+  
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -75,29 +111,52 @@ export default function CBMAdhesion() {
 
   const criteres = typeAdhesion === "reseau" ? criteresReseau : criteresCatalogue;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleNextStep = () => {
+    // Sauvegarder les données de l'étape actuelle
+    if (step === 1) {
+      setFormData({
+        ...formData,
+        nom_bibliotheque: (document.getElementById('nom') as HTMLInputElement)?.value || "",
+        type_bibliotheque: (document.getElementById('type') as HTMLInputElement)?.value || "",
+        tutelle: (document.getElementById('tutelle') as HTMLInputElement)?.value || "",
+        adresse: (document.getElementById('adresse') as HTMLInputElement)?.value || "",
+        region: (document.getElementById('region') as HTMLInputElement)?.value || "",
+        ville: (document.getElementById('ville') as HTMLInputElement)?.value || "",
+        url_maps: (document.getElementById('url-maps') as HTMLInputElement)?.value || "",
+      });
+    } else if (step === 2) {
+      setFormData({
+        ...formData,
+        directeur: (document.getElementById('directeur') as HTMLInputElement)?.value || "",
+        email: (document.getElementById('email') as HTMLInputElement)?.value || "",
+        telephone: (document.getElementById('tel') as HTMLInputElement)?.value || "",
+        referent_technique: (document.getElementById('referent') as HTMLInputElement)?.value || "",
+        responsable_catalogage: (document.getElementById('catalogueur') as HTMLInputElement)?.value || "",
+        tutelle: (document.getElementById('tutelle') as HTMLInputElement)?.value || "",
+        adresse: (document.getElementById('adresse') as HTMLInputElement)?.value || "",
+      });
+    }
+    setStep(step + 1);
+  };
+
+  const handleSubmit = async () => {
     try {
-      // Récupération des données du formulaire avec les bons IDs
-      const adhesionData = {
-        nom_bibliotheque: (document.getElementById('nom') as HTMLInputElement)?.value,
-        type_bibliotheque: (document.getElementById('type') as HTMLInputElement)?.value,
-        tutelle: (document.getElementById('tutelle') as HTMLInputElement)?.value,
-        adresse: (document.getElementById('adresse') as HTMLInputElement)?.value,
-        region: (document.getElementById('region') as HTMLInputElement)?.value,
-        ville: (document.getElementById('ville') as HTMLInputElement)?.value,
-        url_maps: (document.getElementById('url-maps') as HTMLInputElement)?.value,
-        directeur: (document.getElementById('directeur') as HTMLInputElement)?.value,
-        email: (document.getElementById('email') as HTMLInputElement)?.value,
-        telephone: (document.getElementById('tel') as HTMLInputElement)?.value,
-        referent_technique: (document.getElementById('referent') as HTMLInputElement)?.value,
-        responsable_catalogage: (document.getElementById('catalogueur') as HTMLInputElement)?.value,
+      // Récupérer les données de l'étape 3
+      const step3Data = {
         nombre_documents: parseInt((document.getElementById('collection') as HTMLInputElement)?.value || '0'),
+        url_catalogue: (document.getElementById('catalogue-url') as HTMLInputElement)?.value || "",
+        sigb: (document.getElementById('sigb') as HTMLInputElement)?.value || "",
+        normes_catalogage: (document.getElementById('normes') as HTMLInputElement)?.value || "",
+        moyens_recensement: (document.getElementById('recensement') as HTMLInputElement)?.value || "",
+        en_cours_informatisation: (document.getElementById('informatisation') as HTMLInputElement)?.value || "",
+        engagement_charte: (document.getElementById('engagement') as HTMLInputElement)?.checked || false,
+        engagement_partage_donnees: (document.getElementById('donnees') as HTMLInputElement)?.checked || false,
+      };
+
+      const adhesionData = {
+        ...formData,
+        ...step3Data,
         volumetrie: volumetrie,
-        url_catalogue: (document.getElementById('catalogue-url') as HTMLInputElement)?.value,
-        engagement_charte: (document.getElementById('engagement') as HTMLInputElement)?.checked,
-        engagement_partage_donnees: (document.getElementById('donnees') as HTMLInputElement)?.checked,
       };
 
       // Vérifier l'authentification
@@ -108,10 +167,25 @@ export default function CBMAdhesion() {
         const { error } = await supabase
           .from('cbm_adhesions_reseau')
           .insert({
-            ...adhesionData,
+            nom_bibliotheque: adhesionData.nom_bibliotheque,
+            type_bibliotheque: adhesionData.type_bibliotheque,
+            tutelle: adhesionData.tutelle || null,
+            adresse: adhesionData.adresse || null,
+            region: adhesionData.region,
+            ville: adhesionData.ville,
+            url_maps: adhesionData.url_maps || null,
+            directeur: adhesionData.directeur,
+            email: adhesionData.email,
+            telephone: adhesionData.telephone,
+            referent_technique: adhesionData.referent_technique,
+            responsable_catalogage: adhesionData.responsable_catalogage,
+            nombre_documents: adhesionData.nombre_documents || 0,
+            volumetrie: adhesionData.volumetrie,
+            moyens_recensement: adhesionData.moyens_recensement,
+            en_cours_informatisation: adhesionData.en_cours_informatisation,
+            engagement_charte: adhesionData.engagement_charte,
+            engagement_partage_donnees: adhesionData.engagement_partage_donnees,
             user_id: user?.id,
-            moyens_recensement: (document.getElementById('recensement') as HTMLInputElement)?.value,
-            en_cours_informatisation: (document.getElementById('informatisation') as HTMLInputElement)?.value,
           });
         
         if (error) throw error;
@@ -120,15 +194,32 @@ export default function CBMAdhesion() {
         const { error } = await supabase
           .from('cbm_adhesions_catalogue')
           .insert({
-            ...adhesionData,
+            nom_bibliotheque: adhesionData.nom_bibliotheque,
+            type_bibliotheque: adhesionData.type_bibliotheque,
+            tutelle: adhesionData.tutelle || null,
+            adresse: adhesionData.adresse || null,
+            region: adhesionData.region,
+            ville: adhesionData.ville,
+            url_maps: adhesionData.url_maps || null,
+            directeur: adhesionData.directeur,
+            email: adhesionData.email,
+            telephone: adhesionData.telephone,
+            referent_technique: adhesionData.referent_technique,
+            responsable_catalogage: adhesionData.responsable_catalogage,
+            nombre_documents: adhesionData.nombre_documents || 0,
+            volumetrie: adhesionData.volumetrie,
+            url_catalogue: adhesionData.url_catalogue || null,
+            sigb: adhesionData.sigb,
+            normes_catalogage: adhesionData.normes_catalogage || null,
+            engagement_charte: adhesionData.engagement_charte,
+            engagement_partage_donnees: adhesionData.engagement_partage_donnees,
             user_id: user?.id,
-            sigb: (document.getElementById('sigb') as HTMLInputElement)?.value,
-            normes_catalogage: (document.getElementById('normes') as HTMLInputElement)?.value,
           });
         
         if (error) throw error;
       }
 
+      setShowConfirmDialog(false);
       toast({
         title: "Demande envoyée avec succès",
         description: "Votre dossier sera examiné par le Bureau CBM sous 15 jours ouvrables.",
@@ -136,6 +227,7 @@ export default function CBMAdhesion() {
       setStep(4);
     } catch (error: any) {
       console.error('Erreur lors de la soumission:', error);
+      setShowConfirmDialog(false);
       toast({
         title: "Erreur",
         description: error.message || "Une erreur est survenue lors de la soumission.",
@@ -224,7 +316,7 @@ export default function CBMAdhesion() {
                   )}
                 </CardHeader>
                 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={(e) => e.preventDefault()}>
                   <CardContent className="space-y-6">
                     {step === 0 && (
                       <div className="space-y-6">
@@ -350,9 +442,19 @@ export default function CBMAdhesion() {
                               </div>
                             </div>
                           </div>
-                        </div>
+                         </div>
 
-                        <div className="grid gap-4 md:grid-cols-2">
+                         <div className="space-y-2">
+                           <Label htmlFor="tutelle">Tutelle</Label>
+                           <Input id="tutelle" placeholder="Ex: Ministère de la Culture" />
+                         </div>
+
+                         <div className="space-y-2">
+                           <Label htmlFor="adresse">Adresse Complète</Label>
+                           <Input id="adresse" placeholder="Numéro, rue, quartier, code postal" />
+                         </div>
+
+                         <div className="grid gap-4 md:grid-cols-2">
                           <div className="space-y-2">
                             <Label htmlFor="region">Région *</Label>
                             <div className="relative">
@@ -493,7 +595,7 @@ export default function CBMAdhesion() {
                       {step > 0 && step < 3 && (
                         <Button 
                           type="button" 
-                          onClick={() => setStep(step + 1)} 
+                          onClick={handleNextStep} 
                           className="ml-auto px-8 py-3 font-semibold !bg-blue-600 hover:!bg-blue-700 !text-white"
                           style={{ backgroundColor: '#2563eb', color: '#ffffff' }}
                         >
@@ -503,7 +605,8 @@ export default function CBMAdhesion() {
                       
                       {step === 3 && (
                         <Button 
-                          type="submit" 
+                          type="button"
+                          onClick={() => setShowConfirmDialog(true)} 
                           className="ml-auto px-8 py-3 font-semibold !bg-green-600 hover:!bg-green-700 !text-white"
                           style={{ backgroundColor: '#16a34a', color: '#ffffff' }}
                         >
@@ -547,6 +650,26 @@ export default function CBMAdhesion() {
       </main>
       
       <Footer />
+      
+      {/* Popup de confirmation */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer l'envoi de la demande</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir soumettre votre demande d'adhésion au {typeAdhesion === "reseau" ? "Réseau des Bibliothèques Marocaines" : "Catalogue CBM"} ?
+              <br /><br />
+              Votre dossier sera examiné par le Bureau CBM et vous recevrez une réponse sous 15 jours ouvrables.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSubmit} className="!bg-green-600 hover:!bg-green-700">
+              Confirmer l'envoi
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
