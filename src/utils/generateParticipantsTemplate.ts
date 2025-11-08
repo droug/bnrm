@@ -32,14 +32,18 @@ export async function generateParticipantsTemplate() {
   worksheet.getColumn(4).width = 20; // Téléphone
   worksheet.getColumn(5).width = 30; // Remarques
 
-  // Ajouter des lignes d'exemple
-  worksheet.addRow(['Exemple: Ahmed BENJELLOUN', 'Bibliothécaire', 'ahmed.benjelloun@exemple.ma', '+212 6XX XXX XXX', '']);
-  worksheet.addRow(['Exemple: Fatima ALAOUI', 'Responsable catalogage', 'fatima.alaoui@exemple.ma', '+212 6XX XXX XXX', '']);
+  // Ajouter des lignes d'exemple avec apostrophe pour forcer le texte
+  const row1 = worksheet.addRow(['Exemple: Ahmed BENJELLOUN', 'Bibliothécaire', 'ahmed.benjelloun@exemple.ma', "'0612345678", '']);
+  const row2 = worksheet.addRow(['Exemple: Fatima ALAOUI', 'Responsable catalogage', 'fatima.alaoui@exemple.ma', "'0687654321", '']);
   
-  // Ajouter des lignes vides
-  worksheet.addRow(['', '', '', '', '']);
-  worksheet.addRow(['', '', '', '', '']);
-  worksheet.addRow(['', '', '', '', '']);
+  // Ajouter des lignes vides avec les cellules de téléphone pré-formatées explicitement
+  for (let i = 0; i < 20; i++) {
+    const row = worksheet.addRow(['', '', '', '', '']);
+    // Forcer explicitement chaque cellule de téléphone comme texte
+    const phoneCell = row.getCell(4);
+    phoneCell.numFmt = '@';
+    phoneCell.value = { richText: [{ text: '' }] };
+  }
 
   // Générer et télécharger le fichier
   const buffer = await workbook.xlsx.writeBuffer();
