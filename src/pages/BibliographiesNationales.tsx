@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import KitabHeader from "@/components/KitabHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,9 +12,14 @@ import SEOHead from "@/components/seo/SEOHead";
 import mosaicBanner from "@/assets/kitab-banner-mosaic-gradient.jpeg";
 
 export default function BibliographiesNationales() {
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedFormat, setSelectedFormat] = useState("");
+  
+  // Détecte si on vient de Kitab via le state de navigation ou le referrer
+  const isFromKitab = location.state?.fromKitab || 
+    (typeof document !== 'undefined' && document.referrer.includes('/kitab'));
 
   const handleSearch = () => {
     console.log("Advanced search:", { searchQuery, selectedYear, selectedFormat });
@@ -40,7 +46,7 @@ export default function BibliographiesNationales() {
       />
       
       <div className="min-h-screen bg-background">
-        <Header />
+        {isFromKitab ? <KitabHeader /> : <Header />}
         
         {/* Hero Section */}
         <section className="relative overflow-hidden h-[400px]">
@@ -58,10 +64,10 @@ export default function BibliographiesNationales() {
           
           <div className="container mx-auto px-4 relative z-10 h-full flex items-start pt-16">
             <div className="w-full">
-              <Link to="/">
+              <Link to={isFromKitab ? "/kitab" : "/"}>
                 <Button variant="ghost" className="text-white hover:text-white/80 mb-6">
                   <ArrowLeft className="w-5 h-5 mr-2" />
-                  Retour à l'Accueil
+                  {isFromKitab ? "Retour à l'Accueil Kitab" : "Retour à l'Accueil"}
                 </Button>
               </Link>
               
