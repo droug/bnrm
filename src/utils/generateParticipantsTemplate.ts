@@ -22,9 +22,9 @@ export async function generateParticipantsTemplate() {
     fgColor: { argb: 'FFCCCCCC' }
   };
 
-  // IMPORTANT: Définir TOUTE la colonne D (Téléphone) comme format texte
+  // IMPORTANT: Définir TOUTE la colonne D (Téléphone) comme format téléphone marocain
   const phoneColumn = worksheet.getColumn(4);
-  phoneColumn.numFmt = '@'; // Format texte pour toute la colonne
+  phoneColumn.numFmt = '[<=9999999]###-####;(###) ###-####'; // Format numéro de téléphone
   
   // Définir les largeurs des colonnes
   worksheet.getColumn(1).width = 25; // Nom complet
@@ -33,15 +33,13 @@ export async function generateParticipantsTemplate() {
   worksheet.getColumn(4).width = 20; // Téléphone
   worksheet.getColumn(5).width = 30; // Remarques
 
-  // Ajouter des lignes d'exemple - AVEC apostrophe pour forcer le format texte
-  const row1 = worksheet.addRow(['Exemple: Ahmed BENJELLOUN', 'Bibliothécaire', 'ahmed.benjelloun@exemple.ma', "'0612345678", '']);
-  const row2 = worksheet.addRow(['Exemple: Fatima ALAOUI', 'Responsable catalogage', 'fatima.alaoui@exemple.ma', "'0687654321", '']);
+  // Ajouter des lignes d'exemple avec des numéros de téléphone marocains
+  const row1 = worksheet.addRow(['Exemple: Ahmed BENJELLOUN', 'Bibliothécaire', 'ahmed.benjelloun@exemple.ma', 612345678, '']);
+  const row2 = worksheet.addRow(['Exemple: Fatima ALAOUI', 'Responsable catalogage', 'fatima.alaoui@exemple.ma', 687654321, '']);
   
-  // Ajouter 50 lignes vides - chaque cellule de téléphone commence par une apostrophe
+  // Ajouter 50 lignes vides
   for (let i = 0; i < 50; i++) {
-    const row = worksheet.addRow(['', '', '', "'", '']);
-    const phoneCell = row.getCell(4);
-    phoneCell.numFmt = '@';
+    worksheet.addRow(['', '', '', '', '']);
   }
 
   // Générer et télécharger le fichier
