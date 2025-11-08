@@ -90,10 +90,10 @@ export default function Step3CatalogueCBM({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="normes">Normes de Catalogage Utilisées</Label>
+        <Label htmlFor="normes">Système de classification adopté</Label>
         <Input 
           id="normes" 
-          placeholder="Ex: UNIMARC, RDA, Dewey"
+          placeholder="Expl: CDD, Autre"
           value={normesCatalogag}
           onChange={(e) => onFieldChange('normes_catalogage', e.target.value)}
         />
