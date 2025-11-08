@@ -27,6 +27,17 @@ export function generateParticipantsTemplate() {
   // Créer la feuille
   const ws = XLSX.utils.aoa_to_sheet(data);
 
+  // Forcer TOUTE la colonne Téléphone (colonne D, index 3) en format texte
+  // Cela inclut les cellules vides pour que Excel comprenne que c'est du texte
+  for (let R = 0; R <= 100; ++R) { // Format les 100 premières lignes
+    const cellAddress = XLSX.utils.encode_cell({ r: R, c: 3 }); // colonne D
+    if (!ws[cellAddress]) {
+      ws[cellAddress] = { t: 's', v: '' }; // Créer une cellule vide en format texte
+    }
+    ws[cellAddress].t = 's'; // Type string
+    ws[cellAddress].z = '@'; // Format texte Excel
+  }
+
   // Définir les largeurs des colonnes
   ws['!cols'] = [
     { wch: 25 }, // Nom complet
