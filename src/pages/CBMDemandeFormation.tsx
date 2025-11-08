@@ -60,7 +60,7 @@ export default function CBMDemandeFormation() {
         const filePath = `participants/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
-          .from("cbm-formation-files")
+          .from("formations")
           .upload(filePath, participantsFile);
 
         if (uploadError) {
