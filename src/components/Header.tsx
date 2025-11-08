@@ -488,7 +488,7 @@ const Header = () => {
                         <p className="text-xs font-semibold text-foreground px-2 mb-1">Lire, écouter et voir</p>
                         <NavigationMenuLink asChild>
                           <Link to="/bibliographies" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
-                            Bibliographies
+                            Bibliographies Nationales
                           </Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
