@@ -8,10 +8,22 @@ import { AlertCircle } from "lucide-react";
 interface Step3CatalogueCBMProps {
   volumetrie: Record<string, string>;
   setVolumetrie: (value: Record<string, string>) => void;
+  nombreDocuments: number;
+  sigb: string;
+  normesCatalogag: string;
+  urlCatalogue: string;
+  onFieldChange: (field: string, value: string | number | boolean) => void;
 }
 
-export default function Step3CatalogueCBM({ volumetrie, setVolumetrie }: Step3CatalogueCBMProps) {
-  const [totalDocuments, setTotalDocuments] = useState<string>("");
+export default function Step3CatalogueCBM({ 
+  volumetrie, 
+  setVolumetrie, 
+  nombreDocuments, 
+  sigb, 
+  normesCatalogag, 
+  urlCatalogue,
+  onFieldChange 
+}: Step3CatalogueCBMProps) {
 
   const sumVolumetrie = useMemo(() => {
     return Object.values(volumetrie).reduce((sum, val) => {
@@ -21,10 +33,9 @@ export default function Step3CatalogueCBM({ volumetrie, setVolumetrie }: Step3Ca
   }, [volumetrie]);
 
   const isVolumetrieValid = useMemo(() => {
-    if (!totalDocuments) return true;
-    const total = parseInt(totalDocuments) || 0;
-    return sumVolumetrie === total;
-  }, [sumVolumetrie, totalDocuments]);
+    if (!nombreDocuments) return true;
+    return sumVolumetrie === nombreDocuments;
+  }, [sumVolumetrie, nombreDocuments]);
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg text-cbm-primary">Infrastructure Technique</h3>
@@ -37,19 +48,20 @@ export default function Step3CatalogueCBM({ volumetrie, setVolumetrie }: Step3Ca
             readOnly 
             placeholder="Sélectionnez votre SIGB"
             className="cursor-pointer"
+            value={sigb}
             onClick={() => document.getElementById('sigb-list')?.classList.toggle('hidden')}
           />
           <div id="sigb-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg z-50">
-            {["Koha", "PMB", "Virtua", "Aleph", "Sierra", "Alma", "Symphony", "Autre"].map((sigb) => (
+            {["Koha", "PMB", "Virtua", "Aleph", "Sierra", "Alma", "Symphony", "Autre"].map((sigbOption) => (
               <div 
-                key={sigb}
+                key={sigbOption}
                 className="p-2 hover:bg-muted cursor-pointer" 
                 onClick={() => {
-                  (document.getElementById('sigb') as HTMLInputElement).value = sigb;
+                  onFieldChange('sigb', sigbOption);
                   document.getElementById('sigb-list')?.classList.add('hidden');
                 }}
               >
-                {sigb}
+                {sigbOption}
               </div>
             ))}
           </div>
@@ -63,15 +75,15 @@ export default function Step3CatalogueCBM({ volumetrie, setVolumetrie }: Step3Ca
           type="number" 
           required 
           placeholder="Volume approximatif de la collection"
-          value={totalDocuments}
-          onChange={(e) => setTotalDocuments(e.target.value)}
+          value={nombreDocuments || ''}
+          onChange={(e) => onFieldChange('nombre_documents', parseInt(e.target.value) || 0)}
           className={!isVolumetrieValid ? "border-destructive" : ""}
         />
-        {!isVolumetrieValid && totalDocuments && (
+        {!isVolumetrieValid && nombreDocuments && (
           <div className="flex items-center gap-2 text-sm text-destructive">
             <AlertCircle className="h-4 w-4" />
             <span>
-              La somme de la volumétrie ({sumVolumetrie}) doit être égale au nombre total de documents ({parseInt(totalDocuments) || 0})
+              La somme de la volumétrie ({sumVolumetrie}) doit être égale au nombre total de documents ({nombreDocuments})
             </span>
           </div>
         )}
@@ -79,7 +91,12 @@ export default function Step3CatalogueCBM({ volumetrie, setVolumetrie }: Step3Ca
 
       <div className="space-y-2">
         <Label htmlFor="normes">Normes de Catalogage Utilisées</Label>
-        <Input id="normes" placeholder="Ex: UNIMARC, RDA, Dewey" />
+        <Input 
+          id="normes" 
+          placeholder="Ex: UNIMARC, RDA, Dewey"
+          value={normesCatalogag}
+          onChange={(e) => onFieldChange('normes_catalogage', e.target.value)}
+        />
       </div>
 
       <div className="space-y-2">
@@ -124,7 +141,9 @@ export default function Step3CatalogueCBM({ volumetrie, setVolumetrie }: Step3Ca
         <Input 
           id="catalogue-url" 
           type="url" 
-          placeholder="https://exemple.ma/catalogue" 
+          placeholder="https://exemple.ma/catalogue"
+          value={urlCatalogue}
+          onChange={(e) => onFieldChange('url_catalogue', e.target.value)}
         />
         <p className="text-xs text-muted-foreground">Lien vers votre catalogue en ligne (si disponible)</p>
       </div>

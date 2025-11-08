@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -74,6 +74,13 @@ export default function CBMAdhesion() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Synchroniser selectedRegion avec formData.region
+  useEffect(() => {
+    if (formData.region) {
+      setSelectedRegion(formData.region);
+    }
+  }, [formData.region]);
+
   const regionsData = {
     "Tanger-Tétouan-Al Hoceïma": ["Tanger", "Tétouan", "Al Hoceïma", "Larache", "Chefchaouen", "Ouazzane", "Asilah"],
     "L'Oriental": ["Oujda", "Nador", "Berkane", "Taourirt", "Guercif", "Jerada"],
@@ -112,31 +119,14 @@ export default function CBMAdhesion() {
   const criteres = typeAdhesion === "reseau" ? criteresReseau : criteresCatalogue;
 
   const handleNextStep = () => {
-    // Sauvegarder les données de l'étape actuelle
-    if (step === 1) {
-      setFormData({
-        ...formData,
-        nom_bibliotheque: (document.getElementById('nom') as HTMLInputElement)?.value || "",
-        type_bibliotheque: (document.getElementById('type') as HTMLInputElement)?.value || "",
-        tutelle: (document.getElementById('tutelle') as HTMLInputElement)?.value || "",
-        adresse: (document.getElementById('adresse') as HTMLInputElement)?.value || "",
-        region: (document.getElementById('region') as HTMLInputElement)?.value || "",
-        ville: (document.getElementById('ville') as HTMLInputElement)?.value || "",
-        url_maps: (document.getElementById('url-maps') as HTMLInputElement)?.value || "",
-      });
-    } else if (step === 2) {
-      setFormData({
-        ...formData,
-        directeur: (document.getElementById('directeur') as HTMLInputElement)?.value || "",
-        email: (document.getElementById('email') as HTMLInputElement)?.value || "",
-        telephone: (document.getElementById('tel') as HTMLInputElement)?.value || "",
-        referent_technique: (document.getElementById('referent') as HTMLInputElement)?.value || "",
-        responsable_catalogage: (document.getElementById('catalogueur') as HTMLInputElement)?.value || "",
-        tutelle: (document.getElementById('tutelle') as HTMLInputElement)?.value || "",
-        adresse: (document.getElementById('adresse') as HTMLInputElement)?.value || "",
-      });
-    }
     setStep(step + 1);
+  };
+
+  const handleInputChange = (field: string, value: string | number | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleSubmit = async () => {
@@ -402,7 +392,13 @@ export default function CBMAdhesion() {
                         
                         <div className="space-y-2">
                           <Label htmlFor="nom">Nom de la Bibliothèque *</Label>
-                          <Input id="nom" required placeholder="Ex: Médiathèque Municipale de Fès" />
+                          <Input 
+                            id="nom" 
+                            required 
+                            placeholder="Ex: Médiathèque Municipale de Fès"
+                            value={formData.nom_bibliotheque}
+                            onChange={(e) => handleInputChange('nom_bibliotheque', e.target.value)}
+                          />
                         </div>
 
                         <div className="space-y-2">
@@ -413,29 +409,30 @@ export default function CBMAdhesion() {
                               readOnly 
                               placeholder="Sélectionnez un type"
                               className="cursor-pointer"
+                              value={formData.type_bibliotheque}
                               onClick={() => document.getElementById('type-list')?.classList.toggle('hidden')}
                             />
                             <div id="type-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg">
                               <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
-                                (document.getElementById('type') as HTMLInputElement).value = 'Bibliothèque Publique';
+                                handleInputChange('type_bibliotheque', 'Bibliothèque Publique');
                                 document.getElementById('type-list')?.classList.add('hidden');
                               }}>
                                 Bibliothèque Publique
                               </div>
                               <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
-                                (document.getElementById('type') as HTMLInputElement).value = 'Bibliothèque Universitaire';
+                                handleInputChange('type_bibliotheque', 'Bibliothèque Universitaire');
                                 document.getElementById('type-list')?.classList.add('hidden');
                               }}>
                                 Bibliothèque Universitaire
                               </div>
                               <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
-                                (document.getElementById('type') as HTMLInputElement).value = 'Bibliothèque Spécialisée';
+                                handleInputChange('type_bibliotheque', 'Bibliothèque Spécialisée');
                                 document.getElementById('type-list')?.classList.add('hidden');
                               }}>
                                 Bibliothèque Spécialisée
                               </div>
                               <div className="p-2 hover:bg-muted cursor-pointer" onClick={() => {
-                                (document.getElementById('type') as HTMLInputElement).value = 'Bibliothèque Scolaire';
+                                handleInputChange('type_bibliotheque', 'Bibliothèque Scolaire');
                                 document.getElementById('type-list')?.classList.add('hidden');
                               }}>
                                 Bibliothèque Scolaire
@@ -446,12 +443,22 @@ export default function CBMAdhesion() {
 
                          <div className="space-y-2">
                            <Label htmlFor="tutelle">Tutelle</Label>
-                           <Input id="tutelle" placeholder="Ex: Ministère de la Culture" />
+                           <Input 
+                             id="tutelle" 
+                             placeholder="Ex: Ministère de la Culture"
+                             value={formData.tutelle}
+                             onChange={(e) => handleInputChange('tutelle', e.target.value)}
+                           />
                          </div>
 
                          <div className="space-y-2">
                            <Label htmlFor="adresse">Adresse Complète</Label>
-                           <Input id="adresse" placeholder="Numéro, rue, quartier, code postal" />
+                           <Input 
+                             id="adresse" 
+                             placeholder="Numéro, rue, quartier, code postal"
+                             value={formData.adresse}
+                             onChange={(e) => handleInputChange('adresse', e.target.value)}
+                           />
                          </div>
 
                          <div className="grid gap-4 md:grid-cols-2">
@@ -464,7 +471,7 @@ export default function CBMAdhesion() {
                                 placeholder="Sélectionnez une région"
                                 className="cursor-pointer"
                                 onClick={() => document.getElementById('region-list')?.classList.toggle('hidden')}
-                                value={selectedRegion}
+                                value={formData.region}
                               />
                               <div id="region-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg max-h-60 overflow-y-auto z-10">
                                 {regions.map((region) => (
@@ -473,8 +480,8 @@ export default function CBMAdhesion() {
                                     className="p-2 hover:bg-muted cursor-pointer" 
                                     onClick={() => {
                                       setSelectedRegion(region);
-                                      (document.getElementById('region') as HTMLInputElement).value = region;
-                                      (document.getElementById('ville') as HTMLInputElement).value = '';
+                                      handleInputChange('region', region);
+                                      handleInputChange('ville', '');
                                       document.getElementById('region-list')?.classList.add('hidden');
                                     }}
                                   >
@@ -490,19 +497,20 @@ export default function CBMAdhesion() {
                               <Input 
                                 id="ville" 
                                 readOnly 
-                                placeholder={selectedRegion ? "Sélectionnez une ville" : "Sélectionnez d'abord une région"}
+                                placeholder={formData.region ? "Sélectionnez une ville" : "Sélectionnez d'abord une région"}
                                 className="cursor-pointer"
-                                onClick={() => selectedRegion && document.getElementById('ville-list')?.classList.toggle('hidden')}
-                                disabled={!selectedRegion}
+                                value={formData.ville}
+                                onClick={() => formData.region && document.getElementById('ville-list')?.classList.toggle('hidden')}
+                                disabled={!formData.region}
                               />
-                              {selectedRegion && (
+                              {formData.region && (
                                 <div id="ville-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg max-h-60 overflow-y-auto z-10">
                                   {villes.map((ville) => (
                                     <div 
                                       key={ville}
                                       className="p-2 hover:bg-muted cursor-pointer" 
                                       onClick={() => {
-                                        (document.getElementById('ville') as HTMLInputElement).value = ville;
+                                        handleInputChange('ville', ville);
                                         document.getElementById('ville-list')?.classList.add('hidden');
                                       }}
                                     >
@@ -517,7 +525,13 @@ export default function CBMAdhesion() {
 
                         <div className="space-y-2">
                           <Label htmlFor="url-maps">URL Google Maps</Label>
-                          <Input id="url-maps" type="url" placeholder="https://maps.google.com/..." />
+                          <Input 
+                            id="url-maps" 
+                            type="url" 
+                            placeholder="https://maps.google.com/..."
+                            value={formData.url_maps}
+                            onChange={(e) => handleInputChange('url_maps', e.target.value)}
+                          />
                           <p className="text-xs text-muted-foreground">Lien vers la localisation de votre bibliothèque sur Google Maps</p>
                         </div>
                       </div>
@@ -529,28 +543,60 @@ export default function CBMAdhesion() {
                         
                         <div className="space-y-2">
                           <Label htmlFor="directeur">Directeur/Directrice *</Label>
-                          <Input id="directeur" required placeholder="Nom complet" />
+                          <Input 
+                            id="directeur" 
+                            required 
+                            placeholder="Nom complet"
+                            value={formData.directeur}
+                            onChange={(e) => handleInputChange('directeur', e.target.value)}
+                          />
                         </div>
 
                         <div className="grid gap-4 md:grid-cols-2">
                           <div className="space-y-2">
                             <Label htmlFor="email">Email Officiel *</Label>
-                            <Input id="email" type="email" required placeholder="contact@bibliotheque.ma" />
+                            <Input 
+                              id="email" 
+                              type="email" 
+                              required 
+                              placeholder="contact@bibliotheque.ma"
+                              value={formData.email}
+                              onChange={(e) => handleInputChange('email', e.target.value)}
+                            />
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor="tel">Téléphone *</Label>
-                            <Input id="tel" type="tel" required placeholder="+212 5XX-XXXXXX" />
+                            <Input 
+                              id="tel" 
+                              type="tel" 
+                              required 
+                              placeholder="+212 5XX-XXXXXX"
+                              value={formData.telephone}
+                              onChange={(e) => handleInputChange('telephone', e.target.value)}
+                            />
                           </div>
                         </div>
 
                         <div className="space-y-2">
                           <Label htmlFor="referent">Référent Technique *</Label>
-                          <Input id="referent" required placeholder="Nom du responsable SIGB" />
+                          <Input 
+                            id="referent" 
+                            required 
+                            placeholder="Nom du responsable SIGB"
+                            value={formData.referent_technique}
+                            onChange={(e) => handleInputChange('referent_technique', e.target.value)}
+                          />
                         </div>
 
                         <div className="space-y-2">
                           <Label htmlFor="catalogueur">Responsable Catalogage *</Label>
-                          <Input id="catalogueur" required placeholder="Nom du bibliothécaire catalogueur" />
+                          <Input 
+                            id="catalogueur" 
+                            required 
+                            placeholder="Nom du bibliothécaire catalogueur"
+                            value={formData.responsable_catalogage}
+                            onChange={(e) => handleInputChange('responsable_catalogage', e.target.value)}
+                          />
                         </div>
                       </div>
                     )}
@@ -561,11 +607,20 @@ export default function CBMAdhesion() {
                           <Step3ReseauBibliotheques 
                             volumetrie={volumetrie}
                             setVolumetrie={setVolumetrie}
+                            nombreDocuments={formData.nombre_documents}
+                            moyensRecensement={formData.moyens_recensement}
+                            enCoursInformatisation={formData.en_cours_informatisation}
+                            onFieldChange={handleInputChange}
                           />
                         ) : (
                           <Step3CatalogueCBM 
                             volumetrie={volumetrie}
                             setVolumetrie={setVolumetrie}
+                            nombreDocuments={formData.nombre_documents}
+                            sigb={formData.sigb}
+                            normesCatalogag={formData.normes_catalogage}
+                            urlCatalogue={formData.url_catalogue}
+                            onFieldChange={handleInputChange}
                           />
                         )}
                       </>

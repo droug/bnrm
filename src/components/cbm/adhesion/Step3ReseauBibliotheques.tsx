@@ -8,9 +8,20 @@ import { X, ChevronDown } from "lucide-react";
 interface Step3ReseauBibliothequesProps {
   volumetrie: Record<string, string>;
   setVolumetrie: (value: Record<string, string>) => void;
+  nombreDocuments: number;
+  moyensRecensement: string;
+  enCoursInformatisation: string;
+  onFieldChange: (field: string, value: string | number | boolean) => void;
 }
 
-export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: Step3ReseauBibliothequesProps) {
+export default function Step3ReseauBibliotheques({ 
+  volumetrie, 
+  setVolumetrie,
+  nombreDocuments,
+  moyensRecensement,
+  enCoursInformatisation,
+  onFieldChange
+}: Step3ReseauBibliothequesProps) {
   const [selectedRecensements, setSelectedRecensements] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -28,6 +39,13 @@ export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: 
     "Autre"
   ];
 
+  // Charger les valeurs initiales depuis les props
+  useEffect(() => {
+    if (moyensRecensement) {
+      setSelectedRecensements(moyensRecensement.split(', ').filter(Boolean));
+    }
+  }, []);
+
   // Fermer le dropdown si on clique à l'extérieur
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -40,13 +58,11 @@ export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Mettre à jour le champ caché quand la sélection change
+  // Mettre à jour le champ caché et l'état parent quand la sélection change
   useEffect(() => {
-    const inputElement = document.getElementById('recensement') as HTMLInputElement;
-    if (inputElement) {
-      inputElement.value = selectedRecensements.join(', ');
-    }
-  }, [selectedRecensements]);
+    const newValue = selectedRecensements.join(', ');
+    onFieldChange('moyens_recensement', newValue);
+  }, [selectedRecensements, onFieldChange]);
 
   const toggleRecensement = (option: string) => {
     setSelectedRecensements(prev => 
@@ -125,6 +141,7 @@ export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: 
             readOnly 
             placeholder="Sélectionnez Oui ou Non"
             className="cursor-pointer"
+            value={enCoursInformatisation}
             onClick={() => document.getElementById('informatisation-list')?.classList.toggle('hidden')}
           />
           <div id="informatisation-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg z-50">
@@ -133,7 +150,7 @@ export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: 
                 key={option}
                 className="p-2 hover:bg-muted cursor-pointer" 
                 onClick={() => {
-                  (document.getElementById('informatisation') as HTMLInputElement).value = option;
+                  onFieldChange('en_cours_informatisation', option);
                   document.getElementById('informatisation-list')?.classList.add('hidden');
                 }}
               >
@@ -146,7 +163,14 @@ export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: 
 
       <div className="space-y-2">
         <Label htmlFor="collection">Nombre de Documents *</Label>
-        <Input id="collection" type="number" required placeholder="Volume approximatif de la collection" />
+        <Input 
+          id="collection" 
+          type="number" 
+          required 
+          placeholder="Volume approximatif de la collection"
+          value={nombreDocuments || ''}
+          onChange={(e) => onFieldChange('nombre_documents', parseInt(e.target.value) || 0)}
+        />
       </div>
 
       <div className="space-y-2">
