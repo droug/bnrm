@@ -575,17 +575,26 @@ export default function CBMAdhesion() {
                   {/* Boutons de navigation */}
                   <div className="p-6 border-t bg-background">
                     <div className="flex justify-between items-center">
-                      {step > 0 && (
-                        <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
-                          Précédent
+                      <div className="flex gap-3">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => navigate('/cbm')}
+                        >
+                          Annuler
                         </Button>
-                      )}
+                        {step > 0 && (
+                          <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
+                            Précédent
+                          </Button>
+                        )}
+                      </div>
                       
                       {step === 0 && (
                         <Button 
                           type="button" 
                           onClick={() => typeAdhesion && setStep(1)} 
-                          className={`ml-auto px-8 py-3 font-semibold ${typeAdhesion ? '!bg-blue-600 hover:!bg-blue-700 !text-white' : '!bg-gray-400 !text-gray-700 cursor-not-allowed'}`}
+                          className={`px-8 py-3 font-semibold ${typeAdhesion ? '!bg-blue-600 hover:!bg-blue-700 !text-white' : '!bg-gray-400 !text-gray-700 cursor-not-allowed'}`}
                           style={{ backgroundColor: typeAdhesion ? '#2563eb' : '#9ca3af', color: typeAdhesion ? '#ffffff' : '#374151' }}
                         >
                           Suivant
@@ -596,7 +605,7 @@ export default function CBMAdhesion() {
                         <Button 
                           type="button" 
                           onClick={handleNextStep} 
-                          className="ml-auto px-8 py-3 font-semibold !bg-blue-600 hover:!bg-blue-700 !text-white"
+                          className="px-8 py-3 font-semibold !bg-blue-600 hover:!bg-blue-700 !text-white"
                           style={{ backgroundColor: '#2563eb', color: '#ffffff' }}
                         >
                           Suivant
@@ -607,7 +616,7 @@ export default function CBMAdhesion() {
                         <Button 
                           type="button"
                           onClick={() => setShowConfirmDialog(true)} 
-                          className="ml-auto px-8 py-3 font-semibold !bg-green-600 hover:!bg-green-700 !text-white"
+                          className="px-8 py-3 font-semibold !bg-green-600 hover:!bg-green-700 !text-white"
                           style={{ backgroundColor: '#16a34a', color: '#ffffff' }}
                         >
                           Soumettre la Demande
