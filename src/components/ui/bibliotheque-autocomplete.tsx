@@ -38,6 +38,7 @@ export function BibliothequeAutocomplete({
   
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Charger les bibliothèques populaires au montage
   useEffect(() => {
@@ -147,7 +148,13 @@ export function BibliothequeAutocomplete({
   // Fermer le dropdown au clic extérieur
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        containerRef.current && 
+        !containerRef.current.contains(target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target)
+      ) {
         setShowSuggestions(false);
       }
     };
@@ -222,6 +229,7 @@ export function BibliothequeAutocomplete({
 
       {showSuggestions && createPortal(
         <div
+          ref={dropdownRef}
           className="fixed z-50 bg-popover border border-border rounded-md shadow-lg max-h-64 overflow-y-auto"
           style={{
             top: `${dropdownPosition.top}px`,
