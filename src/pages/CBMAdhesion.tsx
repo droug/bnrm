@@ -153,7 +153,7 @@ export default function CBMAdhesion() {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (typeAdhesion === "reseau") {
-        // Insertion dans cbm_adhesions_reseau
+        // Insertion dans cbm_adhesions_reseau uniquement
         const { error } = await supabase
           .from('cbm_adhesions_reseau')
           .insert({
@@ -180,8 +180,9 @@ export default function CBMAdhesion() {
         
         if (error) throw error;
       } else {
+        // RÈGLE DE GESTION: Adhésion au catalogue = adhésion automatique au réseau
         // Insertion dans cbm_adhesions_catalogue
-        const { error } = await supabase
+        const { error: errorCatalogue } = await supabase
           .from('cbm_adhesions_catalogue')
           .insert({
             nom_bibliotheque: adhesionData.nom_bibliotheque,
@@ -206,13 +207,42 @@ export default function CBMAdhesion() {
             user_id: user?.id,
           });
         
-        if (error) throw error;
+        if (errorCatalogue) throw errorCatalogue;
+
+        // Insertion automatique dans cbm_adhesions_reseau
+        const { error: errorReseau } = await supabase
+          .from('cbm_adhesions_reseau')
+          .insert({
+            nom_bibliotheque: adhesionData.nom_bibliotheque,
+            type_bibliotheque: adhesionData.type_bibliotheque,
+            tutelle: adhesionData.tutelle || null,
+            adresse: adhesionData.adresse || null,
+            region: adhesionData.region,
+            ville: adhesionData.ville,
+            url_maps: adhesionData.url_maps || null,
+            directeur: adhesionData.directeur,
+            email: adhesionData.email,
+            telephone: adhesionData.telephone,
+            referent_technique: adhesionData.referent_technique,
+            responsable_catalogage: adhesionData.responsable_catalogage,
+            nombre_documents: adhesionData.nombre_documents || 0,
+            volumetrie: adhesionData.volumetrie,
+            moyens_recensement: adhesionData.moyens_recensement || "N/A",
+            en_cours_informatisation: adhesionData.en_cours_informatisation || "Non",
+            engagement_charte: adhesionData.engagement_charte,
+            engagement_partage_donnees: adhesionData.engagement_partage_donnees,
+            user_id: user?.id,
+          });
+        
+        if (errorReseau) throw errorReseau;
       }
 
       setShowConfirmDialog(false);
       toast({
         title: "Demande envoyée avec succès",
-        description: "Votre dossier sera examiné par le Bureau CBM sous 15 jours ouvrables.",
+        description: typeAdhesion === "catalogue" 
+          ? "Votre demande d'adhésion au Catalogue CBM et au Réseau des Bibliothèques Marocaines a été enregistrée. Vous recevrez une réponse sous 15 jours ouvrables."
+          : "Votre dossier sera examiné par le Bureau CBM sous 15 jours ouvrables.",
       });
       setStep(4);
     } catch (error: any) {
@@ -368,6 +398,15 @@ export default function CBMAdhesion() {
                                       Intégrez vos notices bibliographiques au catalogue collectif national 
                                       et rendez vos collections visibles au niveau national.
                                     </p>
+                                    <div className="mt-3 p-3 bg-cbm-secondary/10 border border-cbm-secondary/30 rounded-lg">
+                                      <p className="text-xs text-cbm-secondary font-medium flex items-start gap-2">
+                                        <span className="text-base">ℹ️</span>
+                                        <span>
+                                          <strong>Important :</strong> L'adhésion au Catalogue CBM inclut automatiquement 
+                                          l'adhésion au Réseau des Bibliothèques Marocaines, vous bénéficierez ainsi de tous les avantages des deux programmes.
+                                        </span>
+                                      </p>
+                                    </div>
                                   </div>
                                 </div>
                               </CardContent>
