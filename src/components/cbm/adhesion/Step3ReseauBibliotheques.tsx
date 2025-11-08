@@ -2,8 +2,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { useState } from "react";
-import { X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { X, ChevronDown } from "lucide-react";
 
 interface Step3ReseauBibliothequesProps {
   volumetrie: Record<string, string>;
@@ -13,6 +13,7 @@ interface Step3ReseauBibliothequesProps {
 export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: Step3ReseauBibliothequesProps) {
   const [selectedRecensements, setSelectedRecensements] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const recensementOptions = [
     "Fichiers Excel", 
@@ -27,24 +28,37 @@ export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: 
     "Autre"
   ];
 
-  const toggleRecensement = (option: string) => {
-    setSelectedRecensements(prev => {
-      const newSelection = prev.includes(option)
-        ? prev.filter(item => item !== option)
-        : [...prev, option];
-      
-      // Mettre à jour le champ caché pour la soumission
-      const inputElement = document.getElementById('recensement') as HTMLInputElement;
-      if (inputElement) {
-        inputElement.value = newSelection.join(', ');
+  // Fermer le dropdown si on clique à l'extérieur
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
       }
-      
-      return newSelection;
-    });
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Mettre à jour le champ caché quand la sélection change
+  useEffect(() => {
+    const inputElement = document.getElementById('recensement') as HTMLInputElement;
+    if (inputElement) {
+      inputElement.value = selectedRecensements.join(', ');
+    }
+  }, [selectedRecensements]);
+
+  const toggleRecensement = (option: string) => {
+    setSelectedRecensements(prev => 
+      prev.includes(option)
+        ? prev.filter(item => item !== option)
+        : [...prev, option]
+    );
   };
 
-  const removeRecensement = (option: string) => {
-    toggleRecensement(option);
+  const removeRecensement = (option: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedRecensements(prev => prev.filter(item => item !== option));
   };
 
   return (
@@ -53,30 +67,30 @@ export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: 
       
       <div className="space-y-2">
         <Label htmlFor="recensement">Moyens de recensement du fond documentaire *</Label>
-        <div className="relative">
+        <div className="relative" ref={dropdownRef}>
           <div 
-            className="min-h-[42px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm cursor-pointer flex flex-wrap gap-2 items-center"
+            className="min-h-[42px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm cursor-pointer flex flex-wrap gap-2 items-center justify-between"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            {selectedRecensements.length === 0 ? (
-              <span className="text-muted-foreground">Sélectionnez un ou plusieurs moyens</span>
-            ) : (
-              selectedRecensements.map((item) => (
-                <span 
-                  key={item}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-cbm-primary/10 text-cbm-primary rounded-md text-xs font-medium"
-                >
-                  {item}
-                  <X 
-                    className="h-3 w-3 cursor-pointer hover:text-cbm-primary/70" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeRecensement(item);
-                    }}
-                  />
-                </span>
-              ))
-            )}
+            <div className="flex flex-wrap gap-2 flex-1">
+              {selectedRecensements.length === 0 ? (
+                <span className="text-muted-foreground">Sélectionnez un ou plusieurs moyens</span>
+              ) : (
+                selectedRecensements.map((item) => (
+                  <span 
+                    key={item}
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-cbm-primary/10 text-cbm-primary rounded-md text-xs font-medium"
+                  >
+                    {item}
+                    <X 
+                      className="h-3 w-3 cursor-pointer hover:text-cbm-primary/70" 
+                      onClick={(e) => removeRecensement(item, e)}
+                    />
+                  </span>
+                ))
+              )}
+            </div>
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </div>
           <Input 
             id="recensement" 
@@ -86,20 +100,16 @@ export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: 
           {isDropdownOpen && (
             <div className="absolute mt-1 w-full border rounded-lg bg-background shadow-lg z-50 max-h-60 overflow-y-auto">
               {recensementOptions.map((option) => (
-                <div 
+                <label 
                   key={option}
-                  className="p-3 hover:bg-muted cursor-pointer flex items-center gap-2" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleRecensement(option);
-                  }}
+                  className="flex items-center gap-3 p-3 hover:bg-muted cursor-pointer"
                 >
                   <Checkbox 
                     checked={selectedRecensements.includes(option)}
                     onCheckedChange={() => toggleRecensement(option)}
                   />
-                  <span className="text-sm">{option}</span>
-                </div>
+                  <span className="text-sm flex-1">{option}</span>
+                </label>
               ))}
             </div>
           )}
