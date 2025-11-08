@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { FileText, Download, Eye, Filter } from "lucide-react";
+import { Link } from "react-router-dom";
+import { FileText, Download, Eye, Filter, ArrowLeft } from "lucide-react";
 import KitabHeader from "@/components/KitabHeader";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import SEOHead from "@/components/seo/SEOHead";
 import { Badge } from "@/components/ui/badge";
+import mosaicBanner from "@/assets/kitab-banner-mosaic-gradient.jpeg";
 
 interface RapportEdition {
   id: string;
@@ -131,16 +133,37 @@ export default function KitabRapportsEdition() {
         <KitabHeader />
         
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-[hsl(var(--kitab-primary))] via-[hsl(var(--kitab-primary-dark))] to-[hsl(var(--kitab-secondary))] text-white py-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <FileText className="w-16 h-16 text-white mx-auto mb-6" />
-              <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-                Rapports d'Édition
-              </h1>
-              <p className="text-xl text-white/90 leading-relaxed">
-                Analyses et statistiques annuelles du secteur éditorial marocain
-              </p>
+        <section className="relative overflow-hidden h-[400px]">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <img 
+              src={mosaicBanner} 
+              alt="Mosaïque Marocaine" 
+              className="w-full h-full object-cover object-center"
+            />
+          </div>
+          
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--kitab-primary))]/70 via-[hsl(var(--kitab-primary-dark))]/60 to-[hsl(var(--kitab-secondary))]/70"></div>
+          
+          <div className="container mx-auto px-4 relative z-10 h-full flex items-start pt-16">
+            <div className="w-full">
+              <Link to="/kitab">
+                <Button variant="ghost" className="text-white hover:text-white/80 mb-6">
+                  <ArrowLeft className="w-5 h-5 mr-2" />
+                  Retour au Portail Kitab
+                </Button>
+              </Link>
+              
+              <div className="max-w-4xl mx-auto text-center">
+                <FileText className="w-16 h-16 text-white mx-auto mb-6" />
+                <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+                  Rapports d'Édition
+                </h1>
+                <p className="text-xl text-white/90 leading-relaxed">
+                  Analyses et statistiques annuelles du secteur éditorial marocain
+                </p>
+              </div>
             </div>
           </div>
         </section>
