@@ -670,7 +670,7 @@ export default function GestionAdhesions() {
                       {selectedAdhesion.engagement_charte ? (
                         <CheckCircle className="h-5 w-5 text-green-600" />
                       ) : (
-                        <XCircle className="h-5 w-5 text-destructive" />
+                        <CheckCircle className="h-5 w-5 text-muted-foreground" />
                       )}
                       <p className="text-sm">Engagement à respecter la Charte du Réseau CBM</p>
                     </div>
@@ -678,7 +678,7 @@ export default function GestionAdhesions() {
                       {selectedAdhesion.engagement_partage_donnees ? (
                         <CheckCircle className="h-5 w-5 text-green-600" />
                       ) : (
-                        <XCircle className="h-5 w-5 text-destructive" />
+                        <CheckCircle className="h-5 w-5 text-muted-foreground" />
                       )}
                       <p className="text-sm">Acceptation du partage des métadonnées bibliographiques</p>
                     </div>
