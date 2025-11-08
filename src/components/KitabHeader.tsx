@@ -109,6 +109,11 @@ const KitabHeader = () => {
               Bibliographie Nationale
             </Button>
           </Link>
+          <Link to="/kitab/rapports-edition">
+            <Button variant="ghost" size="sm" className="hover:text-[hsl(var(--kitab-primary))] hover:bg-[hsl(var(--kitab-primary))]/10">
+              Rapports d'édition
+            </Button>
+          </Link>
           <Link to="/kitab/upcoming">
             <Button variant="ghost" size="sm" className="hover:text-[hsl(var(--kitab-primary))] hover:bg-[hsl(var(--kitab-primary))]/10">
               À Paraître
@@ -181,6 +186,11 @@ const KitabHeader = () => {
             <Link to="/kitab/bibliography" onClick={() => setIsMenuOpen(false)}>
               <Button variant="ghost" size="sm" className="w-full justify-start">
                 Bibliographie Nationale
+              </Button>
+            </Link>
+            <Link to="/kitab/rapports-edition" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" size="sm" className="w-full justify-start">
+                Rapports d'édition
               </Button>
             </Link>
             <Link to="/kitab/upcoming" onClick={() => setIsMenuOpen(false)}>
