@@ -151,7 +151,6 @@ const KitabPortal = lazy(() => import("./pages/KitabPortal"));
 const KitabAbout = lazy(() => import("./pages/KitabAbout"));
 const KitabUpcoming = lazy(() => import("./pages/KitabUpcoming"));
 const KitabNewPublications = lazy(() => import("./pages/KitabNewPublications"));
-const KitabBibliography = lazy(() => import("./pages/KitabBibliography"));
 const KitabRapportsEdition = lazy(() => import("./pages/KitabRapportsEdition"));
 const KitabFAQ = lazy(() => import("./pages/KitabFAQ"));
 const KitabRepertoireEditeurs = lazy(() => import("./pages/KitabRepertoireEditeurs"));
@@ -344,7 +343,6 @@ const App = () => {
           <Route path="/kitab/about" element={<KitabAbout />} />
           <Route path="/kitab/upcoming" element={<KitabUpcoming />} />
           <Route path="/kitab/new-publications" element={<KitabNewPublications />} />
-          <Route path="/kitab/bibliography" element={<KitabBibliography />} />
           <Route path="/kitab/rapports-edition" element={<KitabRapportsEdition />} />
           <Route path="/kitab/faq" element={<KitabFAQ />} />
           <Route path="/kitab/repertoire-editeurs" element={<KitabRepertoireEditeurs />} />
