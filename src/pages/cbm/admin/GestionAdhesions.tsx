@@ -542,18 +542,21 @@ export default function GestionAdhesions() {
                     </div>
                     <p className="font-medium">{selectedAdhesion.ville}, {selectedAdhesion.region}</p>
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1 col-span-2">
                     <p className="text-muted-foreground text-sm">Lien Google Maps</p>
                     {selectedAdhesion.url_maps ? (
-                      <a 
-                        href={selectedAdhesion.url_maps} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="font-medium text-primary hover:underline break-all inline-flex items-center gap-1"
-                      >
-                        <MapPin className="h-3 w-3" />
-                        Voir sur Maps
-                      </a>
+                      <div className="space-y-1">
+                        <a 
+                          href={selectedAdhesion.url_maps} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="font-medium text-primary hover:underline break-all inline-flex items-center gap-1"
+                        >
+                          <MapPin className="h-3 w-3" />
+                          Ouvrir dans Google Maps
+                        </a>
+                        <p className="text-xs text-muted-foreground break-all">{selectedAdhesion.url_maps}</p>
+                      </div>
                     ) : (
                       <p className="font-medium text-muted-foreground">Non renseigné</p>
                     )}
