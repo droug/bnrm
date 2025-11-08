@@ -510,17 +510,28 @@ export default function GestionFormations() {
                       try {
                         const { data, error } = await supabase.storage
                           .from('formations')
-                          .createSignedUrl(selectedFormation.fichier_participants_path, 60);
+                          .download(selectedFormation.fichier_participants_path);
                         
                         if (error) throw error;
                         
-                        if (data?.signedUrl) {
-                          window.open(data.signedUrl, '_blank');
-                        }
+                        // Créer un lien de téléchargement
+                        const url = URL.createObjectURL(data);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = selectedFormation.fichier_participants_path.split('/').pop() || 'participants.xlsx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        toast({
+                          title: "Téléchargement réussi",
+                          description: "Le fichier a été téléchargé avec succès.",
+                        });
                       } catch (error: any) {
                         toast({
                           title: "Erreur",
-                          description: "Impossible de télécharger le fichier",
+                          description: error.message || "Impossible de télécharger le fichier",
                           variant: "destructive",
                         });
                       }
