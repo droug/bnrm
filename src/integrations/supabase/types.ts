@@ -1061,7 +1061,7 @@ export type Database = {
       }
       cbm_adhesions_catalogue: {
         Row: {
-          adresse: string
+          adresse: string | null
           created_at: string
           directeur: string
           email: string
@@ -1088,7 +1088,7 @@ export type Database = {
           volumetrie: Json | null
         }
         Insert: {
-          adresse: string
+          adresse?: string | null
           created_at?: string
           directeur: string
           email: string
@@ -1115,7 +1115,7 @@ export type Database = {
           volumetrie?: Json | null
         }
         Update: {
-          adresse?: string
+          adresse?: string | null
           created_at?: string
           directeur?: string
           email?: string
@@ -1145,7 +1145,7 @@ export type Database = {
       }
       cbm_adhesions_reseau: {
         Row: {
-          adresse: string
+          adresse: string | null
           created_at: string
           directeur: string
           email: string
@@ -1172,7 +1172,7 @@ export type Database = {
           volumetrie: Json | null
         }
         Insert: {
-          adresse: string
+          adresse?: string | null
           created_at?: string
           directeur: string
           email: string
@@ -1199,7 +1199,7 @@ export type Database = {
           volumetrie?: Json | null
         }
         Update: {
-          adresse?: string
+          adresse?: string | null
           created_at?: string
           directeur?: string
           email?: string
