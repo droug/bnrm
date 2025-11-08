@@ -168,7 +168,10 @@ export function BibliothequeAutocomplete({
 
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);
-    onChange(newValue);
+    // Ne pas réinitialiser la sélection tant que l'utilisateur n'a pas choisi
+    if (newValue.length === 0) {
+      onChange("");
+    }
     if (newValue.length === 0 || newValue.length >= 2) {
       setShowSuggestions(true);
     }
