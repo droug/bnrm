@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
@@ -12,7 +12,7 @@ import { BibliothequeAutocomplete } from "@/components/ui/bibliotheque-autocompl
 import { FileUpload } from "@/components/ui/file-upload";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SimpleSelect } from "@/components/ui/simple-select";
-import { ArrowLeft, GraduationCap, Send, AlertCircle } from "lucide-react";
+import { ArrowLeft, GraduationCap, Send, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { generateParticipantsTemplate } from "@/utils/generateParticipantsTemplate";
@@ -28,8 +28,10 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function CBMDemandeFormation() {
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
   const [bibliotheque, setBibliotheque] = useState("");
   const [bibliothequeId, setBibliothequeId] = useState<string | undefined>();
@@ -89,14 +91,7 @@ export default function CBMDemandeFormation() {
 
       if (error) throw error;
 
-      toast.success("Demande de formation envoyée avec succès");
-      setBibliotheque("");
-      setBibliothequeId(undefined);
-      setBibliothequeType(undefined);
-      setParticipantsFile(null);
-      setBesoinsSpecifiques("");
-      setTypeFormation("");
-      setPendingFormData(null);
+      setShowSuccess(true);
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Erreur lors de l'envoi de la demande");
@@ -126,19 +121,21 @@ export default function CBMDemandeFormation() {
         </Link>
 
         <div className="max-w-3xl mx-auto">
-          <div className="mb-8 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-              <GraduationCap className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="text-4xl font-bold text-foreground mb-4">
-              Demande de Formation
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Sollicitez une formation adaptée aux besoins de votre établissement
-            </p>
-          </div>
+          {!showSuccess ? (
+            <>
+              <div className="mb-8 text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+                  <GraduationCap className="w-8 h-8 text-primary" />
+                </div>
+                <h1 className="text-4xl font-bold text-foreground mb-4">
+                  Demande de Formation
+                </h1>
+                <p className="text-lg text-muted-foreground">
+                  Sollicitez une formation adaptée aux besoins de votre établissement
+                </p>
+              </div>
 
-          <Card>
+              <Card>
             <CardHeader>
               <CardTitle>Formulaire de Demande</CardTitle>
               <CardDescription>
@@ -297,6 +294,35 @@ export default function CBMDemandeFormation() {
               </form>
             </CardContent>
           </Card>
+            </>
+          ) : (
+            <Card className="border-2 border-primary/40 bg-primary/5">
+              <CardHeader className="text-center">
+                <div className="h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle2 className="h-8 w-8 text-primary" />
+                </div>
+                <CardTitle className="text-2xl text-primary">Demande Envoyée !</CardTitle>
+                <CardDescription>Votre demande de formation a été transmise au Bureau CBM</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-center">
+                  Vous recevrez une confirmation par email sous 48h et une réponse définitive sous 15 jours ouvrables.
+                </p>
+                <div className="bg-primary/5 p-4 rounded-lg">
+                  <h4 className="font-semibold mb-2">Prochaines Étapes :</h4>
+                  <ol className="space-y-2 text-sm list-decimal list-inside">
+                    <li>Examen de votre demande par le Comité Technique</li>
+                    <li>Validation par le Bureau CBM</li>
+                    <li>Organisation de la formation</li>
+                    <li>Notification et planification</li>
+                  </ol>
+                </div>
+                <Button variant="outline" className="w-full" onClick={() => navigate('/cbm')}>
+                  Retour au Portail CBM
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
       
