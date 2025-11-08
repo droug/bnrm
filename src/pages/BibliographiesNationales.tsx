@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import KitabHeader from "@/components/KitabHeader";
+import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -60,7 +61,10 @@ export default function BibliographiesNationales() {
           </div>
           
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-primary/60 to-secondary/70"></div>
+          <div className={`absolute inset-0 ${isFromKitab 
+            ? 'bg-gradient-to-br from-[hsl(var(--kitab-primary))]/70 via-[hsl(var(--kitab-secondary))]/60 to-[hsl(var(--kitab-accent))]/70' 
+            : 'bg-gradient-to-br from-primary/70 via-primary/60 to-secondary/70'
+          }`}></div>
           
           <div className="container mx-auto px-4 relative z-10 h-full flex items-start pt-16">
             <div className="w-full">
@@ -87,9 +91,12 @@ export default function BibliographiesNationales() {
         <main className="container mx-auto px-4 py-16">
           {/* Advanced Search Section */}
           <section className="mb-12">
-            <Card className="border-0 shadow-lg max-w-5xl mx-auto">
-              <CardHeader className="bg-gradient-to-r from-muted/50 to-background">
-                <CardTitle className="text-2xl text-primary flex items-center gap-2">
+            <Card className={`border-0 shadow-lg max-w-5xl mx-auto ${isFromKitab ? 'shadow-[var(--shadow-kitab)]' : ''}`}>
+              <CardHeader className={`${isFromKitab 
+                ? 'bg-gradient-to-r from-[hsl(var(--kitab-neutral-light))]/50 to-background' 
+                : 'bg-gradient-to-r from-muted/50 to-background'
+              }`}>
+                <CardTitle className={`text-2xl flex items-center gap-2 ${isFromKitab ? 'text-[hsl(var(--kitab-primary))]' : 'text-primary'}`}>
                   <Filter className="w-6 h-6" />
                   Recherche Avancée
                 </CardTitle>
@@ -108,7 +115,10 @@ export default function BibliographiesNationales() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                        className="h-12 text-base pl-6 pr-14 border-2 border-primary/30"
+                        className={`h-12 text-base pl-6 pr-14 border-2 ${isFromKitab 
+                          ? 'border-[hsl(var(--kitab-primary))]/30' 
+                          : 'border-primary/30'
+                        }`}
                       />
                       <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     </div>
@@ -122,7 +132,10 @@ export default function BibliographiesNationales() {
                         Année de publication
                       </label>
                       <Select value={selectedYear} onValueChange={setSelectedYear}>
-                        <SelectTrigger className="h-12 border-2 border-primary/30">
+                        <SelectTrigger className={`h-12 border-2 ${isFromKitab 
+                          ? 'border-[hsl(var(--kitab-primary))]/30' 
+                          : 'border-primary/30'
+                        }`}>
                           <SelectValue placeholder="Sélectionner une année" />
                         </SelectTrigger>
                         <SelectContent>
@@ -141,7 +154,10 @@ export default function BibliographiesNationales() {
                         Type de support
                       </label>
                       <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-                        <SelectTrigger className="h-12 border-2 border-primary/30">
+                        <SelectTrigger className={`h-12 border-2 ${isFromKitab 
+                          ? 'border-[hsl(var(--kitab-primary))]/30' 
+                          : 'border-primary/30'
+                        }`}>
                           <SelectValue placeholder="Sélectionner un type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -160,7 +176,10 @@ export default function BibliographiesNationales() {
                     <Button 
                       size="lg" 
                       onClick={handleSearch}
-                      className="flex-1 bg-primary hover:bg-primary/90 text-white h-12"
+                      className={`flex-1 h-12 ${isFromKitab 
+                        ? 'bg-[hsl(var(--kitab-primary))] hover:bg-[hsl(var(--kitab-primary-dark))] text-white' 
+                        : 'bg-primary hover:bg-primary/90 text-white'
+                      }`}
                     >
                       <Search className="h-5 w-5 mr-2" />
                       Rechercher
@@ -185,11 +204,14 @@ export default function BibliographiesNationales() {
 
           {/* Download Section */}
           <section className="mb-12">
-            <Card className="border-0 shadow-lg max-w-5xl mx-auto">
+            <Card className={`border-0 shadow-lg max-w-5xl mx-auto ${isFromKitab ? 'shadow-[var(--shadow-kitab)]' : ''}`}>
               <CardContent className="p-8">
                 <div className="flex items-start gap-6">
-                  <div className="bg-gradient-to-br from-primary/20 to-accent/10 p-4 rounded-xl">
-                    <Download className="w-10 h-10 text-primary" />
+                  <div className={`p-4 rounded-xl ${isFromKitab 
+                    ? 'bg-gradient-to-br from-[hsl(var(--kitab-primary))]/20 to-[hsl(var(--kitab-accent))]/10' 
+                    : 'bg-gradient-to-br from-primary/20 to-accent/10'
+                  }`}>
+                    <Download className={`w-10 h-10 ${isFromKitab ? 'text-[hsl(var(--kitab-primary))]' : 'text-primary'}`} />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold text-foreground mb-3">
@@ -201,13 +223,19 @@ export default function BibliographiesNationales() {
                     </p>
                     <div className="flex gap-3 flex-wrap">
                       <Button 
-                        className="bg-primary hover:bg-primary/90 text-white"
+                        className={`${isFromKitab 
+                          ? 'bg-[hsl(var(--kitab-primary))] hover:bg-[hsl(var(--kitab-primary-dark))] text-white' 
+                          : 'bg-primary hover:bg-primary/90 text-white'
+                        }`}
                       >
                         <Download className="w-4 h-4 mr-2" />
                         Version Arabe (PDF)
                       </Button>
                       <Button 
-                        className="bg-secondary hover:bg-secondary/80 text-white"
+                        className={`${isFromKitab 
+                          ? 'bg-[hsl(var(--kitab-secondary))] hover:bg-[hsl(var(--kitab-secondary))]/80 text-white' 
+                          : 'bg-secondary hover:bg-secondary/80 text-white'
+                        }`}
                       >
                         <Download className="w-4 h-4 mr-2" />
                         Version Française (PDF)
@@ -221,10 +249,13 @@ export default function BibliographiesNationales() {
 
           {/* Results Placeholder */}
           <section>
-            <Card className="border-0 shadow-lg max-w-5xl mx-auto">
+            <Card className={`border-0 shadow-lg max-w-5xl mx-auto ${isFromKitab ? 'shadow-[var(--shadow-kitab)]' : ''}`}>
               <CardContent className="p-12 text-center">
-                <div className="bg-gradient-to-br from-primary/10 to-secondary/5 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
-                  <BookMarked className="w-12 h-12 text-primary" />
+                <div className={`rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 ${isFromKitab 
+                  ? 'bg-gradient-to-br from-[hsl(var(--kitab-primary))]/10 to-[hsl(var(--kitab-secondary))]/5' 
+                  : 'bg-gradient-to-br from-primary/10 to-secondary/5'
+                }`}>
+                  <BookMarked className={`w-12 h-12 ${isFromKitab ? 'text-[hsl(var(--kitab-primary))]' : 'text-primary'}`} />
                 </div>
                 
                 <h3 className="text-2xl font-bold text-foreground mb-4">
@@ -242,6 +273,8 @@ export default function BibliographiesNationales() {
         </main>
         
         <Footer />
+        
+        {isFromKitab && <GlobalAccessibilityTools />}
       </div>
     </>
   );
