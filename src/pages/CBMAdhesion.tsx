@@ -277,7 +277,6 @@ export default function CBMAdhesion() {
                 </CardHeader>
                 <CardContent className="text-sm space-y-2">
                   <p>✓ Accès au catalogue collectif national</p>
-                  <p>✓ Prêt entre bibliothèques gratuit</p>
                   <p>✓ Formations continues offertes</p>
                   <p>✓ Support technique dédié</p>
                   <p>✓ Participation aux groupes de travail</p>
