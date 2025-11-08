@@ -272,7 +272,7 @@ export default function BibliographiesNationales() {
           </section>
         </main>
         
-        <Footer />
+        <Footer forceKitabStyle={isFromKitab} />
         
         {isFromKitab && <GlobalAccessibilityTools />}
       </div>

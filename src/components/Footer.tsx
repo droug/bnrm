@@ -21,15 +21,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logoBnrm from "@/assets/logo-bnrm.png";
 
-const Footer = () => {
+const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {}) => {
   const currentYear = new Date().getFullYear();
   const { t } = useLanguage();
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
   
-  // Check if we're on a Kitab page
-  const isKitabPage = location.pathname.startsWith('/kitab');
+  // Check if we're on a Kitab page or if Kitab style is forced
+  const isKitabPage = location.pathname.startsWith('/kitab') || forceKitabStyle;
 
   const handleNewsletterSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
