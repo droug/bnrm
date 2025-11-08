@@ -23,8 +23,9 @@ export async function generateParticipantsTemplate() {
   };
 
   // IMPORTANT: Définir TOUTE la colonne D (Téléphone) comme format texte
-  worksheet.getColumn(4).numFmt = '@'; // Format texte pour toute la colonne
-
+  const phoneColumn = worksheet.getColumn(4);
+  phoneColumn.numFmt = '@'; // Format texte pour toute la colonne
+  
   // Définir les largeurs des colonnes
   worksheet.getColumn(1).width = 25; // Nom complet
   worksheet.getColumn(2).width = 25; // Fonction
@@ -32,17 +33,15 @@ export async function generateParticipantsTemplate() {
   worksheet.getColumn(4).width = 20; // Téléphone
   worksheet.getColumn(5).width = 30; // Remarques
 
-  // Ajouter des lignes d'exemple avec apostrophe pour forcer le texte
+  // Ajouter des lignes d'exemple - AVEC apostrophe pour forcer le format texte
   const row1 = worksheet.addRow(['Exemple: Ahmed BENJELLOUN', 'Bibliothécaire', 'ahmed.benjelloun@exemple.ma', "'0612345678", '']);
   const row2 = worksheet.addRow(['Exemple: Fatima ALAOUI', 'Responsable catalogage', 'fatima.alaoui@exemple.ma', "'0687654321", '']);
   
-  // Ajouter des lignes vides avec les cellules de téléphone pré-formatées explicitement
-  for (let i = 0; i < 20; i++) {
-    const row = worksheet.addRow(['', '', '', '', '']);
-    // Forcer explicitement chaque cellule de téléphone comme texte
+  // Ajouter 50 lignes vides - chaque cellule de téléphone commence par une apostrophe
+  for (let i = 0; i < 50; i++) {
+    const row = worksheet.addRow(['', '', '', "'", '']);
     const phoneCell = row.getCell(4);
     phoneCell.numFmt = '@';
-    phoneCell.value = { richText: [{ text: '' }] };
   }
 
   // Générer et télécharger le fichier
