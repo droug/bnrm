@@ -506,11 +506,24 @@ export default function GestionFormations() {
                   </h3>
                   <Button
                     variant="outline"
-                    onClick={() => {
-                      const url = supabase.storage
-                        .from('formations')
-                        .getPublicUrl(selectedFormation.fichier_participants_path).data.publicUrl;
-                      window.open(url, '_blank');
+                    onClick={async () => {
+                      try {
+                        const { data, error } = await supabase.storage
+                          .from('formations')
+                          .createSignedUrl(selectedFormation.fichier_participants_path, 60);
+                        
+                        if (error) throw error;
+                        
+                        if (data?.signedUrl) {
+                          window.open(data.signedUrl, '_blank');
+                        }
+                      } catch (error: any) {
+                        toast({
+                          title: "Erreur",
+                          description: "Impossible de télécharger le fichier",
+                          variant: "destructive",
+                        });
+                      }
                     }}
                   >
                     Télécharger la liste
