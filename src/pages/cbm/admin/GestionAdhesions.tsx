@@ -47,13 +47,8 @@ export default function GestionAdhesions() {
         throw error;
       }
       
-      // Initialiser l'état local avec les données réelles
-      if (localCatalogueData.length === 0 && data) {
-        setLocalCatalogueData(data);
-        return data;
-      }
-      
-      return localCatalogueData.length > 0 ? localCatalogueData : data || [];
+      setLocalCatalogueData(data || []);
+      return data || [];
     }
   });
 
@@ -71,13 +66,8 @@ export default function GestionAdhesions() {
         throw error;
       }
       
-      // Initialiser l'état local avec les données réelles
-      if (localReseauData.length === 0 && data) {
-        setLocalReseauData(data);
-        return data;
-      }
-      
-      return localReseauData.length > 0 ? localReseauData : data || [];
+      setLocalReseauData(data || []);
+      return data || [];
     }
   });
 
@@ -102,7 +92,6 @@ export default function GestionAdhesions() {
 
   const handleApprove = async (id: string, table: "cbm_adhesions_catalogue" | "cbm_adhesions_reseau") => {
     try {
-      // Mettre à jour dans Supabase
       const { error } = await supabase
         .from(table)
         .update({ statut: 'en_validation' })
@@ -110,29 +99,15 @@ export default function GestionAdhesions() {
       
       if (error) throw error;
 
-      // Mettre à jour localement le statut en "en_validation"
-      if (table === "cbm_adhesions_catalogue") {
-        const updatedData = localCatalogueData.map(item => 
-          item.id === id ? { ...item, statut: "en_validation" } : item
-        );
-        setLocalCatalogueData(updatedData);
-      } else {
-        const updatedData = localReseauData.map(item => 
-          item.id === id ? { ...item, statut: "en_validation" } : item
-        );
-        setLocalReseauData(updatedData);
-      }
-
       toast({
         title: "Demande envoyée en validation",
         description: "Le comité de pilotage a été notifié pour valider cette demande.",
       });
 
-      // Rafraîchir les données
       if (table === "cbm_adhesions_catalogue") {
-        refetchCatalogue();
+        await refetchCatalogue();
       } else {
-        refetchReseau();
+        await refetchReseau();
       }
     } catch (error: any) {
       toast({
@@ -154,7 +129,6 @@ export default function GestionAdhesions() {
     }
 
     try {
-      // Mettre à jour dans Supabase
       const { error } = await supabase
         .from(selectedTable)
         .update({ 
@@ -164,23 +138,6 @@ export default function GestionAdhesions() {
         .eq('id', selectedAdhesion.id);
       
       if (error) throw error;
-
-      // Mettre à jour localement le statut en "rejete"
-      if (selectedTable === "cbm_adhesions_catalogue") {
-        const updatedData = localCatalogueData.map(item => 
-          item.id === selectedAdhesion.id 
-            ? { ...item, statut: "rejete", motif_refus: rejectionReason } 
-            : item
-        );
-        setLocalCatalogueData(updatedData);
-      } else {
-        const updatedData = localReseauData.map(item => 
-          item.id === selectedAdhesion.id 
-            ? { ...item, statut: "rejete", motif_refus: rejectionReason } 
-            : item
-        );
-        setLocalReseauData(updatedData);
-      }
 
       toast({
         title: "Demande rejetée",
@@ -192,9 +149,9 @@ export default function GestionAdhesions() {
       setSelectedAdhesion(null);
 
       if (selectedTable === "cbm_adhesions_catalogue") {
-        refetchCatalogue();
+        await refetchCatalogue();
       } else {
-        refetchReseau();
+        await refetchReseau();
       }
     } catch (error: any) {
       toast({
@@ -207,7 +164,6 @@ export default function GestionAdhesions() {
 
   const handleValidateByCommittee = async (id: string, table: "cbm_adhesions_catalogue" | "cbm_adhesions_reseau") => {
     try {
-      // Mettre à jour dans Supabase
       const { error } = await supabase
         .from(table)
         .update({ statut: 'approuve' })
@@ -215,28 +171,15 @@ export default function GestionAdhesions() {
       
       if (error) throw error;
 
-      // Mettre à jour localement le statut en "approuve"
-      if (table === "cbm_adhesions_catalogue") {
-        const updatedData = localCatalogueData.map(item => 
-          item.id === id ? { ...item, statut: "approuve" } : item
-        );
-        setLocalCatalogueData(updatedData);
-      } else {
-        const updatedData = localReseauData.map(item => 
-          item.id === id ? { ...item, statut: "approuve" } : item
-        );
-        setLocalReseauData(updatedData);
-      }
-
       toast({
         title: "Demande validée",
         description: "La demande a été approuvée par le comité de pilotage.",
       });
 
       if (table === "cbm_adhesions_catalogue") {
-        refetchCatalogue();
+        await refetchCatalogue();
       } else {
-        refetchReseau();
+        await refetchReseau();
       }
     } catch (error: any) {
       toast({
