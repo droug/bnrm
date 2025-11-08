@@ -12,13 +12,25 @@ import { BibliothequeAutocomplete } from "@/components/ui/bibliotheque-autocompl
 import { FileUpload } from "@/components/ui/file-upload";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SimpleSelect } from "@/components/ui/simple-select";
-import { ArrowLeft, GraduationCap, Send } from "lucide-react";
+import { ArrowLeft, GraduationCap, Send, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { generateParticipantsTemplate } from "@/utils/generateParticipantsTemplate";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function CBMDemandeFormation() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
   const [bibliotheque, setBibliotheque] = useState("");
   const [bibliothequeId, setBibliothequeId] = useState<string | undefined>();
   const [bibliothequeType, setBibliothequeType] = useState<string | undefined>();
@@ -26,13 +38,20 @@ export default function CBMDemandeFormation() {
   const [besoinsSpecifiques, setBesoinsSpecifiques] = useState("");
   const [typeFormation, setTypeFormation] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    setPendingFormData(formData);
+    setShowConfirmDialog(true);
+  };
+
+  const confirmSubmit = async () => {
+    if (!pendingFormData) return;
+    
     setIsSubmitting(true);
+    setShowConfirmDialog(false);
 
     try {
-      const formData = new FormData(e.currentTarget);
-      
       // Upload du fichier participants si présent
       let fichierParticipantsPath = null;
       if (participantsFile) {
@@ -57,12 +76,12 @@ export default function CBMDemandeFormation() {
         .insert({
           nom_organisme: bibliotheque,
           type_organisme: bibliothequeType || "autre",
-          nom_contact: formData.get("nom_contact") as string,
-          fonction_contact: formData.get("fonction_contact") as string,
-          email: formData.get("email") as string,
-          telephone: formData.get("telephone") as string,
+          nom_contact: pendingFormData.get("nom_contact") as string,
+          fonction_contact: pendingFormData.get("fonction_contact") as string,
+          email: pendingFormData.get("email") as string,
+          telephone: pendingFormData.get("telephone") as string,
           type_formation: typeFormation,
-          nombre_participants: parseInt(formData.get("nombre_participants") as string),
+          nombre_participants: parseInt(pendingFormData.get("nombre_participants") as string),
           besoins_specifiques: besoinsSpecifiques,
           fichier_participants_path: fichierParticipantsPath,
           statut: "en_attente"
@@ -71,13 +90,13 @@ export default function CBMDemandeFormation() {
       if (error) throw error;
 
       toast.success("Demande de formation envoyée avec succès");
-      (e.target as HTMLFormElement).reset();
       setBibliotheque("");
       setBibliothequeId(undefined);
       setBibliothequeType(undefined);
       setParticipantsFile(null);
       setBesoinsSpecifiques("");
       setTypeFormation("");
+      setPendingFormData(null);
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Erreur lors de l'envoi de la demande");
@@ -275,6 +294,43 @@ export default function CBMDemandeFormation() {
           </Card>
         </div>
       </main>
+      
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-primary" />
+              Confirmer l'envoi de la demande
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>Vous êtes sur le point d'envoyer une demande de formation avec les informations suivantes :</p>
+              <div className="bg-muted p-3 rounded-md space-y-1 text-sm">
+                <p><strong>Bibliothèque :</strong> {bibliotheque || "Non renseignée"}</p>
+                <p><strong>Type de formation :</strong> {typeFormation ? 
+                  typeFormation === "catalogage_normes" ? "Catalogage (Normes)" :
+                  typeFormation === "classification_indexation" ? "Classification - indexation" :
+                  typeFormation === "chaine_documentaire" ? "Chaine documentaire" :
+                  typeFormation === "cotation" ? "Cotation" :
+                  typeFormation === "formats_marc" ? "Formats MARC - UNIMARC" :
+                  typeFormation === "systeme_gestion" ? "Système de gestion de bibliothèque" :
+                  typeFormation === "recherche_documentaire" ? "Recherche documentaire" :
+                  typeFormation === "numerisation" ? "Numérisation et archivage" :
+                  typeFormation === "gestion_collections" ? "Gestion des collections" :
+                  typeFormation === "accueil_usagers" ? "Accueil et services aux usagers" :
+                  "Autre" : "Non renseigné"}</p>
+                <p><strong>Nombre de participants :</strong> {pendingFormData?.get("nombre_participants")?.toString() || "Non renseigné"}</p>
+              </div>
+              <p className="text-foreground pt-2">Voulez-vous confirmer l'envoi de cette demande ?</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmSubmit} disabled={isSubmitting}>
+              {isSubmitting ? "Envoi en cours..." : "Confirmer l'envoi"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       
       <Footer />
       <GlobalAccessibilityTools />
