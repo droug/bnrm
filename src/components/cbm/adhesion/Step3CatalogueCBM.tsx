@@ -2,6 +2,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useState, useMemo } from "react";
+import { AlertCircle } from "lucide-react";
 
 interface Step3CatalogueCBMProps {
   volumetrie: Record<string, string>;
@@ -9,6 +11,20 @@ interface Step3CatalogueCBMProps {
 }
 
 export default function Step3CatalogueCBM({ volumetrie, setVolumetrie }: Step3CatalogueCBMProps) {
+  const [totalDocuments, setTotalDocuments] = useState<string>("");
+
+  const sumVolumetrie = useMemo(() => {
+    return Object.values(volumetrie).reduce((sum, val) => {
+      const num = parseInt(val) || 0;
+      return sum + num;
+    }, 0);
+  }, [volumetrie]);
+
+  const isVolumetrieValid = useMemo(() => {
+    if (!totalDocuments) return true;
+    const total = parseInt(totalDocuments) || 0;
+    return sumVolumetrie === total;
+  }, [sumVolumetrie, totalDocuments]);
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg text-cbm-primary">Infrastructure Technique</h3>
@@ -42,7 +58,23 @@ export default function Step3CatalogueCBM({ volumetrie, setVolumetrie }: Step3Ca
 
       <div className="space-y-2">
         <Label htmlFor="collection">Nombre de Documents *</Label>
-        <Input id="collection" type="number" required placeholder="Volume approximatif de la collection" />
+        <Input 
+          id="collection" 
+          type="number" 
+          required 
+          placeholder="Volume approximatif de la collection"
+          value={totalDocuments}
+          onChange={(e) => setTotalDocuments(e.target.value)}
+          className={!isVolumetrieValid ? "border-destructive" : ""}
+        />
+        {!isVolumetrieValid && totalDocuments && (
+          <div className="flex items-center gap-2 text-sm text-destructive">
+            <AlertCircle className="h-4 w-4" />
+            <span>
+              La somme de la volumétrie ({sumVolumetrie}) doit être égale au nombre total de documents ({parseInt(totalDocuments) || 0})
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -55,7 +87,9 @@ export default function Step3CatalogueCBM({ volumetrie, setVolumetrie }: Step3Ca
         <Accordion type="single" collapsible className="w-full border rounded-lg">
           <AccordionItem value="volumetrie" className="border-none">
             <AccordionTrigger className="px-4 hover:no-underline hover:bg-muted/50">
-              <span className="text-sm font-medium">Types de documents et volumétrie</span>
+              <span className="text-sm font-medium">
+                Types de documents et volumétrie {sumVolumetrie > 0 && `(Total: ${sumVolumetrie})`}
+              </span>
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4">
               <div className="grid gap-3 mt-2">
@@ -79,7 +113,10 @@ export default function Step3CatalogueCBM({ volumetrie, setVolumetrie }: Step3Ca
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-        <p className="text-xs text-muted-foreground">Indiquez la volumétrie pour chaque type de document de votre collection</p>
+        <p className="text-xs text-muted-foreground">
+          Indiquez la volumétrie pour chaque type de document de votre collection. 
+          La somme doit correspondre au nombre total de documents.
+        </p>
       </div>
 
       <div className="space-y-2">
