@@ -2,6 +2,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useState } from "react";
+import { X } from "lucide-react";
 
 interface Step3ReseauBibliothequesProps {
   volumetrie: Record<string, string>;
@@ -9,6 +11,42 @@ interface Step3ReseauBibliothequesProps {
 }
 
 export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: Step3ReseauBibliothequesProps) {
+  const [selectedRecensements, setSelectedRecensements] = useState<string[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const recensementOptions = [
+    "Fichiers Excel", 
+    "BD Access", 
+    "Manuel", 
+    "Registres papier", 
+    "Système local non SIGB", 
+    "Tableur Google Sheets", 
+    "Base de données simple", 
+    "Fiches cartonnées",
+    "Cahiers de prêt",
+    "Autre"
+  ];
+
+  const toggleRecensement = (option: string) => {
+    setSelectedRecensements(prev => {
+      const newSelection = prev.includes(option)
+        ? prev.filter(item => item !== option)
+        : [...prev, option];
+      
+      // Mettre à jour le champ caché pour la soumission
+      const inputElement = document.getElementById('recensement') as HTMLInputElement;
+      if (inputElement) {
+        inputElement.value = newSelection.join(', ');
+      }
+      
+      return newSelection;
+    });
+  };
+
+  const removeRecensement = (option: string) => {
+    toggleRecensement(option);
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg text-cbm-primary">Infrastructure Technique</h3>
@@ -16,39 +54,57 @@ export default function Step3ReseauBibliotheques({ volumetrie, setVolumetrie }: 
       <div className="space-y-2">
         <Label htmlFor="recensement">Moyens de recensement du fond documentaire *</Label>
         <div className="relative">
+          <div 
+            className="min-h-[42px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm cursor-pointer flex flex-wrap gap-2 items-center"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          >
+            {selectedRecensements.length === 0 ? (
+              <span className="text-muted-foreground">Sélectionnez un ou plusieurs moyens</span>
+            ) : (
+              selectedRecensements.map((item) => (
+                <span 
+                  key={item}
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-cbm-primary/10 text-cbm-primary rounded-md text-xs font-medium"
+                >
+                  {item}
+                  <X 
+                    className="h-3 w-3 cursor-pointer hover:text-cbm-primary/70" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeRecensement(item);
+                    }}
+                  />
+                </span>
+              ))
+            )}
+          </div>
           <Input 
             id="recensement" 
-            readOnly 
-            placeholder="Sélectionnez le moyen de recensement"
-            className="cursor-pointer"
-            onClick={() => document.getElementById('recensement-list')?.classList.toggle('hidden')}
+            type="hidden"
+            value={selectedRecensements.join(', ')}
           />
-          <div id="recensement-list" className="hidden mt-1 border rounded-lg bg-background shadow-lg z-50">
-            {[
-              "Fichiers Excel", 
-              "BD Access", 
-              "Manuel", 
-              "Registres papier", 
-              "Système local non SIGB", 
-              "Tableur Google Sheets", 
-              "Base de données simple", 
-              "Fiches cartonnées",
-              "Cahiers de prêt",
-              "Autre"
-            ].map((option) => (
-              <div 
-                key={option}
-                className="p-2 hover:bg-muted cursor-pointer" 
-                onClick={() => {
-                  (document.getElementById('recensement') as HTMLInputElement).value = option;
-                  document.getElementById('recensement-list')?.classList.add('hidden');
-                }}
-              >
-                {option}
-              </div>
-            ))}
-          </div>
+          {isDropdownOpen && (
+            <div className="absolute mt-1 w-full border rounded-lg bg-background shadow-lg z-50 max-h-60 overflow-y-auto">
+              {recensementOptions.map((option) => (
+                <div 
+                  key={option}
+                  className="p-3 hover:bg-muted cursor-pointer flex items-center gap-2" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleRecensement(option);
+                  }}
+                >
+                  <Checkbox 
+                    checked={selectedRecensements.includes(option)}
+                    onCheckedChange={() => toggleRecensement(option)}
+                  />
+                  <span className="text-sm">{option}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+        <p className="text-xs text-muted-foreground">Vous pouvez sélectionner plusieurs options</p>
       </div>
 
       <div className="space-y-2">
