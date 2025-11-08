@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Users, Database, Eye, CheckCircle, XCircle, Clock, AlertCircle, Mail, Phone, Building, MapPin } from "lucide-react";
+import { PaginationControls } from "@/components/manuscripts/PaginationControls";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -32,6 +33,11 @@ export default function GestionAdhesions() {
   // État local pour les modifications des adhésions
   const [localCatalogueData, setLocalCatalogueData] = useState<any[]>([]);
   const [localReseauData, setLocalReseauData] = useState<any[]>([]);
+  
+  // États pour la pagination
+  const [cataloguePage, setCataloguePage] = useState(1);
+  const [reseauPage, setReseauPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
   // Récupérer les demandes d'adhésion au catalogue
   const { data: catalogueAdhesions, refetch: refetchCatalogue } = useQuery({
@@ -70,6 +76,25 @@ export default function GestionAdhesions() {
       return data || [];
     }
   });
+
+  // Pagination pour le catalogue
+  const paginatedCatalogueAdhesions = useMemo(() => {
+    if (!catalogueAdhesions) return [];
+    const startIndex = (cataloguePage - 1) * perPage;
+    const endIndex = startIndex + perPage;
+    return catalogueAdhesions.slice(startIndex, endIndex);
+  }, [catalogueAdhesions, cataloguePage, perPage]);
+
+  // Pagination pour le réseau
+  const paginatedReseauAdhesions = useMemo(() => {
+    if (!reseauAdhesions) return [];
+    const startIndex = (reseauPage - 1) * perPage;
+    const endIndex = startIndex + perPage;
+    return reseauAdhesions.slice(startIndex, endIndex);
+  }, [reseauAdhesions, reseauPage, perPage]);
+
+  const catalogueTotalPages = Math.ceil((catalogueAdhesions?.length || 0) / perPage);
+  const reseauTotalPages = Math.ceil((reseauAdhesions?.length || 0) / perPage);
 
   const getStatusBadge = (statut: string) => {
     const statusMap = {
@@ -372,9 +397,22 @@ export default function GestionAdhesions() {
 
           <TabsContent value="catalogue" className="space-y-6">
             {catalogueAdhesions && catalogueAdhesions.length > 0 ? (
-              <div className="grid gap-6 md:grid-cols-2">
-                {catalogueAdhesions.map((adhesion) => renderAdhesionCard(adhesion, "catalogue"))}
-              </div>
+              <>
+                <div className="grid gap-6 md:grid-cols-2">
+                  {paginatedCatalogueAdhesions.map((adhesion) => renderAdhesionCard(adhesion, "catalogue"))}
+                </div>
+                <PaginationControls
+                  currentPage={cataloguePage}
+                  totalPages={catalogueTotalPages}
+                  resultsPerPage={perPage}
+                  totalResults={catalogueAdhesions.length}
+                  onPageChange={setCataloguePage}
+                  onResultsPerPageChange={(value) => {
+                    setPerPage(value);
+                    setCataloguePage(1);
+                  }}
+                />
+              </>
             ) : (
               <Card>
                 <CardContent className="py-12 text-center text-muted-foreground">
@@ -386,9 +424,22 @@ export default function GestionAdhesions() {
 
           <TabsContent value="reseau" className="space-y-6">
             {reseauAdhesions && reseauAdhesions.length > 0 ? (
-              <div className="grid gap-6 md:grid-cols-2">
-                {reseauAdhesions.map((adhesion) => renderAdhesionCard(adhesion, "reseau"))}
-              </div>
+              <>
+                <div className="grid gap-6 md:grid-cols-2">
+                  {paginatedReseauAdhesions.map((adhesion) => renderAdhesionCard(adhesion, "reseau"))}
+                </div>
+                <PaginationControls
+                  currentPage={reseauPage}
+                  totalPages={reseauTotalPages}
+                  resultsPerPage={perPage}
+                  totalResults={reseauAdhesions.length}
+                  onPageChange={setReseauPage}
+                  onResultsPerPageChange={(value) => {
+                    setPerPage(value);
+                    setReseauPage(1);
+                  }}
+                />
+              </>
             ) : (
               <Card>
                 <CardContent className="py-12 text-center text-muted-foreground">
