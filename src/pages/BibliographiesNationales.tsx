@@ -241,15 +241,7 @@ export default function BibliographiesNationales() {
           </section>
         </main>
         
-        {isFromKitab ? (
-          <footer className="bg-[hsl(var(--kitab-primary))] text-white py-8">
-            <div className="container mx-auto px-4 text-center">
-              <p>© 2024 Kitab - Bibliothèque Nationale du Royaume du Maroc</p>
-            </div>
-          </footer>
-        ) : (
-          <Footer />
-        )}
+        <Footer />
       </div>
     </>
   );
