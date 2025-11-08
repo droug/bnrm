@@ -13,7 +13,7 @@ export function generateParticipantsTemplate() {
     'Remarques'
   ];
 
-  // Ajouter des lignes d'exemple
+  // Ajouter des lignes d'exemple avec apostrophe pour forcer le format texte sur le téléphone
   const data = [
     headers,
     ['Exemple: Ahmed BENJELLOUN', 'Bibliothécaire', 'ahmed.benjelloun@exemple.ma', '+212 6XX XXX XXX', ''],
@@ -26,6 +26,16 @@ export function generateParticipantsTemplate() {
   // Créer la feuille
   const ws = XLSX.utils.aoa_to_sheet(data);
 
+  // Forcer le format texte pour la colonne Téléphone (colonne D)
+  const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+  for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+    const cellAddress = XLSX.utils.encode_cell({ r: R, c: 3 }); // colonne D (index 3)
+    if (ws[cellAddress]) {
+      ws[cellAddress].z = '@'; // Format texte
+      ws[cellAddress].t = 's'; // Type string
+    }
+  }
+
   // Définir les largeurs des colonnes
   ws['!cols'] = [
     { wch: 25 }, // Nom complet
@@ -36,8 +46,8 @@ export function generateParticipantsTemplate() {
   ];
 
   // Ajouter un style aux en-têtes (seulement pour la première ligne)
-  const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
-  for (let C = range.s.c; C <= range.e.c; ++C) {
+  const headerRange = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+  for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
     const address = XLSX.utils.encode_col(C) + "1";
     if (!ws[address]) continue;
     
@@ -52,5 +62,8 @@ export function generateParticipantsTemplate() {
   XLSX.utils.book_append_sheet(wb, ws, 'Liste des participants');
 
   // Générer le fichier
-  XLSX.writeFile(wb, 'canevas_participants_formation.xlsx');
+  XLSX.writeFile(wb, 'canevas_participants_formation.xlsx', { 
+    bookType: 'xlsx',
+    cellStyles: true 
+  });
 }
