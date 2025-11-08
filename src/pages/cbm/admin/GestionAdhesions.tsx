@@ -526,18 +526,41 @@ export default function GestionAdhesions() {
                     <p className="font-medium">{selectedAdhesion.tutelle}</p>
                   </div>
                   <div className="space-y-1">
+                    <p className="text-muted-foreground text-sm">Directeur</p>
+                    <p className="font-medium">{selectedAdhesion.directeur || "Non renseigné"}</p>
+                  </div>
+                  {selectedAdhesion.adresse && (
+                    <div className="space-y-1 col-span-2">
+                      <p className="text-muted-foreground text-sm">Adresse</p>
+                      <p className="font-medium">{selectedAdhesion.adresse}</p>
+                    </div>
+                  )}
+                  <div className="space-y-1">
                     <div className="flex items-center gap-2 text-muted-foreground text-sm">
                       <MapPin className="h-4 w-4" />
                       <span>Localisation</span>
                     </div>
                     <p className="font-medium">{selectedAdhesion.ville}, {selectedAdhesion.region}</p>
                   </div>
+                  {selectedAdhesion.url_maps && (
+                    <div className="space-y-1">
+                      <p className="text-muted-foreground text-sm">Lien Google Maps</p>
+                      <a 
+                        href={selectedAdhesion.url_maps} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="font-medium text-primary hover:underline break-all"
+                      >
+                        Voir sur Maps
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Coordonnées */}
+              {/* Coordonnées et Personnes de contact */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg border-b pb-2">Coordonnées</h3>
+                <h3 className="font-semibold text-lg border-b pb-2">Coordonnées et Personnes de contact</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-muted-foreground text-sm">
@@ -553,6 +576,18 @@ export default function GestionAdhesions() {
                     </div>
                     <p className="font-medium">{selectedAdhesion.telephone}</p>
                   </div>
+                  {selectedAdhesion.referent_technique && (
+                    <div className="space-y-1">
+                      <p className="text-muted-foreground text-sm">Référent Technique</p>
+                      <p className="font-medium">{selectedAdhesion.referent_technique}</p>
+                    </div>
+                  )}
+                  {selectedAdhesion.responsable_catalogage && (
+                    <div className="space-y-1">
+                      <p className="text-muted-foreground text-sm">Responsable Catalogage</p>
+                      <p className="font-medium">{selectedAdhesion.responsable_catalogage}</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -560,11 +595,34 @@ export default function GestionAdhesions() {
               <div className="space-y-4">
                 <h3 className="font-semibold text-lg border-b pb-2">Informations spécifiques</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  {selectedTable === "cbm_adhesions_catalogue" && selectedAdhesion.sigb && (
-                    <div className="space-y-1">
-                      <p className="text-muted-foreground text-sm">SIGB utilisé</p>
-                      <p className="font-medium">{selectedAdhesion.sigb}</p>
-                    </div>
+                  {selectedTable === "cbm_adhesions_catalogue" && (
+                    <>
+                      {selectedAdhesion.sigb && (
+                        <div className="space-y-1">
+                          <p className="text-muted-foreground text-sm">SIGB utilisé</p>
+                          <p className="font-medium">{selectedAdhesion.sigb}</p>
+                        </div>
+                      )}
+                      {selectedAdhesion.normes_catalogage && (
+                        <div className="space-y-1">
+                          <p className="text-muted-foreground text-sm">Normes de Catalogage</p>
+                          <p className="font-medium">{selectedAdhesion.normes_catalogage}</p>
+                        </div>
+                      )}
+                      {selectedAdhesion.url_catalogue && (
+                        <div className="space-y-1">
+                          <p className="text-muted-foreground text-sm">URL du Catalogue</p>
+                          <a 
+                            href={selectedAdhesion.url_catalogue} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="font-medium text-primary hover:underline break-all"
+                          >
+                            Accéder au catalogue
+                          </a>
+                        </div>
+                      )}
+                    </>
                   )}
                   {selectedTable === "cbm_adhesions_reseau" && (
                     <>
@@ -596,6 +654,31 @@ export default function GestionAdhesions() {
                   </div>
                 </div>
               </div>
+
+              {/* Engagements */}
+              {selectedTable === "cbm_adhesions_catalogue" && (
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg border-b pb-2">Engagements</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      {selectedAdhesion.engagement_charte ? (
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-destructive" />
+                      )}
+                      <p className="text-sm">Engagement à respecter la Charte du Réseau CBM</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {selectedAdhesion.engagement_partage_donnees ? (
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-destructive" />
+                      )}
+                      <p className="text-sm">Acceptation du partage des métadonnées bibliographiques</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Nature Fond documentaire et Volumétrie */}
               {selectedTable === "cbm_adhesions_catalogue" && selectedAdhesion.volumetrie && (
