@@ -34,6 +34,7 @@ export function BibliothequeAutocomplete({
   const [popularBibliotheques, setPopularBibliotheques] = useState<BibliothequeItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [isSelected, setIsSelected] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -155,30 +156,36 @@ export function BibliothequeAutocomplete({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Synchroniser avec la prop value
+  // Synchroniser avec la prop value seulement si ce n'est pas une saisie en cours
   useEffect(() => {
-    setInputValue(value);
-  }, [value]);
+    if (isSelected || value === "") {
+      setInputValue(value);
+    }
+  }, [value, isSelected]);
 
   const handleSelect = (bibliotheque: BibliothequeItem) => {
-    setInputValue(bibliotheque.nom_bibliotheque);
-    onChange(bibliotheque.nom_bibliotheque, bibliotheque.id, bibliotheque.source);
+    const nomBibliotheque = bibliotheque.nom_bibliotheque;
+    setInputValue(nomBibliotheque);
+    setIsSelected(true);
+    onChange(nomBibliotheque, bibliotheque.id, bibliotheque.source);
     setShowSuggestions(false);
   };
 
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);
-    // Ne pas réinitialiser la sélection tant que l'utilisateur n'a pas choisi
+    setIsSelected(false);
+    
     if (newValue.length === 0) {
       onChange("");
-    }
-    if (newValue.length === 0 || newValue.length >= 2) {
+      setShowSuggestions(true);
+    } else if (newValue.length >= 2) {
       setShowSuggestions(true);
     }
   };
 
   const handleClear = () => {
     setInputValue("");
+    setIsSelected(false);
     onChange("");
     inputRef.current?.focus();
   };
