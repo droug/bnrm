@@ -105,9 +105,14 @@ export default function CBMDemandeFormation() {
     }
   };
 
-  const handleDownloadTemplate = () => {
-    generateParticipantsTemplate();
-    toast.success("Canevas téléchargé avec succès");
+  const handleDownloadTemplate = async () => {
+    try {
+      await generateParticipantsTemplate();
+      toast.success("Canevas téléchargé avec succès");
+    } catch (error) {
+      console.error("Error downloading template:", error);
+      toast.error("Erreur lors du téléchargement du canevas");
+    }
   };
 
   return (
