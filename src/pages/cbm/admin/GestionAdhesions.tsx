@@ -597,6 +597,35 @@ export default function GestionAdhesions() {
                 </div>
               </div>
 
+              {/* Nature Fond documentaire et Volumétrie */}
+              {selectedTable === "cbm_adhesions_catalogue" && selectedAdhesion.volumetrie && (
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg border-b pb-2">Nature Fond documentaire et Volumétrie</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {Object.entries(selectedAdhesion.volumetrie).map(([type, quantite]) => {
+                      const qty = parseInt(quantite as string) || 0;
+                      if (qty > 0) {
+                        return (
+                          <div key={type} className="space-y-1 p-3 bg-muted/30 rounded-lg">
+                            <p className="text-muted-foreground text-sm">{type}</p>
+                            <p className="font-medium text-lg">{qty.toLocaleString()}</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+                  <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
+                    <p className="text-sm text-muted-foreground">Total volumétrie</p>
+                    <p className="font-semibold text-xl text-primary">
+                      {Object.values(selectedAdhesion.volumetrie as Record<string, string>)
+                        .reduce((sum: number, val: string) => sum + (parseInt(val) || 0), 0)
+                        .toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Motif de refus si rejeté */}
               {selectedAdhesion.statut === "rejete" && selectedAdhesion.motif_refus && (
                 <div className="space-y-2 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
