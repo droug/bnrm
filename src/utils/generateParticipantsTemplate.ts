@@ -13,30 +13,40 @@ export function generateParticipantsTemplate() {
     'Remarques'
   ];
 
-  // Ajouter des lignes d'exemple
-  // Important: Les numéros de téléphone sont préfixés avec ' pour forcer le format texte dans Excel
+  // Créer une feuille vide d'abord
+  const ws = XLSX.utils.aoa_to_sheet([]);
+  
+  // Pré-formater TOUTE la colonne Téléphone (colonne D, index 3) en format texte
+  // Cela doit être fait AVANT d'ajouter les données
+  const sheetRange = { s: { r: 0, c: 0 }, e: { r: 100, c: 4 } };
+  ws['!ref'] = XLSX.utils.encode_range(sheetRange);
+  
+  for (let R = 0; R <= 100; ++R) {
+    const cellAddress = XLSX.utils.encode_cell({ r: R, c: 3 }); // colonne D (Téléphone)
+    ws[cellAddress] = { t: 's', v: '', z: '@' }; // Format texte
+  }
+
+  // Maintenant ajouter les données (sans apostrophe car le format est déjà texte)
   const data = [
     headers,
-    ['Exemple: Ahmed BENJELLOUN', 'Bibliothécaire', 'ahmed.benjelloun@exemple.ma', '\'+212 6XX XXX XXX', ''],
-    ['Exemple: Fatima ALAOUI', 'Responsable catalogage', 'fatima.alaoui@exemple.ma', '\'+212 6XX XXX XXX', ''],
+    ['Exemple: Ahmed BENJELLOUN', 'Bibliothécaire', 'ahmed.benjelloun@exemple.ma', '+212 6XX XXX XXX', ''],
+    ['Exemple: Fatima ALAOUI', 'Responsable catalogage', 'fatima.alaoui@exemple.ma', '+212 6XX XXX XXX', ''],
     ['', '', '', '', ''],
     ['', '', '', '', ''],
     ['', '', '', '', ''],
   ];
 
-  // Créer la feuille
-  const ws = XLSX.utils.aoa_to_sheet(data);
-
-  // Forcer TOUTE la colonne Téléphone (colonne D, index 3) en format texte
-  // Cela inclut les cellules vides pour que Excel comprenne que c'est du texte
-  for (let R = 0; R <= 100; ++R) { // Format les 100 premières lignes
-    const cellAddress = XLSX.utils.encode_cell({ r: R, c: 3 }); // colonne D
-    if (!ws[cellAddress]) {
-      ws[cellAddress] = { t: 's', v: '' }; // Créer une cellule vide en format texte
-    }
-    ws[cellAddress].t = 's'; // Type string
-    ws[cellAddress].z = '@'; // Format texte Excel
-  }
+  // Ajouter les données manuellement pour préserver le format texte
+  data.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      const cellAddress = XLSX.utils.encode_cell({ r: rowIndex, c: colIndex });
+      if (colIndex === 3) { // Colonne Téléphone
+        ws[cellAddress] = { t: 's', v: cell, z: '@' };
+      } else {
+        ws[cellAddress] = { v: cell };
+      }
+    });
+  });
 
   // Définir les largeurs des colonnes
   ws['!cols'] = [
