@@ -1078,7 +1078,7 @@ export type Database = {
           sigb: string
           statut: string | null
           telephone: string
-          tutelle: string
+          tutelle: string | null
           type_bibliotheque: string
           updated_at: string
           url_catalogue: string | null
@@ -1105,7 +1105,7 @@ export type Database = {
           sigb: string
           statut?: string | null
           telephone: string
-          tutelle: string
+          tutelle?: string | null
           type_bibliotheque: string
           updated_at?: string
           url_catalogue?: string | null
@@ -1132,7 +1132,7 @@ export type Database = {
           sigb?: string
           statut?: string | null
           telephone?: string
-          tutelle?: string
+          tutelle?: string | null
           type_bibliotheque?: string
           updated_at?: string
           url_catalogue?: string | null
@@ -1162,7 +1162,7 @@ export type Database = {
           responsable_catalogage: string
           statut: string | null
           telephone: string
-          tutelle: string
+          tutelle: string | null
           type_bibliotheque: string
           updated_at: string
           url_catalogue: string | null
@@ -1189,7 +1189,7 @@ export type Database = {
           responsable_catalogage: string
           statut?: string | null
           telephone: string
-          tutelle: string
+          tutelle?: string | null
           type_bibliotheque: string
           updated_at?: string
           url_catalogue?: string | null
@@ -1216,7 +1216,7 @@ export type Database = {
           responsable_catalogage?: string
           statut?: string | null
           telephone?: string
-          tutelle?: string
+          tutelle?: string | null
           type_bibliotheque?: string
           updated_at?: string
           url_catalogue?: string | null
