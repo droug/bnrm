@@ -76,7 +76,89 @@ export function BookReservationDialog({
   const [showPhysicalWarning, setShowPhysicalWarning] = useState(false);
   const [showUserTypeList, setShowUserTypeList] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [disabledDates, setDisabledDates] = useState<Date[]>([]);
+  const [isLoadingDates, setIsLoadingDates] = useState(false);
   const userTypeRef = useRef<HTMLDivElement>(null);
+
+  // Charger les dates désactivées au montage du composant
+  useEffect(() => {
+    if (isOpen && documentId) {
+      fetchDisabledDates();
+    }
+  }, [isOpen, documentId]);
+
+  const fetchDisabledDates = async () => {
+    try {
+      setIsLoadingDates(true);
+      const dates: Date[] = [];
+
+      // 1. Récupérer les dates déjà réservées pour ce document
+      const { data: reservations, error: reservationsError } = await supabase
+        .from("reservations_ouvrages")
+        .select("requested_date")
+        .eq("document_id", documentId)
+        .in("statut", ["soumise", "en_cours", "validee"]) // Ne pas inclure les réservations refusées ou archivées
+        .not("requested_date", "is", null);
+
+      if (reservationsError) {
+        console.error("Erreur lors du chargement des réservations:", reservationsError);
+      } else if (reservations) {
+        reservations.forEach((reservation) => {
+          if (reservation.requested_date) {
+            dates.push(new Date(reservation.requested_date));
+          }
+        });
+      }
+
+      // 2. Récupérer les périodes d'indisponibilité depuis le SIGB
+      const { data: metadata, error: metadataError } = await supabase
+        .from("catalog_metadata")
+        .select("custom_fields")
+        .eq("source_record_id", documentId)
+        .maybeSingle();
+
+      if (metadataError) {
+        console.error("Erreur lors du chargement des métadonnées SIGB:", metadataError);
+      } else if (metadata?.custom_fields) {
+        // Type casting pour accéder aux données SIGB
+        const customFields = metadata.custom_fields as Record<string, any>;
+        const sigbData = customFields.original_data as Record<string, any> | undefined;
+        
+        if (sigbData) {
+          // Vérifier si le SIGB indique des périodes d'indisponibilité
+          // Format attendu: sigbData.unavailableDates = ["2025-01-15", "2025-01-16", ...]
+          // ou sigbData.status = "emprunte" / "restauration" / "reliure"
+          if (sigbData.unavailableDates && Array.isArray(sigbData.unavailableDates)) {
+            sigbData.unavailableDates.forEach((dateStr: string) => {
+              dates.push(new Date(dateStr));
+            });
+          }
+
+          // Si le document est dans un statut non disponible (emprunté, restauration, etc.)
+          // on peut désactiver toutes les dates futures jusqu'à une date de retour
+          if (sigbData.status && ["emprunte", "restauration", "reliure"].includes(sigbData.status)) {
+            // Si une date de retour est disponible
+            if (sigbData.returnDate || sigbData.availableFrom) {
+              const returnDate = new Date(sigbData.returnDate || sigbData.availableFrom);
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              
+              // Désactiver toutes les dates entre aujourd'hui et la date de retour
+              for (let d = new Date(today); d < returnDate; d.setDate(d.getDate() + 1)) {
+                dates.push(new Date(d));
+              }
+            }
+          }
+        }
+      }
+
+      setDisabledDates(dates);
+    } catch (error) {
+      console.error("Erreur lors du chargement des dates désactivées:", error);
+    } finally {
+      setIsLoadingDates(false);
+    }
+  };
 
   const form = useForm<BookReservationFormData>({
     resolver: zodResolver(bookReservationSchema),
@@ -441,17 +523,35 @@ export function BookReservationDialog({
                       
                       {showCalendar && (
                         <div className="relative w-full border rounded-lg p-3 bg-popover shadow-lg mt-2">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={(date) => {
-                              field.onChange(date);
-                              setShowCalendar(false);
-                            }}
-                            disabled={(date) => date < new Date()}
-                            locale={fr}
-                            className="pointer-events-auto mx-auto"
-                          />
+                          {isLoadingDates ? (
+                            <div className="flex items-center justify-center py-8">
+                              <div className="text-sm text-muted-foreground">Chargement des disponibilités...</div>
+                            </div>
+                          ) : (
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={(date) => {
+                                field.onChange(date);
+                                setShowCalendar(false);
+                              }}
+                              disabled={(date) => {
+                                // Désactiver les dates passées
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                if (date < today) return true;
+
+                                // Désactiver les dates réservées ou indisponibles
+                                return disabledDates.some((disabledDate) => {
+                                  const d = new Date(disabledDate);
+                                  d.setHours(0, 0, 0, 0);
+                                  return d.getTime() === date.getTime();
+                                });
+                              }}
+                              locale={fr}
+                              className="pointer-events-auto mx-auto"
+                            />
+                          )}
                         </div>
                       )}
                       <FormMessage />
