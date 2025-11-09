@@ -111,8 +111,8 @@ export default function PaymentServices() {
     },
     {
       id: "book-reservation",
-      title: "Réserver un ouvrage",
-      description: "Réservez vos ouvrages et consultez-les sur place ou en ligne",
+      title: "Réserver un document",
+      description: "Réservez vos documents et consultez-les sur place ou en ligne",
       icon: BookOpen,
       color: "from-teal-500 to-teal-600",
       features: [
