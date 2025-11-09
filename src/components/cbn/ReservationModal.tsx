@@ -16,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -72,6 +71,7 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
   const [loading, setLoading] = useState(false);
   const [requestType, setRequestType] = useState<'numerique' | 'physique'>('numerique');
   const [requestedDate, setRequestedDate] = useState<Date>();
+  const [showCalendar, setShowCalendar] = useState(false);
   
   // Formulaire simplifié pour utilisateurs non connectés
   const [guestName, setGuestName] = useState("");
@@ -254,29 +254,33 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
           {/* Date souhaitée */}
           <div className="space-y-2">
             <Label>Date de consultation souhaitée</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !requestedDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {requestedDate ? format(requestedDate, "PPP", { locale: fr }) : "Sélectionner une date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+            <Button
+              type="button"
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !requestedDate && "text-muted-foreground"
+              )}
+              onClick={() => setShowCalendar(!showCalendar)}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {requestedDate ? format(requestedDate, "PPP", { locale: fr }) : "Sélectionner une date"}
+            </Button>
+            
+            {showCalendar && (
+              <div className="border rounded-lg p-3 bg-popover">
                 <Calendar
                   mode="single"
                   selected={requestedDate}
-                  onSelect={setRequestedDate}
+                  onSelect={(date) => {
+                    setRequestedDate(date);
+                    setShowCalendar(false);
+                  }}
                   disabled={(date) => date < new Date()}
-                  initialFocus
+                  className="pointer-events-auto"
                 />
-              </PopoverContent>
-            </Popover>
+              </div>
+            )}
           </div>
 
           {/* Motif */}
