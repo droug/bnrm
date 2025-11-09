@@ -561,7 +561,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 {/* Champs personnalisés */}
                 {customFields
-                  .filter((field) => field.section_key === "author_identification")
+                  .filter((field) => field.section_key === "identification_auteur")
                   .map((field) => (
                     <DynamicFieldRenderer
                       key={field.id}
