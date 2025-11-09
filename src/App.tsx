@@ -329,6 +329,7 @@ const App = () => {
           <Route path="/cbm/admin/adhesions" element={<GestionAdhesions />} />
           <Route path="/cbm/admin/formations" element={<GestionFormations />} />
           <Route path="/cbm/admin/reports" element={<CBMReports />} />
+          <Route path="/cbm/admin/reports" element={<CBMReports />} />
 
           {/* CBN Routes */}
           <Route path="/cbm/catalogue" element={<CatalogueCBN />} />
