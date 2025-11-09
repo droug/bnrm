@@ -96,7 +96,6 @@ export function BookReservationDialog({
       userEmail: user?.email || "",
       userPhone: profile?.phone || "",
       userType: "",
-      motif: "",
       comments: "",
       isStudentPFE: false,
       pfeTheme: "",
@@ -238,7 +237,7 @@ export function BookReservationDialog({
         routed_to: routing.routedTo,
         statut: "soumise",
         requested_date: data.requestedDate ? data.requestedDate.toISOString().split('T')[0] : null,
-        motif: data.motif || null,
+        motif: data.comments || null,
         user_name: data.userName,
         user_email: data.userEmail,
         user_phone: data.userPhone || null,
@@ -464,33 +463,15 @@ export function BookReservationDialog({
 
                 <FormField
                   control={form.control}
-                  name="motif"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Motif de la demande</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          placeholder="Recherche, étude, documentation, etc."
-                          rows={3}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="comments"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Commentaires additionnels</FormLabel>
+                      <FormLabel>Informations additionnels</FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
                           placeholder="Informations complémentaires..."
-                          rows={3}
+                          rows={4}
                         />
                       </FormControl>
                       <FormMessage />
