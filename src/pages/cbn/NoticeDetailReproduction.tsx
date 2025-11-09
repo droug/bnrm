@@ -26,11 +26,13 @@ import {
 } from "@/components/ui/collapsible";
 import { ReproductionRequestDialog } from "@/components/cbn/ReproductionRequestDialog";
 import { supabase } from "@/integrations/supabase/client";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 
 export default function NoticeDetailReproduction() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isSubscriber } = useSecureRoles();
   const [document, setDocument] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showReproductionDialog, setShowReproductionDialog] = useState(false);
@@ -428,7 +430,7 @@ export default function NoticeDetailReproduction() {
                     </Button>
                   )}
                   
-                  {document.status === "Numérisé" && (
+                  {document.status === "Numérisé" && !isSubscriber && (
                     <Button className="w-full" variant="default">
                       Adhérer
                     </Button>

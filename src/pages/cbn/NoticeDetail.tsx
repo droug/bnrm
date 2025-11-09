@@ -27,11 +27,13 @@ import {
 } from "@/components/ui/collapsible";
 import { BookReservationDialog } from "@/components/cbn/BookReservationDialog";
 import { supabase } from "@/integrations/supabase/client";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 
 export default function NoticeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isSubscriber } = useSecureRoles();
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [document, setDocument] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -442,7 +444,7 @@ export default function NoticeDetail() {
                     </Button>
                   )}
                   
-                  {document.status === "Numérisé" && (
+                  {document.status === "Numérisé" && !isSubscriber && (
                     <Button className="w-full" variant="default">
                       Adhérer
                     </Button>
