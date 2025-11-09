@@ -44,7 +44,8 @@ import {
   CheckCircle,
   XCircle,
   FolderArchive,
-  AlertCircle
+  AlertCircle,
+  CalendarCheck
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -106,6 +107,16 @@ export default function GestionReservationsOuvrages() {
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [showRefuseDialog, setShowRefuseDialog] = useState(false);
+  const [showAvailabilityDialog, setShowAvailabilityDialog] = useState(false);
+  const [availabilityData, setAvailabilityData] = useState<{
+    reservations: any[];
+    sigbStatus: any;
+    loading: boolean;
+  }>({
+    reservations: [],
+    sigbStatus: null,
+    loading: false,
+  });
   const [refuseReason, setRefuseReason] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -265,6 +276,45 @@ export default function GestionReservationsOuvrages() {
       toast.error("Erreur lors de l'archivage");
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const checkAvailability = async (reservation: Reservation) => {
+    setSelectedReservation(reservation);
+    setAvailabilityData({ reservations: [], sigbStatus: null, loading: true });
+    setShowAvailabilityDialog(true);
+
+    try {
+      // Récupérer toutes les réservations pour ce document
+      const { data: reservationsData, error: reservationsError } = await supabase
+        .from("reservations_ouvrages")
+        .select("*")
+        .eq("document_id", reservation.document_id)
+        .in("statut", ["soumise", "en_cours", "validee"])
+        .order("requested_date", { ascending: true });
+
+      if (reservationsError) throw reservationsError;
+
+      // Récupérer les informations SIGB
+      const { data: sigbData, error: sigbError } = await supabase
+        .from("catalog_metadata")
+        .select("custom_fields, source_sigb, last_sync_date")
+        .eq("source_record_id", reservation.document_id)
+        .maybeSingle();
+
+      if (sigbError && sigbError.code !== "PGRST116") {
+        console.error("Erreur SIGB:", sigbError);
+      }
+
+      setAvailabilityData({
+        reservations: reservationsData || [],
+        sigbStatus: sigbData,
+        loading: false,
+      });
+    } catch (error: any) {
+      console.error("Erreur lors de la vérification:", error);
+      toast.error("Erreur lors de la vérification de disponibilité");
+      setAvailabilityData({ reservations: [], sigbStatus: null, loading: false });
     }
   };
 
@@ -557,8 +607,18 @@ export default function GestionReservationsOuvrages() {
                                 setSelectedReservation(reservation);
                                 setShowDetailDialog(true);
                               }}
+                              title="Voir les détails"
                             >
                               <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-primary"
+                              onClick={() => checkAvailability(reservation)}
+                              title="Vérifier la disponibilité"
+                            >
+                              <CalendarCheck className="h-4 w-4" />
                             </Button>
                             {reservation.statut !== "validee" && reservation.statut !== "refusee" && reservation.statut !== "archivee" && (
                               <>
@@ -567,6 +627,7 @@ export default function GestionReservationsOuvrages() {
                                   variant="outline"
                                   className="text-success"
                                   onClick={() => handleValidate(reservation)}
+                                  title="Valider"
                                 >
                                   <Check className="h-4 w-4" />
                                 </Button>
@@ -578,6 +639,7 @@ export default function GestionReservationsOuvrages() {
                                     setSelectedReservation(reservation);
                                     setShowRefuseDialog(true);
                                   }}
+                                  title="Refuser"
                                 >
                                   <X className="h-4 w-4" />
                                 </Button>
@@ -588,6 +650,7 @@ export default function GestionReservationsOuvrages() {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleArchive(reservation)}
+                                title="Archiver"
                               >
                                 <Archive className="h-4 w-4" />
                               </Button>
@@ -800,6 +863,251 @@ export default function GestionReservationsOuvrages() {
               <X className="mr-2 h-4 w-4" />
               Confirmer le refus
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialogue de vérification de disponibilité */}
+      <Dialog open={showAvailabilityDialog} onOpenChange={setShowAvailabilityDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarCheck className="h-5 w-5" />
+              Vérification de disponibilité
+            </DialogTitle>
+            <DialogDescription>
+              {selectedReservation?.document_title}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {availabilityData.loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <Clock className="h-12 w-12 mx-auto mb-4 text-primary animate-pulse" />
+                  <p className="text-muted-foreground">Vérification en cours...</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Statut SIGB */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Statut SIGB</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {availabilityData.sigbStatus ? (
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-2">
+                          <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                          <div className="flex-1">
+                            <p className="font-medium">Données synchronisées depuis le SIGB</p>
+                            <p className="text-sm text-muted-foreground">
+                              Source: {availabilityData.sigbStatus.source_sigb || "Non spécifiée"}
+                            </p>
+                            {availabilityData.sigbStatus.last_sync_date && (
+                              <p className="text-sm text-muted-foreground">
+                                Dernière synchronisation: {format(new Date(availabilityData.sigbStatus.last_sync_date), "dd/MM/yyyy à HH:mm", { locale: fr })}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        {availabilityData.sigbStatus.custom_fields?.original_data && (
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-sm font-medium mb-2">Informations du SIGB:</p>
+                            <div className="text-sm space-y-1">
+                              {(() => {
+                                const sigbData = availabilityData.sigbStatus.custom_fields.original_data as Record<string, any>;
+                                if (sigbData.status) {
+                                  return (
+                                    <p>
+                                      <span className="font-medium">Statut:</span>{" "}
+                                      <Badge variant={sigbData.status === "disponible" ? "default" : "destructive"}>
+                                        {sigbData.status}
+                                      </Badge>
+                                    </p>
+                                  );
+                                }
+                                if (sigbData.returnDate || sigbData.availableFrom) {
+                                  return (
+                                    <p>
+                                      <span className="font-medium">Disponible à partir du:</span>{" "}
+                                      {format(new Date(sigbData.returnDate || sigbData.availableFrom), "dd/MM/yyyy", { locale: fr })}
+                                    </p>
+                                  );
+                                }
+                                return <p className="text-muted-foreground">Aucune restriction détectée</p>;
+                              })()}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex items-start gap-2 text-muted-foreground">
+                        <AlertCircle className="h-5 w-5 mt-0.5" />
+                        <p className="text-sm">
+                          Aucune donnée SIGB disponible pour cet ouvrage. La disponibilité est basée uniquement sur les réservations internes.
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Réservations existantes */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">
+                      Réservations existantes ({availabilityData.reservations.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {availabilityData.reservations.length === 0 ? (
+                      <div className="text-center py-6">
+                        <CheckCircle className="h-12 w-12 mx-auto mb-3 text-green-600" />
+                        <p className="font-medium text-green-700">Aucune réservation active</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          L'ouvrage est disponible pour réservation
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {availabilityData.reservations.map((res) => (
+                          <div
+                            key={res.id}
+                            className={`p-3 rounded-lg border ${
+                              res.id === selectedReservation?.id
+                                ? "bg-primary/5 border-primary"
+                                : "bg-muted/50 border-border"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge variant="outline" className={getStatusColor(res.statut)}>
+                                    {getStatusLabel(res.statut)}
+                                  </Badge>
+                                  {res.id === selectedReservation?.id && (
+                                    <Badge variant="default" className="text-xs">
+                                      Demande actuelle
+                                    </Badge>
+                                  )}
+                                </div>
+                                <p className="font-medium text-sm">{res.user_name}</p>
+                                <p className="text-xs text-muted-foreground">{res.user_email}</p>
+                                {res.requested_date && (
+                                  <p className="text-sm mt-1">
+                                    <span className="font-medium">Date souhaitée:</span>{" "}
+                                    {format(new Date(res.requested_date), "dd/MM/yyyy", { locale: fr })}
+                                  </p>
+                                )}
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Demandé le: {format(new Date(res.created_at), "dd/MM/yyyy à HH:mm", { locale: fr })}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Recommandation */}
+                <Card className="border-primary/20">
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4" />
+                      Recommandation
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {(() => {
+                      const hasConflict = availabilityData.reservations.some(
+                        (res) =>
+                          res.id !== selectedReservation?.id &&
+                          res.requested_date === selectedReservation?.requested_date
+                      );
+                      const sigbData = availabilityData.sigbStatus?.custom_fields?.original_data as Record<string, any> | undefined;
+                      const isUnavailableInSigb = sigbData?.status && 
+                        ["emprunte", "restauration", "reliure"].includes(sigbData.status);
+
+                      if (isUnavailableInSigb) {
+                        return (
+                          <div className="flex items-start gap-2 text-destructive">
+                            <XCircle className="h-5 w-5 mt-0.5" />
+                            <div>
+                              <p className="font-medium">L'ouvrage n'est pas disponible</p>
+                              <p className="text-sm mt-1">
+                                Le SIGB indique que l'ouvrage est actuellement {sigbData.status}. 
+                                Il est recommandé de refuser cette demande ou de proposer une date ultérieure.
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (hasConflict) {
+                        return (
+                          <div className="flex items-start gap-2 text-orange-600">
+                            <AlertCircle className="h-5 w-5 mt-0.5" />
+                            <div>
+                              <p className="font-medium">Conflit de date détecté</p>
+                              <p className="text-sm mt-1">
+                                Une autre réservation existe pour la même date. Veuillez coordonner les demandes 
+                                ou proposer une date alternative.
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="flex items-start gap-2 text-green-600">
+                          <CheckCircle className="h-5 w-5 mt-0.5" />
+                          <div>
+                            <p className="font-medium">L'ouvrage est disponible</p>
+                            <p className="text-sm mt-1">
+                              Aucun conflit détecté. Vous pouvez valider cette demande de réservation.
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </CardContent>
+                </Card>
+              </>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAvailabilityDialog(false)}>
+              Fermer
+            </Button>
+            {selectedReservation && selectedReservation.statut !== "validee" && 
+             selectedReservation.statut !== "refusee" && selectedReservation.statut !== "archivee" && (
+              <>
+                <Button
+                  variant="outline"
+                  className="text-destructive"
+                  onClick={() => {
+                    setShowAvailabilityDialog(false);
+                    setShowRefuseDialog(true);
+                  }}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Refuser
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowAvailabilityDialog(false);
+                    handleValidate(selectedReservation);
+                  }}
+                >
+                  <Check className="mr-2 h-4 w-4" />
+                  Valider la réservation
+                </Button>
+              </>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
