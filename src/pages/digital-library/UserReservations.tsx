@@ -21,19 +21,20 @@ interface ReservationRequest {
   id: string;
   document_title: string;
   document_cote: string | null;
-  requested_date: string;
-  requested_time: string;
-  status: string;
+  statut: string;
+  requested_date: string | null;
   created_at: string;
   updated_at: string;
-  admin_comments: string | null;
+  reason_refus: string | null;
+  routed_to: string;
 }
 
 const STATUS_LABELS: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-  en_attente: { label: "En attente", variant: "secondary" },
-  approuvee: { label: "Approuvée", variant: "default" },
-  rejetee: { label: "Rejetée", variant: "destructive" },
-  annulee: { label: "Annulée", variant: "outline" },
+  soumise: { label: "Soumise", variant: "secondary" },
+  en_cours: { label: "En cours", variant: "outline" },
+  validee: { label: "Validée", variant: "default" },
+  refusee: { label: "Refusée", variant: "destructive" },
+  archivee: { label: "Archivée", variant: "outline" },
 };
 
 export default function UserReservations() {
@@ -56,7 +57,7 @@ export default function UserReservations() {
 
     try {
       const { data, error } = await supabase
-        .from("reservations_requests")
+        .from("reservations_ouvrages")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -124,39 +125,50 @@ export default function UserReservations() {
                         Date souhaitée
                       </div>
                     </TableHead>
-                    <TableHead>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4" />
-                        Heure
-                      </div>
-                    </TableHead>
                     <TableHead>Statut</TableHead>
-                    <TableHead>Mise à jour</TableHead>
+                    <TableHead>Routage</TableHead>
+                    <TableHead>Date de demande</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {reservations.map((reservation) => {
-                    const statusInfo = STATUS_LABELS[reservation.status] || STATUS_LABELS.en_attente;
+                    const statusInfo = STATUS_LABELS[reservation.statut] || STATUS_LABELS.soumise;
                     
                     return (
-                      <TableRow key={reservation.id}>
+                      <TableRow 
+                        key={reservation.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => navigate(`/digital-library/reservation/${reservation.id}`)}
+                      >
                         <TableCell className="font-medium">
                           {reservation.document_title}
                         </TableCell>
                         <TableCell>
-                          {reservation.document_cote || <span className="text-muted-foreground">—</span>}
+                          {reservation.document_cote ? (
+                            <span className="font-mono text-primary">{reservation.document_cote}</span>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
                         </TableCell>
                         <TableCell>
-                          {format(new Date(reservation.requested_date), "PPP", { locale: fr })}
+                          {reservation.requested_date ? (
+                            format(new Date(reservation.requested_date), "PPP", { locale: fr })
+                          ) : (
+                            <span className="text-muted-foreground">Non spécifiée</span>
+                          )}
                         </TableCell>
-                        <TableCell>{reservation.requested_time}</TableCell>
                         <TableCell>
                           <Badge variant={statusInfo.variant}>
                             {statusInfo.label}
                           </Badge>
                         </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-xs">
+                            {reservation.routed_to === "bibliotheque_numerique" ? "BN" : "Support"}
+                          </Badge>
+                        </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
-                          {format(new Date(reservation.updated_at), "PPP", { locale: fr })}
+                          {format(new Date(reservation.created_at), "PPP", { locale: fr })}
                         </TableCell>
                       </TableRow>
                     );

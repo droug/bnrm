@@ -101,6 +101,7 @@ const MyLoans = lazy(() => import("./pages/digital-library/MyLoans"));
 const MyNotes = lazy(() => import("./pages/digital-library/MyNotes"));
 const AccountSettings = lazy(() => import("./pages/digital-library/AccountSettings"));
 const UserReservations = lazy(() => import("./pages/digital-library/UserReservations"));
+const ReservationDetails = lazy(() => import("./pages/digital-library/ReservationDetails"));
 const UserDigitizationRequests = lazy(() => import("./pages/digital-library/UserDigitizationRequests"));
 const MyRequests = lazy(() => import("./pages/digital-library/MyRequests"));
 const RequestsManagement = lazy(() => import("./pages/digital-library/RequestsManagement"));
@@ -285,6 +286,8 @@ const App = () => {
           <Route path="/digital-library/my-loans" element={<MyLoans />} />
           <Route path="/digital-library/my-notes" element={<MyNotes />} />
           <Route path="/digital-library/mes-reservations" element={<UserReservations />} />
+          <Route path="/digital-library/my-reservations" element={<UserReservations />} />
+          <Route path="/digital-library/reservation/:id" element={<ReservationDetails />} />
           <Route path="/digital-library/mes-demandes-numerisation" element={<UserDigitizationRequests />} />
           <Route path="/digital-library/mes-demandes" element={<MyRequests />} />
           <Route path="/digital-library/account-settings" element={<AccountSettings />} />

@@ -81,6 +81,9 @@ export function BookReservationDialog({
   const [isLoadingDates, setIsLoadingDates] = useState(false);
   const [documentCopies, setDocumentCopies] = useState<any[]>([]);
   const [selectedCopy, setSelectedCopy] = useState<string>("");
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingReservation, setPendingReservation] = useState<any>(null);
+  const [createdReservationId, setCreatedReservationId] = useState<string | null>(null);
   const userTypeRef = useRef<HTMLDivElement>(null);
 
   // Charger les dates désactivées et les copies au montage du composant
@@ -351,19 +354,45 @@ export function BookReservationDialog({
         pfe_proof_url: pfeProofUrl,
       };
 
-      const { error } = await supabase
+      // Sauvegarder les données et afficher la popup de confirmation
+      setPendingReservation({ data: reservationData, routing });
+      setShowConfirmDialog(true);
+      setIsSubmitting(false);
+    } catch (error: any) {
+      console.error("Erreur lors de la préparation de la réservation:", error);
+      toast.error("Erreur", {
+        description: error.message || "Une erreur est survenue",
+      });
+      setIsSubmitting(false);
+    }
+  };
+
+  const confirmReservation = async () => {
+    if (!pendingReservation) return;
+    
+    setIsSubmitting(true);
+    try {
+      const { data: insertedData, error } = await supabase
         .from("reservations_ouvrages")
-        .insert([reservationData]);
+        .insert([pendingReservation.data])
+        .select()
+        .single();
 
       if (error) throw error;
 
+      setCreatedReservationId(insertedData.id);
+      setShowConfirmDialog(false);
+      
       toast.success("Réservation soumise avec succès", {
-        description: routing.message,
+        description: pendingReservation.routing.message,
       });
 
       onReserve?.();
-      onClose();
-      form.reset();
+      
+      // Redirection vers la page de détails après un court délai
+      setTimeout(() => {
+        window.location.href = `/digital-library/reservation/${insertedData.id}`;
+      }, 1500);
     } catch (error: any) {
       console.error("Erreur lors de la soumission de la réservation:", error);
       toast.error("Erreur lors de la soumission", {
@@ -722,6 +751,80 @@ export function BookReservationDialog({
           </form>
         </Form>
       </DialogContent>
+
+      {/* Popup de confirmation */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-primary" />
+              Confirmer votre demande
+            </DialogTitle>
+            <DialogDescription>
+              Veuillez vérifier les informations de votre réservation avant de confirmer
+            </DialogDescription>
+          </DialogHeader>
+
+          {pendingReservation && (
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm text-muted-foreground">Document</h4>
+                <p className="font-medium">{pendingReservation.data.document_title}</p>
+                {pendingReservation.data.document_cote && (
+                  <p className="text-sm text-muted-foreground">
+                    Cote: <span className="font-mono text-primary">{pendingReservation.data.document_cote}</span>
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm text-muted-foreground">Vos informations</h4>
+                <p className="text-sm">{pendingReservation.data.user_name}</p>
+                <p className="text-sm text-muted-foreground">{pendingReservation.data.user_email}</p>
+              </div>
+
+              {pendingReservation.data.requested_date && (
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-sm text-muted-foreground">Date souhaitée</h4>
+                  <p className="text-sm">{format(new Date(pendingReservation.data.requested_date), "PPP", { locale: fr })}</p>
+                </div>
+              )}
+
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-sm">
+                  <span className="font-medium">Routage:</span>{" "}
+                  {pendingReservation.routing.routedTo === "bibliotheque_numerique" 
+                    ? "Bibliothèque Numérique" 
+                    : "Responsable Support"}
+                </p>
+              </div>
+
+              {pendingReservation.data.comments && (
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-sm text-muted-foreground">Commentaires</h4>
+                  <p className="text-sm">{pendingReservation.data.comments}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmDialog(false)}
+              disabled={isSubmitting}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={confirmReservation}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Envoi en cours..." : "Confirmer la demande"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
