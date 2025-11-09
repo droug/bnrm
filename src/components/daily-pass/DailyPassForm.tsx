@@ -144,6 +144,8 @@ export function DailyPassForm({ onClose }: DailyPassFormProps) {
         </CardTitle>
         <CardDescription>
           Accès gratuit limité à une fois par an. Veuillez remplir tous les champs requis.
+          <br />
+          * Reproduction selon la politique interne de la BNRM
         </CardDescription>
       </CardHeader>
       <CardContent>
