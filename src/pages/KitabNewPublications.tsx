@@ -33,6 +33,9 @@ export default function KitabNewPublications() {
   const [selectedPublication, setSelectedPublication] = useState<Publication | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isVisualizeOpen, setIsVisualizeOpen] = useState(false);
+  const [filterDiscipline, setFilterDiscipline] = useState("");
+  const [filterEditor, setFilterEditor] = useState("");
+  const [filterLanguage, setFilterLanguage] = useState("");
   const { toast } = useToast();
 
   const handleDetailsClick = (publication: Publication) => {
@@ -50,17 +53,40 @@ export default function KitabNewPublications() {
   }, []);
 
   useEffect(() => {
+    let filtered = publications;
+
+    // Filtre par recherche
     if (searchQuery.trim()) {
-      const filtered = publications.filter(pub =>
+      filtered = filtered.filter(pub =>
         pub.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         pub.author_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         pub.isbn?.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setFilteredPublications(filtered);
-    } else {
-      setFilteredPublications(publications);
     }
-  }, [searchQuery, publications]);
+
+    // Filtre par discipline
+    if (filterDiscipline) {
+      filtered = filtered.filter(pub =>
+        pub.metadata?.discipline?.toLowerCase().includes(filterDiscipline.toLowerCase())
+      );
+    }
+
+    // Filtre par éditeur
+    if (filterEditor) {
+      filtered = filtered.filter(pub =>
+        pub.metadata?.publisher?.toLowerCase().includes(filterEditor.toLowerCase())
+      );
+    }
+
+    // Filtre par langue
+    if (filterLanguage) {
+      filtered = filtered.filter(pub =>
+        pub.language?.toLowerCase() === filterLanguage.toLowerCase()
+      );
+    }
+
+    setFilteredPublications(filtered);
+  }, [searchQuery, publications, filterDiscipline, filterEditor, filterLanguage]);
 
   const loadPublications = async () => {
     try {
@@ -150,19 +176,43 @@ export default function KitabNewPublications() {
                 </div>
               </div>
 
-              <div className="mt-6 flex gap-3 flex-wrap justify-center">
-                <Button variant="outline" size="sm" className="rounded-full">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filtrer par Genre
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-full">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filtrer par Éditeur
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-full">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filtrer par Langue
-                </Button>
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                    Discipline
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Ex: Sciences, Littérature..."
+                    value={filterDiscipline}
+                    onChange={(e) => setFilterDiscipline(e.target.value)}
+                    className="rounded-full border-[hsl(var(--kitab-primary))]/30 focus:border-[hsl(var(--kitab-primary))]"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                    Éditeur
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Ex: Dar Al Kitab..."
+                    value={filterEditor}
+                    onChange={(e) => setFilterEditor(e.target.value)}
+                    className="rounded-full border-[hsl(var(--kitab-primary))]/30 focus:border-[hsl(var(--kitab-primary))]"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                    Langue
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Ex: Français, Arabe..."
+                    value={filterLanguage}
+                    onChange={(e) => setFilterLanguage(e.target.value)}
+                    className="rounded-full border-[hsl(var(--kitab-primary))]/30 focus:border-[hsl(var(--kitab-primary))]"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
