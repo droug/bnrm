@@ -734,7 +734,7 @@ export default function GestionReservationsOuvrages() {
                   {selectedReservation.document_cote && (
                     <div className="grid grid-cols-2 gap-2">
                       <span className="text-muted-foreground">Cote:</span>
-                      <span className="font-mono">{selectedReservation.document_cote}</span>
+                      <span className="font-mono text-primary">{selectedReservation.document_cote}</span>
                     </div>
                   )}
                   <div className="grid grid-cols-2 gap-2">
@@ -831,10 +831,10 @@ export default function GestionReservationsOuvrages() {
                       {selectedReservation.routed_to === "bibliotheque_numerique" ? "Bibliothèque Numérique" : "Responsable Support"}
                     </Badge>
                   </div>
-                  {(selectedReservation.comments || selectedReservation.motif) && (
+                  {selectedReservation.comments && (
                     <div className="col-span-2">
                       <span className="text-muted-foreground">Commentaires:</span>
-                      <p className="mt-1 p-2 bg-muted rounded">{selectedReservation.comments || selectedReservation.motif}</p>
+                      <p className="mt-1 p-2 bg-muted rounded">{selectedReservation.comments}</p>
                     </div>
                   )}
                   {selectedReservation.reason_refus && (
@@ -959,6 +959,12 @@ export default function GestionReservationsOuvrages() {
                     <CardTitle className="text-base">Statut SIGB</CardTitle>
                   </CardHeader>
                   <CardContent>
+                    {selectedReservation?.document_cote && (
+                      <div className="mb-3 pb-3 border-b">
+                        <span className="text-sm text-muted-foreground">Cote: </span>
+                        <span className="font-mono text-primary">{selectedReservation.document_cote}</span>
+                      </div>
+                    )}
                     {availabilityData.sigbStatus ? (
                       <div className="space-y-3">
                         <div className="flex items-start gap-2">
@@ -1056,7 +1062,7 @@ export default function GestionReservationsOuvrages() {
                                     )}
                                   </div>
                                   {res.document_cote && (
-                                    <p className="font-mono text-xs text-muted-foreground mb-1">
+                                    <p className="font-mono text-xs text-primary mb-1">
                                       Cote: {res.document_cote}
                                     </p>
                                   )}
