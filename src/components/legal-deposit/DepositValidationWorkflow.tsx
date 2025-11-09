@@ -25,6 +25,7 @@ interface DepositRequest {
   status: string;
   author_name: string;
   created_at: string;
+  metadata?: any;
   validated_by_service?: string;
   service_validated_at?: string;
   service_validation_notes?: string;
@@ -68,6 +69,7 @@ export function DepositValidationWorkflow() {
         status,
         author_name,
         created_at,
+        metadata,
         validated_by_service,
         service_validated_at,
         service_validation_notes,
@@ -696,6 +698,16 @@ export function DepositValidationWorkflow() {
                     </div>
                   )}
                   <div>
+                    <span className="font-medium">Auteur:</span>
+                    <p className="mt-1">{selectedRequest.author_name || 'Non spécifié'}</p>
+                  </div>
+                  {selectedRequest.metadata?.customFields?.author_nationality && (
+                    <div>
+                      <span className="font-medium">Nationalité:</span>
+                      <p className="mt-1">{selectedRequest.metadata.customFields.author_nationality}</p>
+                    </div>
+                  )}
+                  <div>
                     <span className="font-medium">Type de support:</span>
                     <p className="mt-1">{selectedRequest.support_type}</p>
                   </div>
@@ -704,6 +716,23 @@ export function DepositValidationWorkflow() {
                     <p className="mt-1">{getStatusBadge(selectedRequest.status)}</p>
                   </div>
                 </div>
+
+                {/* Section pour tous les autres champs personnalisés */}
+                {selectedRequest.metadata?.customFields && Object.keys(selectedRequest.metadata.customFields).length > 1 && (
+                  <div className="mt-4 pt-4 border-t">
+                    <h4 className="font-medium text-sm mb-2">Informations supplémentaires</h4>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      {Object.entries(selectedRequest.metadata.customFields)
+                        .filter(([key]) => key !== 'author_nationality') // Déjà affiché plus haut
+                        .map(([key, value]) => (
+                          <div key={key}>
+                            <strong className="capitalize">{key.replace(/_/g, ' ')}:</strong>{' '}
+                            {value as string || 'Non spécifié'}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Historique des validations */}

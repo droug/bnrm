@@ -16,13 +16,40 @@ export default function DynamicFormPage() {
 
   const handleSubmit = async (data: any) => {
     try {
+      if (!user) {
+        toast.error("Vous devez être connecté pour soumettre une demande");
+        return;
+      }
+
+      // Récupérer l'ID du registre professionnel de l'utilisateur
+      const { data: professionalData, error: professionalError } = await supabase
+        .from('professional_registry')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (professionalError || !professionalData) {
+        toast.error("Vous devez être enregistré comme professionnel pour soumettre une déclaration");
+        return;
+      }
+
       // Créer une demande de dépôt légal avec les données du formulaire
       const { error } = await supabase
         .from("legal_deposit_requests")
         .insert({
-          form_data: data,
-          monograph_type: formKey.includes("monograph") ? "livres" : "other",
-          status: "pending",
+          initiator_id: professionalData.id,
+          title: data.publication_title || 'Sans titre',
+          author_name: data.author_name || '',
+          support_type: 'imprime' as const,
+          monograph_type: formKey.includes("monograph") ? "livres" : 
+                          formKey.includes("bd_software") ? "bd_logiciels" :
+                          formKey.includes("special_collections") ? "collections_specialisees" : "other",
+          status: 'soumis' as const,
+          submission_date: new Date().toISOString(),
+          metadata: {
+            customFields: data, // Toutes les données du formulaire dynamique
+            formKey: formKey
+          }
         } as any);
 
       if (error) throw error;

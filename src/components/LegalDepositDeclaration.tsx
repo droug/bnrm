@@ -3450,6 +3450,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           printer: printerData,
           depositType,
           publisher: selectedPublisher,
+          customFields: customFieldsData, // Inclure les champs personnalisés comme author_nationality
           ...formData
         }
       };

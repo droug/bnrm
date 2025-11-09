@@ -582,6 +582,9 @@ const RequestDetailsModal = ({ request, onUpdateStatus, onAssignNumbers }: {
               <div className="space-y-2 text-sm">
                 <p><strong>Titre:</strong> {request.title}</p>
                 <p><strong>Auteur:</strong> {request.author_name || 'Non spécifié'}</p>
+                {request.metadata?.customFields?.author_nationality && (
+                  <p><strong>Nationalité:</strong> {request.metadata.customFields.author_nationality}</p>
+                )}
                 <p><strong>Type de support:</strong> {request.support_type}</p>
                 <p><strong>Type de publication:</strong> {request.monograph_type}</p>
               </div>
@@ -606,6 +609,24 @@ const RequestDetailsModal = ({ request, onUpdateStatus, onAssignNumbers }: {
               )}
             </div>
           </div>
+
+          {/* Section pour afficher tous les champs personnalisés */}
+          {request.metadata?.customFields && Object.keys(request.metadata.customFields).length > 0 && (
+            <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+              <h4 className="font-medium mb-3 flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Champs supplémentaires
+              </h4>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                {Object.entries(request.metadata.customFields).map(([key, value]) => (
+                  <div key={key}>
+                    <strong className="capitalize">{key.replace(/_/g, ' ')}:</strong>{' '}
+                    {value as string || 'Non spécifié'}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           
           <div className="mt-4">
             <h4 className="font-medium mb-2 flex items-center gap-2">
