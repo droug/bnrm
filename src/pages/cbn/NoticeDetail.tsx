@@ -33,7 +33,7 @@ export default function NoticeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isSubscriber } = useSecureRoles();
+  const { isSubscriber, isResearcher } = useSecureRoles();
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [document, setDocument] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -450,14 +450,17 @@ export default function NoticeDetail() {
                     </Button>
                   )}
                   
-                  <Button 
-                    className="w-full" 
-                    variant="default"
-                    onClick={() => setShowReservationDialog(true)}
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Réserver l'ouvrage
-                  </Button>
+                  {/* Réservation manuscrits : uniquement pour chercheurs et étudiants/chercheurs */}
+                  {(document.type?.toLowerCase().includes('manuscrit') ? isResearcher : true) && (
+                    <Button 
+                      className="w-full" 
+                      variant="default"
+                      onClick={() => setShowReservationDialog(true)}
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Réserver l'ouvrage
+                    </Button>
+                  )}
                   
                   <Button className="w-full" variant="ghost">
                     <Share2 className="h-4 w-4 mr-2" />
