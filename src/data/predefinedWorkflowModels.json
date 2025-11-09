@@ -1159,5 +1159,249 @@
       {"name": "Gestionnaire Visites", "level": "module"},
       {"name": "Guide", "level": "module"}
     ]
+  },
+  {
+    "code": "WF_CBM_01",
+    "name": "Demandes d'Adhésion CBM",
+    "module": "cbm",
+    "workflow_type": "cbm_adhesion",
+    "version": "1.0",
+    "description": "Circuit de validation des demandes d'adhésion au réseau CBM (Catalogue Bibliographique Marocain).",
+    "color": "cyan",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Soumission de la demande",
+        "type": "creation",
+        "required_role": "Demandeur",
+        "description": "Le demandeur soumet sa demande d'adhésion avec les documents requis"
+      },
+      {
+        "order": 2,
+        "name": "Vérification des documents",
+        "type": "validation",
+        "required_role": "Agent CBM",
+        "description": "Vérification de la complétude et de la conformité des documents"
+      },
+      {
+        "order": 3,
+        "name": "Validation technique",
+        "type": "validation",
+        "required_role": "Responsable Technique CBM",
+        "description": "Validation des critères techniques et des capacités de la bibliothèque"
+      },
+      {
+        "order": 4,
+        "name": "Approbation finale",
+        "type": "approbation",
+        "required_role": "Directeur CBM",
+        "description": "Décision finale sur l'adhésion au réseau"
+      },
+      {
+        "order": 5,
+        "name": "Notification",
+        "type": "notification",
+        "required_role": "Système",
+        "description": "Notification du demandeur de la décision"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Soumettre la demande",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Soumettre"
+      },
+      {
+        "name": "Valider les documents",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Valider"
+      },
+      {
+        "name": "Approuver techniquement",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Approuver"
+      },
+      {
+        "name": "Approbation finale",
+        "from_step": 3,
+        "to_step": 4,
+        "trigger_type": "manual",
+        "action": "Approuver définitivement"
+      },
+      {
+        "name": "Notifier le demandeur",
+        "from_step": 4,
+        "to_step": null,
+        "trigger_type": "automatic",
+        "action": "Notifier"
+      },
+      {
+        "name": "Demander corrections",
+        "from_step": 1,
+        "to_step": 0,
+        "trigger_type": "manual",
+        "action": "Demander modification"
+      },
+      {
+        "name": "Rejeter la demande",
+        "from_step": 2,
+        "to_step": 4,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      },
+      {
+        "name": "Rejeter définitivement",
+        "from_step": 3,
+        "to_step": 4,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      }
+    ],
+    "roles": [
+      {"name": "Demandeur", "level": "module"},
+      {"name": "Agent CBM", "level": "module"},
+      {"name": "Responsable Technique CBM", "level": "module"},
+      {"name": "Directeur CBM", "level": "module"},
+      {"name": "Système", "level": "system"}
+    ]
+  },
+  {
+    "code": "WF_CBM_02",
+    "name": "Demandes de Formation CBM",
+    "module": "cbm",
+    "workflow_type": "cbm_formation",
+    "version": "1.0",
+    "description": "Circuit de validation et d'organisation des formations pour les bibliothèques du réseau CBM.",
+    "color": "purple",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Soumission de la demande",
+        "type": "creation",
+        "required_role": "Bibliothèque",
+        "description": "La bibliothèque soumet une demande de formation avec les besoins identifiés"
+      },
+      {
+        "order": 2,
+        "name": "Analyse des besoins",
+        "type": "validation",
+        "required_role": "Responsable Formation CBM",
+        "description": "Analyse et évaluation des besoins en formation"
+      },
+      {
+        "order": 3,
+        "name": "Planification",
+        "type": "planification",
+        "required_role": "Coordinateur Pédagogique",
+        "description": "Élaboration du programme et planification des sessions"
+      },
+      {
+        "order": 4,
+        "name": "Validation budgétaire",
+        "type": "validation",
+        "required_role": "Responsable Administratif",
+        "description": "Validation du budget et des ressources nécessaires"
+      },
+      {
+        "order": 5,
+        "name": "Approbation finale",
+        "type": "approbation",
+        "required_role": "Directeur CBM",
+        "description": "Approbation finale et programmation de la formation"
+      },
+      {
+        "order": 6,
+        "name": "Notification et confirmation",
+        "type": "notification",
+        "required_role": "Système",
+        "description": "Notification de la bibliothèque avec dates et modalités"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Soumettre la demande",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Soumettre"
+      },
+      {
+        "name": "Analyser les besoins",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Analyser"
+      },
+      {
+        "name": "Planifier la formation",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Planifier"
+      },
+      {
+        "name": "Valider le budget",
+        "from_step": 3,
+        "to_step": 4,
+        "trigger_type": "manual",
+        "action": "Valider budget"
+      },
+      {
+        "name": "Approuver définitivement",
+        "from_step": 4,
+        "to_step": 5,
+        "trigger_type": "manual",
+        "action": "Approuver"
+      },
+      {
+        "name": "Confirmer et notifier",
+        "from_step": 5,
+        "to_step": null,
+        "trigger_type": "automatic",
+        "action": "Notifier"
+      },
+      {
+        "name": "Demander précisions",
+        "from_step": 1,
+        "to_step": 0,
+        "trigger_type": "manual",
+        "action": "Demander modification"
+      },
+      {
+        "name": "Rejeter pour raisons pédagogiques",
+        "from_step": 2,
+        "to_step": 5,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      },
+      {
+        "name": "Rejeter pour raisons budgétaires",
+        "from_step": 3,
+        "to_step": 5,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      },
+      {
+        "name": "Rejeter définitivement",
+        "from_step": 4,
+        "to_step": 5,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      }
+    ],
+    "roles": [
+      {"name": "Bibliothèque", "level": "module"},
+      {"name": "Responsable Formation CBM", "level": "module"},
+      {"name": "Coordinateur Pédagogique", "level": "module"},
+      {"name": "Responsable Administratif", "level": "module"},
+      {"name": "Directeur CBM", "level": "module"},
+      {"name": "Système", "level": "system"}
+    ]
   }
 ]
