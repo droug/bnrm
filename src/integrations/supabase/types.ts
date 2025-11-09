@@ -5537,6 +5537,39 @@ export type Database = {
         }
         Relationships: []
       }
+      nationalities: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          label_ar: string | null
+          label_fr: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          label_ar?: string | null
+          label_fr: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          label_ar?: string | null
+          label_fr?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
