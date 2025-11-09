@@ -23,7 +23,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { bookReservationSchema, type BookReservationFormData } from "@/schemas/bookReservationSchema";
@@ -76,6 +75,7 @@ export function BookReservationDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPhysicalWarning, setShowPhysicalWarning] = useState(false);
   const [showUserTypeList, setShowUserTypeList] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   const userTypeRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<BookReservationFormData>({
@@ -418,44 +418,42 @@ export function BookReservationDialog({
                   control={form.control}
                   name="requestedDate"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem className="flex flex-col relative">
                       <FormLabel>Date souhaitée de consultation</FormLabel>
-                      <Popover modal={true}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP", { locale: fr })
-                              ) : (
-                                <span>Sélectionnez une date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent 
-                          className="w-auto p-0" 
-                          align="start"
-                          side="bottom"
-                          sideOffset={4}
+                      <FormControl>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                          onClick={() => setShowCalendar(!showCalendar)}
                         >
+                          {field.value ? (
+                            format(field.value, "PPP", { locale: fr })
+                          ) : (
+                            <span>Sélectionnez une date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                      
+                      {showCalendar && (
+                        <div className="relative w-full border rounded-lg p-3 bg-popover shadow-lg mt-2">
                           <Calendar
                             mode="single"
                             selected={field.value}
-                            onSelect={field.onChange}
+                            onSelect={(date) => {
+                              field.onChange(date);
+                              setShowCalendar(false);
+                            }}
                             disabled={(date) => date < new Date()}
-                            initialFocus
                             locale={fr}
-                            className="p-3"
+                            className="pointer-events-auto mx-auto"
                           />
-                        </PopoverContent>
-                      </Popover>
+                        </div>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
