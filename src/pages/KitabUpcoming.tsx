@@ -88,7 +88,7 @@ export default function KitabUpcoming() {
                 À Paraître
               </h1>
               <p className="text-xl text-white/90 leading-relaxed">
-                Découvrez les prochaines sorties et nouvelles publications
+                Découvrez les prochaines sorties de publications
               </p>
             </div>
           </div>
