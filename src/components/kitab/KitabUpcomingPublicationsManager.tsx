@@ -82,15 +82,51 @@ export function KitabUpcomingPublicationsManager() {
           <div className="divide-y divide-border">
             {publications.map((pub) => (
               <div key={pub.id} className="p-4 hover:bg-accent/50 transition-colors">
-                <h3 className="font-semibold text-lg">{pub.titre}</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {pub.auteur} • {pub.editeur}
-                </p>
-                {pub.date_parution && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Date de parution prévue: {new Date(pub.date_parution).toLocaleDateString('fr-FR')}
-                  </p>
-                )}
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg text-kitab-primary">{pub.titre}</h3>
+                    {pub.soustitre && (
+                      <p className="text-sm text-muted-foreground italic">{pub.soustitre}</p>
+                    )}
+                    <div className="flex flex-wrap gap-2 mt-2 text-sm text-muted-foreground">
+                      {pub.auteur && <span>Auteur: {pub.auteur}</span>}
+                      {pub.editeur && <span>• Éditeur: {pub.editeur}</span>}
+                      {pub.type && <span>• Type: {pub.type}</span>}
+                      {pub.langue && <span>• Langue: {pub.langue}</span>}
+                    </div>
+                    {(pub.isbn || pub.issn) && (
+                      <div className="flex gap-2 mt-2 text-xs">
+                        {pub.isbn && (
+                          <span className="px-2 py-1 rounded bg-kitab-primary/10 text-kitab-primary font-medium">
+                            ISBN: {pub.isbn}
+                          </span>
+                        )}
+                        {pub.issn && (
+                          <span className="px-2 py-1 rounded bg-kitab-secondary/10 text-kitab-secondary font-medium">
+                            ISSN: {pub.issn}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {pub.date_parution && (
+                      <div className="mt-2">
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-kitab-accent">
+                          <span className="text-base">📅</span>
+                          Date de parution prévue: {new Date(pub.date_parution).toLocaleDateString('fr-FR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  {pub.nombre_pages && (
+                    <div className="text-xs text-muted-foreground ml-4 flex-shrink-0">
+                      {pub.nombre_pages} pages
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
