@@ -58,11 +58,12 @@ export function KitabNewPublicationsManager() {
   const loadPublications = async () => {
     setLoading(true);
     try {
-      // Récupérer uniquement les dépôts légaux avec validation finale (attribue)
+      // Récupérer les publications approuvées pour Kitab avec le statut "published" (nouvelles parutions)
       const { data, error } = await supabase
         .from('legal_deposit_requests')
         .select('*')
-        .eq('status', 'attribue')
+        .eq('kitab_status', 'approved')
+        .eq('publication_status', 'published')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -72,12 +73,12 @@ export function KitabNewPublicationsManager() {
         id: item.id,
         title: item.title || 'Sans titre',
         author: item.author_name || item.creator_name,
-        publisher: item.publisher_name,
+        publisher: (item.metadata as any)?.publisher || item.publisher_name || 'Éditeur non spécifié',
         isbn: item.isbn || item.issn,
         publication_date: item.publication_date || item.created_at,
         cover_url: item.cover_image_url,
-        document_type: item.deposit_type || 'Document',
-        status: item.workflow_status || 'completed',
+        document_type: item.support_type || item.deposit_type || 'Document',
+        status: item.status || 'attribue',
         created_at: item.created_at,
         kitab_status: item.kitab_status || 'pending',
       }));

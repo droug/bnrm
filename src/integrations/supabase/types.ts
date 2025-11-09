@@ -2832,6 +2832,13 @@ export type Database = {
             foreignKeyName: "deposit_activity_log_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: false
+            referencedRelation: "kitab_publications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposit_activity_log_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
             referencedRelation: "legal_deposit_requests"
             referencedColumns: ["id"]
           },
@@ -2869,6 +2876,13 @@ export type Database = {
           title?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "deposit_notifications_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "kitab_publications"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "deposit_notifications_request_id_fkey"
             columns: ["request_id"]
@@ -2913,6 +2927,13 @@ export type Database = {
           step_number?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "deposit_workflow_steps_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "kitab_publications"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "deposit_workflow_steps_request_id_fkey"
             columns: ["request_id"]
@@ -4460,6 +4481,13 @@ export type Database = {
             foreignKeyName: "legal_deposit_committee_reviews_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: false
+            referencedRelation: "kitab_publications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "legal_deposit_committee_reviews_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
             referencedRelation: "legal_deposit_requests"
             referencedColumns: ["id"]
           },
@@ -4626,6 +4654,13 @@ export type Database = {
             foreignKeyName: "legal_deposit_monograph_data_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: true
+            referencedRelation: "kitab_publications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "legal_deposit_monograph_data_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: true
             referencedRelation: "legal_deposit_requests"
             referencedColumns: ["id"]
           },
@@ -4676,6 +4711,13 @@ export type Database = {
             foreignKeyName: "legal_deposit_parties_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: false
+            referencedRelation: "kitab_publications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "legal_deposit_parties_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
             referencedRelation: "legal_deposit_requests"
             referencedColumns: ["id"]
           },
@@ -4709,6 +4751,7 @@ export type Database = {
           page_count: number | null
           processing_start_date: string | null
           publication_date: string | null
+          publication_status: string | null
           reception_date: string | null
           rejected_at: string | null
           rejected_by: string | null
@@ -4756,6 +4799,7 @@ export type Database = {
           page_count?: number | null
           processing_start_date?: string | null
           publication_date?: string | null
+          publication_status?: string | null
           reception_date?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
@@ -4803,6 +4847,7 @@ export type Database = {
           page_count?: number | null
           processing_start_date?: string | null
           publication_date?: string | null
+          publication_status?: string | null
           reception_date?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
@@ -9908,6 +9953,72 @@ export type Database = {
       }
     }
     Views: {
+      kitab_publications: {
+        Row: {
+          author_name: string | null
+          created_at: string | null
+          dl_number: string | null
+          id: string | null
+          isbn: string | null
+          ismn: string | null
+          issn: string | null
+          kitab_status: string | null
+          language: string | null
+          metadata: Json | null
+          monograph_type: Database["public"]["Enums"]["monograph_type"] | null
+          page_count: number | null
+          publication_date: string | null
+          publication_status: string | null
+          request_number: string | null
+          subtitle: string | null
+          support_type: Database["public"]["Enums"]["support_type"] | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          author_name?: string | null
+          created_at?: string | null
+          dl_number?: string | null
+          id?: string | null
+          isbn?: string | null
+          ismn?: string | null
+          issn?: string | null
+          kitab_status?: string | null
+          language?: string | null
+          metadata?: Json | null
+          monograph_type?: Database["public"]["Enums"]["monograph_type"] | null
+          page_count?: number | null
+          publication_date?: string | null
+          publication_status?: string | null
+          request_number?: string | null
+          subtitle?: string | null
+          support_type?: Database["public"]["Enums"]["support_type"] | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          author_name?: string | null
+          created_at?: string | null
+          dl_number?: string | null
+          id?: string | null
+          isbn?: string | null
+          ismn?: string | null
+          issn?: string | null
+          kitab_status?: string | null
+          language?: string | null
+          metadata?: Json | null
+          monograph_type?: Database["public"]["Enums"]["monograph_type"] | null
+          page_count?: number | null
+          publication_date?: string | null
+          publication_status?: string | null
+          request_number?: string | null
+          subtitle?: string | null
+          support_type?: Database["public"]["Enums"]["support_type"] | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       manuscript_reading_stats: {
         Row: {
           download_count: number | null

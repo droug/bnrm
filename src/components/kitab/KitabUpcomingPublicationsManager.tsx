@@ -12,14 +12,39 @@ export function KitabUpcomingPublicationsManager() {
   const loadPublications = async () => {
     try {
       setLoading(true);
-      // Pour l'instant, aucune table dédiée pour les publications "à paraître"
-      // Cela nécessite une migration de base de données pour ajouter ce statut
-      // ou une table séparée
-      setPublications([]);
+      
+      // Charger les publications approuvées avec le statut "upcoming" (à paraître)
+      const { data, error } = await supabase
+        .from('legal_deposit_requests')
+        .select('*')
+        .eq('kitab_status', 'approved')
+        .eq('publication_status', 'upcoming')
+        .order('publication_date', { ascending: true });
+
+      if (error) throw error;
+
+      // Mapper les données au format attendu
+      const mappedPublications = (data || []).map(pub => ({
+        id: pub.id,
+        titre: pub.title,
+        soustitre: pub.subtitle,
+        auteur: pub.author_name || 'Auteur inconnu',
+        editeur: (pub.metadata as any)?.publisher || 'Éditeur non spécifié',
+        type: pub.support_type,
+        isbn: pub.isbn,
+        issn: pub.issn,
+        date_parution: pub.publication_date,
+        status: pub.kitab_status,
+        numero_depot: pub.dl_number,
+        langue: pub.language,
+        nombre_pages: pub.page_count
+      }));
+
+      setPublications(mappedPublications);
     } catch (error: any) {
       toast({
         title: "Erreur",
-        description: "Impossible de charger les publications à paraître",
+        description: error.message || "Impossible de charger les publications à paraître",
         variant: "destructive",
       });
     } finally {
