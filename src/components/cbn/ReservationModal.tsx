@@ -41,13 +41,9 @@ const reservationSchema = z.object({
     .regex(/^(\+212|0)[5-7]\d{8}$/, { message: "Numéro de téléphone marocain invalide" })
     .optional()
     .or(z.literal("")),
-  motif: z.string()
-    .trim()
-    .min(5, { message: "Le motif doit contenir au moins 5 caractères" })
-    .max(200, { message: "Le motif ne peut pas dépasser 200 caractères" }),
   comments: z.string()
     .trim()
-    .max(1000, { message: "Les commentaires ne peuvent pas dépasser 1000 caractères" })
+    .max(1000, { message: "Les informations ne peuvent pas dépasser 1000 caractères" })
     .optional()
     .or(z.literal("")),
 });
@@ -79,7 +75,6 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
   const [guestPhone, setGuestPhone] = useState("");
   
   // Champs communs
-  const [motif, setMotif] = useState("");
   const [comments, setComments] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -91,7 +86,6 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
         guestName: user ? "" : guestName,
         guestEmail: user ? "" : guestEmail,
         guestPhone: user ? "" : guestPhone,
-        motif,
         comments
       };
 
@@ -142,7 +136,7 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
         routed_to: routedTo,
         statut: 'soumise',
         requested_date: requestedDate?.toISOString().split('T')[0],
-        motif,
+        motif: comments || '',
         user_name: user ? `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim() : guestName,
         user_email: user?.email || guestEmail,
         user_phone: user?.user_metadata?.phone || guestPhone,
@@ -166,7 +160,6 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
       setGuestName("");
       setGuestEmail("");
       setGuestPhone("");
-      setMotif("");
       setComments("");
     } catch (error: any) {
       console.error("Erreur lors de la création de la réservation:", error);
@@ -283,27 +276,15 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
             )}
           </div>
 
-          {/* Motif */}
+          {/* Informations additionnelles */}
           <div className="space-y-2">
-            <Label htmlFor="motif">Motif de la demande *</Label>
-            <Input
-              id="motif"
-              value={motif}
-              onChange={(e) => setMotif(e.target.value)}
-              placeholder="Recherche académique, étude personnelle, etc."
-              required
-            />
-          </div>
-
-          {/* Commentaires */}
-          <div className="space-y-2">
-            <Label htmlFor="comments">Commentaires additionnels</Label>
+            <Label htmlFor="comments">Informations additionnels</Label>
             <Textarea
               id="comments"
               value={comments}
               onChange={(e) => setComments(e.target.value)}
               placeholder="Informations complémentaires sur votre demande..."
-              rows={3}
+              rows={4}
             />
           </div>
 
