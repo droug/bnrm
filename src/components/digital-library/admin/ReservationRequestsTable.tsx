@@ -509,80 +509,134 @@ export function ReservationRequestsTable() {
 
       {/* Details Dialog */}
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Détails de la demande de réservation</DialogTitle>
+            <DialogTitle className="text-xl">Détails de la demande de réservation</DialogTitle>
+            <DialogDescription>
+              Informations complètes sur la demande et le demandeur
+            </DialogDescription>
           </DialogHeader>
           {selectedRequest && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-muted-foreground">Lecteur</Label>
-                  <p className="font-medium">{selectedRequest.user_name}</p>
-                  <p className="text-sm text-muted-foreground">{selectedRequest.user_email}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Statut</Label>
-                  <div className="mt-1">
-                    <Badge variant={STATUS_LABELS[selectedRequest.status]?.variant || "default"}>
-                      {STATUS_LABELS[selectedRequest.status]?.label || selectedRequest.status}
-                    </Badge>
+            <div className="space-y-6">
+              {/* Informations du demandeur */}
+              <div className="p-4 bg-muted/50 rounded-lg">
+                <h3 className="font-semibold text-base mb-3 flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  Informations du demandeur
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-xs text-muted-foreground uppercase">Nom complet</Label>
+                    <p className="font-medium text-base mt-1">{selectedRequest.user_name}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground uppercase">Email</Label>
+                    <p className="font-medium text-base mt-1">{selectedRequest.user_email}</p>
                   </div>
                 </div>
               </div>
-              
-              <div>
-                <Label className="text-muted-foreground">Document demandé</Label>
-                <p className="font-medium">{selectedRequest.document_title}</p>
-                {selectedRequest.document_cote && (
-                  <p className="text-sm text-muted-foreground">Cote: {selectedRequest.document_cote}</p>
-                )}
+
+              {/* Informations du document */}
+              <div className="p-4 border rounded-lg">
+                <h3 className="font-semibold text-base mb-3">Document demandé</h3>
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs text-muted-foreground uppercase">Titre</Label>
+                    <p className="font-medium text-base mt-1">{selectedRequest.document_title}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {selectedRequest.document_cote && (
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase">Cote</Label>
+                        <p className="font-mono text-sm mt-1 bg-muted px-2 py-1 rounded inline-block">
+                          {selectedRequest.document_cote}
+                        </p>
+                      </div>
+                    )}
+                    {selectedRequest.document_status && (
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase">Type de document</Label>
+                        <div className="mt-1">
+                          <Badge variant={selectedRequest.document_status === "numerise" ? "default" : "secondary"}>
+                            {selectedRequest.document_status === "numerise" ? "📱 Numérisé" :
+                             selectedRequest.document_status === "physique" ? "📚 Physique" :
+                             selectedRequest.document_status === "en_cours_numerisation" ? "⏳ En cours" : 
+                             selectedRequest.document_status}
+                          </Badge>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-muted-foreground">Date souhaitée</Label>
-                  <p className="font-medium">
-                    {format(new Date(selectedRequest.requested_date), "dd/MM/yyyy", { locale: fr })}
-                  </p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Heure souhaitée</Label>
-                  <p className="font-medium">{selectedRequest.requested_time}</p>
+              {/* Détails de la réservation */}
+              <div className="p-4 border rounded-lg">
+                <h3 className="font-semibold text-base mb-3">Détails de la réservation</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-xs text-muted-foreground uppercase">Date souhaitée</Label>
+                    <p className="font-medium text-base mt-1">
+                      {format(new Date(selectedRequest.requested_date), "dd MMMM yyyy", { locale: fr })}
+                    </p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground uppercase">Heure</Label>
+                    <p className="font-medium text-base mt-1">{selectedRequest.requested_time}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground uppercase">Statut</Label>
+                    <div className="mt-1">
+                      <Badge variant={STATUS_LABELS[selectedRequest.status]?.variant || "default"}>
+                        {STATUS_LABELS[selectedRequest.status]?.label || selectedRequest.status}
+                      </Badge>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {selectedRequest.comments && (
-                <div>
-                  <Label className="text-muted-foreground">Commentaire du lecteur</Label>
-                  <p className="text-sm mt-1">{selectedRequest.comments}</p>
+              {/* Commentaires */}
+              {(selectedRequest.comments || selectedRequest.admin_comments) && (
+                <div className="space-y-3">
+                  {selectedRequest.comments && (
+                    <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <Label className="text-xs text-muted-foreground uppercase flex items-center gap-2">
+                        💬 Commentaire du lecteur
+                      </Label>
+                      <p className="text-sm mt-2">{selectedRequest.comments}</p>
+                    </div>
+                  )}
+
+                  {selectedRequest.admin_comments && (
+                    <div className="p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                      <Label className="text-xs text-muted-foreground uppercase flex items-center gap-2">
+                        🔐 Commentaire administrateur
+                      </Label>
+                      <p className="text-sm mt-2">{selectedRequest.admin_comments}</p>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {selectedRequest.admin_comments && (
-                <div>
-                  <Label className="text-muted-foreground">Commentaire administrateur</Label>
-                  <p className="text-sm mt-1">{selectedRequest.admin_comments}</p>
-                </div>
-              )}
-
+              {/* Métadonnées */}
               <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                 <div>
-                  <Label className="text-muted-foreground">Date de création</Label>
-                  <p className="text-sm">
-                    {format(new Date(selectedRequest.created_at), "dd/MM/yyyy HH:mm", { locale: fr })}
+                  <Label className="text-xs text-muted-foreground uppercase">Demande créée le</Label>
+                  <p className="text-sm mt-1">
+                    {format(new Date(selectedRequest.created_at), "dd/MM/yyyy 'à' HH:mm", { locale: fr })}
                   </p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Dernière modification</Label>
-                  <p className="text-sm">
-                    {format(new Date(selectedRequest.updated_at), "dd/MM/yyyy HH:mm", { locale: fr })}
+                  <Label className="text-xs text-muted-foreground uppercase">Dernière modification</Label>
+                  <p className="text-sm mt-1">
+                    {format(new Date(selectedRequest.updated_at), "dd/MM/yyyy 'à' HH:mm", { locale: fr })}
                   </p>
                 </div>
               </div>
             </div>
           )}
-          <DialogFooter>
+          <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
               Fermer
             </Button>
