@@ -88,6 +88,7 @@ export function DynamicFormRenderer({
         .order("order_index");
 
       if (fieldsResponse.error) throw fieldsResponse.error;
+      console.log("Custom fields loaded:", fieldsResponse.data);
       setFields(fieldsResponse.data || []);
 
     } catch (error) {
@@ -121,6 +122,7 @@ export function DynamicFormRenderer({
 
   const visibleSections = sections.filter(section => {
     const sectionFields = fields.filter(f => f.section_key === section.key);
+    console.log(`Section ${section.key}: ${sectionFields.length} fields, visible: ${sectionFields.some(f => f.is_visible)}`);
     return sectionFields.some(f => f.is_visible);
   });
 
@@ -140,6 +142,8 @@ export function DynamicFormRenderer({
                 const sectionFields = fields
                   .filter((f) => f.section_key === section.key && f.is_visible)
                   .sort((a, b) => a.order_index - b.order_index);
+
+                console.log(`Rendering section ${section.key} with ${sectionFields.length} fields:`, sectionFields.map(f => f.field_key));
 
                 if (sectionFields.length === 0) return null;
 
