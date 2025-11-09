@@ -59,11 +59,11 @@ export function KitabNewPublicationsManager() {
   const loadPublications = async () => {
     setLoading(true);
     try {
-      // Récupérer les dépôts légaux validés qui sont pertinents pour Kitab
+      // Récupérer uniquement les dépôts légaux avec validation finale (attribue)
       const { data, error } = await supabase
         .from('legal_deposit_requests')
         .select('*')
-        .in('status', ['valide_par_comite', 'attribue'])
+        .eq('status', 'attribue')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -186,7 +186,7 @@ export function KitabNewPublicationsManager() {
               Gestion des Nouvelles Parutions
             </CardTitle>
             <CardDescription className="mt-2">
-              Publications provenant du Dépôt Légal du portail BNRM
+              Publications ayant obtenu la validation finale du Dépôt Légal BNRM
             </CardDescription>
           </div>
           <Button onClick={loadPublications} variant="outline" size="sm">
