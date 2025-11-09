@@ -111,6 +111,10 @@ export function CBNSearchWithSelection({
         query = query.ilike('cote', `%${criteria.cote}%`);
       }
       
+      if (criteria.numeroDL) {
+        query = query.ilike('deposit_number', `%${criteria.numeroDL}%`);
+      }
+      
       if (criteria.documentType && criteria.documentType !== "all") {
         const typeMap: Record<string, string> = {
           "monographie": "Monographie",

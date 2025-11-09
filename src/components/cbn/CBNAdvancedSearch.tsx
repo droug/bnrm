@@ -20,6 +20,7 @@ interface SearchCriteria {
   documentType?: string;
   isbn?: string;
   cote?: string;
+  numeroDL?: string;
   collection?: string;
   supportType?: string;
 }
@@ -46,6 +47,7 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
   const [documentTypeOther, setDocumentTypeOther] = useState("");
   const [isbn, setIsbn] = useState("");
   const [cote, setCote] = useState("");
+  const [numeroDL, setNumeroDL] = useState("");
   const [collection, setCollection] = useState("");
   const [supportType, setSupportType] = useState("all");
 
@@ -68,6 +70,7 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
       documentType: documentType !== "all" ? (documentType === "other" ? documentTypeOther : documentType) : undefined,
       isbn: isbn || undefined,
       cote: cote || undefined,
+      numeroDL: numeroDL || undefined,
       collection: collection || undefined,
       supportType: supportType !== "all" ? supportType : undefined,
     });
@@ -346,13 +349,22 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">ISBN/ISSN</label>
+                  <label className="text-sm font-medium">Numéro DL</label>
                   <Input 
-                    placeholder="ISBN ou ISSN" 
-                    value={isbn}
-                    onChange={(e) => setIsbn(e.target.value)}
+                    placeholder="Ex: DL-2024-001234" 
+                    value={numeroDL}
+                    onChange={(e) => setNumeroDL(e.target.value)}
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">ISBN/ISSN</label>
+                <Input 
+                  placeholder="ISBN ou ISSN" 
+                  value={isbn}
+                  onChange={(e) => setIsbn(e.target.value)}
+                />
               </div>
 
               <div className="grid md:grid-cols-3 gap-4">
