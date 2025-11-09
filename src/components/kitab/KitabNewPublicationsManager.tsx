@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -177,80 +176,64 @@ export function KitabNewPublicationsManager() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <BookPlus className="h-6 w-6 text-kitab-primary" />
-              Gestion des Nouvelles Parutions
-            </CardTitle>
-            <CardDescription className="mt-2">
-              Publications ayant obtenu la validation finale du Dépôt Légal BNRM
-            </CardDescription>
-          </div>
-          <Button onClick={loadPublications} variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Actualiser
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Filtres et recherche */}
-        <div className="flex flex-col gap-4 md:flex-row">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Rechercher par titre, auteur, ISBN..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-[200px]">
-              <Filter className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Statut" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous les statuts</SelectItem>
-              <SelectItem value="pending">En attente</SelectItem>
-              <SelectItem value="approved">Approuvé</SelectItem>
-              <SelectItem value="rejected">Rejeté</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+    <div className="space-y-4">
+      {/* Bouton d'actualisation */}
+      <div className="flex justify-end">
+        <Button onClick={loadPublications} variant="outline" size="sm">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Actualiser
+        </Button>
+      </div>
 
-        {/* Statistiques */}
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>En attente</CardDescription>
-              <CardTitle className="text-3xl text-amber-600">
-                {publications.filter(p => p.kitab_status === 'pending').length}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>Approuvées</CardDescription>
-              <CardTitle className="text-3xl text-green-600">
-                {publications.filter(p => p.kitab_status === 'approved').length}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>Rejetées</CardDescription>
-              <CardTitle className="text-3xl text-red-600">
-                {publications.filter(p => p.kitab_status === 'rejected').length}
-              </CardTitle>
-            </CardHeader>
-          </Card>
+      {/* Filtres et recherche */}
+      <div className="flex flex-col gap-4 md:flex-row">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher par titre, auteur, ISBN..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
         </div>
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="w-[200px]">
+            <Filter className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="Statut" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous les statuts</SelectItem>
+            <SelectItem value="pending">En attente</SelectItem>
+            <SelectItem value="approved">Approuvé</SelectItem>
+            <SelectItem value="rejected">Rejeté</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-        {/* Tableau des publications */}
-        <div className="border rounded-lg">
+      {/* Statistiques */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="p-4 rounded-lg border bg-card">
+          <p className="text-sm text-muted-foreground mb-1">En attente</p>
+          <p className="text-3xl font-bold text-amber-600">
+            {publications.filter(p => p.kitab_status === 'pending').length}
+          </p>
+        </div>
+        <div className="p-4 rounded-lg border bg-card">
+          <p className="text-sm text-muted-foreground mb-1">Approuvées</p>
+          <p className="text-3xl font-bold text-green-600">
+            {publications.filter(p => p.kitab_status === 'approved').length}
+          </p>
+        </div>
+        <div className="p-4 rounded-lg border bg-card">
+          <p className="text-sm text-muted-foreground mb-1">Rejetées</p>
+          <p className="text-3xl font-bold text-red-600">
+            {publications.filter(p => p.kitab_status === 'rejected').length}
+          </p>
+        </div>
+      </div>
+
+      {/* Tableau des publications */}
+      <div className="border rounded-lg">
           <Table>
             <TableHeader>
               <TableRow>
@@ -328,16 +311,15 @@ export function KitabNewPublicationsManager() {
                 ))
               )}
             </TableBody>
-          </Table>
-        </div>
+        </Table>
+      </div>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Affichage de {filteredPublications.length} publication{filteredPublications.length > 1 ? 's' : ''}
-          </p>
-        </div>
-      </CardContent>
+      {/* Pagination */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          Affichage de {filteredPublications.length} publication{filteredPublications.length > 1 ? 's' : ''}
+        </p>
+      </div>
 
       {/* Dialog de prévisualisation */}
       <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
@@ -430,6 +412,6 @@ export function KitabNewPublicationsManager() {
           )}
         </DialogContent>
       </Dialog>
-    </Card>
+    </div>
   );
 }
