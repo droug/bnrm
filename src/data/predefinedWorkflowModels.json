@@ -1403,5 +1403,227 @@
       {"name": "Directeur CBM", "level": "module"},
       {"name": "Système", "level": "system"}
     ]
+  },
+  {
+    "code": "WF_ACT_01",
+    "name": "Réservation Activités Culturelles",
+    "module": "cultural_activities",
+    "workflow_type": "cultural_booking",
+    "version": "1.0",
+    "description": "Circuit de réservation et validation des activités culturelles (ateliers, conférences, expositions).",
+    "color": "orange",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Soumission de la réservation",
+        "type": "creation",
+        "required_role": "Visiteur",
+        "description": "Le visiteur soumet une demande de réservation pour une activité culturelle"
+      },
+      {
+        "order": 2,
+        "name": "Vérification disponibilité",
+        "type": "validation",
+        "required_role": "Gestionnaire Activités",
+        "description": "Vérification des places disponibles et des conditions d'accès"
+      },
+      {
+        "order": 3,
+        "name": "Validation de la réservation",
+        "type": "approbation",
+        "required_role": "Responsable Activités",
+        "description": "Validation finale de la réservation"
+      },
+      {
+        "order": 4,
+        "name": "Confirmation",
+        "type": "notification",
+        "required_role": "Système",
+        "description": "Envoi de la confirmation au visiteur avec les détails"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Soumettre réservation",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Réserver"
+      },
+      {
+        "name": "Vérifier et valider",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Valider disponibilité"
+      },
+      {
+        "name": "Approuver réservation",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Approuver"
+      },
+      {
+        "name": "Envoyer confirmation",
+        "from_step": 3,
+        "to_step": null,
+        "trigger_type": "automatic",
+        "action": "Confirmer"
+      },
+      {
+        "name": "Rejeter - Places épuisées",
+        "from_step": 1,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      },
+      {
+        "name": "Annuler réservation",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Annuler"
+      }
+    ],
+    "roles": [
+      {"name": "Visiteur", "level": "module"},
+      {"name": "Gestionnaire Activités", "level": "module"},
+      {"name": "Responsable Activités", "level": "module"},
+      {"name": "Système", "level": "system"}
+    ]
+  },
+  {
+    "code": "WF_ACT_02",
+    "name": "Organisation Événements Culturels",
+    "module": "cultural_activities",
+    "workflow_type": "cultural_event",
+    "version": "1.0",
+    "description": "Circuit d'organisation et de validation des événements culturels (conférences, expositions, spectacles).",
+    "color": "yellow",
+    "steps": [
+      {
+        "order": 1,
+        "name": "Proposition événement",
+        "type": "creation",
+        "required_role": "Organisateur",
+        "description": "Proposition d'un nouvel événement culturel"
+      },
+      {
+        "order": 2,
+        "name": "Validation contenu",
+        "type": "validation",
+        "required_role": "Responsable Programmation",
+        "description": "Validation du contenu et de la pertinence culturelle"
+      },
+      {
+        "order": 3,
+        "name": "Validation logistique",
+        "type": "validation",
+        "required_role": "Gestionnaire Logistique",
+        "description": "Vérification de la faisabilité logistique et des ressources"
+      },
+      {
+        "order": 4,
+        "name": "Validation budgétaire",
+        "type": "validation",
+        "required_role": "Responsable Budget",
+        "description": "Validation du budget et des coûts"
+      },
+      {
+        "order": 5,
+        "name": "Approbation finale",
+        "type": "approbation",
+        "required_role": "Directeur Culturel",
+        "description": "Approbation finale et programmation de l'événement"
+      },
+      {
+        "order": 6,
+        "name": "Publication",
+        "type": "publication",
+        "required_role": "Système",
+        "description": "Publication de l'événement et ouverture des réservations"
+      }
+    ],
+    "transitions": [
+      {
+        "name": "Proposer événement",
+        "from_step": 0,
+        "to_step": 1,
+        "trigger_type": "manual",
+        "action": "Proposer"
+      },
+      {
+        "name": "Valider contenu",
+        "from_step": 1,
+        "to_step": 2,
+        "trigger_type": "manual",
+        "action": "Approuver contenu"
+      },
+      {
+        "name": "Valider logistique",
+        "from_step": 2,
+        "to_step": 3,
+        "trigger_type": "manual",
+        "action": "Approuver logistique"
+      },
+      {
+        "name": "Valider budget",
+        "from_step": 3,
+        "to_step": 4,
+        "trigger_type": "manual",
+        "action": "Approuver budget"
+      },
+      {
+        "name": "Approuver définitivement",
+        "from_step": 4,
+        "to_step": 5,
+        "trigger_type": "manual",
+        "action": "Approuver"
+      },
+      {
+        "name": "Publier événement",
+        "from_step": 5,
+        "to_step": null,
+        "trigger_type": "automatic",
+        "action": "Publier"
+      },
+      {
+        "name": "Demander révision",
+        "from_step": 1,
+        "to_step": 0,
+        "trigger_type": "manual",
+        "action": "Réviser"
+      },
+      {
+        "name": "Rejeter - Logistique",
+        "from_step": 2,
+        "to_step": 5,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      },
+      {
+        "name": "Rejeter - Budget",
+        "from_step": 3,
+        "to_step": 5,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      },
+      {
+        "name": "Rejeter définitivement",
+        "from_step": 4,
+        "to_step": 5,
+        "trigger_type": "manual",
+        "action": "Rejeter"
+      }
+    ],
+    "roles": [
+      {"name": "Organisateur", "level": "module"},
+      {"name": "Responsable Programmation", "level": "module"},
+      {"name": "Gestionnaire Logistique", "level": "module"},
+      {"name": "Responsable Budget", "level": "module"},
+      {"name": "Directeur Culturel", "level": "module"},
+      {"name": "Système", "level": "system"}
+    ]
   }
 ]
