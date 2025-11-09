@@ -13,7 +13,7 @@ import { PartnerCollectionForm } from './PartnerCollectionForm';
 interface Collection {
   id: string;
   institution_name: string;
-  institution_code: string;
+  legal_representative: string | null;
   description: string;
   is_approved: boolean;
   created_at: string;
@@ -113,7 +113,7 @@ export function PartnerCollectionsManager() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Institution</TableHead>
-                  <TableHead>Code</TableHead>
+                  <TableHead>Représentant légal</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead>Date</TableHead>
@@ -123,7 +123,7 @@ export function PartnerCollectionsManager() {
                 {collections.map((collection) => (
                   <TableRow key={collection.id}>
                     <TableCell className="font-medium">{collection.institution_name}</TableCell>
-                    <TableCell>{collection.institution_code}</TableCell>
+                    <TableCell>{collection.legal_representative || "Non spécifié"}</TableCell>
                     <TableCell className="max-w-md truncate">{collection.description}</TableCell>
                     <TableCell>{getStatusBadge(collection.is_approved)}</TableCell>
                     <TableCell>{new Date(collection.created_at).toLocaleDateString()}</TableCell>

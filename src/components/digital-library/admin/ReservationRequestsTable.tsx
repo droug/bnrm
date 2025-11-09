@@ -46,6 +46,7 @@ interface ReservationRequest {
   admin_comments: string | null;
   created_at: string;
   updated_at: string;
+  document_status?: string;
 }
 
 const STATUS_LABELS: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -60,6 +61,7 @@ export function ReservationRequestsTable() {
   const [filteredRequests, setFilteredRequests] = useState<ReservationRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterDocumentStatus, setFilterDocumentStatus] = useState<string>("all");
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<ReservationRequest | null>(null);
@@ -70,12 +72,20 @@ export function ReservationRequestsTable() {
   }, []);
 
   useEffect(() => {
-    if (filterStatus === "all") {
-      setFilteredRequests(requests);
-    } else {
-      setFilteredRequests(requests.filter(r => r.status === filterStatus));
+    let filtered = requests;
+    
+    // Filtre par statut de demande
+    if (filterStatus !== "all") {
+      filtered = filtered.filter(r => r.status === filterStatus);
     }
-  }, [filterStatus, requests]);
+    
+    // Filtre par statut du document
+    if (filterDocumentStatus !== "all") {
+      filtered = filtered.filter(r => r.document_status === filterDocumentStatus);
+    }
+    
+    setFilteredRequests(filtered);
+  }, [filterStatus, filterDocumentStatus, requests]);
 
   const loadRequests = async () => {
     setIsLoading(true);
@@ -289,21 +299,38 @@ export function ReservationRequestsTable() {
   return (
     <div className="space-y-4">
       {/* Filters and Export */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Label>Filtrer par statut:</Label>
-          <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous</SelectItem>
-              <SelectItem value="en_attente">En attente</SelectItem>
-              <SelectItem value="acceptee">Acceptée</SelectItem>
-              <SelectItem value="refusee">Refusée</SelectItem>
-              <SelectItem value="terminee">Terminée</SelectItem>
-            </SelectContent>
-          </Select>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Label>Statut demande:</Label>
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous</SelectItem>
+                <SelectItem value="en_attente">En attente</SelectItem>
+                <SelectItem value="acceptee">Acceptée</SelectItem>
+                <SelectItem value="refusee">Refusée</SelectItem>
+                <SelectItem value="terminee">Terminée</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Label>Statut document:</Label>
+            <Select value={filterDocumentStatus} onValueChange={setFilterDocumentStatus}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous</SelectItem>
+                <SelectItem value="physique">Physique</SelectItem>
+                <SelectItem value="numerise">Numérisé</SelectItem>
+                <SelectItem value="en_cours_numerisation">En cours de numérisation</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <Button onClick={exportToExcel} variant="outline">
           <Download className="h-4 w-4 mr-2" />
@@ -318,6 +345,7 @@ export function ReservationRequestsTable() {
             <TableRow>
               <TableHead>Nom Lecteur</TableHead>
               <TableHead>Document</TableHead>
+              <TableHead>Statut Document</TableHead>
               <TableHead>Date souhaitée</TableHead>
               <TableHead>Heure</TableHead>
               <TableHead>Statut</TableHead>
@@ -327,7 +355,7 @@ export function ReservationRequestsTable() {
           <TableBody>
             {filteredRequests.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   Aucune demande trouvée
                 </TableCell>
               </TableRow>
@@ -347,6 +375,18 @@ export function ReservationRequestsTable() {
                         <p className="text-sm text-muted-foreground">Cote: {request.document_cote}</p>
                       )}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {request.document_status ? (
+                      <Badge variant={request.document_status === "numerise" ? "default" : "secondary"}>
+                        {request.document_status === "numerise" ? "Numérisé" :
+                         request.document_status === "physique" ? "Physique" :
+                         request.document_status === "en_cours_numerisation" ? "En cours" : 
+                         request.document_status}
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">Non spécifié</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     {format(new Date(request.requested_date), "dd/MM/yyyy", { locale: fr })}

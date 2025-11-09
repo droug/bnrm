@@ -38,7 +38,7 @@ interface ManuscriptSubmission {
   submitted_by: string;
   partner_collections?: {
     institution_name: string;
-    institution_code: string;
+    legal_representative: string | null;
   };
 }
 
@@ -61,7 +61,7 @@ export function PartnerManuscriptSubmissions() {
           *,
           partner_collections (
             institution_name,
-            institution_code
+            legal_representative
           )
         `)
         .order('created_at', { ascending: false });
@@ -233,10 +233,14 @@ export function PartnerManuscriptSubmissions() {
                                 <label className="text-sm font-medium">Institution</label>
                                 <p className="text-sm text-muted-foreground">
                                   {submission.partner_collections?.institution_name}
-                                  {' '}
-                                  <code className="text-xs bg-muted px-1 rounded">
-                                    {submission.partner_collections?.institution_code}
-                                  </code>
+                                  {submission.partner_collections?.legal_representative && (
+                                    <>
+                                      {' - '}
+                                      <span className="text-xs">
+                                        Représentant: {submission.partner_collections.legal_representative}
+                                      </span>
+                                    </>
+                                  )}
                                 </p>
                               </div>
                             </div>

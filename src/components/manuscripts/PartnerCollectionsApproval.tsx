@@ -25,7 +25,7 @@ import {
 interface PartnerCollection {
   id: string;
   institution_name: string;
-  institution_code: string;
+  legal_representative: string | null;
   contact_person: string;
   contact_email: string;
   contact_phone: string | null;
@@ -147,9 +147,11 @@ export function PartnerCollectionsApproval() {
                     {collection.institution_name}
                   </TableCell>
                   <TableCell>
-                    <code className="text-xs bg-muted px-2 py-1 rounded">
-                      {collection.institution_code}
-                    </code>
+                    {collection.legal_representative ? (
+                      <span className="text-xs">{collection.legal_representative}</span>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">Non spécifié</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
@@ -203,9 +205,9 @@ export function PartnerCollectionsApproval() {
                                 </p>
                               </div>
                               <div>
-                                <label className="text-sm font-medium">Code</label>
+                                <label className="text-sm font-medium">Représentant légal</label>
                                 <p className="text-sm text-muted-foreground">
-                                  {collection.institution_code}
+                                  {collection.legal_representative || "Non spécifié"}
                                 </p>
                               </div>
                               <div>
