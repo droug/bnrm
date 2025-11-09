@@ -252,7 +252,7 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
           )}
 
           {/* Date souhaitée */}
-          <div className="space-y-2">
+          <div className="space-y-2 relative">
             <Label>Date de consultation souhaitée</Label>
             <Button
               type="button"
@@ -268,7 +268,7 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
             </Button>
             
             {showCalendar && (
-              <div className="border rounded-lg p-3 bg-popover">
+              <div className="relative w-full border rounded-lg p-3 bg-popover shadow-lg">
                 <Calendar
                   mode="single"
                   selected={requestedDate}
@@ -277,7 +277,7 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
                     setShowCalendar(false);
                   }}
                   disabled={(date) => date < new Date()}
-                  className="pointer-events-auto"
+                  className="pointer-events-auto mx-auto"
                 />
               </div>
             )}
