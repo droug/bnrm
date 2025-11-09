@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { InlineSelect } from "@/components/ui/inline-select";
+import { GenericAutocomplete } from "@/components/ui/generic-autocomplete";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -113,6 +114,21 @@ export function DynamicField({ field, control, language }: DynamicFieldProps) {
             options={options}
             placeholder={`Sélectionner ${label.toLowerCase()}`}
             disabled={field.is_readonly}
+          />
+        );
+
+      case "autocomplete":
+        // Autocomplete avec chargement depuis la base de données
+        const listCode = field.config?.list_code;
+        if (!listCode) {
+          return <div className="text-sm text-destructive">Configuration manquante: list_code requis</div>;
+        }
+        return (
+          <GenericAutocomplete
+            listCode={listCode}
+            value={formField.value || ''}
+            onChange={formField.onChange}
+            placeholder={`Rechercher ${label.toLowerCase()}`}
           />
         );
 

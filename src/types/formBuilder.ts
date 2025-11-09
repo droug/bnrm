@@ -70,6 +70,7 @@ export const FIELD_TYPES: FieldTypeOption[] = [
   { type: "text", icon: "T", label_fr: "Texte sur seule ligne", label_ar: "نص في سطر واحد" },
   { type: "textarea", icon: "T", label_fr: "Texte multiligne", label_ar: "نص متعدد الأسطر" },
   { type: "select", icon: "≡", label_fr: "Liste système", label_ar: "قائمة النظام" },
+  { type: "autocomplete", icon: "🔍", label_fr: "Autocomplétion", label_ar: "إكمال تلقائي" },
   { type: "multiselect", icon: "≡", label_fr: "Multiple sélection", label_ar: "اختيار متعدد" },
   { type: "date", icon: "📅", label_fr: "Date", label_ar: "تاريخ" },
   { type: "number", icon: "#", label_fr: "Nombre", label_ar: "رقم" },

@@ -82,14 +82,14 @@ export async function initializeLegalDepositMonographForm() {
 
     // Créer les champs de base pour chaque section
     const baseFields = [
-      // Section 1: Identification de l'auteur
       { section_key: "identification_auteur", field_key: "author_type", field_type: "select", label_fr: "Type de l'auteur", label_ar: "نوع المؤلف", order_index: 0, is_required: true },
       { section_key: "identification_auteur", field_key: "author_name", field_type: "text", label_fr: "Nom de l'auteur", label_ar: "اسم المؤلف", order_index: 1, is_required: true },
       { section_key: "identification_auteur", field_key: "author_pseudonym", field_type: "text", label_fr: "Pseudonyme", label_ar: "الاسم المستعار", order_index: 2 },
-      { section_key: "identification_auteur", field_key: "author_phone", field_type: "text", label_fr: "Téléphone", label_ar: "الهاتف", order_index: 3 },
-      { section_key: "identification_auteur", field_key: "author_email", field_type: "text", label_fr: "Email", label_ar: "البريد الإلكتروني", order_index: 4 },
-      { section_key: "identification_auteur", field_key: "author_region", field_type: "select", label_fr: "Région", label_ar: "المنطقة", order_index: 5 },
-      { section_key: "identification_auteur", field_key: "author_city", field_type: "select", label_fr: "Ville", label_ar: "المدينة", order_index: 6 },
+      { section_key: "identification_auteur", field_key: "author_nationality", field_type: "autocomplete", label_fr: "Nationalité", label_ar: "الجنسية", order_index: 3, config: { list_code: "nationalities" } },
+      { section_key: "identification_auteur", field_key: "author_phone", field_type: "text", label_fr: "Téléphone", label_ar: "الهاتف", order_index: 4 },
+      { section_key: "identification_auteur", field_key: "author_email", field_type: "text", label_fr: "Email", label_ar: "البريد الإلكتروني", order_index: 5 },
+      { section_key: "identification_auteur", field_key: "author_region", field_type: "select", label_fr: "Région", label_ar: "المنطقة", order_index: 6 },
+      { section_key: "identification_auteur", field_key: "author_city", field_type: "select", label_fr: "Ville", label_ar: "المدينة", order_index: 7 },
       
       // Section 2: Identification de la publication
       { section_key: "identification_publication", field_key: "publication_discipline", field_type: "select", label_fr: "Discipline de l'ouvrage", label_ar: "تخصص الكتاب", order_index: 0 },
