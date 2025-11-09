@@ -1,7 +1,7 @@
 import KitabHeader from "@/components/KitabHeader";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Book, Award, Mail, ExternalLink } from "lucide-react";
+import { User, Book, Award, Mail, ExternalLink, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -9,7 +9,8 @@ import { useState } from "react";
 const KitabRepertoireAuteurs = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Mock data - à remplacer par des vraies données depuis Supabase
+  // Données temporaires - filtrées pour auteurs marocains uniquement
+  // À remplacer par des vraies données depuis Supabase quand la table auteurs sera créée
   const auteurs = [
     {
       id: 1,
@@ -18,6 +19,7 @@ const KitabRepertoireAuteurs = () => {
       email: "a.elfassi@email.ma",
       nombrePublications: 12,
       distinctions: ["Prix Kitab 2023"],
+      nationalite: "Marocaine",
     },
     {
       id: 2,
@@ -26,6 +28,7 @@ const KitabRepertoireAuteurs = () => {
       email: "fz.bennani@email.ma",
       nombrePublications: 8,
       distinctions: ["Prix de Poésie 2022"],
+      nationalite: "Marocaine",
     },
     {
       id: 3,
@@ -34,6 +37,16 @@ const KitabRepertoireAuteurs = () => {
       email: "m.idrissi@email.ma",
       nombrePublications: 15,
       distinctions: [],
+      nationalite: "Marocaine",
+    },
+    {
+      id: 4,
+      nom: "Aicha Bouali",
+      genres: ["Roman", "Littérature jeunesse"],
+      email: "a.bouali@email.ma",
+      nombrePublications: 6,
+      distinctions: [],
+      nationalite: "Marocaine",
     },
   ];
 
@@ -50,14 +63,14 @@ const KitabRepertoireAuteurs = () => {
         {/* En-tête */}
         <div className="text-center mb-12 space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--kitab-primary))]/10 border border-[hsl(var(--kitab-primary))]/20 mb-4">
-            <User className="h-5 w-5 text-[hsl(var(--kitab-primary))]" />
-            <span className="text-sm font-medium text-[hsl(var(--kitab-primary))]">Programme Kitab BNRM</span>
+            <Globe className="h-5 w-5 text-[hsl(var(--kitab-primary))]" />
+            <span className="text-sm font-medium text-[hsl(var(--kitab-primary))]">Nationalité Marocaine</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[hsl(var(--kitab-primary))] to-[hsl(var(--kitab-accent))] bg-clip-text text-transparent">
             Répertoire des Auteurs
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Tous les auteurs ayant rejoint le programme Kitab de la BNRM
+            Auteurs marocains du programme Kitab de la BNRM
           </p>
         </div>
 
@@ -77,7 +90,14 @@ const KitabRepertoireAuteurs = () => {
           <Card className="border-[hsl(var(--kitab-primary))]/20">
             <CardContent className="pt-6 text-center">
               <div className="text-4xl font-bold text-[hsl(var(--kitab-primary))] mb-2">{auteurs.length}</div>
-              <div className="text-sm text-muted-foreground">Auteurs Inscrits</div>
+              <div className="text-sm text-muted-foreground">Auteurs Marocains</div>
+            </CardContent>
+          </Card>
+          <Card className="border-[hsl(var(--kitab-primary))]/20">
+            <CardContent className="pt-6 text-center">
+              <Globe className="h-8 w-8 mx-auto mb-2 text-[hsl(var(--kitab-primary))]" />
+              <div className="text-sm text-muted-foreground">Nationalité</div>
+              <div className="text-lg font-semibold text-[hsl(var(--kitab-primary))] mt-1">Marocaine</div>
             </CardContent>
           </Card>
           <Card className="border-[hsl(var(--kitab-primary))]/20">
@@ -86,14 +106,6 @@ const KitabRepertoireAuteurs = () => {
                 {auteurs.reduce((acc, a) => acc + a.nombrePublications, 0)}
               </div>
               <div className="text-sm text-muted-foreground">Publications Totales</div>
-            </CardContent>
-          </Card>
-          <Card className="border-[hsl(var(--kitab-primary))]/20">
-            <CardContent className="pt-6 text-center">
-              <div className="text-4xl font-bold text-[hsl(var(--kitab-primary))] mb-2">
-                {auteurs.filter(a => a.distinctions.length > 0).length}
-              </div>
-              <div className="text-sm text-muted-foreground">Auteurs Primés</div>
             </CardContent>
           </Card>
         </div>
@@ -107,9 +119,15 @@ const KitabRepertoireAuteurs = () => {
                   <div className="p-3 rounded-lg bg-[hsl(var(--kitab-primary))]/10 group-hover:bg-[hsl(var(--kitab-primary))]/20 transition-colors">
                     <User className="h-6 w-6 text-[hsl(var(--kitab-primary))]" />
                   </div>
-                  <span className="text-sm font-medium text-[hsl(var(--kitab-primary))]">
-                    {auteur.nombrePublications} publications
-                  </span>
+                  <div className="flex flex-col gap-1 items-end">
+                    <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 border border-green-200 flex items-center gap-1">
+                      <Globe className="h-3 w-3" />
+                      {auteur.nationalite}
+                    </span>
+                    <span className="text-xs font-medium text-[hsl(var(--kitab-primary))]">
+                      {auteur.nombrePublications} publications
+                    </span>
+                  </div>
                 </div>
                 <CardTitle className="text-xl group-hover:text-[hsl(var(--kitab-primary))] transition-colors">
                   {auteur.nom}
