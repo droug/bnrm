@@ -2408,9 +2408,34 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input type="email" placeholder="Adresse email" />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Adresse</Label>
-                  <Textarea placeholder="Adresse complète" />
+                <div className="space-y-2">
+                  <Label>Région</Label>
+                  <InlineSelect
+                    value={selectedRegion}
+                    onChange={(value) => {
+                      setSelectedRegion(value);
+                      setSelectedCity('');
+                    }}
+                    placeholder="Sélectionner la région"
+                    options={moroccanRegions.map(region => ({ 
+                      value: region.name, 
+                      label: region.name 
+                    }))}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Ville</Label>
+                  <InlineSelect
+                    value={selectedCity}
+                    onChange={setSelectedCity}
+                    placeholder={selectedRegion ? "Sélectionner la ville" : "Sélectionner d'abord une région"}
+                    options={selectedRegion ? getCitiesByRegion(selectedRegion).map(city => ({ 
+                      value: city, 
+                      label: city 
+                    })) : []}
+                    disabled={!selectedRegion}
+                  />
                 </div>
 
                 {/* Champs personnalisés (sauf nationality qui est déjà affiché plus haut) */}
