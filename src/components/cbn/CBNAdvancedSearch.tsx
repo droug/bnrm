@@ -339,7 +339,7 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                 />
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Cote</label>
                   <Input 
@@ -356,15 +356,14 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                     onChange={(e) => setNumeroDL(e.target.value)}
                   />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">ISBN/ISSN</label>
-                <Input 
-                  placeholder="ISBN ou ISSN" 
-                  value={isbn}
-                  onChange={(e) => setIsbn(e.target.value)}
-                />
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">ISBN/ISSN</label>
+                  <Input 
+                    placeholder="ISBN ou ISSN" 
+                    value={isbn}
+                    onChange={(e) => setIsbn(e.target.value)}
+                  />
+                </div>
               </div>
 
               <div className="grid md:grid-cols-3 gap-4">
