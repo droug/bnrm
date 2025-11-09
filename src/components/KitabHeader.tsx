@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Globe, User, LogIn, Accessibility, Bot, ChevronDown } from "lucide-react";
+import { Menu, X, Globe, User, LogIn, Accessibility, Bot, ChevronDown, Settings } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
@@ -58,14 +58,25 @@ const KitabHeader = () => {
               <span className="hidden sm:inline">Assistant</span>
             </Button>
 
+
             {/* Utilisateur */}
             {user ? (
-              <Link to="/profile">
-                <Button variant="outline" size="sm" className="gap-2 border-[hsl(var(--kitab-primary))]/40">
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">{profile?.first_name || 'Profil'}</span>
-                </Button>
-              </Link>
+              <>
+                {profile?.role === 'admin' && (
+                  <Link to="/kitab/admin">
+                    <Button variant="outline" size="sm" className="gap-2 border-[hsl(var(--kitab-primary))]/40">
+                      <Settings className="h-4 w-4" />
+                      <span className="hidden sm:inline">Admin Kitab</span>
+                    </Button>
+                  </Link>
+                )}
+                <Link to="/profile">
+                  <Button variant="outline" size="sm" className="gap-2 border-[hsl(var(--kitab-primary))]/40">
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline">{profile?.first_name || 'Profil'}</span>
+                  </Button>
+                </Link>
+              </>
             ) : (
               <Link to="/auth">
                 <Button variant="outline" size="sm" className="gap-2 border-[hsl(var(--kitab-primary))]/40">

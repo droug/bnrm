@@ -4702,6 +4702,7 @@ export type Database = {
           ismn_assigned: string | null
           issn: string | null
           issn_assigned: string | null
+          kitab_status: string | null
           language: string | null
           metadata: Json | null
           monograph_type: Database["public"]["Enums"]["monograph_type"]
@@ -4748,6 +4749,7 @@ export type Database = {
           ismn_assigned?: string | null
           issn?: string | null
           issn_assigned?: string | null
+          kitab_status?: string | null
           language?: string | null
           metadata?: Json | null
           monograph_type: Database["public"]["Enums"]["monograph_type"]
@@ -4794,6 +4796,7 @@ export type Database = {
           ismn_assigned?: string | null
           issn?: string | null
           issn_assigned?: string | null
+          kitab_status?: string | null
           language?: string | null
           metadata?: Json | null
           monograph_type?: Database["public"]["Enums"]["monograph_type"]

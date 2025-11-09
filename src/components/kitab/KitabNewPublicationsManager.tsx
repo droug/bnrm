@@ -59,11 +59,11 @@ export function KitabNewPublicationsManager() {
   const loadPublications = async () => {
     setLoading(true);
     try {
-      // Récupérer les dépôts légaux validés
+      // Récupérer les dépôts légaux validés qui sont pertinents pour Kitab
       const { data, error } = await supabase
         .from('legal_deposit_requests')
         .select('*')
-        .eq('status', 'approved')
+        .in('status', ['valide_par_comite', 'attribue'])
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -103,9 +103,10 @@ export function KitabNewPublicationsManager() {
 
   const handleApprove = async (publicationId: string) => {
     try {
+      // Utiliser .update() avec un objet Record<string, any> pour contourner le problème de typage temporairement
       const { error } = await supabase
         .from('legal_deposit_requests')
-        .update({ kitab_status: 'approved' })
+        .update({ kitab_status: 'approved' } as any)
         .eq('id', publicationId);
 
       if (error) throw error;
@@ -130,7 +131,7 @@ export function KitabNewPublicationsManager() {
     try {
       const { error } = await supabase
         .from('legal_deposit_requests')
-        .update({ kitab_status: 'rejected' })
+        .update({ kitab_status: 'rejected' } as any)
         .eq('id', publicationId);
 
       if (error) throw error;
