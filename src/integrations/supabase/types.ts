@@ -3156,6 +3156,60 @@ export type Database = {
         }
         Relationships: []
       }
+      document_copies: {
+        Row: {
+          availability_status: string
+          barcode: string | null
+          copy_number: string
+          cote: string
+          created_at: string
+          document_id: string
+          id: string
+          last_sync_date: string | null
+          location: string | null
+          notes: string | null
+          sigb_copy_id: string | null
+          sigb_data: Json | null
+          unavailability_reason: string | null
+          unavailable_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          availability_status?: string
+          barcode?: string | null
+          copy_number: string
+          cote: string
+          created_at?: string
+          document_id: string
+          id?: string
+          last_sync_date?: string | null
+          location?: string | null
+          notes?: string | null
+          sigb_copy_id?: string | null
+          sigb_data?: Json | null
+          unavailability_reason?: string | null
+          unavailable_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          availability_status?: string
+          barcode?: string | null
+          copy_number?: string
+          cote?: string
+          created_at?: string
+          document_id?: string
+          id?: string
+          last_sync_date?: string | null
+          location?: string | null
+          notes?: string | null
+          sigb_copy_id?: string | null
+          sigb_data?: Json | null
+          unavailability_reason?: string | null
+          unavailable_until?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       document_templates: {
         Row: {
           content_template: string
@@ -7313,17 +7367,22 @@ export type Database = {
           allow_physical_consultation: boolean
           archived_by: string | null
           comments: string | null
+          copy_id: string | null
           created_at: string
           date_archivage: string | null
           date_refus: string | null
           date_validation: string | null
           document_author: string | null
+          document_cote: string | null
           document_id: string
           document_title: string
           document_year: string | null
           id: string
           is_free_access: boolean
+          is_student_pfe: boolean | null
           motif: string | null
+          pfe_proof_url: string | null
+          pfe_theme: string | null
           processed_at: string | null
           processed_by: string | null
           reason_refus: string | null
@@ -7347,17 +7406,22 @@ export type Database = {
           allow_physical_consultation?: boolean
           archived_by?: string | null
           comments?: string | null
+          copy_id?: string | null
           created_at?: string
           date_archivage?: string | null
           date_refus?: string | null
           date_validation?: string | null
           document_author?: string | null
+          document_cote?: string | null
           document_id: string
           document_title: string
           document_year?: string | null
           id?: string
           is_free_access?: boolean
+          is_student_pfe?: boolean | null
           motif?: string | null
+          pfe_proof_url?: string | null
+          pfe_theme?: string | null
           processed_at?: string | null
           processed_by?: string | null
           reason_refus?: string | null
@@ -7381,17 +7445,22 @@ export type Database = {
           allow_physical_consultation?: boolean
           archived_by?: string | null
           comments?: string | null
+          copy_id?: string | null
           created_at?: string
           date_archivage?: string | null
           date_refus?: string | null
           date_validation?: string | null
           document_author?: string | null
+          document_cote?: string | null
           document_id?: string
           document_title?: string
           document_year?: string | null
           id?: string
           is_free_access?: boolean
+          is_student_pfe?: boolean | null
           motif?: string | null
+          pfe_proof_url?: string | null
+          pfe_theme?: string | null
           processed_at?: string | null
           processed_by?: string | null
           reason_refus?: string | null
@@ -7410,7 +7479,15 @@ export type Database = {
           user_type?: string | null
           validated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reservations_ouvrages_copy_id_fkey"
+            columns: ["copy_id"]
+            isOneToOne: false
+            referencedRelation: "document_copies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reservations_requests: {
         Row: {

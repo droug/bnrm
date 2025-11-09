@@ -330,6 +330,8 @@ export function BookReservationDialog({
         document_title: data.documentTitle,
         document_author: data.documentAuthor || null,
         document_year: data.documentYear || null,
+        document_cote: selectedCopy ? documentCopies.find(c => c.id === selectedCopy)?.cote : null,
+        copy_id: selectedCopy || null,
         support_type: data.supportType,
         support_status: data.supportStatus,
         is_free_access: data.isFreeAccess,

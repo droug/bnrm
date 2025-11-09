@@ -60,17 +60,25 @@ interface Reservation {
   document_id: string;
   document_title: string;
   document_author?: string;
+  document_year?: string;
+  document_cote?: string;
+  copy_id?: string;
   support_type: string;
   support_status: string;
   is_free_access: boolean;
+  request_physical?: boolean;
   routed_to: string;
   statut: string;
   user_name: string;
   user_email: string;
+  user_phone?: string;
   user_type?: string;
   requested_date?: string;
   motif?: string;
   comments?: string;
+  is_student_pfe?: boolean;
+  pfe_theme?: string;
+  pfe_proof_url?: string;
   created_at: string;
   processed_at?: string;
   reason_refus?: string;
@@ -572,6 +580,7 @@ export default function GestionReservationsOuvrages() {
                   <TableRow>
                     <TableHead>N° demande</TableHead>
                     <TableHead>Titre</TableHead>
+                    <TableHead>Cote</TableHead>
                     <TableHead>Demandeur</TableHead>
                     <TableHead>Type support</TableHead>
                     <TableHead>Date demande</TableHead>
@@ -583,7 +592,7 @@ export default function GestionReservationsOuvrages() {
                 <TableBody>
                   {filteredReservations.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                         Aucune réservation trouvée
                       </TableCell>
                     </TableRow>
@@ -595,6 +604,9 @@ export default function GestionReservationsOuvrages() {
                         </TableCell>
                         <TableCell className="font-medium max-w-xs truncate">
                           {reservation.document_title}
+                        </TableCell>
+                        <TableCell className="font-mono text-sm">
+                          {reservation.document_cote || "-"}
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col">
@@ -713,6 +725,18 @@ export default function GestionReservationsOuvrages() {
                       <span>{selectedReservation.document_author}</span>
                     </div>
                   )}
+                  {selectedReservation.document_year && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <span className="text-muted-foreground">Année:</span>
+                      <span>{selectedReservation.document_year}</span>
+                    </div>
+                  )}
+                  {selectedReservation.document_cote && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <span className="text-muted-foreground">Cote:</span>
+                      <span className="font-mono">{selectedReservation.document_cote}</span>
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 gap-2">
                     <span className="text-muted-foreground">Type de support:</span>
                     <span>{selectedReservation.support_type}</span>
@@ -723,6 +747,14 @@ export default function GestionReservationsOuvrages() {
                       {selectedReservation.support_status === "numerise" ? "Numérisé" : "Non numérisé"}
                     </Badge>
                   </div>
+                  {selectedReservation.request_physical !== undefined && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <span className="text-muted-foreground">Consultation physique:</span>
+                      <Badge variant={selectedReservation.request_physical ? "default" : "outline"}>
+                        {selectedReservation.request_physical ? "Oui" : "Non"}
+                      </Badge>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -741,11 +773,31 @@ export default function GestionReservationsOuvrages() {
                     <span className="text-muted-foreground">Email:</span>
                     <span>{selectedReservation.user_email}</span>
                   </div>
+                  {selectedReservation.user_phone && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <span className="text-muted-foreground">Téléphone:</span>
+                      <span>{selectedReservation.user_phone}</span>
+                    </div>
+                  )}
                   {selectedReservation.user_type && (
                     <div className="grid grid-cols-2 gap-2">
                       <span className="text-muted-foreground">Type:</span>
-                      <span>{selectedReservation.user_type}</span>
+                      <span className="capitalize">{selectedReservation.user_type}</span>
                     </div>
+                  )}
+                  {selectedReservation.is_student_pfe && (
+                    <>
+                      <div className="grid grid-cols-2 gap-2">
+                        <span className="text-muted-foreground">Étudiant PFE:</span>
+                        <Badge variant="secondary">Oui</Badge>
+                      </div>
+                      {selectedReservation.pfe_theme && (
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground">Thème PFE:</span>
+                          <p className="mt-1 p-2 bg-muted rounded">{selectedReservation.pfe_theme}</p>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -989,40 +1041,45 @@ export default function GestionReservationsOuvrages() {
                     ) : (
                       <div className="space-y-3">
                         {availabilityData.reservations.map((res) => (
-                          <div
-                            key={res.id}
-                            className={`p-3 rounded-lg border ${
-                              res.id === selectedReservation?.id
-                                ? "bg-primary/5 border-primary"
-                                : "bg-muted/50 border-border"
-                            }`}
-                          >
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <Badge variant="outline" className={getStatusColor(res.statut)}>
-                                    {getStatusLabel(res.statut)}
-                                  </Badge>
-                                  {res.id === selectedReservation?.id && (
-                                    <Badge variant="default" className="text-xs">
-                                      Demande actuelle
+                            <div
+                              key={res.id}
+                              className={`p-3 rounded-lg border ${
+                                res.id === selectedReservation?.id
+                                  ? "bg-primary/5 border-primary"
+                                  : "bg-muted/50 border-border"
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Badge variant="outline" className={getStatusColor(res.statut)}>
+                                      {getStatusLabel(res.statut)}
                                     </Badge>
+                                    {res.id === selectedReservation?.id && (
+                                      <Badge variant="default" className="text-xs">
+                                        Demande actuelle
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  {res.document_cote && (
+                                    <p className="font-mono text-xs text-muted-foreground mb-1">
+                                      Cote: {res.document_cote}
+                                    </p>
                                   )}
-                                </div>
-                                <p className="font-medium text-sm">{res.user_name}</p>
-                                <p className="text-xs text-muted-foreground">{res.user_email}</p>
-                                {res.requested_date && (
-                                  <p className="text-sm mt-1">
-                                    <span className="font-medium">Date souhaitée:</span>{" "}
-                                    {format(new Date(res.requested_date), "dd/MM/yyyy", { locale: fr })}
+                                  <p className="font-medium text-sm">{res.user_name}</p>
+                                  <p className="text-xs text-muted-foreground">{res.user_email}</p>
+                                  {res.requested_date && (
+                                    <p className="text-sm mt-1">
+                                      <span className="font-medium">Date souhaitée:</span>{" "}
+                                      {format(new Date(res.requested_date), "dd/MM/yyyy", { locale: fr })}
+                                    </p>
+                                  )}
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Demandé le: {format(new Date(res.created_at), "dd/MM/yyyy à HH:mm", { locale: fr })}
                                   </p>
-                                )}
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  Demandé le: {format(new Date(res.created_at), "dd/MM/yyyy à HH:mm", { locale: fr })}
-                                </p>
+                                </div>
                               </div>
                             </div>
-                          </div>
                         ))}
                       </div>
                     )}
