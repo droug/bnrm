@@ -5801,9 +5801,9 @@ export type Database = {
           created_by: string
           description: string | null
           id: string
-          institution_code: string
           institution_name: string
           is_approved: boolean | null
+          legal_representative: string | null
           logo_url: string | null
           updated_at: string | null
           website_url: string | null
@@ -5818,9 +5818,9 @@ export type Database = {
           created_by: string
           description?: string | null
           id?: string
-          institution_code: string
           institution_name: string
           is_approved?: boolean | null
+          legal_representative?: string | null
           logo_url?: string | null
           updated_at?: string | null
           website_url?: string | null
@@ -5835,9 +5835,9 @@ export type Database = {
           created_by?: string
           description?: string | null
           id?: string
-          institution_code?: string
           institution_name?: string
           is_approved?: boolean | null
+          legal_representative?: string | null
           logo_url?: string | null
           updated_at?: string | null
           website_url?: string | null
