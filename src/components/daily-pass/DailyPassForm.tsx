@@ -342,7 +342,7 @@ export function DailyPassForm({ onClose }: DailyPassFormProps) {
                 </label>
               </div>
               <FormDescription>
-                Vous pouvez joindre un document justificatif si nécessaire (attestation, carte d'étudiant, etc.)
+                Vous pouvez joindre un document justificatif pour demande de reproduction (Attestation, PFE etc.)
               </FormDescription>
             </div>
 
