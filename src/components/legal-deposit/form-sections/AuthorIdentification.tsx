@@ -5,6 +5,7 @@ import { SimpleDropdown } from '@/components/ui/simple-dropdown';
 import { Textarea } from '@/components/ui/textarea';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { MonographDepositFormData } from '@/schemas/legalDepositSchema';
+import { NationalityAutocomplete } from '@/components/ui/nationality-autocomplete';
 
 interface AuthorIdentificationProps {
   form: UseFormReturn<MonographDepositFormData>;
@@ -145,6 +146,24 @@ export function AuthorIdentification({
                   <FormLabel>Date de naissance *</FormLabel>
                   <FormControl>
                     <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="author.nationality"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nationalité *</FormLabel>
+                  <FormControl>
+                    <NationalityAutocomplete
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Sélectionner la nationalité"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -20,6 +20,7 @@ const authorIdentificationSchema = z.object({
         required_error: 'Le genre est obligatoire pour une personne physique'
       }),
       birthDate: z.string().min(1, 'La date de naissance est obligatoire pour une personne physique'),
+      nationality: z.string().min(1, 'La nationalité est obligatoire pour une personne physique'),
       declarationNature: z.string().optional(),
     }),
     z.object({
