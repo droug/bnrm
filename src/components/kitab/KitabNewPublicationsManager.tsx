@@ -309,7 +309,7 @@ export function KitabNewPublicationsManager() {
                         </Button>
                         {pub.kitab_status !== 'rejected' && (
                           <>
-                            {pub.kitab_status === 'pending' && (
+                            {pub.kitab_status !== 'approved' && (
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -420,7 +420,7 @@ export function KitabNewPublicationsManager() {
                     <X className="h-4 w-4 mr-2" />
                     Rejeter
                   </Button>
-                  {selectedPublication.kitab_status === 'pending' && (
+                  {selectedPublication.kitab_status !== 'approved' && (
                     <Button
                       onClick={() => {
                         setPreviewDialogOpen(false);
