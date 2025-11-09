@@ -114,6 +114,8 @@ export default function GestionReservationsOuvrages() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [routeFilter, setRouteFilter] = useState<string>("all");
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
@@ -146,6 +148,7 @@ export default function GestionReservationsOuvrages() {
 
   useEffect(() => {
     applyFilters();
+    setCurrentPage(1); // Reset to first page when filters change
   }, [reservations, searchTerm, statusFilter, routeFilter]);
 
   const fetchReservations = async () => {
@@ -201,6 +204,16 @@ export default function GestionReservationsOuvrages() {
     }
 
     setFilteredReservations(filtered);
+  };
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredReservations.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedReservations = filteredReservations.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
   };
 
   const handleValidate = async (reservation: Reservation) => {
@@ -571,7 +584,27 @@ export default function GestionReservationsOuvrages() {
         {/* Tableau des réservations */}
         <Card>
           <CardHeader>
-            <CardTitle>Liste des réservations ({filteredReservations.length})</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Liste des réservations ({filteredReservations.length})</CardTitle>
+              <Select
+                value={itemsPerPage.toString()}
+                onValueChange={(value) => {
+                  setItemsPerPage(Number(value));
+                  setCurrentPage(1);
+                }}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5 par page</SelectItem>
+                  <SelectItem value="10">10 par page</SelectItem>
+                  <SelectItem value="20">20 par page</SelectItem>
+                  <SelectItem value="50">50 par page</SelectItem>
+                  <SelectItem value="100">100 par page</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -597,7 +630,7 @@ export default function GestionReservationsOuvrages() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredReservations.map((reservation) => (
+                    paginatedReservations.map((reservation) => (
                       <TableRow key={reservation.id}>
                         <TableCell className="font-mono text-sm">
                           {reservation.id.slice(0, 8)}...
@@ -693,6 +726,77 @@ export default function GestionReservationsOuvrages() {
                 </TableBody>
               </Table>
             </div>
+
+            {/* Pagination Controls */}
+            {filteredReservations.length > 0 && totalPages > 1 && (
+              <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                <div className="text-sm text-muted-foreground">
+                  Affichage de {startIndex + 1} à {Math.min(endIndex, filteredReservations.length)} sur {filteredReservations.length} réservations
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => goToPage(1)}
+                    disabled={currentPage === 1}
+                  >
+                    Premier
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Précédent
+                  </Button>
+                  
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+                      
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => goToPage(pageNum)}
+                          className="w-10"
+                        >
+                          {pageNum}
+                        </Button>
+                      );
+                    })}
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Suivant
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => goToPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Dernier
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
