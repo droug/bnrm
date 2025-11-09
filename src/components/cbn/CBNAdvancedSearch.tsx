@@ -167,11 +167,25 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
     { value: "all", label: "Tous" },
     { value: "book", label: "Livre" },
     { value: "periodical", label: "Périodique" },
-    { value: "thesis", label: "Thèse" },
+    { value: "journal", label: "Journal" },
+    { value: "revue", label: "Revue" },
     { value: "manuscript", label: "Manuscrit" },
     { value: "microfilm", label: "Microfilm" },
     { value: "digital", label: "Numérique" },
     { value: "maps", label: "Cartes et Plans" },
+    { value: "brochure", label: "Brochure" },
+    { value: "rapport", label: "Rapport" },
+    { value: "audio", label: "Document sonore" },
+    { value: "video", label: "Document audiovisuel" },
+    { value: "photo", label: "Photographie" },
+    { value: "poster", label: "Affiche" },
+    { value: "sheet_music", label: "Partition musicale" },
+    { value: "catalog", label: "Catalogue" },
+    { value: "dictionary", label: "Dictionnaire" },
+    { value: "encyclopedia", label: "Encyclopédie" },
+    { value: "atlas", label: "Atlas" },
+    { value: "cd", label: "CD-ROM" },
+    { value: "dvd", label: "DVD" },
   ];
 
   const supportTypeOptions = [
@@ -249,13 +263,6 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                 onClick={() => handleQuickFilter("periodical")}
               >
                 <Filter className="h-3 w-3 mr-1" /> Périodiques
-              </Badge>
-              <Badge 
-                variant="outline" 
-                className="cursor-pointer hover:bg-primary/10 transition-colors"
-                onClick={() => handleQuickFilter("thesis")}
-              >
-                <Filter className="h-3 w-3 mr-1" /> Thèses
               </Badge>
               <Badge 
                 variant="outline" 

@@ -115,11 +115,25 @@ export function CBNSearchWithSelection({
         const typeMap: Record<string, string> = {
           "book": "Livre",
           "periodical": "Périodique",
-          "thesis": "Thèse",
+          "journal": "Journal",
+          "revue": "Revue",
           "manuscript": "Manuscrit",
           "microfilm": "Microfilm",
-          "digital": "CD-ROM",
-          "maps": "Cartes et Plans"
+          "digital": "Numérique",
+          "maps": "Cartes et Plans",
+          "brochure": "Brochure",
+          "rapport": "Rapport",
+          "audio": "Document sonore",
+          "video": "Document audiovisuel",
+          "photo": "Photographie",
+          "poster": "Affiche",
+          "sheet_music": "Partition musicale",
+          "catalog": "Catalogue",
+          "dictionary": "Dictionnaire",
+          "encyclopedia": "Encyclopédie",
+          "atlas": "Atlas",
+          "cd": "CD-ROM",
+          "dvd": "DVD"
         };
         const targetType = typeMap[criteria.documentType];
         if (targetType) {
