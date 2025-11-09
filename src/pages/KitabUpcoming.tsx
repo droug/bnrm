@@ -4,7 +4,8 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Clock, BookOpen, Calendar } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ArrowLeft, Clock, BookOpen, Calendar, Info } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -26,7 +27,14 @@ interface Publication {
 export default function KitabUpcoming() {
   const [publications, setPublications] = useState<Publication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPublication, setSelectedPublication] = useState<Publication | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { toast } = useToast();
+
+  const handleDetailsClick = (publication: Publication) => {
+    setSelectedPublication(publication);
+    setIsDetailsOpen(true);
+  };
 
   useEffect(() => {
     loadPublications();
@@ -213,6 +221,18 @@ export default function KitabUpcoming() {
                           })}</span>
                         </div>
                       )}
+                      
+                      <div className="mt-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDetailsClick(pub)}
+                          className="rounded-full border-[hsl(var(--kitab-secondary))]/30 hover:bg-[hsl(var(--kitab-secondary))]/10 hover:border-[hsl(var(--kitab-secondary))]"
+                        >
+                          <Info className="w-4 h-4 mr-2" />
+                          Détails
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -221,6 +241,106 @@ export default function KitabUpcoming() {
           </div>
         )}
       </main>
+      
+      {/* Details Dialog */}
+      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-[hsl(var(--kitab-secondary))]">
+              Détails de la Publication
+            </DialogTitle>
+          </DialogHeader>
+          {selectedPublication && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xl font-bold text-foreground mb-2">
+                  {selectedPublication.title}
+                </h3>
+                {selectedPublication.subtitle && (
+                  <p className="text-lg text-muted-foreground italic">
+                    {selectedPublication.subtitle}
+                  </p>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                {selectedPublication.author_name && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">Auteur</p>
+                    <p className="text-foreground">{selectedPublication.author_name}</p>
+                  </div>
+                )}
+                {selectedPublication.metadata?.publisher && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">Éditeur</p>
+                    <p className="text-foreground">{selectedPublication.metadata.publisher}</p>
+                  </div>
+                )}
+                {selectedPublication.isbn && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">ISBN</p>
+                    <p className="text-foreground">{selectedPublication.isbn}</p>
+                  </div>
+                )}
+                {selectedPublication.support_type && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">Type de support</p>
+                    <p className="text-foreground">{selectedPublication.support_type}</p>
+                  </div>
+                )}
+                {selectedPublication.language && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">Langue</p>
+                    <p className="text-foreground">{selectedPublication.language}</p>
+                  </div>
+                )}
+                {selectedPublication.page_count && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">Nombre de pages</p>
+                    <p className="text-foreground">{selectedPublication.page_count}</p>
+                  </div>
+                )}
+                {selectedPublication.publication_date && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">Date de parution prévue</p>
+                    <p className="text-foreground">
+                      {new Date(selectedPublication.publication_date).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                )}
+              </div>
+              
+              {selectedPublication.metadata && (
+                <div>
+                  <p className="text-sm font-semibold text-muted-foreground mb-2">Informations complémentaires</p>
+                  <div className="bg-muted/30 rounded-lg p-4 space-y-2">
+                    {selectedPublication.metadata.description && (
+                      <p className="text-sm text-foreground">{selectedPublication.metadata.description}</p>
+                    )}
+                    {selectedPublication.metadata.subject && (
+                      <p className="text-sm"><span className="font-semibold">Sujet:</span> {selectedPublication.metadata.subject}</p>
+                    )}
+                    {selectedPublication.metadata.collection && (
+                      <p className="text-sm"><span className="font-semibold">Collection:</span> {selectedPublication.metadata.collection}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-center gap-2 p-4 bg-[hsl(var(--kitab-accent))]/10 rounded-lg">
+                <Clock className="w-5 h-5 text-[hsl(var(--kitab-accent))]" />
+                <p className="text-sm text-muted-foreground">
+                  Cette publication sera disponible prochainement
+                </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
       
       <Footer />
     </div>
