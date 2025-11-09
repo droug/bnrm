@@ -152,6 +152,7 @@ const NoticeDetailReproduction = lazy(() => import("./pages/cbn/NoticeDetailRepr
 // Kitab Platform (lazy)
 const KitabPortal = lazy(() => import("./pages/KitabPortal"));
 const KitabAdmin = lazy(() => import("./pages/KitabAdmin"));
+const KitabAdminGestionParutions = lazy(() => import("./pages/KitabAdminGestionParutions"));
 const KitabAbout = lazy(() => import("./pages/KitabAbout"));
 const KitabUpcoming = lazy(() => import("./pages/KitabUpcoming"));
 const KitabNewPublications = lazy(() => import("./pages/KitabNewPublications"));
@@ -348,6 +349,7 @@ const App = () => {
           {/* Kitab Platform Routes */}
           <Route path="/kitab" element={<KitabPortal />} />
           <Route path="/kitab/admin" element={<KitabAdmin />} />
+          <Route path="/kitab/admin/gestion_parutions" element={<KitabAdminGestionParutions />} />
           <Route path="/kitab/about" element={<KitabAbout />} />
           <Route path="/kitab/upcoming" element={<KitabUpcoming />} />
           <Route path="/kitab/new-publications" element={<KitabNewPublications />} />
