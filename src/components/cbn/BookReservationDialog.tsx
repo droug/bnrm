@@ -25,6 +25,7 @@ import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { bookReservationSchema, type BookReservationFormData } from "@/schemas/bookReservationSchema";
 import { useAuth } from "@/hooks/useAuth";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -78,14 +79,32 @@ export function BookReservationDialog({
   const [showCalendar, setShowCalendar] = useState(false);
   const [disabledDates, setDisabledDates] = useState<Date[]>([]);
   const [isLoadingDates, setIsLoadingDates] = useState(false);
+  const [documentCopies, setDocumentCopies] = useState<any[]>([]);
+  const [selectedCopy, setSelectedCopy] = useState<string>("");
   const userTypeRef = useRef<HTMLDivElement>(null);
 
-  // Charger les dates désactivées au montage du composant
+  // Charger les dates désactivées et les copies au montage du composant
   useEffect(() => {
     if (isOpen && documentId) {
       fetchDisabledDates();
+      fetchDocumentCopies();
     }
   }, [isOpen, documentId]);
+
+  const fetchDocumentCopies = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("document_copies" as any)
+        .select("*")
+        .eq("document_id", documentId)
+        .order("copy_number", { ascending: true });
+
+      if (error) throw error;
+      setDocumentCopies(data || []);
+    } catch (error) {
+      console.error("Erreur chargement copies:", error);
+    }
+  };
 
   const fetchDisabledDates = async () => {
     try {
@@ -465,7 +484,28 @@ export function BookReservationDialog({
             {/* Informations personnelles */}
             <Card>
               <CardContent className="pt-6 space-y-4">
-                <h3 className="font-semibold mb-3">Vos informations</h3>
+                <h3 className="font-semibold mb-3">Détails de la demande</h3>
+                
+                {/* Sélection de la copie */}
+                {documentCopies.length > 0 && (
+                  <div className="space-y-2">
+                    <Label htmlFor="copy-select">Document (Copie) *</Label>
+                    <Select value={selectedCopy} onValueChange={setSelectedCopy}>
+                      <SelectTrigger id="copy-select">
+                        <SelectValue placeholder="Sélectionnez une copie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {documentCopies.map((copy) => (
+                          <SelectItem key={copy.id} value={copy.id} disabled={copy.availability_status !== 'disponible'}>
+                            {copy.cote} - {copy.copy_number} ({copy.availability_status === 'disponible' ? 'Disponible' : copy.unavailability_reason || 'Non disponible'})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                
+                <h3 className="font-semibold mb-3 mt-6">Vos informations</h3>
                 
                 <FormField
                   control={form.control}

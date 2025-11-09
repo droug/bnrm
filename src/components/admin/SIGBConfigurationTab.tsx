@@ -4,15 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
 } from "@/components/ui/table";
 import {
   Dialog,
@@ -22,10 +22,34 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Database, RefreshCw, Settings, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { 
+  Settings, 
+  Database, 
+  RefreshCw, 
+  CheckCircle, 
+  XCircle,
+  Edit,
+  Trash2,
+  Plus,
+  Copy as CopyIcon
+} from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+
+interface SIGBConfig {
+  id: string;
+  config_name: string;
+  sigb_type: string;
+  api_url: string;
+  api_key?: string;
+  sync_enabled: boolean;
+  sync_frequency: string;
+  last_sync_at?: string;
+  auto_update_availability: boolean;
+  sync_all_locations: boolean;
+}
 
 interface DocumentCopy {
   id: string;
@@ -33,349 +57,456 @@ interface DocumentCopy {
   copy_number: string;
   cote: string;
   barcode?: string;
-  location?: string;
+  location: string;
   availability_status: string;
   unavailability_reason?: string;
   unavailable_until?: string;
   sigb_copy_id?: string;
   last_sync_date?: string;
   notes?: string;
-  created_at: string;
-}
-
-interface SIGBConfig {
-  id: string;
-  system_name: string;
-  api_endpoint: string;
-  sync_enabled: boolean;
-  last_sync_date?: string;
-  is_active: boolean;
 }
 
 export function SIGBConfigurationTab() {
+  const [config, setConfig] = useState<SIGBConfig | null>(null);
   const [copies, setCopies] = useState<DocumentCopy[]>([]);
-  const [sigbConfig, setSigbConfig] = useState<SIGBConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [selectedCopy, setSelectedCopy] = useState<DocumentCopy | null>(null);
-  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showCopyDialog, setShowCopyDialog] = useState(false);
+  const [editingCopy, setEditingCopy] = useState<DocumentCopy | null>(null);
+  const [newCopy, setNewCopy] = useState({
+    document_id: "",
+    copy_number: "",
+    cote: "",
+    barcode: "",
+    location: "",
+    availability_status: "disponible",
+    unavailability_reason: "",
+    notes: ""
+  });
 
   useEffect(() => {
-    loadData();
+    loadConfig();
+    loadCopies();
   }, []);
 
-  const loadData = async () => {
+  const loadConfig = async () => {
     try {
-      setIsLoading(true);
-
-      // Charger les copies de documents
-      const { data: copiesData, error: copiesError } = await supabase
-        .from("document_copies")
-        .select("*")
-        .order("document_id", { ascending: true })
-        .order("copy_number", { ascending: true });
-
-      if (copiesError) throw copiesError;
-      setCopies(copiesData || []);
-
-      // Charger la configuration SIGB
-      const { data: configData, error: configError } = await supabase
+      const { data, error } = await supabase
         .from("sigb_configuration")
         .select("*")
-        .limit(1)
         .maybeSingle();
 
-      if (configError && configError.code !== 'PGRST116') throw configError;
-      setSigbConfig(configData);
-
+      if (error && error.code !== "PGRST116") throw error;
+      setConfig(data as any);
     } catch (error: any) {
-      console.error("Erreur de chargement:", error);
-      toast.error("Erreur lors du chargement des données");
+      console.error("Erreur chargement config:", error);
+      toast.error("Erreur lors du chargement de la configuration");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSync = async () => {
+  const loadCopies = async () => {
     try {
-      setIsSyncing(true);
-      toast.info("Synchronisation en cours...");
+      const { data, error } = await supabase
+        .from("document_copies" as any)
+        .select("*")
+        .order("document_id", { ascending: true })
+        .order("copy_number", { ascending: true });
 
+      if (error) throw error;
+      setCopies((data || []) as any);
+    } catch (error: any) {
+      console.error("Erreur chargement copies:", error);
+      toast.error("Erreur lors du chargement des copies");
+    }
+  };
+
+  const handleSync = async () => {
+    if (!config) return;
+
+    setIsSyncing(true);
+    try {
       const { data, error } = await supabase.functions.invoke("sigb-metadata-sync", {
         body: {
-          sigbUrl: sigbConfig?.api_endpoint || "https://sigb.example.com/api/v1/items",
-          mode: "manual",
-        },
+          sigbUrl: config.api_url,
+          mode: "manual"
+        }
       });
 
       if (error) throw error;
 
-      toast.success(`Synchronisation réussie! ${data?.imported || 0} enregistrements importés.`);
-      loadData();
+      toast.success("Synchronisation SIGB réussie", {
+        description: `${data.imported || 0} enregistrements synchronisés`
+      });
+
+      await loadCopies();
+      await loadConfig();
     } catch (error: any) {
-      console.error("Erreur de synchronisation:", error);
-      toast.error("Échec de la synchronisation: " + error.message);
+      console.error("Erreur synchronisation:", error);
+      toast.error("Erreur lors de la synchronisation SIGB");
     } finally {
       setIsSyncing(false);
     }
   };
 
+  const handleSaveCopy = async () => {
+    try {
+      if (editingCopy) {
+        const { error } = await supabase
+          .from("document_copies" as any)
+          .update(newCopy)
+          .eq("id", editingCopy.id);
+
+        if (error) throw error;
+        toast.success("Copie mise à jour");
+      } else {
+        const { error } = await supabase
+          .from("document_copies" as any)
+          .insert([newCopy]);
+
+        if (error) throw error;
+        toast.success("Copie ajoutée");
+      }
+
+      setShowCopyDialog(false);
+      setEditingCopy(null);
+      setNewCopy({
+        document_id: "",
+        copy_number: "",
+        cote: "",
+        barcode: "",
+        location: "",
+        availability_status: "disponible",
+        unavailability_reason: "",
+        notes: ""
+      });
+      loadCopies();
+    } catch (error: any) {
+      console.error("Erreur sauvegarde copie:", error);
+      toast.error("Erreur lors de la sauvegarde");
+    }
+  };
+
+  const handleDeleteCopy = async (copyId: string) => {
+    try {
+      const { error } = await supabase
+        .from("document_copies" as any)
+        .delete()
+        .eq("id", copyId);
+
+      if (error) throw error;
+      toast.success("Copie supprimée");
+      loadCopies();
+    } catch (error: any) {
+      console.error("Erreur suppression copie:", error);
+      toast.error("Erreur lors de la suppression");
+    }
+  };
+
   const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      disponible: { variant: "default" as const, icon: CheckCircle2, label: "Disponible" },
-      emprunte: { variant: "destructive" as const, icon: XCircle, label: "Emprunté" },
-      en_restauration: { variant: "secondary" as const, icon: AlertCircle, label: "Restauration" },
-      en_reliure: { variant: "secondary" as const, icon: AlertCircle, label: "Reliure" },
-      reserve: { variant: "outline" as const, icon: AlertCircle, label: "Réservé" },
-      en_traitement: { variant: "outline" as const, icon: AlertCircle, label: "Traitement" },
-    };
-
-    const config = statusConfig[status as keyof typeof statusConfig] || {
-      variant: "outline" as const,
-      icon: AlertCircle,
-      label: status,
-    };
-
-    const Icon = config.icon;
-
-    return (
-      <Badge variant={config.variant} className="gap-1">
-        <Icon className="h-3 w-3" />
-        {config.label}
-      </Badge>
-    );
+    switch (status) {
+      case "disponible":
+        return <Badge className="bg-green-500/10 text-green-700 border-green-500/30">Disponible</Badge>;
+      case "emprunte":
+        return <Badge className="bg-orange-500/10 text-orange-700 border-orange-500/30">Emprunté</Badge>;
+      case "en_restauration":
+        return <Badge className="bg-purple-500/10 text-purple-700 border-purple-500/30">En restauration</Badge>;
+      case "en_reliure":
+        return <Badge className="bg-blue-500/10 text-blue-700 border-blue-500/30">En reliure</Badge>;
+      case "reserve":
+        return <Badge className="bg-yellow-500/10 text-yellow-700 border-yellow-500/30">Réservé</Badge>;
+      case "en_traitement":
+        return <Badge className="bg-indigo-500/10 text-indigo-700 border-indigo-500/30">En traitement</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-12">
-        <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <div className="p-8 text-center">Chargement...</div>;
   }
 
   return (
     <div className="space-y-6">
-      {/* Configuration SIGB */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-primary" />
-              <CardTitle>Configuration de l'interconnexion SIGB</CardTitle>
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Configuration du SIGB
+              </CardTitle>
+              <CardDescription>
+                Paramètres de connexion et synchronisation avec le système de gestion de bibliothèque
+              </CardDescription>
             </div>
-            {sigbConfig && (
-              <Badge variant={sigbConfig.is_active ? "default" : "outline"}>
-                {sigbConfig.is_active ? "Actif" : "Inactif"}
-              </Badge>
-            )}
-          </div>
-          <CardDescription>
-            Gestion de la connexion au Système Intégré de Gestion de Bibliothèque
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {sigbConfig ? (
-            <>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <Label>Système</Label>
-                  <Input value={sigbConfig.system_name} disabled />
-                </div>
-                <div>
-                  <Label>Endpoint API</Label>
-                  <Input value={sigbConfig.api_endpoint} disabled />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Switch checked={sigbConfig.sync_enabled} disabled />
-                  <Label>Synchronisation automatique</Label>
-                </div>
-                {sigbConfig.last_sync_date && (
-                  <p className="text-sm text-muted-foreground">
-                    Dernière synchro: {format(new Date(sigbConfig.last_sync_date), "PPp", { locale: fr })}
-                  </p>
-                )}
-              </div>
-
+            {config && (
               <div className="flex gap-2">
                 <Button
                   onClick={handleSync}
-                  disabled={isSyncing || !sigbConfig.is_active}
-                  className="gap-2"
+                  disabled={isSyncing}
+                  variant="outline"
                 >
-                  <RefreshCw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
-                  Synchroniser maintenant
+                  <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+                  Synchroniser
                 </Button>
               </div>
-            </>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {config ? (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium text-muted-foreground">Type de SIGB</Label>
+                <p className="text-base font-medium">{config.sigb_type}</p>
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-muted-foreground">URL API</Label>
+                <p className="text-base font-medium truncate">{config.api_url}</p>
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-muted-foreground">Synchronisation</Label>
+                <div className="flex items-center gap-2">
+                  {config.sync_enabled ? (
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <XCircle className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <span>{config.sync_enabled ? "Activée" : "Désactivée"}</span>
+                </div>
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-muted-foreground">Fréquence</Label>
+                <p className="text-base font-medium">{config.sync_frequency}</p>
+              </div>
+              {config.last_sync_at && (
+                <div className="col-span-2">
+                  <Label className="text-sm font-medium text-muted-foreground">Dernière synchronisation</Label>
+                  <p className="text-base font-medium">
+                    {format(new Date(config.last_sync_at), "PPP 'à' HH:mm", { locale: fr })}
+                  </p>
+                </div>
+              )}
+            </div>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <Database className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Aucune configuration SIGB trouvée</p>
-              <p className="text-sm">Veuillez configurer la connexion au SIGB</p>
+            <div className="text-center py-8">
+              <Database className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">Aucune configuration SIGB trouvée</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Contactez votre administrateur système pour configurer l'interconnexion
+              </p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Liste des copies de documents */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5 text-primary" />
-            Copies de documents disponibles
-          </CardTitle>
-          <CardDescription>
-            Statut de disponibilité des différentes copies d'ouvrages synchronisées avec le SIGB
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <CopyIcon className="h-5 w-5" />
+                Copies de documents
+              </CardTitle>
+              <CardDescription>
+                Gestion des copies physiques et leur disponibilité
+              </CardDescription>
+            </div>
+            <Button onClick={() => {
+              setEditingCopy(null);
+              setShowCopyDialog(true);
+            }}>
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter une copie
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
-          {copies.length > 0 ? (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Document</TableHead>
-                    <TableHead>Copie</TableHead>
-                    <TableHead>Cote</TableHead>
-                    <TableHead>Localisation</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead>Disponible jusqu'à</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {copies.map((copy) => (
-                    <TableRow key={copy.id}>
-                      <TableCell className="font-medium">{copy.document_id}</TableCell>
-                      <TableCell>{copy.copy_number}</TableCell>
-                      <TableCell className="font-mono text-sm">{copy.cote}</TableCell>
-                      <TableCell>{copy.location || "-"}</TableCell>
-                      <TableCell>{getStatusBadge(copy.availability_status)}</TableCell>
-                      <TableCell>
-                        {copy.unavailable_until ? (
-                          format(new Date(copy.unavailable_until), "P", { locale: fr })
-                        ) : (
-                          "-"
-                        )}
-                      </TableCell>
-                      <TableCell>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Document ID</TableHead>
+                <TableHead>N° Copie</TableHead>
+                <TableHead>Cote</TableHead>
+                <TableHead>Localisation</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Motif</TableHead>
+                <TableHead>Disponible jusqu'au</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {copies.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    Aucune copie enregistrée
+                  </TableCell>
+                </TableRow>
+              ) : (
+                copies.map((copy) => (
+                  <TableRow key={copy.id}>
+                    <TableCell className="font-mono text-sm">{copy.document_id}</TableCell>
+                    <TableCell>{copy.copy_number}</TableCell>
+                    <TableCell className="font-mono">{copy.cote}</TableCell>
+                    <TableCell>{copy.location}</TableCell>
+                    <TableCell>{getStatusBadge(copy.availability_status)}</TableCell>
+                    <TableCell className="max-w-xs truncate">
+                      {copy.unavailability_reason || "-"}
+                    </TableCell>
+                    <TableCell>
+                      {copy.unavailable_until 
+                        ? format(new Date(copy.unavailable_until), "PPP", { locale: fr })
+                        : "-"
+                      }
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
                         <Button
-                          variant="ghost"
                           size="sm"
+                          variant="ghost"
                           onClick={() => {
-                            setSelectedCopy(copy);
-                            setShowDetailsDialog(true);
+                            setEditingCopy(copy);
+                            setNewCopy({
+                              document_id: copy.document_id,
+                              copy_number: copy.copy_number,
+                              cote: copy.cote,
+                              barcode: copy.barcode || "",
+                              location: copy.location,
+                              availability_status: copy.availability_status,
+                              unavailability_reason: copy.unavailability_reason || "",
+                              notes: copy.notes || ""
+                            });
+                            setShowCopyDialog(true);
                           }}
                         >
-                          Détails
+                          <Edit className="h-4 w-4" />
                         </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <Database className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Aucune copie de document trouvée</p>
-              <p className="text-sm">Les copies apparaîtront ici après la synchronisation avec le SIGB</p>
-            </div>
-          )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteCopy(copy.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
 
-      {/* Dialog détails copie */}
-      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent>
+      <Dialog open={showCopyDialog} onOpenChange={setShowCopyDialog}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Détails de la copie</DialogTitle>
+            <DialogTitle>
+              {editingCopy ? "Modifier la copie" : "Ajouter une copie"}
+            </DialogTitle>
             <DialogDescription>
-              Informations détaillées sur cette copie d'ouvrage
+              Renseignez les informations de la copie du document
             </DialogDescription>
           </DialogHeader>
-
-          {selectedCopy && (
-            <div className="space-y-4">
-              <div className="grid gap-2">
-                <Label>Document</Label>
-                <p className="text-sm">{selectedCopy.document_id}</p>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="document_id">ID Document *</Label>
+                <Input
+                  id="document_id"
+                  value={newCopy.document_id}
+                  onChange={(e) => setNewCopy({...newCopy, document_id: e.target.value})}
+                  placeholder="DOC001"
+                />
               </div>
-
-              <div className="grid gap-2">
-                <Label>Numéro de copie</Label>
-                <p className="text-sm">{selectedCopy.copy_number}</p>
+              <div>
+                <Label htmlFor="copy_number">N° Copie *</Label>
+                <Input
+                  id="copy_number"
+                  value={newCopy.copy_number}
+                  onChange={(e) => setNewCopy({...newCopy, copy_number: e.target.value})}
+                  placeholder="Copie 1"
+                />
               </div>
-
-              <div className="grid gap-2">
-                <Label>Cote</Label>
-                <p className="font-mono text-sm">{selected Copy.cote}</p>
-              </div>
-
-              {selectedCopy.barcode && (
-                <div className="grid gap-2">
-                  <Label>Code-barre</Label>
-                  <p className="font-mono text-sm">{selectedCopy.barcode}</p>
-                </div>
-              )}
-
-              <div className="grid gap-2">
-                <Label>Localisation</Label>
-                <p className="text-sm">{selectedCopy.location || "Non spécifiée"}</p>
-              </div>
-
-              <div className="grid gap-2">
-                <Label>Statut de disponibilité</Label>
-                {getStatusBadge(selectedCopy.availability_status)}
-              </div>
-
-              {selectedCopy.unavailability_reason && (
-                <div className="grid gap-2">
-                  <Label>Motif d'indisponibilité</Label>
-                  <p className="text-sm text-muted-foreground">{selectedCopy.unavailability_reason}</p>
-                </div>
-              )}
-
-              {selectedCopy.unavailable_until && (
-                <div className="grid gap-2">
-                  <Label>Disponible le</Label>
-                  <p className="text-sm">
-                    {format(new Date(selectedCopy.unavailable_until), "PPP", { locale: fr })}
-                  </p>
-                </div>
-              )}
-
-              {selectedCopy.notes && (
-                <div className="grid gap-2">
-                  <Label>Notes</Label>
-                  <p className="text-sm text-muted-foreground">{selectedCopy.notes}</p>
-                </div>
-              )}
-
-              {selectedCopy.sigb_copy_id && (
-                <div className="grid gap-2">
-                  <Label>ID SIGB</Label>
-                  <p className="font-mono text-xs text-muted-foreground">{selectedCopy.sigb_copy_id}</p>
-                </div>
-              )}
-
-              {selectedCopy.last_sync_date && (
-                <div className="grid gap-2">
-                  <Label>Dernière synchronisation</Label>
-                  <p className="text-sm">
-                    {format(new Date(selectedCopy.last_sync_date), "PPp", { locale: fr })}
-                  </p>
-                </div>
-              )}
             </div>
-          )}
-
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="cote">Cote *</Label>
+                <Input
+                  id="cote"
+                  value={newCopy.cote}
+                  onChange={(e) => setNewCopy({...newCopy, cote: e.target.value})}
+                  placeholder="A.123.456.C1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="barcode">Code-barre</Label>
+                <Input
+                  id="barcode"
+                  value={newCopy.barcode}
+                  onChange={(e) => setNewCopy({...newCopy, barcode: e.target.value})}
+                  placeholder="123456789"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="location">Localisation *</Label>
+                <Input
+                  id="location"
+                  value={newCopy.location}
+                  onChange={(e) => setNewCopy({...newCopy, location: e.target.value})}
+                  placeholder="Magasin Principal"
+                />
+              </div>
+              <div>
+                <Label htmlFor="availability_status">Statut *</Label>
+                <Select
+                  value={newCopy.availability_status}
+                  onValueChange={(value) => setNewCopy({...newCopy, availability_status: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="disponible">Disponible</SelectItem>
+                    <SelectItem value="emprunte">Emprunté</SelectItem>
+                    <SelectItem value="en_restauration">En restauration</SelectItem>
+                    <SelectItem value="en_reliure">En reliure</SelectItem>
+                    <SelectItem value="reserve">Réservé</SelectItem>
+                    <SelectItem value="en_traitement">En traitement</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="unavailability_reason">Motif d'indisponibilité</Label>
+              <Input
+                id="unavailability_reason"
+                value={newCopy.unavailability_reason}
+                onChange={(e) => setNewCopy({...newCopy, unavailability_reason: e.target.value})}
+                placeholder="Raison de l'indisponibilité"
+              />
+            </div>
+            <div>
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                value={newCopy.notes}
+                onChange={(e) => setNewCopy({...newCopy, notes: e.target.value})}
+                placeholder="Notes internes sur cette copie"
+              />
+            </div>
+          </div>
           <DialogFooter>
-            <Button onClick={() => setShowDetailsDialog(false)}>Fermer</Button>
+            <Button variant="outline" onClick={() => setShowCopyDialog(false)}>
+              Annuler
+            </Button>
+            <Button onClick={handleSaveCopy}>
+              {editingCopy ? "Mettre à jour" : "Ajouter"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

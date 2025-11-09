@@ -45,12 +45,15 @@ import {
   XCircle,
   FolderArchive,
   AlertCircle,
-  CalendarCheck
+  CalendarCheck,
+  Settings
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SIGBConfigurationTab } from "@/components/admin/SIGBConfigurationTab";
 
 interface Reservation {
   id: string;
@@ -383,9 +386,24 @@ export default function GestionReservationsOuvrages() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2 text-primary">Gestion des Réservations d'Ouvrages</h1>
           <p className="text-muted-foreground">
-            Interface de gestion centralisée pour toutes les demandes de réservation
+            Interface de gestion centralisée pour toutes les demandes de réservation et configuration SIGB
           </p>
         </div>
+
+        {/* Onglets principaux */}
+        <Tabs defaultValue="reservations" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:inline-grid">
+            <TabsTrigger value="reservations" className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Réservations
+            </TabsTrigger>
+            <TabsTrigger value="sigb" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Configuration Interconnexion SIGB
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="reservations" className="space-y-6">
 
         {/* Statistiques */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
@@ -665,7 +683,6 @@ export default function GestionReservationsOuvrages() {
             </div>
           </CardContent>
         </Card>
-      </main>
 
       {/* Dialogue détail */}
       {selectedReservation && (
@@ -1111,6 +1128,14 @@ export default function GestionReservationsOuvrages() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+          </TabsContent>
+
+          <TabsContent value="sigb">
+            <SIGBConfigurationTab />
+          </TabsContent>
+        </Tabs>
+      </main>
 
       <Footer />
     </div>
