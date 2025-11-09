@@ -307,16 +307,18 @@ export function KitabNewPublicationsManager() {
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        {pub.kitab_status === 'pending' && (
+                        {pub.kitab_status !== 'rejected' && (
                           <>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleApproveClick(pub)}
-                              className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                            >
-                              <Check className="h-4 w-4" />
-                            </Button>
+                            {pub.kitab_status === 'pending' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleApproveClick(pub)}
+                                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                            )}
                             <Button
                               variant="ghost"
                               size="sm"
@@ -405,7 +407,7 @@ export function KitabNewPublicationsManager() {
               </div>
 
               {/* Actions */}
-              {selectedPublication.kitab_status === 'pending' && (
+              {selectedPublication.kitab_status !== 'rejected' && (
                 <div className="flex gap-2 justify-end pt-4 border-t">
                   <Button
                     onClick={() => {
@@ -418,16 +420,18 @@ export function KitabNewPublicationsManager() {
                     <X className="h-4 w-4 mr-2" />
                     Rejeter
                   </Button>
-                  <Button
-                    onClick={() => {
-                      setPreviewDialogOpen(false);
-                      handleApproveClick(selectedPublication);
-                    }}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    <Check className="h-4 w-4 mr-2" />
-                    Approuver pour Kitab
-                  </Button>
+                  {selectedPublication.kitab_status === 'pending' && (
+                    <Button
+                      onClick={() => {
+                        setPreviewDialogOpen(false);
+                        handleApproveClick(selectedPublication);
+                      }}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Check className="h-4 w-4 mr-2" />
+                      Approuver pour Kitab
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
