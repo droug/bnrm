@@ -65,8 +65,6 @@ export function DailyPassForm({ onClose }: DailyPassFormProps) {
 
   const profileType = form.watch("profileType");
 
-  const requiresJustification = ["chercheur", "chercheur_retraite", "etudiant_3eme"].includes(profileType || "");
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -94,16 +92,6 @@ export function DailyPassForm({ onClose }: DailyPassFormProps) {
   };
 
   const onSubmit = async (data: FormValues) => {
-    // Validation : vérifier si le justificatif est requis
-    if (requiresJustification && !uploadedFile) {
-      toast({
-        variant: "destructive",
-        title: "Document requis",
-        description: "Veuillez joindre un document justificatif pour votre profil",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
@@ -316,58 +304,47 @@ export function DailyPassForm({ onClose }: DailyPassFormProps) {
             />
 
             {/* Upload du document justificatif */}
-            {requiresJustification && (
-              <div className="space-y-2">
-                <FormLabel className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  Document justificatif *
-                </FormLabel>
-                <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
-                  <input
-                    type="file"
-                    id="file-upload"
-                    className="hidden"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={handleFileChange}
-                  />
-                  <label htmlFor="file-upload" className="cursor-pointer">
-                    <div className="flex flex-col items-center gap-2">
-                      {uploadedFile ? (
-                        <>
-                          <CheckCircle2 className="h-10 w-10 text-green-500" />
-                          <p className="text-sm font-medium">{uploadedFile.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {(uploadedFile.size / 1024).toFixed(2)} KB
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-10 w-10 text-muted-foreground" />
-                          <p className="text-sm font-medium">
-                            Cliquez pour uploader ou glissez votre document
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            PDF, JPG ou PNG (max 5MB)
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </label>
-                </div>
-                {requiresJustification && (
-                  <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg">
-                    <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-amber-800 dark:text-amber-200">
-                      {profileType === "chercheur"
-                        ? "Document requis : Attestation officielle de votre sujet de recherche délivrée par votre institution"
-                        : profileType === "chercheur_retraite"
-                        ? "Document requis : Attestation de retraite ou document justifiant votre statut de chercheur retraité"
-                        : "Document requis : Attestation d'inscription en 3ème année et sujet de PFE validé"}
-                    </p>
+            <div className="space-y-2">
+              <FormLabel className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Document justificatif
+              </FormLabel>
+              <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                <input
+                  type="file"
+                  id="file-upload"
+                  className="hidden"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={handleFileChange}
+                />
+                <label htmlFor="file-upload" className="cursor-pointer">
+                  <div className="flex flex-col items-center gap-2">
+                    {uploadedFile ? (
+                      <>
+                        <CheckCircle2 className="h-10 w-10 text-green-500" />
+                        <p className="text-sm font-medium">{uploadedFile.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {(uploadedFile.size / 1024).toFixed(2)} KB
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-10 w-10 text-muted-foreground" />
+                        <p className="text-sm font-medium">
+                          Cliquez pour uploader ou glissez votre document
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          PDF, JPG ou PNG (max 5MB)
+                        </p>
+                      </>
+                    )}
                   </div>
-                )}
+                </label>
               </div>
-            )}
+              <FormDescription>
+                Vous pouvez joindre un document justificatif si nécessaire (attestation, carte d'étudiant, etc.)
+              </FormDescription>
+            </div>
 
             {/* Actions */}
             <div className="flex gap-3 justify-end pt-4">
