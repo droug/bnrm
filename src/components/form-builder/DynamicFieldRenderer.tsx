@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { InlineSelect } from "@/components/ui/inline-select";
+import { GenericAutocomplete } from "@/components/ui/generic-autocomplete";
 import { CustomField } from "@/types/formBuilder";
 
 interface DynamicFieldRendererProps {
@@ -94,6 +95,21 @@ export function DynamicFieldRenderer({ field, language, value, onChange }: Dynam
             placeholder={`Sélectionner ${label.toLowerCase()}`}
             options={options}
             disabled={field.is_readonly}
+          />
+        );
+
+      case "autocomplete":
+        // Autocomplete avec chargement depuis la base de données
+        const listCode = field.config?.list_code as string;
+        if (!listCode) {
+          return <div className="text-sm text-destructive">Configuration manquante: list_code requis</div>;
+        }
+        return (
+          <GenericAutocomplete
+            listCode={listCode}
+            value={value || ''}
+            onChange={onChange}
+            placeholder={`Rechercher ${label.toLowerCase()}`}
           />
         );
 
