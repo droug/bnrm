@@ -50,6 +50,9 @@ export function KitabNewPublicationsManager() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedPublication, setSelectedPublication] = useState<LegalDepositPublication | null>(null);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [confirmApproveDialogOpen, setConfirmApproveDialogOpen] = useState(false);
+  const [confirmRejectDialogOpen, setConfirmRejectDialogOpen] = useState(false);
+  const [publicationToAction, setPublicationToAction] = useState<LegalDepositPublication | null>(null);
 
   useEffect(() => {
     loadPublications();
@@ -101,13 +104,24 @@ export function KitabNewPublicationsManager() {
     setPreviewDialogOpen(true);
   };
 
-  const handleApprove = async (publicationId: string) => {
+  const handleApproveClick = (publication: LegalDepositPublication) => {
+    setPublicationToAction(publication);
+    setConfirmApproveDialogOpen(true);
+  };
+
+  const handleRejectClick = (publication: LegalDepositPublication) => {
+    setPublicationToAction(publication);
+    setConfirmRejectDialogOpen(true);
+  };
+
+  const handleApprove = async () => {
+    if (!publicationToAction) return;
+    
     try {
-      // Utiliser .update() avec un objet Record<string, any> pour contourner le problème de typage temporairement
       const { error } = await supabase
         .from('legal_deposit_requests')
         .update({ kitab_status: 'approved' } as any)
-        .eq('id', publicationId);
+        .eq('id', publicationToAction.id);
 
       if (error) throw error;
 
@@ -116,6 +130,8 @@ export function KitabNewPublicationsManager() {
         description: "La publication a été ajoutée à Kitab avec succès.",
       });
 
+      setConfirmApproveDialogOpen(false);
+      setPublicationToAction(null);
       loadPublications();
     } catch (error) {
       console.error('Error approving publication:', error);
@@ -127,20 +143,25 @@ export function KitabNewPublicationsManager() {
     }
   };
 
-  const handleReject = async (publicationId: string) => {
+  const handleReject = async () => {
+    if (!publicationToAction) return;
+    
     try {
       const { error } = await supabase
         .from('legal_deposit_requests')
         .update({ kitab_status: 'rejected' } as any)
-        .eq('id', publicationId);
+        .eq('id', publicationToAction.id);
 
       if (error) throw error;
 
       toast({
         title: "Publication rejetée",
         description: "La publication a été rejetée.",
+        variant: "destructive",
       });
 
+      setConfirmRejectDialogOpen(false);
+      setPublicationToAction(null);
       loadPublications();
     } catch (error) {
       console.error('Error rejecting publication:', error);
@@ -291,7 +312,7 @@ export function KitabNewPublicationsManager() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleApprove(pub.id)}
+                              onClick={() => handleApproveClick(pub)}
                               className="text-green-600 hover:text-green-700 hover:bg-green-50"
                             >
                               <Check className="h-4 w-4" />
@@ -299,7 +320,7 @@ export function KitabNewPublicationsManager() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleReject(pub.id)}
+                              onClick={() => handleRejectClick(pub)}
                               className="text-red-600 hover:text-red-700 hover:bg-red-50"
                             >
                               <X className="h-4 w-4" />
@@ -388,8 +409,8 @@ export function KitabNewPublicationsManager() {
                 <div className="flex gap-2 justify-end pt-4 border-t">
                   <Button
                     onClick={() => {
-                      handleReject(selectedPublication.id);
                       setPreviewDialogOpen(false);
+                      handleRejectClick(selectedPublication);
                     }}
                     variant="outline"
                     className="text-red-600 hover:text-red-700"
@@ -399,8 +420,8 @@ export function KitabNewPublicationsManager() {
                   </Button>
                   <Button
                     onClick={() => {
-                      handleApprove(selectedPublication.id);
                       setPreviewDialogOpen(false);
+                      handleApproveClick(selectedPublication);
                     }}
                     className="bg-green-600 hover:bg-green-700"
                   >
@@ -409,6 +430,92 @@ export function KitabNewPublicationsManager() {
                   </Button>
                 </div>
               )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de confirmation d'approbation */}
+      <Dialog open={confirmApproveDialogOpen} onOpenChange={setConfirmApproveDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-green-600">Approuver la publication</DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir approuver cette publication pour le portail Kitab ?
+            </DialogDescription>
+          </DialogHeader>
+          {publicationToAction && (
+            <div className="space-y-4">
+              <div className="p-4 rounded-lg bg-muted/50">
+                <p className="font-semibold text-lg mb-1">{publicationToAction.title}</p>
+                <p className="text-sm text-muted-foreground">
+                  {publicationToAction.author && `Auteur: ${publicationToAction.author}`}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {publicationToAction.isbn && `ISBN: ${publicationToAction.isbn}`}
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setConfirmApproveDialogOpen(false)}
+                  className="flex-1"
+                >
+                  Annuler
+                </Button>
+                <Button
+                  onClick={handleApprove}
+                  className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  Confirmer l'approbation
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de confirmation de rejet */}
+      <Dialog open={confirmRejectDialogOpen} onOpenChange={setConfirmRejectDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-red-600">Rejeter la publication</DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir rejeter cette publication pour le portail Kitab ?
+            </DialogDescription>
+          </DialogHeader>
+          {publicationToAction && (
+            <div className="space-y-4">
+              <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+                <p className="font-semibold text-lg mb-1">{publicationToAction.title}</p>
+                <p className="text-sm text-muted-foreground">
+                  {publicationToAction.author && `Auteur: ${publicationToAction.author}`}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {publicationToAction.isbn && `ISBN: ${publicationToAction.isbn}`}
+                </p>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Cette action retirera la publication du portail Kitab. Elle ne sera plus visible par les utilisateurs.
+              </p>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setConfirmRejectDialogOpen(false)}
+                  className="flex-1"
+                >
+                  Annuler
+                </Button>
+                <Button
+                  onClick={handleReject}
+                  variant="destructive"
+                  className="flex-1"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Confirmer le rejet
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
