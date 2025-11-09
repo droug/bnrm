@@ -43,6 +43,7 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
   const [subject, setSubject] = useState("");
   const [language, setLanguage] = useState("all");
   const [documentType, setDocumentType] = useState("all");
+  const [documentTypeOther, setDocumentTypeOther] = useState("");
   const [isbn, setIsbn] = useState("");
   const [cote, setCote] = useState("");
   const [collection, setCollection] = useState("");
@@ -64,7 +65,7 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
       yearEnd: yearEnd || undefined,
       subject: subject || undefined,
       language: language !== "all" ? language : undefined,
-      documentType: documentType !== "all" ? documentType : undefined,
+      documentType: documentType !== "all" ? (documentType === "other" ? documentTypeOther : documentType) : undefined,
       isbn: isbn || undefined,
       cote: cote || undefined,
       collection: collection || undefined,
@@ -165,27 +166,11 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
 
   const documentTypeOptions = [
     { value: "all", label: "Tous" },
-    { value: "book", label: "Livre" },
-    { value: "periodical", label: "Périodique" },
-    { value: "journal", label: "Journal" },
-    { value: "revue", label: "Revue" },
-    { value: "manuscript", label: "Manuscrit" },
-    { value: "microfilm", label: "Microfilm" },
-    { value: "digital", label: "Numérique" },
-    { value: "maps", label: "Cartes et Plans" },
-    { value: "brochure", label: "Brochure" },
-    { value: "rapport", label: "Rapport" },
-    { value: "audio", label: "Document sonore" },
-    { value: "video", label: "Document audiovisuel" },
-    { value: "photo", label: "Photographie" },
-    { value: "poster", label: "Affiche" },
-    { value: "sheet_music", label: "Partition musicale" },
-    { value: "catalog", label: "Catalogue" },
-    { value: "dictionary", label: "Dictionnaire" },
-    { value: "encyclopedia", label: "Encyclopédie" },
-    { value: "atlas", label: "Atlas" },
-    { value: "cd", label: "CD-ROM" },
-    { value: "dvd", label: "DVD" },
+    { value: "monographie", label: "Monographie" },
+    { value: "periodique", label: "Périodique" },
+    { value: "bd_logiciel", label: "BD & Logiciel" },
+    { value: "collection_specialisee", label: "Collection spécialisée" },
+    { value: "other", label: "Autre" },
   ];
 
   const supportTypeOptions = [
@@ -253,44 +238,30 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
               <Badge 
                 variant="outline" 
                 className="cursor-pointer hover:bg-primary/10 transition-colors"
-                onClick={() => handleQuickFilter("book")}
+                onClick={() => handleQuickFilter("monographie")}
               >
-                <BookOpen className="h-3 w-3 mr-1" /> Livres
+                <BookOpen className="h-3 w-3 mr-1" /> Monographies
               </Badge>
               <Badge 
                 variant="outline" 
                 className="cursor-pointer hover:bg-primary/10 transition-colors"
-                onClick={() => handleQuickFilter("periodical")}
+                onClick={() => handleQuickFilter("periodique")}
               >
                 <Filter className="h-3 w-3 mr-1" /> Périodiques
               </Badge>
               <Badge 
                 variant="outline" 
                 className="cursor-pointer hover:bg-primary/10 transition-colors"
-                onClick={() => handleQuickFilter("manuscript")}
+                onClick={() => handleQuickFilter("bd_logiciel")}
               >
-                <Filter className="h-3 w-3 mr-1" /> Manuscrits
+                <Filter className="h-3 w-3 mr-1" /> BD & Logiciel
               </Badge>
               <Badge 
                 variant="outline" 
                 className="cursor-pointer hover:bg-primary/10 transition-colors"
-                onClick={() => handleQuickFilter("microfilm")}
+                onClick={() => handleQuickFilter("collection_specialisee")}
               >
-                <Filter className="h-3 w-3 mr-1" /> 📼 Microfilms
-              </Badge>
-              <Badge 
-                variant="outline" 
-                className="cursor-pointer hover:bg-primary/10 transition-colors"
-                onClick={() => handleQuickFilter("digital")}
-              >
-                <Filter className="h-3 w-3 mr-1" /> Documents numériques
-              </Badge>
-              <Badge 
-                variant="outline" 
-                className="cursor-pointer hover:bg-primary/10 transition-colors"
-                onClick={() => handleQuickFilter("maps")}
-              >
-                <Filter className="h-3 w-3 mr-1" /> 🗺️ Cartes et Plans
+                <Filter className="h-3 w-3 mr-1" /> Collections spécialisées
               </Badge>
             </div>
           </TabsContent>
@@ -398,7 +369,12 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                   <label className="text-sm font-medium">Type de document</label>
                   <SimpleDropdown
                     value={documentType}
-                    onChange={setDocumentType}
+                    onChange={(value) => {
+                      setDocumentType(value);
+                      if (value !== "other") {
+                        setDocumentTypeOther("");
+                      }
+                    }}
                     options={documentTypeOptions}
                   />
                 </div>
@@ -411,6 +387,18 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
                   />
                 </div>
               </div>
+
+              {documentType === "other" && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Précisez le type de document</label>
+                  <Input 
+                    placeholder="Ex: Carte postale, Manuscrit ancien..." 
+                    value={documentTypeOther}
+                    onChange={(e) => setDocumentTypeOther(e.target.value)}
+                    className="border-primary/30 focus:border-primary"
+                  />
+                </div>
+              )}
 
               <Button 
                 className="w-full bg-primary hover:bg-primary/90"

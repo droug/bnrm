@@ -113,31 +113,17 @@ export function CBNSearchWithSelection({
       
       if (criteria.documentType && criteria.documentType !== "all") {
         const typeMap: Record<string, string> = {
-          "book": "Livre",
-          "periodical": "Périodique",
-          "journal": "Journal",
-          "revue": "Revue",
-          "manuscript": "Manuscrit",
-          "microfilm": "Microfilm",
-          "digital": "Numérique",
-          "maps": "Cartes et Plans",
-          "brochure": "Brochure",
-          "rapport": "Rapport",
-          "audio": "Document sonore",
-          "video": "Document audiovisuel",
-          "photo": "Photographie",
-          "poster": "Affiche",
-          "sheet_music": "Partition musicale",
-          "catalog": "Catalogue",
-          "dictionary": "Dictionnaire",
-          "encyclopedia": "Encyclopédie",
-          "atlas": "Atlas",
-          "cd": "CD-ROM",
-          "dvd": "DVD"
+          "monographie": "Monographie",
+          "periodique": "Périodique",
+          "bd_logiciel": "BD & Logiciel",
+          "collection_specialisee": "Collection spécialisée"
         };
         const targetType = typeMap[criteria.documentType];
         if (targetType) {
           query = query.ilike('document_type', `%${targetType}%`);
+        } else {
+          // Si c'est un type personnalisé (autre), rechercher directement
+          query = query.ilike('document_type', `%${criteria.documentType}%`);
         }
       }
 
