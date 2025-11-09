@@ -46,8 +46,42 @@ export default function KitabAdmin() {
           </div>
         </div>
 
-        {/* Gestion des nouvelles parutions */}
-        <KitabNewPublicationsManager />
+        {/* Dashboard Grid */}
+        <div className="grid gap-6">
+          {/* Carte Gestion des Nouvelles Parutions */}
+          <Card className="border-kitab-primary/20 shadow-lg">
+            <CardHeader className="border-b border-kitab-primary/10">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-kitab-primary/20 to-kitab-secondary/20 flex items-center justify-center">
+                  <BookPlus className="h-6 w-6 text-kitab-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl text-kitab-primary">
+                    Gestion des Nouvelles Parutions
+                  </CardTitle>
+                  <CardDescription className="text-base">
+                    Publications provenant du Dépôt Légal du portail BNRM ayant obtenu la validation finale
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <KitabNewPublicationsManager />
+            </CardContent>
+          </Card>
+
+          {/* Placeholder pour futures fonctionnalités d'administration */}
+          {/* 
+          <Card>
+            <CardHeader>
+              <CardTitle>Autres fonctionnalités d'administration</CardTitle>
+            </CardHeader>
+            <CardContent>
+              ...
+            </CardContent>
+          </Card>
+          */}
+        </div>
       </main>
       <Footer forceKitabStyle />
     </div>
