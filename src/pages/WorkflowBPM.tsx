@@ -13,8 +13,9 @@ import { WorkflowModelsManager } from "@/components/workflow/WorkflowModelsManag
 import { WorkflowDynamicSelects } from "@/components/workflow/WorkflowDynamicSelects";
 import { PredefinedWorkflowsImporter } from "@/components/workflow/PredefinedWorkflowsImporter";
 import { WorkflowSyncManager } from "@/components/workflow/WorkflowSyncManager";
-import { Activity, GitBranch, Settings, TrendingUp, Users, ArrowLeft, FolderKanban, ListFilter, Package, CalendarRange } from "lucide-react";
+import { Activity, GitBranch, Settings, TrendingUp, Users, ArrowLeft, FolderKanban, ListFilter, Package, CalendarRange, Building2 } from "lucide-react";
 import { BookingWorkflowStepsManager } from "@/components/workflow/BookingWorkflowStepsManager";
+import { CBMWorkflowsManager } from "@/components/workflow/CBMWorkflowsManager";
 
 export default function WorkflowBPM() {
   const { user, profile } = useAuth();
@@ -64,7 +65,7 @@ export default function WorkflowBPM() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-9 mb-6">
+          <TabsList className="grid w-full grid-cols-10 mb-6">
             <TabsTrigger value="predefined">
               <Package className="w-4 h-4 mr-2" />
               Modèles Prédéfinis
@@ -100,6 +101,10 @@ export default function WorkflowBPM() {
             <TabsTrigger value="cultural-activities">
               <CalendarRange className="w-4 h-4 mr-2" />
               Activités Culturelles
+            </TabsTrigger>
+            <TabsTrigger value="cbm">
+              <Building2 className="w-4 h-4 mr-2" />
+              CBM
             </TabsTrigger>
           </TabsList>
 
@@ -140,6 +145,10 @@ export default function WorkflowBPM() {
 
           <TabsContent value="cultural-activities" className="mt-6">
             <BookingWorkflowStepsManager />
+          </TabsContent>
+
+          <TabsContent value="cbm" className="mt-6">
+            <CBMWorkflowsManager />
           </TabsContent>
         </Tabs>
       </main>
