@@ -21,7 +21,41 @@ export async function initializeLegalDepositMonographForm() {
       .maybeSingle();
 
     if (existingVersion) {
-      console.log("Version already exists");
+      console.log("Version already exists, checking for missing fields");
+      
+      // Vérifier si le champ author_nationality existe
+      const { data: existingField } = await supabase
+        .from("custom_fields")
+        .select("id")
+        .eq("form_version_id", existingVersion.id)
+        .eq("field_key", "author_nationality")
+        .maybeSingle();
+      
+      if (!existingField) {
+        // Ajouter le champ manquant
+        const { error: insertError } = await supabase
+          .from("custom_fields")
+          .insert({
+            form_version_id: existingVersion.id,
+            section_key: "identification_auteur",
+            field_key: "author_nationality",
+            field_type: "autocomplete",
+            label_fr: "Nationalité",
+            label_ar: "الجنسية",
+            order_index: 3,
+            is_required: false,
+            is_visible: true,
+            is_readonly: false,
+            config: { list_code: "nationalities" }
+          });
+        
+        if (insertError) {
+          console.error("Error adding nationality field:", insertError);
+        } else {
+          console.log("Nationality field added successfully");
+        }
+      }
+      
       return { success: true, versionId: existingVersion.id };
     }
 
