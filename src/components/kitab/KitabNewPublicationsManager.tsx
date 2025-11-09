@@ -307,28 +307,22 @@ export function KitabNewPublicationsManager() {
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        {pub.kitab_status !== 'rejected' && (
-                          <>
-                            {pub.kitab_status !== 'approved' && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleApproveClick(pub)}
-                                className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                              >
-                                <Check className="h-4 w-4" />
-                              </Button>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRejectClick(pub)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleApproveClick(pub)}
+                          className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRejectClick(pub)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -407,33 +401,29 @@ export function KitabNewPublicationsManager() {
               </div>
 
               {/* Actions */}
-              {selectedPublication.kitab_status !== 'rejected' && (
-                <div className="flex gap-2 justify-end pt-4 border-t">
-                  <Button
-                    onClick={() => {
-                      setPreviewDialogOpen(false);
-                      handleRejectClick(selectedPublication);
-                    }}
-                    variant="outline"
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <X className="h-4 w-4 mr-2" />
-                    Rejeter
-                  </Button>
-                  {selectedPublication.kitab_status !== 'approved' && (
-                    <Button
-                      onClick={() => {
-                        setPreviewDialogOpen(false);
-                        handleApproveClick(selectedPublication);
-                      }}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      <Check className="h-4 w-4 mr-2" />
-                      Approuver pour Kitab
-                    </Button>
-                  )}
-                </div>
-              )}
+              <div className="flex gap-2 justify-end pt-4 border-t">
+                <Button
+                  onClick={() => {
+                    setPreviewDialogOpen(false);
+                    handleRejectClick(selectedPublication);
+                  }}
+                  variant="outline"
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Rejeter
+                </Button>
+                <Button
+                  onClick={() => {
+                    setPreviewDialogOpen(false);
+                    handleApproveClick(selectedPublication);
+                  }}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  Approuver pour Kitab
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
