@@ -163,7 +163,7 @@ export function DailyPassForm({ onClose }: DailyPassFormProps) {
                       placeholder="Sélectionnez votre profil"
                       options={[
                         { value: "chercheur", label: "Chercheur" },
-                        { value: "chercheur_retraite", label: "Chercheur en retraite" },
+                        { value: "chercheur_retraite", label: "Chercheur retraité" },
                         { value: "etudiant_3eme", label: "Étudiant 3ème année (PFE)" },
                         { value: "etudiant_autre", label: "Étudiant (autre niveau)" },
                         { value: "professionnel", label: "Professionnel" },
