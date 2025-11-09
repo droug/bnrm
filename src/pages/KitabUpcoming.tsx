@@ -3,10 +3,58 @@ import KitabHeader from "@/components/KitabHeader";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Clock, Info } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Clock, BookOpen, Calendar } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import mosaicBanner from "@/assets/kitab-banner-mosaic-purple.jpg";
 
+interface Publication {
+  id: string;
+  title: string;
+  subtitle?: string;
+  author_name?: string;
+  isbn?: string;
+  publication_date?: string;
+  support_type?: string;
+  metadata?: any;
+  language?: string;
+  page_count?: number;
+}
+
 export default function KitabUpcoming() {
+  const [publications, setPublications] = useState<Publication[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    loadPublications();
+  }, []);
+
+  const loadPublications = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('legal_deposit_requests')
+        .select('*')
+        .eq('kitab_status', 'approved')
+        .eq('publication_status', 'upcoming')
+        .order('publication_date', { ascending: true })
+        .limit(50);
+
+      if (error) throw error;
+      setPublications(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les publications à paraître",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-background">
       <KitabHeader />
@@ -48,36 +96,130 @@ export default function KitabUpcoming() {
       </section>
 
       <main className="container mx-auto px-4 py-16">
-        {/* Coming Soon Notice */}
-        <Card className="border-0 shadow-[var(--shadow-kitab-strong)] max-w-3xl mx-auto">
-          <CardContent className="p-12 text-center">
-            <div className="bg-gradient-to-br from-[hsl(var(--kitab-primary))]/10 to-[hsl(var(--kitab-accent))]/5 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
-              <Info className="w-12 h-12 text-[hsl(var(--kitab-primary))]" />
-            </div>
-            
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              Section en Cours de Développement
-            </h2>
-            
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              Cette section sera bientôt disponible et présentera les prochaines parutions 
-              et publications à venir de l'édition marocaine.
-            </p>
-            
-            <div className="flex gap-4 justify-center flex-wrap">
-              <Link to="/kitab/new-publications">
-                <Button size="lg" className="bg-[hsl(var(--kitab-primary))] hover:bg-[hsl(var(--kitab-primary-dark))] text-white">
-                  Voir les Nouvelles Parutions
-                </Button>
-              </Link>
-              <Link to="/kitab">
-                <Button size="lg" variant="outline">
-                  Retour à l'Accueil
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mb-8 text-center">
+          <p className="text-lg text-muted-foreground">
+            {loading ? "Chargement..." : `${publications.length} publication(s) à paraître`}
+          </p>
+        </div>
+
+        {loading ? (
+          <Card className="border-0 shadow-[var(--shadow-kitab-strong)] max-w-3xl mx-auto">
+            <CardContent className="p-12 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[hsl(var(--kitab-primary))] mx-auto"></div>
+              <p className="mt-4 text-muted-foreground">Chargement des publications...</p>
+            </CardContent>
+          </Card>
+        ) : publications.length === 0 ? (
+          <Card className="border-0 shadow-[var(--shadow-kitab-strong)] max-w-3xl mx-auto">
+            <CardContent className="p-12 text-center">
+              <div className="bg-gradient-to-br from-[hsl(var(--kitab-primary))]/10 to-[hsl(var(--kitab-accent))]/5 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+                <Clock className="w-12 h-12 text-[hsl(var(--kitab-primary))]" />
+              </div>
+              
+              <h2 className="text-3xl font-bold text-foreground mb-4">
+                Aucune Publication à Venir
+              </h2>
+              
+              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                Aucune publication à venir n'est actuellement enregistrée.
+                Revenez bientôt pour découvrir les prochaines parutions.
+              </p>
+              
+              <div className="flex gap-4 justify-center flex-wrap">
+                <Link to="/kitab/new-publications">
+                  <Button size="lg" className="bg-[hsl(var(--kitab-primary))] hover:bg-[hsl(var(--kitab-primary-dark))] text-white">
+                    Voir les Nouvelles Parutions
+                  </Button>
+                </Link>
+                <Link to="/kitab">
+                  <Button size="lg" variant="outline">
+                    Retour à l'Accueil
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-6 max-w-6xl mx-auto">
+            {publications.map((pub) => (
+              <Card key={pub.id} className="border-0 shadow-[var(--shadow-kitab)] hover:shadow-[var(--shadow-kitab-strong)] transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex gap-6">
+                    <div className="flex-shrink-0 w-32 h-40 bg-gradient-to-br from-[hsl(var(--kitab-secondary))]/10 to-[hsl(var(--kitab-accent))]/10 rounded-lg flex items-center justify-center">
+                      <BookOpen className="w-12 h-12 text-[hsl(var(--kitab-secondary))]/40" />
+                    </div>
+                    
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="text-2xl font-bold text-foreground">
+                          {pub.title}
+                        </h3>
+                        {pub.publication_date && (
+                          <Badge className="bg-[hsl(var(--kitab-accent))] text-white">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {new Date(pub.publication_date).toLocaleDateString('fr-FR', {
+                              month: 'long',
+                              year: 'numeric'
+                            })}
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      {pub.subtitle && (
+                        <p className="text-lg text-muted-foreground italic mb-3">
+                          {pub.subtitle}
+                        </p>
+                      )}
+                      
+                      <div className="flex flex-wrap gap-3 mb-4">
+                        {pub.author_name && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-muted-foreground">Auteur:</span>
+                            <span className="text-sm text-foreground">{pub.author_name}</span>
+                          </div>
+                        )}
+                        {pub.metadata?.publisher && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-muted-foreground">Éditeur:</span>
+                            <span className="text-sm text-foreground">{pub.metadata.publisher}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {pub.isbn && (
+                          <Badge variant="outline" className="bg-[hsl(var(--kitab-secondary))]/5">
+                            ISBN: {pub.isbn}
+                          </Badge>
+                        )}
+                        {pub.support_type && (
+                          <Badge variant="outline">{pub.support_type}</Badge>
+                        )}
+                        {pub.language && (
+                          <Badge variant="outline">{pub.language}</Badge>
+                        )}
+                        {pub.page_count && (
+                          <Badge variant="outline">{pub.page_count} pages</Badge>
+                        )}
+                      </div>
+                      
+                      {pub.publication_date && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Calendar className="w-4 h-4" />
+                          <span>Date de parution prévue: {new Date(pub.publication_date).toLocaleDateString('fr-FR', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </main>
       
       <Footer />
