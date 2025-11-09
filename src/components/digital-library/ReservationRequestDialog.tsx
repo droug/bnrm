@@ -80,6 +80,7 @@ export function ReservationRequestDialog({
       documentId: documentId || "",
       documentTitle: documentTitle || "",
       documentCote: documentCote || "",
+      documentStatus: "numerise",
       userName: `${userProfile.firstName} ${userProfile.lastName}`,
       userEmail: userProfile.email,
       requestedDate: undefined,
@@ -108,7 +109,7 @@ export function ReservationRequestDialog({
           document_id: data.documentId,
           document_title: data.documentTitle,
           document_cote: data.documentCote || null,
-          document_status: "numerise", // Par défaut pour la bibliothèque numérique
+          document_status: data.documentStatus,
           user_name: data.userName,
           user_email: data.userEmail,
           requested_date: format(data.requestedDate, "yyyy-MM-dd"),
@@ -214,6 +215,33 @@ export function ReservationRequestDialog({
                         placeholder="Entrez la cote du document si connue"
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Statut du document */}
+              <FormField
+                control={form.control}
+                name="documentStatus"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type de support</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner le type de support" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="numerise">Document numérisé</SelectItem>
+                        <SelectItem value="physique">Document physique</SelectItem>
+                        <SelectItem value="en_cours_numerisation">En cours de numérisation</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Sélectionnez le type de support du document que vous souhaitez consulter
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

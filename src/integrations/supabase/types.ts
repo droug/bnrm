@@ -7496,6 +7496,7 @@ export type Database = {
           created_at: string
           document_cote: string | null
           document_id: string
+          document_status: string | null
           document_title: string
           id: string
           requested_date: string
@@ -7514,6 +7515,7 @@ export type Database = {
           created_at?: string
           document_cote?: string | null
           document_id: string
+          document_status?: string | null
           document_title: string
           id?: string
           requested_date: string
@@ -7532,6 +7534,7 @@ export type Database = {
           created_at?: string
           document_cote?: string | null
           document_id?: string
+          document_status?: string | null
           document_title?: string
           id?: string
           requested_date?: string
