@@ -61,11 +61,11 @@ export function KitabNewPublicationsManager() {
   const loadPublications = async () => {
     setLoading(true);
     try {
-      // Récupérer les publications approuvées pour Kitab avec le statut "published" (nouvelles parutions)
+      // Récupérer toutes les publications avec le statut "published" (nouvelles parutions)
+      // peu importe leur kitab_status pour permettre l'approbation/rejet
       const { data, error } = await supabase
         .from('legal_deposit_requests')
         .select('*')
-        .eq('kitab_status', 'approved')
         .eq('publication_status', 'published')
         .order('created_at', { ascending: false });
 
