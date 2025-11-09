@@ -381,7 +381,7 @@ const Header = () => {
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <Link to="/cbn/reserver-ouvrage" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
-                          <div className="font-semibold">Réserver un ouvrage</div>
+                          <div className="font-semibold">Réserver un document</div>
                           <div className="text-xs text-muted-foreground mt-1">Recherchez et réservez un document CBN</div>
                         </Link>
                       </NavigationMenuLink>
