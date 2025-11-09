@@ -1059,6 +1059,63 @@ export type Database = {
           },
         ]
       }
+      cbm_adhesions: {
+        Row: {
+          address: string | null
+          city: string | null
+          contact_person: string | null
+          created_at: string
+          email: string | null
+          id: string
+          library_name: string
+          library_type: string
+          motivation: string | null
+          phone: string | null
+          processed_at: string | null
+          processed_by: string | null
+          rejection_reason: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          library_name: string
+          library_type: string
+          motivation?: string | null
+          phone?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          library_name?: string
+          library_type?: string
+          motivation?: string | null
+          phone?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       cbm_adhesions_catalogue: {
         Row: {
           adresse: string | null
@@ -1361,6 +1418,54 @@ export type Database = {
           type_formation?: string
           type_organisme?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      cbm_formation_requests: {
+        Row: {
+          created_at: string
+          id: string
+          library_name: string
+          number_of_participants: number | null
+          preferred_dates: string | null
+          processed_at: string | null
+          processed_by: string | null
+          rejection_reason: string | null
+          specific_needs: string | null
+          status: string
+          training_type: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          library_name: string
+          number_of_participants?: number | null
+          preferred_dates?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          rejection_reason?: string | null
+          specific_needs?: string | null
+          status?: string
+          training_type: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          library_name?: string
+          number_of_participants?: number | null
+          preferred_dates?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          rejection_reason?: string | null
+          specific_needs?: string | null
+          status?: string
+          training_type?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }

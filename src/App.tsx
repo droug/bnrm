@@ -136,6 +136,7 @@ const CBMAccesRapide = lazy(() => import("./pages/CBMAccesRapide"));
 const CBMAdmin = lazy(() => import("./pages/CBMAdmin"));
 const GestionAdhesions = lazy(() => import("./pages/cbm/admin/GestionAdhesions"));
 const GestionFormations = lazy(() => import("./pages/cbm/admin/GestionFormations"));
+const CBMReports = lazy(() => import("./pages/CBMReports"));
 const CBNRechercheAvancee = lazy(() => import("./pages/cbm/RechercheAvancee"));
 const CBNNoticeExample = lazy(() => import("./pages/cbm/NoticeExample"));
 const CatalogueCBN = lazy(() => import("./pages/cbm/CatalogueCBN"));
@@ -327,6 +328,7 @@ const App = () => {
           <Route path="/cbm/admin" element={<CBMAdmin />} />
           <Route path="/cbm/admin/adhesions" element={<GestionAdhesions />} />
           <Route path="/cbm/admin/formations" element={<GestionFormations />} />
+          <Route path="/cbm/admin/reports" element={<CBMReports />} />
 
           {/* CBN Routes */}
           <Route path="/cbm/catalogue" element={<CatalogueCBN />} />
