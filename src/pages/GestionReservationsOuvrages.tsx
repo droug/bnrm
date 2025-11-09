@@ -831,16 +831,10 @@ export default function GestionReservationsOuvrages() {
                       {selectedReservation.routed_to === "bibliotheque_numerique" ? "Bibliothèque Numérique" : "Responsable Support"}
                     </Badge>
                   </div>
-                  {selectedReservation.motif && (
-                    <div className="col-span-2">
-                      <span className="text-muted-foreground">Motif:</span>
-                      <p className="mt-1 p-2 bg-muted rounded">{selectedReservation.motif}</p>
-                    </div>
-                  )}
-                  {selectedReservation.comments && (
+                  {(selectedReservation.comments || selectedReservation.motif) && (
                     <div className="col-span-2">
                       <span className="text-muted-foreground">Commentaires:</span>
-                      <p className="mt-1 p-2 bg-muted rounded">{selectedReservation.comments}</p>
+                      <p className="mt-1 p-2 bg-muted rounded">{selectedReservation.comments || selectedReservation.motif}</p>
                     </div>
                   )}
                   {selectedReservation.reason_refus && (
