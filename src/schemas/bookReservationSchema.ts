@@ -10,7 +10,6 @@ export const bookReservationSchema = z.object({
     required_error: "Le statut du support est requis",
   }),
   isFreeAccess: z.boolean().default(false),
-  requestPhysical: z.boolean().default(false),
   allowPhysicalConsultation: z.boolean().default(true),
   requestedDate: z.date().optional(),
   motif: z.string().optional(),

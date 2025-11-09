@@ -74,7 +74,6 @@ export function BookReservationDialog({
   const { user, profile } = useAuth();
   const { userRole, isAuthenticated, isAdmin, isLibrarian } = useAccessControl();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPhysicalWarning, setShowPhysicalWarning] = useState(false);
   const [showUserTypeList, setShowUserTypeList] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [disabledDates, setDisabledDates] = useState<Date[]>([]);
@@ -193,7 +192,6 @@ export function BookReservationDialog({
       supportStatus,
       isFreeAccess,
       allowPhysicalConsultation,
-      requestPhysical: false,
       userName: profile?.first_name && profile?.last_name
         ? `${profile.first_name} ${profile.last_name}`
         : "",
@@ -206,20 +204,11 @@ export function BookReservationDialog({
     },
   });
 
-  const requestPhysical = form.watch("requestPhysical");
   const selectedUserType = form.watch("userType");
   const isStudentPFE = form.watch("isStudentPFE");
   
   // Vérifier si le document est un manuscrit
   const isManuscript = supportType?.toLowerCase().includes("manuscrit");
-
-  useEffect(() => {
-    if (requestPhysical && !allowPhysicalConsultation) {
-      setShowPhysicalWarning(true);
-    } else {
-      setShowPhysicalWarning(false);
-    }
-  }, [requestPhysical, allowPhysicalConsultation]);
 
   // Fermer la liste si on clique à l'extérieur
   useEffect(() => {
@@ -246,15 +235,6 @@ export function BookReservationDialog({
     }
 
     if (data.supportStatus === "numerise") {
-      if (data.requestPhysical) {
-        if (!data.allowPhysicalConsultation) {
-          throw new Error("La consultation physique n'est pas autorisée pour ce document");
-        }
-        return {
-          routedTo: "responsable_support",
-          message: "Demande de consultation sur place - routée vers le Responsable Support",
-        };
-      }
       return {
         routedTo: "bibliotheque_numerique",
         message: "Document numérisé - routé vers la Bibliothèque Numérique",
@@ -271,13 +251,6 @@ export function BookReservationDialog({
     setIsSubmitting(true);
 
     try {
-      // Vérification de la consultation physique
-      if (data.requestPhysical && !data.allowPhysicalConsultation) {
-        toast.error("La consultation physique n'est pas autorisée pour ce document");
-        setIsSubmitting(false);
-        return;
-      }
-
       // Vérification pour les manuscrits et étudiants PFE
       if (isManuscript && data.userType === "etudiant") {
         if (!data.isStudentPFE) {
@@ -338,7 +311,6 @@ export function BookReservationDialog({
         support_type: data.supportType,
         support_status: data.supportStatus,
         is_free_access: data.isFreeAccess,
-        request_physical: data.requestPhysical,
         allow_physical_consultation: data.allowPhysicalConsultation,
         routed_to: routing.routedTo,
         statut: "soumise",
@@ -472,45 +444,6 @@ export function BookReservationDialog({
                 </div>
               </CardContent>
             </Card>
-
-            {/* Consultation physique */}
-            {supportStatus !== "libre_acces" && (
-              <Card>
-                <CardContent className="pt-6">
-                  <FormField
-                    control={form.control}
-                    name="requestPhysical"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center justify-between space-y-0">
-                        <div className="space-y-1">
-                          <FormLabel className="text-base font-semibold">
-                            Demande de consultation sur place
-                          </FormLabel>
-                          <p className="text-sm text-muted-foreground">
-                            Souhaitez-vous consulter le document sur place?
-                          </p>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  {showPhysicalWarning && (
-                    <div className="mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg flex items-start gap-2">
-                      <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-                      <div className="text-sm text-destructive">
-                        <p className="font-medium">Consultation physique non autorisée</p>
-                        <p>Ce document ne peut pas être consulté physiquement. Veuillez accéder à la version numérique.</p>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
 
             {/* Informations personnelles */}
             <Card>
@@ -742,7 +675,7 @@ export function BookReservationDialog({
               </Button>
               <Button
                 type="submit"
-                disabled={isSubmitting || showPhysicalWarning}
+                disabled={isSubmitting}
                 className="min-w-[120px]"
               >
                 {isSubmitting ? "Envoi en cours..." : "Envoyer la demande"}
