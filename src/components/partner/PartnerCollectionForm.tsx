@@ -14,7 +14,7 @@ import { Building2, Mail, Phone, Globe } from 'lucide-react';
 
 const collectionSchema = z.object({
   institution_name: z.string().min(3, "Le nom de l'institution doit contenir au moins 3 caractères"),
-  institution_code: z.string().min(2, "Le code institution doit contenir au moins 2 caractères"),
+  legal_representative: z.string().min(2, "Le représentant légal est requis"),
   contact_person: z.string().min(2, "Le nom du contact est requis"),
   contact_email: z.string().email("Email invalide"),
   contact_phone: z.string().optional(),
@@ -49,7 +49,7 @@ export function PartnerCollectionForm({ onSuccess }: { onSuccess?: () => void })
         .from('partner_collections')
         .insert([{
           institution_name: data.institution_name,
-          institution_code: data.institution_code,
+          legal_representative: data.legal_representative,
           contact_person: data.contact_person,
           contact_email: data.contact_email,
           contact_phone: data.contact_phone || null,
@@ -105,14 +105,14 @@ export function PartnerCollectionForm({ onSuccess }: { onSuccess?: () => void })
           </div>
 
           <div>
-            <Label htmlFor="institution_code">Code institution *</Label>
+            <Label htmlFor="legal_representative">Représentant légal *</Label>
             <Input
-              id="institution_code"
-              {...register('institution_code')}
-              placeholder="BN-XXX"
+              id="legal_representative"
+              {...register('legal_representative')}
+              placeholder="Nom complet du représentant légal"
             />
-            {errors.institution_code && (
-              <p className="text-sm text-destructive mt-1">{errors.institution_code.message}</p>
+            {errors.legal_representative && (
+              <p className="text-sm text-destructive mt-1">{errors.legal_representative.message}</p>
             )}
           </div>
 
