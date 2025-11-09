@@ -108,6 +108,7 @@ export function ReservationRequestDialog({
           document_id: data.documentId,
           document_title: data.documentTitle,
           document_cote: data.documentCote || null,
+          document_status: "numerise", // Par défaut pour la bibliothèque numérique
           user_name: data.userName,
           user_email: data.userEmail,
           requested_date: format(data.requestedDate, "yyyy-MM-dd"),
