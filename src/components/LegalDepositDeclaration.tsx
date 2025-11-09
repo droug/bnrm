@@ -1739,7 +1739,73 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             <div>
               <h3 className="text-2xl font-semibold mb-4">Identification de l'auteur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Champs dynamiques depuis la base de données */}
+                <div className="space-y-2">
+                  <Label>Type de l'auteur</Label>
+                  <InlineSelect
+                    placeholder="Sélectionner le type"
+                    options={[
+                      { value: "physique", label: "Personne physique" },
+                      { value: "morale", label: "Personne morale (collectivités)" },
+                    ]}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Nom de la collectivité / Nom de l'Auteur</Label>
+                  <Input placeholder="Nom complet" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Sigle</Label>
+                  <Input placeholder="Sigle" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Nature du déclarant</Label>
+                  <Input placeholder="Nature du déclarant" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Numéro de téléphone" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Adresse email" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Région</Label>
+                  <InlineSelect
+                    value={selectedRegion}
+                    onChange={(value) => {
+                      setSelectedRegion(value);
+                      setSelectedCity('');
+                    }}
+                    placeholder="Sélectionner la région"
+                    options={moroccanRegions.map(region => ({ 
+                      value: region.name, 
+                      label: region.name 
+                    }))}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Ville</Label>
+                  <InlineSelect
+                    value={selectedCity}
+                    onChange={setSelectedCity}
+                    placeholder={selectedRegion ? "Sélectionner la ville" : "Sélectionner d'abord une région"}
+                    options={selectedRegion ? getCitiesByRegion(selectedRegion).map(city => ({ 
+                      value: city, 
+                      label: city 
+                    })) : []}
+                    disabled={!selectedRegion}
+                  />
+                </div>
+
+                {/* Champs personnalisés */}
                 {customFields
                   .filter((field) => field.section_key === "identification_auteur")
                   .map((field) => (
@@ -2270,9 +2336,50 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             <div>
               <h3 className="text-2xl font-semibold mb-4">Identification de l'auteur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Champs dynamiques depuis la base de données */}
+                <div className="space-y-2">
+                  <Label>Type de l'auteur</Label>
+                  <InlineSelect
+                    placeholder="Sélectionner le type"
+                    options={[
+                      { value: "physique", label: "Personne physique" },
+                      { value: "morale", label: "Personne morale (collectivités)" },
+                    ]}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Nom de la collectivité / Nom de l'auteur</Label>
+                  <Input placeholder="Nom complet" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Sigle</Label>
+                  <Input placeholder="Sigle" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Nature du déclarant</Label>
+                  <Input placeholder="Nature du déclarant" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input placeholder="Numéro de téléphone" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Adresse email" />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Adresse</Label>
+                  <Textarea placeholder="Adresse complète" />
+                </div>
+
+                {/* Champs personnalisés */}
                 {customFields
-                  .filter((field) => field.section_key === "identification_auteur")
+                  .filter((field) => field.section_key === "responsible_info")
                   .map((field) => (
                     <DynamicFieldRenderer
                       key={field.id}
