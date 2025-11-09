@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import Header from "@/components/Header";
@@ -31,7 +31,15 @@ export default function PaymentServices() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [searchParams] = useSearchParams();
   const [isDailyPassFormOpen, setIsDailyPassFormOpen] = useState(false);
+
+  // Ouvrir automatiquement le formulaire si le paramètre URL est présent
+  useEffect(() => {
+    if (searchParams.get('open') === 'daily-pass') {
+      setIsDailyPassFormOpen(true);
+    }
+  }, [searchParams]);
 
   const services = [
     {
