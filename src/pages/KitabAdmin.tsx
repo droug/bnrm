@@ -5,7 +5,9 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Settings, ArrowLeft, BookPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KitabNewPublicationsManager } from "@/components/kitab/KitabNewPublicationsManager";
+import { KitabUpcomingPublicationsManager } from "@/components/kitab/KitabUpcomingPublicationsManager";
 
 export default function KitabAdmin() {
   const { user, profile } = useAuth();
@@ -57,16 +59,27 @@ export default function KitabAdmin() {
                 </div>
                 <div>
                   <CardTitle className="text-2xl text-kitab-primary">
-                    Gestion des Nouvelles Parutions
+                    Gestion des Parutions
                   </CardTitle>
                   <CardDescription className="text-base">
-                    Publications provenant du Dépôt Légal du portail BNRM ayant obtenu la validation finale
+                    Gestion des publications Kitab
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <KitabNewPublicationsManager />
+              <Tabs defaultValue="nouvelles" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="nouvelles">Nouvelles parutions</TabsTrigger>
+                  <TabsTrigger value="a-paraitre">À paraître</TabsTrigger>
+                </TabsList>
+                <TabsContent value="nouvelles" className="mt-6">
+                  <KitabNewPublicationsManager />
+                </TabsContent>
+                <TabsContent value="a-paraitre" className="mt-6">
+                  <KitabUpcomingPublicationsManager />
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
 
