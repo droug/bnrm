@@ -41,7 +41,7 @@ export default function CBMAdmin() {
       description: "Analyses et rapports d'activité du réseau",
       icon: FileText,
       path: "/cbm/admin/reports",
-      gradient: "from-cbm-primary/90 to-cbm-secondary"
+      gradient: "from-primary/90 to-primary"
     }
   ];
 
