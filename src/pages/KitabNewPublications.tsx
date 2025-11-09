@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Search, Sparkles, Filter, BookOpen, Calendar } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ArrowLeft, Search, Sparkles, Filter, BookOpen, Calendar, Info, Eye } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -29,7 +30,20 @@ export default function KitabNewPublications() {
   const [publications, setPublications] = useState<Publication[]>([]);
   const [filteredPublications, setFilteredPublications] = useState<Publication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPublication, setSelectedPublication] = useState<Publication | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isVisualizeOpen, setIsVisualizeOpen] = useState(false);
   const { toast } = useToast();
+
+  const handleDetailsClick = (publication: Publication) => {
+    setSelectedPublication(publication);
+    setIsDetailsOpen(true);
+  };
+
+  const handleVisualizeClick = (publication: Publication) => {
+    setSelectedPublication(publication);
+    setIsVisualizeOpen(true);
+  };
 
   useEffect(() => {
     loadPublications();
@@ -243,6 +257,27 @@ export default function KitabNewPublications() {
                             <span>Publié le {new Date(pub.publication_date).toLocaleDateString('fr-FR')}</span>
                           </div>
                         )}
+                        
+                        <div className="flex gap-3 mt-4">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDetailsClick(pub)}
+                            className="rounded-full border-[hsl(var(--kitab-primary))]/30 hover:bg-[hsl(var(--kitab-primary))]/10 hover:border-[hsl(var(--kitab-primary))]"
+                          >
+                            <Info className="w-4 h-4 mr-2" />
+                            Détails
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleVisualizeClick(pub)}
+                            className="rounded-full border-[hsl(var(--kitab-accent))]/30 hover:bg-[hsl(var(--kitab-accent))]/10 hover:border-[hsl(var(--kitab-accent))]"
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            Visualiser
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -252,6 +287,156 @@ export default function KitabNewPublications() {
           )}
         </section>
       </main>
+      
+      {/* Details Dialog */}
+      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-[hsl(var(--kitab-primary))]">
+              Détails de la Publication
+            </DialogTitle>
+          </DialogHeader>
+          {selectedPublication && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xl font-bold text-foreground mb-2">
+                  {selectedPublication.title}
+                </h3>
+                {selectedPublication.subtitle && (
+                  <p className="text-lg text-muted-foreground italic">
+                    {selectedPublication.subtitle}
+                  </p>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                {selectedPublication.author_name && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">Auteur</p>
+                    <p className="text-foreground">{selectedPublication.author_name}</p>
+                  </div>
+                )}
+                {selectedPublication.metadata?.publisher && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">Éditeur</p>
+                    <p className="text-foreground">{selectedPublication.metadata.publisher}</p>
+                  </div>
+                )}
+                {selectedPublication.isbn && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">ISBN</p>
+                    <p className="text-foreground">{selectedPublication.isbn}</p>
+                  </div>
+                )}
+                {selectedPublication.support_type && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">Type de support</p>
+                    <p className="text-foreground">{selectedPublication.support_type}</p>
+                  </div>
+                )}
+                {selectedPublication.language && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">Langue</p>
+                    <p className="text-foreground">{selectedPublication.language}</p>
+                  </div>
+                )}
+                {selectedPublication.page_count && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">Nombre de pages</p>
+                    <p className="text-foreground">{selectedPublication.page_count}</p>
+                  </div>
+                )}
+                {selectedPublication.publication_date && (
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">Date de publication</p>
+                    <p className="text-foreground">
+                      {new Date(selectedPublication.publication_date).toLocaleDateString('fr-FR')}
+                    </p>
+                  </div>
+                )}
+              </div>
+              
+              {selectedPublication.metadata && (
+                <div>
+                  <p className="text-sm font-semibold text-muted-foreground mb-2">Informations complémentaires</p>
+                  <div className="bg-muted/30 rounded-lg p-4 space-y-2">
+                    {selectedPublication.metadata.description && (
+                      <p className="text-sm text-foreground">{selectedPublication.metadata.description}</p>
+                    )}
+                    {selectedPublication.metadata.subject && (
+                      <p className="text-sm"><span className="font-semibold">Sujet:</span> {selectedPublication.metadata.subject}</p>
+                    )}
+                    {selectedPublication.metadata.collection && (
+                      <p className="text-sm"><span className="font-semibold">Collection:</span> {selectedPublication.metadata.collection}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Visualize Dialog */}
+      <Dialog open={isVisualizeOpen} onOpenChange={setIsVisualizeOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-[hsl(var(--kitab-accent))]">
+              Visualisation de la Publication
+            </DialogTitle>
+          </DialogHeader>
+          {selectedPublication && (
+            <div className="space-y-6">
+              <div className="flex gap-6">
+                <div className="flex-shrink-0 w-48 h-64 bg-gradient-to-br from-[hsl(var(--kitab-primary))]/10 to-[hsl(var(--kitab-accent))]/10 rounded-lg flex items-center justify-center">
+                  <BookOpen className="w-24 h-24 text-[hsl(var(--kitab-primary))]/40" />
+                </div>
+                
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-foreground mb-2">
+                    {selectedPublication.title}
+                  </h3>
+                  {selectedPublication.subtitle && (
+                    <p className="text-lg text-muted-foreground italic mb-3">
+                      {selectedPublication.subtitle}
+                    </p>
+                  )}
+                  
+                  <div className="space-y-2">
+                    {selectedPublication.author_name && (
+                      <p className="text-sm"><span className="font-semibold">Auteur:</span> {selectedPublication.author_name}</p>
+                    )}
+                    {selectedPublication.metadata?.publisher && (
+                      <p className="text-sm"><span className="font-semibold">Éditeur:</span> {selectedPublication.metadata.publisher}</p>
+                    )}
+                    {selectedPublication.isbn && (
+                      <p className="text-sm"><span className="font-semibold">ISBN:</span> {selectedPublication.isbn}</p>
+                    )}
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {selectedPublication.support_type && (
+                      <Badge variant="outline">{selectedPublication.support_type}</Badge>
+                    )}
+                    {selectedPublication.language && (
+                      <Badge variant="outline">{selectedPublication.language}</Badge>
+                    )}
+                    {selectedPublication.page_count && (
+                      <Badge variant="outline">{selectedPublication.page_count} pages</Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-muted/30 rounded-lg p-6 text-center">
+                <p className="text-muted-foreground">
+                  La prévisualisation complète de cette publication sera bientôt disponible
+                </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
       
       <Footer />
     </div>
