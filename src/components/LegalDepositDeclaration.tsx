@@ -1765,6 +1765,24 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input placeholder="Nature du déclarant" />
                 </div>
 
+                {/* Champ Nationalité - inséré ici pour être juste après Nature du déclarant */}
+                {customFields
+                  .filter((field) => field.section_key === "identification_auteur" && field.field_key === "author_nationality")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
+
                 <div className="space-y-2">
                   <Label>Téléphone</Label>
                   <Input placeholder="Numéro de téléphone" />
@@ -1805,9 +1823,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   />
                 </div>
 
-                {/* Champs personnalisés */}
+                {/* Champs personnalisés (sauf nationality qui est déjà affiché plus haut) */}
                 {customFields
-                  .filter((field) => field.section_key === "identification_auteur")
+                  .filter((field) => field.section_key === "identification_auteur" && field.field_key !== "author_nationality")
                   .map((field) => (
                     <DynamicFieldRenderer
                       key={field.id}
@@ -2362,6 +2380,24 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input placeholder="Nature du déclarant" />
                 </div>
 
+                {/* Champ Nationalité - inséré ici pour être juste après Nature du déclarant */}
+                {customFields
+                  .filter((field) => field.section_key === "identification_auteur" && field.field_key === "author_nationality")
+                  .map((field) => (
+                    <DynamicFieldRenderer
+                      key={field.id}
+                      field={field}
+                      language={language}
+                      value={customFieldsData[field.field_key]}
+                      onChange={(value) =>
+                        setCustomFieldsData((prev) => ({
+                          ...prev,
+                          [field.field_key]: value,
+                        }))
+                      }
+                    />
+                  ))}
+
                 <div className="space-y-2">
                   <Label>Téléphone</Label>
                   <Input placeholder="Numéro de téléphone" />
@@ -2377,9 +2413,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Textarea placeholder="Adresse complète" />
                 </div>
 
-                {/* Champs personnalisés */}
+                {/* Champs personnalisés (sauf nationality qui est déjà affiché plus haut) */}
                 {customFields
-                  .filter((field) => field.section_key === "responsible_info")
+                  .filter((field) => field.section_key === "responsible_info" || (field.section_key === "identification_auteur" && field.field_key !== "author_nationality"))
                   .map((field) => (
                     <DynamicFieldRenderer
                       key={field.id}
