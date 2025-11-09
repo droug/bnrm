@@ -448,8 +448,6 @@ export function BookReservationDialog({
             {/* Informations personnelles */}
             <Card>
               <CardContent className="pt-6 space-y-4">
-                <h3 className="font-semibold mb-3">Détails de la demande</h3>
-                
                 {/* Sélection de la copie */}
                 {documentCopies.length > 0 && (
                   <div className="space-y-2">
