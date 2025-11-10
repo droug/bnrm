@@ -505,6 +505,13 @@ const Index = () => {
                       >
                         Collections Spécialisées
                       </Button>
+                      <Button
+                        size="lg"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 md:col-span-2"
+                        onClick={() => navigate("/signup")}
+                      >
+                        Inscription
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -519,12 +526,11 @@ const Index = () => {
                       <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">Services Rapides</h3>
                       <div className="w-32 h-2 bg-gradient-neutral mx-auto rounded-full shadow-gold"></div>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                       {[
                         { icon: FileText, label: "Dépôt légal", color: "text-primary", bg: "bg-primary/10", border: "border-primary/25", href: "/legal-deposit" },
                         { icon: BookOpen, label: "Réserver un document", color: "text-accent", bg: "bg-accent/10", border: "border-accent/25", href: "/cbn/reserver-ouvrage" },
                         { icon: Download, label: "Reproduction", color: "text-highlight", bg: "bg-highlight/10", border: "border-highlight/25", href: "/cbm/demande-reproduction" },
-                         { icon: Users, label: "Inscription", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25", href: "/signup" },
                          { icon: Calendar, label: "Événements", color: "text-gold", bg: "bg-gold/10", border: "border-gold/25", href: "/news" }
                         ].map((service, index) => (
                           <div 
