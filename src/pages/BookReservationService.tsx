@@ -4,9 +4,10 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CBNSearchWithSelection } from "@/components/cbn/CBNSearchWithSelection";
 import { BookReservationDialog } from "@/components/cbn/BookReservationDialog";
+import { AvailabilityCalendar } from "@/components/cbn/AvailabilityCalendar";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Calendar } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface SelectedDocument {
@@ -25,6 +26,7 @@ export default function BookReservationService() {
   const navigate = useNavigate();
   const [selectedDocument, setSelectedDocument] = useState<SelectedDocument | null>(null);
   const [showReservationDialog, setShowReservationDialog] = useState(false);
+  const [showAvailabilityDialog, setShowAvailabilityDialog] = useState(false);
 
   // Nettoyer les résultats de recherche sauvegardés au démontage
   useEffect(() => {
@@ -112,13 +114,24 @@ export default function BookReservationService() {
                 )}
               </div>
 
-              <Button
-                onClick={handleOpenReservation}
-                className="w-full"
-                size="lg"
-              >
-                Continuer vers la réservation
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setShowAvailabilityDialog(true)}
+                  variant="outline"
+                  className="flex-1"
+                  size="lg"
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Disponibilité
+                </Button>
+                <Button
+                  onClick={handleOpenReservation}
+                  className="flex-1"
+                  size="lg"
+                >
+                  Continuer vers la réservation
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -134,6 +147,15 @@ export default function BookReservationService() {
             supportType={selectedDocument.type || "Livre"}
             supportStatus={getSupportStatus(selectedDocument.status)}
             onReserve={handleReservationComplete}
+          />
+        )}
+
+        {showAvailabilityDialog && selectedDocument && (
+          <AvailabilityCalendar
+            isOpen={showAvailabilityDialog}
+            onClose={() => setShowAvailabilityDialog(false)}
+            documentId={selectedDocument.id}
+            documentTitle={selectedDocument.title}
           />
         )}
       </main>
