@@ -7,19 +7,34 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Building2, Mail, Phone, Globe } from 'lucide-react';
 
 const collectionSchema = z.object({
-  institution_name: z.string().min(3, "Le nom de l'institution doit contenir au moins 3 caractères"),
+  institution_name: z.enum(["institution", "organisme", "zaouia", "autre"], {
+    errorMap: () => ({ message: "Veuillez sélectionner une entité" }),
+  }),
+  institution_name_autre: z.string()
+    .min(2, "Le nom doit contenir au moins 2 caractères")
+    .max(200, "Le nom ne peut pas dépasser 200 caractères")
+    .optional(),
   legal_representative: z.string().min(2, "Le représentant légal est requis"),
   contact_person: z.string().min(2, "Le nom du contact est requis"),
   contact_email: z.string().email("Email invalide"),
   contact_phone: z.string().optional(),
   description: z.string().min(10, "La description doit contenir au moins 10 caractères"),
   website_url: z.string().url("URL invalide").optional().or(z.literal('')),
+}).refine((data) => {
+  if (data.institution_name === "autre" && !data.institution_name_autre) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Veuillez préciser l'entité",
+  path: ["institution_name_autre"],
 });
 
 type CollectionFormData = z.infer<typeof collectionSchema>;
@@ -29,9 +44,11 @@ export function PartnerCollectionForm({ onSuccess }: { onSuccess?: () => void })
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<CollectionFormData>({
+  const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm<CollectionFormData>({
     resolver: zodResolver(collectionSchema),
   });
+
+  const institutionName = watch('institution_name');
 
   const onSubmit = async (data: CollectionFormData) => {
     if (!user) {
@@ -48,7 +65,9 @@ export function PartnerCollectionForm({ onSuccess }: { onSuccess?: () => void })
       const { error } = await supabase
         .from('partner_collections')
         .insert([{
-          institution_name: data.institution_name,
+          institution_name: data.institution_name === 'autre' && data.institution_name_autre 
+            ? data.institution_name_autre 
+            : data.institution_name,
           legal_representative: data.legal_representative,
           contact_person: data.contact_person,
           contact_email: data.contact_email,
@@ -93,16 +112,39 @@ export function PartnerCollectionForm({ onSuccess }: { onSuccess?: () => void })
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label htmlFor="institution_name">Nom de l'institution *</Label>
-            <Input
-              id="institution_name"
-              {...register('institution_name')}
-              placeholder="Bibliothèque Nationale..."
-            />
+            <Label htmlFor="institution_name">Entité *</Label>
+            <Select 
+              onValueChange={(value) => setValue('institution_name', value as any)}
+              defaultValue=""
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="institution">Institution</SelectItem>
+                <SelectItem value="organisme">Organisme</SelectItem>
+                <SelectItem value="zaouia">Zaouïa</SelectItem>
+                <SelectItem value="autre">Autre</SelectItem>
+              </SelectContent>
+            </Select>
             {errors.institution_name && (
               <p className="text-sm text-destructive mt-1">{errors.institution_name.message}</p>
             )}
           </div>
+
+          {institutionName === 'autre' && (
+            <div>
+              <Label htmlFor="institution_name_autre">Précisez l'entité *</Label>
+              <Input
+                id="institution_name_autre"
+                {...register('institution_name_autre')}
+                placeholder="Ex: Nom de l'entité..."
+              />
+              {errors.institution_name_autre && (
+                <p className="text-sm text-destructive mt-1">{errors.institution_name_autre.message}</p>
+              )}
+            </div>
+          )}
 
           <div>
             <Label htmlFor="legal_representative">Représentant légal *</Label>
