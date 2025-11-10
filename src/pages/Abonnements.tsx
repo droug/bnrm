@@ -147,7 +147,6 @@ export default function Abonnements() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredServices.map((service) => {
               const serviceTariffs = getTariffsForService(service.id_service);
-              const firstTariff = serviceTariffs[0];
               
               return (
                 <Card key={service.id_service} className="hover:shadow-lg transition-shadow flex flex-col">
@@ -176,24 +175,37 @@ export default function Abonnements() {
                         </div>
                       )}
                       
-                      {firstTariff && (
-                        <div className="pt-2 border-t">
-                          <div className="flex items-center gap-2">
-                            <span className="text-2xl font-bold text-primary">
-                              {firstTariff.montant} {firstTariff.devise}
-                            </span>
-                          </div>
-                          {firstTariff.condition_tarif && (
-                            <div className="text-sm text-muted-foreground">
-                              {firstTariff.condition_tarif}
-                            </div>
-                          )}
+                      {service.reference_legale && (
+                        <div className="text-sm">
+                          <span className="font-semibold">Référence légale : </span>
+                          {service.reference_legale}
                         </div>
                       )}
                       
-                      {service.reference_legale && (
-                        <div className="text-xs text-muted-foreground">
-                          Référence légale : {service.reference_legale}
+                      {serviceTariffs.length > 0 && (
+                        <div className="pt-2 border-t">
+                          <div className="font-semibold text-sm mb-2">Tarifs</div>
+                          <div className="space-y-2">
+                            {serviceTariffs.map((tariff) => (
+                              <div key={tariff.id_tarif} className="p-2 bg-muted/50 rounded-md">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xl font-bold text-primary">
+                                    {tariff.montant} {tariff.devise}
+                                  </span>
+                                </div>
+                                {tariff.condition_tarif && (
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    {tariff.condition_tarif}
+                                  </div>
+                                )}
+                                {tariff.periode_validite && (
+                                  <div className="text-xs text-muted-foreground">
+                                    Période: {tariff.periode_validite}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -201,7 +213,7 @@ export default function Abonnements() {
                       className="w-full"
                       onClick={() => {
                         setSelectedServiceForRegistration(service);
-                        setSelectedTariffForRegistration(firstTariff || null);
+                        setSelectedTariffForRegistration(serviceTariffs[0] || null);
                         setRegistrationDialogOpen(true);
                       }}
                     >
