@@ -26,7 +26,7 @@ export default function BNRMPortal() {
               </Badge>
             </div>
             <p className="text-muted-foreground text-lg">
-              Gestion des services, tarifs et paramètres de la Bibliothèque Nationale du Royaume du Maroc
+              Abonnements, services et tarifs de la Bibliothèque Nationale du Royaume du Maroc
             </p>
           </div>
 
