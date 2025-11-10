@@ -86,7 +86,22 @@ export default function ReservationEspaces() {
   const filteredServices = services.filter((service) => {
     const matchesSearch = service.nom_service.toLowerCase().includes(searchTerm.toLowerCase()) ||
       service.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
+    
+    // Exclure les services spécifiques
+    const excludedServices = [
+      "Formation en bibliothéconomie",
+      "Impression papier couleur",
+      "Impression papier NB",
+      "Numérisation documents rares",
+      "Pass journalier",
+      "Restauration"
+    ];
+    
+    const isExcluded = excludedServices.some(excluded => 
+      service.nom_service.toLowerCase().includes(excluded.toLowerCase())
+    );
+    
+    return matchesSearch && !isExcluded;
   });
 
   const getTariffsForService = (serviceId: string) => {
