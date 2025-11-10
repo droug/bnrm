@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SimpleEntitySelect } from '@/components/ui/simple-entity-select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -113,20 +113,17 @@ export function PartnerCollectionForm({ onSuccess }: { onSuccess?: () => void })
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <Label htmlFor="institution_name">Entité *</Label>
-            <Select 
-              onValueChange={(value) => setValue('institution_name', value as any)}
-              defaultValue=""
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Sélectionner" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="institution">Institution</SelectItem>
-                <SelectItem value="organisme">Organisme</SelectItem>
-                <SelectItem value="zaouia">Zaouïa</SelectItem>
-                <SelectItem value="autre">Autre</SelectItem>
-              </SelectContent>
-            </Select>
+            <SimpleEntitySelect
+              options={[
+                { value: 'institution', label: 'Institution' },
+                { value: 'organisme', label: 'Organisme' },
+                { value: 'zaouia', label: 'Zaouïa' },
+                { value: 'autre', label: 'Autre' },
+              ]}
+              value={institutionName}
+              onChange={(value) => setValue('institution_name', value as any)}
+              placeholder="Sélectionner"
+            />
             {errors.institution_name && (
               <p className="text-sm text-destructive mt-1">{errors.institution_name.message}</p>
             )}
