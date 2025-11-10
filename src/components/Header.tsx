@@ -386,7 +386,7 @@ const Header = () => {
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link to="/my-library-space" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                        <Link to="/reservation-espaces" className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
                           <div className="font-semibold">Réserver nos espaces</div>
                           <div className="text-xs text-muted-foreground mt-1">Réservez un espace de travail ou une salle</div>
                         </Link>
