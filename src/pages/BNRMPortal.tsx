@@ -303,13 +303,15 @@ export default function BNRMPortal() {
         </DialogContent>
       </Dialog>
 
-      {/* Registration Dialog */}
-      <ServiceRegistrationDialog
-        open={registrationDialogOpen}
-        onOpenChange={setRegistrationDialogOpen}
-        service={selectedServiceForRegistration}
-        tariff={selectedTariffForRegistration}
-      />
+      {/* Registration Dialog - only render when service exists */}
+      {selectedServiceForRegistration && (
+        <ServiceRegistrationDialog
+          open={registrationDialogOpen}
+          onOpenChange={setRegistrationDialogOpen}
+          service={selectedServiceForRegistration}
+          tariff={selectedTariffForRegistration}
+        />
+      )}
 
       {/* Box Reservation Dialog */}
       <BoxReservationDialog
