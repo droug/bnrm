@@ -549,7 +549,7 @@ const Index = () => {
               </div>
 
               {/* Sidebar avec mosaïques et tons neutres */}
-              <div className="xl:col-span-1 space-y-8">
+              <div className="xl:col-span-1 space-y-12">
                 
                 {/* Mon espace avec mosaïques raffinées */}
                 <Link to="/auth">
