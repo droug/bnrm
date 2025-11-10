@@ -29,7 +29,7 @@ const SignupPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Compte éditeur */}
         <Card 
-          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-accent"
+          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-accent flex flex-col"
           onClick={() => setSelectedType("editor")}
         >
           <CardHeader className="text-center">
@@ -39,8 +39,8 @@ const SignupPage = () => {
               Pour les maisons d'édition et éditeurs
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <ul className="text-sm text-muted-foreground space-y-2">
+          <CardContent className="flex-1 flex flex-col">
+            <ul className="text-sm text-muted-foreground space-y-2 flex-1">
               <li>• Dépôt légal des publications</li>
               <li>• Suivi des dépôts</li>
               <li>• Services dédiés aux éditeurs</li>
@@ -53,7 +53,7 @@ const SignupPage = () => {
 
         {/* Compte imprimeur */}
         <Card 
-          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-highlight"
+          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-highlight flex flex-col"
           onClick={() => setSelectedType("printer")}
         >
           <CardHeader className="text-center">
@@ -63,8 +63,8 @@ const SignupPage = () => {
               Pour les imprimeries et prestataires d'impression
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <ul className="text-sm text-muted-foreground space-y-2">
+          <CardContent className="flex-1 flex flex-col">
+            <ul className="text-sm text-muted-foreground space-y-2 flex-1">
               <li>• Dépôt légal des impressions</li>
               <li>• Gestion des partenariats</li>
               <li>• Services aux imprimeurs</li>
@@ -77,7 +77,7 @@ const SignupPage = () => {
 
         {/* Compte auteur */}
         <Card 
-          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-secondary"
+          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-secondary flex flex-col"
           onClick={() => setSelectedType("author")}
         >
           <CardHeader className="text-center">
@@ -87,8 +87,8 @@ const SignupPage = () => {
               Pour les auteurs et écrivains
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <ul className="text-sm text-muted-foreground space-y-2">
+          <CardContent className="flex-1 flex flex-col">
+            <ul className="text-sm text-muted-foreground space-y-2 flex-1">
               <li>• Publication d'œuvres littéraires</li>
               <li>• Gestion des droits d'auteur</li>
               <li>• Promotion de vos créations</li>
@@ -101,7 +101,7 @@ const SignupPage = () => {
 
         {/* Compte distributeur */}
         <Card 
-          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-muted"
+          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-muted flex flex-col"
           onClick={() => setSelectedType("distributor")}
         >
           <CardHeader className="text-center">
@@ -111,8 +111,8 @@ const SignupPage = () => {
               Pour les distributeurs et diffuseurs
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <ul className="text-sm text-muted-foreground space-y-2">
+          <CardContent className="flex-1 flex flex-col">
+            <ul className="text-sm text-muted-foreground space-y-2 flex-1">
               <li>• Distribution d'ouvrages</li>
               <li>• Gestion de réseau commercial</li>
               <li>• Logistique et stockage</li>
@@ -125,7 +125,7 @@ const SignupPage = () => {
 
         {/* Compte producteur */}
         <Card 
-          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50"
+          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50 flex flex-col"
           onClick={() => setSelectedType("producer")}
         >
           <CardHeader className="text-center">
@@ -135,8 +135,8 @@ const SignupPage = () => {
               Pour les producteurs de contenus éditoriaux
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <ul className="text-sm text-muted-foreground space-y-2">
+          <CardContent className="flex-1 flex flex-col">
+            <ul className="text-sm text-muted-foreground space-y-2 flex-1">
               <li>• Production audiovisuelle et multimédia</li>
               <li>• Dépôt légal de productions</li>
               <li>• Services dédiés aux producteurs</li>
