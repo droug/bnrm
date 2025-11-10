@@ -277,18 +277,38 @@ export function CBNSearchWithSelection({
                         </p>
                       </div>
                       
-                      {/* Details Button */}
-                      <Button 
-                        className="shrink-0"
-                        onClick={() => {
-                          const route = detailsRoute === "reproduction" 
-                            ? `/cbn/notice-reproduction/${result.id}`
-                            : `/cbn/notice/${result.id}`;
-                          navigate(route);
-                        }}
-                      >
-                        Détails
-                      </Button>
+                      {/* Action Buttons */}
+                      <div className="flex flex-col gap-2 shrink-0">
+                        <Button 
+                          variant={selectedDocumentId === result.id ? "default" : "outline"}
+                          onClick={() => {
+                            onSelectDocument({
+                              id: result.id,
+                              title: result.title,
+                              author: result.author,
+                              publisher: result.publisher,
+                              year: result.year,
+                              type: result.type,
+                              status: result.status,
+                              cote: result.cote,
+                            });
+                          }}
+                        >
+                          {selectedDocumentId === result.id ? "Sélectionné" : "Sélectionner"}
+                        </Button>
+                        <Button 
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const route = detailsRoute === "reproduction" 
+                              ? `/cbn/notice-reproduction/${result.id}`
+                              : `/cbn/notice/${result.id}`;
+                            navigate(route);
+                          }}
+                        >
+                          Détails
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}
