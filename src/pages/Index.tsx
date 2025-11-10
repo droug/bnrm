@@ -526,9 +526,8 @@ const Index = () => {
                       <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">Services Rapides</h3>
                       <div className="w-32 h-2 bg-gradient-neutral mx-auto rounded-full shadow-gold"></div>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                       {[
-                        { icon: FileText, label: "Dépôt légal", color: "text-primary", bg: "bg-primary/10", border: "border-primary/25", href: "/legal-deposit" },
                         { icon: BookOpen, label: "Réserver un document", color: "text-accent", bg: "bg-accent/10", border: "border-accent/25", href: "/cbn/reserver-ouvrage" },
                         { icon: Download, label: "Reproduction", color: "text-highlight", bg: "bg-highlight/10", border: "border-highlight/25", href: "/demande-reproduction" },
                         { icon: CreditCard, label: "Adhésions et services", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25", href: "/tarifs-bnrm" },
