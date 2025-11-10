@@ -218,7 +218,7 @@ export function PartnerCollectionForm({ onSuccess }: { onSuccess?: () => void })
             <Textarea
               id="description"
               {...register('description')}
-              placeholder="Décrivez votre collection et vos objectifs..."
+              placeholder="Décrivez vos arguments et vos objectifs..."
               rows={4}
             />
             {errors.description && (
