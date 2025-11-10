@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -27,6 +27,7 @@ export default function BookReservationService() {
   const [selectedDocument, setSelectedDocument] = useState<SelectedDocument | null>(null);
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [showAvailabilityDialog, setShowAvailabilityDialog] = useState(false);
+  const selectedCardRef = useRef<HTMLDivElement>(null);
 
   // Nettoyer les résultats de recherche sauvegardés au démontage
   useEffect(() => {
@@ -41,6 +42,13 @@ export default function BookReservationService() {
 
   const handleSelectDocument = (doc: SelectedDocument) => {
     setSelectedDocument(doc);
+    // Scroller automatiquement vers la carte du document sélectionné
+    setTimeout(() => {
+      selectedCardRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }, 100);
   };
 
   const handleOpenReservation = () => {
@@ -90,11 +98,17 @@ export default function BookReservationService() {
         />
 
         {selectedDocument && (
-          <Card className="mt-6 border-2 border-primary/20">
-            <CardHeader>
-              <CardTitle>Document sélectionné</CardTitle>
+          <Card 
+            ref={selectedCardRef}
+            className="mt-6 border-2 border-primary shadow-lg animate-in fade-in-50 slide-in-from-bottom-4 duration-300"
+          >
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Document sélectionné
+              </CardTitle>
               <CardDescription>
-                Vérifiez les informations avant de réserver
+                Vérifiez les informations et consultez la disponibilité
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
