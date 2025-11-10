@@ -570,6 +570,7 @@ const Index = () => {
                 </Link>
 
                 {/* Cartes sidebar avec différentes mosaïques */}
+                <div className="space-y-6">
                 {[
                   { title: "Aide & Support", subtitle: "FAQ, règlements, contacts", icon: MousePointer, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-moroccan-stars", border: "border-accent/25", shadow: "shadow-elegant hover:shadow-zellige", href: "/help" },
                   { title: "Services numériques", subtitle: "Catalogue, reproduction", icon: Download, gradient: "bg-gradient-neutral", pattern: "bg-pattern-filigrane", border: "border-gold/25", shadow: "shadow-gold hover:shadow-mosaique", href: "/services-bnrm" },
@@ -589,6 +590,7 @@ const Index = () => {
                     </Card>
                   </Link>
                 ))}
+                </div>
               </div>
             </div>
           </main>
