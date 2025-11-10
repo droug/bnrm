@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Building, Printer, Users, UserPlus, PenTool, Truck, Clapperboard } from "lucide-react";
+import { ArrowLeft, Building, Printer, Users, PenTool, Truck, Clapperboard } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -27,30 +27,6 @@ const SignupPage = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Compte utilisateur standard */}
-        <Card 
-          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-primary"
-          onClick={() => navigate('/auth')}
-        >
-          <CardHeader className="text-center">
-            <UserPlus className="h-12 w-12 mx-auto mb-4 text-primary" />
-            <CardTitle>Compte Utilisateur</CardTitle>
-            <CardDescription>
-              Pour les chercheurs, étudiants et visiteurs
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="text-sm text-muted-foreground space-y-2">
-              <li>• Accès aux collections publiques</li>
-              <li>• Demandes de consultation</li>
-              <li>• Services de reproduction</li>
-            </ul>
-            <Button className="w-full mt-4">
-              S'inscrire
-            </Button>
-          </CardContent>
-        </Card>
-
         {/* Compte éditeur */}
         <Card 
           className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-accent"
