@@ -44,8 +44,8 @@ export default function PaymentServices() {
   const services = [
     {
       id: "bnrm-services",
-      title: "Services BNRM",
-      description: "Accédez à l'ensemble des services de la BNRM",
+      title: "Abonnements et Services BNRM",
+      description: "Accédez à l'ensemble des abonnements et services de la BNRM",
       icon: Building,
       color: "from-orange-500 to-orange-600",
       features: [
