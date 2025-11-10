@@ -52,11 +52,12 @@ export default function ReservationEspaces() {
     try {
       setLoading(true);
       
-      // Fetch only services (not Inscription category)
+      // Fetch only specific space/service services
+      const allowedServiceIds = ["S007", "S008", "S009", "S010"];
       const { data: servicesData, error: servicesError } = await supabase
         .from("bnrm_services")
         .select("*")
-        .neq("categorie", "Inscription")
+        .in("id_service", allowedServiceIds)
         .order("nom_service");
 
       if (servicesError) throw servicesError;
@@ -86,22 +87,7 @@ export default function ReservationEspaces() {
   const filteredServices = services.filter((service) => {
     const matchesSearch = service.nom_service.toLowerCase().includes(searchTerm.toLowerCase()) ||
       service.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Exclure les services spécifiques
-    const excludedServices = [
-      "Formation en bibliothéconomie",
-      "Impression papier couleur",
-      "Impression papier NB",
-      "Numérisation documents rares",
-      "Pass journalier",
-      "Restauration"
-    ];
-    
-    const isExcluded = excludedServices.some(excluded => 
-      service.nom_service.toLowerCase().includes(excluded.toLowerCase())
-    );
-    
-    return matchesSearch && !isExcluded;
+    return matchesSearch;
   });
 
   const getTariffsForService = (serviceId: string) => {
@@ -184,58 +170,14 @@ export default function ReservationEspaces() {
 
           {/* Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Special Box Reservation Card */}
-            <Card className="hover:shadow-lg transition-shadow flex flex-col border-primary/50">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <Package className="h-5 w-5" />
-                    <CardTitle className="text-lg">Réservation de Box</CardTitle>
-                  </div>
-                </div>
-                <Badge className="bg-purple-100 text-purple-800">
-                  Boxes
-                </Badge>
-              </CardHeader>
-              <CardContent className="flex flex-col flex-1">
-                <div className="flex-1 space-y-3 mb-4">
-                  <CardDescription className="text-sm">
-                    Réservez un box de travail pour vos recherches à la BNRM. Espaces calmes et équipés.
-                  </CardDescription>
-                  <div className="text-sm">
-                    <span className="font-semibold">Public cible : </span>
-                    Chercheurs, étudiants, professionnels
-                  </div>
-                  
-                  <div className="pt-2 border-t">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-primary">
-                        50 DH
-                      </span>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Par jour
-                    </div>
-                  </div>
-                </div>
-                <Button 
-                  className="w-full"
-                  onClick={() => {
-                    setBoxTariff({ id_tarif: "T007", id_service: "S007", montant: 50, devise: "DH", condition_tarif: "Par jour", periode_validite: "2025", is_active: true });
-                    setBoxReservationDialogOpen(true);
-                  }}
-                >
-                  Réserver un box
-                </Button>
-              </CardContent>
-            </Card>
-            
             {filteredServices.map((service) => {
               const serviceTariffs = getTariffsForService(service.id_service);
-              const firstTariff = serviceTariffs[0];
+              
+              // Gérer le cas spécial de la réservation de box (S007)
+              const isBoxReservation = service.id_service === "S007";
               
               return (
-                <Card key={service.id_service} className="hover:shadow-lg transition-shadow flex flex-col">
+                <Card key={service.id_service} className={`hover:shadow-lg transition-shadow flex flex-col ${isBoxReservation ? 'border-primary/50' : ''}`}>
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2">
@@ -261,36 +203,54 @@ export default function ReservationEspaces() {
                         </div>
                       )}
                       
-                      {firstTariff && (
-                        <div className="pt-2 border-t">
-                          <div className="flex items-center gap-2">
-                            <span className="text-2xl font-bold text-primary">
-                              {firstTariff.montant} {firstTariff.devise}
-                            </span>
-                          </div>
-                          {firstTariff.condition_tarif && (
-                            <div className="text-sm text-muted-foreground">
-                              {firstTariff.condition_tarif}
-                            </div>
-                          )}
+                      {service.reference_legale && (
+                        <div className="text-sm">
+                          <span className="font-semibold">Référence légale : </span>
+                          {service.reference_legale}
                         </div>
                       )}
                       
-                      {service.reference_legale && (
-                        <div className="text-xs text-muted-foreground">
-                          Référence légale : {service.reference_legale}
+                      {serviceTariffs.length > 0 && (
+                        <div className="pt-2 border-t">
+                          <div className="font-semibold text-sm mb-2">Tarifs</div>
+                          <div className="space-y-2">
+                            {serviceTariffs.map((tariff) => (
+                              <div key={tariff.id_tarif} className="p-2 bg-muted/50 rounded-md">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xl font-bold text-primary">
+                                    {tariff.montant} {tariff.devise}
+                                  </span>
+                                </div>
+                                {tariff.condition_tarif && (
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    {tariff.condition_tarif}
+                                  </div>
+                                )}
+                                {tariff.periode_validite && (
+                                  <div className="text-xs text-muted-foreground">
+                                    Période: {tariff.periode_validite}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
                     <Button 
                       className="w-full"
                       onClick={() => {
-                        setSelectedServiceForRegistration(service);
-                        setSelectedTariffForRegistration(firstTariff || null);
-                        setRegistrationDialogOpen(true);
+                        if (isBoxReservation) {
+                          setBoxTariff(serviceTariffs[0]);
+                          setBoxReservationDialogOpen(true);
+                        } else {
+                          setSelectedServiceForRegistration(service);
+                          setSelectedTariffForRegistration(serviceTariffs[0] || null);
+                          setRegistrationDialogOpen(true);
+                        }
                       }}
                     >
-                      Réservation
+                      {isBoxReservation ? "Réserver un box" : "Réservation"}
                     </Button>
                   </CardContent>
                 </Card>
