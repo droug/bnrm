@@ -49,11 +49,12 @@ export default function Abonnements() {
     try {
       setLoading(true);
       
-      // Fetch only Inscription (Abonnements) category services
+      // Fetch only specific subscription services
+      const allowedServiceIds = ["I001", "I002", "I003", "S001", "S002", "S003"];
       const { data: servicesData, error: servicesError } = await supabase
         .from("bnrm_services")
         .select("*")
-        .eq("categorie", "Inscription")
+        .in("id_service", allowedServiceIds)
         .order("nom_service");
 
       if (servicesError) throw servicesError;
