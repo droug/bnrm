@@ -17,9 +17,13 @@ const representantSchema = z.object({
 
 export const partnershipRequestSchema = z.object({
   // Étape 1: Identification
-  nom_organisme: z.string()
-    .min(2, "Le nom de l'organisme doit contenir au moins 2 caractères")
-    .max(200, "Le nom ne peut pas dépasser 200 caractères"),
+  nom_organisme: z.enum(["institution", "organisme", "zaouia", "autre"], {
+    errorMap: () => ({ message: "Veuillez sélectionner une entité" }),
+  }),
+  nom_organisme_autre: z.string()
+    .min(2, "Le nom doit contenir au moins 2 caractères")
+    .max(200, "Le nom ne peut pas dépasser 200 caractères")
+    .optional(),
   statut_juridique: z.enum(["association", "organisme_public", "organisme_prive", "autre"], {
     errorMap: () => ({ message: "Veuillez sélectionner un statut juridique" }),
   }),
@@ -90,6 +94,15 @@ export const partnershipRequestSchema = z.object({
 }, {
   message: "Le statut juridique est obligatoire pour les associations",
   path: ["statut_document_url"],
+}).refine((data) => {
+  // Validation: nom_organisme_autre est obligatoire si "autre" est sélectionné
+  if (data.nom_organisme === "autre" && !data.nom_organisme_autre) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Veuillez préciser l'entité",
+  path: ["nom_organisme_autre"],
 }).refine((data) => {
   // Validation: date fin après date début
   if (data.date_debut && data.date_fin) {

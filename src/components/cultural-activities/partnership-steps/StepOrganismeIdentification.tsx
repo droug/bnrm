@@ -18,6 +18,7 @@ const StepOrganismeIdentification = ({ form }: StepOrganismeIdentificationProps)
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const statutJuridique = form.watch("statut_juridique");
+  const nomOrganisme = form.watch("nom_organisme");
 
   const handleFileUpload = async (file: File, fieldName: "statut_document_url") => {
     if (file.size > 10 * 1024 * 1024) {
@@ -73,14 +74,40 @@ const StepOrganismeIdentification = ({ form }: StepOrganismeIdentificationProps)
         name="nom_organisme"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Nom de l'organisme *</FormLabel>
-            <FormControl>
-              <Input placeholder="Ex: Association culturelle..." {...field} />
-            </FormControl>
+            <FormLabel>Entité *</FormLabel>
+            <Select onValueChange={field.onChange} value={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="institution">Institution</SelectItem>
+                <SelectItem value="organisme">Organisme</SelectItem>
+                <SelectItem value="zaouia">Zaouïa</SelectItem>
+                <SelectItem value="autre">Autre</SelectItem>
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         )}
       />
+
+      {nomOrganisme === "autre" && (
+        <FormField
+          control={form.control}
+          name="nom_organisme_autre"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Précisez l'entité *</FormLabel>
+              <FormControl>
+                <Input placeholder="Ex: Nom de l'entité..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField

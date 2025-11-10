@@ -33,6 +33,7 @@ const PartnershipWizard = () => {
       representants: [],
       confirmation_exactitude: false,
       confirmation_reglement: false,
+      nom_organisme_autre: "",
     },
     mode: "onChange",
   });
