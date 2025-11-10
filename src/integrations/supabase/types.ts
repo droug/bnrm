@@ -5996,6 +5996,7 @@ export type Database = {
           moyens_organisme: string
           nationalite: string
           nom_organisme: string
+          nom_organisme_autre: string | null
           notes_admin: string | null
           objectifs: string
           objet_partenariat: string
@@ -6027,6 +6028,7 @@ export type Database = {
           moyens_organisme: string
           nationalite: string
           nom_organisme: string
+          nom_organisme_autre?: string | null
           notes_admin?: string | null
           objectifs: string
           objet_partenariat: string
@@ -6058,6 +6060,7 @@ export type Database = {
           moyens_organisme?: string
           nationalite?: string
           nom_organisme?: string
+          nom_organisme_autre?: string | null
           notes_admin?: string | null
           objectifs?: string
           objet_partenariat?: string
