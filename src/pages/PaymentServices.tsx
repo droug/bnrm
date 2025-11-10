@@ -43,6 +43,21 @@ export default function PaymentServices() {
 
   const services = [
     {
+      id: "bnrm-services",
+      title: "Services BNRM",
+      description: "Accédez à l'ensemble des services de la BNRM",
+      icon: Building,
+      color: "from-orange-500 to-orange-600",
+      features: [
+        "Tarification transparente",
+        "Services variés",
+        "Paiement flexible",
+        "Support client"
+      ],
+      action: () => navigate("/tarifs-bnrm"),
+      available: true
+    },
+    {
       id: "wallet",
       title: "e-Wallet BNRM",
       description: "Portefeuille électronique sécurisé pour tous vos paiements BNRM",
@@ -146,21 +161,6 @@ export default function PaymentServices() {
       ],
       action: () => navigate("/admin/legal-deposit"),
       available: user ? true : false
-    },
-    {
-      id: "bnrm-services",
-      title: "Services BNRM",
-      description: "Accédez à l'ensemble des services de la BNRM",
-      icon: Building,
-      color: "from-orange-500 to-orange-600",
-      features: [
-        "Tarification transparente",
-        "Services variés",
-        "Paiement flexible",
-        "Support client"
-      ],
-      action: () => navigate("/tarifs-bnrm"),
-      available: true
     },
     {
       id: "cultural-activities",
