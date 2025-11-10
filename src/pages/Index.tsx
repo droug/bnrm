@@ -530,7 +530,7 @@ const Index = () => {
                       {[
                         { icon: BookOpen, label: "Réserver un document", color: "text-accent", bg: "bg-accent/10", border: "border-accent/25", href: "/cbn/reserver-ouvrage" },
                         { icon: Download, label: "Reproduction", color: "text-highlight", bg: "bg-highlight/10", border: "border-highlight/25", href: "/demande-reproduction" },
-                        { icon: CreditCard, label: "Adhésions et services", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25", href: "/tarifs-bnrm" },
+                        { icon: CreditCard, label: "Adhésions", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25", href: "/abonnements" },
                          { icon: Calendar, label: "Événements", color: "text-gold", bg: "bg-gold/10", border: "border-gold/25", href: "/news" }
                         ].map((service, index) => (
                           <div 
