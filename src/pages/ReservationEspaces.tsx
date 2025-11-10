@@ -52,8 +52,8 @@ export default function ReservationEspaces() {
     try {
       setLoading(true);
       
-      // Fetch only specific space/service services
-      const allowedServiceIds = ["S007", "S008", "S009", "S010"];
+      // Fetch only specific space/service services including Box reservation
+      const allowedServiceIds = ["S007", "S008", "S009", "S010", "S011"];
       const { data: servicesData, error: servicesError } = await supabase
         .from("bnrm_services")
         .select("*")
@@ -173,8 +173,8 @@ export default function ReservationEspaces() {
             {filteredServices.map((service) => {
               const serviceTariffs = getTariffsForService(service.id_service);
               
-              // Gérer le cas spécial de la réservation de box (S007)
-              const isBoxReservation = service.id_service === "S007";
+              // Gérer le cas spécial de la réservation de box (S011)
+              const isBoxReservation = service.id_service === "S011";
               
               return (
                 <Card key={service.id_service} className={`hover:shadow-lg transition-shadow flex flex-col ${isBoxReservation ? 'border-primary/50' : ''}`}>
