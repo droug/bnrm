@@ -429,51 +429,63 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             <div>
               <h3 className="text-2xl font-semibold mb-4">Identification de l'auteur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Champs dynamiques depuis la base de données */}
+                {/* Champs dynamiques depuis la base de données avec insertion du champ Genre après le nom */}
                 {customFields
                   .filter((field) => field.section_key === "identification_auteur")
-                  .map((field) => (
-                    <DynamicFieldRenderer
-                      key={field.id}
-                      field={field}
-                      language={language}
-                      value={customFieldsData[field.field_key]}
-                      onChange={(value) => {
-                        console.log('Field changed:', field.field_key, '=', value);
-                        setCustomFieldsData((prev) => ({
-                          ...prev,
-                          [field.field_key]: value,
-                        }));
-                        // Mettre à jour authorType si c'est un champ de type d'auteur
-                        if (field.field_key.toLowerCase().includes('type') || 
-                            field.label_fr?.toLowerCase().includes('type de l')) {
-                          setAuthorType(value);
-                          console.log('Author type updated:', value);
-                        }
-                      }}
-                    />
-                  ))}
-                
-                {/* Champ Genre conditionnel - s'affiche uniquement si Type de l'auteur est "Personne physique" */}
-                {(customFieldsData["author_type"] === "physique" || 
-                  authorType === "physique" ||
-                  customFieldsData["author_type"] === "Personne physique" ||
-                  authorType === "Personne physique" ||
-                  Object.values(customFieldsData).includes("physique") ||
-                  Object.values(customFieldsData).includes("Personne physique")) && (
-                  <div className="space-y-2">
-                    <Label>Genre</Label>
-                    <SimpleEntitySelect
-                      placeholder="Sélectionner le genre"
-                      value={authorGender}
-                      onChange={setAuthorGender}
-                      options={[
-                        { value: "homme", label: "Homme" },
-                        { value: "femme", label: "Femme" },
-                      ]}
-                    />
-                  </div>
-                )}
+                  .map((field, index, array) => {
+                    // Trouver si c'est le champ "Nom de l'auteur"
+                    const isNameField = field.field_key.toLowerCase().includes('name') || 
+                                       field.field_key.toLowerCase().includes('nom') ||
+                                       field.label_fr?.toLowerCase().includes('nom de l\'auteur') ||
+                                       field.label_fr?.toLowerCase().includes('name');
+                    
+                    return (
+                      <>
+                        <DynamicFieldRenderer
+                          key={field.id}
+                          field={field}
+                          language={language}
+                          value={customFieldsData[field.field_key]}
+                          onChange={(value) => {
+                            console.log('Field changed:', field.field_key, '=', value);
+                            setCustomFieldsData((prev) => ({
+                              ...prev,
+                              [field.field_key]: value,
+                            }));
+                            // Mettre à jour authorType si c'est un champ de type d'auteur
+                            if (field.field_key.toLowerCase().includes('type') || 
+                                field.label_fr?.toLowerCase().includes('type de l')) {
+                              setAuthorType(value);
+                              console.log('Author type updated:', value);
+                            }
+                          }}
+                        />
+                        
+                        {/* Insérer le champ Genre juste après le champ Nom de l'auteur */}
+                        {isNameField && (
+                          customFieldsData["author_type"] === "physique" || 
+                          authorType === "physique" ||
+                          customFieldsData["author_type"] === "Personne physique" ||
+                          authorType === "Personne physique" ||
+                          Object.values(customFieldsData).includes("physique") ||
+                          Object.values(customFieldsData).includes("Personne physique")
+                        ) ? (
+                          <div className="space-y-2" key={`genre-${field.id}`}>
+                            <Label>Genre</Label>
+                            <SimpleEntitySelect
+                              placeholder="Sélectionner le genre"
+                              value={authorGender}
+                              onChange={setAuthorGender}
+                              options={[
+                                { value: "homme", label: "Homme" },
+                                { value: "femme", label: "Femme" },
+                              ]}
+                            />
+                          </div>
+                        ) : null}
+                      </>
+                    );
+                  })}
               </div>
             </div>
 
