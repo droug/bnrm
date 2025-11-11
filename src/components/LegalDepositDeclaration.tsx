@@ -452,11 +452,36 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     !field.field_key.toLowerCase().includes('city')
                   )
                   .map((field, index, array) => {
-                    // Trouver si c'est le champ "Nom de l'auteur"
+                    // Vérifier si c'est le champ "Type de l'auteur"
+                    const isTypeField = field.field_key.toLowerCase().includes('type') || 
+                                       field.label_fr?.toLowerCase().includes('type de l');
+                    
+                    // Vérifier si c'est le champ "Nom de l'auteur"
                     const isNameField = field.field_key.toLowerCase().includes('name') || 
                                        field.field_key.toLowerCase().includes('nom') ||
                                        field.label_fr?.toLowerCase().includes('nom de l\'auteur') ||
                                        field.label_fr?.toLowerCase().includes('name');
+                    
+                    // Vérifier si on est en mode "Personne physique"
+                    const isPersonnePhysique = customFieldsData["author_type"] === "physique" || 
+                                              authorType === "physique" ||
+                                              customFieldsData["author_type"] === "Personne physique" ||
+                                              authorType === "Personne physique" ||
+                                              Object.values(customFieldsData).includes("physique") ||
+                                              Object.values(customFieldsData).includes("Personne physique");
+                    
+                    // Vérifier si on est en mode "Personne morale"
+                    const isPersonneMorale = customFieldsData["author_type"] === "morale" || 
+                                            authorType === "morale" ||
+                                            customFieldsData["author_type"] === "Personne morale" ||
+                                            authorType === "Personne morale" ||
+                                            Object.values(customFieldsData).includes("morale") ||
+                                            Object.values(customFieldsData).includes("Personne morale");
+                    
+                    // Ne pas afficher le champ "Nom de l'auteur" si on est en mode "Personne morale"
+                    if (isNameField && isPersonneMorale) {
+                      return null;
+                    }
                     
                     return (
                       <>
@@ -472,23 +497,30 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                               [field.field_key]: value,
                             }));
                             // Mettre à jour authorType si c'est un champ de type d'auteur
-                            if (field.field_key.toLowerCase().includes('type') || 
-                                field.label_fr?.toLowerCase().includes('type de l')) {
+                            if (isTypeField) {
                               setAuthorType(value);
                               console.log('Author type updated:', value);
                             }
                           }}
                         />
                         
-                        {/* Insérer le champ Genre juste après le champ Nom de l'auteur */}
-                        {isNameField && (
-                          customFieldsData["author_type"] === "physique" || 
-                          authorType === "physique" ||
-                          customFieldsData["author_type"] === "Personne physique" ||
-                          authorType === "Personne physique" ||
-                          Object.values(customFieldsData).includes("physique") ||
-                          Object.values(customFieldsData).includes("Personne physique")
-                        ) ? (
+                        {/* Insérer le champ "Représentant" juste après le champ Type de l'auteur si Personne Morale */}
+                        {isTypeField && isPersonneMorale && (
+                          <div className="space-y-2" key={`representant-${field.id}`}>
+                            <Label>Représentant <span className="text-destructive">*</span></Label>
+                            <Input
+                              placeholder="Nom du représentant"
+                              value={customFieldsData["representant"] || ""}
+                              onChange={(e) => setCustomFieldsData((prev) => ({
+                                ...prev,
+                                representant: e.target.value
+                              }))}
+                            />
+                          </div>
+                        )}
+                        
+                        {/* Insérer le champ Genre juste après le champ Nom de l'auteur si Personne Physique */}
+                        {isNameField && isPersonnePhysique && (
                           <div className="space-y-2" key={`genre-${field.id}`}>
                             <Label>Genre</Label>
                             <SimpleEntitySelect
@@ -501,7 +533,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                               ]}
                             />
                           </div>
-                        ) : null}
+                        )}
                       </>
                     );
                   })}
