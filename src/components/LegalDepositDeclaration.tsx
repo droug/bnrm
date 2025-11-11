@@ -2874,7 +2874,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               renderFileUpload("summary", "Joindre le Résumé de la publication (format « PDF » moins de 2 MO)", true, "application/pdf")
             )}
             
-            {renderFileUpload("cin", "Envoyer une copie de la CIN du directeur", true, "image/jpeg,application/pdf")}
+            {renderFileUpload("cin", "Joindre une copie de la CNIE de l'Auteur", true, "image/jpeg,application/pdf")}
             
             {/* Pièces conditionnelles selon le type de publication */}
             {depositType === "monographie" && publicationType === "THE" && (
