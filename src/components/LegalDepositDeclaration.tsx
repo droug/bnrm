@@ -440,7 +440,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Champs dynamiques depuis la base de données avec insertion du champ Genre après le nom */}
                 {customFields
-                  .filter((field) => field.section_key === "identification_auteur")
+                  .filter((field) => 
+                    field.section_key === "identification_auteur" &&
+                    !field.field_key.toLowerCase().includes('region') &&
+                    !field.field_key.toLowerCase().includes('ville') &&
+                    !field.field_key.toLowerCase().includes('city')
+                  )
                   .map((field, index, array) => {
                     // Trouver si c'est le champ "Nom de l'auteur"
                     const isNameField = field.field_key.toLowerCase().includes('name') || 
