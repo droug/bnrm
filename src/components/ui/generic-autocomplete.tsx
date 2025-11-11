@@ -41,12 +41,15 @@ export function GenericAutocomplete({
     if (inputValue.trim()) {
       const filtered = search(inputValue);
       setFilteredValues(filtered);
-      setShowSuggestions(true);
+      // Ne montrer les suggestions que si l'utilisateur tape (pas si c'est une valeur déjà sélectionnée)
+      if (document.activeElement === inputRef.current) {
+        setShowSuggestions(true);
+      }
     } else {
       setFilteredValues(values);
       setShowSuggestions(false);
     }
-  }, [inputValue, values, search]);
+  }, [inputValue, values]); // Retirer 'search' des dépendances
 
   // Mettre à jour la position du dropdown
   useEffect(() => {
@@ -103,18 +106,17 @@ export function GenericAutocomplete({
 
   // Synchroniser l'input avec la valeur (mode simple uniquement)
   useEffect(() => {
-    if (!multiple && typeof value === 'string' && value) {
-      // Attendre que les valeurs soient chargées
-      if (!loading && values.length > 0) {
+    if (!multiple && typeof value === 'string') {
+      if (value && values.length > 0) {
         const item = values.find((v) => v.value_code === value);
-        if (item) {
+        if (item && inputValue !== item.value_label) {
           setInputValue(item.value_label);
         }
+      } else if (!value && inputValue !== '') {
+        setInputValue('');
       }
-    } else if (!multiple && !value) {
-      setInputValue('');
     }
-  }, [value, values, multiple, loading]);
+  }, [value, values, multiple]); // Ne pas inclure inputValue dans les dépendances pour éviter la boucle
 
   if (error) {
     return (
