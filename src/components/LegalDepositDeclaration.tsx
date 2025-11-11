@@ -3101,7 +3101,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           <div className="mt-4 p-4 bg-accent/10 rounded-lg">
             <h4 className="font-semibold mb-2">Modalités et nombre d'exemplaires à déposer :</h4>
             <p className="text-sm text-muted-foreground mb-2">
-              Une fois l'ouvrage publié, les exemplaires doivent être déposés à l'Agence Bibliographique Nationale :
+              Une fois le document publié, les exemplaires doivent être déposés à l'Agence Bibliographique Nationale :
             </p>
             <ul className="text-sm text-muted-foreground space-y-1">
               {depositType === "monographie" && (
