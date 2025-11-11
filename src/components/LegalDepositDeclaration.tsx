@@ -711,11 +711,11 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 {multipleVolumes === "yes" && (
                   <div className="space-y-2">
-                    <Label>Nombre de volumes</Label>
+                    <Label>Numéro du volume</Label>
                     <Input 
                       type="number" 
                       min="1"
-                      placeholder="Nombre de volumes" 
+                      placeholder="Numéro du volume" 
                       value={numberOfVolumes}
                       onChange={(e) => setNumberOfVolumes(e.target.value)}
                     />
