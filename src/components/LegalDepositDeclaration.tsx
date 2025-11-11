@@ -2531,10 +2531,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input placeholder="Titre de la publication" />
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Titre de la collection</Label>
-                  <Input placeholder="Titre de la collection" />
-                </div>
+                {specialCollectionPublicationType === "cartes_postales" && (
+                  <div className="space-y-2">
+                    <Label>Titre de la collection</Label>
+                    <Input placeholder="Titre de la collection" />
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label>Langues</Label>
