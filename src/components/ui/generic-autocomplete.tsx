@@ -35,13 +35,30 @@ export function GenericAutocomplete({
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const justSelectedRef = useRef(false);
+
+  // Initialiser inputValue avec le label correspondant à la valeur
+  useEffect(() => {
+    if (!multiple && typeof value === 'string' && value && values.length > 0 && !justSelectedRef.current) {
+      const item = values.find((v) => v.value_code === value);
+      if (item) {
+        setInputValue(item.value_label);
+      }
+    } else if (!multiple && !value && !justSelectedRef.current) {
+      setInputValue('');
+    }
+    // Réinitialiser le flag après avoir synchronisé
+    if (justSelectedRef.current) {
+      justSelectedRef.current = false;
+    }
+  }, [value, values, multiple]);
 
   // Filtrer les valeurs en fonction de la recherche
   useEffect(() => {
     if (inputValue.trim()) {
       const filtered = search(inputValue);
       setFilteredValues(filtered);
-      // Ne montrer les suggestions que si l'utilisateur tape (pas si c'est une valeur déjà sélectionnée)
+      // Ne montrer les suggestions que si le champ est actif
       if (document.activeElement === inputRef.current) {
         setShowSuggestions(true);
       }
@@ -49,7 +66,7 @@ export function GenericAutocomplete({
       setFilteredValues(values);
       setShowSuggestions(false);
     }
-  }, [inputValue, values]); // Retirer 'search' des dépendances
+  }, [inputValue, values]);
 
   // Mettre à jour la position du dropdown
   useEffect(() => {
@@ -76,6 +93,8 @@ export function GenericAutocomplete({
   }, []);
 
   const handleSelect = (code: string, label: string) => {
+    justSelectedRef.current = true;
+    
     if (multiple) {
       const currentValues = Array.isArray(value) ? value : [];
       if (!currentValues.includes(code)) {
@@ -83,13 +102,12 @@ export function GenericAutocomplete({
       }
       setInputValue('');
     } else {
-      // Mettre à jour immédiatement l'input avec le label sélectionné
+      // Mettre à jour immédiatement l'input avec le label complet
       setInputValue(label);
       // Appeler onChange avec le code
       onChange(code);
-      // Fermer les suggestions
-      setShowSuggestions(false);
     }
+    setShowSuggestions(false);
   };
 
   const handleRemove = (code: string) => {
@@ -103,20 +121,6 @@ export function GenericAutocomplete({
     onChange(multiple ? [] : '');
     setFilteredValues(values);
   };
-
-  // Synchroniser l'input avec la valeur (mode simple uniquement)
-  useEffect(() => {
-    if (!multiple && typeof value === 'string') {
-      if (value && values.length > 0) {
-        const item = values.find((v) => v.value_code === value);
-        if (item && inputValue !== item.value_label) {
-          setInputValue(item.value_label);
-        }
-      } else if (!value && inputValue !== '') {
-        setInputValue('');
-      }
-    }
-  }, [value, values, multiple]); // Ne pas inclure inputValue dans les dépendances pour éviter la boucle
 
   if (error) {
     return (
