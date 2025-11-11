@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineSelect } from "@/components/ui/inline-select";
 import { SimpleEntitySelect } from "@/components/ui/simple-entity-select";
+import { SimpleSelectWithTooltip } from "@/components/ui/simple-select-with-tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DynamicHierarchicalSelect } from "@/components/ui/dynamic-hierarchical-select";
 import { Badge } from "@/components/ui/badge";
@@ -2437,18 +2438,46 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de publication</Label>
-                  <SimpleEntitySelect
+                  <SimpleSelectWithTooltip
                     value={specialCollectionPublicationType}
                     onChange={setSpecialCollectionPublicationType}
                     placeholder="Sélectionner le type"
                     options={[
-                      { value: "affiches", label: "Affiches" },
-                      { value: "guides", label: "Guides" },
-                      { value: "atlas", label: "Atlas" },
-                      { value: "cartes_geographiques", label: "Cartes géographiques" },
-                      { value: "cartes_postales", label: "Cartes postales" },
-                      { value: "photos_plans", label: "Photos - Plans" },
-                      { value: "autre", label: "Autre" },
+                      { 
+                        value: "affiches", 
+                        label: "Affiches",
+                        tooltip: "Documents imprimés de grande taille destinés à être affichés publiquement (publicité, information, art)"
+                      },
+                      { 
+                        value: "guides", 
+                        label: "Guides",
+                        tooltip: "Ouvrages pratiques fournissant des informations et des conseils sur un sujet spécifique"
+                      },
+                      { 
+                        value: "atlas", 
+                        label: "Atlas",
+                        tooltip: "Recueils de cartes géographiques, thématiques ou historiques reliés en volume"
+                      },
+                      { 
+                        value: "cartes_geographiques", 
+                        label: "Cartes géographiques",
+                        tooltip: "Représentations planes de la surface terrestre ou d'une partie de celle-ci"
+                      },
+                      { 
+                        value: "cartes_postales", 
+                        label: "Cartes postales",
+                        tooltip: "Cartes illustrées destinées à l'envoi postal ou à la collection"
+                      },
+                      { 
+                        value: "photos_plans", 
+                        label: "Photos - Plans",
+                        tooltip: "Photographies et plans techniques, architecturaux ou d'aménagement"
+                      },
+                      { 
+                        value: "autre", 
+                        label: "Autre",
+                        tooltip: "Tout autre type de collection spécialisée ne correspondant pas aux catégories ci-dessus"
+                      },
                     ]}
                   />
                 </div>
