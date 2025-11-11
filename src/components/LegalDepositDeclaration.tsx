@@ -991,11 +991,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     </div>
                   )}
                 </div>
-
-                <div className="space-y-2">
-                  <Label>Nombre de tirage</Label>
-                  <Input type="number" placeholder="Nombre de tirage" />
-                </div>
               </div>
             </div>
 
@@ -1610,11 +1605,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     </div>
                   )}
                 </div>
-
-                 <div className="space-y-2">
-                   <Label>Nombre de tirage</Label>
-                   <Input type="number" placeholder="Nombre de tirage" />
-                 </div>
 
                 {/* Champs personnalisés */}
                 {customFields
@@ -2271,11 +2261,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     </div>
                   )}
                 </div>
-
-                <div className="space-y-2">
-                  <Label>Nombre de tirage</Label>
-                  <Input type="number" placeholder="Nombre de tirage" />
-                </div>
               </div>
             </div>
 
@@ -2773,11 +2758,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       </Button>
                     </div>
                   )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Nombre de tirage</Label>
-                  <Input type="number" placeholder="Nombre de tirage" />
                 </div>
 
                 {/* Champs personnalisés */}
@@ -3624,11 +3604,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             <div className="space-y-2">
               <Label>{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
               <Input type="email" placeholder={language === 'ar' ? 'البريد الإلكتروني' : 'Adresse email'} />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>{language === 'ar' ? 'عدد النسخ' : 'Tirage'}</Label>
-              <Input type="number" placeholder={language === 'ar' ? 'عدد النسخ' : 'Nombre d\'exemplaires'} />
             </div>
           </div>
 
