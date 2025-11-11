@@ -80,10 +80,13 @@ export function GenericAutocomplete({
       }
       setInputValue('');
     } else {
+      // Mettre à jour immédiatement l'input avec le label sélectionné
       setInputValue(label);
+      // Appeler onChange avec le code
       onChange(code);
+      // Fermer les suggestions
+      setShowSuggestions(false);
     }
-    setShowSuggestions(false);
   };
 
   const handleRemove = (code: string) => {
@@ -101,12 +104,17 @@ export function GenericAutocomplete({
   // Synchroniser l'input avec la valeur (mode simple uniquement)
   useEffect(() => {
     if (!multiple && typeof value === 'string' && value) {
-      const item = values.find((v) => v.value_code === value);
-      setInputValue(item?.value_label || value);
-    } else if (!multiple) {
+      // Attendre que les valeurs soient chargées
+      if (!loading && values.length > 0) {
+        const item = values.find((v) => v.value_code === value);
+        if (item) {
+          setInputValue(item.value_label);
+        }
+      }
+    } else if (!multiple && !value) {
       setInputValue('');
     }
-  }, [value, values, multiple]);
+  }, [value, values, multiple, loading]);
 
   if (error) {
     return (
