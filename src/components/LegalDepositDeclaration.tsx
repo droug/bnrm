@@ -495,6 +495,38 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       </>
                     );
                   })}
+                
+                {/* Champs Région et Ville */}
+                <div className="space-y-2">
+                  <Label>Région</Label>
+                  <InlineSelect
+                    placeholder="Sélectionner une région"
+                    value={selectedRegion}
+                    onChange={(value) => {
+                      setSelectedRegion(value);
+                      setSelectedCity(''); // Reset city when region changes
+                    }}
+                    options={moroccanRegions.map(region => ({
+                      value: region.name,
+                      label: region.name
+                    }))}
+                  />
+                </div>
+
+                {selectedRegion && (
+                  <div className="space-y-2">
+                    <Label>Ville</Label>
+                    <InlineSelect
+                      placeholder="Sélectionner une ville"
+                      value={selectedCity}
+                      onChange={setSelectedCity}
+                      options={getCitiesByRegion(selectedRegion).map(city => ({
+                        value: city,
+                        label: city
+                      }))}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
