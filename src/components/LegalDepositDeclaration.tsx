@@ -123,6 +123,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [publisherSearch, setPublisherSearch] = useState<string>("");
   const [publisherNature, setPublisherNature] = useState<string>("");
+  const [editorIdentification, setEditorIdentification] = useState<string>("");
   const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
   const [publicationDate, setPublicationDate] = useState<Date>();
   const [publicationDateInput, setPublicationDateInput] = useState<string>("");
@@ -1377,6 +1378,60 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             <div>
               <h3 className="text-2xl font-semibold mb-4">Identification de l'Éditeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Nature de l'éditeur</Label>
+                  <SimpleEntitySelect
+                    placeholder="Sélectionner la nature"
+                    value={editorIdentification}
+                    onChange={setEditorIdentification}
+                    options={[
+                      { value: "etatique", label: "Étatique" },
+                      { value: "non_etatique", label: "Non étatique" },
+                    ]}
+                  />
+                </div>
+
+                {editorIdentification === "non_etatique" && (
+                  <div className="space-y-2">
+                    <Label>Décision du Tribunal</Label>
+                    <div className="flex gap-2">
+                      <input
+                        type="file"
+                        accept=".pdf"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            handleFileUpload('tribunal-decision', file);
+                          }
+                        }}
+                        ref={(el) => {
+                          if (el) fileInputRefs.current['tribunal-decision'] = el;
+                        }}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRefs.current['tribunal-decision']?.click()}
+                        className="flex-1"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        {uploadedFiles['tribunal-decision'] ? uploadedFiles['tribunal-decision'].name : "Choisir un fichier PDF"}
+                      </Button>
+                      {uploadedFiles['tribunal-decision'] && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveFile('tribunal-decision')}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
                 <div className="space-y-2">
                   <Label>Identification de l'Éditeur <span className="text-destructive">*</span></Label>
                   {!selectedPublisher ? (
