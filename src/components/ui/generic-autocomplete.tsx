@@ -75,7 +75,10 @@ export function GenericAutocomplete({
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
-        setIsEditing(false);
+        // Sortir du mode édition après un court délai
+        setTimeout(() => {
+          setIsEditing(false);
+        }, 100);
       }
     };
 
@@ -84,8 +87,6 @@ export function GenericAutocomplete({
   }, []);
 
   const handleSelect = (code: string, label: string) => {
-    setIsEditing(false);
-    
     if (multiple) {
       const currentValues = Array.isArray(value) ? value : [];
       if (!currentValues.includes(code)) {
@@ -93,8 +94,13 @@ export function GenericAutocomplete({
       }
       setInputValue('');
     } else {
-      setInputValue(label);
       onChange(code);
+      // Forcer l'affichage du label immédiatement
+      setInputValue(label);
+      // Sortir du mode édition pour que la synchronisation prenne le relais
+      setTimeout(() => {
+        setIsEditing(false);
+      }, 50);
     }
     setShowSuggestions(false);
   };
@@ -115,10 +121,8 @@ export function GenericAutocomplete({
   };
 
   const handleInputBlur = () => {
-    // Petit délai pour permettre au clic sur une suggestion de s'enregistrer
-    setTimeout(() => {
-      setIsEditing(false);
-    }, 200);
+    // Ne pas quitter le mode édition immédiatement pour permettre le clic sur les suggestions
+    // Le mode édition sera désactivé par handleSelect ou handleClickOutside
   };
 
   const handleRemove = (code: string) => {
