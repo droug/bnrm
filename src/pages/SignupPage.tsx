@@ -75,30 +75,6 @@ const SignupPage = () => {
           </CardContent>
         </Card>
 
-        {/* Compte auteur */}
-        <Card 
-          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-secondary flex flex-col"
-          onClick={() => setSelectedType("author")}
-        >
-          <CardHeader className="text-center">
-            <PenTool className="h-12 w-12 mx-auto mb-4 text-secondary" />
-            <CardTitle>Compte Auteur</CardTitle>
-            <CardDescription>
-              Pour les auteurs et écrivains
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col">
-            <ul className="text-sm text-muted-foreground space-y-2 flex-1">
-              <li>• Publication d'œuvres littéraires</li>
-              <li>• Gestion des droits d'auteur</li>
-              <li>• Promotion de vos créations</li>
-            </ul>
-            <Button variant="outline" className="w-full mt-4">
-              Créer un compte auteur
-            </Button>
-          </CardContent>
-        </Card>
-
         {/* Compte distributeur */}
         <Card 
           className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-muted flex flex-col"
