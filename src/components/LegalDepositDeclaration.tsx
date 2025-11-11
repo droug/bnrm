@@ -293,6 +293,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     const allowedTypes = {
       cover: ['image/jpeg', 'image/jpg'],
       summary: ['application/pdf'],
+      abstract: ['application/pdf'],
       cin: ['image/jpeg', 'image/jpg', 'application/pdf'],
       'court-decision': ['application/pdf'],
       'thesis-recommendation': ['application/pdf'],
@@ -302,6 +303,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     const maxSizes = {
       cover: 1 * 1024 * 1024, // 1MB
       summary: 2 * 1024 * 1024, // 2MB
+      abstract: 2 * 1024 * 1024, // 2MB
       cin: 2 * 1024 * 1024, // 2MB
       'court-decision': 5 * 1024 * 1024, // 5MB
       'thesis-recommendation': 5 * 1024 * 1024, // 5MB
