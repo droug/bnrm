@@ -29,32 +29,37 @@ export function GenericAutocomplete({
   className
 }: GenericAutocompleteProps) {
   const { values, loading, error } = useAutocompleteList(listCode);
-  const [inputValue, setInputValue] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
+  const [displayValue, setDisplayValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const previousValueRef = useRef(value);
 
-  // Synchroniser l'affichage avec la valeur sélectionnée
+  // Synchroniser displayValue uniquement quand la valeur externe change réellement
   useEffect(() => {
-    if (!isEditing && !multiple && typeof value === 'string') {
-      if (value && values.length > 0) {
-        const item = values.find((v) => v.value_code === value);
-        if (item) {
-          setInputValue(item.value_label);
+    if (!multiple && typeof value === 'string') {
+      // Si la valeur a changé depuis l'extérieur (pas depuis notre sélection)
+      if (value !== previousValueRef.current) {
+        previousValueRef.current = value;
+        
+        if (value && values.length > 0) {
+          const item = values.find((v) => v.value_code === value);
+          if (item) {
+            setDisplayValue(item.value_label);
+          }
+        } else {
+          setDisplayValue('');
         }
-      } else if (!value) {
-        setInputValue('');
       }
     }
-  }, [value, values, multiple, isEditing]);
+  }, [value, values, multiple]);
 
-  // Filtrer les valeurs
-  const filteredValues = inputValue.trim() && isEditing
+  // Calculer les valeurs filtrées
+  const filteredValues = displayValue.trim()
     ? values.filter(v => 
-        v.value_label.toLowerCase().includes(inputValue.toLowerCase()) ||
-        v.value_code.toLowerCase().includes(inputValue.toLowerCase())
+        v.value_label.toLowerCase().includes(displayValue.toLowerCase()) ||
+        v.value_code.toLowerCase().includes(displayValue.toLowerCase())
       )
     : values;
 
@@ -75,10 +80,6 @@ export function GenericAutocomplete({
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
-        // Sortir du mode édition après un court délai
-        setTimeout(() => {
-          setIsEditing(false);
-        }, 100);
       }
     };
 
@@ -92,37 +93,31 @@ export function GenericAutocomplete({
       if (!currentValues.includes(code)) {
         onChange([...currentValues, code]);
       }
-      setInputValue('');
+      setDisplayValue('');
     } else {
+      // Mettre à jour la ref avant d'appeler onChange pour éviter la re-synchronisation
+      previousValueRef.current = code;
+      // Mettre à jour l'affichage immédiatement
+      setDisplayValue(label);
+      // Appeler onChange
       onChange(code);
-      // Forcer l'affichage du label immédiatement
-      setInputValue(label);
-      // Sortir du mode édition pour que la synchronisation prenne le relais
-      setTimeout(() => {
-        setIsEditing(false);
-      }, 50);
     }
     setShowSuggestions(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsEditing(true);
-    setInputValue(e.target.value);
+    setDisplayValue(e.target.value);
     if (e.target.value.trim()) {
       setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
     }
   };
 
   const handleInputFocus = () => {
-    setIsEditing(true);
-    if (inputValue.trim()) {
+    if (displayValue.trim()) {
       setShowSuggestions(true);
     }
-  };
-
-  const handleInputBlur = () => {
-    // Ne pas quitter le mode édition immédiatement pour permettre le clic sur les suggestions
-    // Le mode édition sera désactivé par handleSelect ou handleClickOutside
   };
 
   const handleRemove = (code: string) => {
@@ -132,9 +127,9 @@ export function GenericAutocomplete({
   };
 
   const handleClear = () => {
-    setIsEditing(false);
-    setInputValue('');
+    setDisplayValue('');
     onChange(multiple ? [] : '');
+    previousValueRef.current = '';
     setShowSuggestions(false);
   };
 
@@ -156,16 +151,15 @@ export function GenericAutocomplete({
       <div className="relative">
         <Input
           ref={inputRef}
-          value={inputValue}
+          value={displayValue}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
-          onBlur={handleInputBlur}
           placeholder={loading ? 'Chargement...' : placeholder}
           disabled={loading}
           className="w-full pr-10"
         />
         
-        {inputValue && !loading && (
+        {displayValue && !loading && (
           <button
             type="button"
             onClick={handleClear}
@@ -190,7 +184,10 @@ export function GenericAutocomplete({
                 key={item.value_code}
                 type="button"
                 className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground cursor-pointer flex items-center justify-between"
-                onClick={() => handleSelect(item.value_code, item.value_label)}
+                onMouseDown={(e) => {
+                  e.preventDefault(); // Empêcher le blur de l'input
+                  handleSelect(item.value_code, item.value_label);
+                }}
               >
                 <span>{item.value_label}</span>
                 {(multiple ? selectedValues.includes(item.value_code) : value === item.value_code) && (
@@ -203,7 +200,7 @@ export function GenericAutocomplete({
         )}
 
         {/* Message aucun résultat */}
-        {showSuggestions && filteredValues.length === 0 && inputValue.trim() && createPortal(
+        {showSuggestions && filteredValues.length === 0 && displayValue.trim() && createPortal(
           <div
             className="fixed bg-popover border border-border rounded-md shadow-lg p-3 text-sm text-muted-foreground z-[9999]"
             style={{
