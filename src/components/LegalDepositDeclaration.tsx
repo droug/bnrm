@@ -136,6 +136,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>([]);
   const [specialCollectionPublicationType, setSpecialCollectionPublicationType] = useState<string>("");
   const [specialCollectionPublicationTypeOther, setSpecialCollectionPublicationTypeOther] = useState<string>("");
+  const [hasScale, setHasScale] = useState<string>("");
+  const [hasLegend, setHasLegend] = useState<string>("");
 
   // Load disciplines based on publication type using dependent list hook
   const { values: disciplineValues, loading: disciplinesLoading } = useDependentList({
@@ -2491,6 +2493,37 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       onChange={(e) => setSpecialCollectionPublicationTypeOther(e.target.value)}
                     />
                   </div>
+                )}
+
+                {(specialCollectionPublicationType === "cartes_geographiques" || 
+                  specialCollectionPublicationType === "photos_plans") && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>Présence échelle</Label>
+                      <SimpleEntitySelect
+                        value={hasScale}
+                        onChange={setHasScale}
+                        placeholder="Sélectionner"
+                        options={[
+                          { value: "oui", label: "Oui" },
+                          { value: "non", label: "Non" },
+                        ]}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Présence de légende</Label>
+                      <SimpleEntitySelect
+                        value={hasLegend}
+                        onChange={setHasLegend}
+                        placeholder="Sélectionner"
+                        options={[
+                          { value: "oui", label: "Oui" },
+                          { value: "non", label: "Non" },
+                        ]}
+                      />
+                    </div>
+                  </>
                 )}
 
                 <div className="space-y-2">
