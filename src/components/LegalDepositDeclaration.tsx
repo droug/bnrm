@@ -439,20 +439,28 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       language={language}
                       value={customFieldsData[field.field_key]}
                       onChange={(value) => {
+                        console.log('Field changed:', field.field_key, '=', value);
                         setCustomFieldsData((prev) => ({
                           ...prev,
                           [field.field_key]: value,
                         }));
-                        // Mettre à jour authorType si c'est le champ author_type
-                        if (field.field_key === "author_type") {
+                        // Mettre à jour authorType si c'est un champ de type d'auteur
+                        if (field.field_key.toLowerCase().includes('type') || 
+                            field.label_fr?.toLowerCase().includes('type de l')) {
                           setAuthorType(value);
+                          console.log('Author type updated:', value);
                         }
                       }}
                     />
                   ))}
                 
                 {/* Champ Genre conditionnel - s'affiche uniquement si Type de l'auteur est "Personne physique" */}
-                {(customFieldsData["author_type"] === "physique" || authorType === "physique") && (
+                {(customFieldsData["author_type"] === "physique" || 
+                  authorType === "physique" ||
+                  customFieldsData["author_type"] === "Personne physique" ||
+                  authorType === "Personne physique" ||
+                  Object.values(customFieldsData).includes("physique") ||
+                  Object.values(customFieldsData).includes("Personne physique")) && (
                   <div className="space-y-2">
                     <Label>Genre</Label>
                     <SimpleEntitySelect
