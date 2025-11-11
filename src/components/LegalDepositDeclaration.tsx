@@ -133,6 +133,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [isPeriodic, setIsPeriodic] = useState<string>("");
   const [disciplineInput, setDisciplineInput] = useState<string>("");
   const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>([]);
+  const [specialCollectionPublicationType, setSpecialCollectionPublicationType] = useState<string>("");
+  const [specialCollectionPublicationTypeOther, setSpecialCollectionPublicationTypeOther] = useState<string>("");
 
   // Load disciplines based on publication type using dependent list hook
   const { values: disciplineValues, loading: disciplinesLoading } = useDependentList({
@@ -2435,8 +2437,32 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Type de publication</Label>
-                  <Input placeholder="Type de publication" />
+                  <SimpleEntitySelect
+                    value={specialCollectionPublicationType}
+                    onChange={setSpecialCollectionPublicationType}
+                    placeholder="Sélectionner le type"
+                    options={[
+                      { value: "affiches", label: "Affiches" },
+                      { value: "guides", label: "Guides" },
+                      { value: "atlas", label: "Atlas" },
+                      { value: "cartes_geographiques", label: "Cartes géographiques" },
+                      { value: "cartes_postales", label: "Cartes postales" },
+                      { value: "photos_plans", label: "Photos - Plans" },
+                      { value: "autre", label: "Autre" },
+                    ]}
+                  />
                 </div>
+
+                {specialCollectionPublicationType === "autre" && (
+                  <div className="space-y-2">
+                    <Label>Préciser le type</Label>
+                    <Input 
+                      placeholder="Saisir le type de publication" 
+                      value={specialCollectionPublicationTypeOther}
+                      onChange={(e) => setSpecialCollectionPublicationTypeOther(e.target.value)}
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label>Titre de la publication</Label>
