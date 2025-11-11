@@ -117,6 +117,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [authorStatus, setAuthorStatus] = useState<string>("");
   const [selectedDiscipline, setSelectedDiscipline] = useState<string>("");
   const [disciplineSearch, setDisciplineSearch] = useState<string>("");
+  const [showDisciplineDropdown, setShowDisciplineDropdown] = useState<boolean>(false);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [languageSearch, setLanguageSearch] = useState<string>("");
   const [multipleVolumes, setMultipleVolumes] = useState<string>("");
@@ -547,10 +548,18 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     <Input
                       placeholder="Rechercher une discipline..."
                       value={disciplineSearch}
-                      onChange={(e) => setDisciplineSearch(e.target.value)}
+                      onChange={(e) => {
+                        setDisciplineSearch(e.target.value);
+                        setShowDisciplineDropdown(true);
+                      }}
+                      onFocus={() => setShowDisciplineDropdown(true)}
+                      onBlur={() => {
+                        // Delay to allow click on dropdown items
+                        setTimeout(() => setShowDisciplineDropdown(false), 200);
+                      }}
                       className="pr-10"
                     />
-                    {disciplineSearch && (
+                    {showDisciplineDropdown && disciplineSearch && (
                       <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
                         {bookDisciplines
                           .flatMap(domain => 
@@ -569,10 +578,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                               key={index}
                               type="button"
                               className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
-                              onClick={() => {
+                              onMouseDown={(e) => {
+                                e.preventDefault(); // Prevent blur
                                 const fullDiscipline = `${item.domain} → ${item.subdiscipline}`;
                                 setSelectedDiscipline(fullDiscipline);
                                 setDisciplineSearch(fullDiscipline);
+                                setShowDisciplineDropdown(false);
                               }}
                             >
                               <div className="text-sm font-medium text-muted-foreground">
