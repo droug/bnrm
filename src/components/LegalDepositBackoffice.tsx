@@ -35,6 +35,7 @@ interface LegalDepositRequest {
   id: string;
   request_number: string;
   title: string;
+  subtitle?: string;
   author_name?: string;
   status: 'brouillon' | 'soumis' | 'en_attente_validation_b' | 'valide_par_b' | 'rejete_par_b' | 'en_cours' | 'attribue' | 'receptionne' | 'rejete' | 'en_attente_comite_validation' | 'valide_par_comite' | 'rejete_par_comite';
   support_type: 'imprime' | 'electronique';
@@ -42,8 +43,17 @@ interface LegalDepositRequest {
   submission_date?: string;
   attribution_date?: string;
   dl_number?: string;
+  isbn?: string;
   isbn_assigned?: string;
+  issn?: string;
   issn_assigned?: string;
+  ismn?: string;
+  ismn_assigned?: string;
+  language?: string;
+  publication_date?: string;
+  page_count?: number;
+  publication_status?: string;
+  documents_urls?: any;
   amazon_link?: string;
   requires_amazon_validation?: boolean;
   metadata?: any;
@@ -447,11 +457,17 @@ export const LegalDepositBackoffice = () => {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>
+                     <TableCell>
                       <div>
                         <p className="font-medium">{request.title}</p>
+                        {request.subtitle && (
+                          <p className="text-xs text-muted-foreground italic">{request.subtitle}</p>
+                        )}
                         {request.author_name && (
                           <p className="text-sm text-muted-foreground">par {request.author_name}</p>
+                        )}
+                        {request.language && (
+                          <Badge variant="outline" className="mt-1">{request.language.toUpperCase()}</Badge>
                         )}
                       </div>
                     </TableCell>
@@ -471,6 +487,14 @@ export const LegalDepositBackoffice = () => {
                         <p className="text-xs text-muted-foreground capitalize">
                           {request.monograph_type.replace('_', ' ')}
                         </p>
+                        {request.page_count && (
+                          <p className="text-xs text-muted-foreground">{request.page_count} pages</p>
+                        )}
+                        {request.publication_date && (
+                          <p className="text-xs text-muted-foreground">
+                            Pub: {new Date(request.publication_date).toLocaleDateString('fr-FR')}
+                          </p>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -487,10 +511,35 @@ export const LegalDepositBackoffice = () => {
                       }
                     </TableCell>
                     <TableCell>
-                      <div className="space-y-1">
-                        {request.dl_number && <Badge variant="secondary">DL: {request.dl_number}</Badge>}
-                        {request.isbn_assigned && <Badge variant="secondary">ISBN: {request.isbn_assigned}</Badge>}
-                        {request.issn_assigned && <Badge variant="secondary">ISSN: {request.issn_assigned}</Badge>}
+                      <div className="space-y-1 text-xs">
+                        {request.dl_number && (
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium">DL:</span>
+                            <span className="font-mono">{request.dl_number}</span>
+                          </div>
+                        )}
+                        {(request.isbn_assigned || request.isbn) && (
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium">ISBN:</span>
+                            <span className="font-mono">{request.isbn_assigned || request.isbn}</span>
+                          </div>
+                        )}
+                        {(request.issn_assigned || request.issn) && (
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium">ISSN:</span>
+                            <span className="font-mono">{request.issn_assigned || request.issn}</span>
+                          </div>
+                        )}
+                        {(request.ismn_assigned || request.ismn) && (
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium">ISMN:</span>
+                            <span className="font-mono">{request.ismn_assigned || request.ismn}</span>
+                          </div>
+                        )}
+                        {!request.dl_number && !request.isbn_assigned && !request.issn_assigned && !request.ismn_assigned && 
+                         !request.isbn && !request.issn && !request.ismn && (
+                          <span className="text-muted-foreground">Non attribués</span>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>

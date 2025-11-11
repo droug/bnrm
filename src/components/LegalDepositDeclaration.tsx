@@ -138,6 +138,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [specialCollectionPublicationTypeOther, setSpecialCollectionPublicationTypeOther] = useState<string>("");
   const [hasScale, setHasScale] = useState<string>("");
   const [hasLegend, setHasLegend] = useState<string>("");
+  const [collectionTitle, setCollectionTitle] = useState<string>("");
+  const [periodicity, setPeriodicity] = useState<string>("");
+  const [printRun, setPrintRun] = useState<string>("");
 
   // Load disciplines based on publication type using dependent list hook
   const { values: disciplineValues, loading: disciplinesLoading } = useDependentList({
@@ -669,7 +672,11 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Titre de la collection</Label>
-                  <Input placeholder="Titre de la collection" />
+                  <Input 
+                    placeholder="Titre de la collection"
+                    value={collectionTitle}
+                    onChange={(e) => setCollectionTitle(e.target.value)}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -1041,7 +1048,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Nombre de tirage</Label>
-                  <Input type="number" placeholder="Nombre de tirage" />
+                  <Input 
+                    type="number" 
+                    placeholder="Nombre de tirage"
+                    value={printRun}
+                    onChange={(e) => setPrintRun(e.target.value)}
+                  />
                 </div>
               </div>
             </div>
@@ -1217,6 +1229,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Label>Périodicité</Label>
                   <InlineSelect
                     placeholder="Sélectionner la périodicité"
+                    value={periodicity}
+                    onChange={setPeriodicity}
                     options={[
                       { value: "daily", label: "Quotidien" },
                       { value: "weekly", label: "Hebdomadaire" },
@@ -1650,7 +1664,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Nombre de tirage</Label>
-                  <Input type="number" placeholder="Nombre de tirage" />
+                  <Input 
+                    type="number" 
+                    placeholder="Nombre de tirage"
+                    value={printRun}
+                    onChange={(e) => setPrintRun(e.target.value)}
+                  />
                 </div>
 
                 {/* Champs personnalisés */}
@@ -2311,7 +2330,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Nombre de tirage</Label>
-                  <Input type="number" placeholder="Nombre de tirage" />
+                  <Input 
+                    type="number" 
+                    placeholder="Nombre de tirage"
+                    value={printRun}
+                    onChange={(e) => setPrintRun(e.target.value)}
+                  />
                 </div>
               </div>
             </div>
@@ -2534,7 +2558,11 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 {specialCollectionPublicationType === "cartes_postales" && (
                   <div className="space-y-2">
                     <Label>Titre de la collection</Label>
-                    <Input placeholder="Titre de la collection" />
+                    <Input 
+                      placeholder="Titre de la collection"
+                      value={collectionTitle}
+                      onChange={(e) => setCollectionTitle(e.target.value)}
+                    />
                   </div>
                 )}
 
@@ -2899,7 +2927,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Nombre de tirage</Label>
-                  <Input type="number" placeholder="Nombre de tirage" />
+                  <Input 
+                    type="number" 
+                    placeholder="Nombre de tirage"
+                    value={printRun}
+                    onChange={(e) => setPrintRun(e.target.value)}
+                  />
                 </div>
 
                 {/* Champs personnalisés */}
@@ -3441,20 +3474,56 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       // Créer la demande de dépôt légal
       const requestNumber = `DL-${new Date().getFullYear()}-${Date.now()}`;
       
+      // Déterminer le monograph_type basé sur le depositType
+      let monographType: 'livres' | 'periodiques' | 'theses' | 'corans' | 'beaux_livres' | 'musique' | 'encyclopedies' | 'ouvrages_scolaires' = 'livres';
+      if (depositType === 'monographie') monographType = 'livres';
+      else if (depositType === 'periodique') monographType = 'periodiques';
+      else if (depositType === 'collections_specialisees') monographType = 'beaux_livres'; // Default for collections
+      else if (depositType === 'bd_logiciels') monographType = 'musique'; // Default for BD/software
+      
+      // Préparer l'objet documents_urls depuis uploadedFiles
+      const documentsUrls: any = {};
+      Object.keys(uploadedFiles).forEach(key => {
+        if (uploadedFiles[key]) {
+          documentsUrls[key] = uploadedFiles[key];
+        }
+      });
+      
       const newRequest = {
         initiator_id: professionalData.id,
         request_number: requestNumber,
         support_type: 'imprime' as const,
-        monograph_type: 'livres' as const,
+        monograph_type: monographType,
         status: 'brouillon' as const,
         title: formData.title || 'Sans titre',
+        subtitle: formData.subtitle || null,
         author_name: formData.author_name || '',
+        language: formData.language || language || 'fr',
+        publication_date: formData.publication_date || null,
+        page_count: formData.page_count ? parseInt(formData.page_count) : null,
+        isbn: formData.isbn || null,
+        issn: formData.issn || null,
+        ismn: formData.ismn || null,
+        publication_status: formData.publication_status || null,
+        documents_urls: documentsUrls,
+        amazon_link: formData.amazon_link || null,
+        requires_amazon_validation: !!formData.amazon_link,
         metadata: {
+          depositType,
           editor: editorData,
           printer: printerData,
-          depositType,
+          distributor: selectedDistributor,
+          producer: selectedProducer,
           publisher: selectedPublisher,
-          customFields: customFieldsData, // Inclure les champs personnalisés comme author_nationality
+          publicationType: publicationType,
+          periodicity: periodicity,
+          hasScale: hasScale,
+          hasLegend: hasLegend,
+          collectionTitle: collectionTitle,
+          printRun: printRun,
+          editorIdentification: editorIdentification,
+          authorGender: authorGender,
+          customFields: customFieldsData,
           ...formData
         }
       };
