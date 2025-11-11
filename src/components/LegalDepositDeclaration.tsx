@@ -3956,9 +3956,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               </Button>
               <Button 
                 onClick={handleFormSubmit}
-                disabled={!acceptedPrivacy || !partnerConfirmed}
+                disabled={!acceptedPrivacy}
               >
-                {language === 'ar' ? 'إرسال التصريح' : 'Soumettre la déclaration'}
+                {language === 'ar' ? 'إرسال التصريح' : 'Soumettre la demande'}
               </Button>
             </div>
           </CardFooter>
