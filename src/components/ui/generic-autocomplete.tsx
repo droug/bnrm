@@ -28,48 +28,35 @@ export function GenericAutocomplete({
   multiple = false,
   className
 }: GenericAutocompleteProps) {
-  const { values, loading, error, search } = useAutocompleteList(listCode);
+  const { values, loading, error } = useAutocompleteList(listCode);
   const [inputValue, setInputValue] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [filteredValues, setFilteredValues] = useState(values);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const justSelectedRef = useRef(false);
 
-  // Initialiser inputValue avec le label correspondant à la valeur
+  // Synchroniser l'affichage avec la valeur sélectionnée
   useEffect(() => {
-    console.log('GenericAutocomplete - useEffect sync:', { value, valuesCount: values.length, inputValue, justSelected: justSelectedRef.current });
-    
-    if (!multiple && typeof value === 'string' && value && values.length > 0 && !justSelectedRef.current) {
-      const item = values.find((v) => v.value_code === value);
-      console.log('GenericAutocomplete - Found item for value:', { value, item });
-      if (item) {
-        setInputValue(item.value_label);
+    if (!isEditing && !multiple && typeof value === 'string') {
+      if (value && values.length > 0) {
+        const item = values.find((v) => v.value_code === value);
+        if (item) {
+          setInputValue(item.value_label);
+        }
+      } else if (!value) {
+        setInputValue('');
       }
-    } else if (!multiple && !value && !justSelectedRef.current) {
-      setInputValue('');
     }
-    // Réinitialiser le flag après avoir synchronisé
-    if (justSelectedRef.current) {
-      justSelectedRef.current = false;
-    }
-  }, [value, values, multiple]);
+  }, [value, values, multiple, isEditing]);
 
-  // Filtrer les valeurs en fonction de la recherche
-  useEffect(() => {
-    if (inputValue.trim()) {
-      const filtered = search(inputValue);
-      setFilteredValues(filtered);
-      // Ne montrer les suggestions que si le champ est actif
-      if (document.activeElement === inputRef.current) {
-        setShowSuggestions(true);
-      }
-    } else {
-      setFilteredValues(values);
-      setShowSuggestions(false);
-    }
-  }, [inputValue, values]);
+  // Filtrer les valeurs
+  const filteredValues = inputValue.trim() && isEditing
+    ? values.filter(v => 
+        v.value_label.toLowerCase().includes(inputValue.toLowerCase()) ||
+        v.value_code.toLowerCase().includes(inputValue.toLowerCase())
+      )
+    : values;
 
   // Mettre à jour la position du dropdown
   useEffect(() => {
@@ -88,6 +75,7 @@ export function GenericAutocomplete({
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
+        setIsEditing(false);
       }
     };
 
@@ -96,8 +84,7 @@ export function GenericAutocomplete({
   }, []);
 
   const handleSelect = (code: string, label: string) => {
-    console.log('GenericAutocomplete - handleSelect called:', { code, label, currentValue: value });
-    justSelectedRef.current = true;
+    setIsEditing(false);
     
     if (multiple) {
       const currentValues = Array.isArray(value) ? value : [];
@@ -106,14 +93,32 @@ export function GenericAutocomplete({
       }
       setInputValue('');
     } else {
-      // Mettre à jour immédiatement l'input avec le label complet
-      console.log('GenericAutocomplete - Setting inputValue to:', label);
       setInputValue(label);
-      // Appeler onChange avec le code
-      console.log('GenericAutocomplete - Calling onChange with code:', code);
       onChange(code);
     }
     setShowSuggestions(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsEditing(true);
+    setInputValue(e.target.value);
+    if (e.target.value.trim()) {
+      setShowSuggestions(true);
+    }
+  };
+
+  const handleInputFocus = () => {
+    setIsEditing(true);
+    if (inputValue.trim()) {
+      setShowSuggestions(true);
+    }
+  };
+
+  const handleInputBlur = () => {
+    // Petit délai pour permettre au clic sur une suggestion de s'enregistrer
+    setTimeout(() => {
+      setIsEditing(false);
+    }, 200);
   };
 
   const handleRemove = (code: string) => {
@@ -123,9 +128,10 @@ export function GenericAutocomplete({
   };
 
   const handleClear = () => {
+    setIsEditing(false);
     setInputValue('');
     onChange(multiple ? [] : '');
-    setFilteredValues(values);
+    setShowSuggestions(false);
   };
 
   if (error) {
@@ -147,9 +153,10 @@ export function GenericAutocomplete({
         <Input
           ref={inputRef}
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
           placeholder={loading ? 'Chargement...' : placeholder}
-          onFocus={() => inputValue.trim() && setShowSuggestions(true)}
           disabled={loading}
           className="w-full pr-10"
         />
