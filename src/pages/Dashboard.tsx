@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, FileText, Clock, Library, LogOut, Settings, Cog, ArrowLeft } from "lucide-react";
+import { BookOpen, Users, FileText, Clock, Library, LogOut, Settings, Cog, ArrowLeft, CheckCircle, XCircle, AlertCircle, TrendingUp, Award, BarChart3 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
@@ -15,33 +15,96 @@ import logoBnrm from "@/assets/logo-bnrm.png";
 export default function Dashboard() {
   const { user, profile, signOut, loading } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    totalManuscripts: 0,
-    totalCollections: 0,
-    pendingRequests: 0,
-    totalUsers: 0
+  const [cpsStats, setCpsStats] = useState({
+    totalRequests: 0,
+    pendingValidation: 0,
+    validated: 0,
+    rejected: 0,
+    inProgress: 0,
+    completed: 0,
+    avgProcessingTime: 0,
+    validationRate: 0,
+    dlNumbersAssigned: 0,
+    isbnAssigned: 0,
+    issnAssigned: 0,
+    ismnAssigned: 0,
+    monographs: 0,
+    periodicals: 0,
+    specialCollections: 0,
+    bdLogiciels: 0
   });
 
   useEffect(() => {
     if (user && profile) {
-      fetchStats();
+      fetchCpsStats();
     }
   }, [user, profile]);
 
-  const fetchStats = async () => {
-    const [manuscriptsRes, collectionsRes, requestsRes, usersRes] = await Promise.all([
-      supabase.from('manuscripts').select('id', { count: 'exact', head: true }),
-      supabase.from('collections').select('id', { count: 'exact', head: true }),
-      supabase.from('access_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-      supabase.from('profiles').select('id', { count: 'exact', head: true })
-    ]);
+  const fetchCpsStats = async () => {
+    try {
+      // Récupérer toutes les demandes de dépôt légal
+      const { data: requests, error } = await supabase
+        .from('legal_deposit_requests')
+        .select('*');
 
-    setStats({
-      totalManuscripts: manuscriptsRes.count || 0,
-      totalCollections: collectionsRes.count || 0,
-      pendingRequests: requestsRes.count || 0,
-      totalUsers: usersRes.count || 0
-    });
+      if (error) throw error;
+
+      const total = requests?.length || 0;
+      const pending = requests?.filter(r => r.status === 'en_attente_validation_b' || r.status === 'soumis').length || 0;
+      const validated = requests?.filter(r => r.status === 'valide_par_b' || r.status === 'attribue' || r.status === 'receptionne').length || 0;
+      const rejected = requests?.filter(r => r.status === 'rejete' || r.status === 'rejete_par_b' || r.status === 'rejete_par_comite').length || 0;
+      const inProgress = requests?.filter(r => r.status === 'en_cours').length || 0;
+      const completed = requests?.filter(r => r.status === 'attribue' || r.status === 'receptionne').length || 0;
+
+      // Calculer le taux de validation
+      const validationRate = total > 0 ? Math.round((validated / total) * 100) : 0;
+
+      // Calculer le temps de traitement moyen (en jours)
+      const completedRequests = requests?.filter(r => r.attribution_date && r.submission_date) || [];
+      let avgProcessingTime = 0;
+      if (completedRequests.length > 0) {
+        const totalDays = completedRequests.reduce((sum, req) => {
+          const submitted = new Date(req.submission_date!);
+          const attributed = new Date(req.attribution_date!);
+          const days = Math.floor((attributed.getTime() - submitted.getTime()) / (1000 * 60 * 60 * 24));
+          return sum + days;
+        }, 0);
+        avgProcessingTime = Math.round(totalDays / completedRequests.length);
+      }
+
+      // Compter les numéros attribués
+      const dlAssigned = requests?.filter(r => r.dl_number).length || 0;
+      const isbnAssigned = requests?.filter(r => r.isbn_assigned || r.isbn).length || 0;
+      const issnAssigned = requests?.filter(r => r.issn_assigned || r.issn).length || 0;
+      const ismnAssigned = requests?.filter(r => r.ismn_assigned || r.ismn).length || 0;
+
+      // Statistiques par type
+      const monographs = requests?.filter(r => r.monograph_type === 'livres').length || 0;
+      const periodicals = requests?.filter(r => r.monograph_type === 'periodiques').length || 0;
+      const specialCollections = requests?.filter(r => r.monograph_type === 'beaux_livres').length || 0;
+      const bdLogiciels = requests?.filter(r => r.monograph_type === 'musique').length || 0;
+
+      setCpsStats({
+        totalRequests: total,
+        pendingValidation: pending,
+        validated,
+        rejected,
+        inProgress,
+        completed,
+        avgProcessingTime,
+        validationRate,
+        dlNumbersAssigned: dlAssigned,
+        isbnAssigned,
+        issnAssigned,
+        ismnAssigned,
+        monographs,
+        periodicals,
+        specialCollections,
+        bdLogiciels
+      });
+    } catch (error) {
+      console.error('Erreur lors du chargement des statistiques CPS:', error);
+    }
   };
 
   if (loading) {
@@ -161,182 +224,291 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Manuscrits</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalManuscripts}</div>
-              <p className="text-xs text-muted-foreground">
-                Total des manuscrits disponibles
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Collections</CardTitle>
-              <Library className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalCollections}</div>
-              <p className="text-xs text-muted-foreground">
-                Collections organisées
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Demandes</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.pendingRequests}</div>
-              <p className="text-xs text-muted-foreground">
-                En attente de traitement
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Utilisateurs</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalUsers}</div>
-              <p className="text-xs text-muted-foreground">
-                Comptes enregistrés
-              </p>
-            </CardContent>
-          </Card>
+        {/* Indicateurs CPS - Statistiques Globales */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <BarChart3 className="h-6 w-6 text-primary" />
+            Indicateurs CPS - Dépôt Légal
+          </h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Demandes</CardTitle>
+                <FileText className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{cpsStats.totalRequests}</div>
+                <p className="text-xs text-muted-foreground">
+                  Toutes les demandes de dépôt légal
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">En Attente</CardTitle>
+                <Clock className="h-4 w-4 text-yellow-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-yellow-600">{cpsStats.pendingValidation}</div>
+                <p className="text-xs text-muted-foreground">
+                  En attente de validation
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Validées</CardTitle>
+                <CheckCircle className="h-4 w-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">{cpsStats.validated}</div>
+                <p className="text-xs text-muted-foreground">
+                  Demandes validées avec succès
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Rejetées</CardTitle>
+                <XCircle className="h-4 w-4 text-red-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-red-600">{cpsStats.rejected}</div>
+                <p className="text-xs text-muted-foreground">
+                  Demandes rejetées
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <BookOpen className="h-5 w-5" />
-                <span>Consulter les manuscrits</span>
-              </CardTitle>
-              <CardDescription>
-                Parcourez notre collection de manuscrits historiques
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full" onClick={() => navigate('/manuscripts')}>
-                Accéder aux manuscrits
-              </Button>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <FileText className="h-5 w-5" />
-                <span>Faire une demande</span>
-              </CardTitle>
-              <CardDescription>
-                Demander l'accès à un manuscrit ou une reproduction
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full" variant="outline" onClick={() => navigate('/access-request')}>
-                Nouvelle demande
-              </Button>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Library className="h-5 w-5" />
-                <span>Explorer les collections</span>
-              </CardTitle>
-              <CardDescription>
-                Découvrez nos collections thématiques organisées
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full" variant="outline" onClick={() => navigate('/collections')}>
-                Voir les collections
-              </Button>
-            </CardContent>
-          </Card>
+        {/* Performance & KPI */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <TrendingUp className="h-6 w-6 text-primary" />
+            Performance & KPI
+          </h2>
+          <div className="grid gap-6 md:grid-cols-3">
+            <Card className="border-blue-200 bg-blue-50/50">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Award className="h-4 w-4 text-blue-600" />
+                  Taux de Validation
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-blue-600">{cpsStats.validationRate}%</div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Pourcentage de demandes validées
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-purple-200 bg-purple-50/50">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-purple-600" />
+                  Temps Moyen de Traitement
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-purple-600">{cpsStats.avgProcessingTime} j</div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Délai moyen d'attribution
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-green-200 bg-green-50/50">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  Demandes Complétées
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-green-600">{cpsStats.completed}</div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Numéros attribués et réceptionnés
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        {/* Admin Quick Actions */}
+        {/* Attribution des Numéros */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">Attribution des Numéros</h2>
+          <div className="grid gap-6 md:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">DL Attribués</CardTitle>
+                <Badge className="bg-blue-500">DL</Badge>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{cpsStats.dlNumbersAssigned}</div>
+                <p className="text-xs text-muted-foreground">
+                  Numéros de dépôt légal
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">ISBN Attribués</CardTitle>
+                <Badge className="bg-green-500">ISBN</Badge>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{cpsStats.isbnAssigned}</div>
+                <p className="text-xs text-muted-foreground">
+                  International Standard Book Number
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">ISSN Attribués</CardTitle>
+                <Badge className="bg-orange-500">ISSN</Badge>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{cpsStats.issnAssigned}</div>
+                <p className="text-xs text-muted-foreground">
+                  International Standard Serial Number
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">ISMN Attribués</CardTitle>
+                <Badge className="bg-purple-500">ISMN</Badge>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{cpsStats.ismnAssigned}</div>
+                <p className="text-xs text-muted-foreground">
+                  International Standard Music Number
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Répartition par Type de Publication */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">Répartition par Type de Publication</h2>
+          <div className="grid gap-6 md:grid-cols-4">
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium">Monographies</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{cpsStats.monographs}</div>
+                <p className="text-xs text-muted-foreground">
+                  Livres et ouvrages
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-l-4 border-l-green-500">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium">Périodiques</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{cpsStats.periodicals}</div>
+                <p className="text-xs text-muted-foreground">
+                  Revues et publications périodiques
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-l-4 border-l-orange-500">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium">Collections Spécialisées</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{cpsStats.specialCollections}</div>
+                <p className="text-xs text-muted-foreground">
+                  Cartes, affiches, atlas
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-l-4 border-l-purple-500">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium">BD & Logiciels</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{cpsStats.bdLogiciels}</div>
+                <p className="text-xs text-muted-foreground">
+                  Bases de données et logiciels
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Accès Rapide - Admin */}
         <PermissionGuard permission="requests.manage">
           <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">Actions Administrateur</h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="border-orange-200 bg-orange-50/50">
+            <h2 className="text-2xl font-bold mb-4">Accès Rapide - Gestion</h2>
+            <div className="grid gap-6 md:grid-cols-3">
+              <Card className="border-blue-200 bg-blue-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/legal-deposit')}>
                 <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Clock className="h-5 w-5 text-orange-600" />
-                    <span>Demandes d'accès</span>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-blue-600" />
+                    Backoffice Dépôt Légal
                   </CardTitle>
                   <CardDescription>
-                    Traiter et gérer les demandes d'accès
+                    Gérer les demandes et workflows de validation
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">En attente</span>
-                    <Badge variant="outline" className="bg-orange-100 text-orange-700 border-orange-300">
-                      {stats.pendingRequests}
+                    <Badge variant="outline" className="bg-yellow-100 text-yellow-700">
+                      {cpsStats.pendingValidation}
                     </Badge>
                   </div>
-                  <Button 
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white" 
-                    onClick={() => navigate('/admin/access-requests')}
-                  >
-                    Gérer les demandes d'accès
-                  </Button>
                 </CardContent>
               </Card>
 
-              <Card className="border-blue-200 bg-blue-50/50">
+              <Card className="border-green-200 bg-green-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/committee')}>
                 <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Users className="h-5 w-5 text-blue-600" />
-                    <span>Gestion utilisateurs</span>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-green-600" />
+                    Comité de Validation
                   </CardTitle>
                   <CardDescription>
-                    Administrer les comptes utilisateurs
+                    Gestion du comité et validations
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm text-muted-foreground">Total</span>
-                    <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300">
-                      {stats.totalUsers}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">En cours</span>
+                    <Badge variant="outline" className="bg-blue-100 text-blue-700">
+                      {cpsStats.inProgress}
                     </Badge>
                   </div>
-                  <Button className="w-full" variant="outline" onClick={() => navigate('/admin/users')}>
-                    Gérer les utilisateurs
-                  </Button>
                 </CardContent>
               </Card>
 
-              <Card className="border-purple-200 bg-purple-50/50">
+              <Card className="border-purple-200 bg-purple-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/settings')}>
                 <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
+                  <CardTitle className="flex items-center gap-2">
                     <Settings className="h-5 w-5 text-purple-600" />
-                    <span>Administration</span>
+                    Paramètres Système
                   </CardTitle>
                   <CardDescription>
-                    Accéder aux paramètres système
+                    Configuration et administration
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full" variant="outline" onClick={() => navigate('/admin/settings')}>
-                    Paramètres admin
+                  <Button variant="outline" className="w-full">
+                    Accéder aux paramètres
                   </Button>
                 </CardContent>
               </Card>
