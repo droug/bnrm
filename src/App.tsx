@@ -213,13 +213,12 @@ const App = () => {
   useAutoSync(true);
   
   return (
-    <TooltipProvider>
-      <LanguageProvider>
-        <PerformanceOptimizer />
-        <ScrollToTop />
-        <Toaster />
-        <Sonner />
-        <Suspense fallback={<PageLoader />}>
+    <LanguageProvider>
+      <PerformanceOptimizer />
+      <ScrollToTop />
+      <Toaster />
+      <Sonner />
+      <Suspense fallback={<PageLoader />}>
           <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/search" element={<SearchResults />} />
@@ -452,7 +451,6 @@ const App = () => {
         </Suspense>
         <CookieBanner />
       </LanguageProvider>
-    </TooltipProvider>
   );
 };
 
