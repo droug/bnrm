@@ -142,6 +142,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [collectionTitle, setCollectionTitle] = useState<string>("");
   const [periodicity, setPeriodicity] = useState<string>("");
   const [printRun, setPrintRun] = useState<string>("");
+  const [supportType, setSupportType] = useState<string>("");
+
 
   // Load disciplines based on publication type using dependent list hook
   const { values: disciplineValues, loading: disciplinesLoading } = useDependentList({
@@ -624,6 +626,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <div className="space-y-2">
                   <Label>Type de support</Label>
                   <InlineSelect
+                    value={supportType}
+                    onChange={setSupportType}
                     placeholder="Sélectionner le type"
                     options={[
                       { value: "printed", label: "Imprimé" },
