@@ -462,24 +462,28 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                        field.label_fr?.toLowerCase().includes('nom de l\'auteur') ||
                                        field.label_fr?.toLowerCase().includes('name');
                     
+                    // Récupérer la valeur actuelle du type d'auteur depuis les différentes sources possibles
+                    const currentAuthorTypeValue = customFieldsData["author_type"] || 
+                                                   customFieldsData[field.field_key] || 
+                                                   authorType || "";
+                    
+                    console.log('DEBUG - Field:', field.field_key, 'Current value:', currentAuthorTypeValue);
+                    
                     // Vérifier si on est en mode "Personne physique"
-                    const isPersonnePhysique = customFieldsData["author_type"] === "physique" || 
-                                              authorType === "physique" ||
-                                              customFieldsData["author_type"] === "Personne physique" ||
-                                              authorType === "Personne physique" ||
-                                              Object.values(customFieldsData).includes("physique") ||
-                                              Object.values(customFieldsData).includes("Personne physique");
+                    const isPersonnePhysique = currentAuthorTypeValue.toLowerCase().includes("physique") ||
+                                              currentAuthorTypeValue === "physique" ||
+                                              currentAuthorTypeValue === "Personne physique";
                     
                     // Vérifier si on est en mode "Personne morale"
-                    const isPersonneMorale = customFieldsData["author_type"] === "morale" || 
-                                            authorType === "morale" ||
-                                            customFieldsData["author_type"] === "Personne morale" ||
-                                            authorType === "Personne morale" ||
-                                            Object.values(customFieldsData).includes("morale") ||
-                                            Object.values(customFieldsData).includes("Personne morale");
+                    const isPersonneMorale = currentAuthorTypeValue.toLowerCase().includes("morale") ||
+                                            currentAuthorTypeValue === "morale" ||
+                                            currentAuthorTypeValue === "Personne morale";
+                    
+                    console.log('DEBUG - isPersonnePhysique:', isPersonnePhysique, 'isPersonneMorale:', isPersonneMorale);
                     
                     // Ne pas afficher le champ "Nom de l'auteur" si on est en mode "Personne morale"
                     if (isNameField && isPersonneMorale) {
+                      console.log('DEBUG - Hiding Nom de l\'auteur for Personne Morale');
                       return null;
                     }
                     
