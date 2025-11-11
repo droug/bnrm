@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineSelect } from "@/components/ui/inline-select";
+import { SimpleEntitySelect } from "@/components/ui/simple-entity-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DynamicHierarchicalSelect } from "@/components/ui/dynamic-hierarchical-select";
 import { Badge } from "@/components/ui/badge";
@@ -437,14 +438,34 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       field={field}
                       language={language}
                       value={customFieldsData[field.field_key]}
-                      onChange={(value) =>
+                      onChange={(value) => {
                         setCustomFieldsData((prev) => ({
                           ...prev,
                           [field.field_key]: value,
-                        }))
-                      }
+                        }));
+                        // Mettre à jour authorType si c'est le champ author_type
+                        if (field.field_key === "author_type") {
+                          setAuthorType(value);
+                        }
+                      }}
                     />
                   ))}
+                
+                {/* Champ Genre conditionnel - s'affiche uniquement si Type de l'auteur est "Personne physique" */}
+                {(customFieldsData["author_type"] === "physique" || authorType === "physique") && (
+                  <div className="space-y-2">
+                    <Label>Genre</Label>
+                    <SimpleEntitySelect
+                      placeholder="Sélectionner le genre"
+                      value={authorGender}
+                      onChange={setAuthorGender}
+                      options={[
+                        { value: "homme", label: "Homme" },
+                        { value: "femme", label: "Femme" },
+                      ]}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
