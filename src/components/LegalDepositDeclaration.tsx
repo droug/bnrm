@@ -3527,11 +3527,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <Label>{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
               <Input type="email" placeholder={language === 'ar' ? 'البريد الإلكتروني' : 'Adresse email'} />
             </div>
-            
-            <div className="space-y-2">
-              <Label>{language === 'ar' ? 'تاريخ النشر المتوقع' : 'Date de publication prévue'}</Label>
-              <Input type="date" />
-            </div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
