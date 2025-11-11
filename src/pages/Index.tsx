@@ -482,21 +482,21 @@ const Index = () => {
                         className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
                         onClick={() => handleLegalDepositClick("monographie")}
                       >
-                        Monographies
+                        Livres
                       </Button>
                       <Button
                         size="lg"
                         className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
                         onClick={() => handleLegalDepositClick("periodique")}
                       >
-                        Publications Périodiques
+                        Périodiques
                       </Button>
                       <Button
                         size="lg"
                         className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
                         onClick={() => handleLegalDepositClick("bd_logiciels")}
                       >
-                        BD & Logiciels
+                        Audio-visuel & Logiciels
                       </Button>
                       <Button
                         size="lg"
