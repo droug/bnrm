@@ -2553,6 +2553,11 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <h3 className="text-2xl font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
+                  <Label>Titre de la publication</Label>
+                  <Input placeholder="Titre de la publication" />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Type de publication</Label>
                   <SimpleSelectWithTooltip
                     value={specialCollectionPublicationType}
@@ -2639,11 +2644,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     </div>
                   </>
                 )}
-
-                <div className="space-y-2">
-                  <Label>Titre de la publication</Label>
-                  <Input placeholder="Titre de la publication" />
-                </div>
 
                 {specialCollectionPublicationType === "cartes_postales" && (
                   <div className="space-y-2">
