@@ -583,6 +583,11 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <h3 className="text-2xl font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
+                  <Label>Titre de l'ouvrage</Label>
+                  <Input placeholder="Titre de l'ouvrage" />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Discipline de l'ouvrage</Label>
                   <div className="relative">
                     <Input
@@ -654,11 +659,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       Discipline sélectionnée : <span className="font-medium">{selectedDiscipline}</span>
                     </p>
                   )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Titre de l'ouvrage</Label>
-                  <Input placeholder="Titre de l'ouvrage" />
                 </div>
 
                 <div className="space-y-2">
