@@ -202,10 +202,10 @@ export default function Dashboard() {
                 Retour
               </Button>
             </Link>
-            <div className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
               <img src={logoBnrm} alt="Logo BNRM" className="h-8 w-auto object-contain" />
               <span className="text-xl font-bold">Portail BNRM</span>
-            </div>
+            </Link>
           </div>
           
           <div className="flex items-center space-x-4">
