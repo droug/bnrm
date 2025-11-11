@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import bnrmBuildingNight from "@/assets/bnrm-building-night.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
@@ -477,34 +478,73 @@ const Index = () => {
                       <div className="w-32 h-2 bg-gradient-neutral mx-auto rounded-full shadow-gold"></div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Button
-                        size="lg"
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
-                        onClick={() => handleLegalDepositClick("monographie")}
-                      >
-                        Livres
-                      </Button>
-                      <Button
-                        size="lg"
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
-                        onClick={() => handleLegalDepositClick("periodique")}
-                      >
-                        Périodiques
-                      </Button>
-                      <Button
-                        size="lg"
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
-                        onClick={() => handleLegalDepositClick("bd_logiciels")}
-                      >
-                        Audio-visuel & Logiciels
-                      </Button>
-                      <Button
-                        size="lg"
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
-                        onClick={() => handleLegalDepositClick("collections_specialisees")}
-                      >
-                        Collections Spécialisées
-                      </Button>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="lg"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
+                              onClick={() => handleLegalDepositClick("monographie")}
+                            >
+                              Livres
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Déposez vos ouvrages imprimés, romans, essais et publications en un seul volume ou en série</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="lg"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
+                              onClick={() => handleLegalDepositClick("periodique")}
+                            >
+                              Périodiques
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Déclarez vos revues, magazines, journaux et toute publication à parution régulière</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="lg"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
+                              onClick={() => handleLegalDepositClick("bd_logiciels")}
+                            >
+                              Audio-visuel & Logiciels
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Déposez vos supports audio-visuels, bases de données, logiciels et documents multimédias</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="lg"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
+                              onClick={() => handleLegalDepositClick("collections_specialisees")}
+                            >
+                              Collections Spécialisées
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Déclarez vos affiches, cartes géographiques, atlas, cartes postales, photos et plans</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <Button
                         size="lg"
                         className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 md:col-span-2"
