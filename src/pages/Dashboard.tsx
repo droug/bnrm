@@ -5,7 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, FileText, Clock, Library, LogOut, Settings, Cog, ArrowLeft, CheckCircle, XCircle, AlertCircle, TrendingUp, Award, BarChart3 } from "lucide-react";
+import { BookOpen, Users, FileText, Clock, Library, LogOut, Settings, Cog, ArrowLeft, CheckCircle, XCircle, AlertCircle, TrendingUp, Award, BarChart3, Eye, Download, Archive, Calendar } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ManuscriptsDashboard } from "@/components/manuscripts/ManuscriptsDashboard";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
@@ -34,9 +36,31 @@ export default function Dashboard() {
     bdLogiciels: 0
   });
 
+  const [reservationStats, setReservationStats] = useState({
+    totalReservations: 0,
+    pending: 0,
+    confirmed: 0,
+    cancelled: 0
+  });
+
+  const [accessRequestStats, setAccessRequestStats] = useState({
+    totalRequests: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0
+  });
+
+  const [subscriptionStats, setSubscriptionStats] = useState({
+    totalSubscriptions: 0,
+    active: 0,
+    expired: 0,
+    pending: 0
+  });
+
   useEffect(() => {
     if (user && profile) {
       fetchCpsStats();
+      fetchAccessRequestStats();
     }
   }, [user, profile]);
 
@@ -106,6 +130,27 @@ export default function Dashboard() {
       console.error('Erreur lors du chargement des statistiques CPS:', error);
     }
   };
+
+
+  const fetchAccessRequestStats = async () => {
+    try {
+      const { data: requests, error } = await supabase
+        .from('access_requests')
+        .select('*');
+
+      if (error) throw error;
+
+      const total = requests?.length || 0;
+      const pending = requests?.filter(r => r.status === 'pending').length || 0;
+      const approved = requests?.filter(r => r.status === 'approved').length || 0;
+      const rejected = requests?.filter(r => r.status === 'rejected').length || 0;
+
+      setAccessRequestStats({ totalRequests: total, pending, approved, rejected });
+    } catch (error) {
+      console.error('Erreur lors du chargement des statistiques de demandes d\'accès:', error);
+    }
+  };
+
 
   if (loading) {
     return (
@@ -203,10 +248,10 @@ export default function Dashboard() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">
-            Bienvenue, {profile?.first_name} !
+            Tableau de bord
           </h1>
           <p className="text-muted-foreground mt-2">
-            Gérez et consultez les ressources de la Bibliothèque Nationale du Royaume du Maroc
+            Vue d'ensemble des statistiques et indicateurs du portail BNRM
           </p>
           
           {!profile?.is_approved && (
@@ -224,12 +269,26 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Indicateurs CPS - Statistiques Globales */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-            <BarChart3 className="h-6 w-6 text-primary" />
-            Indicateurs CPS - Dépôt Légal
-          </h2>
+        {/* Statistiques Accordéon */}
+        <Accordion type="multiple" defaultValue={["depot-legal"]} className="space-y-4">
+          {/* Dépôt Légal */}
+          <AccordionItem value="depot-legal" className="border rounded-lg bg-card">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <FileText className="h-5 w-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <h2 className="text-xl font-bold">Indicateurs - Dépôt Légal</h2>
+                  <p className="text-sm text-muted-foreground">Statistiques des déclarations et attributions</p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="space-y-6 pt-4">
+                {/* Statistiques Globales */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Statistiques Globales</h3>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -286,11 +345,8 @@ export default function Dashboard() {
         </div>
 
         {/* Performance & KPI */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-            <TrendingUp className="h-6 w-6 text-primary" />
-            Performance & KPI
-          </h2>
+        <div>
+          <h3 className="text-lg font-semibold mb-3">Performance & KPI</h3>
           <div className="grid gap-6 md:grid-cols-3">
             <Card className="border-blue-200 bg-blue-50/50">
               <CardHeader>
@@ -340,8 +396,8 @@ export default function Dashboard() {
         </div>
 
         {/* Attribution des Numéros */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Attribution des Numéros</h2>
+        <div>
+          <h3 className="text-lg font-semibold mb-3">Attribution des Numéros</h3>
           <div className="grid gap-6 md:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -398,8 +454,8 @@ export default function Dashboard() {
         </div>
 
         {/* Répartition par Type de Publication */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Répartition par Type de Publication</h2>
+        <div>
+          <h3 className="text-lg font-semibold mb-3">Répartition par Type de Publication</h3>
           <div className="grid gap-6 md:grid-cols-4">
             <Card className="border-l-4 border-l-blue-500">
               <CardHeader>
@@ -452,6 +508,278 @@ export default function Dashboard() {
         </div>
 
         {/* Accès Rapide - Admin */}
+        <PermissionGuard permission="requests.manage">
+          <div className="mt-6 pt-6 border-t">
+            <h3 className="text-lg font-semibold mb-3">Accès Rapide - Gestion</h3>
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card className="border-blue-200 bg-blue-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/legal-deposit')}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <FileText className="h-4 w-4 text-blue-600" />
+                    Backoffice Dépôt Légal
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">En attente</span>
+                    <Badge variant="outline" className="bg-yellow-100 text-yellow-700">
+                      {cpsStats.pendingValidation}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-green-200 bg-green-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/committee')}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Users className="h-4 w-4 text-green-600" />
+                    Comité de Validation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">En cours</span>
+                    <Badge variant="outline" className="bg-blue-100 text-blue-700">
+                      {cpsStats.inProgress}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-purple-200 bg-purple-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/settings')}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Settings className="h-4 w-4 text-purple-600" />
+                    Paramètres Système
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" size="sm" className="w-full">
+                    Accéder aux paramètres
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </PermissionGuard>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Manuscrits */}
+          <AccordionItem value="manuscrits" className="border rounded-lg bg-card">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-gold/10">
+                  <BookOpen className="h-5 w-5 text-gold" />
+                </div>
+                <div className="text-left">
+                  <h2 className="text-xl font-bold">Plateforme Manuscrits</h2>
+                  <p className="text-sm text-muted-foreground">Statistiques des manuscrits et collections</p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="pt-4">
+                <ManuscriptsDashboard />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Réservations */}
+          <AccordionItem value="reservations" className="border rounded-lg bg-card">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-blue-500/10">
+                  <Calendar className="h-5 w-5 text-blue-600" />
+                </div>
+                <div className="text-left">
+                  <h2 className="text-xl font-bold">Réservations</h2>
+                  <p className="text-sm text-muted-foreground">Statistiques des réservations d'ouvrages et espaces</p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="space-y-4 pt-4">
+                <div className="grid gap-4 md:grid-cols-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Réservations</CardTitle>
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{reservationStats.totalReservations}</div>
+                      <p className="text-xs text-muted-foreground">Toutes les réservations</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">En Attente</CardTitle>
+                      <Clock className="h-4 w-4 text-yellow-500" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-yellow-600">{reservationStats.pending}</div>
+                      <p className="text-xs text-muted-foreground">En attente de confirmation</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Confirmées</CardTitle>
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-green-600">{reservationStats.confirmed}</div>
+                      <p className="text-xs text-muted-foreground">Réservations confirmées</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Annulées</CardTitle>
+                      <XCircle className="h-4 w-4 text-red-500" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-red-600">{reservationStats.cancelled}</div>
+                      <p className="text-xs text-muted-foreground">Réservations annulées</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Demandes d'Accès aux Manuscrits */}
+          <AccordionItem value="access-requests" className="border rounded-lg bg-card">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-purple-500/10">
+                  <Users className="h-5 w-5 text-purple-600" />
+                </div>
+                <div className="text-left">
+                  <h2 className="text-xl font-bold">Demandes d'Accès</h2>
+                  <p className="text-sm text-muted-foreground">Statistiques des demandes d'accès aux manuscrits</p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="space-y-4 pt-4">
+                <div className="grid gap-4 md:grid-cols-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Demandes</CardTitle>
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{accessRequestStats.totalRequests}</div>
+                      <p className="text-xs text-muted-foreground">Toutes les demandes</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">En Attente</CardTitle>
+                      <Clock className="h-4 w-4 text-yellow-500" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-yellow-600">{accessRequestStats.pending}</div>
+                      <p className="text-xs text-muted-foreground">En attente de traitement</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Approuvées</CardTitle>
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-green-600">{accessRequestStats.approved}</div>
+                      <p className="text-xs text-muted-foreground">Demandes approuvées</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Rejetées</CardTitle>
+                      <XCircle className="h-4 w-4 text-red-500" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-red-600">{accessRequestStats.rejected}</div>
+                      <p className="text-xs text-muted-foreground">Demandes rejetées</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Abonnements */}
+          <AccordionItem value="subscriptions" className="border rounded-lg bg-card">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-green-500/10">
+                  <Library className="h-5 w-5 text-green-600" />
+                </div>
+                <div className="text-left">
+                  <h2 className="text-xl font-bold">Abonnements</h2>
+                  <p className="text-sm text-muted-foreground">Statistiques des abonnements et adhésions</p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="space-y-4 pt-4">
+                <div className="grid gap-4 md:grid-cols-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Abonnements</CardTitle>
+                      <Library className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{subscriptionStats.totalSubscriptions}</div>
+                      <p className="text-xs text-muted-foreground">Tous les abonnements</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Actifs</CardTitle>
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-green-600">{subscriptionStats.active}</div>
+                      <p className="text-xs text-muted-foreground">Abonnements actifs</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Expirés</CardTitle>
+                      <XCircle className="h-4 w-4 text-red-500" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-red-600">{subscriptionStats.expired}</div>
+                      <p className="text-xs text-muted-foreground">Abonnements expirés</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">En Attente</CardTitle>
+                      <Clock className="h-4 w-4 text-yellow-500" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-yellow-600">{subscriptionStats.pending}</div>
+                      <p className="text-xs text-muted-foreground">En attente de validation</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
+        {/* Global Admin Access - Outside Accordion */}
         <PermissionGuard permission="requests.manage">
           <div className="mt-8">
             <h2 className="text-2xl font-bold mb-4">Accès Rapide - Gestion</h2>
