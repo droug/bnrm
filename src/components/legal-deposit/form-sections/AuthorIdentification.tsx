@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { MonographDepositFormData } from '@/schemas/legalDepositSchema';
 import { NationalityAutocomplete } from '@/components/ui/nationality-autocomplete';
+import { moroccanRegions, getCitiesByRegion } from '@/data/moroccanRegions';
 
 interface AuthorIdentificationProps {
   form: UseFormReturn<MonographDepositFormData>;
@@ -225,6 +226,37 @@ export function AuthorIdentification({
             </FormItem>
           )}
         />
+
+        <div className="md:col-span-2">
+          <FormLabel>Région</FormLabel>
+          <SimpleDropdown
+            value={selectedRegion}
+            onChange={(value) => {
+              setSelectedRegion?.(value);
+              setSelectedCity?.(''); // Reset city when region changes
+            }}
+            placeholder="Sélectionner une région"
+            options={moroccanRegions.map(region => ({
+              value: region.name,
+              label: region.name
+            }))}
+          />
+        </div>
+
+        {selectedRegion && (
+          <div className="md:col-span-2">
+            <FormLabel>Ville</FormLabel>
+            <SimpleDropdown
+              value={selectedCity}
+              onChange={(value) => setSelectedCity?.(value)}
+              placeholder="Sélectionner une ville"
+              options={getCitiesByRegion(selectedRegion).map(city => ({
+                value: city,
+                label: city
+              }))}
+            />
+          </div>
+        )}
 
         <FormField
           control={form.control}
