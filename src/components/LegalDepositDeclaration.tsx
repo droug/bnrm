@@ -2938,7 +2938,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
         <div>
           <h3 className="text-2xl font-semibold mb-4">Pièces à fournir</h3>
           <div className="space-y-4">
-            {renderFileUpload("cover", "Joindre la couverture (format « jpg » moins de 1 MO)", true, "image/jpeg")}
+            {renderFileUpload("cover", "Joindre la couverture ou une capture (format « jpg » moins de 1 MO)", true, "image/jpeg")}
             
             {(depositType === "monographie" || depositType === "periodique") && (
               <>
@@ -2952,7 +2952,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             )}
             
             {depositType === "collections_specialisees" && (
-              renderFileUpload("summary", "Joindre le Résumé de la publication (format « PDF » moins de 2 MO)", true, "application/pdf")
+              renderFileUpload("summary", "Joindre le Résumé de la publication ou descriptif (format « PDF » moins de 2 MO)", true, "application/pdf")
             )}
             
             {renderFileUpload("cin", "Joindre une copie de la CNIE de l'Auteur", true, "image/jpeg,application/pdf")}
