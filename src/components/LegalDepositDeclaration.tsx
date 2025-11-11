@@ -545,7 +545,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Périodicité <span className="text-destructive">*</span></Label>
+                  <Label>Périodicité</Label>
                   <InlineSelect
                     placeholder="Sélectionner"
                     value={isPeriodic}
