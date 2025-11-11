@@ -1155,71 +1155,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             <h3 className="text-2xl font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Nature publication</Label>
-                  <InlineSelect
-                    value={naturePublication}
-                    onChange={setNaturePublication}
-                    placeholder="Sélectionner la nature"
-                    options={[
-                      { value: "etatique", label: "Étatique" },
-                      { value: "non-etatique", label: "Non étatique" },
-                    ]}
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <Label>Type de publication</Label>
                   <InlineSelect
                     placeholder="Sélectionner le type"
                     options={publicationTypePeriodicalOptions}
                   />
                 </div>
-
-                {naturePublication === "non-etatique" && (
-                  <div className="space-y-2">
-                    <Label>Décision du Tribunal</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="file"
-                        accept=".pdf"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            handleFileUpload('court-decision', file);
-                          }
-                        }}
-                        ref={(el) => fileInputRefs.current['court-decision'] = el}
-                        className="hidden"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => fileInputRefs.current['court-decision']?.click()}
-                        className="flex-1"
-                      >
-                        <Upload className="h-4 w-4 mr-2" />
-                        {uploadedFiles['court-decision'] ? uploadedFiles['court-decision'].name : "Choisir un fichier PDF"}
-                      </Button>
-                      {uploadedFiles['court-decision'] && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            const newFiles = { ...uploadedFiles };
-                            delete newFiles['court-decision'];
-                            setUploadedFiles(newFiles);
-                            if (fileInputRefs.current['court-decision']) {
-                              fileInputRefs.current['court-decision'].value = '';
-                            }
-                          }}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                )}
 
                 <div className="space-y-2">
                   <Label>Titre du périodique</Label>
