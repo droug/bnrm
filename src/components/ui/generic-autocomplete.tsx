@@ -39,8 +39,11 @@ export function GenericAutocomplete({
 
   // Initialiser inputValue avec le label correspondant à la valeur
   useEffect(() => {
+    console.log('GenericAutocomplete - useEffect sync:', { value, valuesCount: values.length, inputValue, justSelected: justSelectedRef.current });
+    
     if (!multiple && typeof value === 'string' && value && values.length > 0 && !justSelectedRef.current) {
       const item = values.find((v) => v.value_code === value);
+      console.log('GenericAutocomplete - Found item for value:', { value, item });
       if (item) {
         setInputValue(item.value_label);
       }
@@ -93,6 +96,7 @@ export function GenericAutocomplete({
   }, []);
 
   const handleSelect = (code: string, label: string) => {
+    console.log('GenericAutocomplete - handleSelect called:', { code, label, currentValue: value });
     justSelectedRef.current = true;
     
     if (multiple) {
@@ -103,8 +107,10 @@ export function GenericAutocomplete({
       setInputValue('');
     } else {
       // Mettre à jour immédiatement l'input avec le label complet
+      console.log('GenericAutocomplete - Setting inputValue to:', label);
       setInputValue(label);
       // Appeler onChange avec le code
+      console.log('GenericAutocomplete - Calling onChange with code:', code);
       onChange(code);
     }
     setShowSuggestions(false);
