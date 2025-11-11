@@ -3254,15 +3254,23 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       const successMsg = isBDLogiciels ? "Producteur authentifié avec succès" : "Éditeur authentifié avec succès";
       toast.success(successMsg);
       // Si l'utilisateur est un éditeur/producteur, passer à l'authentification de l'imprimeur/distributeur
+      // Si l'utilisateur est un imprimeur/distributeur, passer au formulaire
       if (userType === "editor" || userType === "producer") {
         setCurrentStep("printer_auth");
+      } else {
+        setCurrentStep("form_filling");
       }
     } else {
       setPrinterData(credentials);
       const successMsg = isBDLogiciels ? "Distributeur authentifié avec succès" : "Imprimeur authentifié avec succès";
       toast.success(successMsg);
-      // Après l'authentification de l'imprimeur/distributeur, passer au formulaire
-      setCurrentStep("form_filling");
+      // Si l'utilisateur est un éditeur/producteur qui remplit les infos de l'imprimeur/distributeur, passer au formulaire
+      // Si l'utilisateur est un imprimeur/distributeur, passer à l'authentification de l'éditeur/producteur
+      if (userType === "editor" || userType === "producer") {
+        setCurrentStep("form_filling");
+      } else {
+        setCurrentStep("editor_auth");
+      }
     }
   };
 
