@@ -86,9 +86,9 @@ export default function BookReservationService() {
         </div>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Réserver un ouvrage</h1>
+          <h1 className="text-3xl font-bold mb-2">Réserver un document</h1>
           <p className="text-muted-foreground">
-            Recherchez et réservez un ouvrage du catalogue de la Bibliothèque Nationale (CBN)
+            Recherchez et réservez un document du catalogue de la Bibliothèque Nationale (CBN)
           </p>
         </div>
 

@@ -173,7 +173,7 @@ export default function ReservationModal({ open, onOpenChange, document }: Reser
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Réserver un ouvrage</DialogTitle>
+          <DialogTitle className="text-xl">Réserver un document</DialogTitle>
           <DialogDescription>
             Demande de réservation pour : <span className="font-semibold text-foreground">{document.title}</span>
           </DialogDescription>

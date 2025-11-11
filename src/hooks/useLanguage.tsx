@@ -49,7 +49,7 @@ const translations = {
     'nav.restoration.request': 'Demande de restauration',
     'nav.online.registration': 'Inscription en ligne / réinscription',
     'nav.consult.national.library': 'Consulter la Bibliothèque Nationale',
-    'nav.reserve.book': 'Réserver un ouvrage',
+    'nav.reserve.book': 'Réserver un document',
     'nav.reserve.spaces': 'Réserver nos espaces',
     'nav.specialized.collections': 'Collections spécialisées',
     'nav.digitized.collections': 'Collections numérisées',

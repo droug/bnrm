@@ -409,7 +409,7 @@ export function BookReservationDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <BookOpen className="h-5 w-5 text-primary" />
-            Réserver un Ouvrage
+            Réserver un document
           </DialogTitle>
           <DialogDescription>
             Complétez ce formulaire pour réserver l'accès à cet ouvrage
