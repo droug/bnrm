@@ -478,7 +478,7 @@ const Index = () => {
                       <div className="w-32 h-2 bg-gradient-neutral mx-auto rounded-full shadow-gold"></div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Tooltip>
+                      <Tooltip delayDuration={200}>
                         <TooltipTrigger asChild>
                           <Button
                             size="lg"
@@ -488,12 +488,12 @@ const Index = () => {
                             Livres
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent side="top" className="bg-slate-900 text-white border-slate-700">
+                        <TooltipContent side="top">
                           <p className="max-w-xs">Déposez vos ouvrages imprimés, romans, essais et publications en un seul volume ou en série</p>
                         </TooltipContent>
                       </Tooltip>
                       
-                      <Tooltip>
+                      <Tooltip delayDuration={200}>
                         <TooltipTrigger asChild>
                           <Button
                             size="lg"
@@ -503,12 +503,12 @@ const Index = () => {
                             Périodiques
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent side="top" className="bg-slate-900 text-white border-slate-700">
+                        <TooltipContent side="top">
                           <p className="max-w-xs">Déclarez vos revues, magazines, journaux et toute publication à parution régulière</p>
                         </TooltipContent>
                       </Tooltip>
                       
-                      <Tooltip>
+                      <Tooltip delayDuration={200}>
                         <TooltipTrigger asChild>
                           <Button
                             size="lg"
@@ -518,12 +518,12 @@ const Index = () => {
                             Audio-visuel & Logiciels
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent side="top" className="bg-slate-900 text-white border-slate-700">
+                        <TooltipContent side="top">
                           <p className="max-w-xs">Déposez vos supports audio-visuels, bases de données, logiciels et documents multimédias</p>
                         </TooltipContent>
                       </Tooltip>
                       
-                      <Tooltip>
+                      <Tooltip delayDuration={200}>
                         <TooltipTrigger asChild>
                           <Button
                             size="lg"
@@ -533,7 +533,7 @@ const Index = () => {
                             Collections Spécialisées
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent side="top" className="bg-slate-900 text-white border-slate-700">
+                        <TooltipContent side="top">
                           <p className="max-w-xs">Déclarez vos affiches, cartes géographiques, atlas, cartes postales, photos et plans</p>
                         </TooltipContent>
                       </Tooltip>
