@@ -488,7 +488,7 @@ const Index = () => {
                             Livres
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>
+                        <TooltipContent side="top" className="bg-slate-900 text-white border-slate-700">
                           <p className="max-w-xs">Déposez vos ouvrages imprimés, romans, essais et publications en un seul volume ou en série</p>
                         </TooltipContent>
                       </Tooltip>
@@ -503,7 +503,7 @@ const Index = () => {
                             Périodiques
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>
+                        <TooltipContent side="top" className="bg-slate-900 text-white border-slate-700">
                           <p className="max-w-xs">Déclarez vos revues, magazines, journaux et toute publication à parution régulière</p>
                         </TooltipContent>
                       </Tooltip>
@@ -518,7 +518,7 @@ const Index = () => {
                             Audio-visuel & Logiciels
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>
+                        <TooltipContent side="top" className="bg-slate-900 text-white border-slate-700">
                           <p className="max-w-xs">Déposez vos supports audio-visuels, bases de données, logiciels et documents multimédias</p>
                         </TooltipContent>
                       </Tooltip>
@@ -533,7 +533,7 @@ const Index = () => {
                             Collections Spécialisées
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>
+                        <TooltipContent side="top" className="bg-slate-900 text-white border-slate-700">
                           <p className="max-w-xs">Déclarez vos affiches, cartes géographiques, atlas, cartes postales, photos et plans</p>
                         </TooltipContent>
                       </Tooltip>
