@@ -181,7 +181,7 @@ const Index = () => {
                   Manuscrits
                 </Button>
               </Link>
-              <Link to="/access-request">
+              <Link to="/abonnements">
                 <Button className="py-6 px-8 bg-amber-50/90 hover:bg-amber-100/90 text-amber-700 shadow-lg backdrop-blur-sm">
                   <Download className="h-5 w-5 mr-2" />
                   Accès
