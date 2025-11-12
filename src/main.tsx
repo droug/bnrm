@@ -23,7 +23,7 @@ createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider delayDuration={300} skipDelayDuration={0}>
+        <TooltipProvider delayDuration={100} skipDelayDuration={200}>
           <AuthProvider>
             <PermissionsProvider>
               <App />

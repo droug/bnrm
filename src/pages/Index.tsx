@@ -478,62 +478,70 @@ const Index = () => {
                       <div className="w-32 h-2 bg-gradient-neutral mx-auto rounded-full shadow-gold"></div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Tooltip delayDuration={200}>
+                      <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button
-                            size="lg"
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
-                            onClick={() => handleLegalDepositClick("monographie")}
-                          >
-                            Livres
-                          </Button>
+                          <div>
+                            <Button
+                              size="lg"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 w-full"
+                              onClick={() => handleLegalDepositClick("monographie")}
+                            >
+                              Livres
+                            </Button>
+                          </div>
                         </TooltipTrigger>
-                        <TooltipContent side="top">
+                        <TooltipContent side="top" sideOffset={8}>
                           <p className="max-w-xs">Déposez vos ouvrages imprimés, romans, essais et publications en un seul volume ou en série</p>
                         </TooltipContent>
                       </Tooltip>
                       
-                      <Tooltip delayDuration={200}>
+                      <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button
-                            size="lg"
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
-                            onClick={() => handleLegalDepositClick("periodique")}
-                          >
-                            Périodiques
-                          </Button>
+                          <div>
+                            <Button
+                              size="lg"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 w-full"
+                              onClick={() => handleLegalDepositClick("periodique")}
+                            >
+                              Périodiques
+                            </Button>
+                          </div>
                         </TooltipTrigger>
-                        <TooltipContent side="top">
+                        <TooltipContent side="top" sideOffset={8}>
                           <p className="max-w-xs">Déclarez vos revues, magazines, journaux et toute publication à parution régulière</p>
                         </TooltipContent>
                       </Tooltip>
                       
-                      <Tooltip delayDuration={200}>
+                      <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button
-                            size="lg"
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
-                            onClick={() => handleLegalDepositClick("bd_logiciels")}
-                          >
-                            Audio-visuel & Logiciels
-                          </Button>
+                          <div>
+                            <Button
+                              size="lg"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 w-full"
+                              onClick={() => handleLegalDepositClick("bd_logiciels")}
+                            >
+                              Audio-visuel & Logiciels
+                            </Button>
+                          </div>
                         </TooltipTrigger>
-                        <TooltipContent side="top">
+                        <TooltipContent side="top" sideOffset={8}>
                           <p className="max-w-xs">Déposez vos supports audio-visuels, bases de données, logiciels et documents multimédias</p>
                         </TooltipContent>
                       </Tooltip>
                       
-                      <Tooltip delayDuration={200}>
+                      <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button
-                            size="lg"
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
-                            onClick={() => handleLegalDepositClick("collections_specialisees")}
-                          >
-                            Collections Spécialisées
-                          </Button>
+                          <div>
+                            <Button
+                              size="lg"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 w-full"
+                              onClick={() => handleLegalDepositClick("collections_specialisees")}
+                            >
+                              Collections Spécialisées
+                            </Button>
+                          </div>
                         </TooltipTrigger>
-                        <TooltipContent side="top">
+                        <TooltipContent side="top" sideOffset={8}>
                           <p className="max-w-xs">Déclarez vos affiches, cartes géographiques, atlas, cartes postales, photos et plans</p>
                         </TooltipContent>
                       </Tooltip>
