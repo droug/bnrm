@@ -127,9 +127,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [publisherNature, setPublisherNature] = useState<string>("");
   const [editorIdentification, setEditorIdentification] = useState<string>("");
   const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
-  const [isNewPublisher, setIsNewPublisher] = useState(false);
-  const [newPublisherName, setNewPublisherName] = useState<string>("");
-  const [publisherGoogleMapsLink, setPublisherGoogleMapsLink] = useState<string>("");
   const [publicationDate, setPublicationDate] = useState<Date>();
   const [publicationDateInput, setPublicationDateInput] = useState<string>("");
   const [publicationType, setPublicationType] = useState<string>("");
@@ -883,21 +880,20 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <h3 className="text-2xl font-semibold mb-4">Identification de l'Éditeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Nom <span className="text-destructive">*</span></Label>
-                  {!selectedPublisher && !isNewPublisher ? (
+                  <Label>Éditeur <span className="text-destructive">*</span></Label>
+                  {!selectedPublisher ? (
                     <div className="relative">
                       <Input
                         placeholder="Rechercher un éditeur..."
                         value={publisherSearch}
                         onChange={(e) => setPublisherSearch(e.target.value)}
-                        onFocus={() => setPublisherSearch(publisherSearch || " ")}
                         className="pr-10"
                       />
                       {publisherSearch && (
                         <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
                           {publishers
                             .filter(pub => 
-                              pub.name.toLowerCase().includes(publisherSearch.trim().toLowerCase())
+                              pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
                             )
                             .map((pub) => (
                               <button
@@ -907,7 +903,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 onClick={() => {
                                   setSelectedPublisher(pub);
                                   setPublisherSearch('');
-                                  setIsNewPublisher(false);
                                 }}
                               >
                                 <div className="flex flex-col">
@@ -920,41 +915,42 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 </div>
                               </button>
                             ))}
-                          <button
-                            type="button"
-                            className="w-full text-left px-4 py-2 hover:bg-accent transition-colors border-t font-medium"
-                            onClick={() => {
-                              setIsNewPublisher(true);
-                              setSelectedPublisher(null);
-                              setPublisherSearch('');
-                            }}
-                          >
-                            ✚ Autre
-                          </button>
+                          {publishers.filter(pub => 
+                            pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
+                          ).length === 0 && (
+                            <div className="px-4 py-3">
+                              <div className="text-sm text-muted-foreground mb-2">
+                                Aucun éditeur trouvé
+                              </div>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={async () => {
+                                  const newName = publisherSearch;
+                                  const { data, error } = await supabase
+                                    .from('publishers')
+                                    .insert([{ name: newName }])
+                                    .select()
+                                    .single();
+                                  
+                                  if (error) {
+                                    toast.error('Erreur lors de l\'ajout de l\'éditeur');
+                                  } else {
+                                    setPublishers([...publishers, data]);
+                                    setSelectedPublisher(data);
+                                    setPublisherSearch('');
+                                    toast.success('Éditeur ajouté avec succès');
+                                  }
+                                }}
+                              >
+                                + Ajouter "{publisherSearch}"
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       )}
-                    </div>
-                  ) : isNewPublisher ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between p-3 bg-primary/10 rounded-md">
-                        <span className="text-sm font-medium">Nouvel éditeur</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setIsNewPublisher(false);
-                            setNewPublisherName('');
-                          }}
-                        >
-                          Modifier
-                        </Button>
-                      </div>
-                      <Input
-                        placeholder="Nom de l'éditeur"
-                        value={newPublisherName}
-                        onChange={(e) => setNewPublisherName(e.target.value)}
-                      />
                     </div>
                   ) : (
                     <div className="p-3 bg-primary/10 rounded-md flex justify-between items-start">
@@ -975,43 +971,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          setSelectedPublisher(null);
-                          setPublisherSearch('');
-                        }}
+                        onClick={() => setSelectedPublisher(null)}
                       >
                         Modifier
                       </Button>
                     </div>
                   )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Lien Google Maps</Label>
-                  <Input
-                    type="url"
-                    placeholder="https://maps.google.com/..."
-                    value={publisherGoogleMapsLink}
-                    onChange={(e) => setPublisherGoogleMapsLink(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Copiez le lien de localisation depuis Google Maps
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Téléphone</Label>
-                  <Input
-                    placeholder="Numéro de téléphone"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input
-                    type="email"
-                    placeholder="Adresse email"
-                  />
                 </div>
 
                 <div className="space-y-2">
@@ -1513,21 +1478,20 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 )}
                 
                 <div className="space-y-2">
-                  <Label>Nom <span className="text-destructive">*</span></Label>
-                  {!selectedPublisher && !isNewPublisher ? (
+                  <Label>Identification de l'Éditeur <span className="text-destructive">*</span></Label>
+                  {!selectedPublisher ? (
                     <div className="relative">
                       <Input
                         placeholder="Rechercher un éditeur..."
                         value={publisherSearch}
                         onChange={(e) => setPublisherSearch(e.target.value)}
-                        onFocus={() => setPublisherSearch(publisherSearch || " ")}
                         className="pr-10"
                       />
                       {publisherSearch && (
                         <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
                           {publishers
                             .filter(pub => 
-                              pub.name.toLowerCase().includes(publisherSearch.trim().toLowerCase())
+                              pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
                             )
                             .map((pub) => (
                               <button
@@ -1537,7 +1501,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 onClick={() => {
                                   setSelectedPublisher(pub);
                                   setPublisherSearch('');
-                                  setIsNewPublisher(false);
                                 }}
                               >
                                 <div className="flex flex-col">
@@ -1550,41 +1513,42 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 </div>
                               </button>
                             ))}
-                          <button
-                            type="button"
-                            className="w-full text-left px-4 py-2 hover:bg-accent transition-colors border-t font-medium"
-                            onClick={() => {
-                              setIsNewPublisher(true);
-                              setSelectedPublisher(null);
-                              setPublisherSearch('');
-                            }}
-                          >
-                            ✚ Autre
-                          </button>
+                          {publishers.filter(pub => 
+                            pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
+                          ).length === 0 && (
+                            <div className="px-4 py-3">
+                              <div className="text-sm text-muted-foreground mb-2">
+                                Aucun éditeur trouvé
+                              </div>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={async () => {
+                                  const newName = publisherSearch;
+                                  const { data, error } = await supabase
+                                    .from('publishers')
+                                    .insert([{ name: newName }])
+                                    .select()
+                                    .single();
+                                  
+                                  if (error) {
+                                    toast.error('Erreur lors de l\'ajout de l\'éditeur');
+                                  } else {
+                                    setPublishers([...publishers, data]);
+                                    setSelectedPublisher(data);
+                                    setPublisherSearch('');
+                                    toast.success('Éditeur ajouté avec succès');
+                                  }
+                                }}
+                              >
+                                + Ajouter "{publisherSearch}"
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       )}
-                    </div>
-                  ) : isNewPublisher ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between p-3 bg-primary/10 rounded-md">
-                        <span className="text-sm font-medium">Nouvel éditeur</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setIsNewPublisher(false);
-                            setNewPublisherName('');
-                          }}
-                        >
-                          Modifier
-                        </Button>
-                      </div>
-                      <Input
-                        placeholder="Nom de l'éditeur"
-                        value={newPublisherName}
-                        onChange={(e) => setNewPublisherName(e.target.value)}
-                      />
                     </div>
                   ) : (
                     <div className="p-3 bg-primary/10 rounded-md flex justify-between items-start">
@@ -1605,28 +1569,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          setSelectedPublisher(null);
-                          setPublisherSearch('');
-                        }}
+                        onClick={() => setSelectedPublisher(null)}
                       >
                         Modifier
                       </Button>
                     </div>
                   )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Lien Google Maps</Label>
-                  <Input
-                    type="url"
-                    placeholder="https://maps.google.com/..."
-                    value={publisherGoogleMapsLink}
-                    onChange={(e) => setPublisherGoogleMapsLink(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Copiez le lien de localisation depuis Google Maps
-                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -2811,21 +2759,20 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <h3 className="text-2xl font-semibold mb-4">Identification de l'Éditeur</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Nom <span className="text-destructive">*</span></Label>
-                  {!selectedPublisher && !isNewPublisher ? (
+                  <Label>Éditeur <span className="text-destructive">*</span></Label>
+                  {!selectedPublisher ? (
                     <div className="relative">
                       <Input
                         placeholder="Rechercher un éditeur..."
                         value={publisherSearch}
                         onChange={(e) => setPublisherSearch(e.target.value)}
-                        onFocus={() => setPublisherSearch(publisherSearch || " ")}
                         className="pr-10"
                       />
                       {publisherSearch && (
                         <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
                           {publishers
                             .filter(pub => 
-                              pub.name.toLowerCase().includes(publisherSearch.trim().toLowerCase())
+                              pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
                             )
                             .map((pub) => (
                               <button
@@ -2835,7 +2782,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 onClick={() => {
                                   setSelectedPublisher(pub);
                                   setPublisherSearch('');
-                                  setIsNewPublisher(false);
                                 }}
                               >
                                 <div className="flex flex-col">
@@ -2848,41 +2794,42 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 </div>
                               </button>
                             ))}
-                          <button
-                            type="button"
-                            className="w-full text-left px-4 py-2 hover:bg-accent transition-colors border-t font-medium"
-                            onClick={() => {
-                              setIsNewPublisher(true);
-                              setSelectedPublisher(null);
-                              setPublisherSearch('');
-                            }}
-                          >
-                            ✚ Autre
-                          </button>
+                          {publishers.filter(pub => 
+                            pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
+                          ).length === 0 && (
+                            <div className="px-4 py-3">
+                              <div className="text-sm text-muted-foreground mb-2">
+                                Aucun éditeur trouvé
+                              </div>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={async () => {
+                                  const newName = publisherSearch;
+                                  const { data, error } = await supabase
+                                    .from('publishers')
+                                    .insert([{ name: newName }])
+                                    .select()
+                                    .single();
+                                  
+                                  if (error) {
+                                    toast.error('Erreur lors de l\'ajout de l\'éditeur');
+                                  } else {
+                                    setPublishers([...publishers, data]);
+                                    setSelectedPublisher(data);
+                                    setPublisherSearch('');
+                                    toast.success('Éditeur ajouté avec succès');
+                                  }
+                                }}
+                              >
+                                + Ajouter "{publisherSearch}"
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       )}
-                    </div>
-                  ) : isNewPublisher ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between p-3 bg-primary/10 rounded-md">
-                        <span className="text-sm font-medium">Nouvel éditeur</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setIsNewPublisher(false);
-                            setNewPublisherName('');
-                          }}
-                        >
-                          Modifier
-                        </Button>
-                      </div>
-                      <Input
-                        placeholder="Nom de l'éditeur"
-                        value={newPublisherName}
-                        onChange={(e) => setNewPublisherName(e.target.value)}
-                      />
                     </div>
                   ) : (
                     <div className="p-3 bg-primary/10 rounded-md flex justify-between items-start">
@@ -2903,28 +2850,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          setSelectedPublisher(null);
-                          setPublisherSearch('');
-                        }}
+                        onClick={() => setSelectedPublisher(null)}
                       >
                         Modifier
                       </Button>
                     </div>
                   )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Lien Google Maps</Label>
-                  <Input
-                    type="url"
-                    placeholder="https://maps.google.com/..."
-                    value={publisherGoogleMapsLink}
-                    onChange={(e) => setPublisherGoogleMapsLink(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Copiez le lien de localisation depuis Google Maps
-                  </p>
                 </div>
 
                 <div className="space-y-2">
