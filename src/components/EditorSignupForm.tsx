@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,8 +7,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, User, Building } from "lucide-react";
+import { Upload, User, Building, X, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EditorFormData {
   type: "morale" | "physique";
@@ -16,7 +17,7 @@ interface EditorFormData {
   // Commun
   email: string;
   phone: string;
-  address: string;
+  googleMapsLink: string;
   region: string;
   city: string;
   
@@ -26,6 +27,8 @@ interface EditorFormData {
   nameFr?: string;
   commerceRegistry?: string;
   contactPerson?: string;
+  selectedEditor?: string;
+  isOtherEditor?: boolean;
   
   // Personne physique
   cin?: string;
@@ -42,10 +45,29 @@ const EditorSignupForm = () => {
     nature: "",
     email: "",
     phone: "+212 ",
-    address: "",
+    googleMapsLink: "",
     region: "",
     city: "",
+    isOtherEditor: false,
   });
+  const [editors, setEditors] = useState<Array<{ id: string; name: string }>>([]);
+  const [editorSearch, setEditorSearch] = useState("");
+  const [showEditorDropdown, setShowEditorDropdown] = useState(false);
+
+  useEffect(() => {
+    fetchEditors();
+  }, []);
+
+  const fetchEditors = async () => {
+    const { data, error } = await supabase
+      .from('publishers')
+      .select('id, name')
+      .order('name');
+    
+    if (!error && data) {
+      setEditors(data);
+    }
+  };
 
   const handleFileUpload = (field: string, file: File | null) => {
     setFormData(prev => ({ ...prev, [field]: file }));
@@ -55,7 +77,7 @@ const EditorSignupForm = () => {
     e.preventDefault();
     
     // Validation basique
-    if (!formData.email || !formData.phone || !formData.address) {
+    if (!formData.email || !formData.phone || !formData.googleMapsLink) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -71,6 +93,10 @@ const EditorSignupForm = () => {
       description: "Votre demande d'inscription éditeur a été soumise avec succès.",
     });
   };
+
+  const filteredEditors = editors.filter(editor =>
+    editor.name.toLowerCase().includes(editorSearch.toLowerCase())
+  );
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
@@ -132,27 +158,63 @@ const EditorSignupForm = () => {
           <Tabs value={formData.type} className="w-full">
             <TabsContent value="morale" className="space-y-4">
               {/* Formulaire personne morale */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="nameAr">Nom de l'éditeur (Arabe) *</Label>
-                  <Input
-                    id="nameAr"
-                    value={formData.nameAr || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, nameAr: e.target.value }))}
-                    placeholder="اسم الناشر"
-                    dir="rtl"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="nameFr">Nom de l'éditeur (Français) *</Label>
-                  <Input
-                    id="nameFr"
-                    value={formData.nameFr || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, nameFr: e.target.value }))}
-                    placeholder="Nom de l'éditeur"
-                  />
+              <div className="space-y-2">
+                <Label htmlFor="editorName">Nom de l'éditeur *</Label>
+                <div className="relative">
+                  <Select
+                    value={formData.isOtherEditor ? "autre" : formData.selectedEditor}
+                    onValueChange={(value) => {
+                      if (value === "autre") {
+                        setFormData(prev => ({ ...prev, isOtherEditor: true, selectedEditor: undefined }));
+                      } else {
+                        const editor = editors.find(e => e.id === value);
+                        setFormData(prev => ({ 
+                          ...prev, 
+                          isOtherEditor: false, 
+                          selectedEditor: value,
+                          nameFr: editor?.name || ""
+                        }));
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionnez un éditeur" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-50">
+                      {editors.map(editor => (
+                        <SelectItem key={editor.id} value={editor.id}>
+                          {editor.name}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="autre">Autre</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
+
+              {formData.isOtherEditor && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="nameAr">Nom de l'éditeur (Arabe) *</Label>
+                    <Input
+                      id="nameAr"
+                      value={formData.nameAr || ""}
+                      onChange={(e) => setFormData(prev => ({ ...prev, nameAr: e.target.value }))}
+                      placeholder="اسم الناشر"
+                      dir="rtl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="nameFr">Nom de l'éditeur (Français) *</Label>
+                    <Input
+                      id="nameFr"
+                      value={formData.nameFr || ""}
+                      onChange={(e) => setFormData(prev => ({ ...prev, nameFr: e.target.value }))}
+                      placeholder="Nom de l'éditeur"
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="logo">Logo de l'éditeur</Label>
@@ -295,14 +357,22 @@ const EditorSignupForm = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Adresse physique *</Label>
-              <Textarea
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                placeholder="Adresse complète"
-                rows={3}
-              />
+              <Label htmlFor="googleMapsLink">Lien Google Maps *</Label>
+              <div className="flex gap-2">
+                <div className="flex items-center justify-center px-3 py-2 border border-input rounded-lg bg-muted/30">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <Input
+                  id="googleMapsLink"
+                  value={formData.googleMapsLink}
+                  onChange={(e) => setFormData(prev => ({ ...prev, googleMapsLink: e.target.value }))}
+                  placeholder="https://maps.google.com/?q=..."
+                  className="flex-1"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Collez le lien de localisation Google Maps de votre établissement
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
