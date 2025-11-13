@@ -10,7 +10,22 @@ interface LegalDepositDetailsViewProps {
 
 export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProps) {
   const renderAuthorInfo = () => {
-    if (!request.author_name && !request.author_type) return null;
+    const metadata = request.metadata || {};
+    const customFields = metadata.customFields || {};
+    
+    // Check if we have any author information
+    const hasAuthorInfo = request.author_name || 
+                         customFields.author_name || 
+                         customFields.author_type || 
+                         metadata.authorGender ||
+                         customFields.author_nationality ||
+                         customFields.author_phone ||
+                         customFields.author_email ||
+                         customFields.author_region ||
+                         customFields.author_city ||
+                         customFields.author_address;
+
+    if (!hasAuthorInfo) return null;
 
     return (
       <Card>
@@ -18,29 +33,54 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
           <CardTitle className="text-base">Identification de l'auteur</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          {request.author_name && (
+          {(customFields.author_name || request.author_name) && (
             <div>
-              <strong>Nom:</strong> {request.author_name}
+              <strong>Nom de l'auteur:</strong> {customFields.author_name || request.author_name}
             </div>
           )}
-          {request.author_type && (
+          {customFields.author_type && (
             <div>
-              <strong>Type d'auteur:</strong> <Badge variant="outline">{request.author_type}</Badge>
+              <strong>Type d'auteur:</strong> <Badge variant="outline">{customFields.author_type}</Badge>
             </div>
           )}
-          {request.author_nationality && (
+          {metadata.authorGender && (
             <div>
-              <strong>Nationalité:</strong> {request.author_nationality}
+              <strong>Genre:</strong> {metadata.authorGender === 'homme' ? 'Homme' : 'Femme'}
             </div>
           )}
-          {request.author_gender && (
+          {customFields.author_nationality && (
             <div>
-              <strong>Genre:</strong> {request.author_gender}
+              <strong>Nationalité:</strong> {customFields.author_nationality}
             </div>
           )}
-          {request.representative_name && (
+          {customFields.author_region && (
             <div>
-              <strong>Représentant:</strong> {request.representative_name}
+              <strong>Région:</strong> {customFields.author_region}
+            </div>
+          )}
+          {customFields.author_city && (
+            <div>
+              <strong>Ville:</strong> {customFields.author_city}
+            </div>
+          )}
+          {customFields.author_address && (
+            <div>
+              <strong>Adresse:</strong> {customFields.author_address}
+            </div>
+          )}
+          {customFields.author_phone && (
+            <div>
+              <strong>Téléphone:</strong> {customFields.author_phone}
+            </div>
+          )}
+          {customFields.author_email && (
+            <div>
+              <strong>Email:</strong> {customFields.author_email}
+            </div>
+          )}
+          {metadata.representative_name && (
+            <div>
+              <strong>Représentant:</strong> {metadata.representative_name}
             </div>
           )}
         </CardContent>
@@ -49,7 +89,23 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
   };
 
   const renderEditorInfo = () => {
-    if (!request.editor_name && !request.editor_type) return null;
+    const metadata = request.metadata || {};
+    const publisher = metadata.publisher || {};
+    const editor = metadata.editor || {};
+    
+    // Check if we have any editor/publisher information
+    const hasEditorInfo = publisher.name || 
+                         editor.name || 
+                         publisher.city || 
+                         publisher.country ||
+                         publisher.publisher_type ||
+                         editor.address ||
+                         editor.phone ||
+                         editor.email ||
+                         editor.publicationDate ||
+                         metadata.editorIdentification;
+
+    if (!hasEditorInfo) return null;
 
     return (
       <Card>
@@ -57,39 +113,49 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
           <CardTitle className="text-base">Identification de l'éditeur</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          {request.editor_name && (
+          {(publisher.name || editor.name) && (
             <div>
-              <strong>Éditeur:</strong> {request.editor_name}
+              <strong>Éditeur:</strong> {publisher.name || editor.name}
             </div>
           )}
-          {request.editor_type && (
+          {publisher.publisher_type && (
             <div>
-              <strong>Type d'éditeur:</strong> <Badge variant="outline">{request.editor_type}</Badge>
+              <strong>Type d'éditeur:</strong> <Badge variant="outline">{publisher.publisher_type}</Badge>
             </div>
           )}
-          {request.editor_address && (
+          {metadata.editorIdentification && (
             <div>
-              <strong>Adresse:</strong> {request.editor_address}
+              <strong>Identification de l'éditeur:</strong> <Badge>{metadata.editorIdentification}</Badge>
             </div>
           )}
-          {request.editor_city && (
+          {publisher.city && (
             <div>
-              <strong>Ville:</strong> {request.editor_city}
+              <strong>Ville:</strong> {publisher.city}
             </div>
           )}
-          {request.editor_phone && (
+          {publisher.country && (
             <div>
-              <strong>Téléphone:</strong> {request.editor_phone}
+              <strong>Pays:</strong> {publisher.country}
             </div>
           )}
-          {request.editor_email && (
+          {(editor.address || publisher.address) && (
             <div>
-              <strong>Email:</strong> {request.editor_email}
+              <strong>Adresse:</strong> {editor.address || publisher.address}
             </div>
           )}
-          {request.expected_publication_date && (
+          {(editor.phone || publisher.phone) && (
             <div>
-              <strong>Date de publication prévue:</strong> {request.expected_publication_date}
+              <strong>Téléphone:</strong> {editor.phone || publisher.phone}
+            </div>
+          )}
+          {(editor.email || publisher.email) && (
+            <div>
+              <strong>Email:</strong> {editor.email || publisher.email}
+            </div>
+          )}
+          {editor.publicationDate && (
+            <div>
+              <strong>Date de publication prévue:</strong> {editor.publicationDate}
             </div>
           )}
         </CardContent>
@@ -98,7 +164,18 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
   };
 
   const renderPrinterInfo = () => {
-    if (!request.printer_name && !request.printer_type) return null;
+    const metadata = request.metadata || {};
+    const printer = metadata.printer || {};
+    
+    // Check if we have any printer information
+    const hasPrinterInfo = printer.name || 
+                          metadata.printRun ||
+                          printer.address ||
+                          printer.phone ||
+                          printer.email ||
+                          printer.printRun;
+
+    if (!hasPrinterInfo) return null;
 
     return (
       <Card>
@@ -106,19 +183,29 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
           <CardTitle className="text-base">Identification de l'imprimeur</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          {request.printer_name && (
+          {printer.name && (
             <div>
-              <strong>Imprimerie:</strong> {request.printer_name}
+              <strong>Imprimerie:</strong> {printer.name}
             </div>
           )}
-          {request.printer_type && (
+          {metadata.printRun && (
             <div>
-              <strong>Type d'imprimeur:</strong> <Badge variant="outline">{request.printer_type}</Badge>
+              <strong>Nombre de tirage:</strong> {metadata.printRun}
             </div>
           )}
-          {request.print_run_number && (
+          {printer.address && (
             <div>
-              <strong>Nombre de tirage:</strong> {request.print_run_number}
+              <strong>Adresse:</strong> {printer.address}
+            </div>
+          )}
+          {printer.phone && (
+            <div>
+              <strong>Téléphone:</strong> {printer.phone}
+            </div>
+          )}
+          {printer.email && (
+            <div>
+              <strong>Email:</strong> {printer.email}
             </div>
           )}
         </CardContent>
@@ -127,7 +214,10 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
   };
 
   const renderDistributorInfo = () => {
-    if (!request.distributor_name) return null;
+    const metadata = request.metadata || {};
+    const distributor = metadata.distributor;
+
+    if (!distributor) return null;
 
     return (
       <Card>
@@ -135,14 +225,29 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
           <CardTitle className="text-base">Identification du distributeur</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          {request.distributor_name && (
+          {distributor.name && (
             <div>
-              <strong>Distributeur:</strong> {request.distributor_name}
+              <strong>Distributeur:</strong> {distributor.name}
             </div>
           )}
-          {request.print_run_number && (
+          {distributor.printRun && (
             <div>
-              <strong>Nombre de tirage:</strong> {request.print_run_number}
+              <strong>Nombre de tirage:</strong> {distributor.printRun}
+            </div>
+          )}
+          {distributor.address && (
+            <div>
+              <strong>Adresse:</strong> {distributor.address}
+            </div>
+          )}
+          {distributor.phone && (
+            <div>
+              <strong>Téléphone:</strong> {distributor.phone}
+            </div>
+          )}
+          {distributor.email && (
+            <div>
+              <strong>Email:</strong> {distributor.email}
             </div>
           )}
         </CardContent>
@@ -151,6 +256,8 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
   };
 
   const renderPublicationInfo = () => {
+    const metadata = request.metadata || {};
+    
     return (
       <Card>
         <CardHeader>
@@ -167,9 +274,9 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
               <strong>Sous-titre:</strong> {request.subtitle}
             </div>
           )}
-          {request.publication_type && (
+          {metadata.publicationType && (
             <div>
-              <strong>Type de publication:</strong> <Badge>{request.publication_type}</Badge>
+              <strong>Type de publication:</strong> <Badge>{metadata.publicationType}</Badge>
             </div>
           )}
           {request.support_type && (
@@ -177,39 +284,44 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
               <strong>Type de support:</strong> <Badge>{request.support_type}</Badge>
             </div>
           )}
-          {request.publication_discipline && (
+          {request.monograph_type && (
             <div>
-              <strong>Discipline:</strong> {request.publication_discipline}
+              <strong>Type de monographie:</strong> <Badge>{request.monograph_type}</Badge>
             </div>
           )}
-          {request.publication_language && (
+          {metadata.publicationDiscipline && (
             <div>
-              <strong>Langue:</strong> {request.publication_language}
+              <strong>Discipline:</strong> {metadata.publicationDiscipline}
             </div>
           )}
-          {request.pages_count && (
+          {(request.language || metadata.language) && (
             <div>
-              <strong>Nombre de pages:</strong> {request.pages_count}
+              <strong>Langue:</strong> {request.language || metadata.language}
             </div>
           )}
-          {request.format && (
+          {request.page_count && (
             <div>
-              <strong>Format:</strong> {request.format}
+              <strong>Nombre de pages:</strong> {request.page_count}
             </div>
           )}
-          {request.edition_number && (
+          {metadata.format && (
             <div>
-              <strong>Numéro d'édition:</strong> {request.edition_number}
+              <strong>Format:</strong> {metadata.format}
             </div>
           )}
-          {request.multiple_volumes !== undefined && (
+          {metadata.editionNumber && (
             <div>
-              <strong>Publication en plusieurs volumes:</strong> {request.multiple_volumes ? "Oui" : "Non"}
+              <strong>Numéro d'édition:</strong> {metadata.editionNumber}
             </div>
           )}
-          {request.volume_number && (
+          {metadata.multipleVolumes !== undefined && (
             <div>
-              <strong>Numéro du volume:</strong> {request.volume_number}
+              <strong>Publication en plusieurs volumes:</strong> {metadata.multipleVolumes === 'oui' ? "Oui" : "Non"}
+            </div>
+          )}
+          {metadata.volumeNumber && (
+            <div>
+              <strong>Numéro du volume:</strong> {metadata.volumeNumber}
             </div>
           )}
           {request.isbn && (
@@ -222,27 +334,52 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
               <strong>ISSN:</strong> {request.issn}
             </div>
           )}
-          {request.operational_url && (
+          {request.ismn && (
+            <div>
+              <strong>ISMN:</strong> {request.ismn}
+            </div>
+          )}
+          {metadata.operationalUrl && (
             <div>
               <strong>URL Opérationnelle:</strong>{" "}
-              <a href={request.operational_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                {request.operational_url}
+              <a href={metadata.operationalUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                {metadata.operationalUrl}
               </a>
             </div>
           )}
-          {request.has_scale !== undefined && (
+          {metadata.hasScale !== undefined && (
             <div>
-              <strong>Présence échelle:</strong> {request.has_scale ? "Oui" : "Non"}
+              <strong>Présence échelle:</strong> {metadata.hasScale === 'oui' ? "Oui" : "Non"}
             </div>
           )}
-          {request.has_legend !== undefined && (
+          {metadata.hasLegend !== undefined && (
             <div>
-              <strong>Présence de légende:</strong> {request.has_legend ? "Oui" : "Non"}
+              <strong>Présence de légende:</strong> {metadata.hasLegend === 'oui' ? "Oui" : "Non"}
             </div>
           )}
-          {request.collection_title && (
+          {(metadata.collectionTitle || request.collection_title) && (
             <div>
-              <strong>Titre de la collection:</strong> {request.collection_title}
+              <strong>Titre de la collection:</strong> {metadata.collectionTitle || request.collection_title}
+            </div>
+          )}
+          {metadata.periodicity && (
+            <div>
+              <strong>Périodicité:</strong> {metadata.periodicity}
+            </div>
+          )}
+          {metadata.hasAccompanyingMaterial !== undefined && (
+            <div>
+              <strong>Matériel d'accompagnement:</strong> {metadata.hasAccompanyingMaterial === 'yes' ? "Oui" : "Non"}
+            </div>
+          )}
+          {metadata.accompanyingMaterialType && (
+            <div>
+              <strong>Type de matériel d'accompagnement:</strong> {metadata.accompanyingMaterialType}
+            </div>
+          )}
+          {request.publication_date && (
+            <div>
+              <strong>Date de publication:</strong> {format(new Date(request.publication_date), "dd/MM/yyyy", { locale: fr })}
             </div>
           )}
         </CardContent>
@@ -252,7 +389,26 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
 
   const renderDocuments = () => {
     const documents = [];
+    const metadata = request.metadata || {};
+    const documentsUrls = request.documents_urls || {};
     
+    // Documents from documents_urls field
+    if (documentsUrls.cin && documentsUrls.cin.url) {
+      documents.push({ label: 'CNIE de l\'auteur', url: documentsUrls.cin.url });
+    }
+    if (documentsUrls.summary && documentsUrls.summary.url) {
+      documents.push({ label: 'Résumé du document', url: documentsUrls.summary.url });
+    }
+    if (documentsUrls.cover && documentsUrls.cover.url) {
+      documents.push({ label: 'Couverture', url: documentsUrls.cover.url });
+    }
+    if (documentsUrls.abstract && documentsUrls.abstract.url) {
+      documents.push({ label: 'Résumé', url: documentsUrls.abstract.url });
+    }
+    if (documentsUrls.court_decision && documentsUrls.court_decision.url) {
+      documents.push({ label: 'Décision du Tribunal', url: documentsUrls.court_decision.url });
+    }
+
     // Documents from direct fields
     if (request.cnie_document) {
       documents.push({ label: 'CNIE de l\'auteur', url: request.cnie_document });
@@ -265,22 +421,20 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
     }
 
     // Documents from metadata
-    if (request.metadata) {
-      if (request.metadata.cnie_document) {
-        documents.push({ label: 'CNIE de l\'auteur', url: request.metadata.cnie_document });
-      }
-      if (request.metadata.summary_document) {
-        documents.push({ label: 'Résumé du document', url: request.metadata.summary_document });
-      }
-      if (request.metadata.court_decision_document) {
-        documents.push({ label: 'Décision du Tribunal', url: request.metadata.court_decision_document });
-      }
-      if (request.metadata.supporting_document) {
-        documents.push({ label: 'Document justificatif', url: request.metadata.supporting_document });
-      }
-      if (request.metadata.additional_document) {
-        documents.push({ label: 'Document additionnel', url: request.metadata.additional_document });
-      }
+    if (metadata.cnie_document) {
+      documents.push({ label: 'CNIE de l\'auteur', url: metadata.cnie_document });
+    }
+    if (metadata.summary_document) {
+      documents.push({ label: 'Résumé du document', url: metadata.summary_document });
+    }
+    if (metadata.court_decision_document) {
+      documents.push({ label: 'Décision du Tribunal', url: metadata.court_decision_document });
+    }
+    if (metadata.supporting_document) {
+      documents.push({ label: 'Document justificatif', url: metadata.supporting_document });
+    }
+    if (metadata.additional_document) {
+      documents.push({ label: 'Document additionnel', url: metadata.additional_document });
     }
 
     // Remove duplicates
@@ -316,6 +470,14 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
   };
 
   const renderAdministrativeInfo = () => {
+    const metadata = request.metadata || {};
+    const depositTypeLabels: Record<string, string> = {
+      'monographie': 'Livres',
+      'periodique': 'Périodiques',
+      'bd_logiciels': 'Audio-visuel & Logiciels',
+      'collections_specialisees': 'Collections Spécialisées'
+    };
+    
     return (
       <Card>
         <CardHeader>
@@ -327,14 +489,37 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
               <strong>N° de demande:</strong> <span className="font-mono">{request.request_number}</span>
             </div>
           )}
-          {request.deposit_type && (
+          {metadata.depositType && (
             <div>
-              <strong>Type de dépôt:</strong> <Badge>{request.deposit_type}</Badge>
+              <strong>Type de dépôt:</strong>{" "}
+              <Badge variant="secondary">
+                {depositTypeLabels[metadata.depositType] || metadata.depositType}
+              </Badge>
             </div>
           )}
           {request.status && (
             <div>
               <strong>Statut:</strong> <Badge variant="outline">{request.status}</Badge>
+            </div>
+          )}
+          {request.dl_number && (
+            <div>
+              <strong>Numéro DL:</strong> <span className="font-mono">{request.dl_number}</span>
+            </div>
+          )}
+          {request.isbn_assigned && (
+            <div>
+              <strong>ISBN attribué:</strong> <span className="font-mono">{request.isbn_assigned}</span>
+            </div>
+          )}
+          {request.issn_assigned && (
+            <div>
+              <strong>ISSN attribué:</strong> <span className="font-mono">{request.issn_assigned}</span>
+            </div>
+          )}
+          {request.ismn_assigned && (
+            <div>
+              <strong>ISMN attribué:</strong> <span className="font-mono">{request.ismn_assigned}</span>
             </div>
           )}
           {request.created_at && (
@@ -345,6 +530,16 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
           {request.submission_date && (
             <div>
               <strong>Date de soumission:</strong> {format(new Date(request.submission_date), "dd/MM/yyyy HH:mm", { locale: fr })}
+            </div>
+          )}
+          {request.attribution_date && (
+            <div>
+              <strong>Date d'attribution:</strong> {format(new Date(request.attribution_date), "dd/MM/yyyy HH:mm", { locale: fr })}
+            </div>
+          )}
+          {request.reception_date && (
+            <div>
+              <strong>Date de réception:</strong> {format(new Date(request.reception_date), "dd/MM/yyyy HH:mm", { locale: fr })}
             </div>
           )}
         </CardContent>
