@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, User, Building, X, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
 
 interface EditorFormData {
   type: "morale" | "physique";
@@ -158,63 +159,25 @@ const EditorSignupForm = () => {
           <Tabs value={formData.type} className="w-full">
             <TabsContent value="morale" className="space-y-4">
               {/* Formulaire personne morale */}
-              <div className="space-y-2">
-                <Label htmlFor="editorName">Nom de l'éditeur *</Label>
-                <div className="relative">
-                  <Select
-                    value={formData.isOtherEditor ? "autre" : formData.selectedEditor}
-                    onValueChange={(value) => {
-                      if (value === "autre") {
-                        setFormData(prev => ({ ...prev, isOtherEditor: true, selectedEditor: undefined }));
-                      } else {
-                        const editor = editors.find(e => e.id === value);
-                        setFormData(prev => ({ 
-                          ...prev, 
-                          isOtherEditor: false, 
-                          selectedEditor: value,
-                          nameFr: editor?.name || ""
-                        }));
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionnez un éditeur" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background z-50">
-                      {editors.map(editor => (
-                        <SelectItem key={editor.id} value={editor.id}>
-                          {editor.name}
-                        </SelectItem>
-                      ))}
-                      <SelectItem value="autre">Autre</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="nameAr">Nom de l'éditeur (Arabe) *</Label>
+                  <ArabicInputWithKeyboard
+                    value={formData.nameAr || ""}
+                    onChange={(value) => setFormData(prev => ({ ...prev, nameAr: value }))}
+                    placeholder="اسم الناشر"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="nameFr">Nom de l'éditeur (Français) *</Label>
+                  <Input
+                    id="nameFr"
+                    value={formData.nameFr || ""}
+                    onChange={(e) => setFormData(prev => ({ ...prev, nameFr: e.target.value }))}
+                    placeholder="Nom de l'éditeur"
+                  />
                 </div>
               </div>
-
-              {formData.isOtherEditor && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="nameAr">Nom de l'éditeur (Arabe) *</Label>
-                    <Input
-                      id="nameAr"
-                      value={formData.nameAr || ""}
-                      onChange={(e) => setFormData(prev => ({ ...prev, nameAr: e.target.value }))}
-                      placeholder="اسم الناشر"
-                      dir="rtl"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="nameFr">Nom de l'éditeur (Français) *</Label>
-                    <Input
-                      id="nameFr"
-                      value={formData.nameFr || ""}
-                      onChange={(e) => setFormData(prev => ({ ...prev, nameFr: e.target.value }))}
-                      placeholder="Nom de l'éditeur"
-                    />
-                  </div>
-                </div>
-              )}
 
               <div className="space-y-2">
                 <Label htmlFor="logo">Logo de l'éditeur</Label>
