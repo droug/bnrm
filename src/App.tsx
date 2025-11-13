@@ -268,7 +268,7 @@ const App = () => {
           <Route path="/admin/import-form-fields" element={<ImportFormFields />} />
           <Route path="/admin/manage-section-fields" element={<ManageSectionFields />} />
         <Route path="/admin/cote-management" element={<CoteManagementPage />} />
-        <Route path="/admin/bnrm-backoffice" element={<BNRMBackOffice />} />
+        <Route path="/admin/bnrm-depot_legal" element={<BNRMBackOffice />} />
         <Route path="/admin/reservations-ouvrages" element={<GestionReservationsOuvrages />} />
         <Route path="/admin/catalog-metadata" element={<CatalogMetadata />} />
         <Route path="/admin/reproduction" element={<ReproductionBackofficePage />} />
