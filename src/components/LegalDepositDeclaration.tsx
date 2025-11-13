@@ -1814,37 +1814,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Lien Google Maps <span className="text-destructive">*</span></Label>
-                  <Input 
-                    placeholder="https://maps.google.com/?q=..."
-                    value={printerData.googleMapsLink || ''}
-                    onChange={(e) => setPrinterData({ ...printerData, googleMapsLink: e.target.value })}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Collez le lien de localisation Google Maps
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Téléphone <span className="text-destructive">*</span></Label>
-                  <Input 
-                    placeholder="Numéro de téléphone"
-                    value={printerData.phone || ''}
-                    onChange={(e) => setPrinterData({ ...printerData, phone: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Email <span className="text-destructive">*</span></Label>
-                  <Input 
-                    type="email"
-                    placeholder="Adresse email"
-                    value={printerData.email || ''}
-                    onChange={(e) => setPrinterData({ ...printerData, email: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <Label>Nombre de tirage</Label>
                   <Input 
                     type="number" 
