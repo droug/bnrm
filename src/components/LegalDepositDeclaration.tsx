@@ -226,7 +226,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     const fetchPublishers = async () => {
       const { data, error } = await supabase
         .from('publishers')
-        .select('*')
+        .select('*, google_maps_link, city, country')
         .order('name');
       
       if (error) {
@@ -241,7 +241,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     const fetchPrinters = async () => {
       const { data, error } = await supabase
         .from('printers')
-        .select('*')
+        .select('*, google_maps_link, city, country')
         .order('name');
       
       if (error) {
@@ -256,7 +256,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     const fetchProducers = async () => {
       const { data, error } = await supabase
         .from('producers')
-        .select('*')
+        .select('*, google_maps_link, city, country')
         .order('name');
       
       if (error) {
@@ -270,7 +270,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     const fetchDistributors = async () => {
       const { data, error } = await supabase
         .from('distributors')
-        .select('*')
+        .select('*, google_maps_link, city, country')
         .order('name');
       
       if (error) {
