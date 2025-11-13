@@ -73,7 +73,7 @@ export default function AdminSettings() {
       icon: BookMarked,
       title: "Gestion du Dépôt Légal",
       description: "Interface complète de gestion du dépôt légal BNRM",
-      href: "/admin/bnrm-depot_legal",
+      href: "/admin/depot-legal",
       permission: "legal_deposit.manage",
       gradient: "from-emerald-500 to-emerald-600"
     },
