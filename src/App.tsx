@@ -302,7 +302,7 @@ const App = () => {
         <Route path="/demande-restauration" element={<RestorationRequest />} />
         <Route path="/demande-numerisation" element={<DemandeNumerisation />} />
         <Route path="/manuscripts" element={<Manuscripts />} />
-        <Route path="/my-library-space" element={<MyLibrarySpace />} />
+        <Route path="/my-space" element={<MyLibrarySpace />} />
         <Route path="/help" element={<HelpPage />} />
         <Route path="/aide" element={<HelpPage />} />
         <Route path="/admin/preservation" element={<PreservationPage />} />

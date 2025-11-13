@@ -213,7 +213,7 @@ export default function AdminSettings() {
                 </div>
               </div>
               <Button 
-                onClick={() => navigate('/my-library-space')}
+                onClick={() => navigate('/my-space')}
                 variant="outline"
                 size="lg"
                 className="flex items-center gap-2"

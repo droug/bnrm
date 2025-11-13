@@ -59,7 +59,7 @@ export default function BankTransferInstructions() {
       <div className="max-w-2xl mx-auto space-y-6">
         <Button
           variant="ghost"
-          onClick={() => navigate("/my-library-space")}
+          onClick={() => navigate("/my-space")}
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -202,7 +202,7 @@ export default function BankTransferInstructions() {
             <Button 
               className="w-full"
               size="lg"
-              onClick={() => navigate("/my-library-space")}
+              onClick={() => navigate("/my-space")}
             >
               J'ai effectué le virement
             </Button>

@@ -80,7 +80,7 @@ export function AdminHeader({
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => navigate('/my-library-space')}
+            onClick={() => navigate('/my-space')}
             className="flex items-center gap-2"
           >
             <Home className="h-4 w-4" />

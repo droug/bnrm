@@ -208,7 +208,7 @@ const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-popover border border-primary/20 z-50">
                     <DropdownMenuItem asChild className="cursor-pointer text-base font-medium">
-                      <Link to="/my-library-space" className="flex items-center gap-2">
+                      <Link to="/my-space" className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4" />
                         Mon Espace
                       </Link>
