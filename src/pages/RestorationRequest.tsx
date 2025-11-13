@@ -228,7 +228,7 @@ export default function RestorationRequest() {
       });
 
       setIsOpen(false);
-      setTimeout(() => navigate("/my-library-space"), 2000);
+      setTimeout(() => navigate("/my-space"), 2000);
     } catch (error: any) {
       console.error('Erreur lors de la soumission:', error);
       toast({
