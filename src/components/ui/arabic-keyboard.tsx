@@ -21,7 +21,7 @@ export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
   const [showDiacritics, setShowDiacritics] = useState(false);
 
   return (
-    <Card className="p-4 w-full max-w-3xl mx-auto shadow-lg border-2 border-primary/20">
+    <Card className="p-4 w-full shadow-lg border-2 border-primary/20">
       <div className="flex justify-between items-center mb-3">
         <div className="flex gap-2">
           <Button
@@ -57,7 +57,7 @@ export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
               key={char}
               variant="outline"
               size="sm"
-              className="min-w-[50px] h-12 text-xl font-arabic"
+              className="min-w-[40px] h-10 text-lg"
               onClick={() => onInsert(char)}
             >
               {char}
@@ -65,15 +65,15 @@ export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
           ))}
         </div>
       ) : (
-        <div className="space-y-1">
+        <div className="space-y-1 overflow-x-auto">
           {arabicKeys.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex gap-1 justify-center">
+            <div key={rowIndex} className="flex gap-1 justify-center flex-nowrap">
               {row.map((char) => (
                 <Button
                   key={char}
                   variant="outline"
                   size="sm"
-                  className="min-w-[50px] h-12 text-xl font-arabic"
+                  className="min-w-[40px] h-10 text-lg flex-shrink-0"
                   onClick={() => onInsert(char)}
                 >
                   {char}
