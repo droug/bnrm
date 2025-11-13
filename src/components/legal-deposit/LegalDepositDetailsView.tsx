@@ -165,15 +165,22 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
 
   const renderPrinterInfo = () => {
     const metadata = request.metadata || {};
+    const customFields = metadata.customFields || {};
     const printer = metadata.printer || {};
     
-    // Check if we have any printer information
+    // Check if we have any printer information from various sources
     const hasPrinterInfo = printer.name || 
+                          customFields.printer_name ||
                           metadata.printRun ||
                           printer.address ||
+                          customFields.printer_address ||
                           printer.phone ||
+                          customFields.printer_phone ||
                           printer.email ||
-                          printer.printRun;
+                          customFields.printer_email ||
+                          printer.printRun ||
+                          customFields.printer_city ||
+                          customFields.printer_country;
 
     if (!hasPrinterInfo) return null;
 
@@ -183,29 +190,39 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
           <CardTitle className="text-base">Identification de l'imprimeur</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          {printer.name && (
+          {(printer.name || customFields.printer_name) && (
             <div>
-              <strong>Imprimerie:</strong> {printer.name}
+              <strong>Imprimerie:</strong> {printer.name || customFields.printer_name}
             </div>
           )}
-          {metadata.printRun && (
+          {(metadata.printRun || customFields.printer_printRun) && (
             <div>
-              <strong>Nombre de tirage:</strong> {metadata.printRun}
+              <strong>Nombre de tirage:</strong> {metadata.printRun || customFields.printer_printRun}
             </div>
           )}
-          {printer.address && (
+          {(customFields.printer_country) && (
             <div>
-              <strong>Adresse:</strong> {printer.address}
+              <strong>Pays:</strong> {customFields.printer_country}
             </div>
           )}
-          {printer.phone && (
+          {(customFields.printer_city) && (
             <div>
-              <strong>Téléphone:</strong> {printer.phone}
+              <strong>Ville:</strong> {customFields.printer_city}
             </div>
           )}
-          {printer.email && (
+          {(printer.address || customFields.printer_address) && (
             <div>
-              <strong>Email:</strong> {printer.email}
+              <strong>Adresse:</strong> {printer.address || customFields.printer_address}
+            </div>
+          )}
+          {(printer.phone || customFields.printer_phone) && (
+            <div>
+              <strong>Téléphone:</strong> {printer.phone || customFields.printer_phone}
+            </div>
+          )}
+          {(printer.email || customFields.printer_email) && (
+            <div>
+              <strong>Email:</strong> {printer.email || customFields.printer_email}
             </div>
           )}
         </CardContent>
@@ -392,21 +409,37 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
     const metadata = request.metadata || {};
     const documentsUrls = request.documents_urls || {};
     
-    // Documents from documents_urls field
-    if (documentsUrls.cin && documentsUrls.cin.url) {
-      documents.push({ label: 'CNIE de l\'auteur', url: documentsUrls.cin.url });
-    }
-    if (documentsUrls.summary && documentsUrls.summary.url) {
-      documents.push({ label: 'Résumé du document', url: documentsUrls.summary.url });
-    }
-    if (documentsUrls.cover && documentsUrls.cover.url) {
-      documents.push({ label: 'Couverture', url: documentsUrls.cover.url });
-    }
-    if (documentsUrls.abstract && documentsUrls.abstract.url) {
-      documents.push({ label: 'Résumé', url: documentsUrls.abstract.url });
-    }
-    if (documentsUrls.court_decision && documentsUrls.court_decision.url) {
-      documents.push({ label: 'Décision du Tribunal', url: documentsUrls.court_decision.url });
+    // Mapping pour les labels en français
+    const documentLabels: Record<string, string> = {
+      'cin': 'CNIE de l\'auteur',
+      'cnie': 'CNIE de l\'auteur',
+      'summary': 'Résumé du document',
+      'cover': 'Couverture',
+      'abstract': 'Résumé/Abstract',
+      'court_decision': 'Décision du Tribunal',
+      'court-decision': 'Décision du Tribunal',
+      'thesis-recommendation': 'Recommandation de soutenance de thèse',
+      'thesis_recommendation': 'Recommandation de soutenance de thèse',
+      'quran-authorization': 'Autorisation de publication Coran',
+      'quran_authorization': 'Autorisation de publication Coran',
+      'supporting_document': 'Document justificatif',
+      'additional_document': 'Document additionnel',
+      'isbn_request': 'Demande ISBN',
+      'issn_request': 'Demande ISSN',
+      'periodical_cover': 'Couverture du périodique',
+      'periodical_sample': 'Exemplaire du périodique',
+      'software_manual': 'Manuel du logiciel',
+      'database_documentation': 'Documentation de la base de données'
+    };
+    
+    // Documents from documents_urls field - parcourir toutes les clés
+    if (documentsUrls && typeof documentsUrls === 'object') {
+      Object.entries(documentsUrls).forEach(([key, value]: [string, any]) => {
+        if (value && value.url) {
+          const label = documentLabels[key] || key.replace(/_/g, ' ').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          documents.push({ label, url: value.url });
+        }
+      });
     }
 
     // Documents from direct fields
@@ -437,7 +470,7 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
       documents.push({ label: 'Document additionnel', url: metadata.additional_document });
     }
 
-    // Remove duplicates
+    // Remove duplicates based on URL
     const uniqueDocuments = documents.filter((doc, index, self) => 
       index === self.findIndex((d) => d.url === doc.url)
     );
