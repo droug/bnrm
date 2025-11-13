@@ -36,6 +36,7 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ReservedRangesManager } from "@/components/legal-deposit/ReservedRangesManager";
+import { SearchPagination } from "@/components/ui/search-pagination";
 
 interface NumberAttribution {
   id: string;
@@ -84,6 +85,8 @@ export const BNRMNumberAttribution = () => {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isViewRequestDialogOpen, setIsViewRequestDialogOpen] = useState(false);
   const [selectedRequestForView, setSelectedRequestForView] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [newRange, setNewRange] = useState({
     number_type: 'isbn' as 'isbn' | 'issn' | 'dl',
     range_start: '',
@@ -476,6 +479,19 @@ export const BNRMNumberAttribution = () => {
     });
   };
 
+  // Filter and paginate attributions
+  const filteredAttributions = attributions.filter(attr => 
+    (numberTypeFilter === "all" || attr.number_type === numberTypeFilter) &&
+    (searchTerm === "" || 
+      attr.attributed_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      attr.metadata.publication_title?.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  const totalPages = Math.ceil(filteredAttributions.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedAttributions = filteredAttributions.slice(startIndex, endIndex);
+
   const downloadExcelTemplate = () => {
     // In real app, generate actual Excel template
     toast({
@@ -612,15 +628,8 @@ export const BNRMNumberAttribution = () => {
                     </TableRow>
                   </TableHeader>
                 <TableBody>
-                  {attributions
-                    .filter(attr => 
-                      (numberTypeFilter === "all" || attr.number_type === numberTypeFilter) &&
-                      (searchTerm === "" || 
-                       attr.attributed_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                       attr.metadata.publication_title?.toLowerCase().includes(searchTerm.toLowerCase()))
-                    )
-                    .map((attribution) => {
-                      const TypeIcon = getNumberTypeIcon(attribution.number_type);
+                  {paginatedAttributions.map((attribution) => {
+                    const TypeIcon = getNumberTypeIcon(attribution.number_type);
                       return (
                         <TableRow key={attribution.id}>
                           <TableCell>
@@ -669,6 +678,17 @@ export const BNRMNumberAttribution = () => {
                     })}
                 </TableBody>
               </Table>
+              <SearchPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredAttributions.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(newItemsPerPage) => {
+                  setItemsPerPage(newItemsPerPage);
+                  setCurrentPage(1);
+                }}
+              />
             </CardContent>
           </Card>
         </TabsContent>

@@ -16,6 +16,7 @@ import { Bell, Mail, FileText, Calendar, Send, Settings, AlertCircle, CheckCircl
 import { toast } from "sonner";
 import jsPDF from 'jspdf';
 import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
+import { SearchPagination } from "@/components/ui/search-pagination";
 
 interface EditorialMonitoringItem {
   id: string;
@@ -115,6 +116,8 @@ export default function BNRMEditorialMonitoring() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [confirmRejectOpen, setConfirmRejectOpen] = useState(false);
   const [confirmCancelRejectOpen, setConfirmCancelRejectOpen] = useState(false);
@@ -567,6 +570,12 @@ export default function BNRMEditorialMonitoring() {
     return matchesSearch && matchesStatus;
   });
 
+  // Pagination
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedItems = filteredItems.slice(startIndex, endIndex);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -774,7 +783,7 @@ export default function BNRMEditorialMonitoring() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredItems.map((item) => (
+                    {paginatedItems.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell className="font-medium">{item.dlNumber}</TableCell>
                         <TableCell>{item.title}</TableCell>
@@ -862,6 +871,17 @@ export default function BNRMEditorialMonitoring() {
                     ))}
                   </TableBody>
                 </Table>
+                <SearchPagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={filteredItems.length}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPage}
+                  onItemsPerPageChange={(newItemsPerPage) => {
+                    setItemsPerPage(newItemsPerPage);
+                    setCurrentPage(1);
+                  }}
+                />
               </div>
             </CardContent>
           </Card>
