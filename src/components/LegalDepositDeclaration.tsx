@@ -4130,21 +4130,126 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>{language === 'ar' ? 'الاسم' : 'Nom'}</Label>
-              <Input 
-                placeholder={language === 'ar' ? `اسم ${roleLabel}` : `Nom du ${roleLabel}`}
-                value={editorData.name || ''}
-                onChange={(e) => setEditorData({ ...editorData, name: e.target.value })}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>{language === 'ar' ? 'العنوان' : 'Adresse'}</Label>
-              <Input 
-                placeholder={language === 'ar' ? 'العنوان' : 'Adresse'}
-                value={editorData.address || ''}
-                onChange={(e) => setEditorData({ ...editorData, address: e.target.value })}
-              />
+              <Label>{language === 'ar' ? 'الاسم' : 'Nom'} <span className="text-destructive">*</span></Label>
+              <div className="relative">
+                <Input
+                  placeholder={language === 'ar' ? `ابحث عن ${roleLabel}...` : `Rechercher un ${roleLabel}...`}
+                  value={printerSearch}
+                  onChange={(e) => setPrinterSearch(e.target.value)}
+                  className="pr-10"
+                />
+                {printerSearch && (
+                  <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                    {printers
+                      .filter(printer => 
+                        printer.name.toLowerCase().includes(printerSearch.toLowerCase())
+                      )
+                      .map((printer) => (
+                        <button
+                          key={printer.id}
+                          type="button"
+                          className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                          onClick={() => {
+                            setPrinterSearch('');
+                            setEditorData({
+                              ...editorData,
+                              name: printer.name,
+                              phone: printer.phone || '',
+                              email: printer.email || '',
+                              googleMapsLink: printer.google_maps_link || '',
+                              address: printer.address || '',
+                              city: printer.city || '',
+                              country: printer.country || 'Maroc',
+                            });
+                          }}
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-medium">{printer.name}</span>
+                            {printer.city && (
+                              <span className="text-sm text-muted-foreground">
+                                {printer.city}, {printer.country}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    {printers.filter(printer => 
+                      printer.name.toLowerCase().includes(printerSearch.toLowerCase())
+                    ).length === 0 && (
+                      <div className="px-4 py-3">
+                        <div className="text-sm text-muted-foreground mb-2">
+                          {language === 'ar' ? 'لم يتم العثور على نتائج' : 'Aucun résultat trouvé'}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={async () => {
+                            const newName = printerSearch;
+                            const { data, error } = await supabase
+                              .from('printers')
+                              .insert([{ name: newName }])
+                              .select('id, name, city, country, address, phone, email, google_maps_link')
+                              .single();
+                            
+                            if (error) {
+                              toast.error(language === 'ar' ? 'خطأ في الإضافة' : 'Erreur lors de l\'ajout');
+                            } else if (data) {
+                              setPrinters([...printers, data as unknown as Printer]);
+                              setPrinterSearch('');
+                              setEditorData({
+                                ...editorData,
+                                name: (data as any).name,
+                                phone: (data as any).phone || '',
+                                email: (data as any).email || '',
+                                googleMapsLink: (data as any).google_maps_link || '',
+                                address: (data as any).address || '',
+                                city: (data as any).city || '',
+                                country: (data as any).country || 'Maroc',
+                              });
+                              toast.success(language === 'ar' ? 'تمت الإضافة بنجاح' : 'Ajouté avec succès');
+                            }
+                          }}
+                        >
+                          {language === 'ar' ? `+ إضافة "${printerSearch}"` : `+ Ajouter "${printerSearch}"`}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {editorData.name && !printerSearch && (
+                  <div className="mt-2 p-3 bg-primary/10 rounded-md flex justify-between items-start">
+                    <div>
+                      <p className="font-medium">{editorData.name}</p>
+                      {editorData.city && (
+                        <p className="text-sm text-muted-foreground">
+                          {editorData.city}, {editorData.country}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setEditorData({
+                          ...editorData,
+                          name: '',
+                          phone: '',
+                          email: '',
+                          googleMapsLink: '',
+                          address: '',
+                          city: '',
+                          country: '',
+                        });
+                      }}
+                    >
+                      {language === 'ar' ? 'تعديل' : 'Modifier'}
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className="space-y-2">
