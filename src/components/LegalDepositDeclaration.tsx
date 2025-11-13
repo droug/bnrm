@@ -2325,6 +2325,37 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   )}
                 </div>
 
+                <div className="space-y-2">
+                  <Label>Lien Google Maps <span className="text-destructive">*</span></Label>
+                  <Input 
+                    placeholder="https://maps.google.com/?q=..."
+                    value={editorData.googleMapsLink || ''}
+                    onChange={(e) => setEditorData({ ...editorData, googleMapsLink: e.target.value })}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Collez le lien de localisation Google Maps
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Téléphone <span className="text-destructive">*</span></Label>
+                  <Input 
+                    placeholder="Numéro de téléphone"
+                    value={editorData.phone || ''}
+                    onChange={(e) => setEditorData({ ...editorData, phone: e.target.value })}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Email <span className="text-destructive">*</span></Label>
+                  <Input 
+                    type="email" 
+                    placeholder="Adresse email"
+                    value={editorData.email || ''}
+                    onChange={(e) => setEditorData({ ...editorData, email: e.target.value })}
+                  />
+                </div>
+
                 {/* Champs personnalisés */}
                 {customFields
                   .filter((field) => field.section_key === "producer_info")
@@ -2526,6 +2557,37 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       </Button>
                     </div>
                   )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Lien Google Maps <span className="text-destructive">*</span></Label>
+                  <Input 
+                    placeholder="https://maps.google.com/?q=..."
+                    value={printerData.googleMapsLink || ''}
+                    onChange={(e) => setPrinterData({ ...printerData, googleMapsLink: e.target.value })}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Collez le lien de localisation Google Maps
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Téléphone <span className="text-destructive">*</span></Label>
+                  <Input 
+                    placeholder="Numéro de téléphone"
+                    value={printerData.phone || ''}
+                    onChange={(e) => setPrinterData({ ...printerData, phone: e.target.value })}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Email <span className="text-destructive">*</span></Label>
+                  <Input 
+                    type="email" 
+                    placeholder="Adresse email"
+                    value={printerData.email || ''}
+                    onChange={(e) => setPrinterData({ ...printerData, email: e.target.value })}
+                  />
                 </div>
 
                 <div className="space-y-2">
