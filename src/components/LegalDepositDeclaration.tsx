@@ -1154,37 +1154,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Lien Google Maps <span className="text-destructive">*</span></Label>
-                  <Input 
-                    placeholder="https://maps.google.com/?q=..."
-                    value={printerData.googleMapsLink || ''}
-                    onChange={(e) => setPrinterData({ ...printerData, googleMapsLink: e.target.value })}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Collez le lien de localisation Google Maps
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Téléphone <span className="text-destructive">*</span></Label>
-                  <Input 
-                    placeholder="Numéro de téléphone"
-                    value={printerData.phone || ''}
-                    onChange={(e) => setPrinterData({ ...printerData, phone: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Email <span className="text-destructive">*</span></Label>
-                  <Input 
-                    type="email"
-                    placeholder="Adresse email"
-                    value={printerData.email || ''}
-                    onChange={(e) => setPrinterData({ ...printerData, email: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <Label>Nombre de tirage</Label>
                   <Input 
                     type="number" 
@@ -3174,37 +3143,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Lien Google Maps <span className="text-destructive">*</span></Label>
-                  <Input 
-                    placeholder="https://maps.google.com/?q=..."
-                    value={printerData.googleMapsLink || ''}
-                    onChange={(e) => setPrinterData({ ...printerData, googleMapsLink: e.target.value })}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Collez le lien de localisation Google Maps
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Téléphone <span className="text-destructive">*</span></Label>
-                  <Input 
-                    placeholder="Numéro de téléphone"
-                    value={printerData.phone || ''}
-                    onChange={(e) => setPrinterData({ ...printerData, phone: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Email <span className="text-destructive">*</span></Label>
-                  <Input 
-                    type="email"
-                    placeholder="Adresse email"
-                    value={printerData.email || ''}
-                    onChange={(e) => setPrinterData({ ...printerData, email: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <Label>Nombre de tirage</Label>
                   <Input 
                     type="number" 
@@ -4282,37 +4220,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   </div>
                 )}
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>{language === 'ar' ? 'رابط خرائط جوجل' : 'Lien Google Maps'} <span className="text-destructive">*</span></Label>
-              <Input 
-                placeholder="https://maps.google.com/?q=..."
-                value={editorData.googleMapsLink || ''}
-                onChange={(e) => setEditorData({ ...editorData, googleMapsLink: e.target.value })}
-              />
-              <p className="text-xs text-muted-foreground">
-                {language === 'ar' ? 'الصق رابط الموقع على خرائط جوجل' : 'Collez le lien de localisation Google Maps'}
-              </p>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>{language === 'ar' ? 'الهاتف' : 'Téléphone'} <span className="text-destructive">*</span></Label>
-              <Input 
-                placeholder={language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'}
-                value={printerData.phone || ''}
-                onChange={(e) => setPrinterData({ ...printerData, phone: e.target.value })}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>{language === 'ar' ? 'البريد الإلكتروني' : 'Email'} <span className="text-destructive">*</span></Label>
-              <Input 
-                type="email" 
-                placeholder={language === 'ar' ? 'البريد الإلكتروني' : 'Adresse email'}
-                value={printerData.email || ''}
-                onChange={(e) => setPrinterData({ ...printerData, email: e.target.value })}
-              />
             </div>
           </div>
 
