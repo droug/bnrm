@@ -3,8 +3,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Clock, BookOpen } from "lucide-react";
+import { FileText, Clock, BookOpen, CheckCircle, AlertCircle, Edit, Eye, Award, XCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface LegalDepositRequest {
   id: string;
@@ -16,12 +20,19 @@ interface LegalDepositRequest {
   created_at: string;
   submission_date: string | null;
   dl_number: string | null;
+  rejection_reason?: string | null;
+  validation_comments?: string | null;
+  deposit_type?: string;
 }
 
 export function MyLegalDeposits() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [deposits, setDeposits] = useState<LegalDepositRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDeposit, setSelectedDeposit] = useState<LegalDepositRequest | null>(null);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -43,28 +54,38 @@ export function MyLegalDeposits() {
       if (data) setDeposits(data);
     } catch (error) {
       console.error('Error fetching legal deposits:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les dépôts légaux",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-      brouillon: { label: "Brouillon", variant: "outline" },
-      soumis: { label: "Soumis", variant: "default" },
-      en_attente_validation_b: { label: "En attente validation B", variant: "default" },
-      valide_par_b: { label: "Validé par B", variant: "secondary" },
-      rejete_par_b: { label: "Rejeté par B", variant: "destructive" },
-      en_attente_comite_validation: { label: "En attente comité", variant: "default" },
-      valide_par_comite: { label: "Validé par comité", variant: "secondary" },
-      rejete_par_comite: { label: "Rejeté par comité", variant: "destructive" },
-      attribue: { label: "Attribué", variant: "secondary" },
-      rejete: { label: "Rejeté", variant: "destructive" },
-      termine: { label: "Terminé", variant: "secondary" }
+    const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: React.ReactNode }> = {
+      brouillon: { label: "Brouillon", variant: "outline", icon: <Edit className="h-3 w-3" /> },
+      soumis: { label: "Soumis", variant: "default", icon: <Clock className="h-3 w-3" /> },
+      en_attente_validation_b: { label: "En validation", variant: "default", icon: <Clock className="h-3 w-3" /> },
+      valide_par_b: { label: "Validé", variant: "secondary", icon: <CheckCircle className="h-3 w-3" /> },
+      rejete_par_b: { label: "Rejeté", variant: "destructive", icon: <XCircle className="h-3 w-3" /> },
+      en_attente_comite_validation: { label: "En attente comité", variant: "default", icon: <Clock className="h-3 w-3" /> },
+      valide_par_comite: { label: "Validé par comité", variant: "secondary", icon: <CheckCircle className="h-3 w-3" /> },
+      rejete_par_comite: { label: "Rejeté par comité", variant: "destructive", icon: <XCircle className="h-3 w-3" /> },
+      attribue: { label: "Numéro DL attribué", variant: "secondary", icon: <Award className="h-3 w-3" /> },
+      rejete: { label: "Rejeté", variant: "destructive", icon: <AlertCircle className="h-3 w-3" /> },
+      termine: { label: "Terminé", variant: "secondary", icon: <CheckCircle className="h-3 w-3" /> }
     };
 
-    const config = statusConfig[status] || { label: status, variant: "outline" };
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    const config = statusConfig[status] || { label: status, variant: "outline" as const, icon: null };
+    return (
+      <Badge variant={config.variant} className="flex items-center gap-1">
+        {config.icon}
+        {config.label}
+      </Badge>
+    );
   };
 
   const formatDate = (dateString: string | null) => {
@@ -76,83 +97,255 @@ export function MyLegalDeposits() {
     });
   };
 
+  const handleViewDetails = (deposit: LegalDepositRequest) => {
+    setSelectedDeposit(deposit);
+    setShowDetailsDialog(true);
+  };
+
+  const handleEditDraft = (depositId: string) => {
+    // Navigation vers le formulaire d'édition du dépôt légal
+    toast({
+      title: "Fonctionnalité à venir",
+      description: "L'édition des brouillons sera bientôt disponible"
+    });
+  };
+
   if (loading) {
     return (
       <Card>
+        <CardHeader>
+          <CardTitle>Dépôts légaux</CardTitle>
+        </CardHeader>
         <CardContent className="p-8 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground mt-2">Chargement...</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Dépôts légaux</CardTitle>
-        <CardDescription>
-          Suivez vos dépôts légaux
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[500px] pr-4">
-          {deposits.length === 0 ? (
-            <div className="text-center py-12">
-              <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">Aucun dépôt légal pour le moment</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {deposits.map((deposit) => (
-                <Card key={deposit.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg mb-1">{deposit.title}</h3>
-                        {deposit.author_name && (
-                          <p className="text-sm text-muted-foreground">{deposit.author_name}</p>
-                        )}
-                      </div>
-                      {getStatusBadge(deposit.status)}
-                    </div>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Mes dépôts légaux</CardTitle>
+          <CardDescription>
+            Suivez l'état de vos demandes de dépôt légal
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[500px] pr-4">
+            {deposits.length === 0 ? (
+              <div className="text-center py-12">
+                <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">Aucun dépôt légal pour le moment</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => navigate('/')}
+                >
+                  Faire une demande de dépôt légal
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {deposits.map((deposit) => (
+                  <Card key={deposit.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        {/* En-tête avec titre et statut */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg mb-1">{deposit.title}</h3>
+                            {deposit.author_name && (
+                              <p className="text-sm text-muted-foreground">{deposit.author_name}</p>
+                            )}
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Demande N° {deposit.request_number}
+                            </p>
+                          </div>
+                          {getStatusBadge(deposit.status)}
+                        </div>
 
-                    <div className="space-y-2 mb-3">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">
-                          <BookOpen className="h-3 w-3 mr-1" />
-                          {deposit.request_number}
-                        </Badge>
-                        {deposit.dl_number && (
-                          <Badge variant="secondary">
-                            DL: {deposit.dl_number}
-                          </Badge>
-                        )}
-                      </div>
-                      {deposit.support_type && (
-                        <p className="text-sm">
-                          <span className="font-medium">Support:</span> {deposit.support_type}
-                        </p>
-                      )}
-                    </div>
+                        {/* Informations supplémentaires */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="flex items-center gap-1">
+                              <BookOpen className="h-3 w-3" />
+                              {deposit.support_type || "Non spécifié"}
+                            </Badge>
+                            {deposit.dl_number && (
+                              <Badge variant="secondary" className="flex items-center gap-1">
+                                <Award className="h-3 w-3" />
+                                DL: {deposit.dl_number}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
 
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        Créé le {formatDate(deposit.created_at)}
-                      </span>
-                      {deposit.submission_date && (
-                        <span>
-                          Soumis le {formatDate(deposit.submission_date)}
-                        </span>
-                      )}
+                        {/* Dates */}
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            Créé le {formatDate(deposit.created_at)}
+                          </span>
+                          {deposit.submission_date && (
+                            <span>
+                              Soumis le {formatDate(deposit.submission_date)}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Numéro DL attribué */}
+                        {deposit.status === 'attribue' && deposit.dl_number && (
+                          <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-2">
+                            <div className="flex items-start gap-2">
+                              <Award className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-green-900 text-sm mb-1">
+                                  Numéro de dépôt légal attribué
+                                </h4>
+                                <p className="text-sm text-green-800">
+                                  Votre numéro DL: <span className="font-bold">{deposit.dl_number}</span>
+                                </p>
+                                <p className="text-xs text-green-700 mt-1">
+                                  Conservez précieusement ce numéro pour vos publications
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Message de rejet */}
+                        {(deposit.status === 'rejete_par_b' || deposit.status === 'rejete_par_comite' || deposit.status === 'rejete') && deposit.rejection_reason && (
+                          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-2">
+                            <div className="flex items-start gap-2">
+                              <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-red-900 text-sm mb-1">
+                                  Demande rejetée
+                                </h4>
+                                <p className="text-sm text-red-800">
+                                  {deposit.rejection_reason}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Commentaires de validation */}
+                        {deposit.validation_comments && (
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
+                            <div className="flex items-start gap-2">
+                              <FileText className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-blue-900 text-sm mb-1">
+                                  Commentaires de validation
+                                </h4>
+                                <p className="text-sm text-blue-800">
+                                  {deposit.validation_comments}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Actions selon le statut */}
+                        <div className="flex gap-2 pt-2 border-t">
+                          {deposit.status === 'brouillon' && (
+                            <>
+                              <Button 
+                                size="sm" 
+                                variant="default"
+                                className="flex-1"
+                                onClick={() => handleEditDraft(deposit.id)}
+                              >
+                                <Edit className="h-4 w-4 mr-2" />
+                                Reprendre l'édition
+                              </Button>
+                            </>
+                          )}
+                          
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className={deposit.status === 'brouillon' ? '' : 'flex-1'}
+                            onClick={() => handleViewDetails(deposit)}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            Voir les détails
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      {/* Dialog pour les détails */}
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Détails du dépôt légal</DialogTitle>
+            <DialogDescription>
+              Demande N° {selectedDeposit?.request_number}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedDeposit && (
+            <div className="space-y-4 py-4">
+              <div>
+                <h4 className="font-semibold mb-2">Informations générales</h4>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Titre:</span>
+                    <p className="font-medium">{selectedDeposit.title}</p>
+                  </div>
+                  {selectedDeposit.author_name && (
+                    <div>
+                      <span className="text-muted-foreground">Auteur:</span>
+                      <p className="font-medium">{selectedDeposit.author_name}</p>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+                  )}
+                  <div>
+                    <span className="text-muted-foreground">Type de support:</span>
+                    <p className="font-medium">{selectedDeposit.support_type}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Statut:</span>
+                    <div className="mt-1">{getStatusBadge(selectedDeposit.status)}</div>
+                  </div>
+                  {selectedDeposit.dl_number && (
+                    <div>
+                      <span className="text-muted-foreground">Numéro DL:</span>
+                      <p className="font-medium">{selectedDeposit.dl_number}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold mb-2">Dates</h4>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Créé le:</span>
+                    <p className="font-medium">{formatDate(selectedDeposit.created_at)}</p>
+                  </div>
+                  {selectedDeposit.submission_date && (
+                    <div>
+                      <span className="text-muted-foreground">Soumis le:</span>
+                      <p className="font-medium">{formatDate(selectedDeposit.submission_date)}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
-        </ScrollArea>
-      </CardContent>
-    </Card>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
