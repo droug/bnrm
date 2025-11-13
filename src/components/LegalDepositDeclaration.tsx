@@ -4220,12 +4220,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               {language === 'ar' ? 'رجوع' : 'Retour'}
             </Button>
             <Button onClick={() => handleAuthentication(isBDLogiciels ? "distributor" : "printer", {
-              name: editorData.name || "",
-              address: editorData.address || "",
-              phone: editorData.phone || "",
-              email: editorData.email || "",
-              googleMapsLink: editorData.googleMapsLink || "",
-              printRun: editorData.printRun || ""
+              name: printerData.name || "",
+              address: printerData.address || "",
+              phone: printerData.phone || "",
+              email: printerData.email || "",
+              googleMapsLink: printerData.googleMapsLink || "",
+              printRun: printerData.printRun || ""
             })}>
               {language === 'ar' ? 'متابعة' : 'Continuer'}
             </Button>
