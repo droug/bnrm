@@ -4234,9 +4234,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                           type="button"
                           className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
                           onClick={() => {
+                            setSelectedPrinter(printer);
                             setPrinterSearch('');
-                            setEditorData({
-                              ...editorData,
+                            setPrinterData({
                               name: printer.name,
                               phone: printer.phone || '',
                               email: printer.email || '',
@@ -4244,6 +4244,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                               address: printer.address || '',
                               city: printer.city || '',
                               country: printer.country || 'Maroc',
+                              ...printer
                             });
                           }}
                         >
@@ -4281,9 +4282,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                               toast.error(language === 'ar' ? 'خطأ في الإضافة' : 'Erreur lors de l\'ajout');
                             } else if (data) {
                               setPrinters([...printers, data as unknown as Printer]);
+                              setSelectedPrinter(data as unknown as Printer);
                               setPrinterSearch('');
-                              setEditorData({
-                                ...editorData,
+                              setPrinterData({
                                 name: (data as any).name,
                                 phone: (data as any).phone || '',
                                 email: (data as any).email || '',
@@ -4291,6 +4292,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 address: (data as any).address || '',
                                 city: (data as any).city || '',
                                 country: (data as any).country || 'Maroc',
+                                ...(data as unknown as Printer)
                               });
                               toast.success(language === 'ar' ? 'تمت الإضافة بنجاح' : 'Ajouté avec succès');
                             }
@@ -4302,13 +4304,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                     )}
                   </div>
                 )}
-                {editorData.name && !printerSearch && (
+                {selectedPrinter && !printerSearch && (
                   <div className="mt-2 p-3 bg-primary/10 rounded-md flex justify-between items-start">
                     <div>
-                      <p className="font-medium">{editorData.name}</p>
-                      {editorData.city && (
+                      <p className="font-medium">{selectedPrinter.name}</p>
+                      {selectedPrinter.city && (
                         <p className="text-sm text-muted-foreground">
-                          {editorData.city}, {editorData.country}
+                          {selectedPrinter.city}, {selectedPrinter.country}
                         </p>
                       )}
                     </div>
@@ -4317,16 +4319,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        setEditorData({
-                          ...editorData,
-                          name: '',
-                          phone: '',
-                          email: '',
-                          googleMapsLink: '',
-                          address: '',
-                          city: '',
-                          country: '',
-                        });
+                        setSelectedPrinter(null);
+                        setPrinterData({});
                       }}
                     >
                       {language === 'ar' ? 'تعديل' : 'Modifier'}
@@ -4352,8 +4346,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <Label>{language === 'ar' ? 'الهاتف' : 'Téléphone'} <span className="text-destructive">*</span></Label>
               <Input 
                 placeholder={language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'}
-                value={editorData.phone || ''}
-                onChange={(e) => setEditorData({ ...editorData, phone: e.target.value })}
+                value={printerData.phone || ''}
+                onChange={(e) => setPrinterData({ ...printerData, phone: e.target.value })}
               />
             </div>
             
@@ -4362,8 +4356,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               <Input 
                 type="email" 
                 placeholder={language === 'ar' ? 'البريد الإلكتروني' : 'Adresse email'}
-                value={editorData.email || ''}
-                onChange={(e) => setEditorData({ ...editorData, email: e.target.value })}
+                value={printerData.email || ''}
+                onChange={(e) => setPrinterData({ ...printerData, email: e.target.value })}
               />
             </div>
           </div>
