@@ -4131,12 +4131,32 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{language === 'ar' ? 'الاسم' : 'Nom'}</Label>
-              <Input placeholder={language === 'ar' ? `اسم ${roleLabel}` : `Nom du ${roleLabel}`} />
+              <Input 
+                placeholder={language === 'ar' ? `اسم ${roleLabel}` : `Nom du ${roleLabel}`}
+                value={editorData.name || ''}
+                onChange={(e) => setEditorData({ ...editorData, name: e.target.value })}
+              />
             </div>
             
             <div className="space-y-2">
               <Label>{language === 'ar' ? 'العنوان' : 'Adresse'}</Label>
-              <Input placeholder={language === 'ar' ? 'العنوان' : 'Adresse'} />
+              <Input 
+                placeholder={language === 'ar' ? 'العنوان' : 'Adresse'}
+                value={editorData.address || ''}
+                onChange={(e) => setEditorData({ ...editorData, address: e.target.value })}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>{language === 'ar' ? 'رابط خرائط جوجل' : 'Lien Google Maps'} <span className="text-destructive">*</span></Label>
+              <Input 
+                placeholder="https://maps.google.com/?q=..."
+                value={editorData.googleMapsLink || ''}
+                onChange={(e) => setEditorData({ ...editorData, googleMapsLink: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground">
+                {language === 'ar' ? 'الصق رابط الموقع على خرائط جوجل' : 'Collez le lien de localisation Google Maps'}
+              </p>
             </div>
             
             <div className="space-y-2">
@@ -4188,11 +4208,12 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               {language === 'ar' ? 'رجوع' : 'Retour'}
             </Button>
             <Button onClick={() => handleAuthentication(isBDLogiciels ? "distributor" : "printer", {
-              name: "",
-              address: "",
-              phone: "",
-              email: "",
-              printRun: ""
+              name: editorData.name || "",
+              address: editorData.address || "",
+              phone: editorData.phone || "",
+              email: editorData.email || "",
+              googleMapsLink: editorData.googleMapsLink || "",
+              printRun: editorData.printRun || ""
             })}>
               {language === 'ar' ? 'متابعة' : 'Continuer'}
             </Button>
