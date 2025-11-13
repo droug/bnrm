@@ -11,6 +11,7 @@ interface AdminHeaderProps {
   badgeText?: string;
   showNotifications?: boolean;
   showSettings?: boolean;
+  backPath?: string;
 }
 
 export function AdminHeader({ 
@@ -18,7 +19,8 @@ export function AdminHeader({
   subtitle, 
   badgeText, 
   showNotifications = true, 
-  showSettings = true 
+  showSettings = true,
+  backPath = '/dashboard'
 }: AdminHeaderProps) {
   const { profile } = useAuth();
   const navigate = useNavigate();
@@ -31,7 +33,7 @@ export function AdminHeader({
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(backPath)}
             className="flex items-center space-x-2 hover:bg-accent transition-all duration-300"
           >
             <ArrowLeft className="h-4 w-4" />

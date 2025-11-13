@@ -90,6 +90,7 @@ export default function BNRMBackOffice() {
           title="BNRM - Système BNRM"
           badgeText="Système de Gestion du Dépôt Légal"
           subtitle="Interface de gestion complète du dépôt légal BNRM"
+          backPath="/admin/settings"
         />
 
         {/* Main Content */}
