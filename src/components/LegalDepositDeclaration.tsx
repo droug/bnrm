@@ -42,6 +42,7 @@ interface Publisher {
   address: string | null;
   phone: string | null;
   email: string | null;
+  google_maps_link: string | null;
 }
 
 interface Printer {
@@ -52,22 +53,29 @@ interface Printer {
   address: string | null;
   phone: string | null;
   email: string | null;
+  google_maps_link: string | null;
 }
 
 interface Producer {
   id: string;
   name: string;
   address: string | null;
+  city: string | null;
+  country: string | null;
   phone: string | null;
   email: string | null;
+  google_maps_link: string | null;
 }
 
 interface Distributor {
   id: string;
   name: string;
   address: string | null;
+  city: string | null;
+  country: string | null;
   phone: string | null;
   email: string | null;
+  google_maps_link: string | null;
 }
 
 interface LegalDepositDeclarationProps {
@@ -3828,7 +3836,16 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                             onClick={() => {
                               setSelectedPublisher(pub);
                               setPublisherSearch('');
-                              setEditorData({ name: pub.name, ...pub });
+                              setEditorData({ 
+                                name: pub.name,
+                                phone: pub.phone || '',
+                                email: pub.email || '',
+                                googleMapsLink: pub.google_maps_link || '',
+                                address: pub.address || '',
+                                city: pub.city || '',
+                                country: pub.country || '',
+                                ...pub
+                              });
                             }}
                           >
                             <div className="flex flex-col">
@@ -3893,13 +3910,22 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             </div>
             
             <div className="space-y-2">
-              <Label>{language === 'ar' ? 'الهاتف' : 'Téléphone'}</Label>
-              <Input placeholder={language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'} />
+              <Label>{language === 'ar' ? 'الهاتف' : 'Téléphone'} <span className="text-destructive">*</span></Label>
+              <Input 
+                placeholder={language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'}
+                value={editorData.phone || ''}
+                onChange={(e) => setEditorData({ ...editorData, phone: e.target.value })}
+              />
             </div>
             
             <div className="space-y-2">
-              <Label>{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
-              <Input type="email" placeholder={language === 'ar' ? 'البريد الإلكتروني' : 'Adresse email'} />
+              <Label>{language === 'ar' ? 'البريد الإلكتروني' : 'Email'} <span className="text-destructive">*</span></Label>
+              <Input 
+                type="email" 
+                placeholder={language === 'ar' ? 'البريد الإلكتروني' : 'Adresse email'}
+                value={editorData.email || ''}
+                onChange={(e) => setEditorData({ ...editorData, email: e.target.value })}
+              />
             </div>
           </div>
         </CardContent>
