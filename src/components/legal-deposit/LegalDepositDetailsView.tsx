@@ -324,6 +324,51 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
     );
   };
 
+  const renderMetadata = () => {
+    if (!request.metadata || Object.keys(request.metadata).length === 0) return null;
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Métadonnées supplémentaires</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {Object.entries(request.metadata).map(([key, value]) => {
+            // Skip null or undefined values
+            if (value === null || value === undefined) return null;
+            
+            // Format the key to be more readable
+            const formattedKey = key
+              .split('_')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ');
+            
+            // Format the value based on type
+            let displayValue: string = String(value);
+            if (typeof value === 'boolean') {
+              displayValue = value ? 'Oui' : 'Non';
+            } else if (typeof value === 'object') {
+              displayValue = JSON.stringify(value, null, 2);
+            }
+            
+            return (
+              <div key={key} className="border-b border-border/50 pb-2 last:border-0">
+                <strong>{formattedKey}:</strong>{' '}
+                {typeof value === 'object' ? (
+                  <pre className="mt-1 p-2 bg-muted rounded text-sm overflow-auto">
+                    {displayValue}
+                  </pre>
+                ) : (
+                  <span>{displayValue}</span>
+                )}
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+    );
+  };
+
   const renderValidationInfo = () => {
     const hasValidation = request.validated_by_service || request.validated_by_department || request.validated_by_committee || request.rejected_by;
     
@@ -442,6 +487,7 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
 
       {renderPublicationInfo()}
       {renderDocuments()}
+      {renderMetadata()}
       {renderValidationInfo()}
     </div>
   );
