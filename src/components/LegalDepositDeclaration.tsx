@@ -4362,25 +4362,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             </div>
           </div>
 
-          {(userType === "printer" || userType === "distributor") && (
-            <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-              <div className="flex items-center space-x-2 mb-3">
-                <Clock className="h-5 w-5 text-muted-foreground" />
-                <h4 className="font-medium">
-                  {language === 'ar' ? 'تأكيد التعاون' : 'Confirmation de partenariat'}
-                </h4>
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                {language === 'ar' ? 
-                  `في انتظار تأكيد ${firstRoleLabel} للتعاون المتبادل` :
-                  `En attente de la confirmation réciproque du ${firstRoleLabel}`
-                }
-              </p>
-              <Button onClick={handlePartnerConfirmation} size="sm">
-                {language === 'ar' ? 'تأكيد التعاون' : 'Confirmer le partenariat'}
-              </Button>
-            </div>
-          )}
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={onClose} className="text-red-600 hover:text-red-700">
