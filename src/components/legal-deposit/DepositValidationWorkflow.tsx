@@ -23,6 +23,7 @@ interface DepositRequest {
   title: string;
   subtitle: string;
   support_type: string;
+  monograph_type?: string;
   status: string;
   author_name: string;
   created_at: string;
@@ -69,6 +70,7 @@ export function DepositValidationWorkflow() {
         title,
         subtitle,
         support_type,
+        monograph_type,
         status,
         author_name,
         created_at,
