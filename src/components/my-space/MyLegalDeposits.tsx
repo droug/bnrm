@@ -52,9 +52,14 @@ export function MyLegalDeposits() {
     const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
       brouillon: { label: "Brouillon", variant: "outline" },
       soumis: { label: "Soumis", variant: "default" },
-      en_validation_a: { label: "En validation", variant: "default" },
-      valide_a: { label: "Validé", variant: "secondary" },
-      rejete_a: { label: "Rejeté", variant: "destructive" },
+      en_attente_validation_b: { label: "En attente validation B", variant: "default" },
+      valide_par_b: { label: "Validé par B", variant: "secondary" },
+      rejete_par_b: { label: "Rejeté par B", variant: "destructive" },
+      en_attente_comite_validation: { label: "En attente comité", variant: "default" },
+      valide_par_comite: { label: "Validé par comité", variant: "secondary" },
+      rejete_par_comite: { label: "Rejeté par comité", variant: "destructive" },
+      attribue: { label: "Attribué", variant: "secondary" },
+      rejete: { label: "Rejeté", variant: "destructive" },
       termine: { label: "Terminé", variant: "secondary" }
     };
 
