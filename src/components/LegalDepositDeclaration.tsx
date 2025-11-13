@@ -4116,7 +4116,40 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   />
                   {printerSearch && (
                     <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
-...
+                      {(isBDLogiciels ? distributors : printers)
+                        .filter(printer => 
+                          printer.name.toLowerCase().includes(printerSearch.toLowerCase())
+                        )
+                        .map((printer) => (
+                          <button
+                            key={printer.id}
+                            type="button"
+                            className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                            onClick={() => {
+                              setSelectedPrinter(printer as any);
+                              setPrinterSearch('');
+                              setPrinterData({ 
+                                name: printer.name,
+                                phone: printer.phone || '',
+                                email: printer.email || '',
+                                googleMapsLink: (printer as any).google_maps_link || '',
+                                address: printer.address || '',
+                                city: printer.city || '',
+                                country: printer.country || '',
+                                ...printer
+                              });
+                            }}
+                          >
+                            <div className="flex flex-col">
+                              <span className="font-medium">{printer.name}</span>
+                              {printer.city && (
+                                <span className="text-sm text-muted-foreground">
+                                  {printer.city}, {printer.country}
+                                </span>
+                              )}
+                            </div>
+                          </button>
+                        ))}
                     </div>
                   )}
                 </div>
