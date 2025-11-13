@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Eye, Clock, FileText, Download, AlertCircle, CheckCheck, Archive } from "lucide-react";
+import { CheckCircle, XCircle, Eye, Clock, FileText, Download, AlertCircle, CheckCheck, Archive, GitBranch, Info } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import jsPDF from "jspdf";
@@ -653,14 +653,24 @@ export function DepositValidationWorkflow() {
                           {format(new Date(request.created_at), "dd/MM/yyyy")}
                         </TableCell>
                         <TableCell>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setSelectedRequest(request)}
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            Examiner
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedRequest(request)}
+                            >
+                              <GitBranch className="h-4 w-4 mr-2" />
+                              Examiner
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setSelectedRequest(request)}
+                              title="Voir les détails"
+                            >
+                              <Info className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

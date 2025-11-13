@@ -34,7 +34,8 @@ import {
   Database,
   Archive,
   Undo2,
-  X
+  X,
+  Info
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -1183,8 +1184,9 @@ export const BNRMRequestManager = () => {
                               setSelectedRequest(request);
                               setIsDetailsOpen(true);
                             }}
+                            title="Voir les détails"
                           >
-                            <Eye className="h-4 w-4" />
+                            <Info className="h-4 w-4" />
                           </Button>
                           
                           {request.status === 'soumis' && (
