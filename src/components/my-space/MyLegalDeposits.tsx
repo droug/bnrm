@@ -16,13 +16,14 @@ interface LegalDepositRequest {
   title: string;
   author_name: string | null;
   support_type: string;
+  monograph_type?: string;
   status: string;
   created_at: string;
   submission_date: string | null;
   dl_number: string | null;
   rejection_reason?: string | null;
   validation_comments?: string | null;
-  deposit_type?: string;
+  metadata?: any;
 }
 
 export function MyLegalDeposits() {
@@ -44,10 +45,23 @@ export function MyLegalDeposits() {
     if (!user) return;
 
     try {
+      // Récupérer l'ID du registre professionnel de l'utilisateur
+      const { data: professionalData, error: profError } = await supabase
+        .from('professional_registry')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profError || !professionalData) {
+        console.log('No professional registry found for user');
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('legal_deposit_requests')
         .select('*')
-        .eq('initiator_id', user.id)
+        .eq('initiator_id', professionalData.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -174,6 +188,16 @@ export function MyLegalDeposits() {
                               <BookOpen className="h-3 w-3" />
                               {deposit.support_type || "Non spécifié"}
                             </Badge>
+                            {deposit.metadata?.depositType && (
+                              <Badge variant="outline" className="flex items-center gap-1">
+                                <FileText className="h-3 w-3" />
+                                {deposit.metadata.depositType === 'monographie' ? 'Livres' :
+                                 deposit.metadata.depositType === 'periodique' ? 'Périodiques' :
+                                 deposit.metadata.depositType === 'bd_logiciels' ? 'Audio-visuel & Logiciels' :
+                                 deposit.metadata.depositType === 'collections_specialisees' ? 'Collections Spécialisées' :
+                                 deposit.metadata.depositType}
+                              </Badge>
+                            )}
                             {deposit.dl_number && (
                               <Badge variant="secondary" className="flex items-center gap-1">
                                 <Award className="h-3 w-3" />
