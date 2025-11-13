@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, User, Building } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EditorFormData {
   type: "morale" | "physique";
@@ -16,12 +17,14 @@ interface EditorFormData {
   // Commun
   email: string;
   phone: string;
-  address: string;
+  googleMapsLink: string;
   region: string;
   city: string;
   
   // Personne morale
   logoFile?: File;
+  selectedPublisherId?: string;
+  isNewPublisher?: boolean;
   nameAr?: string;
   nameFr?: string;
   commerceRegistry?: string;
@@ -42,10 +45,29 @@ const EditorSignupForm = () => {
     nature: "",
     email: "",
     phone: "+212 ",
-    address: "",
+    googleMapsLink: "",
     region: "",
     city: "",
+    isNewPublisher: false,
   });
+  
+  const [publishers, setPublishers] = useState<Array<{id: string, name: string}>>([]);
+  const [publisherSearch, setPublisherSearch] = useState("");
+  const [showPublisherDropdown, setShowPublisherDropdown] = useState(false);
+  
+  // Charger les éditeurs au montage
+  useEffect(() => {
+    const loadPublishers = async () => {
+      const { data } = await supabase
+        .from('publishers')
+        .select('id, name')
+        .order('name');
+      if (data) {
+        setPublishers(data);
+      }
+    };
+    loadPublishers();
+  }, []);
 
   const handleFileUpload = (field: string, file: File | null) => {
     setFormData(prev => ({ ...prev, [field]: file }));
@@ -55,7 +77,7 @@ const EditorSignupForm = () => {
     e.preventDefault();
     
     // Validation basique
-    if (!formData.email || !formData.phone || !formData.address) {
+    if (!formData.email || !formData.phone || !formData.googleMapsLink) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -132,27 +154,109 @@ const EditorSignupForm = () => {
           <Tabs value={formData.type} className="w-full">
             <TabsContent value="morale" className="space-y-4">
               {/* Formulaire personne morale */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="nameAr">Nom de l'éditeur (Arabe) *</Label>
-                  <Input
-                    id="nameAr"
-                    value={formData.nameAr || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, nameAr: e.target.value }))}
-                    placeholder="اسم الناشر"
-                    dir="rtl"
-                  />
+                  <Label>Nom de l'éditeur *</Label>
+                  {!formData.isNewPublisher ? (
+                    <div className="relative">
+                      <Input
+                        placeholder="Rechercher un éditeur..."
+                        value={publisherSearch}
+                        onChange={(e) => {
+                          setPublisherSearch(e.target.value);
+                          setShowPublisherDropdown(true);
+                        }}
+                        onFocus={() => setShowPublisherDropdown(true)}
+                      />
+                      {showPublisherDropdown && publisherSearch && (
+                        <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                          {publishers
+                            .filter(pub => 
+                              pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
+                            )
+                            .map((pub) => (
+                              <button
+                                key={pub.id}
+                                type="button"
+                                className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                                onClick={() => {
+                                  setFormData(prev => ({ 
+                                    ...prev, 
+                                    selectedPublisherId: pub.id,
+                                    nameFr: pub.name 
+                                  }));
+                                  setPublisherSearch(pub.name);
+                                  setShowPublisherDropdown(false);
+                                }}
+                              >
+                                {pub.name}
+                              </button>
+                            ))}
+                          <button
+                            type="button"
+                            className="w-full text-left px-4 py-2 hover:bg-accent transition-colors border-t font-medium"
+                            onClick={() => {
+                              setFormData(prev => ({ 
+                                ...prev, 
+                                isNewPublisher: true,
+                                selectedPublisherId: undefined,
+                                nameFr: "",
+                                nameAr: ""
+                              }));
+                              setPublisherSearch("");
+                              setShowPublisherDropdown(false);
+                            }}
+                          >
+                            ✚ Autre
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-3 bg-primary/10 rounded-md">
+                        <span className="text-sm font-medium">Nouveau éditeur</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setFormData(prev => ({ 
+                              ...prev, 
+                              isNewPublisher: false,
+                              nameFr: "",
+                              nameAr: ""
+                            }));
+                            setPublisherSearch("");
+                          }}
+                        >
+                          Modifier
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="nameAr">Nom de l'éditeur (Arabe) *</Label>
+                          <Input
+                            id="nameAr"
+                            value={formData.nameAr || ""}
+                            onChange={(e) => setFormData(prev => ({ ...prev, nameAr: e.target.value }))}
+                            placeholder="اسم الناشر"
+                            dir="rtl"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="nameFr">Nom de l'éditeur (Français) *</Label>
+                          <Input
+                            id="nameFr"
+                            value={formData.nameFr || ""}
+                            onChange={(e) => setFormData(prev => ({ ...prev, nameFr: e.target.value }))}
+                            placeholder="Nom de l'éditeur"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="nameFr">Nom de l'éditeur (Français) *</Label>
-                  <Input
-                    id="nameFr"
-                    value={formData.nameFr || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, nameFr: e.target.value }))}
-                    placeholder="Nom de l'éditeur"
-                  />
-                </div>
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="logo">Logo de l'éditeur</Label>
@@ -190,6 +294,7 @@ const EditorSignupForm = () => {
                   placeholder="Nom de la personne de contact"
                 />
               </div>
+            </div>
             </TabsContent>
 
             <TabsContent value="physique" className="space-y-4">
@@ -295,14 +400,17 @@ const EditorSignupForm = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Adresse physique *</Label>
-              <Textarea
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                placeholder="Adresse complète"
-                rows={3}
+              <Label htmlFor="googleMapsLink">Lien Google Maps *</Label>
+              <Input
+                id="googleMapsLink"
+                type="url"
+                value={formData.googleMapsLink}
+                onChange={(e) => setFormData(prev => ({ ...prev, googleMapsLink: e.target.value }))}
+                placeholder="https://maps.google.com/..."
               />
+              <p className="text-xs text-muted-foreground">
+                Copiez le lien de votre localisation depuis Google Maps
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
