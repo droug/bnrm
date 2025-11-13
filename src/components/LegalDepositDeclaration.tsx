@@ -3805,13 +3805,91 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>{language === 'ar' ? 'الاسم' : 'Nom'}</Label>
-              <Input placeholder={language === 'ar' ? `اسم ${roleLabel}` : `Nom du ${roleLabel}`} />
+              <Label>{language === 'ar' ? 'الاسم' : 'Nom'} <span className="text-destructive">*</span></Label>
+              {!selectedPublisher ? (
+                <div className="relative">
+                  <Input
+                    placeholder={language === 'ar' ? 'بحث عن ناشر...' : 'Rechercher un éditeur...'}
+                    value={publisherSearch}
+                    onChange={(e) => setPublisherSearch(e.target.value)}
+                    className="pr-10"
+                  />
+                  {publisherSearch && (
+                    <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                      {publishers
+                        .filter(pub => 
+                          pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
+                        )
+                        .map((pub) => (
+                          <button
+                            key={pub.id}
+                            type="button"
+                            className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                            onClick={() => {
+                              setSelectedPublisher(pub);
+                              setPublisherSearch('');
+                              setEditorData({ name: pub.name, ...pub });
+                            }}
+                          >
+                            <div className="flex flex-col">
+                              <span className="font-medium">{pub.name}</span>
+                              {pub.city && (
+                                <span className="text-sm text-muted-foreground">
+                                  {pub.city}, {pub.country}
+                                </span>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      <button
+                        type="button"
+                        className="w-full text-left px-4 py-2 hover:bg-accent transition-colors border-t font-medium"
+                        onClick={() => {
+                          setEditorData({ name: publisherSearch, isOther: true });
+                          setSelectedPublisher({ id: 'other', name: publisherSearch } as Publisher);
+                          setPublisherSearch('');
+                        }}
+                      >
+                        {language === 'ar' ? 'آخر' : 'Autre'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="p-3 bg-primary/10 rounded-md flex justify-between items-start">
+                  <div>
+                    <p className="font-medium">{selectedPublisher.name}</p>
+                    {selectedPublisher.city && selectedPublisher.id !== 'other' && (
+                      <p className="text-sm text-muted-foreground">
+                        {selectedPublisher.city}, {selectedPublisher.country}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedPublisher(null);
+                      setEditorData({});
+                    }}
+                  >
+                    {language === 'ar' ? 'تعديل' : 'Modifier'}
+                  </Button>
+                </div>
+              )}
             </div>
             
             <div className="space-y-2">
-              <Label>{language === 'ar' ? 'العنوان' : 'Adresse'}</Label>
-              <Input placeholder={language === 'ar' ? 'العنوان' : 'Adresse'} />
+              <Label>{language === 'ar' ? 'رابط خرائط Google' : 'Lien Google Maps'} <span className="text-destructive">*</span></Label>
+              <Input 
+                placeholder={language === 'ar' ? 'https://maps.google.com/?q=...' : 'https://maps.google.com/?q=...'}
+                value={editorData.googleMapsLink || ''}
+                onChange={(e) => setEditorData({ ...editorData, googleMapsLink: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground">
+                {language === 'ar' ? 'الصق رابط موقعك على خرائط Google' : 'Collez le lien de localisation Google Maps'}
+              </p>
             </div>
             
             <div className="space-y-2">
