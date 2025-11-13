@@ -112,6 +112,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [partnerConfirmed, setPartnerConfirmed] = useState(false);
   const [editorData, setEditorData] = useState<any>({});
   const [printerData, setPrinterData] = useState<any>({});
+  const [producerData, setProducerData] = useState<any>({});
+  const [distributorData, setDistributorData] = useState<any>({});
   const [formData, setFormData] = useState<any>({});
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, File>>({});
@@ -2244,7 +2246,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 onClick={() => {
                                   setSelectedProducer(prod);
                                   setProducerSearch('');
-                                  setEditorData({
+                                  setProducerData({
                                     name: prod.name,
                                     phone: prod.phone || '',
                                     email: prod.email || '',
@@ -2292,6 +2294,16 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                     setProducers([...producers, data as unknown as Producer]);
                                     setSelectedProducer(data as unknown as Producer);
                                     setProducerSearch('');
+                                    setProducerData({
+                                      name: (data as unknown as Producer).name,
+                                      phone: (data as unknown as Producer).phone || '',
+                                      email: (data as unknown as Producer).email || '',
+                                      googleMapsLink: (data as unknown as Producer).google_maps_link || '',
+                                      address: (data as unknown as Producer).address || '',
+                                      city: (data as unknown as Producer).city || '',
+                                      country: (data as unknown as Producer).country || 'Maroc',
+                                      ...(data as unknown as Producer)
+                                    });
                                     toast.success('Producteur ajouté avec succès');
                                   }
                                 }}
@@ -2329,8 +2341,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Label>Lien Google Maps <span className="text-destructive">*</span></Label>
                   <Input 
                     placeholder="https://maps.google.com/?q=..."
-                    value={editorData.googleMapsLink || ''}
-                    onChange={(e) => setEditorData({ ...editorData, googleMapsLink: e.target.value })}
+                    value={producerData.googleMapsLink || ''}
+                    onChange={(e) => setProducerData({ ...producerData, googleMapsLink: e.target.value })}
                   />
                   <p className="text-xs text-muted-foreground">
                     Collez le lien de localisation Google Maps
@@ -2341,8 +2353,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Label>Téléphone <span className="text-destructive">*</span></Label>
                   <Input 
                     placeholder="Numéro de téléphone"
-                    value={editorData.phone || ''}
-                    onChange={(e) => setEditorData({ ...editorData, phone: e.target.value })}
+                    value={producerData.phone || ''}
+                    onChange={(e) => setProducerData({ ...producerData, phone: e.target.value })}
                   />
                 </div>
                 
@@ -2351,8 +2363,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input 
                     type="email" 
                     placeholder="Adresse email"
-                    value={editorData.email || ''}
-                    onChange={(e) => setEditorData({ ...editorData, email: e.target.value })}
+                    value={producerData.email || ''}
+                    onChange={(e) => setProducerData({ ...producerData, email: e.target.value })}
                   />
                 </div>
 
@@ -2478,7 +2490,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 onClick={() => {
                                   setSelectedDistributor(dist);
                                   setDistributorSearch('');
-                                  setPrinterData({
+                                  setDistributorData({
                                     name: dist.name,
                                     phone: dist.phone || '',
                                     email: dist.email || '',
@@ -2526,6 +2538,16 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                     setDistributors([...distributors, data as unknown as Distributor]);
                                     setSelectedDistributor(data as unknown as Distributor);
                                     setDistributorSearch('');
+                                    setDistributorData({
+                                      name: (data as unknown as Distributor).name,
+                                      phone: (data as unknown as Distributor).phone || '',
+                                      email: (data as unknown as Distributor).email || '',
+                                      googleMapsLink: (data as unknown as Distributor).google_maps_link || '',
+                                      address: (data as unknown as Distributor).address || '',
+                                      city: (data as unknown as Distributor).city || '',
+                                      country: (data as unknown as Distributor).country || 'Maroc',
+                                      ...(data as unknown as Distributor)
+                                    });
                                     toast.success('Distributeur ajouté avec succès');
                                   }
                                 }}
@@ -2563,8 +2585,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Label>Lien Google Maps <span className="text-destructive">*</span></Label>
                   <Input 
                     placeholder="https://maps.google.com/?q=..."
-                    value={printerData.googleMapsLink || ''}
-                    onChange={(e) => setPrinterData({ ...printerData, googleMapsLink: e.target.value })}
+                    value={distributorData.googleMapsLink || ''}
+                    onChange={(e) => setDistributorData({ ...distributorData, googleMapsLink: e.target.value })}
                   />
                   <p className="text-xs text-muted-foreground">
                     Collez le lien de localisation Google Maps
@@ -2575,8 +2597,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Label>Téléphone <span className="text-destructive">*</span></Label>
                   <Input 
                     placeholder="Numéro de téléphone"
-                    value={printerData.phone || ''}
-                    onChange={(e) => setPrinterData({ ...printerData, phone: e.target.value })}
+                    value={distributorData.phone || ''}
+                    onChange={(e) => setDistributorData({ ...distributorData, phone: e.target.value })}
                   />
                 </div>
                 
@@ -2585,8 +2607,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <Input 
                     type="email" 
                     placeholder="Adresse email"
-                    value={printerData.email || ''}
-                    onChange={(e) => setPrinterData({ ...printerData, email: e.target.value })}
+                    value={distributorData.email || ''}
+                    onChange={(e) => setDistributorData({ ...distributorData, email: e.target.value })}
                   />
                 </div>
 
