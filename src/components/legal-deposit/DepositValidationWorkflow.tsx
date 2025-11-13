@@ -44,6 +44,8 @@ export function DepositValidationWorkflow() {
   const { user } = useAuth();
   const [requests, setRequests] = useState<DepositRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<DepositRequest | null>(null);
+  const [viewDetailsRequest, setViewDetailsRequest] = useState<DepositRequest | null>(null);
+  const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false);
   const [comments, setComments] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
@@ -665,7 +667,10 @@ export function DepositValidationWorkflow() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => setSelectedRequest(request)}
+                              onClick={() => {
+                                setViewDetailsRequest(request);
+                                setIsViewDetailsOpen(true);
+                              }}
                               title="Voir les détails"
                             >
                               <Info className="h-4 w-4" />
@@ -964,6 +969,177 @@ export function DepositValidationWorkflow() {
                   </Button>
                 </div>
               )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* View-Only Details Dialog */}
+      <Dialog open={isViewDetailsOpen} onOpenChange={setIsViewDetailsOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              Détails de la demande - {viewDetailsRequest?.request_number}
+            </DialogTitle>
+            <DialogDescription>
+              Consultation en lecture seule des informations de la demande
+            </DialogDescription>
+          </DialogHeader>
+          
+          {viewDetailsRequest && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Informations de la publication</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div>
+                    <strong>Titre:</strong> {viewDetailsRequest.title}
+                  </div>
+                  {viewDetailsRequest.subtitle && (
+                    <div>
+                      <strong>Sous-titre:</strong> {viewDetailsRequest.subtitle}
+                    </div>
+                  )}
+                  <div>
+                    <strong>Auteur:</strong> {viewDetailsRequest.author_name}
+                  </div>
+                  <div>
+                    <strong>Type de support:</strong> <Badge>{viewDetailsRequest.support_type}</Badge>
+                  </div>
+                  <div>
+                    <strong>Statut:</strong> {viewDetailsRequest.status === "soumis" ? (
+                      <Badge variant="secondary">Soumis</Badge>
+                    ) : viewDetailsRequest.status === "en_attente_validation_b" ? (
+                      <Badge variant="outline">En attente DLBN</Badge>
+                    ) : viewDetailsRequest.status === "valide_par_b" ? (
+                      <Badge className="bg-green-100 text-green-800">Validé DLBN</Badge>
+                    ) : viewDetailsRequest.status === "en_attente_comite_validation" ? (
+                      <Badge variant="outline">En attente Comité</Badge>
+                    ) : viewDetailsRequest.status === "valide_par_comite" ? (
+                      <Badge className="bg-green-100 text-green-800">Validé Comité</Badge>
+                    ) : viewDetailsRequest.status === "rejete" ? (
+                      <Badge variant="destructive">Rejeté</Badge>
+                    ) : (
+                      <Badge>{viewDetailsRequest.status}</Badge>
+                    )}
+                  </div>
+                  <div>
+                    <strong>Date de soumission:</strong> {format(new Date(viewDetailsRequest.created_at), "dd/MM/yyyy HH:mm", { locale: fr })}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {viewDetailsRequest.metadata && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Métadonnées supplémentaires</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <pre className="text-xs bg-muted p-3 rounded-lg overflow-auto max-h-60">
+                      {JSON.stringify(viewDetailsRequest.metadata, null, 2)}
+                    </pre>
+                  </CardContent>
+                </Card>
+              )}
+
+              {viewDetailsRequest.validated_by_service && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Validation Service DLBN</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div>
+                      <strong>Validé par:</strong> {viewDetailsRequest.validated_by_service}
+                    </div>
+                    {viewDetailsRequest.service_validated_at && (
+                      <div>
+                        <strong>Date de validation:</strong> {format(new Date(viewDetailsRequest.service_validated_at), "dd/MM/yyyy HH:mm", { locale: fr })}
+                      </div>
+                    )}
+                    {viewDetailsRequest.service_validation_notes && (
+                      <div>
+                        <strong>Notes:</strong> {viewDetailsRequest.service_validation_notes}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {viewDetailsRequest.validated_by_department && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Validation Département ABN</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div>
+                      <strong>Validé par:</strong> {viewDetailsRequest.validated_by_department}
+                    </div>
+                    {viewDetailsRequest.department_validated_at && (
+                      <div>
+                        <strong>Date de validation:</strong> {format(new Date(viewDetailsRequest.department_validated_at), "dd/MM/yyyy HH:mm", { locale: fr })}
+                      </div>
+                    )}
+                    {viewDetailsRequest.department_validation_notes && (
+                      <div>
+                        <strong>Notes:</strong> {viewDetailsRequest.department_validation_notes}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {viewDetailsRequest.validated_by_committee && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Validation Comité</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div>
+                      <strong>Validé par:</strong> {viewDetailsRequest.validated_by_committee}
+                    </div>
+                    {viewDetailsRequest.committee_validated_at && (
+                      <div>
+                        <strong>Date de validation:</strong> {format(new Date(viewDetailsRequest.committee_validated_at), "dd/MM/yyyy HH:mm", { locale: fr })}
+                      </div>
+                    )}
+                    {viewDetailsRequest.committee_validation_notes && (
+                      <div>
+                        <strong>Notes:</strong> {viewDetailsRequest.committee_validation_notes}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {viewDetailsRequest.rejected_by && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base text-destructive">Rejet</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div>
+                      <strong>Rejeté par:</strong> {viewDetailsRequest.rejected_by}
+                    </div>
+                    {viewDetailsRequest.rejected_at && (
+                      <div>
+                        <strong>Date de rejet:</strong> {format(new Date(viewDetailsRequest.rejected_at), "dd/MM/yyyy HH:mm", { locale: fr })}
+                      </div>
+                    )}
+                    {viewDetailsRequest.rejection_reason && (
+                      <div>
+                        <strong>Raison:</strong> {viewDetailsRequest.rejection_reason}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              <div className="flex justify-end pt-4">
+                <Button variant="outline" onClick={() => setIsViewDetailsOpen(false)}>
+                  Fermer
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
