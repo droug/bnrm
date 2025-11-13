@@ -226,7 +226,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     const fetchPublishers = async () => {
       const { data, error } = await supabase
         .from('publishers')
-        .select('*, google_maps_link, city, country')
+        .select('id, name, city, country, publisher_type, address, phone, email, google_maps_link')
         .order('name');
       
       if (error) {
@@ -234,14 +234,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
         const errorMsg = depositType === 'bd_logiciels' ? 'Erreur lors du chargement des producteurs' : 'Erreur lors du chargement des éditeurs';
         toast.error(errorMsg);
       } else {
-        setPublishers(data || []);
+        setPublishers((data as unknown as Publisher[]) || []);
       }
     };
 
     const fetchPrinters = async () => {
       const { data, error } = await supabase
         .from('printers')
-        .select('*, google_maps_link, city, country')
+        .select('id, name, city, country, address, phone, email, google_maps_link')
         .order('name');
       
       if (error) {
@@ -249,35 +249,35 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
         const errorMsg = depositType === 'bd_logiciels' ? 'Erreur lors du chargement des distributeurs' : 'Erreur lors du chargement des imprimeries';
         toast.error(errorMsg);
       } else {
-        setPrinters(data || []);
+        setPrinters((data as unknown as Printer[]) || []);
       }
     };
 
     const fetchProducers = async () => {
       const { data, error } = await supabase
         .from('producers')
-        .select('*, google_maps_link, city, country')
+        .select('id, name, address, city, country, phone, email, google_maps_link')
         .order('name');
       
       if (error) {
         console.error('Error fetching producers:', error);
         toast.error('Erreur lors du chargement des producteurs');
       } else {
-        setProducers(data || []);
+        setProducers((data as unknown as Producer[]) || []);
       }
     };
 
     const fetchDistributors = async () => {
       const { data, error } = await supabase
         .from('distributors')
-        .select('*, google_maps_link, city, country')
+        .select('id, name, address, city, country, phone, email, google_maps_link')
         .order('name');
       
       if (error) {
         console.error('Error fetching distributors:', error);
         toast.error('Erreur lors du chargement des distributeurs');
       } else {
-        setDistributors(data || []);
+        setDistributors((data as unknown as Distributor[]) || []);
       }
     };
 
@@ -940,14 +940,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                   const { data, error } = await supabase
                                     .from('publishers')
                                     .insert([{ name: newName }])
-                                    .select()
+                                    .select('id, name, city, country, publisher_type, address, phone, email, google_maps_link')
                                     .single();
                                   
                                   if (error) {
                                     toast.error('Erreur lors de l\'ajout de l\'éditeur');
-                                  } else {
-                                    setPublishers([...publishers, data]);
-                                    setSelectedPublisher(data);
+                                  } else if (data) {
+                                    setPublishers([...publishers, data as unknown as Publisher]);
+                                    setSelectedPublisher(data as unknown as Publisher);
                                     setPublisherSearch('');
                                     toast.success('Éditeur ajouté avec succès');
                                   }
@@ -1112,14 +1112,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                   const { data, error } = await supabase
                                     .from('printers')
                                     .insert([{ name: newName }])
-                                    .select()
+                                    .select('id, name, city, country, address, phone, email, google_maps_link')
                                     .single();
                                   
                                   if (error) {
                                     toast.error('Erreur lors de l\'ajout de l\'imprimerie');
-                                  } else {
-                                    setPrinters([...printers, data]);
-                                    setSelectedPrinter(data);
+                                  } else if (data) {
+                                    setPrinters([...printers, data as unknown as Printer]);
+                                    setSelectedPrinter(data as unknown as Printer);
                                     setPrinterSearch('');
                                     toast.success('Imprimerie ajoutée avec succès');
                                   }
@@ -1579,14 +1579,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                   const { data, error } = await supabase
                                     .from('publishers')
                                     .insert([{ name: newName }])
-                                    .select()
+                                    .select('id, name, city, country, publisher_type, address, phone, email, google_maps_link')
                                     .single();
                                   
                                   if (error) {
                                     toast.error('Erreur lors de l\'ajout de l\'éditeur');
-                                  } else {
-                                    setPublishers([...publishers, data]);
-                                    setSelectedPublisher(data);
+                                  } else if (data) {
+                                    setPublishers([...publishers, data as unknown as Publisher]);
+                                    setSelectedPublisher(data as unknown as Publisher);
                                     setPublisherSearch('');
                                     toast.success('Éditeur ajouté avec succès');
                                   }
@@ -1769,14 +1769,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                   const { data, error } = await supabase
                                     .from('printers')
                                     .insert([{ name: newName }])
-                                    .select()
+                                    .select('id, name, city, country, address, phone, email, google_maps_link')
                                     .single();
                                   
                                   if (error) {
                                     toast.error('Erreur lors de l\'ajout de l\'imprimerie');
-                                  } else {
-                                    setPrinters([...printers, data]);
-                                    setSelectedPrinter(data);
+                                  } else if (data) {
+                                    setPrinters([...printers, data as unknown as Printer]);
+                                    setSelectedPrinter(data as unknown as Printer);
                                     setPrinterSearch('');
                                     toast.success('Imprimerie ajoutée avec succès');
                                   }
@@ -2283,14 +2283,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                   const { data, error } = await supabase
                                     .from('producers')
                                     .insert([{ name: newName }])
-                                    .select()
+                                    .select('id, name, address, city, country, phone, email, google_maps_link')
                                     .single();
                                   
                                   if (error) {
                                     toast.error('Erreur lors de l\'ajout du producteur');
-                                  } else {
-                                    setProducers([...producers, data]);
-                                    setSelectedProducer(data);
+                                  } else if (data) {
+                                    setProducers([...producers, data as unknown as Producer]);
+                                    setSelectedProducer(data as unknown as Producer);
                                     setProducerSearch('');
                                     toast.success('Producteur ajouté avec succès');
                                   }
@@ -2486,14 +2486,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                   const { data, error } = await supabase
                                     .from('distributors')
                                     .insert([{ name: newName }])
-                                    .select()
+                                    .select('id, name, address, city, country, phone, email, google_maps_link')
                                     .single();
                                   
                                   if (error) {
                                     toast.error('Erreur lors de l\'ajout du distributeur');
-                                  } else {
-                                    setDistributors([...distributors, data]);
-                                    setSelectedDistributor(data);
+                                  } else if (data) {
+                                    setDistributors([...distributors, data as unknown as Distributor]);
+                                    setSelectedDistributor(data as unknown as Distributor);
                                     setDistributorSearch('');
                                     toast.success('Distributeur ajouté avec succès');
                                   }
@@ -2921,14 +2921,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                   const { data, error } = await supabase
                                     .from('publishers')
                                     .insert([{ name: newName }])
-                                    .select()
+                                    .select('id, name, city, country, publisher_type, address, phone, email, google_maps_link')
                                     .single();
                                   
                                   if (error) {
                                     toast.error('Erreur lors de l\'ajout de l\'éditeur');
-                                  } else {
-                                    setPublishers([...publishers, data]);
-                                    setSelectedPublisher(data);
+                                  } else if (data) {
+                                    setPublishers([...publishers, data as unknown as Publisher]);
+                                    setSelectedPublisher(data as unknown as Publisher);
                                     setPublisherSearch('');
                                     toast.success('Éditeur ajouté avec succès');
                                   }
@@ -3093,14 +3093,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                   const { data, error } = await supabase
                                     .from('printers')
                                     .insert([{ name: newName }])
-                                    .select()
+                                    .select('id, name, city, country, address, phone, email, google_maps_link')
                                     .single();
                                   
                                   if (error) {
                                     toast.error('Erreur lors de l\'ajout de l\'imprimerie');
-                                  } else {
-                                    setPrinters([...printers, data]);
-                                    setSelectedPrinter(data);
+                                  } else if (data) {
+                                    setPrinters([...printers, data as unknown as Printer]);
+                                    setSelectedPrinter(data as unknown as Printer);
                                     setPrinterSearch('');
                                     toast.success('Imprimerie ajoutée avec succès');
                                   }
