@@ -139,6 +139,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
   const [publicationDate, setPublicationDate] = useState<Date>();
   const [publicationDateInput, setPublicationDateInput] = useState<string>("");
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [publicationType, setPublicationType] = useState<string>("");
   const [publicationTypes, setPublicationTypes] = useState<Array<{code: string, label: string}>>([]);
   const [authorPseudonym, setAuthorPseudonym] = useState<string>("");
@@ -991,39 +992,52 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Date prévue de parution</Label>
-                  <Input
-                    placeholder="JJ/MM/AAAA"
-                    value={publicationDateInput}
-                    onChange={(e) => {
-                      setPublicationDateInput(e.target.value);
-                      // Parse manual input
-                      const parts = e.target.value.split('/');
-                      if (parts.length === 3) {
-                        const day = parseInt(parts[0]);
-                        const month = parseInt(parts[1]) - 1;
-                        const year = parseInt(parts[2]);
-                        if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-                          const date = new Date(year, month, day);
-                          if (date.getDate() === day && date.getMonth() === month) {
-                            setPublicationDate(date);
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="JJ/MM/AAAA"
+                      value={publicationDateInput}
+                      onChange={(e) => {
+                        setPublicationDateInput(e.target.value);
+                        // Parse manual input
+                        const parts = e.target.value.split('/');
+                        if (parts.length === 3) {
+                          const day = parseInt(parts[0]);
+                          const month = parseInt(parts[1]) - 1;
+                          const year = parseInt(parts[2]);
+                          if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                            const date = new Date(year, month, day);
+                            if (date.getDate() === day && date.getMonth() === month) {
+                              setPublicationDate(date);
+                            }
                           }
                         }
-                      }
-                    }}
-                  />
-                  <div className="border rounded-md">
-                    <Calendar
-                      mode="single"
-                      selected={publicationDate}
-                      onSelect={(date) => {
-                        setPublicationDate(date);
-                        if (date) {
-                          setPublicationDateInput(format(date, "dd/MM/yyyy"));
-                        }
                       }}
-                      className="pointer-events-auto"
+                      className="flex-1"
                     />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setShowCalendar(!showCalendar)}
+                    >
+                      <CalendarIcon className="h-4 w-4" />
+                    </Button>
                   </div>
+                  {showCalendar && (
+                    <div className="border rounded-md bg-background">
+                      <Calendar
+                        mode="single"
+                        selected={publicationDate}
+                        onSelect={(date) => {
+                          setPublicationDate(date);
+                          if (date) {
+                            setPublicationDateInput(format(date, "dd/MM/yyyy"));
+                          }
+                        }}
+                        className="pointer-events-auto"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1613,39 +1627,52 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Date prévue de parution</Label>
-                  <Input
-                    placeholder="JJ/MM/AAAA"
-                    value={publicationDateInput}
-                    onChange={(e) => {
-                      setPublicationDateInput(e.target.value);
-                      // Parse manual input
-                      const parts = e.target.value.split('/');
-                      if (parts.length === 3) {
-                        const day = parseInt(parts[0]);
-                        const month = parseInt(parts[1]) - 1;
-                        const year = parseInt(parts[2]);
-                        if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-                          const date = new Date(year, month, day);
-                          if (date.getDate() === day && date.getMonth() === month) {
-                            setPublicationDate(date);
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="JJ/MM/AAAA"
+                      value={publicationDateInput}
+                      onChange={(e) => {
+                        setPublicationDateInput(e.target.value);
+                        // Parse manual input
+                        const parts = e.target.value.split('/');
+                        if (parts.length === 3) {
+                          const day = parseInt(parts[0]);
+                          const month = parseInt(parts[1]) - 1;
+                          const year = parseInt(parts[2]);
+                          if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                            const date = new Date(year, month, day);
+                            if (date.getDate() === day && date.getMonth() === month) {
+                              setPublicationDate(date);
+                            }
                           }
                         }
-                      }
-                    }}
-                  />
-                  <div className="border rounded-md">
-                    <Calendar
-                      mode="single"
-                      selected={publicationDate}
-                      onSelect={(date) => {
-                        setPublicationDate(date);
-                        if (date) {
-                          setPublicationDateInput(format(date, "dd/MM/yyyy"));
-                        }
                       }}
-                      className="pointer-events-auto"
+                      className="flex-1"
                     />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setShowCalendar(!showCalendar)}
+                    >
+                      <CalendarIcon className="h-4 w-4" />
+                    </Button>
                   </div>
+                  {showCalendar && (
+                    <div className="border rounded-md bg-background">
+                      <Calendar
+                        mode="single"
+                        selected={publicationDate}
+                        onSelect={(date) => {
+                          setPublicationDate(date);
+                          if (date) {
+                            setPublicationDateInput(format(date, "dd/MM/yyyy"));
+                          }
+                        }}
+                        className="pointer-events-auto"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Champs personnalisés */}
@@ -2323,39 +2350,52 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 
                 <div className="space-y-2">
                   <Label>Date prévue de parution</Label>
-                  <Input
-                    placeholder="JJ/MM/AAAA"
-                    value={publicationDateInput}
-                    onChange={(e) => {
-                      setPublicationDateInput(e.target.value);
-                      // Parse manual input
-                      const parts = e.target.value.split('/');
-                      if (parts.length === 3) {
-                        const day = parseInt(parts[0]);
-                        const month = parseInt(parts[1]) - 1;
-                        const year = parseInt(parts[2]);
-                        if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-                          const date = new Date(year, month, day);
-                          if (date.getDate() === day && date.getMonth() === month) {
-                            setPublicationDate(date);
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="JJ/MM/AAAA"
+                      value={publicationDateInput}
+                      onChange={(e) => {
+                        setPublicationDateInput(e.target.value);
+                        // Parse manual input
+                        const parts = e.target.value.split('/');
+                        if (parts.length === 3) {
+                          const day = parseInt(parts[0]);
+                          const month = parseInt(parts[1]) - 1;
+                          const year = parseInt(parts[2]);
+                          if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                            const date = new Date(year, month, day);
+                            if (date.getDate() === day && date.getMonth() === month) {
+                              setPublicationDate(date);
+                            }
                           }
                         }
-                      }
-                    }}
-                  />
-                  <div className="border rounded-md">
-                    <Calendar
-                      mode="single"
-                      selected={publicationDate}
-                      onSelect={(date) => {
-                        setPublicationDate(date);
-                        if (date) {
-                          setPublicationDateInput(format(date, "dd/MM/yyyy"));
-                        }
                       }}
-                      className="pointer-events-auto"
+                      className="flex-1"
                     />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setShowCalendar(!showCalendar)}
+                    >
+                      <CalendarIcon className="h-4 w-4" />
+                    </Button>
                   </div>
+                  {showCalendar && (
+                    <div className="border rounded-md bg-background">
+                      <Calendar
+                        mode="single"
+                        selected={publicationDate}
+                        onSelect={(date) => {
+                          setPublicationDate(date);
+                          if (date) {
+                            setPublicationDateInput(format(date, "dd/MM/yyyy"));
+                          }
+                        }}
+                        className="pointer-events-auto"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Champs personnalisés */}
@@ -2972,39 +3012,52 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
 
                 <div className="space-y-2">
                   <Label>Date prévue de parution</Label>
-                  <Input
-                    placeholder="JJ/MM/AAAA"
-                    value={publicationDateInput}
-                    onChange={(e) => {
-                      setPublicationDateInput(e.target.value);
-                      // Parse manual input
-                      const parts = e.target.value.split('/');
-                      if (parts.length === 3) {
-                        const day = parseInt(parts[0]);
-                        const month = parseInt(parts[1]) - 1;
-                        const year = parseInt(parts[2]);
-                        if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-                          const date = new Date(year, month, day);
-                          if (date.getDate() === day && date.getMonth() === month) {
-                            setPublicationDate(date);
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="JJ/MM/AAAA"
+                      value={publicationDateInput}
+                      onChange={(e) => {
+                        setPublicationDateInput(e.target.value);
+                        // Parse manual input
+                        const parts = e.target.value.split('/');
+                        if (parts.length === 3) {
+                          const day = parseInt(parts[0]);
+                          const month = parseInt(parts[1]) - 1;
+                          const year = parseInt(parts[2]);
+                          if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                            const date = new Date(year, month, day);
+                            if (date.getDate() === day && date.getMonth() === month) {
+                              setPublicationDate(date);
+                            }
                           }
                         }
-                      }
-                    }}
-                  />
-                  <div className="border rounded-md">
-                    <Calendar
-                      mode="single"
-                      selected={publicationDate}
-                      onSelect={(date) => {
-                        setPublicationDate(date);
-                        if (date) {
-                          setPublicationDateInput(format(date, "dd/MM/yyyy"));
-                        }
                       }}
-                      className="pointer-events-auto"
+                      className="flex-1"
                     />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setShowCalendar(!showCalendar)}
+                    >
+                      <CalendarIcon className="h-4 w-4" />
+                    </Button>
                   </div>
+                  {showCalendar && (
+                    <div className="border rounded-md bg-background">
+                      <Calendar
+                        mode="single"
+                        selected={publicationDate}
+                        onSelect={(date) => {
+                          setPublicationDate(date);
+                          if (date) {
+                            setPublicationDateInput(format(date, "dd/MM/yyyy"));
+                          }
+                        }}
+                        className="pointer-events-auto"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
