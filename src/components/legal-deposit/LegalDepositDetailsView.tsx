@@ -168,19 +168,23 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
     const customFields = metadata.customFields || {};
     const printer = metadata.printer || {};
     
+    // Vérifier toutes les sources possibles pour les données de l'imprimeur
+    const printerName = printer.name || customFields.printer_name || customFields.printerName || '';
+    const printerAddress = printer.address || customFields.printer_address || customFields.printerAddress || '';
+    const printerPhone = printer.phone || customFields.printer_phone || customFields.printerPhone || '';
+    const printerEmail = printer.email || customFields.printer_email || customFields.printerEmail || '';
+    const printerCity = customFields.printer_city || customFields.printerCity || '';
+    const printerCountry = customFields.printer_country || customFields.printerCountry || '';
+    const printRun = metadata.printRun || printer.printRun || customFields.printer_printRun || '';
+    
     // Check if we have any printer information from various sources
-    const hasPrinterInfo = printer.name || 
-                          customFields.printer_name ||
-                          metadata.printRun ||
-                          printer.address ||
-                          customFields.printer_address ||
-                          printer.phone ||
-                          customFields.printer_phone ||
-                          printer.email ||
-                          customFields.printer_email ||
-                          printer.printRun ||
-                          customFields.printer_city ||
-                          customFields.printer_country;
+    const hasPrinterInfo = printerName || 
+                          printerAddress ||
+                          printerPhone ||
+                          printerEmail ||
+                          printRun ||
+                          printerCity ||
+                          printerCountry;
 
     if (!hasPrinterInfo) return null;
 
@@ -190,39 +194,39 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
           <CardTitle className="text-base">Identification de l'imprimeur</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          {(printer.name || customFields.printer_name) && (
+          {printerName && (
             <div>
-              <strong>Imprimerie:</strong> {printer.name || customFields.printer_name}
+              <strong>Imprimerie:</strong> {printerName}
             </div>
           )}
-          {(metadata.printRun || customFields.printer_printRun) && (
+          {printRun && (
             <div>
-              <strong>Nombre de tirage:</strong> {metadata.printRun || customFields.printer_printRun}
+              <strong>Nombre de tirage:</strong> {printRun}
             </div>
           )}
-          {(customFields.printer_country) && (
+          {printerCountry && (
             <div>
-              <strong>Pays:</strong> {customFields.printer_country}
+              <strong>Pays:</strong> {printerCountry}
             </div>
           )}
-          {(customFields.printer_city) && (
+          {printerCity && (
             <div>
-              <strong>Ville:</strong> {customFields.printer_city}
+              <strong>Ville:</strong> {printerCity}
             </div>
           )}
-          {(printer.address || customFields.printer_address) && (
+          {printerAddress && (
             <div>
-              <strong>Adresse:</strong> {printer.address || customFields.printer_address}
+              <strong>Adresse:</strong> {printerAddress}
             </div>
           )}
-          {(printer.phone || customFields.printer_phone) && (
+          {printerPhone && (
             <div>
-              <strong>Téléphone:</strong> {printer.phone || customFields.printer_phone}
+              <strong>Téléphone:</strong> {printerPhone}
             </div>
           )}
-          {(printer.email || customFields.printer_email) && (
+          {printerEmail && (
             <div>
-              <strong>Email:</strong> {printer.email || customFields.printer_email}
+              <strong>Email:</strong> {printerEmail}
             </div>
           )}
         </CardContent>
@@ -435,9 +439,19 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
     // Documents from documents_urls field - parcourir toutes les clés
     if (documentsUrls && typeof documentsUrls === 'object') {
       Object.entries(documentsUrls).forEach(([key, value]: [string, any]) => {
-        if (value && value.url) {
+        let url = null;
+        
+        // Gérer différents formats de stockage d'URL
+        if (typeof value === 'string' && value.trim()) {
+          url = value;
+        } else if (value && typeof value === 'object') {
+          // Si c'est un objet, chercher la propriété url
+          url = value.url || value.path || value.file_url;
+        }
+        
+        if (url) {
           const label = documentLabels[key] || key.replace(/_/g, ' ').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-          documents.push({ label, url: value.url });
+          documents.push({ label, url });
         }
       });
     }
@@ -453,26 +467,45 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
       documents.push({ label: 'Décision du Tribunal', url: request.court_decision_document });
     }
 
-    // Documents from metadata
-    if (metadata.cnie_document) {
-      documents.push({ label: 'CNIE de l\'auteur', url: metadata.cnie_document });
-    }
-    if (metadata.summary_document) {
-      documents.push({ label: 'Résumé du document', url: metadata.summary_document });
-    }
-    if (metadata.court_decision_document) {
-      documents.push({ label: 'Décision du Tribunal', url: metadata.court_decision_document });
-    }
-    if (metadata.supporting_document) {
-      documents.push({ label: 'Document justificatif', url: metadata.supporting_document });
-    }
-    if (metadata.additional_document) {
-      documents.push({ label: 'Document additionnel', url: metadata.additional_document });
-    }
+    // Documents from metadata - parcourir tous les champs possibles
+    const metadataDocumentFields = [
+      'cnie_document', 'cin_document', 'cin', 'cnie',
+      'summary_document', 'summary', 'abstract',
+      'court_decision_document', 'court_decision', 'courtDecision',
+      'supporting_document', 'supportingDocument',
+      'additional_document', 'additionalDocument',
+      'cover', 'cover_document', 'coverDocument',
+      'thesis_recommendation', 'thesisRecommendation', 'thesis-recommendation',
+      'quran_authorization', 'quranAuthorization', 'quran-authorization',
+      'isbn_request', 'isbnRequest', 'isbn-request',
+      'issn_request', 'issnRequest', 'issn-request',
+      'periodical_cover', 'periodicalCover', 'periodical-cover',
+      'periodical_sample', 'periodicalSample', 'periodical-sample',
+      'software_manual', 'softwareManual', 'software-manual',
+      'database_documentation', 'databaseDocumentation', 'database-documentation'
+    ];
 
-    // Remove duplicates based on URL
+    metadataDocumentFields.forEach(field => {
+      if (metadata[field]) {
+        let url = null;
+        const value = metadata[field];
+        
+        if (typeof value === 'string' && value.trim()) {
+          url = value;
+        } else if (value && typeof value === 'object') {
+          url = value.url || value.path || value.file_url;
+        }
+        
+        if (url) {
+          const label = documentLabels[field] || field.replace(/_/g, ' ').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          documents.push({ label, url });
+        }
+      }
+    });
+
+    // Remove duplicates and filter out invalid URLs
     const uniqueDocuments = documents.filter((doc, index, self) => 
-      index === self.findIndex((d) => d.url === doc.url)
+      doc.url && doc.url.trim() && index === self.findIndex((d) => d.url === doc.url)
     );
 
     if (uniqueDocuments.length === 0) return null;
