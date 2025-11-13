@@ -1073,6 +1073,16 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 onClick={() => {
                                   setSelectedPrinter(printer);
                                   setPrinterSearch('');
+                                  setPrinterData({
+                                    name: printer.name,
+                                    phone: printer.phone || '',
+                                    email: printer.email || '',
+                                    googleMapsLink: printer.google_maps_link || '',
+                                    address: printer.address || '',
+                                    city: printer.city || '',
+                                    country: printer.country || 'Maroc',
+                                    ...printer
+                                  });
                                 }}
                               >
                                 <div className="flex flex-col">
@@ -1689,6 +1699,16 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 onClick={() => {
                                   setSelectedPrinter(printer);
                                   setPrinterSearch('');
+                                  setPrinterData({
+                                    name: printer.name,
+                                    phone: printer.phone || '',
+                                    email: printer.email || '',
+                                    googleMapsLink: printer.google_maps_link || '',
+                                    address: printer.address || '',
+                                    city: printer.city || '',
+                                    country: printer.country || 'Maroc',
+                                    ...printer
+                                  });
                                 }}
                               >
                                 <div className="flex flex-col">
@@ -2162,6 +2182,16 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 onClick={() => {
                                   setSelectedProducer(prod);
                                   setProducerSearch('');
+                                  setEditorData({
+                                    name: prod.name,
+                                    phone: prod.phone || '',
+                                    email: prod.email || '',
+                                    googleMapsLink: prod.google_maps_link || '',
+                                    address: prod.address || '',
+                                    city: prod.city || '',
+                                    country: prod.country || 'Maroc',
+                                    ...prod
+                                  });
                                 }}
                               >
                                 <div className="flex flex-col">
@@ -2355,6 +2385,16 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 onClick={() => {
                                   setSelectedDistributor(dist);
                                   setDistributorSearch('');
+                                  setPrinterData({
+                                    name: dist.name,
+                                    phone: dist.phone || '',
+                                    email: dist.email || '',
+                                    googleMapsLink: dist.google_maps_link || '',
+                                    address: dist.address || '',
+                                    city: dist.city || '',
+                                    country: dist.country || 'Maroc',
+                                    ...dist
+                                  });
                                 }}
                               >
                                 <div className="flex flex-col">
@@ -2952,6 +2992,16 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                                 onClick={() => {
                                   setSelectedPrinter(printer);
                                   setPrinterSearch('');
+                                  setPrinterData({
+                                    name: printer.name,
+                                    phone: printer.phone || '',
+                                    email: printer.email || '',
+                                    googleMapsLink: printer.google_maps_link || '',
+                                    address: printer.address || '',
+                                    city: printer.city || '',
+                                    country: printer.country || 'Maroc',
+                                    ...printer
+                                  });
                                 }}
                               >
                                 <div className="flex flex-col">
@@ -3997,13 +4047,22 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             </div>
             
             <div className="space-y-2">
-              <Label>{language === 'ar' ? 'الهاتف' : 'Téléphone'}</Label>
-              <Input placeholder={language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'} />
+              <Label>{language === 'ar' ? 'الهاتف' : 'Téléphone'} <span className="text-destructive">*</span></Label>
+              <Input 
+                placeholder={language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'}
+                value={editorData.phone || ''}
+                onChange={(e) => setEditorData({ ...editorData, phone: e.target.value })}
+              />
             </div>
             
             <div className="space-y-2">
-              <Label>{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
-              <Input type="email" placeholder={language === 'ar' ? 'البريد الإلكتروني' : 'Adresse email'} />
+              <Label>{language === 'ar' ? 'البريد الإلكتروني' : 'Email'} <span className="text-destructive">*</span></Label>
+              <Input 
+                type="email" 
+                placeholder={language === 'ar' ? 'البريد الإلكتروني' : 'Adresse email'}
+                value={editorData.email || ''}
+                onChange={(e) => setEditorData({ ...editorData, email: e.target.value })}
+              />
             </div>
           </div>
 
