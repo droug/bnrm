@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { LegalDepositDetailsView } from "@/components/legal-deposit/LegalDepositDetailsView";
 
 interface DepositRequest {
   id: string;
@@ -1535,145 +1536,15 @@ export const BNRMRequestManager = () => {
           </DialogHeader>
           
           {viewDetailsRequest && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Informations du déclarant</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div>
-                      <strong>Nom:</strong> {viewDetailsRequest.metadata?.declarant?.name}
-                    </div>
-                    <div>
-                      <strong>Qualité:</strong> {viewDetailsRequest.metadata?.declarant?.type}
-                    </div>
-                    <div>
-                      <strong>Organisation:</strong> {viewDetailsRequest.metadata?.declarant?.organization}
-                    </div>
-                    <div>
-                      <strong>Email:</strong> {viewDetailsRequest.metadata?.declarant?.email}
-                    </div>
-                    <div>
-                      <strong>Téléphone:</strong> {viewDetailsRequest.metadata?.declarant?.phone}
-                    </div>
-                    <div>
-                      <strong>Adresse:</strong> {viewDetailsRequest.metadata?.declarant?.address}
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Informations de la publication</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div>
-                      <strong>Titre:</strong> {viewDetailsRequest.metadata?.publication?.title}
-                    </div>
-                    <div>
-                      <strong>Auteur:</strong> {viewDetailsRequest.metadata?.publication?.author}
-                    </div>
-                    <div>
-                      <strong>ISBN/ISSN:</strong> {viewDetailsRequest.metadata?.publication?.isbn_issn || "Non attribué"}
-                    </div>
-                    <div>
-                      <strong>Date de publication:</strong> {viewDetailsRequest.metadata?.publication?.publication_date}
-                    </div>
-                    <div>
-                      <strong>Langue:</strong> {viewDetailsRequest.metadata?.publication?.language}
-                    </div>
-                    <div>
-                      <strong>Pages:</strong> {viewDetailsRequest.metadata?.publication?.pages}
-                    </div>
-                    <div>
-                      <strong>Format:</strong> {viewDetailsRequest.metadata?.publication?.format}
-                    </div>
-                    <div>
-                      <strong>Édition:</strong> {viewDetailsRequest.metadata?.publication?.edition}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Informations administratives</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div>
-                    <strong>Type de dépôt:</strong> <Badge>{viewDetailsRequest.deposit_type}</Badge>
-                  </div>
-                  <div>
-                    <strong>Statut:</strong> {getStatusBadge(viewDetailsRequest.status)}
-                  </div>
-                  <div>
-                    <strong>Date de soumission:</strong> {format(new Date(viewDetailsRequest.submission_date), "dd/MM/yyyy HH:mm", { locale: fr })}
-                  </div>
-                  {viewDetailsRequest.acknowledgment_date && (
-                    <div>
-                      <strong>Date d'accusé de réception:</strong> {format(new Date(viewDetailsRequest.acknowledgment_date), "dd/MM/yyyy HH:mm", { locale: fr })}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {viewDetailsRequest.metadata?.validation_dlbn && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Validation Service DLBN</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    {viewDetailsRequest.metadata.validation_dlbn.validation_date && (
-                      <div>
-                        <strong>Date de validation:</strong> {format(new Date(viewDetailsRequest.metadata.validation_dlbn.validation_date), "dd/MM/yyyy HH:mm", { locale: fr })}
-                      </div>
-                    )}
-                    {viewDetailsRequest.metadata.validation_dlbn.comments && (
-                      <div>
-                        <strong>Commentaire:</strong> {viewDetailsRequest.metadata.validation_dlbn.comments}
-                      </div>
-                    )}
-                    {viewDetailsRequest.metadata.validation_dlbn.rejection_reason && (
-                      <div>
-                        <strong>Raison du rejet:</strong> {viewDetailsRequest.metadata.validation_dlbn.rejection_reason}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-
-              {viewDetailsRequest.metadata?.validation_abn && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Validation Département ABN</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    {viewDetailsRequest.metadata.validation_abn.validation_date && (
-                      <div>
-                        <strong>Date de validation:</strong> {format(new Date(viewDetailsRequest.metadata.validation_abn.validation_date), "dd/MM/yyyy HH:mm", { locale: fr })}
-                      </div>
-                    )}
-                    {viewDetailsRequest.metadata.validation_abn.comments && (
-                      <div>
-                        <strong>Commentaire:</strong> {viewDetailsRequest.metadata.validation_abn.comments}
-                      </div>
-                    )}
-                    {viewDetailsRequest.metadata.validation_abn.rejection_reason && (
-                      <div>
-                        <strong>Raison du rejet:</strong> {viewDetailsRequest.metadata.validation_abn.rejection_reason}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-
-              <div className="flex justify-end pt-4">
+            <>
+              <LegalDepositDetailsView request={viewDetailsRequest} />
+              
+              <div className="flex justify-end pt-4 border-t">
                 <Button variant="outline" onClick={() => setIsViewDetailsOpen(false)}>
                   Fermer
                 </Button>
               </div>
-            </div>
+            </>
           )}
         </DialogContent>
       </Dialog>
