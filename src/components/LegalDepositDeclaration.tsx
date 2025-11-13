@@ -4022,14 +4022,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               {!selectedPublisher ? (
                 <div className="relative">
                   <Input
-                    placeholder={language === 'ar' ? 'بحث عن ناشر...' : 'Rechercher un éditeur...'}
+                    placeholder={language === 'ar' ? `بحث عن ${roleLabel}...` : `Rechercher un ${roleLabel}...`}
                     value={publisherSearch}
                     onChange={(e) => setPublisherSearch(e.target.value)}
                     className="pr-10"
                   />
                   {publisherSearch && (
                     <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
-                      {publishers
+                      {(isBDLogiciels ? producers : publishers)
                         .filter(pub => 
                           pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
                         )
@@ -4039,13 +4039,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                             type="button"
                             className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
                             onClick={() => {
-                              setSelectedPublisher(pub);
+                              setSelectedPublisher(pub as any);
                               setPublisherSearch('');
                               setEditorData({ 
                                 name: pub.name,
                                 phone: pub.phone || '',
                                 email: pub.email || '',
-                                googleMapsLink: pub.google_maps_link || '',
+                                googleMapsLink: (pub as any).google_maps_link || '',
                                 address: pub.address || '',
                                 city: pub.city || '',
                                 country: pub.country || '',
