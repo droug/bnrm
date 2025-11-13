@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -250,38 +251,65 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
   };
 
   const renderDocuments = () => {
-    if (!request.cnie_document && !request.summary_document && !request.court_decision_document) return null;
+    const documents = [];
+    
+    // Documents from direct fields
+    if (request.cnie_document) {
+      documents.push({ label: 'CNIE de l\'auteur', url: request.cnie_document });
+    }
+    if (request.summary_document) {
+      documents.push({ label: 'Résumé du document', url: request.summary_document });
+    }
+    if (request.court_decision_document) {
+      documents.push({ label: 'Décision du Tribunal', url: request.court_decision_document });
+    }
+
+    // Documents from metadata
+    if (request.metadata) {
+      if (request.metadata.cnie_document) {
+        documents.push({ label: 'CNIE de l\'auteur', url: request.metadata.cnie_document });
+      }
+      if (request.metadata.summary_document) {
+        documents.push({ label: 'Résumé du document', url: request.metadata.summary_document });
+      }
+      if (request.metadata.court_decision_document) {
+        documents.push({ label: 'Décision du Tribunal', url: request.metadata.court_decision_document });
+      }
+      if (request.metadata.supporting_document) {
+        documents.push({ label: 'Document justificatif', url: request.metadata.supporting_document });
+      }
+      if (request.metadata.additional_document) {
+        documents.push({ label: 'Document additionnel', url: request.metadata.additional_document });
+      }
+    }
+
+    // Remove duplicates
+    const uniqueDocuments = documents.filter((doc, index, self) => 
+      index === self.findIndex((d) => d.url === doc.url)
+    );
+
+    if (uniqueDocuments.length === 0) return null;
 
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Pièces à fournir</CardTitle>
+          <CardTitle className="text-base">Documents joints</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
-          {request.cnie_document && (
-            <div>
-              <strong>CNIE de l'auteur:</strong>{" "}
-              <a href={request.cnie_document} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                Télécharger
-              </a>
+        <CardContent className="space-y-3">
+          {uniqueDocuments.map((doc, index) => (
+            <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
+              <span className="font-medium">{doc.label}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+              >
+                <a href={doc.url} target="_blank" rel="noopener noreferrer" download>
+                  Télécharger
+                </a>
+              </Button>
             </div>
-          )}
-          {request.summary_document && (
-            <div>
-              <strong>Résumé de l'ouvrage:</strong>{" "}
-              <a href={request.summary_document} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                Télécharger
-              </a>
-            </div>
-          )}
-          {request.court_decision_document && (
-            <div>
-              <strong>Décision du Tribunal:</strong>{" "}
-              <a href={request.court_decision_document} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                Télécharger
-              </a>
-            </div>
-          )}
+          ))}
         </CardContent>
       </Card>
     );
@@ -327,46 +355,83 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
   const renderMetadata = () => {
     if (!request.metadata || Object.keys(request.metadata).length === 0) return null;
 
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Métadonnées supplémentaires</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {Object.entries(request.metadata).map(([key, value]) => {
-            // Skip null or undefined values
-            if (value === null || value === undefined) return null;
-            
-            // Format the key to be more readable
-            const formattedKey = key
-              .split('_')
-              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(' ');
-            
-            // Format the value based on type
-            let displayValue: string = String(value);
-            if (typeof value === 'boolean') {
-              displayValue = value ? 'Oui' : 'Non';
-            } else if (typeof value === 'object') {
-              displayValue = JSON.stringify(value, null, 2);
-            }
-            
-            return (
-              <div key={key} className="border-b border-border/50 pb-2 last:border-0">
-                <strong>{formattedKey}:</strong>{' '}
-                {typeof value === 'object' ? (
-                  <pre className="mt-1 p-2 bg-muted rounded text-sm overflow-auto">
-                    {displayValue}
-                  </pre>
-                ) : (
-                  <span>{displayValue}</span>
-                )}
+    const metadata = request.metadata;
+    const sections = [];
+
+    // Section: Informations sur le type de dépôt
+    if (metadata.depositType) {
+      const depositTypeLabels: Record<string, string> = {
+        'monographie': 'Livres',
+        'periodique': 'Périodiques',
+        'bd_logiciels': 'Audio-visuel & Logiciels',
+        'collections_specialisees': 'Collections Spécialisées'
+      };
+      
+      sections.push(
+        <Card key="deposit-type">
+          <CardHeader>
+            <CardTitle className="text-base">Type de dépôt</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Badge variant="secondary" className="text-base px-3 py-1">
+              {depositTypeLabels[metadata.depositType] || metadata.depositType}
+            </Badge>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Section: Informations sur l'auteur supplémentaires (depuis metadata)
+    const authorMetadata = [];
+    if (metadata.author_region) authorMetadata.push(['Région', metadata.author_region]);
+    if (metadata.author_city) authorMetadata.push(['Ville', metadata.author_city]);
+    if (metadata.author_address) authorMetadata.push(['Adresse', metadata.author_address]);
+    if (metadata.author_phone) authorMetadata.push(['Téléphone', metadata.author_phone]);
+    if (metadata.author_email) authorMetadata.push(['Email', metadata.author_email]);
+
+    if (authorMetadata.length > 0) {
+      sections.push(
+        <Card key="author-metadata">
+          <CardHeader>
+            <CardTitle className="text-base">Coordonnées de l'auteur</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {authorMetadata.map(([label, value]) => (
+              <div key={label}>
+                <strong>{label}:</strong> {value}
               </div>
-            );
-          })}
-        </CardContent>
-      </Card>
-    );
+            ))}
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Section: Informations complémentaires sur la publication
+    const publicationMetadata = [];
+    if (metadata.publication_periodicity) publicationMetadata.push(['Périodicité', metadata.publication_periodicity]);
+    if (metadata.publication_nature) publicationMetadata.push(['Nature de la publication', metadata.publication_nature]);
+    if (metadata.collection_title) publicationMetadata.push(['Titre de la collection', metadata.collection_title]);
+    if (metadata.has_scale !== undefined) publicationMetadata.push(['Présence échelle', metadata.has_scale ? 'Oui' : 'Non']);
+    if (metadata.has_legend !== undefined) publicationMetadata.push(['Présence de légende', metadata.has_legend ? 'Oui' : 'Non']);
+
+    if (publicationMetadata.length > 0) {
+      sections.push(
+        <Card key="publication-metadata">
+          <CardHeader>
+            <CardTitle className="text-base">Informations complémentaires</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {publicationMetadata.map(([label, value]) => (
+              <div key={label}>
+                <strong>{label}:</strong> {value}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return sections.length > 0 ? <>{sections}</> : null;
   };
 
   const renderValidationInfo = () => {
