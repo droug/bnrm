@@ -40,6 +40,7 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { LegalDepositDetailsView } from "@/components/legal-deposit/LegalDepositDetailsView";
+import { SearchPagination } from "@/components/ui/search-pagination";
 
 interface DepositRequest {
   id: string;
@@ -368,6 +369,8 @@ export const BNRMRequestManager = () => {
   const [viewDetailsRequest, setViewDetailsRequest] = useState<DepositRequest | null>(null);
   const [isNewRequestOpen, setIsNewRequestOpen] = useState(false);
   const [validationComments, setValidationComments] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [newRequestForm, setNewRequestForm] = useState<DepositForm>({
     deposit_type: 'monographie',
     declarant: {
@@ -793,6 +796,12 @@ export const BNRMRequestManager = () => {
     return matchesSearch && matchesStatus && matchesType;
   });
 
+  // Pagination
+  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedRequests = filteredRequests.slice(startIndex, endIndex);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -1146,7 +1155,7 @@ export const BNRMRequestManager = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredRequests.map((request) => {
+                {paginatedRequests.map((request) => {
                   const TypeIcon = getDepositTypeIcon(request.deposit_type);
                   return (
                     <TableRow key={request.id}>
@@ -1241,6 +1250,17 @@ export const BNRMRequestManager = () => {
               </TableBody>
             </Table>
           )}
+          <SearchPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={filteredRequests.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={(newItemsPerPage) => {
+              setItemsPerPage(newItemsPerPage);
+              setCurrentPage(1);
+            }}
+          />
         </CardContent>
       </Card>
 
