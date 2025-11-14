@@ -24,6 +24,16 @@ import {
   Ban
 } from "lucide-react";
 
+interface Publisher {
+  id: string;
+  name: string;
+  city?: string;
+  country?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+}
+
 interface ReservedRange {
   id: string;
   requester_id: string;
@@ -44,7 +54,9 @@ interface ReservedRange {
 export const ReservedRangesManager = () => {
   const { toast } = useToast();
   const [reservedRanges, setReservedRanges] = useState<ReservedRange[]>([]);
-  const [users, setUsers] = useState<any[]>([]);
+  const [publishers, setPublishers] = useState<Publisher[]>([]);
+  const [publisherSearch, setPublisherSearch] = useState<string>("");
+  const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedRange, setSelectedRange] = useState<ReservedRange | null>(null);
@@ -73,21 +85,21 @@ export const ReservedRangesManager = () => {
 
       if (rangesError) throw rangesError;
 
-      // Fetch users (profiles)
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, first_name, last_name')
-        .order('first_name');
+      // Fetch publishers
+      const { data: publishersData, error: publishersError } = await supabase
+        .from('publishers')
+        .select('id, name, city, country, address, phone, email')
+        .order('name');
 
-      if (profilesError) throw profilesError;
+      if (publishersError) throw publishersError;
 
       // Mock data for demonstration if no real data
-      const mockUsers = [
-        { user_id: '1', first_name: 'Ahmed', last_name: 'Bennani' },
-        { user_id: '2', first_name: 'Fatima', last_name: 'El Amrani' },
-        { user_id: '3', first_name: 'Karim', last_name: 'Tazi' },
-        { user_id: '4', first_name: 'Laila', last_name: 'Chraibi' },
-        { user_id: '5', first_name: 'Youssef', last_name: 'Alaoui' },
+      const mockPublishers = [
+        { id: '1', name: 'Éditions Marocaines', city: 'Rabat', country: 'Maroc' },
+        { id: '2', name: 'Dar Al Kitab', city: 'Casablanca', country: 'Maroc' },
+        { id: '3', name: 'Publications Universitaires', city: 'Fès', country: 'Maroc' },
+        { id: '4', name: 'Librairie Nationale', city: 'Marrakech', country: 'Maroc' },
+        { id: '5', name: 'Imprimerie Royale', city: 'Rabat', country: 'Maroc' },
       ];
 
       const mockRanges = [
@@ -164,20 +176,18 @@ export const ReservedRangesManager = () => {
       ];
 
       // Use real data if available, otherwise use mock data
-      const finalUsers = (profilesData && profilesData.length > 0) ? profilesData : mockUsers;
+      const finalPublishers = (publishersData && publishersData.length > 0) ? publishersData : mockPublishers;
       const finalRanges = (rangesData && rangesData.length > 0) ? rangesData : mockRanges;
 
-      // Map ranges with user names
+      // Map ranges with publisher names
       const rangesWithNames = finalRanges.map((range: any) => ({
         ...range,
         requester_email: range.requester?.email,
-        requester_name: finalUsers.find(p => p.user_id === range.requester_id)
-          ? `${finalUsers.find(p => p.user_id === range.requester_id)?.first_name} ${finalUsers.find(p => p.user_id === range.requester_id)?.last_name}`
-          : range.requester?.email || 'Utilisateur inconnu'
+        requester_name: finalPublishers.find(p => p.id === range.requester_id)?.name || 'Éditeur inconnu'
       }));
 
       setReservedRanges(rangesWithNames);
-      setUsers(finalUsers);
+      setPublishers(finalPublishers);
 
     } catch (error) {
       console.error('Erreur lors du chargement:', error);
@@ -303,6 +313,8 @@ export const ReservedRangesManager = () => {
       quantity: '',
       notes: ''
     });
+    setSelectedPublisher(null);
+    setPublisherSearch('');
   };
 
   const getStatusBadge = (status: string) => {
@@ -335,9 +347,9 @@ export const ReservedRangesManager = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Tranches Réservées par Demandeur</h2>
+          <h2 className="text-2xl font-bold">Tranches Réservées par Éditeur</h2>
           <p className="text-muted-foreground">
-            Gestion des plages de numéros réservées pour des demandeurs spécifiques
+            Gestion des plages de numéros réservées pour des éditeurs spécifiques
           </p>
         </div>
         <Button onClick={() => setIsAddDialogOpen(true)}>
@@ -451,22 +463,76 @@ export const ReservedRangesManager = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Demandeur *</Label>
-                <Select
-                  value={formData.requester_id}
-                  onValueChange={(value) => setFormData({ ...formData, requester_id: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un demandeur" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {users.map((user) => (
-                      <SelectItem key={user.user_id} value={user.user_id}>
-                        {user.first_name} {user.last_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>Éditeur *</Label>
+                {!selectedPublisher ? (
+                  <div className="relative">
+                    <Input
+                      placeholder="Rechercher un éditeur..."
+                      value={publisherSearch}
+                      onChange={(e) => setPublisherSearch(e.target.value)}
+                      className="pr-10"
+                    />
+                    {publisherSearch && (
+                      <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                        {publishers
+                          .filter(pub => 
+                            pub.name.toLowerCase().includes(publisherSearch.toLowerCase()) ||
+                            pub.city?.toLowerCase().includes(publisherSearch.toLowerCase())
+                          )
+                          .map((pub) => (
+                            <button
+                              key={pub.id}
+                              type="button"
+                              className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                              onClick={() => {
+                                setSelectedPublisher(pub);
+                                setPublisherSearch('');
+                                setFormData({ ...formData, requester_id: pub.id });
+                              }}
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">{pub.name}</span>
+                                {pub.city && (
+                                  <span className="text-sm text-muted-foreground">
+                                    {pub.city}, {pub.country}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        {publishers.filter(pub => 
+                          pub.name.toLowerCase().includes(publisherSearch.toLowerCase()) ||
+                          pub.city?.toLowerCase().includes(publisherSearch.toLowerCase())
+                        ).length === 0 && (
+                          <div className="px-4 py-2 text-sm text-muted-foreground">
+                            Aucun éditeur trouvé
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 p-2 border rounded-md bg-accent/50">
+                    <div className="flex-1">
+                      <p className="font-medium">{selectedPublisher.name}</p>
+                      {selectedPublisher.city && (
+                        <p className="text-sm text-muted-foreground">
+                          {selectedPublisher.city}, {selectedPublisher.country}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedPublisher(null);
+                        setFormData({ ...formData, requester_id: '' });
+                      }}
+                    >
+                      Changer
+                    </Button>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -531,7 +597,7 @@ export const ReservedRangesManager = () => {
             <div className="bg-blue-50 p-4 rounded-md">
               <p className="text-sm font-medium text-blue-900 mb-2">Information importante:</p>
               <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-                <li>Cette tranche sera réservée exclusivement pour ce demandeur</li>
+                <li>Cette tranche sera réservée exclusivement pour cet éditeur</li>
                 <li>Elle ne pourra pas être utilisée pour d'autres demandes</li>
                 <li>La plage sera générée automatiquement selon le type de numéro</li>
               </ul>
