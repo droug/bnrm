@@ -661,6 +661,8 @@ export function DepositValidationWorkflow() {
                         { value: "Périodique", label: "Périodique" },
                         { value: "Base de données", label: "Base de données" },
                         { value: "Logiciel", label: "Logiciel" },
+                        { value: "Collections spéciales", label: "Collections spéciales" },
+                        { value: "Audio-visuel", label: "Audio-visuel" },
                       ]}
                     />
                   </div>
