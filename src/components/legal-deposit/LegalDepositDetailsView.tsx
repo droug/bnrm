@@ -3,12 +3,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { FileText, Image, File as FileIcon, Download, ExternalLink } from "lucide-react";
+import { useState } from "react";
 
 interface LegalDepositDetailsViewProps {
   request: any;
 }
 
 export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProps) {
+  const [previewDocument, setPreviewDocument] = useState<{ label: string; url: string; type: string } | null>(null);
   const renderAuthorInfo = () => {
     const metadata = request.metadata || {};
     const customFields = metadata.customFields || {};
@@ -408,8 +411,28 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
     );
   };
 
+  const getFileIcon = (fileName: string) => {
+    const extension = fileName?.split('.').pop()?.toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')) {
+      return <Image className="h-4 w-4" />;
+    } else if (['pdf'].includes(extension || '')) {
+      return <FileText className="h-4 w-4" />;
+    }
+    return <FileIcon className="h-4 w-4" />;
+  };
+
+  const getFileType = (fileName: string): string => {
+    const extension = fileName?.split('.').pop()?.toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')) {
+      return 'image';
+    } else if (['pdf'].includes(extension || '')) {
+      return 'pdf';
+    }
+    return 'file';
+  };
+
   const renderDocuments = () => {
-    const documents = [];
+    const documents: Array<{ label: string; url: string; fileName?: string; type?: string }> = [];
     const metadata = request.metadata || {};
     const documentsUrls = request.documents_urls || {};
     
@@ -422,6 +445,7 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
       'abstract': 'Résumé/Abstract',
       'court_decision': 'Décision du Tribunal',
       'court-decision': 'Décision du Tribunal',
+      'tribunal-decision': 'Décision du Tribunal',
       'thesis-recommendation': 'Recommandation de soutenance de thèse',
       'thesis_recommendation': 'Recommandation de soutenance de thèse',
       'quran-authorization': 'Autorisation de publication Coran',
@@ -440,18 +464,31 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
     if (documentsUrls && typeof documentsUrls === 'object') {
       Object.entries(documentsUrls).forEach(([key, value]: [string, any]) => {
         let url = null;
+        let fileName = '';
+        let type = '';
         
-        // Gérer différents formats de stockage d'URL
+        // Gérer différents formats de stockage
         if (typeof value === 'string' && value.trim()) {
           url = value;
+          fileName = value.split('/').pop() || key;
         } else if (value && typeof value === 'object') {
-          // Si c'est un objet, chercher la propriété url
-          url = value.url || value.path || value.file_url;
+          // Si c'est un objet File (depuis le formulaire)
+          if (value.name && value.size) {
+            // C'est un objet File, on ne peut pas l'afficher directement
+            // mais on peut montrer qu'il existe
+            fileName = value.name;
+            type = value.type || '';
+            url = `file://${value.name}`; // URL symbolique pour indiquer qu'il y a un fichier
+          } else {
+            // Si c'est un objet avec url/path
+            url = value.url || value.path || value.file_url;
+            fileName = value.name || url?.split('/').pop() || key;
+          }
         }
         
-        if (url) {
+        if (url || fileName) {
           const label = documentLabels[key] || key.replace(/_/g, ' ').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-          documents.push({ label, url });
+          documents.push({ label, url: url || '', fileName, type });
         }
       });
     }
@@ -503,9 +540,9 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
       }
     });
 
-    // Remove duplicates and filter out invalid URLs
+    // Remove duplicates and filter out valid documents
     const uniqueDocuments = documents.filter((doc, index, self) => 
-      doc.url && doc.url.trim() && index === self.findIndex((d) => d.url === doc.url)
+      (doc.url || doc.fileName) && index === self.findIndex((d) => d.url === doc.url || d.fileName === doc.fileName)
     );
 
     if (uniqueDocuments.length === 0) return null;
@@ -513,23 +550,80 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Documents joints</CardTitle>
+          <CardTitle className="text-base flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Pièces fournies ({uniqueDocuments.length})
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {uniqueDocuments.map((doc, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
-              <span className="font-medium">{doc.label}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-              >
-                <a href={doc.url} target="_blank" rel="noopener noreferrer" download>
-                  Télécharger
-                </a>
-              </Button>
+        <CardContent className="space-y-2">
+          {uniqueDocuments.map((doc, index) => {
+            const isValidUrl = doc.url && !doc.url.startsWith('file://');
+            const fileType = getFileType(doc.fileName || doc.url || '');
+            
+            return (
+              <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border hover:border-primary/50 transition-colors">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="text-muted-foreground">
+                    {getFileIcon(doc.fileName || doc.url || '')}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{doc.label}</p>
+                    {doc.fileName && (
+                      <p className="text-xs text-muted-foreground truncate">{doc.fileName}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-2 ml-2">
+                  {isValidUrl ? (
+                    <>
+                      {fileType === 'image' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setPreviewDocument({ label: doc.label, url: doc.url, type: fileType })}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-1" />
+                          Voir
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                      >
+                        <a href={doc.url} target="_blank" rel="noopener noreferrer" download>
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </a>
+                      </Button>
+                    </>
+                  ) : (
+                    <Badge variant="secondary" className="text-xs">
+                      En attente d'upload
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          
+          {previewDocument && (
+            <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setPreviewDocument(null)}>
+              <div className="bg-background rounded-lg max-w-4xl max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="sticky top-0 bg-background border-b p-4 flex items-center justify-between">
+                  <h3 className="font-semibold">{previewDocument.label}</h3>
+                  <Button variant="ghost" size="sm" onClick={() => setPreviewDocument(null)}>
+                    ✕
+                  </Button>
+                </div>
+                <div className="p-4">
+                  {previewDocument.type === 'image' && (
+                    <img src={previewDocument.url} alt={previewDocument.label} className="max-w-full h-auto" />
+                  )}
+                </div>
+              </div>
             </div>
-          ))}
+          )}
         </CardContent>
       </Card>
     );
