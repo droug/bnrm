@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, Eye, Clock, FileText, Download, AlertCircle, CheckCheck, Archive, GitBranch, Info, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { DuplicateDetectionAlert } from "./DuplicateDetectionAlert";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import jsPDF from "jspdf";
@@ -64,6 +65,14 @@ export function DepositValidationWorkflow() {
   // États pour la pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // Fonction pour détecter les doublons par titre
+  const findDuplicatesByTitle = (request: DepositRequest): DepositRequest[] => {
+    return requests.filter(
+      req => req.id !== request.id && 
+      req.title.toLowerCase().trim() === request.title.toLowerCase().trim()
+    );
+  };
 
   useEffect(() => {
     if (user) {
@@ -147,6 +156,40 @@ export function DepositValidationWorkflow() {
           status: "soumis",
           author_name: "Dr. Ahmed Benjelloun",
           created_at: new Date(baseDate.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          metadata: {
+            author_type: "physique",
+            author_firstname: "Ahmed",
+            author_lastname: "Benjelloun",
+            publisher_name: "Éditions Al Manar",
+          },
+        },
+        {
+          id: "example-1-duplicate",
+          request_number: "DL-2025-000124",
+          title: "Histoire du Maroc Contemporain",
+          subtitle: "Tome 1: Les Fondations",
+          support_type: "Livre",
+          status: "soumis",
+          author_name: "Éditions Al Manar",
+          created_at: new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          metadata: {
+            author_type: "morale",
+            publisher_name: "Éditions Al Manar",
+          },
+        },
+        {
+          id: "example-1-duplicate-2",
+          request_number: "DL-2025-000125",
+          title: "Histoire du Maroc Contemporain",
+          subtitle: "Tome 1: Les Fondations",
+          support_type: "Livre",
+          status: "soumis",
+          author_name: "Imprimerie Nationale",
+          created_at: new Date(baseDate.getTime() - 1.5 * 24 * 60 * 60 * 1000).toISOString(),
+          metadata: {
+            printer_name: "Imprimerie Nationale",
+            publisher_name: "Éditions Al Manar",
+          },
         },
         {
           id: "example-2",
