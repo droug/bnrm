@@ -32,6 +32,7 @@ import { worldCountries } from "@/data/worldCountries";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { useSystemList } from "@/hooks/useSystemList";
 import { useDependentList } from "@/hooks/useDependentList";
+import { useLegalDepositStorage } from "@/hooks/useLegalDepositStorage";
 
 interface Publisher {
   id: string;
@@ -87,6 +88,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const navigate = useNavigate();
   const { language, isRTL } = useLanguage();
   const { user } = useAuth();
+  const { uploadMultipleDocuments, uploading: uploadingDocuments } = useLegalDepositStorage();
   
   // Charger les champs personnalisés - chercher aussi dans les versions non publiées en dev
   const { fields: customFields, loading: customFieldsLoading } = useDynamicForm({ 
@@ -3794,7 +3796,29 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     }
 
     try {
-      // Récupérer l'ID du registre professionnel de l'utilisateur
+      // 1. Upload des documents vers Supabase Storage
+      console.log('Uploading documents...', Object.keys(uploadedFiles));
+      toast.loading('Upload des documents en cours...');
+      
+      const uploadedDocuments = await uploadMultipleDocuments(uploadedFiles, user.id);
+      console.log('Documents uploaded:', uploadedDocuments);
+      
+      // Préparer l'objet documents_urls avec les URLs réelles
+      const documentsUrls: any = {};
+      Object.entries(uploadedDocuments).forEach(([key, doc]) => {
+        documentsUrls[key] = {
+          url: doc.url,
+          path: doc.path,
+          fileName: doc.fileName,
+          size: doc.size,
+          type: doc.type
+        };
+      });
+      
+      toast.dismiss();
+      toast.loading('Création de la demande...');
+
+      // 2. Récupérer l'ID du registre professionnel de l'utilisateur
       const { data: professionalData, error: professionalError } = await supabase
         .from('professional_registry')
         .select('id')
@@ -3815,14 +3839,6 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       else if (depositType === 'periodique') monographType = 'periodiques';
       else if (depositType === 'collections_specialisees') monographType = 'beaux_livres'; // Default for collections
       else if (depositType === 'bd_logiciels') monographType = 'musique'; // Default for BD/software
-      
-      // Préparer l'objet documents_urls depuis uploadedFiles
-      const documentsUrls: any = {};
-      Object.keys(uploadedFiles).forEach(key => {
-        if (uploadedFiles[key]) {
-          documentsUrls[key] = uploadedFiles[key];
-        }
-      });
       
       const newRequest = {
         initiator_id: professionalData.id,
