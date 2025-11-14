@@ -4057,10 +4057,11 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
               {language === 'ar' ? 'رجوع' : 'Retour'}
             </Button>
             <Button onClick={() => handleAuthentication(isBDLogiciels ? "producer" : "editor", {
-              name: "",
-              address: "",
-              phone: "",
-              email: "",
+              name: editorData.name || "",
+              address: editorData.address || "",
+              phone: editorData.phone || "",
+              email: editorData.email || "",
+              googleMapsLink: editorData.googleMapsLink || "",
               publicationDate: ""
             })}>
               {language === 'ar' ? 'متابعة' : 'Continuer'}
