@@ -139,7 +139,6 @@ export default function BNRMBackOffice() {
                   <span className="hidden md:inline">Gestion des Demandes</span>
                 </TabsTrigger>
                 <TabsTrigger value="attribution" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium">
-                  <Hash className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden md:inline">Gestion Attributions N°</span>
                 </TabsTrigger>
                 <TabsTrigger value="editorial-monitoring" className="flex items-center gap-2 px-4 py-2 whitespace-nowrap text-base font-medium">
