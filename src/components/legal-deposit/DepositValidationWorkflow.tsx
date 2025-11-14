@@ -31,6 +31,7 @@ interface DepositRequest {
   author_name: string;
   created_at: string;
   metadata?: any;
+  documents_urls?: any;
   validated_by_service?: string;
   service_validated_at?: string;
   service_validation_notes?: string;
@@ -103,6 +104,7 @@ export function DepositValidationWorkflow() {
         author_name,
         created_at,
         metadata,
+        documents_urls,
         validated_by_service,
         service_validated_at,
         service_validation_notes,
