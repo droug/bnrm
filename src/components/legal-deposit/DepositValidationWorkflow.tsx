@@ -870,7 +870,7 @@ export function DepositValidationWorkflow() {
                         disabled={isLoading}
                       >
                         <Clock className="h-4 w-4 mr-2" />
-                        En attente de traitement
+                        Mettre en attente
                       </Button>
                       <Button
                         variant="destructive"
@@ -898,7 +898,7 @@ export function DepositValidationWorkflow() {
                         disabled={isLoading}
                       >
                         <Clock className="h-4 w-4 mr-2" />
-                        En attente de traitement
+                        Mettre en attente
                       </Button>
                       <Button
                         variant="destructive"
@@ -926,7 +926,7 @@ export function DepositValidationWorkflow() {
                         disabled={isLoading}
                       >
                         <Clock className="h-4 w-4 mr-2" />
-                        En attente de traitement
+                        Mettre en attente
                       </Button>
                       <Button
                         variant="destructive"
