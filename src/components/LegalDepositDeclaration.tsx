@@ -154,6 +154,9 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   const [periodicity, setPeriodicity] = useState<string>("");
   const [printRun, setPrintRun] = useState<string>("");
   const [supportType, setSupportType] = useState<string>("");
+  const [targetAudience, setTargetAudience] = useState<string>("");
+  const [targetAudienceOther, setTargetAudienceOther] = useState<string>("");
+
 
 
   // Load disciplines based on publication type using dependent list hook
@@ -698,6 +701,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <div className="space-y-2">
                   <Label>Public ciblé</Label>
                   <InlineSelect
+                    value={targetAudience}
+                    onChange={setTargetAudience}
                     placeholder="Sélectionner le public ciblé"
                     options={[
                       { value: "general", label: "Grand public" },
@@ -707,9 +712,21 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       { value: "academic", label: "Académique/Universitaire" },
                       { value: "professional", label: "Professionnel" },
                       { value: "specialized", label: "Spécialisé" },
+                      { value: "other", label: "Autre" },
                     ]}
                   />
                 </div>
+
+                {targetAudience === "other" && (
+                  <div className="space-y-2">
+                    <Label>Préciser le public ciblé</Label>
+                    <Input 
+                      placeholder="Saisir le public ciblé" 
+                      value={targetAudienceOther}
+                      onChange={(e) => setTargetAudienceOther(e.target.value)}
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label>Périodicité</Label>
@@ -1310,6 +1327,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <div className="space-y-2">
                   <Label>Public ciblé</Label>
                   <InlineSelect
+                    value={targetAudience}
+                    onChange={setTargetAudience}
                     placeholder="Sélectionner le public ciblé"
                     options={[
                       { value: "general", label: "Grand public" },
@@ -1319,9 +1338,21 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       { value: "academic", label: "Académique/Universitaire" },
                       { value: "professional", label: "Professionnel" },
                       { value: "specialized", label: "Spécialisé" },
+                      { value: "other", label: "Autre" },
                     ]}
                   />
                 </div>
+
+                {targetAudience === "other" && (
+                  <div className="space-y-2">
+                    <Label>Préciser le public ciblé</Label>
+                    <Input 
+                      placeholder="Saisir le public ciblé" 
+                      value={targetAudienceOther}
+                      onChange={(e) => setTargetAudienceOther(e.target.value)}
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label>Type de support</Label>
@@ -2009,6 +2040,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <div className="space-y-2">
                   <Label>Public ciblé</Label>
                   <InlineSelect
+                    value={targetAudience}
+                    onChange={setTargetAudience}
                     placeholder="Sélectionner le public ciblé"
                     options={[
                       { value: "general", label: "Grand public" },
@@ -2018,9 +2051,21 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       { value: "academic", label: "Académique/Universitaire" },
                       { value: "professional", label: "Professionnel" },
                       { value: "specialized", label: "Spécialisé" },
+                      { value: "other", label: "Autre" },
                     ]}
                   />
                 </div>
+
+                {targetAudience === "other" && (
+                  <div className="space-y-2">
+                    <Label>Préciser le public ciblé</Label>
+                    <Input 
+                      placeholder="Saisir le public ciblé" 
+                      value={targetAudienceOther}
+                      onChange={(e) => setTargetAudienceOther(e.target.value)}
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label>Langue</Label>
@@ -2770,6 +2815,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 <div className="space-y-2">
                   <Label>Public ciblé</Label>
                   <InlineSelect
+                    value={targetAudience}
+                    onChange={setTargetAudience}
                     placeholder="Sélectionner le public ciblé"
                     options={[
                       { value: "general", label: "Grand public" },
@@ -2779,9 +2826,21 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       { value: "academic", label: "Académique/Universitaire" },
                       { value: "professional", label: "Professionnel" },
                       { value: "specialized", label: "Spécialisé" },
+                      { value: "other", label: "Autre" },
                     ]}
                   />
                 </div>
+
+                {targetAudience === "other" && (
+                  <div className="space-y-2">
+                    <Label>Préciser le public ciblé</Label>
+                    <Input 
+                      placeholder="Saisir le public ciblé" 
+                      value={targetAudienceOther}
+                      onChange={(e) => setTargetAudienceOther(e.target.value)}
+                    />
+                  </div>
+                )}
 
                 {specialCollectionPublicationType === "autre" && (
                   <div className="space-y-2">
