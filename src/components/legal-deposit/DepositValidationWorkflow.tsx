@@ -55,6 +55,12 @@ export function DepositValidationWorkflow() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
   const [showPendingModal, setShowPendingModal] = useState(false);
+  const [showRejectionModal, setShowRejectionModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [pendingRejection, setPendingRejection] = useState<{
+    requestId: string;
+    validationType: "service" | "department" | "committee";
+  } | null>(null);
   
   // États pour les filtres
   const [searchTerm, setSearchTerm] = useState("");
@@ -403,7 +409,8 @@ export function DepositValidationWorkflow() {
   const handleValidation = async (
     requestId: string,
     validationType: "service" | "department" | "committee",
-    status: "approved" | "rejected"
+    status: "approved" | "rejected",
+    customRejectionReason?: string
   ) => {
     setIsLoading(true);
 
@@ -435,7 +442,7 @@ export function DepositValidationWorkflow() {
             } else {
               updatedRequest.rejected_by = user!.id;
               updatedRequest.rejected_at = new Date().toISOString();
-              updatedRequest.rejection_reason = comments || null;
+              updatedRequest.rejection_reason = customRejectionReason || comments || null;
               
               if (validationType === "service") {
                 updatedRequest.status = "rejete_par_b";
@@ -493,7 +500,7 @@ export function DepositValidationWorkflow() {
       } else {
         updateData.rejected_by = user!.id;
         updateData.rejected_at = new Date().toISOString();
-        updateData.rejection_reason = comments || null;
+        updateData.rejection_reason = customRejectionReason || comments || null;
         
         if (validationType === "service") {
           updateData.status = "rejete_par_b";
@@ -525,6 +532,7 @@ export function DepositValidationWorkflow() {
 
       setSelectedRequest(null);
       setComments("");
+      setRejectionReason("");
       fetchRequests();
     } catch (error: any) {
       console.error("Error updating validation:", error);
@@ -535,6 +543,38 @@ export function DepositValidationWorkflow() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const openRejectionModal = (
+    requestId: string,
+    validationType: "service" | "department" | "committee"
+  ) => {
+    setPendingRejection({ requestId, validationType });
+    setRejectionReason("");
+    setShowRejectionModal(true);
+  };
+
+  const handleRejectionSubmit = async () => {
+    if (!rejectionReason.trim()) {
+      toast({
+        title: "Motif requis",
+        description: "Veuillez saisir un motif de rejet",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (pendingRejection) {
+      await handleValidation(
+        pendingRejection.requestId,
+        pendingRejection.validationType,
+        "rejected",
+        rejectionReason
+      );
+      setShowRejectionModal(false);
+      setPendingRejection(null);
+      setRejectionReason("");
     }
   };
 
@@ -1189,7 +1229,7 @@ export function DepositValidationWorkflow() {
                       </Button>
                       <Button
                         variant="destructive"
-                        onClick={() => handleValidation(selectedRequest.id, "service", "rejected")}
+                        onClick={() => openRejectionModal(selectedRequest.id, "service")}
                         disabled={isLoading}
                       >
                         <XCircle className="h-4 w-4 mr-2" />
@@ -1217,7 +1257,7 @@ export function DepositValidationWorkflow() {
                       </Button>
                       <Button
                         variant="destructive"
-                        onClick={() => handleValidation(selectedRequest.id, "department", "rejected")}
+                        onClick={() => openRejectionModal(selectedRequest.id, "department")}
                         disabled={isLoading}
                       >
                         <XCircle className="h-4 w-4 mr-2" />
@@ -1245,7 +1285,7 @@ export function DepositValidationWorkflow() {
                       </Button>
                       <Button
                         variant="destructive"
-                        onClick={() => handleValidation(selectedRequest.id, "committee", "rejected")}
+                        onClick={() => openRejectionModal(selectedRequest.id, "committee")}
                         disabled={isLoading}
                       >
                         <XCircle className="h-4 w-4 mr-2" />
@@ -1364,6 +1404,59 @@ export function DepositValidationWorkflow() {
             >
               <Archive className="h-4 w-4 mr-2" />
               Archiver
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modale de rejet avec motif obligatoire */}
+      <Dialog open={showRejectionModal} onOpenChange={setShowRejectionModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <XCircle className="h-5 w-5" />
+              Rejet de la demande
+            </DialogTitle>
+            <DialogDescription>
+              Veuillez indiquer le motif du rejet de cette demande
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="rejection-reason">
+                Motif du rejet <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="rejection-reason"
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="Ex: Dossier incomplet, ISBN manquant, documents non conformes..."
+                className="min-h-[120px]"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Ce motif sera communiqué au demandeur et enregistré dans l'historique.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowRejectionModal(false);
+                setPendingRejection(null);
+                setRejectionReason("");
+              }}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleRejectionSubmit}
+              disabled={isLoading || !rejectionReason.trim()}
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Confirmer le rejet
             </Button>
           </div>
         </DialogContent>
