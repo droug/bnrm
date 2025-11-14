@@ -3129,8 +3129,11 @@ export type Database = {
       distributors: {
         Row: {
           address: string | null
+          city: string | null
+          country: string | null
           created_at: string | null
           email: string | null
+          google_maps_link: string | null
           id: string
           name: string
           phone: string | null
@@ -3138,8 +3141,11 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string | null
           email?: string | null
+          google_maps_link?: string | null
           id?: string
           name: string
           phone?: string | null
@@ -3147,8 +3153,11 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string | null
           email?: string | null
+          google_maps_link?: string | null
           id?: string
           name?: string
           phone?: string | null
@@ -6458,6 +6467,7 @@ export type Database = {
           country: string | null
           created_at: string | null
           email: string | null
+          google_maps_link: string | null
           id: string
           name: string
           phone: string | null
@@ -6469,6 +6479,7 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           email?: string | null
+          google_maps_link?: string | null
           id?: string
           name: string
           phone?: string | null
@@ -6480,6 +6491,7 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           email?: string | null
+          google_maps_link?: string | null
           id?: string
           name?: string
           phone?: string | null
@@ -6490,8 +6502,11 @@ export type Database = {
       producers: {
         Row: {
           address: string | null
+          city: string | null
+          country: string | null
           created_at: string | null
           email: string | null
+          google_maps_link: string | null
           id: string
           name: string
           phone: string | null
@@ -6499,8 +6514,11 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string | null
           email?: string | null
+          google_maps_link?: string | null
           id?: string
           name: string
           phone?: string | null
@@ -6508,8 +6526,11 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string | null
           email?: string | null
+          google_maps_link?: string | null
           id?: string
           name?: string
           phone?: string | null
@@ -6959,6 +6980,7 @@ export type Database = {
           country: string | null
           created_at: string | null
           email: string | null
+          google_maps_link: string | null
           id: string
           name: string
           phone: string | null
@@ -6971,6 +6993,7 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           email?: string | null
+          google_maps_link?: string | null
           id?: string
           name: string
           phone?: string | null
@@ -6983,6 +7006,7 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           email?: string | null
+          google_maps_link?: string | null
           id?: string
           name?: string
           phone?: string | null
