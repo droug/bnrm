@@ -696,6 +696,22 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 </div>
 
                 <div className="space-y-2">
+                  <Label>Public ciblé</Label>
+                  <InlineSelect
+                    placeholder="Sélectionner le public ciblé"
+                    options={[
+                      { value: "general", label: "Grand public" },
+                      { value: "children", label: "Enfants (6-12 ans)" },
+                      { value: "teens", label: "Adolescents (13-17 ans)" },
+                      { value: "adults", label: "Adultes" },
+                      { value: "academic", label: "Académique/Universitaire" },
+                      { value: "professional", label: "Professionnel" },
+                      { value: "specialized", label: "Spécialisé" },
+                    ]}
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Périodicité</Label>
                   <InlineSelect
                     placeholder="Sélectionner"
@@ -1288,6 +1304,22 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                   <InlineSelect
                     placeholder="Sélectionner le type"
                     options={publicationTypePeriodicalOptions}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Public ciblé</Label>
+                  <InlineSelect
+                    placeholder="Sélectionner le public ciblé"
+                    options={[
+                      { value: "general", label: "Grand public" },
+                      { value: "children", label: "Enfants (6-12 ans)" },
+                      { value: "teens", label: "Adolescents (13-17 ans)" },
+                      { value: "adults", label: "Adultes" },
+                      { value: "academic", label: "Académique/Universitaire" },
+                      { value: "professional", label: "Professionnel" },
+                      { value: "specialized", label: "Spécialisé" },
+                    ]}
                   />
                 </div>
 
@@ -1970,6 +2002,22 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       { value: "database", label: "Base de données" },
                       { value: "software", label: "Logiciel" },
                       { value: "audiovisual", label: "Document audiovisuel" },
+                    ]}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Public ciblé</Label>
+                  <InlineSelect
+                    placeholder="Sélectionner le public ciblé"
+                    options={[
+                      { value: "general", label: "Grand public" },
+                      { value: "children", label: "Enfants (6-12 ans)" },
+                      { value: "teens", label: "Adolescents (13-17 ans)" },
+                      { value: "adults", label: "Adultes" },
+                      { value: "academic", label: "Académique/Universitaire" },
+                      { value: "professional", label: "Professionnel" },
+                      { value: "specialized", label: "Spécialisé" },
                     ]}
                   />
                 </div>
@@ -2688,38 +2736,49 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                       { 
                         value: "affiches", 
                         label: "Affiches",
-                        tooltip: "Documents imprimés de grande taille destinés à être affichés publiquement (publicité, information, art)"
-                      },
-                      { 
-                        value: "guides", 
-                        label: "Guides",
-                        tooltip: "Ouvrages pratiques fournissant des informations et des conseils sur un sujet spécifique"
-                      },
-                      { 
-                        value: "atlas", 
-                        label: "Atlas",
-                        tooltip: "Recueils de cartes géographiques, thématiques ou historiques reliés en volume"
+                        tooltip: "Feuilles imprimées destinées à être placardées"
                       },
                       { 
                         value: "cartes_geographiques", 
                         label: "Cartes géographiques",
-                        tooltip: "Représentations planes de la surface terrestre ou d'une partie de celle-ci"
-                      },
-                      { 
-                        value: "cartes_postales", 
-                        label: "Cartes postales",
-                        tooltip: "Cartes illustrées destinées à l'envoi postal ou à la collection"
+                        tooltip: "Représentations géographiques sur support papier ou numérique"
                       },
                       { 
                         value: "photos_plans", 
-                        label: "Photos - Plans",
-                        tooltip: "Photographies et plans techniques, architecturaux ou d'aménagement"
+                        label: "Photos et Plans",
+                        tooltip: "Documents photographiques et plans techniques"
+                      },
+                      { 
+                        value: "estampes", 
+                        label: "Estampes",
+                        tooltip: "Œuvres imprimées obtenues par gravure"
+                      },
+                      { 
+                        value: "manuscrits", 
+                        label: "Manuscrits",
+                        tooltip: "Documents écrits à la main"
                       },
                       { 
                         value: "autre", 
                         label: "Autre",
-                        tooltip: "Tout autre type de collection spécialisée ne correspondant pas aux catégories ci-dessus"
-                      },
+                        tooltip: "Autre type de collection spéciale"
+                      }
+                    ]}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Public ciblé</Label>
+                  <InlineSelect
+                    placeholder="Sélectionner le public ciblé"
+                    options={[
+                      { value: "general", label: "Grand public" },
+                      { value: "children", label: "Enfants (6-12 ans)" },
+                      { value: "teens", label: "Adolescents (13-17 ans)" },
+                      { value: "adults", label: "Adultes" },
+                      { value: "academic", label: "Académique/Universitaire" },
+                      { value: "professional", label: "Professionnel" },
+                      { value: "specialized", label: "Spécialisé" },
                     ]}
                   />
                 </div>
