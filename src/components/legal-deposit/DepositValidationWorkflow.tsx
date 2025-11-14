@@ -1008,6 +1008,12 @@ export function DepositValidationWorkflow() {
           </DialogHeader>
           {selectedRequest && (
             <div className="space-y-6">
+              {/* Alerte de détection de doublons */}
+              <DuplicateDetectionAlert 
+                currentRequest={selectedRequest}
+                duplicates={findDuplicatesByTitle(selectedRequest)}
+              />
+              
               {renderWorkflowSteps(selectedRequest)}
 
               <div className="bg-muted/50 p-4 rounded-lg">
