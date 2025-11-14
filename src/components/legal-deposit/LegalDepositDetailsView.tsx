@@ -545,8 +545,6 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
       (doc.url || doc.fileName) && index === self.findIndex((d) => d.url === doc.url || d.fileName === doc.fileName)
     );
 
-    if (uniqueDocuments.length === 0) return null;
-
     return (
       <Card>
         <CardHeader>
@@ -556,7 +554,13 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          {uniqueDocuments.map((doc, index) => {
+          {uniqueDocuments.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p>Aucune pièce fournie pour cette demande</p>
+            </div>
+          ) : (
+            uniqueDocuments.map((doc, index) => {
             const isValidUrl = doc.url && !doc.url.startsWith('file://');
             const fileType = getFileType(doc.fileName || doc.url || '');
             
@@ -605,7 +609,8 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
                 </div>
               </div>
             );
-          })}
+          })
+          )}
           
           {previewDocument && (
             <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setPreviewDocument(null)}>
