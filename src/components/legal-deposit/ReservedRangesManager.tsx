@@ -39,7 +39,7 @@ interface ReservedRange {
   requester_name?: string;
   requester_email?: string;
   deposit_type: string;
-  number_type: 'isbn' | 'issn' | 'dl';
+  number_type: 'isbn' | 'issn' | 'ismn' | 'dl';
   range_start: string;
   range_end: string;
   current_position: string;
@@ -65,7 +65,7 @@ export const ReservedRangesManager = () => {
   const [formData, setFormData] = useState({
     requester_id: '',
     deposit_type: '',
-    number_type: 'isbn' as 'isbn' | 'issn' | 'dl',
+    number_type: 'isbn' as 'isbn' | 'issn' | 'ismn' | 'dl',
     quantity: '',
     notes: ''
   });
@@ -595,6 +595,7 @@ export const ReservedRangesManager = () => {
                     <span>
                       {formData.number_type === "isbn" ? "ISBN" :
                        formData.number_type === "issn" ? "ISSN" :
+                       formData.number_type === "ismn" ? "ISMN" :
                        formData.number_type === "dl" ? "Dépôt Légal" :
                        "Sélectionner"}
                     </span>
@@ -607,6 +608,7 @@ export const ReservedRangesManager = () => {
                       {[
                         { value: "isbn", label: "ISBN" },
                         { value: "issn", label: "ISSN" },
+                        { value: "ismn", label: "ISMN" },
                         { value: "dl", label: "Dépôt Légal" }
                       ].map((option) => (
                         <button
@@ -614,7 +616,7 @@ export const ReservedRangesManager = () => {
                           type="button"
                           className="w-full text-left px-3 py-2 hover:bg-accent transition-colors"
                           onClick={() => {
-                            setFormData({ ...formData, number_type: option.value as 'isbn' | 'issn' | 'dl' });
+                            setFormData({ ...formData, number_type: option.value as 'isbn' | 'issn' | 'ismn' | 'dl' });
                             setShowNumberTypeDropdown(false);
                           }}
                         >
