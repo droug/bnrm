@@ -8,14 +8,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Eye, Clock, FileText, Download, AlertCircle, CheckCheck, Archive, GitBranch, Info } from "lucide-react";
+import { CheckCircle, XCircle, Eye, Clock, FileText, Download, AlertCircle, CheckCheck, Archive, GitBranch, Info, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import jsPDF from "jspdf";
 import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
 import { LegalDepositDetailsView } from "@/components/legal-deposit/LegalDepositDetailsView";
+import { InlineSelect } from "@/components/ui/inline-select";
 
 interface DepositRequest {
   id: string;
@@ -52,11 +54,22 @@ export function DepositValidationWorkflow() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
   const [showPendingModal, setShowPendingModal] = useState(false);
+  
+  // États pour les filtres
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSupport, setSelectedSupport] = useState<string>("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  
+  // États pour la pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     if (user) {
       fetchRequests();
     }
+    setCurrentPage(1); // Réinitialiser la page lors du changement d'onglet
   }, [user, activeTab]);
 
   const fetchRequests = async () => {
@@ -613,78 +626,226 @@ export function DepositValidationWorkflow() {
             </TabsList>
 
             <TabsContent value={activeTab} className="mt-6">
-              {requests.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Aucune demande dans cette catégorie</p>
+              {/* Filtres */}
+              <div className="mb-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="search">Recherche</Label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="search"
+                        placeholder="N°, titre, auteur..."
+                        value={searchTerm}
+                        onChange={(e) => {
+                          setSearchTerm(e.target.value);
+                          setCurrentPage(1);
+                        }}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="support">Type de support</Label>
+                    <InlineSelect
+                      value={selectedSupport}
+                      onChange={(value) => {
+                        setSelectedSupport(value);
+                        setCurrentPage(1);
+                      }}
+                      placeholder="Tous les supports"
+                      options={[
+                        { value: "all", label: "Tous" },
+                        { value: "Livre", label: "Livre" },
+                        { value: "Périodique", label: "Périodique" },
+                        { value: "Base de données", label: "Base de données" },
+                        { value: "Logiciel", label: "Logiciel" },
+                      ]}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="dateFrom">Date début</Label>
+                    <Input
+                      id="dateFrom"
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => {
+                        setDateFrom(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="dateTo">Date fin</Label>
+                    <Input
+                      id="dateTo"
+                      type="date"
+                      value={dateTo}
+                      onChange={(e) => {
+                        setDateTo(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                    />
+                  </div>
                 </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>N° Demande</TableHead>
-                      <TableHead>Titre</TableHead>
-                      <TableHead>Support</TableHead>
-                      <TableHead>Statut</TableHead>
-                      <TableHead>Étape Actuelle</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {requests.map((request) => (
-                      <TableRow key={request.id}>
-                        <TableCell className="font-medium">
-                          {request.request_number}
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{request.title}</div>
-                            {request.subtitle && (
-                              <div className="text-sm text-muted-foreground">
-                                {request.subtitle}
-                              </div>
-                            )}
+                
+                {(searchTerm || selectedSupport !== "all" || dateFrom || dateTo) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSearchTerm("");
+                      setSelectedSupport("all");
+                      setDateFrom("");
+                      setDateTo("");
+                      setCurrentPage(1);
+                    }}
+                  >
+                    Réinitialiser les filtres
+                  </Button>
+                )}
+              </div>
+
+              {(() => {
+                // Filtrer les demandes
+                let filteredRequests = requests.filter((request) => {
+                  // Filtre de recherche
+                  const searchMatch = !searchTerm || 
+                    request.request_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    request.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    request.author_name.toLowerCase().includes(searchTerm.toLowerCase());
+                  
+                  // Filtre de support
+                  const supportMatch = selectedSupport === "all" || request.support_type === selectedSupport;
+                  
+                  // Filtre de date
+                  const requestDate = new Date(request.created_at);
+                  const dateFromMatch = !dateFrom || requestDate >= new Date(dateFrom);
+                  const dateToMatch = !dateTo || requestDate <= new Date(dateTo + "T23:59:59");
+                  
+                  return searchMatch && supportMatch && dateFromMatch && dateToMatch;
+                });
+
+                // Pagination
+                const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const paginatedRequests = filteredRequests.slice(startIndex, endIndex);
+
+                return (
+                  <>
+                    {filteredRequests.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>Aucune demande trouvée</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="mb-4 text-sm text-muted-foreground">
+                          {filteredRequests.length} demande(s) trouvée(s)
+                        </div>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>N° Demande</TableHead>
+                              <TableHead>Titre</TableHead>
+                              <TableHead>Support</TableHead>
+                              <TableHead>Statut</TableHead>
+                              <TableHead>Étape Actuelle</TableHead>
+                              <TableHead>Date</TableHead>
+                              <TableHead>Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {paginatedRequests.map((request) => (
+                              <TableRow key={request.id}>
+                                <TableCell className="font-medium">
+                                  {request.request_number}
+                                </TableCell>
+                                <TableCell>
+                                  <div>
+                                    <div className="font-medium">{request.title}</div>
+                                    {request.subtitle && (
+                                      <div className="text-sm text-muted-foreground">
+                                        {request.subtitle}
+                                      </div>
+                                    )}
+                                  </div>
+                                </TableCell>
+                                <TableCell>{request.support_type}</TableCell>
+                                <TableCell>{getStatusBadge(request.status)}</TableCell>
+                                <TableCell>
+                                  <Badge variant="outline">
+                                    {getCurrentValidator(request)}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  {format(new Date(request.created_at), "dd/MM/yyyy")}
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => setSelectedRequest(request)}
+                                    >
+                                      <GitBranch className="h-4 w-4 mr-2" />
+                                      Examiner
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => {
+                                        setViewDetailsRequest(request);
+                                        setIsViewDetailsOpen(true);
+                                      }}
+                                      title="Voir les détails"
+                                    >
+                                      <Info className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                        
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                          <div className="flex items-center justify-between mt-4">
+                            <div className="text-sm text-muted-foreground">
+                              Page {currentPage} sur {totalPages}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                              >
+                                <ChevronLeft className="h-4 w-4" />
+                                Précédent
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                              >
+                                Suivant
+                                <ChevronRight className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
-                        </TableCell>
-                        <TableCell>{request.support_type}</TableCell>
-                        <TableCell>{getStatusBadge(request.status)}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">
-                            {getCurrentValidator(request)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {format(new Date(request.created_at), "dd/MM/yyyy")}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setSelectedRequest(request)}
-                            >
-                              <GitBranch className="h-4 w-4 mr-2" />
-                              Examiner
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => {
-                                setViewDetailsRequest(request);
-                                setIsViewDetailsOpen(true);
-                              }}
-                              title="Voir les détails"
-                            >
-                              <Info className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
+                        )}
+                      </>
+                    )}
+                  </>
+                );
+              })()}
             </TabsContent>
           </Tabs>
         </CardContent>
