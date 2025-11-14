@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollableDialog, ScrollableDialogContent, ScrollableDialogHeader, ScrollableDialogTitle } from "@/components/ui/scrollable-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -60,6 +59,8 @@ export const ReservedRangesManager = () => {
   const [loading, setLoading] = useState(true);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedRange, setSelectedRange] = useState<ReservedRange | null>(null);
+  const [showDepositTypeDropdown, setShowDepositTypeDropdown] = useState(false);
+  const [showNumberTypeDropdown, setShowNumberTypeDropdown] = useState(false);
 
   const [formData, setFormData] = useState({
     requester_id: '',
@@ -315,6 +316,8 @@ export const ReservedRangesManager = () => {
     });
     setSelectedPublisher(null);
     setPublisherSearch('');
+    setShowDepositTypeDropdown(false);
+    setShowNumberTypeDropdown(false);
   };
 
   const getStatusBadge = (status: string) => {
@@ -537,39 +540,90 @@ export const ReservedRangesManager = () => {
 
               <div className="space-y-2">
                 <Label>Type de dépôt *</Label>
-                <Select
-                  value={formData.deposit_type}
-                  onValueChange={(value) => setFormData({ ...formData, deposit_type: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner le type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="monographie">Monographie</SelectItem>
-                    <SelectItem value="periodique">Publication périodique</SelectItem>
-                    <SelectItem value="non-livre">Non-livre</SelectItem>
-                    <SelectItem value="numerique">Numérique</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="relative">
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-between px-3 py-2 border rounded-md bg-background hover:bg-accent transition-colors"
+                    onClick={() => setShowDepositTypeDropdown(!showDepositTypeDropdown)}
+                  >
+                    <span className={formData.deposit_type ? "" : "text-muted-foreground"}>
+                      {formData.deposit_type === "monographie" ? "Monographie" :
+                       formData.deposit_type === "periodique" ? "Publication périodique" :
+                       formData.deposit_type === "non-livre" ? "Non-livre" :
+                       formData.deposit_type === "numerique" ? "Numérique" :
+                       "Sélectionner le type"}
+                    </span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {showDepositTypeDropdown && (
+                    <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg">
+                      {[
+                        { value: "monographie", label: "Monographie" },
+                        { value: "periodique", label: "Publication périodique" },
+                        { value: "non-livre", label: "Non-livre" },
+                        { value: "numerique", label: "Numérique" }
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-accent transition-colors"
+                          onClick={() => {
+                            setFormData({ ...formData, deposit_type: option.value });
+                            setShowDepositTypeDropdown(false);
+                          }}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Type de numéro *</Label>
-                <Select
-                  value={formData.number_type}
-                  onValueChange={(value) => setFormData({ ...formData, number_type: value as 'isbn' | 'issn' | 'dl' })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="isbn">ISBN</SelectItem>
-                    <SelectItem value="issn">ISSN</SelectItem>
-                    <SelectItem value="dl">Dépôt Légal</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="relative">
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-between px-3 py-2 border rounded-md bg-background hover:bg-accent transition-colors"
+                    onClick={() => setShowNumberTypeDropdown(!showNumberTypeDropdown)}
+                  >
+                    <span>
+                      {formData.number_type === "isbn" ? "ISBN" :
+                       formData.number_type === "issn" ? "ISSN" :
+                       formData.number_type === "dl" ? "Dépôt Légal" :
+                       "Sélectionner"}
+                    </span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {showNumberTypeDropdown && (
+                    <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg">
+                      {[
+                        { value: "isbn", label: "ISBN" },
+                        { value: "issn", label: "ISSN" },
+                        { value: "dl", label: "Dépôt Légal" }
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-accent transition-colors"
+                          onClick={() => {
+                            setFormData({ ...formData, number_type: option.value as 'isbn' | 'issn' | 'dl' });
+                            setShowNumberTypeDropdown(false);
+                          }}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
