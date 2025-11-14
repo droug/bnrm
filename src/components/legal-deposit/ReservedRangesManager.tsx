@@ -460,7 +460,7 @@ export const ReservedRangesManager = () => {
           <ScrollableDialogHeader>
             <ScrollableDialogTitle>Réserver une tranche de numéros</ScrollableDialogTitle>
           </ScrollableDialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 p-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Éditeur *</Label>
