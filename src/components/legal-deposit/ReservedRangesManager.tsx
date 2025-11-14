@@ -549,8 +549,8 @@ export const ReservedRangesManager = () => {
                     <span className={formData.deposit_type ? "" : "text-muted-foreground"}>
                       {formData.deposit_type === "monographie" ? "Monographie" :
                        formData.deposit_type === "periodique" ? "Publication périodique" :
-                       formData.deposit_type === "non-livre" ? "Non-livre" :
-                       formData.deposit_type === "numerique" ? "Numérique" :
+                       formData.deposit_type === "audiovisuel_logiciels_bd" ? "Audio-visuel & Logiciels et BD" :
+                       formData.deposit_type === "collections_speciales" ? "Collections Spéciales" :
                        "Sélectionner le type"}
                     </span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -562,8 +562,8 @@ export const ReservedRangesManager = () => {
                       {[
                         { value: "monographie", label: "Monographie" },
                         { value: "periodique", label: "Publication périodique" },
-                        { value: "non-livre", label: "Non-livre" },
-                        { value: "numerique", label: "Numérique" }
+                        { value: "audiovisuel_logiciels_bd", label: "Audio-visuel & Logiciels et BD" },
+                        { value: "collections_speciales", label: "Collections Spéciales" }
                       ].map((option) => (
                         <button
                           key={option.value}
