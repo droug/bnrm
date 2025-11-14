@@ -36,6 +36,7 @@ interface EditorFormData {
   editorNameAr?: string;
   editorNameFr?: string;
   cinFile?: File;
+  photoFile?: File;
   otherContact?: string;
 }
 
@@ -252,7 +253,7 @@ const EditorSignupForm = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="cinFile">Copie numérisée de la CIN *</Label>
+                <Label htmlFor="cinFile">Copie numérisée de la CNIE *</Label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                   <input
                     type="file"
@@ -262,8 +263,47 @@ const EditorSignupForm = () => {
                     className="hidden"
                   />
                   <label htmlFor="cinFile" className="cursor-pointer flex flex-col items-center gap-2">
-                    <Upload className="h-8 w-8 text-gray-400" />
-                    <span className="text-sm text-gray-600">Télécharger la copie de la CIN</span>
+                    {formData.cinFile ? (
+                      <>
+                        <Upload className="h-8 w-8 text-primary" />
+                        <span className="text-sm text-primary font-medium">{formData.cinFile.name}</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                        </svg>
+                        <span className="text-sm text-gray-600">Télécharger la copie de la CNIE</span>
+                        <span className="text-xs text-gray-500">Recto et verso de votre carte nationale</span>
+                      </>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="photoFile">Photo d'identité</Label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <input
+                    type="file"
+                    id="photoFile"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload("photoFile", e.target.files?.[0] || null)}
+                    className="hidden"
+                  />
+                  <label htmlFor="photoFile" className="cursor-pointer flex flex-col items-center gap-2">
+                    {formData.photoFile ? (
+                      <>
+                        <User className="h-8 w-8 text-primary" />
+                        <span className="text-sm text-primary font-medium">{formData.photoFile.name}</span>
+                      </>
+                    ) : (
+                      <>
+                        <User className="h-8 w-8 text-gray-400" />
+                        <span className="text-sm text-gray-600">Télécharger la photo d'identité</span>
+                        <span className="text-xs text-gray-500">Format portrait, fond clair recommandé</span>
+                      </>
+                    )}
                   </label>
                 </div>
               </div>
