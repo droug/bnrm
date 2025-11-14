@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PhoneInput } from "@/components/ui/phone-input";
+import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
 
 interface PrinterFormData {
   logoFile?: File;
@@ -100,13 +101,10 @@ const PrinterSignupForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="nameAr">Nom de l'imprimeur (Arabe) *</Label>
-              <Input
-                id="nameAr"
+              <ArabicInputWithKeyboard
                 value={formData.nameAr}
-                onChange={(e) => setFormData(prev => ({ ...prev, nameAr: e.target.value }))}
+                onChange={(value) => setFormData(prev => ({ ...prev, nameAr: value }))}
                 placeholder="اسم المطبعة"
-                dir="rtl"
-                required
               />
             </div>
             <div className="space-y-2">
