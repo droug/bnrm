@@ -3923,8 +3923,8 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
                 onChange={setPublisherNature}
                 placeholder={language === 'ar' ? 'اختر الطبيعة' : 'Sélectionner la nature'}
                 options={[
-                  { value: "etatique", label: language === 'ar' ? 'حكومي' : 'Étatique' },
-                  { value: "non-etatique", label: language === 'ar' ? 'غير حكومي' : 'Non étatique' },
+                  { value: "publique", label: language === 'ar' ? 'عام' : 'Publique' },
+                  { value: "semi-public", label: language === 'ar' ? 'شبه عام' : 'Semi-public' },
                 ]}
               />
             </div>
