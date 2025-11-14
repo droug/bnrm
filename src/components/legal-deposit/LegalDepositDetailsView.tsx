@@ -482,7 +482,9 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
           } else {
             // Si c'est un objet avec url/path
             url = value.url || value.path || value.file_url;
-            fileName = value.name || url?.split('/').pop() || key;
+            // Extraire le nom de fichier sans les query parameters
+            const urlPart = url?.split('/').pop() || key;
+            fileName = value.name || urlPart.split('?')[0] || key;
           }
         }
         
