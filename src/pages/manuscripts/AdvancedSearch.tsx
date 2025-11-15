@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Search, RotateCcw, BookOpen, User, FileText, Tag, Calendar, Hash, Library, Loader2 } from "lucide-react";
+import { Search, RotateCcw, BookOpen, User, FileText, Tag, Calendar, Hash, Library, Loader2, MapPin } from "lucide-react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +13,7 @@ import { SearchPagination } from "@/components/ui/search-pagination";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { moroccanRegions, getCitiesByRegion } from "@/data/moroccanRegions";
 
 export default function ManuscriptAdvancedSearch() {
   const navigate = useNavigate();
@@ -35,6 +36,8 @@ export default function ManuscriptAdvancedSearch() {
     historicalPeriod: "",
     material: "",
     status: "",
+    region: "",
+    ville: "",
   });
 
   // Fonction de recherche
@@ -104,6 +107,16 @@ export default function ManuscriptAdvancedSearch() {
       // Filtrer par statut
       if (params.status) {
         baseQuery = baseQuery.eq('status', params.status);
+      }
+      
+      // Filtrer par région
+      if (params.region) {
+        baseQuery = baseQuery.eq('region', params.region);
+      }
+      
+      // Filtrer par ville
+      if (params.ville) {
+        baseQuery = baseQuery.eq('ville', params.ville);
       }
       
       console.log('🚀 Executing query...');
@@ -188,6 +201,8 @@ export default function ManuscriptAdvancedSearch() {
       historicalPeriod: "",
       material: "",
       status: "",
+      region: "",
+      ville: "",
     });
     setSearchResults([]);
     setTotalResults(0);
@@ -224,7 +239,7 @@ export default function ManuscriptAdvancedSearch() {
             </CardHeader>
             <CardContent className="p-6">
               <Tabs defaultValue="all" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto gap-2 bg-muted/50 p-1">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto gap-2 bg-muted/50 p-1">
                   <TabsTrigger value="all" className="data-[state=active]:bg-background">
                     <Search className="h-4 w-4 mr-2" />
                     Tous
@@ -239,7 +254,11 @@ export default function ManuscriptAdvancedSearch() {
                   </TabsTrigger>
                   <TabsTrigger value="classification" className="data-[state=active]:bg-background">
                     <Tag className="h-4 w-4 mr-2" />
-                    Classification
+                    Thématique
+                  </TabsTrigger>
+                  <TabsTrigger value="source" className="data-[state=active]:bg-background">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Entité source
                   </TabsTrigger>
                   <TabsTrigger value="physical" className="data-[state=active]:bg-background">
                     <FileText className="h-4 w-4 mr-2" />
@@ -330,7 +349,7 @@ export default function ManuscriptAdvancedSearch() {
                   </div>
                 </TabsContent>
 
-                {/* ONGLET: Classification */}
+                {/* ONGLET: Thématique */}
                 <TabsContent value="classification" className="mt-6 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -377,6 +396,50 @@ export default function ManuscriptAdvancedSearch() {
                         onChange={(e) => setFormData({ ...formData, source: e.target.value })}
                         className="h-11"
                       />
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* ONGLET: Entité source */}
+                <TabsContent value="source" className="mt-6 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="region" className="text-base font-semibold">Région</Label>
+                      <Select
+                        value={formData.region}
+                        onValueChange={(value) => setFormData({ ...formData, region: value, ville: "" })}
+                      >
+                        <SelectTrigger id="region" className="h-11">
+                          <SelectValue placeholder="Sélectionner une région" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background z-50">
+                          {moroccanRegions.map((region) => (
+                            <SelectItem key={region.name} value={region.name}>
+                              {region.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="ville" className="text-base font-semibold">Ville</Label>
+                      <Select
+                        value={formData.ville}
+                        onValueChange={(value) => setFormData({ ...formData, ville: value })}
+                        disabled={!formData.region}
+                      >
+                        <SelectTrigger id="ville" className="h-11">
+                          <SelectValue placeholder={formData.region ? "Sélectionner une ville" : "Sélectionner d'abord une région"} />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background z-50">
+                          {formData.region && getCitiesByRegion(formData.region).map((city) => (
+                            <SelectItem key={city} value={city}>
+                              {city}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </TabsContent>
