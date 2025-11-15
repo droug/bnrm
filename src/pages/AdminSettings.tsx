@@ -17,7 +17,7 @@ export default function AdminSettings() {
       icon: ShieldCheck,
       title: "Gestion des Droits et Permissions",
       description: "Gérer les rôles et les permissions d'accès au système",
-      href: "/admin/settings/roles",
+      href: "/admin/roles",
       permission: "users.permissions",
       gradient: "from-indigo-500 to-indigo-600"
     },
