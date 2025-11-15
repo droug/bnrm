@@ -450,6 +450,17 @@ export default function ManuscriptAdvancedSearch() {
                       </Select>
                     </div>
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="entite" className="text-base font-semibold">Entité</Label>
+                    <Input
+                      id="entite"
+                      placeholder="Nom de l'entité (bibliothèque, institution...)"
+                      value={formData.entite}
+                      onChange={(e) => setFormData({ ...formData, entite: e.target.value })}
+                      className="h-11"
+                    />
+                  </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="entite" className="text-base font-semibold">Entité</Label>
