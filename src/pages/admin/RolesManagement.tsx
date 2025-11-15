@@ -10,6 +10,7 @@ import { WatermarkContainer } from "@/components/ui/watermark";
 import { RolePermissionsMatrix } from "@/components/roles/RolePermissionsMatrix";
 import { RoleCreator } from "@/components/roles/RoleCreator";
 import { PermissionSearch } from "@/components/roles/PermissionSearch";
+import { RolesList } from "@/components/roles/RolesList";
 import { 
   Shield, 
   Users, 
@@ -147,19 +148,7 @@ export default function RolesManagement() {
             </TabsContent>
 
             <TabsContent value="roles" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Rôles Système</CardTitle>
-                  <CardDescription>
-                    Gérez les rôles et leurs permissions associées
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    La gestion détaillée des rôles sera affichée ici
-                  </p>
-                </CardContent>
-              </Card>
+              <RolesList />
             </TabsContent>
 
             <TabsContent value="search" className="space-y-6">
