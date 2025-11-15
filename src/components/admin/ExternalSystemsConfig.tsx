@@ -345,7 +345,8 @@ export function ExternalSystemsConfig() {
   }
 
   const catalogSystems = systems.filter(s => s.system_type === 'catalog');
-  const sigbSystems = systems.filter(s => s.system_type === 'sigb');
+  const sigbSystems = systems.filter(s => s.system_type === 'sigb' && s.system_name !== 'dbm-600');
+  const dbm600Systems = systems.filter(s => s.system_name === 'dbm-600');
   const z3950Systems = systems.filter(s => s.system_type === 'z3950');
   const oaiSystems = systems.filter(s => s.system_type === 'oai-pmh');
   const otherSystems = systems.filter(s => !['catalog', 'sigb', 'z3950', 'oai-pmh'].includes(s.system_type));
@@ -353,9 +354,10 @@ export function ExternalSystemsConfig() {
   return (
     <>
       <Tabs defaultValue="catalog" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="catalog">Catalogues ({catalogSystems.length})</TabsTrigger>
           <TabsTrigger value="sigb">SIGB ({sigbSystems.length})</TabsTrigger>
+          <TabsTrigger value="dbm600">DBM-600 ({dbm600Systems.length})</TabsTrigger>
           <TabsTrigger value="z3950">Z39.50 ({z3950Systems.length})</TabsTrigger>
           <TabsTrigger value="oai">OAI-PMH ({oaiSystems.length})</TabsTrigger>
           <TabsTrigger value="other">Autres ({otherSystems.length})</TabsTrigger>
@@ -367,6 +369,10 @@ export function ExternalSystemsConfig() {
 
         <TabsContent value="sigb" className="space-y-4">
           {sigbSystems.map(renderSystemCard)}
+        </TabsContent>
+
+        <TabsContent value="dbm600" className="space-y-4">
+          {dbm600Systems.map(renderSystemCard)}
         </TabsContent>
 
         <TabsContent value="z3950" className="space-y-4">
