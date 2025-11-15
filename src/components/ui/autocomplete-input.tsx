@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -92,46 +92,50 @@ export function AutocompleteInput({
         </Label>
       )}
       
-      <Popover.Root open={open} onOpenChange={setOpen}>
-        <div className="relative">
-          <Input
-            type="text"
-            placeholder={placeholder}
-            value={searchQuery}
-            onChange={handleInputChange}
-            onFocus={() => setOpen(true)}
-            disabled={disabled || loading}
-            className={cn(
-              'pr-8',
-              error && 'border-destructive'
+      <Popover.Root open={open && !loading} onOpenChange={setOpen}>
+        <Popover.Anchor asChild>
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder={placeholder}
+              value={searchQuery}
+              onChange={handleInputChange}
+              onFocus={() => setOpen(true)}
+              disabled={disabled || loading}
+              className={cn(
+                'pr-8',
+                error && 'border-destructive'
+              )}
+            />
+            
+            {loading && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              </div>
             )}
-          />
-          
-          {loading && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            </div>
-          )}
-          
-          {!loading && searchQuery && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+            
+            {!loading && searchQuery && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        </Popover.Anchor>
 
         <Popover.Portal>
           <Popover.Content
-            className="z-[var(--z-popover)] w-[var(--radix-popover-trigger-width)] bg-popover border rounded-md shadow-lg max-h-60 overflow-auto"
+            className="z-[var(--z-popover)] w-[var(--radix-popover-trigger-width)] bg-popover text-popover-foreground border rounded-md shadow-lg max-h-60 overflow-auto"
             sideOffset={4}
+            side="bottom"
             align="start"
             onOpenAutoFocus={(e) => e.preventDefault()}
+            onInteractOutside={() => setOpen(false)}
           >
-            {!loading && filteredOptions.length > 0 && (
+            {filteredOptions.length > 0 ? (
               <div className="py-1">
                 {filteredOptions.map((option) => (
                   <button
@@ -139,7 +143,7 @@ export function AutocompleteInput({
                     type="button"
                     onClick={() => handleSelect(option.value, option.label)}
                     className={cn(
-                      'w-full text-left px-3 py-2 text-sm text-popover-foreground hover:bg-accent hover:text-accent-foreground transition-colors',
+                      'w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors',
                       value === option.value && 'bg-accent/50'
                     )}
                   >
@@ -147,13 +151,11 @@ export function AutocompleteInput({
                   </button>
                 ))}
               </div>
-            )}
-            
-            {!loading && searchQuery && filteredOptions.length === 0 && (
+            ) : searchQuery ? (
               <div className="p-4 text-sm text-muted-foreground text-center">
                 Aucun résultat trouvé
               </div>
-            )}
+            ) : null}
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
