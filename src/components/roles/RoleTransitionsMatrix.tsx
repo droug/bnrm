@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { COMPLETE_SYSTEM_ROLES, ROLE_WORKFLOW_TRANSITIONS } from "@/config/completeSystemRoles";
-import { CheckCircle2, XCircle, Shield, ArrowRight } from "lucide-react";
+import { CheckCircle2, XCircle, Shield, ArrowRight, Edit, Trash2, Plus } from "lucide-react";
+import { TransitionRolesEditorDialog } from "./TransitionRolesEditorDialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface RoleTransitionsMatrixProps {
   selectedPlatform?: string;
@@ -12,7 +16,13 @@ interface RoleTransitionsMatrixProps {
  * Matrice des rôles et leurs capacités de transition dans les workflows
  */
 export function RoleTransitionsMatrix({ selectedPlatform = "all" }: RoleTransitionsMatrixProps) {
-  const transitions = Object.keys(ROLE_WORKFLOW_TRANSITIONS);
+  const { toast } = useToast();
+  const [workflowTransitions, setWorkflowTransitions] = useState(ROLE_WORKFLOW_TRANSITIONS);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedTransition, setSelectedTransition] = useState<string>("");
+  const [selectedTransitionRoles, setSelectedTransitionRoles] = useState<string[]>([]);
+  
+  const transitions = Object.keys(workflowTransitions);
   
   // Mapper les plateformes aux modules
   const platformToModules: Record<string, string[]> = {
@@ -57,8 +67,38 @@ export function RoleTransitionsMatrix({ selectedPlatform = "all" }: RoleTransiti
   };
 
   const canPerformTransition = (roleName: string, transition: string): boolean => {
-    const allowedRoles = ROLE_WORKFLOW_TRANSITIONS[transition as keyof typeof ROLE_WORKFLOW_TRANSITIONS];
+    const allowedRoles = workflowTransitions[transition as keyof typeof workflowTransitions];
     return allowedRoles?.includes(roleName) || false;
+  };
+
+  const handleEditTransition = (transitionName: string) => {
+    setSelectedTransition(transitionName);
+    setSelectedTransitionRoles(workflowTransitions[transitionName as keyof typeof workflowTransitions] || []);
+    setEditDialogOpen(true);
+  };
+
+  const handleSaveTransition = (transitionName: string, newRoles: string[]) => {
+    setWorkflowTransitions(prev => ({
+      ...prev,
+      [transitionName]: newRoles,
+    }));
+    toast({
+      title: "Transition mise à jour",
+      description: `Les rôles pour "${transitionName}" ont été modifiés`,
+    });
+  };
+
+  const handleDeleteTransition = (transitionName: string) => {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer la transition "${transitionName}" ?`)) {
+      const newTransitions = { ...workflowTransitions };
+      delete newTransitions[transitionName as keyof typeof newTransitions];
+      setWorkflowTransitions(newTransitions);
+      toast({
+        title: "Transition supprimée",
+        description: `La transition "${transitionName}" a été supprimée`,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -79,18 +119,56 @@ export function RoleTransitionsMatrix({ selectedPlatform = "all" }: RoleTransiti
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {/* Légende des transitions */}
-          <div className="flex flex-wrap gap-2 p-4 bg-muted/50 rounded-lg">
-            <span className="text-sm font-medium mr-2">Transitions:</span>
-            {transitions.map((transition) => (
-              <Badge 
-                key={transition}
-                variant="outline"
-                className={`${getTransitionColor(transition)} text-white border-0`}
-              >
-                {transition}
-              </Badge>
-            ))}
+          {/* Légende des transitions avec actions */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Transitions disponibles:</span>
+              <Button variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Nouvelle transition
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {transitions.map((transition) => {
+                const rolesCount = workflowTransitions[transition as keyof typeof workflowTransitions]?.length || 0;
+                return (
+                  <div 
+                    key={transition}
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <Badge 
+                        variant="outline"
+                        className={`${getTransitionColor(transition)} text-white border-0`}
+                      >
+                        {transition}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {rolesCount} {rolesCount > 1 ? "rôles" : "rôle"}
+                      </span>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => handleEditTransition(transition)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                        onClick={() => handleDeleteTransition(transition)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Matrice par module */}
@@ -210,6 +288,15 @@ export function RoleTransitionsMatrix({ selectedPlatform = "all" }: RoleTransiti
             </div>
           </div>
         </div>
+
+        {/* Dialog d'édition des transitions */}
+        <TransitionRolesEditorDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          transitionName={selectedTransition}
+          currentRoles={selectedTransitionRoles}
+          onSave={handleSaveTransition}
+        />
       </CardContent>
     </Card>
   );
