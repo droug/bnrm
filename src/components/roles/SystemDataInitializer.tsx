@@ -212,12 +212,12 @@ export function SystemDataInitializer() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <Alert>
+          <Alert>
           <Download className="h-4 w-4" />
           <AlertDescription>
             Cette opération va insérer ou mettre à jour {SYSTEM_MODULES.length} modules, 
             {' '}{SYSTEM_SERVICES.length} services, {WORKFLOW_PERMISSIONS.length} permissions
-            {' '}et {INSCRIPTION_ADHESION_ROLES.length} rôles dans la base de données.
+            {' '}et {INSCRIPTION_ADHESION_ROLES.length} rôles système (incluant inscriptions, adhésions et transitions workflow) dans la base de données.
           </AlertDescription>
         </Alert>
 
