@@ -1,6 +1,15 @@
 /**
- * Configuration complète de tous les rôles du système BNRM
- * Incluant: inscriptions, adhésions, workflows et transitions
+ * ⚠️ FICHIER OBSOLÈTE - NE PLUS UTILISER ⚠️
+ * 
+ * Ce fichier mélange les rôles système et les rôles workflow, causant des erreurs.
+ * 
+ * UTILISEZ À LA PLACE:
+ * - src/config/validSystemRoles.ts → Pour les rôles système (user_roles enum)
+ * - src/config/workflowRoles.ts → Pour les rôles workflow (workflow_roles table)
+ * 
+ * Voir documentation: docs/ROLES_SYSTEM_ARCHITECTURE.md
+ * 
+ * @deprecated Utilisez validSystemRoles.ts ou workflowRoles.ts
  */
 
 export interface CompleteSystemRole {

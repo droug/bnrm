@@ -5,10 +5,37 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Shield, Lock, CheckCircle, AlertCircle, Info } from "lucide-react";
 import { useAccessControl } from "@/hooks/useAccessControl";
-import { ACCESS_MATRIX, ROLE_LIMITS, getRoleDescription, getAccessLevelDescription } from "@/config/accessPolicies";
+import { ACCESS_MATRIX, ROLE_LIMITS, getRoleDescription, getAccessLevelDescription, type ContentAccessRole } from "@/config/accessPolicies";
 
 export function AccessPolicyInfo() {
   const { userRole, isAuthenticated } = useAccessControl();
+
+  // Mapper les rôles système vers les rôles de contrôle d'accès
+  const getAccessRole = (role: string): ContentAccessRole => {
+    const roleMap: Record<string, ContentAccessRole> = {
+      'admin': 'admin',
+      'librarian': 'librarian',
+      'researcher': 'researcher',
+      'subscriber': 'subscriber',
+      'partner': 'partner',
+      'visitor': 'visitor',
+      'public_user': 'subscriber', // Grand public = abonné de base
+      // Professionnels chaîne du livre
+      'author': 'partner',
+      'editor': 'partner',
+      'printer': 'partner',
+      'producer': 'partner',
+      'distributor': 'partner',
+      // Admin internes
+      'direction': 'admin',
+      'dac': 'admin',
+      'comptable': 'admin',
+      'read_only': 'visitor',
+    };
+    return roleMap[role] || 'visitor';
+  };
+
+  const accessRole = userRole ? getAccessRole(userRole) : null;
 
   return (
     <div className="space-y-6">
@@ -29,32 +56,32 @@ export function AccessPolicyInfo() {
               <Info className="h-4 w-4" />
               Votre Statut Actuel
             </h3>
-            {isAuthenticated && userRole ? (
+            {isAuthenticated && userRole && accessRole ? (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Badge variant="default" className="text-sm">
                     {userRole.toUpperCase()}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    {getRoleDescription(userRole)}
+                    {getRoleDescription(accessRole)}
                   </span>
                 </div>
                 <div className="text-sm space-y-1 mt-3">
                   <p className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span>Demandes maximales : {ROLE_LIMITS[userRole].maxRequests}</span>
+                    <span>Demandes maximales : {ROLE_LIMITS[accessRole].maxRequests}</span>
                   </p>
                   <p className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span>Téléchargements/jour : {ROLE_LIMITS[userRole].maxDownloadsPerDay}</span>
+                    <span>Téléchargements/jour : {ROLE_LIMITS[accessRole].maxDownloadsPerDay}</span>
                   </p>
-                  {ROLE_LIMITS[userRole].advancedSearch && (
+                  {ROLE_LIMITS[accessRole].advancedSearch && (
                     <p className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
                       <span>Accès à la recherche avancée</span>
                     </p>
                   )}
-                  {ROLE_LIMITS[userRole].priorityProcessing && (
+                  {ROLE_LIMITS[accessRole].priorityProcessing && (
                     <p className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
                       <span>Traitement prioritaire des demandes</span>
@@ -87,7 +114,7 @@ export function AccessPolicyInfo() {
                 <div
                   key={role}
                   className={`p-3 rounded-lg border ${
-                    userRole === role
+                    accessRole === role
                       ? 'border-primary bg-primary/5'
                       : 'border-muted bg-muted/30'
                   }`}
