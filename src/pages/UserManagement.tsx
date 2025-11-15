@@ -8,11 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Shield, Users, CheckCircle, XCircle, Clock, Settings, User, Mail, Phone, Building, Calendar, UserCheck, UserX, Edit, ArrowLeft, Home, Trash } from "lucide-react";
+import { Shield, Users, CheckCircle, XCircle, Clock, Settings, User, Mail, Phone, Building, Calendar, UserCheck, UserX, Edit, ArrowLeft, Home, Trash, UserPlus, Search as SearchIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate, Link } from "react-router-dom";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
-import Header from "@/components/Header";
+import { WatermarkContainer } from "@/components/ui/watermark";
+import { Input } from "@/components/ui/input";
 import SubscriptionPlansManager from "@/components/SubscriptionPlansManager";
 import AddInternalUserDialog from "@/components/AddInternalUserDialog";
 import { EditUserDialog } from "@/components/EditUserDialog";
@@ -168,6 +168,7 @@ const ROLE_PERMISSIONS = {
 export default function UserManagement() {
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
   
   const [users, setUsers] = useState<Profile[]>([]);
   const [pendingRequests, setPendingRequests] = useState<AccessRequest[]>([]);
@@ -361,7 +362,7 @@ export default function UserManagement() {
 
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
@@ -371,89 +372,146 @@ export default function UserManagement() {
     return <Navigate to="/dashboard" replace />;
   }
 
+  // Filtrer les utilisateurs selon la recherche
+  const filteredUsers = users.filter(u => 
+    `${u.first_name} ${u.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.institution?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.role?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <Header />
-      
-      <main className="container py-8">
-        {/* Breadcrumb Navigation */}
-        <div className="mb-6">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to="/dashboard" className="flex items-center gap-2">
-                    <Home className="h-4 w-4" />
-                    Tableau de bord
-                  </Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Gestion des utilisateurs</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-                <Shield className="h-8 w-8 text-primary" />
-                Gestion des Droits et Permissions
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                Administration des utilisateurs, rôles et permissions
-              </p>
-            </div>
-            <Button asChild variant="outline">
-              <Link to="/dashboard" className="flex items-center gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Retour au tableau de bord
+    <WatermarkContainer 
+      watermarkProps={{ 
+        text: "BNRM - Gestion des Utilisateurs", 
+        variant: "subtle", 
+        position: "corner",
+        opacity: 0.03
+      }}
+    >
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/60 sticky top-0 z-10">
+          <div className="container flex h-16 items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Link to="/admin/settings">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Retour
+                </Button>
               </Link>
-            </Button>
-          </div>
-        </div>
-
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Utilisateurs
-            </TabsTrigger>
-            <TabsTrigger value="permissions" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Permissions
-            </TabsTrigger>
-            <TabsTrigger value="plans" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Profils & Plans
-            </TabsTrigger>
-            <TabsTrigger value="requests" className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Demandes en attente
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Gestion des utilisateurs */}
-          <TabsContent value="users" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5" />
-                      Gestion des Utilisateurs
-                    </CardTitle>
-                    <CardDescription>
-                      Gérez les rôles et approbations des utilisateurs
-                    </CardDescription>
-                  </div>
-                  <AddInternalUserDialog onUserAdded={fetchData} />
+              <div className="flex items-center space-x-2">
+                <Users className="h-6 w-6 text-primary" />
+                <div>
+                  <h1 className="text-xl font-bold">Gestion des Utilisateurs</h1>
+                  <p className="text-xs text-muted-foreground">
+                    Administration des comptes et permissions utilisateurs
+                  </p>
                 </div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Badge variant="outline" className="gap-1">
+                <User className="h-3 w-3" />
+                {profile?.first_name} {profile?.last_name}
+              </Badge>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="container py-8 space-y-8">
+          {/* Quick Actions & Search */}
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div className="flex-1 w-full sm:max-w-md">
+              <div className="relative">
+                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher un utilisateur..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <AddInternalUserDialog onUserAdded={fetchData} />
+          </div>
+
+          {/* Statistics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Utilisateurs</CardTitle>
               </CardHeader>
               <CardContent>
+                <div className="text-2xl font-bold">{users.length}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Utilisateurs Approuvés</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">
+                  {users.filter(u => u.is_approved).length}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">En Attente</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-amber-600">
+                  {users.filter(u => !u.is_approved).length}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Demandes d'accès</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-600">
+                  {pendingRequests.length}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Tabs */}
+          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="users" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Utilisateurs
+              </TabsTrigger>
+              <TabsTrigger value="permissions" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Permissions
+              </TabsTrigger>
+              <TabsTrigger value="plans" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Profils & Plans
+              </TabsTrigger>
+              <TabsTrigger value="requests" className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Demandes ({pendingRequests.length})
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Gestion des utilisateurs */}
+            <TabsContent value="users" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Liste des Utilisateurs
+                  </CardTitle>
+                  <CardDescription>
+                    Gérez les rôles et approbations des utilisateurs ({filteredUsers.length} résultats)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
                 {/* Statistiques des utilisateurs internes */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20">
@@ -874,5 +932,6 @@ export default function UserManagement() {
         />
       </main>
     </div>
+  </WatermarkContainer>
   );
 }
