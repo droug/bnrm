@@ -42,26 +42,37 @@ export function SystemDataInitializer() {
     try {
       // Étape 1: Insérer les modules
       updateStepStatus(0, 'running');
-      const { error: modulesError } = await supabase
+      
+      // Vérifier les modules existants et n'insérer que les nouveaux
+      const { data: existingModules } = await supabase
         .from('system_modules')
-        .upsert(
-          SYSTEM_MODULES.map(m => ({
-            code: m.code,
-            name: m.name,
-            platform: m.platform,
-            description: m.description,
-            icon: m.icon,
-            color: m.color,
-            is_active: m.is_active,
-          })),
-          { onConflict: 'code' }
-        );
+        .select('code');
+      
+      const existingCodes = new Set(existingModules?.map(m => m.code) || []);
+      const newModules = SYSTEM_MODULES.filter(m => !existingCodes.has(m.code));
+      
+      if (newModules.length > 0) {
+        const { error: modulesError } = await supabase
+          .from('system_modules')
+          .insert(
+            newModules.map(m => ({
+              code: m.code,
+              name: m.name,
+              platform: m.platform,
+              description: m.description,
+              icon: m.icon,
+              color: m.color,
+              is_active: m.is_active,
+            }))
+          );
 
-      if (modulesError) {
-        updateStepStatus(0, 'error', modulesError.message);
-        throw modulesError;
+        if (modulesError) {
+          updateStepStatus(0, 'error', modulesError.message);
+          throw modulesError;
+        }
       }
-      updateStepStatus(0, 'success', `${SYSTEM_MODULES.length} modules insérés`);
+
+      updateStepStatus(0, 'success', `${newModules.length} nouveaux modules insérés (${existingCodes.size} existants)`);
       setProgress(25);
 
       // Étape 2: Insérer les services
@@ -74,59 +85,92 @@ export function SystemDataInitializer() {
       
       const moduleMap = new Map(modules?.map(m => [m.code, m.id]) || []);
       
-      const servicesWithModuleIds = SYSTEM_SERVICES.map(s => ({
-        code: s.code,
-        name: s.name,
-        module_id: moduleMap.get(s.module_code),
-        description: s.description,
-        is_active: s.is_active,
-        requires_approval: s.requires_approval,
-      }));
-
-      const { error: servicesError } = await supabase
+      // Vérifier les services existants
+      const { data: existingServices } = await supabase
         .from('system_services')
-        .upsert(servicesWithModuleIds, { onConflict: 'code' });
+        .select('code');
+      
+      const existingServiceCodes = new Set(existingServices?.map(s => s.code) || []);
+      
+      const servicesWithModuleIds = SYSTEM_SERVICES
+        .filter(s => !existingServiceCodes.has(s.code))
+        .map(s => ({
+          code: s.code,
+          name: s.name,
+          module_id: moduleMap.get(s.module_code),
+          description: s.description,
+          is_active: s.is_active,
+          requires_approval: s.requires_approval,
+        }));
 
-      if (servicesError) {
-        updateStepStatus(1, 'error', servicesError.message);
-        throw servicesError;
+      if (servicesWithModuleIds.length > 0) {
+        const { error: servicesError } = await supabase
+          .from('system_services')
+          .insert(servicesWithModuleIds);
+
+        if (servicesError) {
+          updateStepStatus(1, 'error', servicesError.message);
+          throw servicesError;
+        }
       }
-      updateStepStatus(1, 'success', `${SYSTEM_SERVICES.length} services insérés`);
+      
+      updateStepStatus(1, 'success', `${servicesWithModuleIds.length} nouveaux services insérés (${existingServiceCodes.size} existants)`);
       setProgress(50);
 
       // Étape 3: Insérer les permissions
       updateStepStatus(2, 'running');
-      const { error: permissionsError } = await supabase
+      
+      const { data: existingPermissions } = await supabase
         .from('workflow_permissions')
-        .upsert(WORKFLOW_PERMISSIONS, { onConflict: 'permission_name' });
+        .select('permission_name');
+      
+      const existingPermNames = new Set(existingPermissions?.map(p => p.permission_name) || []);
+      const newPermissions = WORKFLOW_PERMISSIONS.filter(p => !existingPermNames.has(p.permission_name));
+      
+      if (newPermissions.length > 0) {
+        const { error: permissionsError } = await supabase
+          .from('workflow_permissions')
+          .insert(newPermissions);
 
-      if (permissionsError) {
-        updateStepStatus(2, 'error', permissionsError.message);
-        throw permissionsError;
+        if (permissionsError) {
+          updateStepStatus(2, 'error', permissionsError.message);
+          throw permissionsError;
+        }
       }
-      updateStepStatus(2, 'success', `${WORKFLOW_PERMISSIONS.length} permissions insérées`);
+      
+      updateStepStatus(2, 'success', `${newPermissions.length} nouvelles permissions insérées (${existingPermNames.size} existantes)`);
       setProgress(75);
 
       // Étape 4: Insérer les rôles
       updateStepStatus(3, 'running');
-      const { error: rolesError } = await supabase
+      
+      const { data: existingRoles } = await supabase
         .from('workflow_roles')
-        .upsert(
-          INSCRIPTION_ADHESION_ROLES.map(r => ({
-            role_name: r.role_name,
-            role_level: r.role_level,
-            module: r.module,
-            description: r.description,
-            permissions: r.permissions,
-          })),
-          { onConflict: 'role_name' }
-        );
+        .select('role_name');
+      
+      const existingRoleNames = new Set(existingRoles?.map(r => r.role_name) || []);
+      const newRoles = INSCRIPTION_ADHESION_ROLES.filter(r => !existingRoleNames.has(r.role_name));
+      
+      if (newRoles.length > 0) {
+        const { error: rolesError } = await supabase
+          .from('workflow_roles')
+          .insert(
+            newRoles.map(r => ({
+              role_name: r.role_name,
+              role_level: r.role_level,
+              module: r.module,
+              description: r.description,
+              permissions: r.permissions,
+            }))
+          );
 
-      if (rolesError) {
-        updateStepStatus(3, 'error', rolesError.message);
-        throw rolesError;
+        if (rolesError) {
+          updateStepStatus(3, 'error', rolesError.message);
+          throw rolesError;
+        }
       }
-      updateStepStatus(3, 'success', `${INSCRIPTION_ADHESION_ROLES.length} rôles insérés`);
+      
+      updateStepStatus(3, 'success', `${newRoles.length} nouveaux rôles insérés (${existingRoleNames.size} existants)`);
       setProgress(100);
 
       toast.success("Initialisation terminée", {
