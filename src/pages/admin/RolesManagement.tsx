@@ -11,6 +11,8 @@ import { RolePermissionsMatrix } from "@/components/roles/RolePermissionsMatrix"
 import { RoleCreator } from "@/components/roles/RoleCreator";
 import { PermissionSearch } from "@/components/roles/PermissionSearch";
 import { RolesList } from "@/components/roles/RolesList";
+import { ModulesManagement } from "@/components/roles/ModulesManagement";
+import { ServicesManagement } from "@/components/roles/ServicesManagement";
 import { 
   Shield, 
   Users, 
@@ -134,10 +136,12 @@ export default function RolesManagement() {
 
           {/* Main Content Tabs */}
           <Tabs defaultValue="matrix" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="matrix">Matrice des Permissions</TabsTrigger>
-              <TabsTrigger value="roles">Gestion des Rôles</TabsTrigger>
-              <TabsTrigger value="search">Recherche Avancée</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="matrix">Matrice</TabsTrigger>
+              <TabsTrigger value="roles">Rôles</TabsTrigger>
+              <TabsTrigger value="modules">Modules</TabsTrigger>
+              <TabsTrigger value="services">Services</TabsTrigger>
+              <TabsTrigger value="search">Recherche</TabsTrigger>
             </TabsList>
 
             <TabsContent value="matrix" className="space-y-6">
@@ -149,6 +153,14 @@ export default function RolesManagement() {
 
             <TabsContent value="roles" className="space-y-6">
               <RolesList />
+            </TabsContent>
+
+            <TabsContent value="modules" className="space-y-6">
+              <ModulesManagement />
+            </TabsContent>
+
+            <TabsContent value="services" className="space-y-6">
+              <ServicesManagement />
             </TabsContent>
 
             <TabsContent value="search" className="space-y-6">
