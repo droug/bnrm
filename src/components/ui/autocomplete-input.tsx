@@ -31,19 +31,20 @@ export function AutocompleteInput({
   const { options, loading, error: loadError, search, getLabel } = useSystemList(source);
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Synchroniser la valeur affichée avec la valeur sélectionnée
+  // Synchroniser la valeur affichée avec la valeur sélectionnée uniquement si l'utilisateur ne tape pas
   useEffect(() => {
-    if (value) {
-      const label = getLabel(value);
-      if (label !== value) {
+    if (!isTyping) {
+      if (value) {
+        const label = getLabel(value);
         setSearchQuery(label);
+      } else {
+        setSearchQuery('');
       }
-    } else {
-      setSearchQuery('');
     }
-  }, [value, getLabel]);
+  }, [value, getLabel, isTyping]);
 
   const filteredOptions = searchQuery
     ? search(searchQuery)
@@ -62,6 +63,7 @@ export function AutocompleteInput({
   }, []);
 
   const handleSelect = (selectedValue: string, selectedLabel: string) => {
+    setIsTyping(false);
     onChange?.(selectedValue);
     setSearchQuery(selectedLabel);
     setOpen(false);
@@ -69,6 +71,7 @@ export function AutocompleteInput({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
+    setIsTyping(true);
     setSearchQuery(newValue);
     setOpen(true);
     
@@ -79,6 +82,7 @@ export function AutocompleteInput({
   };
 
   const handleClear = () => {
+    setIsTyping(false);
     setSearchQuery('');
     onChange?.('');
     setOpen(false);
