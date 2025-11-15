@@ -40,6 +40,7 @@ interface Role {
   users_count: number;
   permissions_count: number;
   is_system: boolean;
+  role_type: 'internal' | 'external'; // internal = administration, external = usagers
 }
 
 export function RolesList() {
@@ -47,9 +48,11 @@ export function RolesList() {
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
+  const [roleTypeFilter, setRoleTypeFilter] = useState<'all' | 'internal' | 'external'>('all');
 
-  // Données de démonstration avec rôles d'inscription et d'adhésion
+  // Données de démonstration avec rôles internes et externes
   const [roles, setRoles] = useState<Role[]>([
+    // === RÔLES INTERNES (ADMINISTRATION) ===
     {
       id: "1",
       name: "Administrateur Système",
@@ -58,6 +61,7 @@ export function RolesList() {
       users_count: 5,
       permissions_count: 120,
       is_system: true,
+      role_type: 'internal',
     },
     {
       id: "2",
@@ -67,8 +71,8 @@ export function RolesList() {
       users_count: 12,
       permissions_count: 45,
       is_system: true,
+      role_type: 'internal',
     },
-    // Rôles d'inscription
     {
       id: "3",
       name: "Agent Inscription",
@@ -77,6 +81,7 @@ export function RolesList() {
       users_count: 6,
       permissions_count: 8,
       is_system: false,
+      role_type: 'internal',
     },
     {
       id: "4",
@@ -86,35 +91,8 @@ export function RolesList() {
       users_count: 3,
       permissions_count: 12,
       is_system: false,
+      role_type: 'internal',
     },
-    {
-      id: "5",
-      name: "Inscrit - Étudiant",
-      description: "Étudiant inscrit avec accès aux services de lecture",
-      color: "bg-teal-500",
-      users_count: 150,
-      permissions_count: 5,
-      is_system: false,
-    },
-    {
-      id: "6",
-      name: "Inscrit - Grand Public",
-      description: "Usager grand public avec accès de base",
-      color: "bg-teal-600",
-      users_count: 200,
-      permissions_count: 4,
-      is_system: false,
-    },
-    {
-      id: "7",
-      name: "Inscrit - Pass Jeunes",
-      description: "Jeune bénéficiant du pass culture avec accès gratuit",
-      color: "bg-teal-400",
-      users_count: 80,
-      permissions_count: 5,
-      is_system: false,
-    },
-    // Rôles d'adhésion
     {
       id: "8",
       name: "Gestionnaire Adhésions",
@@ -123,6 +101,7 @@ export function RolesList() {
       users_count: 4,
       permissions_count: 10,
       is_system: false,
+      role_type: 'internal',
     },
     {
       id: "9",
@@ -132,26 +111,8 @@ export function RolesList() {
       users_count: 2,
       permissions_count: 14,
       is_system: false,
+      role_type: 'internal',
     },
-    {
-      id: "10",
-      name: "Adhérent Premium",
-      description: "Adhérent avec accès premium aux ressources numériques",
-      color: "bg-violet-500",
-      users_count: 75,
-      permissions_count: 15,
-      is_system: false,
-    },
-    {
-      id: "11",
-      name: "Adhérent Chercheur",
-      description: "Chercheur avec accès illimité aux ressources spécialisées",
-      color: "bg-violet-600",
-      users_count: 45,
-      permissions_count: 18,
-      is_system: false,
-    },
-    // Autres rôles existants
     {
       id: "12",
       name: "Catalogueur",
@@ -160,6 +121,7 @@ export function RolesList() {
       users_count: 8,
       permissions_count: 25,
       is_system: false,
+      role_type: 'internal',
     },
     {
       id: "13",
@@ -169,6 +131,59 @@ export function RolesList() {
       users_count: 15,
       permissions_count: 30,
       is_system: false,
+      role_type: 'internal',
+    },
+    
+    // === RÔLES EXTERNES (USAGERS) ===
+    {
+      id: "5",
+      name: "Inscrit - Étudiant",
+      description: "Étudiant inscrit avec accès aux services de lecture",
+      color: "bg-teal-500",
+      users_count: 150,
+      permissions_count: 5,
+      is_system: false,
+      role_type: 'external',
+    },
+    {
+      id: "6",
+      name: "Inscrit - Grand Public",
+      description: "Usager grand public avec accès de base",
+      color: "bg-teal-600",
+      users_count: 200,
+      permissions_count: 4,
+      is_system: false,
+      role_type: 'external',
+    },
+    {
+      id: "7",
+      name: "Inscrit - Pass Jeunes",
+      description: "Jeune bénéficiant du pass culture avec accès gratuit",
+      color: "bg-teal-400",
+      users_count: 80,
+      permissions_count: 5,
+      is_system: false,
+      role_type: 'external',
+    },
+    {
+      id: "10",
+      name: "Adhérent Premium",
+      description: "Adhérent avec accès premium aux ressources numériques",
+      color: "bg-violet-500",
+      users_count: 75,
+      permissions_count: 15,
+      is_system: false,
+      role_type: 'external',
+    },
+    {
+      id: "11",
+      name: "Adhérent Chercheur",
+      description: "Chercheur avec accès illimité aux ressources spécialisées",
+      color: "bg-violet-600",
+      users_count: 45,
+      permissions_count: 18,
+      is_system: false,
+      role_type: 'external',
     },
     {
       id: "14",
@@ -178,6 +193,7 @@ export function RolesList() {
       users_count: 250,
       permissions_count: 10,
       is_system: true,
+      role_type: 'external',
     },
   ]);
 
@@ -231,6 +247,7 @@ export function RolesList() {
         users_count: 0,
         permissions_count: 0,
         is_system: false,
+        role_type: 'internal',
       };
       setRoles([...roles, newRole]);
       toast({
@@ -241,6 +258,12 @@ export function RolesList() {
     setIsEditorOpen(false);
     setSelectedRole(null);
   };
+
+  // Filtrer les rôles selon le type
+  const filteredRoles = roles.filter(role => {
+    if (roleTypeFilter === 'all') return true;
+    return role.role_type === roleTypeFilter;
+  });
 
   return (
     <>
@@ -264,6 +287,35 @@ export function RolesList() {
               Créer un Rôle
             </Button>
           </div>
+          
+          {/* Filtres par type de rôle */}
+          <div className="flex gap-2 mt-4">
+            <Button
+              variant={roleTypeFilter === 'all' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setRoleTypeFilter('all')}
+            >
+              Tous les rôles ({roles.length})
+            </Button>
+            <Button
+              variant={roleTypeFilter === 'internal' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setRoleTypeFilter('internal')}
+              className="gap-2"
+            >
+              <Shield className="h-4 w-4" />
+              Rôles internes ({roles.filter(r => r.role_type === 'internal').length})
+            </Button>
+            <Button
+              variant={roleTypeFilter === 'external' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setRoleTypeFilter('external')}
+              className="gap-2"
+            >
+              <Users className="h-4 w-4" />
+              Rôles externes ({roles.filter(r => r.role_type === 'external').length})
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -278,7 +330,7 @@ export function RolesList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {roles.map((role) => (
+              {filteredRoles.map((role) => (
                 <TableRow key={role.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -306,9 +358,17 @@ export function RolesList() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center">
-                    <Badge variant={role.is_system ? "default" : "secondary"}>
-                      {role.is_system ? "Système" : "Personnalisé"}
-                    </Badge>
+                    <div className="flex flex-col gap-1 items-center">
+                      <Badge variant={role.is_system ? "default" : "secondary"}>
+                        {role.is_system ? "Système" : "Personnalisé"}
+                      </Badge>
+                      <Badge 
+                        variant="outline" 
+                        className={role.role_type === 'internal' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-green-50 text-green-700 border-green-200'}
+                      >
+                        {role.role_type === 'internal' ? 'Interne' : 'Externe'}
+                      </Badge>
+                    </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
