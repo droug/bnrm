@@ -639,49 +639,5 @@ export const WORKFLOW_PERMISSIONS: WorkflowPermission[] = [
 /**
  * Rôles pour les inscriptions et adhésions
  */
-export const INSCRIPTION_ADHESION_ROLES = [
-  {
-    role_name: 'Agent Inscription',
-    role_level: 'module',
-    module: 'inscription',
-    description: 'Gère les demandes d\'inscription des usagers',
-    permissions: [
-      'inscription.create',
-      'inscription.validate',
-      'inscription.reject',
-      'inscription.renew',
-      'inscription.view_all',
-      'workflow.transition.validate',
-      'workflow.transition.reject',
-    ],
-  },
-  {
-    role_name: 'Gestionnaire Adhésions',
-    role_level: 'module',
-    module: 'adhesion',
-    description: 'Gère les adhésions et abonnements',
-    permissions: [
-      'adhesion.create',
-      'adhesion.validate',
-      'adhesion.reject',
-      'adhesion.renew',
-      'adhesion.suspend',
-      'adhesion.view_all',
-      'workflow.transition.validate',
-      'workflow.transition.reject',
-    ],
-  },
-  {
-    role_name: 'Coordinateur CBM Adhésions',
-    role_level: 'module',
-    module: 'cbm',
-    description: 'Coordonne les adhésions des bibliothèques au réseau CBM',
-    permissions: [
-      'cbm.adhesion.create',
-      'cbm.adhesion.validate',
-      'cbm.training.manage',
-      'workflow.transition.validate',
-      'workflow.transition.approve',
-    ],
-  },
-];
+// Importer depuis le fichier complet
+export { COMPLETE_SYSTEM_ROLES as INSCRIPTION_ADHESION_ROLES } from './completeSystemRoles';

@@ -14,6 +14,7 @@ import { RolesList } from "@/components/roles/RolesList";
 import { ModulesManagement } from "@/components/roles/ModulesManagement";
 import { ServicesManagement } from "@/components/roles/ServicesManagement";
 import { SystemDataInitializer } from "@/components/roles/SystemDataInitializer";
+import { RoleTransitionsMatrix } from "@/components/roles/RoleTransitionsMatrix";
 import { 
   Shield, 
   Users, 
@@ -137,8 +138,9 @@ export default function RolesManagement() {
 
           {/* Main Content Tabs */}
           <Tabs defaultValue="initializer" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="initializer">Initialisation</TabsTrigger>
+              <TabsTrigger value="transitions">Transitions</TabsTrigger>
               <TabsTrigger value="matrix">Matrice</TabsTrigger>
               <TabsTrigger value="roles">Rôles</TabsTrigger>
               <TabsTrigger value="modules">Modules</TabsTrigger>
@@ -148,6 +150,10 @@ export default function RolesManagement() {
 
             <TabsContent value="initializer" className="space-y-6">
               <SystemDataInitializer />
+            </TabsContent>
+
+            <TabsContent value="transitions" className="space-y-6">
+              <RoleTransitionsMatrix />
             </TabsContent>
 
             <TabsContent value="matrix" className="space-y-6">
