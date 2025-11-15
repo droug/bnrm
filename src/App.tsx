@@ -249,7 +249,7 @@ const App = () => {
         <Route path="/admin/content" element={<ContentManagement />} />
           <Route path="/news" element={<News />} />
           <Route path="/practical-info" element={<PracticalInfo />} />
-        <Route path="/settings" element={<Navigate to="/admin/settings/roles" replace />} />
+        <Route path="/settings" element={<Navigate to="/admin/roles" replace />} />
         <Route path="/wysiwyg" element={<WysiwygPage />} />
             <Route path="/admin/bnrm-tariffs" element={<BNRMTariffsPage />} />
             <Route path="/admin/wysiwyg" element={<WysiwygPage />} />
@@ -262,7 +262,7 @@ const App = () => {
         <Route path="/form" element={<DynamicFormPage />} />
         <Route path="/admin/archiving" element={<ArchivingPage />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
-        <Route path="/admin/settings/roles" element={<RolesManagement />} />
+        <Route path="/admin/roles" element={<RolesManagement />} />
             <Route path="/admin/cookie-settings" element={<CookieSettingsPage />} />
             <Route path="/admin/integrations" element={<IntegrationsPage />} />
         <Route path="/admin/form-builder" element={<FormBuilder />} />

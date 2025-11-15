@@ -14,7 +14,7 @@ export function AdminSettingsCards() {
       icon: Shield,
       title: t('admin.permissions.title'),
       description: t('admin.permissions.description'),
-      href: "/admin/settings/roles",
+      href: "/admin/roles",
       permission: "users.manage"
     },
     {
