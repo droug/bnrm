@@ -48,6 +48,7 @@ const ManuscriptsBackofficeSettings = lazy(() => import("./pages/ManuscriptsBack
 const UserManagement = lazy(() => import("./pages/UserManagement"));
 const ContentManagement = lazy(() => import("./pages/ContentManagement"));
 const AdminSettings = lazy(() => import("./pages/AdminSettings"));
+const RolesManagement = lazy(() => import("./pages/admin/RolesManagement"));
 const FormBuilder = lazy(() => import("./pages/admin/FormBuilder"));
 const ImportFormFields = lazy(() => import("./pages/admin/ImportFormFields"));
 const ManageSectionFields = lazy(() => import("./pages/admin/ManageSectionFields"));
@@ -262,6 +263,7 @@ const App = () => {
         <Route path="/form" element={<DynamicFormPage />} />
         <Route path="/admin/archiving" element={<ArchivingPage />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
+        <Route path="/admin/settings/roles" element={<RolesManagement />} />
             <Route path="/admin/cookie-settings" element={<CookieSettingsPage />} />
             <Route path="/admin/integrations" element={<IntegrationsPage />} />
         <Route path="/admin/form-builder" element={<FormBuilder />} />
