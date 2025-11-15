@@ -247,7 +247,7 @@ export default function ManuscriptAdvancedSearch() {
             </CardHeader>
             <CardContent className="p-6">
               <Tabs defaultValue="all" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto gap-2 bg-muted/50 p-1">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto gap-2 bg-muted/50 p-1">
                   <TabsTrigger value="all" className="data-[state=active]:bg-background">
                     <Search className="h-4 w-4 mr-2" />
                     Tous
@@ -267,10 +267,6 @@ export default function ManuscriptAdvancedSearch() {
                   <TabsTrigger value="source" className="data-[state=active]:bg-background">
                     <MapPin className="h-4 w-4 mr-2" />
                     Entité source
-                  </TabsTrigger>
-                  <TabsTrigger value="physical" className="data-[state=active]:bg-background">
-                    <FileText className="h-4 w-4 mr-2" />
-                    Physique
                   </TabsTrigger>
                 </TabsList>
 
@@ -292,21 +288,13 @@ export default function ManuscriptAdvancedSearch() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="language-all" className="text-base font-semibold">Langue</Label>
-                      <Select
+                      <DynamicSelect
+                        source="langues_manuscrits"
                         value={formData.language}
-                        onValueChange={(value) => setFormData({ ...formData, language: value })}
-                      >
-                        <SelectTrigger id="language-all" className="h-11">
-                          <SelectValue placeholder="Toutes les langues" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background z-50">
-                          <SelectItem value="arabe">Arabe</SelectItem>
-                          <SelectItem value="berbère">Berbère</SelectItem>
-                          <SelectItem value="français">Français</SelectItem>
-                          <SelectItem value="latin">Latin</SelectItem>
-                          <SelectItem value="espagnol">Espagnol</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        onChange={(value) => setFormData({ ...formData, language: value })}
+                        placeholder="Toutes les langues"
+                        className="h-11"
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -471,33 +459,6 @@ export default function ManuscriptAdvancedSearch() {
                       onChange={(e) => setFormData({ ...formData, entite: e.target.value })}
                       className="h-11"
                     />
-                  </div>
-                </TabsContent>
-
-                {/* ONGLET: Caractéristiques physiques */}
-                <TabsContent value="physical" className="mt-6 space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="material" className="text-base font-semibold">Matériau</Label>
-                      <Input
-                        id="material"
-                        placeholder="Ex: papier, parchemin..."
-                        value={formData.material}
-                        onChange={(e) => setFormData({ ...formData, material: e.target.value })}
-                        className="h-11"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="historicalPeriod" className="text-base font-semibold">Période historique</Label>
-                      <Input
-                        id="historicalPeriod"
-                        placeholder="Période historique"
-                        value={formData.historicalPeriod}
-                        onChange={(e) => setFormData({ ...formData, historicalPeriod: e.target.value })}
-                        className="h-11"
-                      />
-                    </div>
                   </div>
                 </TabsContent>
               </Tabs>
