@@ -48,11 +48,11 @@ export function RolesList() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
 
-  // Données de démonstration
+  // Données de démonstration avec rôles d'inscription et d'adhésion
   const [roles, setRoles] = useState<Role[]>([
     {
       id: "1",
-      name: "Administrateur",
+      name: "Administrateur Système",
       description: "Accès complet au système",
       color: "bg-red-500",
       users_count: 5,
@@ -68,8 +68,92 @@ export function RolesList() {
       permissions_count: 45,
       is_system: true,
     },
+    // Rôles d'inscription
     {
       id: "3",
+      name: "Agent Inscription",
+      description: "Gère les demandes d'inscription des usagers (étudiants, grand public, pass jeunes)",
+      color: "bg-cyan-500",
+      users_count: 6,
+      permissions_count: 8,
+      is_system: false,
+    },
+    {
+      id: "4",
+      name: "Responsable Inscriptions",
+      description: "Supervise et valide toutes les inscriptions",
+      color: "bg-cyan-600",
+      users_count: 3,
+      permissions_count: 12,
+      is_system: false,
+    },
+    {
+      id: "5",
+      name: "Inscrit - Étudiant",
+      description: "Étudiant inscrit avec accès aux services de lecture",
+      color: "bg-teal-500",
+      users_count: 150,
+      permissions_count: 5,
+      is_system: false,
+    },
+    {
+      id: "6",
+      name: "Inscrit - Grand Public",
+      description: "Usager grand public avec accès de base",
+      color: "bg-teal-600",
+      users_count: 200,
+      permissions_count: 4,
+      is_system: false,
+    },
+    {
+      id: "7",
+      name: "Inscrit - Pass Jeunes",
+      description: "Jeune bénéficiant du pass culture avec accès gratuit",
+      color: "bg-teal-400",
+      users_count: 80,
+      permissions_count: 5,
+      is_system: false,
+    },
+    // Rôles d'adhésion
+    {
+      id: "8",
+      name: "Gestionnaire Adhésions",
+      description: "Traite les demandes d'adhésion aux services avancés",
+      color: "bg-indigo-500",
+      users_count: 4,
+      permissions_count: 10,
+      is_system: false,
+    },
+    {
+      id: "9",
+      name: "Responsable Adhésions",
+      description: "Approuve les adhésions premium et chercheur",
+      color: "bg-indigo-600",
+      users_count: 2,
+      permissions_count: 14,
+      is_system: false,
+    },
+    {
+      id: "10",
+      name: "Adhérent Premium",
+      description: "Adhérent avec accès premium aux ressources numériques",
+      color: "bg-violet-500",
+      users_count: 75,
+      permissions_count: 15,
+      is_system: false,
+    },
+    {
+      id: "11",
+      name: "Adhérent Chercheur",
+      description: "Chercheur avec accès illimité aux ressources spécialisées",
+      color: "bg-violet-600",
+      users_count: 45,
+      permissions_count: 18,
+      is_system: false,
+    },
+    // Autres rôles existants
+    {
+      id: "12",
       name: "Catalogueur",
       description: "Création et modification de notices catalographiques",
       color: "bg-green-500",
@@ -78,7 +162,7 @@ export function RolesList() {
       is_system: false,
     },
     {
-      id: "4",
+      id: "13",
       name: "Éditeur de contenu",
       description: "Création et publication de contenu",
       color: "bg-purple-500",
@@ -87,16 +171,7 @@ export function RolesList() {
       is_system: false,
     },
     {
-      id: "5",
-      name: "Chercheur",
-      description: "Accès aux ressources pour la recherche",
-      color: "bg-amber-500",
-      users_count: 45,
-      permissions_count: 18,
-      is_system: false,
-    },
-    {
-      id: "6",
+      id: "14",
       name: "Lecteur",
       description: "Consultation des ressources publiques",
       color: "bg-gray-500",
