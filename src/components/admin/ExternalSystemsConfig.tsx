@@ -353,19 +353,15 @@ export function ExternalSystemsConfig() {
 
   return (
     <>
-      <Tabs defaultValue="catalog" className="w-full">
+      <Tabs defaultValue="sigb" className="w-full">
         <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="catalog">Catalogues ({catalogSystems.length})</TabsTrigger>
           <TabsTrigger value="sigb">SIGB ({sigbSystems.length})</TabsTrigger>
           <TabsTrigger value="dbm600">DBM-600 ({dbm600Systems.length})</TabsTrigger>
+          <TabsTrigger value="catalog">Catalogues ({catalogSystems.length})</TabsTrigger>
           <TabsTrigger value="z3950">Z39.50 ({z3950Systems.length})</TabsTrigger>
           <TabsTrigger value="oai">OAI-PMH ({oaiSystems.length})</TabsTrigger>
           <TabsTrigger value="other">Autres ({otherSystems.length})</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="catalog" className="space-y-4">
-          {catalogSystems.map(renderSystemCard)}
-        </TabsContent>
 
         <TabsContent value="sigb" className="space-y-4">
           {sigbSystems.map(renderSystemCard)}
@@ -373,6 +369,10 @@ export function ExternalSystemsConfig() {
 
         <TabsContent value="dbm600" className="space-y-4">
           {dbm600Systems.map(renderSystemCard)}
+        </TabsContent>
+
+        <TabsContent value="catalog" className="space-y-4">
+          {catalogSystems.map(renderSystemCard)}
         </TabsContent>
 
         <TabsContent value="z3950" className="space-y-4">
