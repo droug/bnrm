@@ -13,6 +13,7 @@ import { PermissionSearch } from "@/components/roles/PermissionSearch";
 import { RolesList } from "@/components/roles/RolesList";
 import { ModulesManagement } from "@/components/roles/ModulesManagement";
 import { ServicesManagement } from "@/components/roles/ServicesManagement";
+import { SystemDataInitializer } from "@/components/roles/SystemDataInitializer";
 import { 
   Shield, 
   Users, 
@@ -135,14 +136,19 @@ export default function RolesManagement() {
           </Card>
 
           {/* Main Content Tabs */}
-          <Tabs defaultValue="matrix" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+          <Tabs defaultValue="initializer" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-6">
+              <TabsTrigger value="initializer">Initialisation</TabsTrigger>
               <TabsTrigger value="matrix">Matrice</TabsTrigger>
               <TabsTrigger value="roles">Rôles</TabsTrigger>
               <TabsTrigger value="modules">Modules</TabsTrigger>
               <TabsTrigger value="services">Services</TabsTrigger>
               <TabsTrigger value="search">Recherche</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="initializer" className="space-y-6">
+              <SystemDataInitializer />
+            </TabsContent>
 
             <TabsContent value="matrix" className="space-y-6">
               <RolePermissionsMatrix 
