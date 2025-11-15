@@ -132,13 +132,20 @@ export function useSystemList(listCode: string) {
     }));
   }, [values]);
 
-  // Rechercher dans les valeurs
-  const search = (query: string): SystemListValue[] => {
+  // Rechercher dans les valeurs et retourner le format option
+  const search = (query: string) => {
     const lowerQuery = query.toLowerCase();
-    return values.filter(v => 
-      v.value_label.toLowerCase().includes(lowerQuery) ||
-      v.value_code.toLowerCase().includes(lowerQuery)
-    );
+    return values
+      .filter(v => 
+        v.value_label.toLowerCase().includes(lowerQuery) ||
+        v.value_code.toLowerCase().includes(lowerQuery)
+      )
+      .map(v => ({
+        value: v.value_code,
+        label: v.value_label,
+        parent: v.parent_code,
+        metadata: v.metadata
+      }));
   };
 
   // Obtenir le label d'un code
