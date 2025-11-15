@@ -285,35 +285,15 @@ export default function ManuscriptAdvancedSearch() {
 
                   <Separator />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="language-all" className="text-base font-semibold">Langue</Label>
-                      <DynamicSelect
-                        source="langues_manuscrits"
-                        value={formData.language}
-                        onChange={(value) => setFormData({ ...formData, language: value })}
-                        placeholder="Toutes les langues"
-                        className="h-11"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="status-all" className="text-base font-semibold">Statut</Label>
-                      <Select
-                        value={formData.status}
-                        onValueChange={(value) => setFormData({ ...formData, status: value })}
-                      >
-                        <SelectTrigger id="status-all" className="h-11">
-                          <SelectValue placeholder="Tous les statuts" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background z-50">
-                          <SelectItem value="available">Disponible</SelectItem>
-                          <SelectItem value="digitization">En numérisation</SelectItem>
-                          <SelectItem value="reserved">Réservé</SelectItem>
-                          <SelectItem value="maintenance">En maintenance</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="language-all" className="text-base font-semibold">Langue</Label>
+                    <DynamicSelect
+                      source="langues_manuscrits"
+                      value={formData.language}
+                      onChange={(value) => setFormData({ ...formData, language: value })}
+                      placeholder="Toutes les langues"
+                      className="h-11"
+                    />
                   </div>
                 </TabsContent>
 
