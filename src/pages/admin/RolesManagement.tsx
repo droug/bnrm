@@ -141,9 +141,9 @@ export default function RolesManagement() {
           <Tabs defaultValue="initializer" className="space-y-6">
             <TabsList className="grid w-full grid-cols-8">
               <TabsTrigger value="initializer">Initialisation</TabsTrigger>
+              <TabsTrigger value="matrix">Matrice</TabsTrigger>
               <TabsTrigger value="transitions">Transitions</TabsTrigger>
               <TabsTrigger value="permissions">Permissions</TabsTrigger>
-              <TabsTrigger value="matrix">Matrice</TabsTrigger>
               <TabsTrigger value="roles">Rôles</TabsTrigger>
               <TabsTrigger value="modules">Modules</TabsTrigger>
               <TabsTrigger value="services">Services</TabsTrigger>
@@ -154,8 +154,15 @@ export default function RolesManagement() {
               <SystemDataInitializer />
             </TabsContent>
 
+            <TabsContent value="matrix" className="space-y-6">
+              <RolePermissionsMatrix 
+                searchQuery={searchQuery}
+                selectedPlatform={selectedPlatform}
+              />
+            </TabsContent>
+
             <TabsContent value="transitions" className="space-y-6">
-              <RoleTransitionsMatrix />
+              <RoleTransitionsMatrix selectedPlatform={selectedPlatform} />
             </TabsContent>
 
             <TabsContent value="permissions" className="space-y-6">
