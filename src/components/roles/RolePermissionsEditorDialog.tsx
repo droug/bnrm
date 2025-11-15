@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -83,6 +84,8 @@ export function RolePermissionsEditorDialog({
   const [canManageTransitions, setCanManageTransitions] = useState(role.can_manage_transitions || false);
   const [newPermission, setNewPermission] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [permissionToDelete, setPermissionToDelete] = useState<string>("");
 
   const isSystemAdmin = role.role_name === "Administrateur Système";
 
@@ -106,7 +109,18 @@ export function RolePermissionsEditorDialog({
   };
 
   const handleRemovePermission = (permission: string) => {
-    setPermissions(permissions.filter(p => p !== permission));
+    setPermissionToDelete(permission);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmRemovePermission = () => {
+    setPermissions(permissions.filter(p => p !== permissionToDelete));
+    setDeleteDialogOpen(false);
+    toast({
+      title: "Permission supprimée",
+      description: `La permission "${permissionToDelete}" a été retirée`,
+    });
+    setPermissionToDelete("");
   };
 
   const handleSave = () => {
@@ -278,6 +292,26 @@ export function RolePermissionsEditorDialog({
             </Button>
           </div>
         </div>
+
+        {/* Dialog de confirmation de suppression */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+              <AlertDialogDescription>
+                Êtes-vous sûr de vouloir retirer la permission <strong className="font-mono text-foreground">{permissionToDelete}</strong> du rôle <strong>{role.role_name}</strong> ?
+                <br /><br />
+                Cette action peut affecter les capacités des utilisateurs ayant ce rôle.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annuler</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmRemovePermission} className="bg-destructive hover:bg-destructive/90">
+                Supprimer
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DialogContent>
     </Dialog>
   );
