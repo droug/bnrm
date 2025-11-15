@@ -13,7 +13,7 @@ import { Navigate, Link } from "react-router-dom";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { Input } from "@/components/ui/input";
 import { SimpleSelect } from "@/components/ui/simple-select";
-import { COMPLETE_SYSTEM_ROLES } from "@/config/completeSystemRoles";
+import { SYSTEM_ROLES_OPTIONS, isValidSystemRole, type UserRole } from "@/config/validSystemRoles";
 import SubscriptionPlansManager from "@/components/SubscriptionPlansManager";
 import AddInternalUserDialog from "@/components/AddInternalUserDialog";
 import { EditUserDialog } from "@/components/EditUserDialog";
@@ -240,6 +240,11 @@ export default function UserManagement() {
 
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
+      // Valider que le rôle est dans l'enum user_role
+      if (!isValidSystemRole(newRole)) {
+        throw new Error(`Rôle invalide: ${newRole}. Utilisez uniquement les rôles système définis.`);
+      }
+
       // Utiliser le système user_roles au lieu de profiles.role
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       
@@ -259,12 +264,12 @@ export default function UserManagement() {
         .delete()
         .eq('user_id', userProfile.user_id);
 
-      // Ajouter le nouveau rôle
+      // Ajouter le nouveau rôle (typé correctement)
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({
           user_id: userProfile.user_id,
-          role: newRole as any,
+          role: newRole as UserRole,
           granted_by: currentUser.id,
         });
 
@@ -657,10 +662,10 @@ export default function UserManagement() {
                             <SimpleSelect
                               value={userProfile.role}
                               onChange={(newRole) => updateUserRole(userProfile.id, newRole)}
-                              options={COMPLETE_SYSTEM_ROLES.map(role => ({
-                                value: role.role_name,
-                                label: role.role_name,
-                                description: role.description,
+                              options={SYSTEM_ROLES_OPTIONS.map(opt => ({
+                                value: opt.value,
+                                label: opt.label,
+                                description: opt.description,
                               }))}
                               className="w-full min-w-[200px]"
                             />
