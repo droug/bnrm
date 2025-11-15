@@ -4,20 +4,43 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { COMPLETE_SYSTEM_ROLES, ROLE_WORKFLOW_TRANSITIONS } from "@/config/completeSystemRoles";
 import { CheckCircle2, XCircle, Shield, ArrowRight } from "lucide-react";
 
+interface RoleTransitionsMatrixProps {
+  selectedPlatform?: string;
+}
+
 /**
  * Matrice des rôles et leurs capacités de transition dans les workflows
  */
-export function RoleTransitionsMatrix() {
+export function RoleTransitionsMatrix({ selectedPlatform = "all" }: RoleTransitionsMatrixProps) {
   const transitions = Object.keys(ROLE_WORKFLOW_TRANSITIONS);
   
-  // Grouper les rôles par module
-  const rolesByModule = COMPLETE_SYSTEM_ROLES.reduce((acc, role) => {
+  // Mapper les plateformes aux modules
+  const platformToModules: Record<string, string[]> = {
+    all: [], // Tous les modules
+    bnrm: ['inscription', 'adhesion', 'reproduction', 'restoration', 'space_booking', 'bnrm'],
+    digital_library: ['digital_library', 'cataloging', 'ged'],
+    manuscripts: ['manuscripts', 'manuscripts_access'],
+    cbm: ['cbm', 'cbm_network', 'cbm_adhesion', 'cbm_training', 'cbm_catalog'],
+    kitab: ['legal_deposit', 'isbn_issn'],
+    cultural: ['cultural_activities'],
+  };
+  
+  // Filtrer les rôles selon la plateforme sélectionnée
+  const filteredRoles = selectedPlatform === "all" 
+    ? COMPLETE_SYSTEM_ROLES 
+    : COMPLETE_SYSTEM_ROLES.filter(role => 
+        platformToModules[selectedPlatform]?.includes(role.module) || 
+        role.module === 'system' // Toujours inclure les rôles système
+      );
+  
+  // Grouper les rôles filtrés par module
+  const rolesByModule = filteredRoles.reduce((acc, role) => {
     if (!acc[role.module]) {
       acc[role.module] = [];
     }
     acc[role.module].push(role);
     return acc;
-  }, {} as Record<string, typeof COMPLETE_SYSTEM_ROLES>);
+  }, {} as Record<string, typeof filteredRoles>);
 
   const getTransitionColor = (transition: string) => {
     const colors: Record<string, string> = {
@@ -47,6 +70,11 @@ export function RoleTransitionsMatrix() {
         </div>
         <CardDescription>
           Vue d'ensemble des capacités de transition pour chaque rôle dans les workflows du système
+          {selectedPlatform !== "all" && (
+            <span className="block mt-1 text-primary font-medium">
+              Filtré par plateforme
+            </span>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -162,9 +190,11 @@ export function RoleTransitionsMatrix() {
           <div className="grid grid-cols-3 gap-4 p-4 bg-muted/50 rounded-lg">
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">
-                {COMPLETE_SYSTEM_ROLES.length}
+                {filteredRoles.length}
               </div>
-              <div className="text-xs text-muted-foreground">Rôles système</div>
+              <div className="text-xs text-muted-foreground">
+                Rôles {selectedPlatform !== "all" ? "filtrés" : "système"}
+              </div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">
