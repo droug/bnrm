@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -13,6 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Navigate, Link } from "react-router-dom";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
+import { COMPLETE_SYSTEM_ROLES } from "@/config/completeSystemRoles";
 import SubscriptionPlansManager from "@/components/SubscriptionPlansManager";
 import AddInternalUserDialog from "@/components/AddInternalUserDialog";
 import { EditUserDialog } from "@/components/EditUserDialog";
@@ -239,23 +240,46 @@ export default function UserManagement() {
 
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role: newRole as any, updated_at: new Date().toISOString() })
-        .eq('id', userId);
+      // Utiliser le système user_roles au lieu de profiles.role
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      
+      if (!currentUser) {
+        throw new Error("Non authentifié");
+      }
 
-      if (error) throw error;
+      // Récupérer le user_id depuis le profile
+      const userProfile = users.find(u => u.id === userId);
+      if (!userProfile) {
+        throw new Error("Utilisateur introuvable");
+      }
+
+      // Supprimer l'ancien rôle
+      await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userProfile.user_id);
+
+      // Ajouter le nouveau rôle
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .insert({
+          user_id: userProfile.user_id,
+          role: newRole as any,
+          granted_by: currentUser.id,
+        });
+
+      if (roleError) throw roleError;
 
       toast({
         title: "Rôle mis à jour",
         description: "Le rôle de l'utilisateur a été modifié avec succès",
       });
-
+      
       fetchData();
     } catch (error: any) {
       toast({
         title: "Erreur",
-        description: "Impossible de mettre à jour le rôle",
+        description: error.message || "Impossible de mettre à jour le rôle",
         variant: "destructive",
       });
     }
@@ -630,23 +654,16 @@ export default function UserManagement() {
                             )}
                           </TableCell>
                           <TableCell>
-                            <Select
+                            <SimpleSelect
                               value={userProfile.role}
-                              onValueChange={(value) => updateUserRole(userProfile.id, value)}
-                            >
-                              <SelectTrigger className="w-32">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="public_user">Grand Public</SelectItem>
-                                <SelectItem value="subscriber">Abonné Premium</SelectItem>
-                                <SelectItem value="researcher">Chercheur</SelectItem>
-                                <SelectItem value="partner">Partenaire Institutionnel</SelectItem>
-                                <SelectItem value="librarian">Bibliothécaire</SelectItem>
-                                <SelectItem value="admin">Administrateur</SelectItem>
-                                <SelectItem value="visitor">Visiteur (Legacy)</SelectItem>
-                              </SelectContent>
-                            </Select>
+                              onChange={(newRole) => updateUserRole(userProfile.id, newRole)}
+                              options={COMPLETE_SYSTEM_ROLES.map(role => ({
+                                value: role.role_name,
+                                label: role.role_name,
+                                description: role.description,
+                              }))}
+                              className="w-full min-w-[200px]"
+                            />
                           </TableCell>
                           <TableCell>
                             <Badge variant={userProfile.is_approved ? "default" : "secondary"}>
