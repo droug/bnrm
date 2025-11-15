@@ -14,7 +14,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { moroccanRegions, getCitiesByRegion } from "@/data/moroccanRegions";
-import { DynamicSelect } from "@/components/ui/dynamic-select";
+import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 
 export default function ManuscriptAdvancedSearch() {
   const navigate = useNavigate();
@@ -287,11 +287,11 @@ export default function ManuscriptAdvancedSearch() {
 
                   <div className="space-y-2">
                     <Label htmlFor="language-all" className="text-base font-semibold">Langue</Label>
-                    <DynamicSelect
+                    <AutocompleteInput
                       source="langues_manuscrits"
                       value={formData.language}
                       onChange={(value) => setFormData({ ...formData, language: value })}
-                      placeholder="Toutes les langues"
+                      placeholder="Rechercher une langue..."
                       className="h-11"
                     />
                   </div>
@@ -330,11 +330,11 @@ export default function ManuscriptAdvancedSearch() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="genre" className="text-base font-semibold">Thématique</Label>
-                      <DynamicSelect
+                      <AutocompleteInput
                         source="thematique_manuscrits"
                         value={formData.genre}
                         onChange={(value) => setFormData({ ...formData, genre: value })}
-                        placeholder="Sélectionner une thématique"
+                        placeholder="Rechercher une thématique..."
                         className="h-11"
                       />
                     </div>
