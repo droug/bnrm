@@ -13,7 +13,7 @@ import { Navigate, Link } from "react-router-dom";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { Input } from "@/components/ui/input";
 import { SimpleSelect } from "@/components/ui/simple-select";
-import { SYSTEM_ROLES_OPTIONS, isValidSystemRole, type UserRole } from "@/config/validSystemRoles";
+import { useSystemRoles } from "@/hooks/useSystemRoles";
 import SubscriptionPlansManager from "@/components/SubscriptionPlansManager";
 import AddInternalUserDialog from "@/components/AddInternalUserDialog";
 import { EditUserDialog } from "@/components/EditUserDialog";
@@ -171,6 +171,9 @@ export default function UserManagement() {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   
+  // Hook pour gérer les rôles système dynamiques
+  const { availableRoles, grantRole: grantSystemRole, isAdmin: currentUserIsAdmin } = useSystemRoles();
+  
   const [users, setUsers] = useState<Profile[]>([]);
   const [pendingRequests, setPendingRequests] = useState<AccessRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -238,14 +241,8 @@ export default function UserManagement() {
     }
   };
 
-  const updateUserRole = async (userId: string, newRole: string) => {
+  const updateUserRole = async (userId: string, newRoleCode: string) => {
     try {
-      // Valider que le rôle est dans l'enum user_role
-      if (!isValidSystemRole(newRole)) {
-        throw new Error(`Rôle invalide: ${newRole}. Utilisez uniquement les rôles système définis.`);
-      }
-
-      // Utiliser le système user_roles au lieu de profiles.role
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       
       if (!currentUser) {
@@ -258,22 +255,55 @@ export default function UserManagement() {
         throw new Error("Utilisateur introuvable");
       }
 
-      // Supprimer l'ancien rôle
-      await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', userProfile.user_id);
+      // Si le nouveau rôle est admin, utiliser user_roles (enum)
+      if (newRoleCode === 'admin') {
+        // Supprimer tous les rôles système
+        await supabase
+          .from('user_system_roles')
+          .delete()
+          .eq('user_id', userProfile.user_id);
 
-      // Ajouter le nouveau rôle (typé correctement)
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: userProfile.user_id,
-          role: newRole as UserRole,
-          granted_by: currentUser.id,
-        });
+        // Ajouter admin dans user_roles
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: userProfile.user_id,
+            role: 'admin',
+            granted_by: currentUser.id,
+          });
 
-      if (roleError) throw roleError;
+        if (roleError) throw roleError;
+      } else {
+        // Trouver le rôle dans system_roles
+        const systemRole = availableRoles.find(r => r.role_code === newRoleCode);
+        if (!systemRole) {
+          throw new Error(`Rôle système introuvable: ${newRoleCode}`);
+        }
+
+        // Supprimer admin si présent
+        await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', userProfile.user_id)
+          .eq('role', 'admin');
+
+        // Supprimer les anciens rôles système
+        await supabase
+          .from('user_system_roles')
+          .delete()
+          .eq('user_id', userProfile.user_id);
+
+        // Ajouter le nouveau rôle système
+        const { error: roleError } = await supabase
+          .from('user_system_roles')
+          .insert({
+            user_id: userProfile.user_id,
+            role_id: systemRole.id,
+            granted_by: currentUser.id,
+          });
+
+        if (roleError) throw roleError;
+      }
 
       toast({
         title: "Rôle mis à jour",
@@ -662,11 +692,16 @@ export default function UserManagement() {
                             <SimpleSelect
                               value={userProfile.role}
                               onChange={(newRole) => updateUserRole(userProfile.id, newRole)}
-                              options={SYSTEM_ROLES_OPTIONS.map(opt => ({
-                                value: opt.value,
-                                label: opt.label,
-                                description: opt.description,
-                              }))}
+                              options={[
+                                {
+                                  value: 'admin',
+                                  label: 'Administrateur',
+                                },
+                                ...availableRoles.map(role => ({
+                                  value: role.role_code,
+                                  label: role.role_name,
+                                }))
+                              ]}
                               className="w-full min-w-[200px]"
                             />
                           </TableCell>

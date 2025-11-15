@@ -8698,6 +8698,45 @@ export type Database = {
         }
         Relationships: []
       }
+      system_roles: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          limits: Json | null
+          permissions: Json | null
+          role_category: string
+          role_code: string
+          role_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          limits?: Json | null
+          permissions?: Json | null
+          role_category: string
+          role_code: string
+          role_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          limits?: Json | null
+          permissions?: Json | null
+          role_category?: string
+          role_code?: string
+          role_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       system_services: {
         Row: {
           code: string
@@ -9125,6 +9164,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_system_roles: {
+        Row: {
+          expires_at: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          is_active: boolean | null
+          role_id: string
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          role_id: string
+          user_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          role_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_system_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "system_roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_tutorial_progress: {
         Row: {
@@ -10448,6 +10525,17 @@ export type Database = {
           unread_count: number
         }[]
       }
+      get_user_all_system_roles: {
+        Args: { _user_id: string }
+        Returns: {
+          expires_at: string
+          granted_at: string
+          role_category: string
+          role_code: string
+          role_id: string
+          role_name: string
+        }[]
+      }
       get_user_email: { Args: never; Returns: string }
       get_user_permissions: { Args: { user_uuid: string }; Returns: Json }
       get_user_primary_role: {
@@ -10470,6 +10558,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["user_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      has_system_role: {
+        Args: { _role_code: string; _user_id: string }
         Returns: boolean
       }
       has_workflow_permission: {
