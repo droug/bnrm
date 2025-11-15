@@ -68,10 +68,6 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
   ];
 
   const legalLinks = [
-    { title: "Paramètres du site", href: "/settings" },
-    { title: "Empreinte carbone du site", href: "#empreinte-carbone" },
-    { title: "Marché public", href: "#marche-public" },
-    { title: "Nous rejoindre", href: "#recrutement" },
     { title: "Conditions d'utilisation", href: "#conditions" },
     { title: "Mentions légales", href: "#mentions" },
     { title: "Flux RSS", href: "#rss" },

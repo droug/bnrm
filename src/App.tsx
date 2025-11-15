@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/hooks/useLanguage";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useAutoSync } from "@/hooks/useAutoSync";
@@ -19,7 +19,6 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const SearchResults = lazy(() => import("./pages/SearchResults"));
 const SignupPage = lazy(() => import("./pages/SignupPage"));
 const Profile = lazy(() => import("./pages/Profile"));
-const SettingsPage = lazy(() => import("./pages/Settings"));
 const HelpPage = lazy(() => import("./pages/HelpPage"));
 const News = lazy(() => import("./pages/News"));
 const PracticalInfo = lazy(() => import("./pages/PracticalInfo"));
@@ -250,7 +249,7 @@ const App = () => {
         <Route path="/admin/content" element={<ContentManagement />} />
           <Route path="/news" element={<News />} />
           <Route path="/practical-info" element={<PracticalInfo />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/settings" element={<Navigate to="/admin/settings/roles" replace />} />
         <Route path="/wysiwyg" element={<WysiwygPage />} />
             <Route path="/admin/bnrm-tariffs" element={<BNRMTariffsPage />} />
             <Route path="/admin/wysiwyg" element={<WysiwygPage />} />
