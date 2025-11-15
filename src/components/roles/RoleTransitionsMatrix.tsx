@@ -3,9 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { COMPLETE_SYSTEM_ROLES, ROLE_WORKFLOW_TRANSITIONS } from "@/config/completeSystemRoles";
-import { CheckCircle2, XCircle, Shield, ArrowRight, Edit, Trash2, Plus } from "lucide-react";
+import { COMPLETE_SYSTEM_ROLES, ROLE_WORKFLOW_TRANSITIONS, CompleteSystemRole } from "@/config/completeSystemRoles";
+import { CheckCircle2, XCircle, Shield, ArrowRight, Edit, Trash2, Plus, Settings } from "lucide-react";
 import { TransitionRolesEditorDialog } from "./TransitionRolesEditorDialog";
+import { RolePermissionsEditorDialog } from "./RolePermissionsEditorDialog";
 import { useToast } from "@/hooks/use-toast";
 
 interface RoleTransitionsMatrixProps {
@@ -17,10 +18,13 @@ interface RoleTransitionsMatrixProps {
  */
 export function RoleTransitionsMatrix({ selectedPlatform = "all" }: RoleTransitionsMatrixProps) {
   const { toast } = useToast();
+  const [roles, setRoles] = useState<CompleteSystemRole[]>(COMPLETE_SYSTEM_ROLES);
   const [workflowTransitions, setWorkflowTransitions] = useState(ROLE_WORKFLOW_TRANSITIONS);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedTransition, setSelectedTransition] = useState<string>("");
   const [selectedTransitionRoles, setSelectedTransitionRoles] = useState<string[]>([]);
+  const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<CompleteSystemRole | null>(null);
   
   const transitions = Object.keys(workflowTransitions);
   
@@ -37,8 +41,8 @@ export function RoleTransitionsMatrix({ selectedPlatform = "all" }: RoleTransiti
   
   // Filtrer les rôles selon la plateforme sélectionnée
   const filteredRoles = selectedPlatform === "all" 
-    ? COMPLETE_SYSTEM_ROLES 
-    : COMPLETE_SYSTEM_ROLES.filter(role => 
+    ? roles 
+    : roles.filter(role => 
         platformToModules[selectedPlatform]?.includes(role.module) || 
         role.module === 'system' // Toujours inclure les rôles système
       );
@@ -99,6 +103,21 @@ export function RoleTransitionsMatrix({ selectedPlatform = "all" }: RoleTransiti
         variant: "destructive",
       });
     }
+  };
+
+  const handleEditRolePermissions = (role: CompleteSystemRole) => {
+    setSelectedRole(role);
+    setPermissionsDialogOpen(true);
+  };
+
+  const handleSaveRolePermissions = (roleName: string, newPermissions: string[], canManageTransitions: boolean) => {
+    setRoles(prevRoles => 
+      prevRoles.map(role => 
+        role.role_name === roleName
+          ? { ...role, permissions: newPermissions, can_manage_transitions: canManageTransitions }
+          : role
+      )
+    );
   };
 
   return (
@@ -199,13 +218,26 @@ export function RoleTransitionsMatrix({ selectedPlatform = "all" }: RoleTransiti
                             </p>
                           </div>
                           
-                          {/* Indicateur de gestion de transitions */}
-                          {role.can_manage_transitions && (
-                            <Badge className="bg-primary">
-                              <ArrowRight className="h-3 w-3 mr-1" />
-                              Transitions
-                            </Badge>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {/* Indicateur de gestion de transitions */}
+                            {role.can_manage_transitions && (
+                              <Badge className="bg-primary">
+                                <ArrowRight className="h-3 w-3 mr-1" />
+                                Transitions
+                              </Badge>
+                            )}
+                            
+                            {/* Bouton modifier permissions */}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleEditRolePermissions(role)}
+                              title="Modifier les permissions"
+                            >
+                              <Settings className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
 
                         {/* Transitions disponibles */}
@@ -297,6 +329,16 @@ export function RoleTransitionsMatrix({ selectedPlatform = "all" }: RoleTransiti
           currentRoles={selectedTransitionRoles}
           onSave={handleSaveTransition}
         />
+
+        {/* Dialog d'édition des permissions de rôle */}
+        {selectedRole && (
+          <RolePermissionsEditorDialog
+            open={permissionsDialogOpen}
+            onOpenChange={setPermissionsDialogOpen}
+            role={selectedRole}
+            onSave={handleSaveRolePermissions}
+          />
+        )}
       </CardContent>
     </Card>
   );
