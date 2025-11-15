@@ -39,7 +39,7 @@ export function DynamicMultiSelect({
   const [showDropdown, setShowDropdown] = useState(false);
 
   const filteredOptions = searchQuery
-    ? search(searchQuery).map(v => ({ value: v.value_code, label: v.value_label }))
+    ? search(searchQuery)
     : options;
 
   const availableOptions = filteredOptions.filter(
