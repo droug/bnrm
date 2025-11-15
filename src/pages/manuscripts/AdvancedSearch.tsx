@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Search, RotateCcw, BookOpen, User, FileText, Tag, Calendar, Hash, Library, Loader2, MapPin } from "lucide-react";
+import { Search, RotateCcw, BookOpen, User, FileText, Tag, Calendar, Hash, Library, Loader2, MapPin, Building2 } from "lucide-react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +14,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { moroccanRegions, getCitiesByRegion } from "@/data/moroccanRegions";
+import { DynamicSelect } from "@/components/ui/dynamic-select";
 
 export default function ManuscriptAdvancedSearch() {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ export default function ManuscriptAdvancedSearch() {
     status: "",
     region: "",
     ville: "",
+    entite: "",
   });
 
   // Fonction de recherche
@@ -117,6 +119,11 @@ export default function ManuscriptAdvancedSearch() {
       // Filtrer par ville
       if (params.ville) {
         baseQuery = baseQuery.eq('ville', params.ville);
+      }
+      
+      // Filtrer par entité
+      if (params.entite) {
+        baseQuery = baseQuery.ilike('entite', `%${params.entite}%`);
       }
       
       console.log('🚀 Executing query...');
@@ -203,6 +210,7 @@ export default function ManuscriptAdvancedSearch() {
       status: "",
       region: "",
       ville: "",
+      entite: "",
     });
     setSearchResults([]);
     setTotalResults(0);
@@ -353,12 +361,12 @@ export default function ManuscriptAdvancedSearch() {
                 <TabsContent value="classification" className="mt-6 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="genre" className="text-base font-semibold">Genre</Label>
-                      <Input
-                        id="genre"
-                        placeholder="Ex: histoire, philosophie, littérature..."
+                      <Label htmlFor="genre" className="text-base font-semibold">Thématique</Label>
+                      <DynamicSelect
+                        source="thematique_manuscrits"
                         value={formData.genre}
-                        onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
+                        onChange={(value) => setFormData({ ...formData, genre: value })}
+                        placeholder="Sélectionner une thématique"
                         className="h-11"
                       />
                     </div>
@@ -441,6 +449,17 @@ export default function ManuscriptAdvancedSearch() {
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="entite" className="text-base font-semibold">Entité</Label>
+                    <Input
+                      id="entite"
+                      placeholder="Nom de l'entité source"
+                      value={formData.entite}
+                      onChange={(e) => setFormData({ ...formData, entite: e.target.value })}
+                      className="h-11"
+                    />
                   </div>
                 </TabsContent>
 
