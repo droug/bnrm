@@ -459,32 +459,6 @@ export function RolePermissionsMatrix({ searchQuery, selectedPlatform }: RolePer
 
   return (
     <div className="space-y-6">
-      {/* Roles Header */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Matrice des Permissions par Rôle
-          </CardTitle>
-          <CardDescription>
-            Gérez les permissions pour chaque rôle système à travers toutes les plateformes
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3">
-            {roles.map((role) => (
-              <Badge key={role.id} className={`${role.color} text-white gap-2 px-4 py-2`}>
-                <Shield className="h-4 w-4" />
-                <div>
-                  <div className="font-semibold">{role.name}</div>
-                  <div className="text-xs opacity-90">{role.description}</div>
-                </div>
-              </Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Platforms and Modules */}
       {filteredPlatforms.map((platform) => {
         const PlatformIcon = platform.icon;
