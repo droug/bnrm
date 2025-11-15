@@ -59,11 +59,8 @@ const SettingsPage = () => {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold">
-                    Gestion des Permissions - {profile?.first_name} {profile?.last_name}
+                    Gestion des rôles et habilitations
                   </h1>
-                  <p className="text-primary-foreground/80">
-                    Gérez les permissions utilisateurs du système BNRM
-                  </p>
                 </div>
               </div>
 
