@@ -397,11 +397,11 @@ export default function RentalManagement() {
           <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
             <SheetHeader>
               <SheetTitle>Détails de la demande</SheetTitle>
-              <SheetDescription>
-                <div className="flex items-center gap-2 mt-2">
+              <SheetDescription asChild>
+                <span className="flex items-center gap-2 mt-2">
                   <span className="font-medium">{selectedRequest?.request_number}</span>
                   {selectedRequest && getStatusBadge(selectedRequest.status)}
-                </div>
+                </span>
               </SheetDescription>
             </SheetHeader>
             {selectedRequest && (

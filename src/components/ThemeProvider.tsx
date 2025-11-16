@@ -2,6 +2,9 @@ import { useEffect } from "react";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
+    // Clear any saved theme preference and force light mode
+    localStorage.removeItem('theme');
+    
     // Force light mode by removing dark class
     document.documentElement.classList.remove("dark");
     
@@ -9,6 +12,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const observer = new MutationObserver(() => {
       if (document.documentElement.classList.contains("dark")) {
         document.documentElement.classList.remove("dark");
+        localStorage.removeItem('theme');
       }
     });
     
