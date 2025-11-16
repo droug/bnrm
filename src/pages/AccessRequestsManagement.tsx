@@ -86,7 +86,8 @@ export default function AccessRequestsManagement() {
           bnrm_tarifs (
             montant,
             devise,
-            periode_validite
+            periode_validite,
+            condition_tarif
           )
         `)
         .order('created_at', { ascending: false });
