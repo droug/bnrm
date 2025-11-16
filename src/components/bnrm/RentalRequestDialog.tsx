@@ -548,11 +548,10 @@ export function RentalRequestDialog({ open, onOpenChange, space }: RentalRequest
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        <SelectItem value="public">Institution publique</SelectItem>
+                        <SelectItem value="private">Entreprise privée</SelectItem>
                         <SelectItem value="association">Association</SelectItem>
-                        <SelectItem value="entreprise">Entreprise</SelectItem>
-                        <SelectItem value="institution_publique">Institution publique</SelectItem>
-                        <SelectItem value="universite">Université</SelectItem>
-                        <SelectItem value="autre">Autre</SelectItem>
+                        <SelectItem value="individual">Individuel</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
