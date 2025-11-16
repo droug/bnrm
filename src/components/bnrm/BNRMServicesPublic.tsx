@@ -36,6 +36,23 @@ interface BNRMTariff {
   is_active: boolean | null;
 }
 
+interface RentalSpace {
+  id: string;
+  space_code: string;
+  space_name: string;
+  space_name_ar: string | null;
+  description: string | null;
+  capacity: number | null;
+  equipment: string[] | null;
+  hourly_rate: number | null;
+  half_day_rate: number | null;
+  full_day_rate: number | null;
+  currency: string | null;
+  is_active: boolean | null;
+  location: string | null;
+  rules: string | null;
+}
+
 interface BNRMServicesPublicProps {
   filterType?: string; // "abonnements" ou "location"
 }
@@ -43,6 +60,7 @@ interface BNRMServicesPublicProps {
 export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
   const [services, setServices] = useState<BNRMService[]>([]);
   const [tariffs, setTariffs] = useState<BNRMTariff[]>([]);
+  const [rentalSpaces, setRentalSpaces] = useState<RentalSpace[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -80,6 +98,16 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
       if (tariffsError) throw tariffsError;
       setTariffs(tariffsData || []);
 
+      // Fetch rental spaces
+      const { data: rentalSpacesData, error: rentalSpacesError } = await supabase
+        .from("rental_spaces")
+        .select("*")
+        .eq("is_active", true)
+        .order("space_code");
+
+      if (rentalSpacesError) throw rentalSpacesError;
+      setRentalSpaces(rentalSpacesData || []);
+
     } catch (error: any) {
       toast({
         title: "Erreur",
@@ -107,11 +135,8 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
     return matchesSearch && matchesCategory;
   });
 
-  // Services de location à la demande (S007 à S011)
-  const locationServiceIds = ["S007", "S008", "S009", "S010", "S011"];
-  const locationServices = services.filter((service) => 
-    locationServiceIds.includes(service.id_service)
-  );
+  // Services de location à la demande - Charger depuis rental_spaces
+  const locationSpacesDisplay = rentalSpaces.filter((space) => space.is_active);
 
   // Filtrer selon le type demandé
   let displaySubscriptions = true;
@@ -134,10 +159,6 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
   }
 
   const filteredOneTimeServices = oneTimeServices.filter((service) => {
-    // Exclure les services de location qui seront affichés dans une carte séparée
-    if (locationServiceIds.includes(service.id_service)) {
-      return false;
-    }
     const matchesSearch = service.nom_service.toLowerCase().includes(searchTerm.toLowerCase()) ||
       service.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || service.categorie === selectedCategory;
@@ -347,83 +368,105 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
           </div>
 
           {/* Services Location à la demande - Grid Cards */}
-          {displayLocationServices && locationServices.length > 0 && (
+          {displayLocationServices && locationSpacesDisplay.length > 0 && (
             <>
               <div className="mb-4">
                 <h3 className="text-xl font-semibold mb-2">Location à la demande</h3>
                 <p className="text-sm text-muted-foreground">Réservez nos espaces et équipements pour vos événements et activités</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {locationServices.map((service) => {
-                  const serviceTariffs = getTariffsForService(service.id_service);
-                  
-                  return (
-                    <Card key={service.id_service} className="hover:shadow-lg transition-shadow flex flex-col">
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-2">
-                            <Package className="h-5 w-5" />
-                            <CardTitle className="text-lg">{service.nom_service}</CardTitle>
-                          </div>
+                {locationSpacesDisplay.map((space) => (
+                  <Card key={space.id} className="hover:shadow-lg transition-shadow flex flex-col">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <Package className="h-5 w-5" />
+                          <CardTitle className="text-lg">{space.space_name}</CardTitle>
                         </div>
-                        <Badge className="bg-blue-100 text-blue-800">
-                          Location d'espaces
-                        </Badge>
-                      </CardHeader>
-                      <CardContent className="flex flex-col flex-1">
-                        <div className="flex-1 space-y-3 mb-4">
-                          {service.description && (
-                            <CardDescription className="text-sm">
-                              {service.description}
-                            </CardDescription>
-                          )}
-                          
-                          {/* Afficher les tarifs disponibles */}
-                          {serviceTariffs.length > 0 && (
-                            <div className="space-y-2">
-                              <p className="text-xs font-semibold text-muted-foreground uppercase">Tarifs disponibles:</p>
-                              {serviceTariffs.map((tariff) => (
-                                <div key={tariff.id_tarif} className="p-2 bg-muted/30 rounded-md">
-                                  <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                      <p className="text-sm font-medium">
-                                        {tariff.montant} {tariff.devise}
-                                      </p>
-                                      {tariff.condition_tarif && (
-                                        <p className="text-xs text-muted-foreground mt-0.5">
-                                          {tariff.condition_tarif}
-                                        </p>
-                                      )}
-                                    </div>
-                                    <Badge variant="outline" className="ml-2 text-xs">
-                                      {tariff.periode_validite}
-                                    </Badge>
-                                  </div>
-                                </div>
+                      </div>
+                      <Badge className="bg-blue-100 text-blue-800">
+                        {space.space_code}
+                      </Badge>
+                    </CardHeader>
+                    <CardContent className="flex flex-col flex-1">
+                      <div className="flex-1 space-y-3 mb-4">
+                        {space.description && (
+                          <CardDescription className="text-sm">
+                            {space.description}
+                          </CardDescription>
+                        )}
+                        
+                        {space.capacity && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Users className="h-4 w-4 text-muted-foreground" />
+                            <span>Capacité: {space.capacity} personnes</span>
+                          </div>
+                        )}
+
+                        {space.equipment && space.equipment.length > 0 && (
+                          <div className="text-sm">
+                            <div className="font-semibold mb-1">Équipements:</div>
+                            <ul className="text-xs text-muted-foreground space-y-1">
+                              {space.equipment.slice(0, 3).map((eq, idx) => (
+                                <li key={idx}>• {eq}</li>
                               ))}
+                              {space.equipment.length > 3 && (
+                                <li>• +{space.equipment.length - 3} autres...</li>
+                              )}
+                            </ul>
+                          </div>
+                        )}
+                        
+                        {/* Afficher les tarifs disponibles */}
+                        <div className="space-y-2">
+                          <p className="text-xs font-semibold text-muted-foreground uppercase">Tarifs disponibles:</p>
+                          {space.hourly_rate && (
+                            <div className="p-2 bg-muted/30 rounded-md">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Horaire</span>
+                                <span className="text-sm font-bold text-primary">
+                                  {space.hourly_rate} {space.currency}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          {space.half_day_rate && (
+                            <div className="p-2 bg-muted/30 rounded-md">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Demi-journée</span>
+                                <span className="text-sm font-bold text-primary">
+                                  {space.half_day_rate} {space.currency}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          {space.full_day_rate && (
+                            <div className="p-2 bg-muted/30 rounded-md">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Journée complète</span>
+                                <span className="text-sm font-bold text-primary">
+                                  {space.full_day_rate} {space.currency}
+                                </span>
+                              </div>
                             </div>
                           )}
                         </div>
-                        
-                        <Button 
-                          onClick={() => {
-                            if (service.id_service === "S011") {
-                              setBoxTariff(serviceTariffs[0]);
-                              setBoxReservationDialogOpen(true);
-                            } else {
-                              setSelectedServiceForRegistration(service);
-                              setSelectedTariffForRegistration(serviceTariffs[0] || null);
-                              setRegistrationDialogOpen(true);
-                            }
-                          }}
-                          className="w-full"
-                        >
-                          Réserver
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                      </div>
+                      
+                      <Button 
+                        onClick={() => {
+                          toast({
+                            title: "Formulaire de réservation",
+                            description: "Le formulaire de réservation sera bientôt disponible",
+                          });
+                        }}
+                        className="w-full"
+                      >
+                        Réserver
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </>
           )}
