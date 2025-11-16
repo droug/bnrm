@@ -53,6 +53,7 @@ export default function AccessRequestsManagement() {
   const navigate = useNavigate();
   
   const [requests, setRequests] = useState<ServiceRegistration[]>([]);
+  const [services, setServices] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>("pending");
   const [rejectReason, setRejectReason] = useState<string>("");
@@ -93,6 +94,12 @@ export default function AccessRequestsManagement() {
       if (error) throw error;
       
       setRequests(data || []);
+      
+      // Extract unique service names
+      const uniqueServices = Array.from(
+        new Set(data?.map(r => r.bnrm_services.nom_service) || [])
+      ).sort();
+      setServices(uniqueServices);
     } catch (error) {
       console.error('Error fetching requests:', error);
       toast({
@@ -253,10 +260,11 @@ export default function AccessRequestsManagement() {
               </SelectTrigger>
               <SelectContent className="bg-background z-50">
                 <SelectItem value="all">Tous les services</SelectItem>
-                <SelectItem value="Pass Jeunes Inscription">Pass Jeunes Inscription</SelectItem>
-                <SelectItem value="Inscription Chercheurs professionnels">Inscription Chercheurs professionnels</SelectItem>
-                <SelectItem value="Espace jeunesse">Espace jeunesse</SelectItem>
-                <SelectItem value="Impression papier NB">Impression papier NB</SelectItem>
+                {services.map((service) => (
+                  <SelectItem key={service} value={service}>
+                    {service}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
