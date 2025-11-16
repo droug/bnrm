@@ -233,7 +233,9 @@ export function ServiceRegistrationDialog({
           address: formData.address,
           institution: formData.institution,
           additionalInfo: formData.additionalInfo,
-          formuleType: selectedTariff?.condition_tarif || "Non spécifié",
+          formuleType: selectedTariff 
+            ? `${selectedTariff.condition_tarif || "Non spécifié"} ${selectedTariff.periode_validite ? `Validité: ${selectedTariff.periode_validite}` : ""}`
+            : "Non spécifié",
           ...(isPageBasedService && { pageCount }),
           ...(selectedManuscript && { 
             manuscriptId: selectedManuscript.id,
