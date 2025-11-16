@@ -46,7 +46,7 @@ export default function PaymentServices() {
     {
       id: "bnrm-services",
       title: "Abonnements et Services BNRM",
-      description: "Accédez à l'ensemble des abonnements et services de la BNRM",
+      description: "Accédez à l'ensemble des abonnements de la BNRM",
       icon: Building,
       color: "from-orange-500 to-orange-600",
       features: [
@@ -55,7 +55,7 @@ export default function PaymentServices() {
         "Paiement flexible",
         "Support client"
       ],
-      action: () => navigate("/tarifs-bnrm"),
+      action: () => navigate("/abonnements?type=abonnements"),
       available: true
     },
     {
@@ -190,7 +190,7 @@ export default function PaymentServices() {
         "Espace enfants",
         "Réservation de Box"
       ],
-      action: () => navigate("/tarifs-bnrm"),
+      action: () => navigate("/services-location?type=location"),
       available: true
     }
   ];

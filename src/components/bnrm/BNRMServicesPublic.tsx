@@ -36,7 +36,11 @@ interface BNRMTariff {
   is_active: boolean | null;
 }
 
-export function BNRMServicesPublic() {
+interface BNRMServicesPublicProps {
+  filterType?: string; // "abonnements" ou "location"
+}
+
+export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
   const [services, setServices] = useState<BNRMService[]>([]);
   const [tariffs, setTariffs] = useState<BNRMTariff[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,6 +113,26 @@ export function BNRMServicesPublic() {
     locationServiceIds.includes(service.id_service)
   );
 
+  // Filtrer selon le type demandé
+  let displaySubscriptions = true;
+  let displayLocationServices = false;
+  let displayOneTimeServices = false;
+
+  if (filterType === "abonnements") {
+    displaySubscriptions = true;
+    displayLocationServices = false;
+    displayOneTimeServices = false;
+  } else if (filterType === "location") {
+    displaySubscriptions = false;
+    displayLocationServices = true;
+    displayOneTimeServices = false;
+  } else {
+    // Par défaut, afficher tout
+    displaySubscriptions = true;
+    displayLocationServices = true;
+    displayOneTimeServices = true;
+  }
+
   const filteredOneTimeServices = oneTimeServices.filter((service) => {
     // Exclure les services de location qui seront affichés dans une carte séparée
     if (locationServiceIds.includes(service.id_service)) {
@@ -161,6 +185,24 @@ export function BNRMServicesPublic() {
 
   return (
     <div className="space-y-6">
+      {/* Title */}
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold mb-4">
+          {filterType === "abonnements" 
+            ? "Abonnements BNRM" 
+            : filterType === "location" 
+            ? "Services de location à la demande" 
+            : "Services de la BNRM"}
+        </h1>
+        <p className="text-xl text-muted-foreground">
+          {filterType === "abonnements" 
+            ? "Découvrez nos formules d'abonnement" 
+            : filterType === "location" 
+            ? "Louez nos espaces (Auditorium, Salles, Box)" 
+            : "Découvrez tous nos services et abonnements"}
+        </p>
+      </div>
+
       {/* Search */}
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1 relative">
@@ -175,14 +217,16 @@ export function BNRMServicesPublic() {
       </div>
 
       {/* Tabs for Subscriptions and One-Time Services */}
-      <Tabs defaultValue="abonnements" className="w-full">
+      <Tabs defaultValue={filterType === "location" ? "services" : "abonnements"} className="w-full">
+        {!filterType && (
         <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 h-11">
           <TabsTrigger value="abonnements" className="text-base font-medium">Abonnements</TabsTrigger>
           <TabsTrigger value="services" className="text-base font-medium">Services</TabsTrigger>
         </TabsList>
+        )}
 
         {/* Subscriptions Tab */}
-        <TabsContent value="abonnements" className="space-y-6 mt-6">
+        {displaySubscriptions && <TabsContent value="abonnements" className="space-y-6 mt-6">
           <div className="flex gap-4 items-center">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger className="w-[200px] h-11 text-base font-medium">
@@ -282,10 +326,10 @@ export function BNRMServicesPublic() {
               Aucun abonnement trouvé.
             </div>
           )}
-        </TabsContent>
+        </TabsContent>}
 
         {/* One-Time Services Tab */}
-        <TabsContent value="services" className="space-y-6 mt-6">
+        {(displayLocationServices || displayOneTimeServices) && <TabsContent value="services" className="space-y-6 mt-6">
           <div className="flex gap-4 items-center">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger className="w-[200px] h-11 text-base font-medium">
@@ -303,7 +347,7 @@ export function BNRMServicesPublic() {
           </div>
 
           {/* Services Location à la demande Card */}
-          {locationServices.length > 0 && (
+          {displayLocationServices && locationServices.length > 0 && (
             <Card className="hover:shadow-lg transition-shadow border-primary/50">
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -368,6 +412,7 @@ export function BNRMServicesPublic() {
             </Card>
           )}
 
+          {displayOneTimeServices && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Special Box Reservation Card */}
             <Card className="hover:shadow-lg transition-shadow flex flex-col border-primary/50">
@@ -483,13 +528,14 @@ export function BNRMServicesPublic() {
               );
             })}
           </div>
+          )}
 
-          {filteredOneTimeServices.length === 0 && (
+          {displayOneTimeServices && filteredOneTimeServices.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
               Aucun service trouvé.
             </div>
           )}
-        </TabsContent>
+        </TabsContent>}
       </Tabs>
 
       {selectedServiceForRegistration && (
