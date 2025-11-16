@@ -39,7 +39,7 @@ export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialog
       <>
         {/* Overlay */}
         <div 
-          className="dialog-overlay fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm animate-in fade-in-0"
+          className="dialog-overlay fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm animate-in fade-in-0"
         />
         
         {/* Content */}
