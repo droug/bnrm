@@ -57,13 +57,24 @@ interface RentalRequest {
   id: string;
   request_number: string;
   event_title: string;
+  event_description: string | null;
+  event_type: string | null;
   organization_name: string;
+  organization_type: string;
   contact_person: string;
   contact_email: string;
+  contact_phone: string;
   start_date: string;
   end_date: string;
   status: string;
+  expected_participants: number | null;
   total_amount: number | null;
+  currency: string | null;
+  space_id: string;
+  user_id: string | null;
+  validation_notes: string | null;
+  rejection_reason: string | null;
+  rental_duration_type: string | null;
   created_at: string;
   rental_spaces: RentalSpace | null;
 }
@@ -376,34 +387,179 @@ export default function RentalManagement() {
 
         {/* Dialog Détails */}
         <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
-          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Détails de la demande</DialogTitle>
-              <DialogDescription>{selectedRequest?.request_number}</DialogDescription>
+              <DialogDescription>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="font-medium">{selectedRequest?.request_number}</span>
+                  {selectedRequest && getStatusBadge(selectedRequest.status)}
+                </div>
+              </DialogDescription>
             </DialogHeader>
             {selectedRequest && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-sm font-medium">Événement</div>
-                    <div className="text-sm text-muted-foreground">{selectedRequest.event_title}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium">Organisation</div>
-                    <div className="text-sm text-muted-foreground">{selectedRequest.organization_name}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium">Contact</div>
-                    <div className="text-sm text-muted-foreground">
-                      {selectedRequest.contact_person}<br />
-                      {selectedRequest.contact_email}
+              <div className="space-y-6">
+                {/* Informations sur l'événement */}
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-base border-b pb-2">Informations sur l'événement</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Titre de l'événement</div>
+                      <div className="text-sm">{selectedRequest.event_title}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Type d'événement</div>
+                      <div className="text-sm">{selectedRequest.event_type || "-"}</div>
+                    </div>
+                    {selectedRequest.event_description && (
+                      <div className="col-span-2">
+                        <div className="text-sm font-medium text-muted-foreground">Description</div>
+                        <div className="text-sm">{selectedRequest.event_description}</div>
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Nombre de participants</div>
+                      <div className="text-sm">{selectedRequest.expected_participants || "-"}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Type de location</div>
+                      <div className="text-sm">
+                        {selectedRequest.rental_duration_type === "hourly" ? "À l'heure" :
+                         selectedRequest.rental_duration_type === "half_day" ? "Demi-journée" :
+                         selectedRequest.rental_duration_type === "full_day" ? "Journée complète" :
+                         selectedRequest.rental_duration_type === "multi_day" ? "Multi-jours" : "-"}
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <div className="text-sm font-medium">Dates</div>
-                    <div className="text-sm text-muted-foreground">
-                      Du {format(new Date(selectedRequest.start_date), "dd/MM/yyyy", { locale: fr })}<br />
-                      Au {format(new Date(selectedRequest.end_date), "dd/MM/yyyy", { locale: fr })}
+                </div>
+
+                {/* Informations sur l'organisation */}
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-base border-b pb-2">Informations sur l'organisation</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Nom de l'organisation</div>
+                      <div className="text-sm">{selectedRequest.organization_name}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Type d'organisation</div>
+                      <div className="text-sm">
+                        {selectedRequest.organization_type === "public" ? "Institution publique" :
+                         selectedRequest.organization_type === "private" ? "Entreprise privée" :
+                         selectedRequest.organization_type === "association" ? "Association" :
+                         selectedRequest.organization_type === "individual" ? "Individuel" :
+                         selectedRequest.organization_type}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Informations de contact */}
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-base border-b pb-2">Informations de contact</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Personne de contact</div>
+                      <div className="text-sm">{selectedRequest.contact_person}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Email</div>
+                      <div className="text-sm">{selectedRequest.contact_email}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Téléphone</div>
+                      <div className="text-sm">{selectedRequest.contact_phone}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Informations sur l'espace */}
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-base border-b pb-2">Espace loué</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Nom de l'espace</div>
+                      <div className="text-sm">{selectedRequest.rental_spaces?.space_name || "-"}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Code de l'espace</div>
+                      <div className="text-sm">{selectedRequest.rental_spaces?.space_code || "-"}</div>
+                    </div>
+                    {selectedRequest.rental_spaces?.capacity && (
+                      <div>
+                        <div className="text-sm font-medium text-muted-foreground">Capacité</div>
+                        <div className="text-sm">{selectedRequest.rental_spaces.capacity} personnes</div>
+                      </div>
+                    )}
+                    {selectedRequest.rental_spaces?.location && (
+                      <div>
+                        <div className="text-sm font-medium text-muted-foreground">Localisation</div>
+                        <div className="text-sm">{selectedRequest.rental_spaces.location}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Dates et horaires */}
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-base border-b pb-2">Dates et horaires</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Date et heure de début</div>
+                      <div className="text-sm">
+                        {format(new Date(selectedRequest.start_date), "dd/MM/yyyy 'à' HH:mm", { locale: fr })}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Date et heure de fin</div>
+                      <div className="text-sm">
+                        {format(new Date(selectedRequest.end_date), "dd/MM/yyyy 'à' HH:mm", { locale: fr })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Informations financières */}
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-base border-b pb-2">Informations financières</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Montant total</div>
+                      <div className="text-sm font-semibold">
+                        {selectedRequest.total_amount} {selectedRequest.currency || "MAD"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes de validation/rejet */}
+                {(selectedRequest.validation_notes || selectedRequest.rejection_reason) && (
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-base border-b pb-2">Notes</h3>
+                    {selectedRequest.validation_notes && (
+                      <div>
+                        <div className="text-sm font-medium text-muted-foreground">Notes de validation</div>
+                        <div className="text-sm">{selectedRequest.validation_notes}</div>
+                      </div>
+                    )}
+                    {selectedRequest.rejection_reason && (
+                      <div>
+                        <div className="text-sm font-medium text-muted-foreground">Raison du rejet</div>
+                        <div className="text-sm text-destructive">{selectedRequest.rejection_reason}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Informations système */}
+                <div className="space-y-2 pt-4 border-t">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-muted-foreground">
+                    <div>
+                      <span className="font-medium">Date de création:</span>{" "}
+                      {format(new Date(selectedRequest.created_at), "dd/MM/yyyy 'à' HH:mm", { locale: fr })}
+                    </div>
+                    <div>
+                      <span className="font-medium">ID de la demande:</span> {selectedRequest.id}
                     </div>
                   </div>
                 </div>
