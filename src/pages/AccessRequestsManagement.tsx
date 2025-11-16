@@ -242,7 +242,8 @@ export default function AccessRequestsManagement() {
           <CardDescription>{requestsList.length} demande(s)</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-4">
+          <div className="mb-4 space-y-2">
+            <label className="text-sm font-medium">Catégorie</label>
             <Select value={categoryFilter} onValueChange={(value) => {
               setCategoryFilter(value);
               setCurrentPage(1);
