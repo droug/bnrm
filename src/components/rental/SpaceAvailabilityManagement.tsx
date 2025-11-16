@@ -18,27 +18,10 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Calendar as CalendarIcon, Clock, Save, X } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
 
-interface RentalSpace {
-  id: string;
-  space_code: string;
-  space_name: string;
-  space_name_ar: string | null;
-  description: string | null;
-  capacity: number | null;
-  location: string | null;
-  is_active: boolean | null;
-}
-
-interface AvailabilityPeriod {
-  id: string;
-  space_id: string;
-  date: string;
-  start_time: string;
-  end_time: string;
-  is_available: boolean;
-  created_at: string;
-}
+type RentalSpace = Database["public"]["Tables"]["rental_spaces"]["Row"];
+type SpaceAvailability = Database["public"]["Tables"]["space_availabilities"]["Row"];
 
 export function SpaceAvailabilityManagement() {
   const { toast } = useToast();
@@ -46,7 +29,7 @@ export function SpaceAvailabilityManagement() {
   const [loading, setLoading] = useState(true);
   const [selectedSpace, setSelectedSpace] = useState<RentalSpace | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [availabilities, setAvailabilities] = useState<AvailabilityPeriod[]>([]);
+  const [availabilities, setAvailabilities] = useState<SpaceAvailability[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("17:00");

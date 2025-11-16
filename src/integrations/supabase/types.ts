@@ -8575,6 +8575,50 @@ export type Database = {
           },
         ]
       }
+      space_availabilities: {
+        Row: {
+          created_at: string | null
+          date: string
+          end_time: string
+          id: string
+          is_available: boolean
+          notes: string | null
+          space_id: string
+          start_time: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          end_time: string
+          id?: string
+          is_available?: boolean
+          notes?: string | null
+          space_id: string
+          start_time: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          end_time?: string
+          id?: string
+          is_available?: boolean
+          notes?: string | null
+          space_id?: string
+          start_time?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_availabilities_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "rental_spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       space_availability: {
         Row: {
           booking_id: string | null
