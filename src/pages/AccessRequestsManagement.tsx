@@ -9,7 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -56,6 +57,9 @@ export default function AccessRequestsManagement() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [rejectReason, setRejectReason] = useState<string>("");
   const [selectedRequest, setSelectedRequest] = useState<ServiceRegistration | null>(null);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [requestToApprove, setRequestToApprove] = useState<ServiceRegistration | null>(null);
 
   useEffect(() => {
     if (user && isAdmin && !loading) {
@@ -115,7 +119,9 @@ export default function AccessRequestsManagement() {
     setFilteredRequests(filtered);
   };
 
-  const handleApprove = async (requestId: string) => {
+  const handleApprove = async () => {
+    if (!requestToApprove) return;
+
     try {
       const { error } = await supabase
         .from('service_registrations')
@@ -124,7 +130,7 @@ export default function AccessRequestsManagement() {
           processed_by: user?.id,
           processed_at: new Date().toISOString()
         })
-        .eq('id', requestId);
+        .eq('id', requestToApprove.id);
 
       if (error) throw error;
 
@@ -133,6 +139,8 @@ export default function AccessRequestsManagement() {
         description: "L'utilisateur a été notifié",
       });
 
+      setApproveDialogOpen(false);
+      setRequestToApprove(null);
       fetchRequests();
     } catch (error) {
       console.error('Error approving request:', error);
@@ -451,58 +459,181 @@ export default function AccessRequestsManagement() {
                             {getStatusBadge(request.status)}
                           </TableCell>
                           <TableCell>
-                            {request.status === 'pending' && (
-                              <div className="flex items-center space-x-2">
-                                <Button
-                                  size="sm"
-                                  variant="default"
-                                  onClick={() => handleApprove(request.id)}
-                                >
-                                  <CheckCircle className="h-4 w-4 mr-1" />
-                                  Approuver
-                                </Button>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button
-                                      size="sm"
-                                      variant="destructive"
-                                      onClick={() => setSelectedRequest(request)}
-                                    >
-                                      <XCircle className="h-4 w-4 mr-1" />
-                                      Rejeter
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Rejeter la demande</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Veuillez indiquer la raison du rejet de cette demande.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <Textarea
-                                      placeholder="Raison du rejet..."
-                                      value={rejectReason}
-                                      onChange={(e) => setRejectReason(e.target.value)}
-                                      className="min-h-[100px]"
-                                    />
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel onClick={() => {
-                                        setSelectedRequest(null);
-                                        setRejectReason("");
-                                      }}>
-                                        Annuler
-                                      </AlertDialogCancel>
-                                      <AlertDialogAction onClick={handleReject}>
-                                        Confirmer le rejet
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </div>
-                            )}
+                            <div className="flex items-center space-x-2">
+                              <Dialog open={detailsDialogOpen && selectedRequest?.id === request.id} onOpenChange={(open) => {
+                                setDetailsDialogOpen(open);
+                                if (!open) setSelectedRequest(null);
+                              }}>
+                                <DialogTrigger asChild>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      setSelectedRequest(request);
+                                      setDetailsDialogOpen(true);
+                                    }}
+                                  >
+                                    <Eye className="h-4 w-4 mr-1" />
+                                    Détails
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                  <DialogHeader>
+                                    <DialogTitle>Détails de la demande</DialogTitle>
+                                    <DialogDescription>
+                                      Informations complètes du demandeur
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="text-sm font-medium text-muted-foreground">Nom complet</label>
+                                        <p className="text-sm font-medium">{request.registration_data.firstName} {request.registration_data.lastName}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-muted-foreground">CNIE</label>
+                                        <p className="text-sm">{request.registration_data.cnie}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-muted-foreground">Email</label>
+                                        <p className="text-sm">{request.registration_data.email}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-muted-foreground">Téléphone</label>
+                                        <p className="text-sm">{request.registration_data.phone}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-muted-foreground">Région</label>
+                                        <p className="text-sm">{request.registration_data.region}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-muted-foreground">Ville</label>
+                                        <p className="text-sm">{request.registration_data.ville}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-muted-foreground">Service</label>
+                                        <p className="text-sm font-medium">{request.bnrm_services.nom_service}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-muted-foreground">Catégorie</label>
+                                        <p className="text-sm">{getCategoryLabel(request.bnrm_services.categorie)}</p>
+                                      </div>
+                                      {request.registration_data.manuscriptTitle && (
+                                        <div className="col-span-2">
+                                          <label className="text-sm font-medium text-muted-foreground">Document</label>
+                                          <p className="text-sm">{request.registration_data.manuscriptTitle}</p>
+                                        </div>
+                                      )}
+                                      {request.registration_data.pageCount && (
+                                        <div>
+                                          <label className="text-sm font-medium text-muted-foreground">Nombre de pages</label>
+                                          <p className="text-sm">{request.registration_data.pageCount}</p>
+                                        </div>
+                                      )}
+                                      <div>
+                                        <label className="text-sm font-medium text-muted-foreground">Date de demande</label>
+                                        <p className="text-sm">{format(new Date(request.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-muted-foreground">Statut</label>
+                                        <div className="mt-1">{getStatusBadge(request.status)}</div>
+                                      </div>
+                                      {request.bnrm_tarifs && (
+                                        <div>
+                                          <label className="text-sm font-medium text-muted-foreground">Tarif</label>
+                                          <p className="text-sm font-medium">{request.bnrm_tarifs.montant} {request.bnrm_tarifs.devise}</p>
+                                          <p className="text-xs text-muted-foreground">{request.bnrm_tarifs.periode_validite}</p>
+                                        </div>
+                                      )}
+                                      {request.rejection_reason && (
+                                        <div className="col-span-2">
+                                          <label className="text-sm font-medium text-muted-foreground">Motif du rejet</label>
+                                          <p className="text-sm text-destructive">{request.rejection_reason}</p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
+
+                              {request.status === 'pending' && (
+                                <>
+                                  <AlertDialog open={approveDialogOpen && requestToApprove?.id === request.id} onOpenChange={(open) => {
+                                    setApproveDialogOpen(open);
+                                    if (!open) setRequestToApprove(null);
+                                  }}>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        size="sm"
+                                        variant="default"
+                                        onClick={() => {
+                                          setRequestToApprove(request);
+                                          setApproveDialogOpen(true);
+                                        }}
+                                      >
+                                        <CheckCircle className="h-4 w-4 mr-1" />
+                                        Approuver
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Approuver la demande</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Êtes-vous sûr de vouloir approuver cette demande d'abonnement pour {request.registration_data.firstName} {request.registration_data.lastName} ?
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleApprove}>
+                                          Confirmer l'approbation
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        onClick={() => setSelectedRequest(request)}
+                                      >
+                                        <XCircle className="h-4 w-4 mr-1" />
+                                        Rejeter
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Rejeter la demande</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Veuillez indiquer la raison du rejet de cette demande pour {request.registration_data.firstName} {request.registration_data.lastName}.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <Textarea
+                                        placeholder="Raison du rejet (obligatoire)..."
+                                        value={rejectReason}
+                                        onChange={(e) => setRejectReason(e.target.value)}
+                                        className="min-h-[100px]"
+                                      />
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel onClick={() => {
+                                          setSelectedRequest(null);
+                                          setRejectReason("");
+                                        }}>
+                                          Annuler
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleReject}>
+                                          Confirmer le rejet
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </>
+                              )}
+                            </div>
                             {request.status === 'rejected' && request.rejection_reason && (
-                              <div className="text-xs text-muted-foreground">
-                                Motif: {request.rejection_reason}
+                              <div className="text-xs text-muted-foreground mt-2">
+                                <span className="font-medium">Motif:</span> {request.rejection_reason}
                               </div>
                             )}
                           </TableCell>
