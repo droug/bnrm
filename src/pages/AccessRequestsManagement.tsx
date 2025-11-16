@@ -114,7 +114,10 @@ export default function AccessRequestsManagement() {
     }
 
     if (categoryFilter !== 'all') {
-      filtered = filtered.filter(req => req.bnrm_services?.categorie === categoryFilter);
+      filtered = filtered.filter(req => 
+        req.registration_data.formuleType?.includes(categoryFilter) || 
+        req.bnrm_tarifs?.condition_tarif?.includes(categoryFilter)
+      );
     }
 
     setFilteredRequests(filtered);
@@ -346,9 +349,12 @@ export default function AccessRequestsManagement() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Toutes les catégories</SelectItem>
-                        <SelectItem value="Abonnements">Abonnements</SelectItem>
-                        <SelectItem value="Reproduction">Reproduction</SelectItem>
-                        <SelectItem value="Consultation">Consultation</SelectItem>
+                        <SelectItem value="Etudiants">Etudiants</SelectItem>
+                        <SelectItem value="Grand public">Grand public</SelectItem>
+                        <SelectItem value="Etudiants chercheurs">Etudiants chercheurs</SelectItem>
+                        <SelectItem value="Chercheurs professionnels">Chercheurs professionnels</SelectItem>
+                        <SelectItem value="Pass Jeunes">Pass Jeunes</SelectItem>
+                        <SelectItem value="Duplicata de carte d'inscription">Duplicata de carte d'inscription</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
