@@ -69,6 +69,7 @@ const BNRMBackOffice = lazy(() => import("./pages/BNRMBackOffice"));
 const ServicesCatalog = lazy(() => import("./pages/ServicesCatalog"));
 const PublicServices = lazy(() => import("./pages/PublicServices"));
 const GestionReservationsOuvrages = lazy(() => import("./pages/GestionReservationsOuvrages"));
+const RentalManagement = lazy(() => import("./pages/admin/RentalManagement"));
 const BibliographiesNationales = lazy(() => import("./pages/BibliographiesNationales"));
 const ReservationEspaces = lazy(() => import("./pages/ReservationEspaces"));
 const Abonnements = lazy(() => import("./pages/Abonnements"));
@@ -272,6 +273,7 @@ const App = () => {
         <Route path="/admin/cote-management" element={<CoteManagementPage />} />
         <Route path="/admin/depot-legal" element={<BNRMBackOffice />} />
         <Route path="/admin/reservations-ouvrages" element={<GestionReservationsOuvrages />} />
+        <Route path="/admin/rental-management" element={<RentalManagement />} />
         <Route path="/admin/catalog-metadata" element={<CatalogMetadata />} />
         <Route path="/admin/reproduction" element={<ReproductionBackofficePage />} />
         <Route path="/admin/committee" element={<CommitteeDashboard />} />

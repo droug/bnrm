@@ -7081,6 +7081,250 @@ export type Database = {
           },
         ]
       }
+      rental_request_history: {
+        Row: {
+          change_reason: string | null
+          changed_by: string | null
+          created_at: string | null
+          id: string
+          new_status: string
+          notes: string | null
+          previous_status: string | null
+          request_id: string | null
+        }
+        Insert: {
+          change_reason?: string | null
+          changed_by?: string | null
+          created_at?: string | null
+          id?: string
+          new_status: string
+          notes?: string | null
+          previous_status?: string | null
+          request_id?: string | null
+        }
+        Update: {
+          change_reason?: string | null
+          changed_by?: string | null
+          created_at?: string | null
+          id?: string
+          new_status?: string
+          notes?: string | null
+          previous_status?: string | null
+          request_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_request_history_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "rental_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rental_requests: {
+        Row: {
+          additional_notes: string | null
+          authorization_document_url: string | null
+          availability_checked_at: string | null
+          availability_checked_by: string | null
+          availability_confirmed: boolean | null
+          base_amount: number | null
+          catering_required: boolean | null
+          contact_email: string
+          contact_person: string
+          contact_phone: string
+          created_at: string | null
+          currency: string | null
+          end_date: string
+          equipment_amount: number | null
+          equipment_needs: string[] | null
+          event_description: string | null
+          event_title: string
+          event_type: string
+          expected_participants: number | null
+          id: string
+          insurance_confirmed: boolean | null
+          insurance_document_url: string | null
+          organization_address: string | null
+          organization_name: string
+          organization_type: string
+          program_document_url: string | null
+          rejection_reason: string | null
+          rental_duration_type: string | null
+          request_number: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          services_amount: number | null
+          space_id: string | null
+          start_date: string
+          status: string | null
+          technical_support_required: boolean | null
+          terms_accepted: boolean | null
+          total_amount: number | null
+          updated_at: string | null
+          user_id: string | null
+          validation_notes: string | null
+        }
+        Insert: {
+          additional_notes?: string | null
+          authorization_document_url?: string | null
+          availability_checked_at?: string | null
+          availability_checked_by?: string | null
+          availability_confirmed?: boolean | null
+          base_amount?: number | null
+          catering_required?: boolean | null
+          contact_email: string
+          contact_person: string
+          contact_phone: string
+          created_at?: string | null
+          currency?: string | null
+          end_date: string
+          equipment_amount?: number | null
+          equipment_needs?: string[] | null
+          event_description?: string | null
+          event_title: string
+          event_type: string
+          expected_participants?: number | null
+          id?: string
+          insurance_confirmed?: boolean | null
+          insurance_document_url?: string | null
+          organization_address?: string | null
+          organization_name: string
+          organization_type: string
+          program_document_url?: string | null
+          rejection_reason?: string | null
+          rental_duration_type?: string | null
+          request_number: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          services_amount?: number | null
+          space_id?: string | null
+          start_date: string
+          status?: string | null
+          technical_support_required?: boolean | null
+          terms_accepted?: boolean | null
+          total_amount?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          validation_notes?: string | null
+        }
+        Update: {
+          additional_notes?: string | null
+          authorization_document_url?: string | null
+          availability_checked_at?: string | null
+          availability_checked_by?: string | null
+          availability_confirmed?: boolean | null
+          base_amount?: number | null
+          catering_required?: boolean | null
+          contact_email?: string
+          contact_person?: string
+          contact_phone?: string
+          created_at?: string | null
+          currency?: string | null
+          end_date?: string
+          equipment_amount?: number | null
+          equipment_needs?: string[] | null
+          event_description?: string | null
+          event_title?: string
+          event_type?: string
+          expected_participants?: number | null
+          id?: string
+          insurance_confirmed?: boolean | null
+          insurance_document_url?: string | null
+          organization_address?: string | null
+          organization_name?: string
+          organization_type?: string
+          program_document_url?: string | null
+          rejection_reason?: string | null
+          rental_duration_type?: string | null
+          request_number?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          services_amount?: number | null
+          space_id?: string | null
+          start_date?: string
+          status?: string | null
+          technical_support_required?: boolean | null
+          terms_accepted?: boolean | null
+          total_amount?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          validation_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_requests_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "rental_spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rental_spaces: {
+        Row: {
+          availability_schedule: Json | null
+          capacity: number | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          equipment: string[] | null
+          full_day_rate: number | null
+          half_day_rate: number | null
+          hourly_rate: number | null
+          id: string
+          images: string[] | null
+          is_active: boolean | null
+          location: string | null
+          rules: string | null
+          space_code: string
+          space_name: string
+          space_name_ar: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          availability_schedule?: Json | null
+          capacity?: number | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          equipment?: string[] | null
+          full_day_rate?: number | null
+          half_day_rate?: number | null
+          hourly_rate?: number | null
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          location?: string | null
+          rules?: string | null
+          space_code: string
+          space_name: string
+          space_name_ar?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          availability_schedule?: Json | null
+          capacity?: number | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          equipment?: string[] | null
+          full_day_rate?: number | null
+          half_day_rate?: number | null
+          hourly_rate?: number | null
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          location?: string | null
+          rules?: string | null
+          space_code?: string
+          space_name?: string
+          space_name_ar?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       reproduction_items: {
         Row: {
           color_mode: string | null
@@ -10461,6 +10705,7 @@ export type Database = {
       generate_document_number: { Args: { doc_type: string }; Returns: string }
       generate_program_contribution_reference: { Args: never; Returns: string }
       generate_proposal_number: { Args: never; Returns: string }
+      generate_rental_request_number: { Args: never; Returns: string }
       generate_reproduction_request_number: { Args: never; Returns: string }
       generate_request_number: { Args: never; Returns: string }
       generate_restoration_request_number: { Args: never; Returns: string }
