@@ -8093,6 +8093,7 @@ export type Database = {
           processed_at: string | null
           processed_by: string | null
           registration_data: Json
+          rejection_reason: string | null
           service_id: string
           status: string
           subscription_id: string | null
@@ -8107,6 +8108,7 @@ export type Database = {
           processed_at?: string | null
           processed_by?: string | null
           registration_data?: Json
+          rejection_reason?: string | null
           service_id: string
           status?: string
           subscription_id?: string | null
@@ -8121,6 +8123,7 @@ export type Database = {
           processed_at?: string | null
           processed_by?: string | null
           registration_data?: Json
+          rejection_reason?: string | null
           service_id?: string
           status?: string
           subscription_id?: string | null
