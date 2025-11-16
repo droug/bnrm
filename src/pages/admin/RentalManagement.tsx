@@ -392,6 +392,11 @@ export default function RentalManagement() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Gestion disponibilité */}
+          <TabsContent value="availability" className="space-y-4">
+            <SpaceAvailabilityManagement />
+          </TabsContent>
         </Tabs>
 
         {/* Side Panel Détails */}
