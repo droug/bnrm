@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -16,6 +16,7 @@ import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 
 interface ServiceRegistration {
   id: string;
@@ -43,8 +44,6 @@ interface ServiceRegistration {
   } | null;
 }
 
-import { useSecureRoles } from "@/hooks/useSecureRoles";
-
 export default function AccessRequestsManagement() {
   const { user } = useAuth();
   const { isAdmin, loading } = useSecureRoles();
@@ -52,10 +51,8 @@ export default function AccessRequestsManagement() {
   const navigate = useNavigate();
   
   const [requests, setRequests] = useState<ServiceRegistration[]>([]);
-  const [filteredRequests, setFilteredRequests] = useState<ServiceRegistration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<string>("pending");
   const [rejectReason, setRejectReason] = useState<string>("");
   const [selectedRequest, setSelectedRequest] = useState<ServiceRegistration | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
@@ -67,10 +64,6 @@ export default function AccessRequestsManagement() {
       fetchRequests();
     }
   }, [user, isAdmin, loading]);
-
-  useEffect(() => {
-    filterRequests();
-  }, [requests, statusFilter, categoryFilter]);
 
   const fetchRequests = async () => {
     try {
@@ -107,21 +100,8 @@ export default function AccessRequestsManagement() {
     }
   };
 
-  const filterRequests = () => {
-    let filtered = requests;
-
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(req => req.status === statusFilter);
-    }
-
-    if (categoryFilter !== 'all') {
-      filtered = filtered.filter(req => 
-        req.registration_data.formuleType?.includes(categoryFilter) || 
-        req.bnrm_tarifs?.condition_tarif?.includes(categoryFilter)
-      );
-    }
-
-    setFilteredRequests(filtered);
+  const getFilteredRequests = (status: string) => {
+    return requests.filter(r => r.status === status);
   };
 
   const handleApprove = async () => {
@@ -210,13 +190,270 @@ export default function AccessRequestsManagement() {
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  const getCategoryLabel = (category: string) => {
-    const categoryLabels: Record<string, string> = {
-      "Abonnements": "Abonnements",
-      "Reproduction": "Reproduction",
-      "Consultation": "Consultation",
-    };
-    return categoryLabels[category] || category;
+  const renderRequestsTable = (requestsList: ServiceRegistration[]) => {
+    if (isLoading) {
+      return (
+        <Card>
+          <CardContent className="text-center py-8 text-muted-foreground">
+            Chargement des demandes...
+          </CardContent>
+        </Card>
+      );
+    }
+
+    if (requestsList.length === 0) {
+      return (
+        <Card>
+          <CardContent className="text-center py-8 text-muted-foreground">
+            Aucune demande trouvée
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Liste des Demandes</CardTitle>
+          <CardDescription>{requestsList.length} demande(s)</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Service</TableHead>
+                  <TableHead>Utilisateur</TableHead>
+                  <TableHead>Formule</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Statut</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {requestsList.map((request) => (
+                  <TableRow key={request.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{request.bnrm_services.nom_service}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {request.bnrm_services.categorie}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <div className="font-medium">
+                            {request.registration_data?.firstName} {request.registration_data?.lastName}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {request.registration_data?.email}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {request.bnrm_tarifs?.condition_tarif || 
+                       request.registration_data?.formuleType || 
+                       "Non spécifiée"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        {format(new Date(request.created_at), "dd/MM/yyyy", { locale: fr })}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {getStatusBadge(request.status)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Dialog open={detailsDialogOpen && selectedRequest?.id === request.id} onOpenChange={(open) => {
+                          if (!open) {
+                            setDetailsDialogOpen(false);
+                            setSelectedRequest(null);
+                          }
+                        }}>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedRequest(request);
+                                setDetailsDialogOpen(true);
+                              }}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle>Détails de la demande</DialogTitle>
+                              <DialogDescription>
+                                Informations complètes sur la demande d'abonnement
+                              </DialogDescription>
+                            </DialogHeader>
+                            {selectedRequest && (
+                              <div className="space-y-4">
+                                <div>
+                                  <h3 className="font-semibold mb-2">Service</h3>
+                                  <p>{selectedRequest.bnrm_services.nom_service}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {selectedRequest.bnrm_services.categorie}
+                                  </p>
+                                </div>
+                                
+                                <div>
+                                  <h3 className="font-semibold mb-2">Utilisateur</h3>
+                                  <p>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {selectedRequest.registration_data?.email}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {selectedRequest.registration_data?.phone}
+                                  </p>
+                                </div>
+
+                                <div>
+                                  <h3 className="font-semibold mb-2">Adresse</h3>
+                                  <p className="text-sm">{selectedRequest.registration_data?.address}</p>
+                                  {selectedRequest.registration_data?.ville && (
+                                    <p className="text-sm text-muted-foreground">
+                                      {selectedRequest.registration_data?.ville}
+                                    </p>
+                                  )}
+                                </div>
+
+                                {selectedRequest.bnrm_tarifs && (
+                                  <div>
+                                    <h3 className="font-semibold mb-2">Tarification</h3>
+                                    <p className="text-sm">
+                                      {selectedRequest.bnrm_tarifs.montant} {selectedRequest.bnrm_tarifs.devise}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                      {selectedRequest.bnrm_tarifs.condition_tarif}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {selectedRequest.rejection_reason && (
+                                  <div>
+                                    <h3 className="font-semibold mb-2 text-destructive">
+                                      Raison du rejet
+                                    </h3>
+                                    <p className="text-sm">{selectedRequest.rejection_reason}</p>
+                                  </div>
+                                )}
+
+                                <div>
+                                  <h3 className="font-semibold mb-2">Statut</h3>
+                                  {getStatusBadge(selectedRequest.status)}
+                                </div>
+
+                                <div>
+                                  <h3 className="font-semibold mb-2">Date de création</h3>
+                                  <p className="text-sm">
+                                    {format(new Date(selectedRequest.created_at), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                          </DialogContent>
+                        </Dialog>
+
+                        {request.status === 'pending' && (
+                          <>
+                            <AlertDialog open={approveDialogOpen && requestToApprove?.id === request.id} onOpenChange={(open) => {
+                              if (!open) {
+                                setApproveDialogOpen(false);
+                                setRequestToApprove(null);
+                              }
+                            }}>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                  onClick={() => {
+                                    setRequestToApprove(request);
+                                    setApproveDialogOpen(true);
+                                  }}
+                                >
+                                  <CheckCircle className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Approuver la demande</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Êtes-vous sûr de vouloir approuver cette demande d'abonnement ?
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                  <AlertDialogAction onClick={handleApprove}>
+                                    Approuver
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  onClick={() => setSelectedRequest(request)}
+                                >
+                                  <XCircle className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Rejeter la demande</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Veuillez indiquer la raison du rejet
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <div className="py-4">
+                                  <Textarea
+                                    placeholder="Raison du rejet..."
+                                    value={rejectReason}
+                                    onChange={(e) => setRejectReason(e.target.value)}
+                                    className="min-h-[100px]"
+                                  />
+                                </div>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel onClick={() => {
+                                    setRejectReason("");
+                                    setSelectedRequest(null);
+                                  }}>
+                                    Annuler
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={handleReject}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    Rejeter
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    );
   };
 
   if (loading) {
@@ -231,9 +468,9 @@ export default function AccessRequestsManagement() {
     return <Navigate to="/" replace />;
   }
 
-  const pendingCount = requests.filter(r => r.status === 'pending').length;
-  const activeCount = requests.filter(r => r.status === 'active').length;
-  const rejectedCount = requests.filter(r => r.status === 'rejected').length;
+  const pendingRequests = getFilteredRequests('pending');
+  const activeRequests = getFilteredRequests('active');
+  const rejectedRequests = getFilteredRequests('rejected');
 
   return (
     <WatermarkContainer 
@@ -250,420 +487,36 @@ export default function AccessRequestsManagement() {
           subtitle="Traiter et gérer toutes les demandes d'abonnement aux services BNRM"
         />
 
-        <main className="container py-8">
-          <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate("/admin/settings")}
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Retour
-                </Button>
-                <div>
-                  <h1 className="text-3xl font-bold">Demandes d'Abonnement</h1>
-                  <p className="text-muted-foreground">
-                    Gérer toutes les demandes d'abonnement aux services BNRM
-                  </p>
-                </div>
-              </div>
-            </div>
+        <div className="container mx-auto px-4 py-8">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="pending" className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                En Attente ({pendingRequests.length})
+              </TabsTrigger>
+              <TabsTrigger value="active" className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                Actifs ({activeRequests.length})
+              </TabsTrigger>
+              <TabsTrigger value="rejected" className="flex items-center gap-2">
+                <XCircle className="h-4 w-4" />
+                Rejetés ({rejectedRequests.length})
+              </TabsTrigger>
+            </TabsList>
 
-            {/* Stats Cards */}
-            <div className="grid gap-4 md:grid-cols-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total</CardTitle>
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{requests.length}</div>
-                  <p className="text-xs text-muted-foreground">Demandes totales</p>
-                </CardContent>
-              </Card>
+            <TabsContent value="pending">
+              {renderRequestsTable(pendingRequests)}
+            </TabsContent>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">En attente</CardTitle>
-                  <Clock className="h-4 w-4 text-yellow-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{pendingCount}</div>
-                  <p className="text-xs text-muted-foreground">À traiter</p>
-                </CardContent>
-              </Card>
+            <TabsContent value="active">
+              {renderRequestsTable(activeRequests)}
+            </TabsContent>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Actives</CardTitle>
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{activeCount}</div>
-                  <p className="text-xs text-muted-foreground">Acceptées</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Rejetées</CardTitle>
-                  <XCircle className="h-4 w-4 text-red-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{rejectedCount}</div>
-                  <p className="text-xs text-muted-foreground">Refusées</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Filters */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Filtres</CardTitle>
-                <CardDescription>Filtrer les demandes par statut et catégorie</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Statut</label>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Tous les statuts" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Tous les statuts</SelectItem>
-                        <SelectItem value="pending">En attente</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="rejected">Rejetée</SelectItem>
-                        <SelectItem value="expired">Expirée</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Catégorie</label>
-                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Toutes les catégories" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Toutes les catégories</SelectItem>
-                        <SelectItem value="Etudiants">Etudiants</SelectItem>
-                        <SelectItem value="Grand public">Grand public</SelectItem>
-                        <SelectItem value="Etudiants chercheurs">Etudiants chercheurs</SelectItem>
-                        <SelectItem value="Chercheurs professionnels">Chercheurs professionnels</SelectItem>
-                        <SelectItem value="Pass Jeunes">Pass Jeunes</SelectItem>
-                        <SelectItem value="Duplicata de carte d'inscription">Duplicata de carte d'inscription</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Requests Table */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Liste des demandes ({filteredRequests.length})</CardTitle>
-                <CardDescription>Toutes les demandes d'abonnement</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="text-muted-foreground">Chargement...</div>
-                  </div>
-                ) : filteredRequests.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <AlertTriangle className="h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Aucune demande</h3>
-                    <p className="text-muted-foreground">
-                      Aucune demande ne correspond aux critères sélectionnés
-                    </p>
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Utilisateur</TableHead>
-                        <TableHead>Service</TableHead>
-                        <TableHead>Formule</TableHead>
-                        <TableHead>Catégorie</TableHead>
-                        <TableHead>Région</TableHead>
-                        <TableHead>Tarif</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredRequests.map((request) => (
-                        <TableRow key={request.id}>
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              <span className="text-sm">
-                                {format(new Date(request.created_at), 'dd/MM/yyyy', { locale: fr })}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <User className="h-4 w-4 text-muted-foreground" />
-                              <div>
-                                <div className="font-medium">
-                                  {request.registration_data.firstName} {request.registration_data.lastName}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  {request.registration_data.email}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  CNIE: {request.registration_data.cnie}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="font-medium">{request.bnrm_services.nom_service}</div>
-                            {request.registration_data.manuscriptTitle && (
-                              <div className="text-xs text-muted-foreground">
-                                Document: {request.registration_data.manuscriptTitle}
-                              </div>
-                            )}
-                            {request.registration_data.pageCount && (
-                              <div className="text-xs text-muted-foreground">
-                                Pages: {request.registration_data.pageCount}
-                              </div>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary">
-                              {request.registration_data.formuleType || request.bnrm_tarifs?.condition_tarif || "Non spécifié"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
-                              {getCategoryLabel(request.bnrm_services.categorie)}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm">
-                              {request.registration_data.region}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {request.registration_data.ville}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {request.bnrm_tarifs ? (
-                              <div>
-                                <div className="font-medium">
-                                  {request.bnrm_tarifs.montant} {request.bnrm_tarifs.devise}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  {request.bnrm_tarifs.periode_validite}
-                                </div>
-                              </div>
-                            ) : (
-                              <Badge variant="secondary">Gratuit</Badge>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(request.status)}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <Dialog open={detailsDialogOpen && selectedRequest?.id === request.id} onOpenChange={(open) => {
-                                setDetailsDialogOpen(open);
-                                if (!open) setSelectedRequest(null);
-                              }}>
-                                <DialogTrigger asChild>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => {
-                                      setSelectedRequest(request);
-                                      setDetailsDialogOpen(true);
-                                    }}
-                                  >
-                                    <Eye className="h-4 w-4 mr-1" />
-                                    Détails
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                                  <DialogHeader>
-                                    <DialogTitle>Détails de la demande</DialogTitle>
-                                    <DialogDescription>
-                                      Informations complètes du demandeur
-                                    </DialogDescription>
-                                  </DialogHeader>
-                                  <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                      <div>
-                                        <label className="text-sm font-medium text-muted-foreground">Nom complet</label>
-                                        <p className="text-sm font-medium">{request.registration_data.firstName} {request.registration_data.lastName}</p>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium text-muted-foreground">CNIE</label>
-                                        <p className="text-sm">{request.registration_data.cnie}</p>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium text-muted-foreground">Email</label>
-                                        <p className="text-sm">{request.registration_data.email}</p>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium text-muted-foreground">Téléphone</label>
-                                        <p className="text-sm">{request.registration_data.phone}</p>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium text-muted-foreground">Région</label>
-                                        <p className="text-sm">{request.registration_data.region}</p>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium text-muted-foreground">Ville</label>
-                                        <p className="text-sm">{request.registration_data.ville}</p>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium text-muted-foreground">Service</label>
-                                        <p className="text-sm font-medium">{request.bnrm_services.nom_service}</p>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium text-muted-foreground">Formule</label>
-                                        <p className="text-sm font-medium">{request.registration_data.formuleType || request.bnrm_tarifs?.condition_tarif || "Non spécifié"}</p>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium text-muted-foreground">Catégorie</label>
-                                        <p className="text-sm">{getCategoryLabel(request.bnrm_services.categorie)}</p>
-                                      </div>
-                                      {request.registration_data.manuscriptTitle && (
-                                        <div className="col-span-2">
-                                          <label className="text-sm font-medium text-muted-foreground">Document</label>
-                                          <p className="text-sm">{request.registration_data.manuscriptTitle}</p>
-                                        </div>
-                                      )}
-                                      {request.registration_data.pageCount && (
-                                        <div>
-                                          <label className="text-sm font-medium text-muted-foreground">Nombre de pages</label>
-                                          <p className="text-sm">{request.registration_data.pageCount}</p>
-                                        </div>
-                                      )}
-                                      <div>
-                                        <label className="text-sm font-medium text-muted-foreground">Date de demande</label>
-                                        <p className="text-sm">{format(new Date(request.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}</p>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium text-muted-foreground">Statut</label>
-                                        <div className="mt-1">{getStatusBadge(request.status)}</div>
-                                      </div>
-                                      {request.bnrm_tarifs && (
-                                        <div>
-                                          <label className="text-sm font-medium text-muted-foreground">Tarif</label>
-                                          <p className="text-sm font-medium">{request.bnrm_tarifs.montant} {request.bnrm_tarifs.devise}</p>
-                                          <p className="text-xs text-muted-foreground">{request.bnrm_tarifs.periode_validite}</p>
-                                        </div>
-                                      )}
-                                      {request.rejection_reason && (
-                                        <div className="col-span-2">
-                                          <label className="text-sm font-medium text-muted-foreground">Motif du rejet</label>
-                                          <p className="text-sm text-destructive">{request.rejection_reason}</p>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </DialogContent>
-                              </Dialog>
-
-                              {request.status === 'pending' && (
-                                <>
-                                  <AlertDialog open={approveDialogOpen && requestToApprove?.id === request.id} onOpenChange={(open) => {
-                                    setApproveDialogOpen(open);
-                                    if (!open) setRequestToApprove(null);
-                                  }}>
-                                    <AlertDialogTrigger asChild>
-                                      <Button
-                                        size="sm"
-                                        variant="default"
-                                        onClick={() => {
-                                          setRequestToApprove(request);
-                                          setApproveDialogOpen(true);
-                                        }}
-                                      >
-                                        <CheckCircle className="h-4 w-4 mr-1" />
-                                        Approuver
-                                      </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle>Approuver la demande</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                          Êtes-vous sûr de vouloir approuver cette demande d'abonnement pour {request.registration_data.firstName} {request.registration_data.lastName} ?
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <AlertDialogFooter>
-                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleApprove}>
-                                          Confirmer l'approbation
-                                        </AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
-
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <Button
-                                        size="sm"
-                                        variant="destructive"
-                                        onClick={() => setSelectedRequest(request)}
-                                      >
-                                        <XCircle className="h-4 w-4 mr-1" />
-                                        Rejeter
-                                      </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle>Rejeter la demande</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                          Veuillez indiquer la raison du rejet de cette demande pour {request.registration_data.firstName} {request.registration_data.lastName}.
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <Textarea
-                                        placeholder="Raison du rejet (obligatoire)..."
-                                        value={rejectReason}
-                                        onChange={(e) => setRejectReason(e.target.value)}
-                                        className="min-h-[100px]"
-                                      />
-                                      <AlertDialogFooter>
-                                        <AlertDialogCancel onClick={() => {
-                                          setSelectedRequest(null);
-                                          setRejectReason("");
-                                        }}>
-                                          Annuler
-                                        </AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleReject}>
-                                          Confirmer le rejet
-                                        </AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
-                                </>
-                              )}
-                            </div>
-                            {request.status === 'rejected' && request.rejection_reason && (
-                              <div className="text-xs text-muted-foreground mt-2">
-                                <span className="font-medium">Motif:</span> {request.rejection_reason}
-                              </div>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </main>
+            <TabsContent value="rejected">
+              {renderRequestsTable(rejectedRequests)}
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </WatermarkContainer>
   );
