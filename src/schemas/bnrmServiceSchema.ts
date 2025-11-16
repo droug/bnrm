@@ -6,6 +6,7 @@ export const serviceRegistrationSchema = z.object({
   lastName: z.string().min(1, 'Le nom est obligatoire'),
   email: z.string().email('Email invalide').min(1, 'L\'email est obligatoire'),
   phone: z.string().min(1, 'Le téléphone est obligatoire'),
+  cnie: z.string().optional(),
   address: z.string().optional(),
   institution: z.string().optional(),
   additionalInfo: z.string().optional(),
