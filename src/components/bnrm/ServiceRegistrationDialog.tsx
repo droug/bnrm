@@ -13,13 +13,7 @@ import { PaymentDialog } from "./PaymentDialog";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { MOROCCO_REGIONS, CITIES_BY_REGION } from "@/data/moroccoRegions";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SimpleListSelect } from "@/components/ui/simple-list-select";
 
 interface BNRMService {
   id_service: string;
@@ -499,45 +493,27 @@ export function ServiceRegistrationDialog({
               
               <div className="grid gap-2">
                 <Label htmlFor="region">Région *</Label>
-                <Select
+                <SimpleListSelect
                   value={formData.region}
-                  onValueChange={(value) => {
+                  onChange={(value) => {
                     setFormData({ ...formData, region: value, ville: "" });
                   }}
+                  options={[...MOROCCO_REGIONS]}
+                  placeholder="Sélectionner une région"
                   required
-                >
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="Sélectionner une région" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background z-50">
-                    {MOROCCO_REGIONS.map((region) => (
-                      <SelectItem key={region} value={region}>
-                        {region}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                />
               </div>
 
               <div className="grid gap-2">
                 <Label htmlFor="ville">Ville *</Label>
-                <Select
+                <SimpleListSelect
                   value={formData.ville}
-                  onValueChange={(value) => setFormData({ ...formData, ville: value })}
+                  onChange={(value) => setFormData({ ...formData, ville: value })}
+                  options={formData.region ? CITIES_BY_REGION[formData.region] || [] : []}
+                  placeholder={formData.region ? "Sélectionner une ville" : "Sélectionner d'abord une région"}
                   disabled={!formData.region}
                   required
-                >
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder={formData.region ? "Sélectionner une ville" : "Sélectionner d'abord une région"} />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background z-50">
-                    {formData.region && CITIES_BY_REGION[formData.region]?.map((ville) => (
-                      <SelectItem key={ville} value={ville}>
-                        {ville}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                />
               </div>
             </div>
 
