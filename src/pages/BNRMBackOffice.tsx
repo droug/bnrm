@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -535,14 +536,14 @@ export default function BNRMBackOffice() {
           </DialogContent>
         </Dialog>
 
-        <Dialog open={selectedDepositModal === "details"} onOpenChange={() => setSelectedDepositModal(null)}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Détails du Dépôt</DialogTitle>
-              <DialogDescription>
+        <Sheet open={selectedDepositModal === "details"} onOpenChange={() => setSelectedDepositModal(null)}>
+          <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle>Détails du Dépôt</SheetTitle>
+              <SheetDescription>
                 Informations complètes sur le dépôt {selectedDepositData?.number}
-              </DialogDescription>
-            </DialogHeader>
+              </SheetDescription>
+            </SheetHeader>
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
@@ -583,8 +584,8 @@ export default function BNRMBackOffice() {
                 <Button variant="outline" onClick={() => setSelectedDepositModal(null)}>Fermer</Button>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
+          </SheetContent>
+        </Sheet>
 
         {/* AlertDialog pour confirmations */}
         <AlertDialog open={!!confirmAction} onOpenChange={() => setConfirmAction(null)}>

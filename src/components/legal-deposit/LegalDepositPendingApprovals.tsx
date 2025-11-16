@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
@@ -340,14 +340,14 @@ export function LegalDepositPendingApprovals() {
         </CardContent>
       </Card>
 
-      <Dialog open={!!selectedApproval} onOpenChange={() => setSelectedApproval(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Approuver ou Rejeter la Demande</DialogTitle>
-            <DialogDescription>
+      <Sheet open={!!selectedApproval} onOpenChange={() => setSelectedApproval(null)}>
+        <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Approuver ou Rejeter la Demande</SheetTitle>
+            <SheetDescription>
               Demande de dépôt légal N° {selectedApproval?.request.request_number}
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
           {selectedApproval && (
             <div className="space-y-4">
               <div>
@@ -399,8 +399,8 @@ export function LegalDepositPendingApprovals() {
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }
