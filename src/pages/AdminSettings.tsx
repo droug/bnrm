@@ -12,7 +12,61 @@ import { ExternalSystemsConfig } from "@/components/admin/ExternalSystemsConfig"
 export default function AdminSettings() {
   const navigate = useNavigate();
   const [showInterconnections, setShowInterconnections] = useState(false);
-  const adminCards = [
+  
+  // Cartes de gestion des demandes
+  const requestCards = [
+    {
+      icon: ClockAlert,
+      title: "Demandes Accès en attente",
+      description: "Traiter les demandes d'accès et Abonnements",
+      href: "/admin/access-requests",
+      permission: "requests.manage",
+      gradient: "from-orange-500 to-amber-600"
+    },
+    {
+      icon: BookOpenCheck,
+      title: "Gestion des Réservations d'Ouvrages",
+      description: "Gérer les réservations d'ouvrages, Validation et traitement",
+      href: "/admin/reservations-ouvrages",
+      permission: "requests.manage",
+      gradient: "from-indigo-500 to-blue-600"
+    },
+    {
+      icon: MapPin,
+      title: "Gestion des Locations",
+      description: "Gérer les demandes de location d'espaces et la disponibilité",
+      href: "/admin/rental-management",
+      permission: "requests.manage",
+      gradient: "from-teal-500 to-cyan-600"
+    },
+    {
+      icon: FileImage,
+      title: "Demandes de Reproduction",
+      description: "Gérer les demandes de reproduction de documents - Validation et workflow",
+      href: "/admin/reproduction",
+      permission: "requests.manage",
+      gradient: "from-red-500 to-red-600"
+    },
+    {
+      icon: UserCog,
+      title: "Demandes Professionnelles",
+      description: "Inviter et valider les inscriptions des professionnels",
+      href: "/admin/professional-management",
+      permission: "users.manage",
+      gradient: "from-indigo-500 to-indigo-600"
+    },
+    {
+      icon: Wrench,
+      title: "Demandes de restauration",
+      description: "Gestion des demandes de restauration de manuscrits",
+      href: "/admin/restoration-requests",
+      permission: "content.manage",
+      gradient: "from-orange-500 to-orange-600"
+    }
+  ];
+
+  // Autres cartes de paramétrage
+  const otherCards = [
     {
       icon: ShieldCheck,
       title: "Gestion des Droits et Permissions",
@@ -36,14 +90,6 @@ export default function AdminSettings() {
       href: "/admin/content",
       permission: "content.manage",
       gradient: "from-blue-500 to-blue-600"
-    },
-    {
-      icon: ClockAlert,
-      title: "Demandes Accès en attente",
-      description: "Traiter les demandes d'accès et Abonnements",
-      href: "/admin/access-requests",
-      permission: "requests.manage",
-      gradient: "from-orange-500 to-amber-600"
     },
     {
       icon: ArchiveRestore,
@@ -78,36 +124,12 @@ export default function AdminSettings() {
       gradient: "from-emerald-500 to-emerald-600"
     },
     {
-      icon: BookOpenCheck,
-      title: "Gestion des Réservations d'Ouvrages",
-      description: "Gérer les réservations d'ouvrages, Validation et traitement",
-      href: "/admin/reservations-ouvrages",
-      permission: "requests.manage",
-      gradient: "from-indigo-500 to-blue-600"
-    },
-    {
-      icon: MapPin,
-      title: "Gestion des Locations",
-      description: "Gérer les demandes de location d'espaces et la disponibilité",
-      href: "/admin/rental-management",
-      permission: "requests.manage",
-      gradient: "from-teal-500 to-cyan-600"
-    },
-    {
       icon: DatabaseZap,
       title: "Catalogue en Ligne - Métadonnées",
       description: "Gérer les métadonnées du catalogue, imports SIGB et exports",
       href: "/admin/catalog-metadata",
       permission: "content.manage",
       gradient: "from-cyan-500 to-teal-600"
-    },
-    {
-      icon: FileImage,
-      title: "Demandes de Reproduction",
-      description: "Gérer les demandes de reproduction de documents - Validation et workflow",
-      href: "/admin/reproduction",
-      permission: "requests.manage",
-      gradient: "from-red-500 to-red-600"
     },
     {
       icon: Languages,
@@ -124,14 +146,6 @@ export default function AdminSettings() {
       href: "/admin/email-management",
       permission: "content.manage",
       gradient: "from-green-500 to-emerald-600"
-    },
-    {
-      icon: UserCog,
-      title: "Demandes Professionnelles",
-      description: "Inviter et valider les inscriptions des professionnels",
-      href: "/admin/professional-management",
-      permission: "users.manage",
-      gradient: "from-indigo-500 to-indigo-600"
     },
     {
       icon: GitBranch,
@@ -172,14 +186,6 @@ export default function AdminSettings() {
       href: "/admin/cote-management",
       permission: "content.manage",
       gradient: "from-amber-500 to-amber-600"
-    },
-    {
-      icon: Wrench,
-      title: "Demandes de restauration",
-      description: "Gestion des demandes de restauration de manuscrits",
-      href: "/admin/restoration-requests",
-      permission: "content.manage",
-      gradient: "from-orange-500 to-orange-600"
     },
     {
       icon: FormInput,
@@ -276,36 +282,92 @@ export default function AdminSettings() {
               </Card>
             </div>
             
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {adminCards.map((card) => (
-                <PermissionGuard key={card.title} permission={card.permission}>
-                  <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/40 flex flex-col">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                    <CardHeader className="relative flex-grow">
-                      <CardTitle className="flex items-center space-x-3">
-                        <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                          <card.icon className="h-6 w-6 text-white" />
-                        </div>
-                        <span className="text-lg group-hover:text-primary transition-colors">{card.title}</span>
-                      </CardTitle>
-                      <CardDescription className="text-base leading-relaxed mt-2">
-                        {card.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="relative mt-auto">
-                      <Button 
-                        className="w-full group-hover:scale-105 transition-transform" 
-                        onClick={() => {
-                          console.log('Navigating to:', card.href);
-                          navigate(card.href);
-                        }}
-                      >
-                        Accéder
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </PermissionGuard>
-              ))}
+            {/* Section Gestion des Demandes */}
+            <div className="mb-12">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                  <ClockAlert className="h-6 w-6 text-orange-500" />
+                  Gestion des Demandes
+                </h2>
+                <p className="text-muted-foreground mt-1">
+                  Traiter et gérer toutes les demandes des usagers
+                </p>
+              </div>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {requestCards.map((card) => (
+                  <PermissionGuard key={card.title} permission={card.permission}>
+                    <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/40 flex flex-col">
+                      <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <CardHeader className="relative flex-grow">
+                        <CardTitle className="flex items-center space-x-3">
+                          <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                            <card.icon className="h-6 w-6 text-white" />
+                          </div>
+                          <span className="text-lg group-hover:text-primary transition-colors">{card.title}</span>
+                        </CardTitle>
+                        <CardDescription className="text-base leading-relaxed mt-2">
+                          {card.description}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="relative mt-auto">
+                        <Button 
+                          className="w-full group-hover:scale-105 transition-transform" 
+                          onClick={() => {
+                            console.log('Navigating to:', card.href);
+                            navigate(card.href);
+                          }}
+                        >
+                          Accéder
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </PermissionGuard>
+                ))}
+              </div>
+            </div>
+
+            {/* Section Autres Paramètres */}
+            <div>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                  <Settings className="h-6 w-6 text-primary" />
+                  Autres Paramètres
+                </h2>
+                <p className="text-muted-foreground mt-1">
+                  Configuration et gestion des différents modules du système
+                </p>
+              </div>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {otherCards.map((card) => (
+                  <PermissionGuard key={card.title} permission={card.permission}>
+                    <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/40 flex flex-col">
+                      <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <CardHeader className="relative flex-grow">
+                        <CardTitle className="flex items-center space-x-3">
+                          <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                            <card.icon className="h-6 w-6 text-white" />
+                          </div>
+                          <span className="text-lg group-hover:text-primary transition-colors">{card.title}</span>
+                        </CardTitle>
+                        <CardDescription className="text-base leading-relaxed mt-2">
+                          {card.description}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="relative mt-auto">
+                        <Button 
+                          className="w-full group-hover:scale-105 transition-transform" 
+                          onClick={() => {
+                            console.log('Navigating to:', card.href);
+                            navigate(card.href);
+                          }}
+                        >
+                          Accéder
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </PermissionGuard>
+                ))}
+              </div>
             </div>
           </div>
         </main>
