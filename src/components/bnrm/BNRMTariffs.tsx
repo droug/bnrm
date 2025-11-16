@@ -33,7 +33,7 @@ interface BNRMService {
 }
 
 interface BNRMTariffsProps {
-  filterCategory?: string; // "Inscription" pour abonnements, "exclude-Inscription" pour services
+  filterCategory?: string; // "Abonnement" pour abonnements, "Service à la demande" pour services
 }
 
 export function BNRMTariffs({ filterCategory }: BNRMTariffsProps) {
@@ -110,18 +110,12 @@ export function BNRMTariffs({ filterCategory }: BNRMTariffsProps) {
     
     // Appliquer le filtre de catégorie si spécifié
     let matchesFilter = true;
-    if (filterCategory === "Inscription") {
-      // Abonnements = services avec catégorie "Inscription"
-      matchesFilter = tariff.bnrm_services?.categorie === 'Inscription';
-    } else if (filterCategory === "exclude-Inscription") {
-      // Services = tous sauf Inscription
-      matchesFilter = tariff.bnrm_services?.categorie !== 'Inscription';
-    } else if (filterCategory === "exclude-Inscription-Restauration") {
-      // Services ponctuels = tous sauf Inscription et Restauration
-      matchesFilter = tariff.bnrm_services?.categorie !== 'Inscription' && tariff.bnrm_services?.categorie !== 'Restauration';
-    } else if (filterCategory === "Restauration") {
-      // Uniquement les tarifs de restauration
-      matchesFilter = tariff.bnrm_services?.categorie === 'Restauration';
+    if (filterCategory === "Abonnement") {
+      // Abonnements = services avec catégorie "Abonnement"
+      matchesFilter = tariff.bnrm_services?.categorie === 'Abonnement';
+    } else if (filterCategory === "Service à la demande") {
+      // Services = services avec catégorie "Service à la demande"
+      matchesFilter = tariff.bnrm_services?.categorie === 'Service à la demande';
     }
     
     return matchesSearch && matchesService && matchesFilter;
