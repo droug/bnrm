@@ -12,6 +12,14 @@ import { Loader2, Search, X } from "lucide-react";
 import { PaymentDialog } from "./PaymentDialog";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { MOROCCO_REGIONS, CITIES_BY_REGION } from "@/data/moroccoRegions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface BNRMService {
   id_service: string;
@@ -57,9 +65,11 @@ export function ServiceRegistrationDialog({
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    cnie: "",
     email: "",
     phone: "",
-    cnie: "",
+    region: "",
+    ville: "",
     address: "",
     institution: "",
     additionalInfo: "",
@@ -221,9 +231,11 @@ export function ServiceRegistrationDialog({
         registration_data: {
           firstName: formData.firstName,
           lastName: formData.lastName,
+          cnie: formData.cnie,
           email: formData.email,
           phone: formData.phone,
-          cnie: formData.cnie,
+          region: formData.region,
+          ville: formData.ville,
           address: formData.address,
           institution: formData.institution,
           additionalInfo: formData.additionalInfo,
@@ -447,6 +459,17 @@ export function ServiceRegistrationDialog({
               </div>
 
               <div className="grid gap-2">
+                <Label htmlFor="cnie">N° CNIE *</Label>
+                <Input
+                  id="cnie"
+                  value={formData.cnie}
+                  onChange={(e) => setFormData({ ...formData, cnie: e.target.value })}
+                  placeholder="Numéro de Carte Nationale d'Identité Électronique"
+                  required
+                />
+              </div>
+
+              <div className="grid gap-2">
                 <Label htmlFor="email">Email *</Label>
                 <Input
                   id="email"
@@ -468,15 +491,53 @@ export function ServiceRegistrationDialog({
                   required
                 />
               </div>
+            </div>
+
+            {/* Localisation */}
+            <div className="bg-muted/30 p-4 rounded-lg space-y-4">
+              <h3 className="font-semibold text-sm">Localisation</h3>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="region">Région *</Label>
+                <Select
+                  value={formData.region}
+                  onValueChange={(value) => {
+                    setFormData({ ...formData, region: value, ville: "" });
+                  }}
+                  required
+                >
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="Sélectionner une région" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background z-50">
+                    {MOROCCO_REGIONS.map((region) => (
+                      <SelectItem key={region} value={region}>
+                        {region}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="cnie">N° CNIE</Label>
-                <Input
-                  id="cnie"
-                  value={formData.cnie}
-                  onChange={(e) => setFormData({ ...formData, cnie: e.target.value })}
-                  placeholder="Numéro de Carte Nationale d'Identité Électronique"
-                />
+                <Label htmlFor="ville">Ville *</Label>
+                <Select
+                  value={formData.ville}
+                  onValueChange={(value) => setFormData({ ...formData, ville: value })}
+                  disabled={!formData.region}
+                  required
+                >
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder={formData.region ? "Sélectionner une ville" : "Sélectionner d'abord une région"} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background z-50">
+                    {formData.region && CITIES_BY_REGION[formData.region]?.map((ville) => (
+                      <SelectItem key={ville} value={ville}>
+                        {ville}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

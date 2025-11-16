@@ -4,9 +4,11 @@ import { z } from 'zod';
 export const serviceRegistrationSchema = z.object({
   firstName: z.string().min(1, 'Le prénom est obligatoire'),
   lastName: z.string().min(1, 'Le nom est obligatoire'),
+  cnie: z.string().min(1, 'Le N° CNIE est obligatoire'),
   email: z.string().email('Email invalide').min(1, 'L\'email est obligatoire'),
   phone: z.string().min(1, 'Le téléphone est obligatoire'),
-  cnie: z.string().optional(),
+  region: z.string().min(1, 'La région est obligatoire'),
+  ville: z.string().min(1, 'La ville est obligatoire'),
   address: z.string().optional(),
   institution: z.string().optional(),
   additionalInfo: z.string().optional(),
