@@ -109,7 +109,7 @@ export default function AccessRequestsManagement() {
     let filtered = requests.filter(r => r.status === status);
     
     if (categoryFilter !== "all") {
-      filtered = filtered.filter(r => r.bnrm_services.categorie === categoryFilter);
+      filtered = filtered.filter(r => r.bnrm_services.nom_service === categoryFilter);
     }
     
     return filtered;
@@ -249,16 +249,14 @@ export default function AccessRequestsManagement() {
               setCurrentPage(1);
             }}>
               <SelectTrigger className="w-full md:w-[300px]">
-                <SelectValue placeholder="Toutes les catégories" />
+                <SelectValue placeholder="Tous les services" />
               </SelectTrigger>
               <SelectContent className="bg-background z-50">
-                <SelectItem value="all">Toutes les catégories</SelectItem>
-                <SelectItem value="Etudiants">Etudiants</SelectItem>
-                <SelectItem value="Grand public">Grand public</SelectItem>
-                <SelectItem value="Etudiants chercheurs">Etudiants chercheurs</SelectItem>
-                <SelectItem value="Chercheurs professionnels">Chercheurs professionnels</SelectItem>
-                <SelectItem value="Pass Jeunes">Pass Jeunes</SelectItem>
-                <SelectItem value="Duplicata de carte d'inscription">Duplicata de carte d'inscription</SelectItem>
+                <SelectItem value="all">Tous les services</SelectItem>
+                <SelectItem value="Pass Jeunes Inscription">Pass Jeunes Inscription</SelectItem>
+                <SelectItem value="Inscription Chercheurs professionnels">Inscription Chercheurs professionnels</SelectItem>
+                <SelectItem value="Espace jeunesse">Espace jeunesse</SelectItem>
+                <SelectItem value="Impression papier NB">Impression papier NB</SelectItem>
               </SelectContent>
             </Select>
           </div>
