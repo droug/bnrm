@@ -350,7 +350,7 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
           {displayLocationServices && locationServices.length > 0 && (
             <>
               <div className="mb-4">
-                <h3 className="text-xl font-semibold mb-2">Services location à la demande</h3>
+                <h3 className="text-xl font-semibold mb-2">Location à la demande</h3>
                 <p className="text-sm text-muted-foreground">Réservez nos espaces et équipements pour vos événements et activités</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
