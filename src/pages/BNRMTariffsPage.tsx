@@ -65,19 +65,19 @@ export default function BNRMTariffsPage() {
                   Services d'abonnement et tarifs associés
                 </p>
               </div>
-              <BNRMServices filterCategory="Inscription" />
-              <BNRMTariffs filterCategory="Inscription" />
+              <BNRMServices filterCategory="Abonnement" />
+              <BNRMTariffs filterCategory="Abonnement" />
             </TabsContent>
 
             <TabsContent value="services" className="space-y-6 mt-6">
               <div>
                 <h2 className="text-xl font-semibold mb-2">Gestion des Services Ponctuels</h2>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Services à la demande et tarifs associés (incluant restauration)
+                  Services à la demande et tarifs associés
                 </p>
               </div>
-              <BNRMServices filterCategory="exclude-Inscription" />
-              <BNRMTariffs filterCategory="exclude-Inscription" />
+              <BNRMServices filterCategory="Service à la demande" />
+              <BNRMTariffs filterCategory="Service à la demande" />
             </TabsContent>
 
             <TabsContent value="statistics" className="space-y-6 mt-6">

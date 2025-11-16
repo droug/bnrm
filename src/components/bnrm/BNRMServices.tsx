@@ -32,7 +32,7 @@ interface BNRMService {
 }
 
 interface BNRMServicesProps {
-  filterCategory?: string; // "Inscription" pour abonnements, "exclude-Inscription" pour services
+  filterCategory?: string; // "Abonnement" pour abonnements, "Service à la demande" pour services
 }
 
 export function BNRMServices({ filterCategory }: BNRMServicesProps) {
@@ -107,12 +107,12 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
     
     // Appliquer le filtre de catégorie si spécifié
     let matchesFilter = true;
-    if (filterCategory === "Inscription") {
-      // Abonnements = services avec catégorie "Inscription"
-      matchesFilter = service.categorie === 'Inscription';
-    } else if (filterCategory === "exclude-Inscription") {
-      // Services = tous sauf Inscription
-      matchesFilter = service.categorie !== 'Inscription';
+    if (filterCategory === "Abonnement") {
+      // Abonnements = services avec catégorie "Abonnement"
+      matchesFilter = service.categorie === 'Abonnement';
+    } else if (filterCategory === "Service à la demande") {
+      // Services = services avec catégorie "Service à la demande"
+      matchesFilter = service.categorie === 'Service à la demande';
     } else if (filterCategory === "exclude-Inscription-Restauration") {
       // Services ponctuels = tous sauf Inscription et Restauration
       matchesFilter = service.categorie !== 'Inscription' && service.categorie !== 'Restauration';
