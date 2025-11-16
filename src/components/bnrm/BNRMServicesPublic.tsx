@@ -103,7 +103,17 @@ export function BNRMServicesPublic() {
     return matchesSearch && matchesCategory;
   });
 
+  // Services de location à la demande (S007 à S011)
+  const locationServiceIds = ["S007", "S008", "S009", "S010", "S011"];
+  const locationServices = services.filter((service) => 
+    locationServiceIds.includes(service.id_service)
+  );
+
   const filteredOneTimeServices = oneTimeServices.filter((service) => {
+    // Exclure les services de location qui seront affichés dans une carte séparée
+    if (locationServiceIds.includes(service.id_service)) {
+      return false;
+    }
     const matchesSearch = service.nom_service.toLowerCase().includes(searchTerm.toLowerCase()) ||
       service.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || service.categorie === selectedCategory;
@@ -291,6 +301,72 @@ export function BNRMServicesPublic() {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Services Location à la demande Card */}
+          {locationServices.length > 0 && (
+            <Card className="hover:shadow-lg transition-shadow border-primary/50">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-5 w-5" />
+                    <CardTitle className="text-lg">Services location à la demande</CardTitle>
+                  </div>
+                </div>
+                <Badge className="bg-blue-100 text-blue-800">
+                  Location d'espaces
+                </Badge>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm mb-4">
+                  Réservez nos espaces et équipements pour vos événements et activités
+                </CardDescription>
+                <div className="space-y-3">
+                  {locationServices.map((service) => {
+                    const serviceTariffs = getTariffsForService(service.id_service);
+                    const firstTariff = serviceTariffs[0];
+                    
+                    return (
+                      <div key={service.id_service} className="p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <div className="font-semibold text-sm">{service.nom_service}</div>
+                            {service.description && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                {service.description}
+                              </div>
+                            )}
+                          </div>
+                          {firstTariff && (
+                            <div className="text-right ml-3">
+                              <div className="font-bold text-primary">
+                                {firstTariff.montant} {firstTariff.devise}
+                              </div>
+                              {firstTariff.condition_tarif && (
+                                <div className="text-xs text-muted-foreground">
+                                  {firstTariff.condition_tarif}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        <Button 
+                          size="sm"
+                          className="w-full mt-2"
+                          onClick={() => {
+                            setSelectedServiceForRegistration(service);
+                            setSelectedTariffForRegistration(firstTariff || null);
+                            setRegistrationDialogOpen(true);
+                          }}
+                        >
+                          Réserver
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Special Box Reservation Card */}
