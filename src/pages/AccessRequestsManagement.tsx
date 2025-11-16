@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye } from "lucide-react";
@@ -58,6 +60,9 @@ export default function AccessRequestsManagement() {
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [requestToApprove, setRequestToApprove] = useState<ServiceRegistration | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     if (user && isAdmin && !loading) {
@@ -101,7 +106,23 @@ export default function AccessRequestsManagement() {
   };
 
   const getFilteredRequests = (status: string) => {
-    return requests.filter(r => r.status === status);
+    let filtered = requests.filter(r => r.status === status);
+    
+    if (categoryFilter !== "all") {
+      filtered = filtered.filter(r => r.bnrm_services.categorie === categoryFilter);
+    }
+    
+    return filtered;
+  };
+
+  const getPaginatedRequests = (requestsList: ServiceRegistration[]) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return requestsList.slice(startIndex, endIndex);
+  };
+
+  const getTotalPages = (requestsList: ServiceRegistration[]) => {
+    return Math.ceil(requestsList.length / itemsPerPage);
   };
 
   const handleApprove = async () => {
@@ -211,6 +232,9 @@ export default function AccessRequestsManagement() {
       );
     }
 
+    const paginatedList = getPaginatedRequests(requestsList);
+    const totalPages = getTotalPages(requestsList);
+
     return (
       <Card>
         <CardHeader>
@@ -218,6 +242,26 @@ export default function AccessRequestsManagement() {
           <CardDescription>{requestsList.length} demande(s)</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-4">
+            <Select value={categoryFilter} onValueChange={(value) => {
+              setCategoryFilter(value);
+              setCurrentPage(1);
+            }}>
+              <SelectTrigger className="w-full md:w-[300px]">
+                <SelectValue placeholder="Toutes les catégories" />
+              </SelectTrigger>
+              <SelectContent className="bg-background z-50">
+                <SelectItem value="all">Toutes les catégories</SelectItem>
+                <SelectItem value="Etudiants">Etudiants</SelectItem>
+                <SelectItem value="Grand public">Grand public</SelectItem>
+                <SelectItem value="Etudiants chercheurs">Etudiants chercheurs</SelectItem>
+                <SelectItem value="Chercheurs professionnels">Chercheurs professionnels</SelectItem>
+                <SelectItem value="Pass Jeunes">Pass Jeunes</SelectItem>
+                <SelectItem value="Duplicata de carte d'inscription">Duplicata de carte d'inscription</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -231,7 +275,7 @@ export default function AccessRequestsManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {requestsList.map((request) => (
+                {paginatedList.map((request) => (
                   <TableRow key={request.id}>
                     <TableCell>
                       <div>
@@ -420,7 +464,7 @@ export default function AccessRequestsManagement() {
                                 </AlertDialogHeader>
                                 <div className="py-4">
                                   <Textarea
-                                    placeholder="Raison du rejet..."
+                                    placeholder="Motif du rejet (obligatoire) ..."
                                     value={rejectReason}
                                     onChange={(e) => setRejectReason(e.target.value)}
                                     className="min-h-[100px]"
@@ -451,6 +495,40 @@ export default function AccessRequestsManagement() {
               </TableBody>
             </Table>
           </div>
+
+          {totalPages > 1 && (
+            <div className="mt-4">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(page)}
+                        isActive={currentPage === page}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
@@ -488,7 +566,11 @@ export default function AccessRequestsManagement() {
         />
 
         <div className="container mx-auto px-4 py-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={(value) => {
+            setActiveTab(value);
+            setCurrentPage(1);
+            setCategoryFilter("all");
+          }} className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="pending" className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
