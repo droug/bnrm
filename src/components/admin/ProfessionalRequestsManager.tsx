@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -541,11 +542,11 @@ export function ProfessionalRequestsManager() {
         </CardContent>
       </Card>
 
-      <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Détails de la demande professionnelle</DialogTitle>
-          </DialogHeader>
+      <Sheet open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
+        <SheetContent side="right" className="w-full sm:max-w-4xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Détails de la demande professionnelle</SheetTitle>
+          </SheetHeader>
 
           {selectedRequest && (
             <div className="space-y-6">
@@ -703,8 +704,8 @@ export function ProfessionalRequestsManager() {
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* Pop-up Raison du refus */}
       <Dialog open={showRejectionDialog} onOpenChange={setShowRejectionDialog}>
