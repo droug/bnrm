@@ -191,7 +191,7 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
           {filterType === "abonnements" 
             ? "Abonnements BNRM" 
             : filterType === "location" 
-            ? "Services de location à la demande" 
+            ? "Location à la demande" 
             : "Services de la BNRM"}
         </h1>
         <p className="text-xl text-muted-foreground">

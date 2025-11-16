@@ -180,7 +180,7 @@ export default function PaymentServices() {
     },
     {
       id: "location-services",
-      title: "Services location à la demande",
+      title: "Location à la demande",
       description: "Louez nos espaces et équipements pour vos besoins",
       icon: Package,
       color: "from-blue-500 to-blue-600",
