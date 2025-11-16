@@ -522,7 +522,7 @@ export default function AccessRequestsManagement() {
                                         <p className="text-sm font-medium">{request.bnrm_services.nom_service}</p>
                                       </div>
                                       <div>
-                                        <label className="text-sm font-medium text-muted-foreground">Type de formule</label>
+                                        <label className="text-sm font-medium text-muted-foreground">Formule</label>
                                         <p className="text-sm font-medium">{request.registration_data.formuleType || request.bnrm_tarifs?.condition_tarif || "Non spécifié"}</p>
                                       </div>
                                       <div>
