@@ -93,6 +93,13 @@ const AVAILABLE_TIMES = [
 export function RentalRequestDialog({ open, onOpenChange, space }: RentalRequestDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [submittedData, setSubmittedData] = useState<{
+    requestNumber: string;
+    eventDate: string;
+    eventTitle: string;
+    totalAmount: number;
+  } | null>(null);
   const [bookedSlots, setBookedSlots] = useState<BookedSlot[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [availableStartTimes, setAvailableStartTimes] = useState<string[]>(AVAILABLE_TIMES);
@@ -116,6 +123,9 @@ export function RentalRequestDialog({ open, onOpenChange, space }: RentalRequest
   useEffect(() => {
     if (open) {
       fetchBookedSlots();
+      // Reset submission state when dialog opens
+      setSubmitted(false);
+      setSubmittedData(null);
     }
   }, [open, space.id]);
 
@@ -247,7 +257,7 @@ export function RentalRequestDialog({ open, onOpenChange, space }: RentalRequest
         totalAmount = (space.hourly_rate || 0) * durationHours;
       }
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("rental_requests")
         .insert({
           user_id: user.id,
@@ -267,17 +277,22 @@ export function RentalRequestDialog({ open, onOpenChange, space }: RentalRequest
           currency: space.currency || "MAD",
           status: "pending",
           request_number: "",
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
 
-      toast({
-        title: "Demande envoyée",
-        description: "Votre demande de location a été enregistrée avec succès. Vous recevrez une confirmation par email.",
+      // Store submission data for confirmation screen
+      setSubmittedData({
+        requestNumber: data.request_number || "En cours de génération",
+        eventDate: format(values.event_date, "PPP", { locale: fr }),
+        eventTitle: values.event_title,
+        totalAmount: totalAmount,
       });
 
+      setSubmitted(true);
       form.reset();
-      onOpenChange(false);
     } catch (error: any) {
       toast({
         title: "Erreur",
@@ -292,15 +307,17 @@ export function RentalRequestDialog({ open, onOpenChange, space }: RentalRequest
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Demande de location - {space.space_name}</DialogTitle>
-          <DialogDescription>
-            Remplissez ce formulaire pour réserver cet espace
-          </DialogDescription>
-        </DialogHeader>
+        {!submitted ? (
+          <>
+            <DialogHeader>
+              <DialogTitle>Demande de location - {space.space_name}</DialogTitle>
+              <DialogDescription>
+                Remplissez ce formulaire pour réserver cet espace
+              </DialogDescription>
+            </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* Event Information */}
             <div className="space-y-4">
               <h3 className="font-semibold text-lg">Informations sur l'événement</h3>
@@ -606,6 +623,102 @@ export function RentalRequestDialog({ open, onOpenChange, space }: RentalRequest
             </DialogFooter>
           </form>
         </Form>
+        </>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle className="text-2xl text-center">✅ Demande envoyée avec succès</DialogTitle>
+              <DialogDescription className="text-center">
+                Votre demande de location a été enregistrée
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-6 py-6">
+              <div className="text-center space-y-4">
+                <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                  <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold">Merci pour votre demande !</h3>
+                <p className="text-muted-foreground">
+                  Nous avons bien reçu votre demande de location. Vous recevrez une confirmation par email sous peu.
+                </p>
+              </div>
+
+              {submittedData && (
+                <div className="bg-muted/50 rounded-lg p-6 space-y-4">
+                  <h4 className="font-semibold text-lg mb-4">Détails de votre demande</h4>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Numéro de demande</p>
+                      <p className="font-semibold">{submittedData.requestNumber}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm text-muted-foreground">Espace</p>
+                      <p className="font-semibold">{space.space_name}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm text-muted-foreground">Événement</p>
+                      <p className="font-semibold">{submittedData.eventTitle}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm text-muted-foreground">Date</p>
+                      <p className="font-semibold">{submittedData.eventDate}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm text-muted-foreground">Montant estimé</p>
+                      <p className="font-semibold">{submittedData.totalAmount} {space.currency}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm text-muted-foreground">Statut</p>
+                      <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                        En attente de validation
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h5 className="font-semibold text-blue-900 mb-2">Prochaines étapes</h5>
+                <ul className="space-y-2 text-sm text-blue-800">
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-0.5">•</span>
+                    <span>Notre équipe examinera votre demande dans les 48 heures</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-0.5">•</span>
+                    <span>Vous recevrez une confirmation par email avec les détails de la réservation</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-0.5">•</span>
+                    <span>Consultez votre espace personnel pour suivre l'état de votre demande</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button 
+                onClick={() => {
+                  setSubmitted(false);
+                  setSubmittedData(null);
+                  onOpenChange(false);
+                }}
+                className="w-full"
+              >
+                Fermer
+              </Button>
+            </DialogFooter>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
