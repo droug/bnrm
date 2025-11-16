@@ -59,6 +59,7 @@ export function ServiceRegistrationDialog({
     lastName: "",
     email: "",
     phone: "",
+    cnie: "",
     address: "",
     institution: "",
     additionalInfo: "",
@@ -222,6 +223,7 @@ export function ServiceRegistrationDialog({
           lastName: formData.lastName,
           email: formData.email,
           phone: formData.phone,
+          cnie: formData.cnie,
           address: formData.address,
           institution: formData.institution,
           additionalInfo: formData.additionalInfo,
@@ -464,6 +466,16 @@ export function ServiceRegistrationDialog({
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   required
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="cnie">N° CNIE</Label>
+                <Input
+                  id="cnie"
+                  value={formData.cnie}
+                  onChange={(e) => setFormData({ ...formData, cnie: e.target.value })}
+                  placeholder="Numéro de Carte Nationale d'Identité Électronique"
                 />
               </div>
             </div>
