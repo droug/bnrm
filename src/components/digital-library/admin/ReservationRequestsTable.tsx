@@ -25,6 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Check, X, Archive, Download, Loader2, Eye } from "lucide-react";
@@ -507,15 +508,15 @@ export function ReservationRequestsTable() {
         </DialogContent>
       </Dialog>
 
-      {/* Details Dialog */}
-      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl">Détails de la demande de réservation</DialogTitle>
-            <DialogDescription>
+      {/* Details Sheet */}
+      <Sheet open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <SheetContent side="right" className="w-full sm:max-w-3xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="text-xl">Détails de la demande de réservation</SheetTitle>
+            <SheetDescription>
               Informations complètes sur la demande et le demandeur
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
           {selectedRequest && (
             <div className="space-y-6">
               {/* Informations du demandeur */}
@@ -636,13 +637,8 @@ export function ReservationRequestsTable() {
               </div>
             </div>
           )}
-          <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
-              Fermer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetContent>
+      </Sheet>
     </div>
   );
 }

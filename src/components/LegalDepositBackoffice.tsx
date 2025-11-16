@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Search, 
@@ -544,8 +545,8 @@ export const LegalDepositBackoffice = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
+                          <Sheet>
+                          <SheetTrigger asChild>
                             <Button 
                               variant="outline" 
                               size="sm"
@@ -553,15 +554,15 @@ export const LegalDepositBackoffice = () => {
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle>Détails de la demande {request.request_number}</DialogTitle>
-                            </DialogHeader>
+                          </SheetTrigger>
+                          <SheetContent side="right" className="w-full sm:max-w-4xl overflow-y-auto">
+                            <SheetHeader>
+                              <SheetTitle>Détails de la demande {request.request_number}</SheetTitle>
+                            </SheetHeader>
                             {/* Contenu du détail de la demande - à développer */}
                             <RequestDetailsModal request={request} onUpdateStatus={updateRequestStatus} onAssignNumbers={assignNumbers} />
-                          </DialogContent>
-                        </Dialog>
+                          </SheetContent>
+                        </Sheet>
                       </div>
                     </TableCell>
                   </TableRow>
