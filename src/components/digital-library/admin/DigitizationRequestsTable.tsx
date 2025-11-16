@@ -17,14 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Loader2, Download, ExternalLink, UserPlus, Eye, Check, X } from "lucide-react";
 import { format } from "date-fns";
@@ -377,12 +370,12 @@ export function DigitizationRequestsTable() {
         </Table>
       </div>
 
-      {/* Details Dialog */}
-      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Détails de la demande de numérisation</DialogTitle>
-          </DialogHeader>
+      {/* Details Sheet */}
+      <Sheet open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Détails de la demande de numérisation</SheetTitle>
+          </SheetHeader>
           {selectedRequest && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -465,13 +458,8 @@ export function DigitizationRequestsTable() {
               </div>
             </div>
           )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
-              Fermer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetContent>
+      </Sheet>
     </div>
   );
 }
