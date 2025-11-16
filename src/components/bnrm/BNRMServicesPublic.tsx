@@ -346,70 +346,86 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
             </Select>
           </div>
 
-          {/* Services Location à la demande Card */}
+          {/* Services Location à la demande - Grid Cards */}
           {displayLocationServices && locationServices.length > 0 && (
-            <Card className="hover:shadow-lg transition-shadow border-primary/50">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <Package className="h-5 w-5" />
-                    <CardTitle className="text-lg">Services location à la demande</CardTitle>
-                  </div>
-                </div>
-                <Badge className="bg-blue-100 text-blue-800">
-                  Location d'espaces
-                </Badge>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-sm mb-4">
-                  Réservez nos espaces et équipements pour vos événements et activités
-                </CardDescription>
-                <div className="space-y-3">
-                  {locationServices.map((service) => {
-                    const serviceTariffs = getTariffsForService(service.id_service);
-                    const firstTariff = serviceTariffs[0];
-                    
-                    return (
-                      <div key={service.id_service} className="p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1">
-                            <div className="font-semibold text-sm">{service.nom_service}</div>
-                            {service.description && (
-                              <div className="text-xs text-muted-foreground mt-1">
-                                {service.description}
-                              </div>
-                            )}
+            <>
+              <div className="mb-4">
+                <h3 className="text-xl font-semibold mb-2">Services location à la demande</h3>
+                <p className="text-sm text-muted-foreground">Réservez nos espaces et équipements pour vos événements et activités</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {locationServices.map((service) => {
+                  const serviceTariffs = getTariffsForService(service.id_service);
+                  
+                  return (
+                    <Card key={service.id_service} className="hover:shadow-lg transition-shadow flex flex-col">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-2">
+                            <Package className="h-5 w-5" />
+                            <CardTitle className="text-lg">{service.nom_service}</CardTitle>
                           </div>
-                          {firstTariff && (
-                            <div className="text-right ml-3">
-                              <div className="font-bold text-primary">
-                                {firstTariff.montant} {firstTariff.devise}
-                              </div>
-                              {firstTariff.condition_tarif && (
-                                <div className="text-xs text-muted-foreground">
-                                  {firstTariff.condition_tarif}
+                        </div>
+                        <Badge className="bg-blue-100 text-blue-800">
+                          Location d'espaces
+                        </Badge>
+                      </CardHeader>
+                      <CardContent className="flex flex-col flex-1">
+                        <div className="flex-1 space-y-3 mb-4">
+                          {service.description && (
+                            <CardDescription className="text-sm">
+                              {service.description}
+                            </CardDescription>
+                          )}
+                          
+                          {/* Afficher les tarifs disponibles */}
+                          {serviceTariffs.length > 0 && (
+                            <div className="space-y-2">
+                              <p className="text-xs font-semibold text-muted-foreground uppercase">Tarifs disponibles:</p>
+                              {serviceTariffs.map((tariff) => (
+                                <div key={tariff.id_tarif} className="p-2 bg-muted/30 rounded-md">
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                      <p className="text-sm font-medium">
+                                        {tariff.montant} {tariff.devise}
+                                      </p>
+                                      {tariff.condition_tarif && (
+                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                          {tariff.condition_tarif}
+                                        </p>
+                                      )}
+                                    </div>
+                                    <Badge variant="outline" className="ml-2 text-xs">
+                                      {tariff.periode_validite}
+                                    </Badge>
+                                  </div>
                                 </div>
-                              )}
+                              ))}
                             </div>
                           )}
                         </div>
+                        
                         <Button 
-                          size="sm"
-                          className="w-full mt-2"
                           onClick={() => {
-                            setSelectedServiceForRegistration(service);
-                            setSelectedTariffForRegistration(firstTariff || null);
-                            setRegistrationDialogOpen(true);
+                            if (service.id_service === "S011") {
+                              setBoxTariff(serviceTariffs[0]);
+                              setBoxReservationDialogOpen(true);
+                            } else {
+                              setSelectedServiceForRegistration(service);
+                              setSelectedTariffForRegistration(serviceTariffs[0] || null);
+                              setRegistrationDialogOpen(true);
+                            }
                           }}
+                          className="w-full"
                         >
                           Réserver
                         </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </>
           )}
 
           {displayOneTimeServices && (
