@@ -223,7 +223,6 @@ export default function RentalManagement() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="requests">Demandes de location</TabsTrigger>
-            <TabsTrigger value="spaces">Espaces disponibles</TabsTrigger>
             <TabsTrigger value="availability">Gestion disponibilité</TabsTrigger>
           </TabsList>
 
@@ -332,63 +331,6 @@ export default function RentalManagement() {
                     )}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Espaces disponibles */}
-          <TabsContent value="spaces" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Espaces disponibles</CardTitle>
-                  <CardDescription>{spaces.length} espace(s)</CardDescription>
-                </div>
-                <Button onClick={() => navigate("/admin/settings")}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Ajouter un espace
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {spaces.map((space) => (
-                    <Card key={space.id} className={!space.is_active ? "opacity-60" : ""}>
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <CardTitle className="text-lg">{space.space_name}</CardTitle>
-                            <CardDescription>{space.space_code}</CardDescription>
-                          </div>
-                          {!space.is_active && (
-                            <Badge variant="secondary">Inactif</Badge>
-                          )}
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Users className="h-4 w-4 text-muted-foreground" />
-                          <span>Capacité: {space.capacity} personnes</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <span>{space.location}</span>
-                        </div>
-                        <div className="pt-2 border-t">
-                          <div className="text-sm font-medium">Tarifs:</div>
-                          <div className="text-xs text-muted-foreground space-y-1">
-                            {space.hourly_rate && <div>Horaire: {space.hourly_rate} {space.currency}</div>}
-                            {space.half_day_rate && <div>Demi-journée: {space.half_day_rate} {space.currency}</div>}
-                            {space.full_day_rate && <div>Journée: {space.full_day_rate} {space.currency}</div>}
-                          </div>
-                        </div>
-                        <Button variant="outline" size="sm" className="w-full mt-2">
-                          <Edit className="h-4 w-4 mr-2" />
-                          Modifier
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
