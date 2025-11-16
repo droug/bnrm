@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -16,184 +16,84 @@ import { AdminHeader } from "@/components/AdminHeader";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
-interface AccessRequest {
+interface ServiceRegistration {
   id: string;
   user_id: string;
-  manuscript_id: string;
-  request_type: string;
-  purpose: string;
-  requested_date: string;
+  service_id: string;
+  tariff_id: string | null;
   status: string;
-  notes: string;
+  is_paid: boolean;
+  registration_data: any;
+  rejection_reason?: string | null;
+  processed_by?: string | null;
+  processed_at?: string | null;
   created_at: string;
-  manuscripts: {
-    title: string;
-    author: string;
-    cote: string;
+  updated_at: string;
+  subscription_id: string;
+  bnrm_services: {
+    nom_service: string;
+    categorie: string;
   };
-  profiles: {
-    first_name: string;
-    last_name: string;
-    institution: string;
+  bnrm_tarifs: {
+    montant: number;
+    devise: string;
+    periode_validite: string;
   } | null;
 }
 
+import { useSecureRoles } from "@/hooks/useSecureRoles";
+
 export default function AccessRequestsManagement() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { isAdmin, loading } = useSecureRoles();
   const { toast } = useToast();
   const navigate = useNavigate();
   
-  const [requests, setRequests] = useState<AccessRequest[]>([]);
-  const [filteredRequests, setFilteredRequests] = useState<AccessRequest[]>([]);
+  const [requests, setRequests] = useState<ServiceRegistration[]>([]);
+  const [filteredRequests, setFilteredRequests] = useState<ServiceRegistration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [rejectReason, setRejectReason] = useState<string>("");
+  const [selectedRequest, setSelectedRequest] = useState<ServiceRegistration | null>(null);
 
   useEffect(() => {
-    if (user && profile?.role === 'admin') {
+    if (user && isAdmin && !loading) {
       fetchRequests();
     }
-  }, [user, profile]);
+  }, [user, isAdmin, loading]);
 
   useEffect(() => {
     filterRequests();
-  }, [requests, statusFilter, typeFilter]);
+  }, [requests, statusFilter, categoryFilter]);
 
   const fetchRequests = async () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
-        .from('access_requests')
+        .from('service_registrations')
         .select(`
           *,
-          manuscripts (
-            title,
-            author,
-            cote
+          bnrm_services (
+            nom_service,
+            categorie
+          ),
+          bnrm_tarifs (
+            montant,
+            devise,
+            periode_validite
           )
         `)
         .order('created_at', { ascending: false });
 
-      // Fetch profiles separately to avoid relationship ambiguity
-      const requestsWithProfiles = await Promise.all(
-        (data || []).map(async (request) => {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('first_name, last_name, institution')
-            .eq('user_id', request.user_id)
-            .single();
-          
-          return {
-            ...request,
-            profiles: profileData
-          };
-        })
-      );
-
       if (error) throw error;
       
-      // Filtrer uniquement les demandes avec types d'abonnements
-      const subscriptionTypes = ['free_access', 'basic_subscription', 'premium_subscription', 'institutional_subscription'];
-      const filteredDbRequests = requestsWithProfiles.filter(req => 
-        subscriptionTypes.includes(req.request_type)
-      );
-      
-      // Ajouter des exemples de demandes avec types d'abonnements
-      const mockRequests: AccessRequest[] = [
-        {
-          id: 'mock-1',
-          user_id: 'mock-user-1',
-          manuscript_id: 'mock-ms-1',
-          request_type: 'free_access',
-          purpose: 'Recherche académique sur l\'histoire marocaine',
-          requested_date: '2025-10-06',
-          status: 'pending',
-          notes: '',
-          created_at: '2025-10-06T10:00:00Z',
-          manuscripts: {
-            title: 'Recueil de poésie',
-            author: 'Auteur inconnu',
-            cote: 'MS-1234'
-          },
-          profiles: {
-            first_name: 'Ahmed',
-            last_name: 'Benani',
-            institution: 'Université Mohammed V'
-          }
-        },
-        {
-          id: 'mock-2',
-          user_id: 'mock-user-2',
-          manuscript_id: 'mock-ms-2',
-          request_type: 'basic_subscription',
-          purpose: 'Consultation régulière des manuscrits',
-          requested_date: '2025-10-05',
-          status: 'pending',
-          notes: '',
-          created_at: '2025-10-05T14:30:00Z',
-          manuscripts: {
-            title: 'Kitab al-Hikmah',
-            author: 'Al-Kindi',
-            cote: 'MS-5678'
-          },
-          profiles: {
-            first_name: 'Fatima',
-            last_name: 'El Amrani',
-            institution: 'Bibliothèque municipale de Rabat'
-          }
-        },
-        {
-          id: 'mock-3',
-          user_id: 'mock-user-3',
-          manuscript_id: 'mock-ms-3',
-          request_type: 'premium_subscription',
-          purpose: 'Demande de reproduction pour publication',
-          requested_date: '2025-10-02',
-          status: 'pending',
-          notes: '',
-          created_at: '2025-10-02T09:15:00Z',
-          manuscripts: {
-            title: 'Chronique de la conquête',
-            author: 'Ibn al-Qutiyya',
-            cote: 'MS-9012'
-          },
-          profiles: {
-            first_name: 'Hassan',
-            last_name: 'Tazi',
-            institution: 'Institut Royal des Études Islamiques'
-          }
-        },
-        {
-          id: 'mock-4',
-          user_id: 'mock-user-4',
-          manuscript_id: 'mock-ms-4',
-          request_type: 'basic_subscription',
-          purpose: 'Consultation sur place pour étude',
-          requested_date: '2025-09-22',
-          status: 'approved',
-          notes: '',
-          created_at: '2025-09-22T16:45:00Z',
-          manuscripts: {
-            title: 'Traité de médecine',
-            author: 'Ibn Sina',
-            cote: 'MS-3456'
-          },
-          profiles: {
-            first_name: 'Amina',
-            last_name: 'Chakir',
-            institution: 'Faculté de Médecine de Casablanca'
-          }
-        }
-      ];
-
-      // Combiner uniquement avec les demandes filtrées de la base de données
-      const allRequests = [...mockRequests, ...filteredDbRequests];
-      setRequests(allRequests);
+      setRequests(data || []);
     } catch (error) {
       console.error('Error fetching requests:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de charger les demandes d'accès",
+        description: "Impossible de charger les demandes",
         variant: "destructive",
       });
     } finally {
@@ -204,88 +104,122 @@ export default function AccessRequestsManagement() {
   const filterRequests = () => {
     let filtered = requests;
 
-    if (statusFilter !== "all") {
+    if (statusFilter !== 'all') {
       filtered = filtered.filter(req => req.status === statusFilter);
     }
 
-    if (typeFilter !== "all") {
-      filtered = filtered.filter(req => req.request_type === typeFilter);
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(req => req.bnrm_services?.categorie === categoryFilter);
     }
 
     setFilteredRequests(filtered);
   };
 
-  const updateRequestStatus = async (requestId: string, newStatus: string) => {
+  const handleApprove = async (requestId: string) => {
     try {
       const { error } = await supabase
-        .from('access_requests')
+        .from('service_registrations')
         .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString()
+          status: 'active',
+          processed_by: user?.id,
+          processed_at: new Date().toISOString()
         })
         .eq('id', requestId);
 
       if (error) throw error;
 
       toast({
-        title: "Succès",
-        description: `La demande a été ${newStatus === 'approved' ? 'approuvée' : 'rejetée'}`,
+        title: "Demande approuvée",
+        description: "L'utilisateur a été notifié",
       });
 
       fetchRequests();
     } catch (error) {
-      console.error('Error updating request:', error);
+      console.error('Error approving request:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de mettre à jour la demande",
+        description: "Impossible d'approuver la demande",
         variant: "destructive",
       });
     }
   };
 
-  if (!user || profile?.role !== 'admin') {
-    return <Navigate to="/" replace />;
-  }
+  const handleReject = async () => {
+    if (!selectedRequest || !rejectReason.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez fournir une raison du rejet",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
-          <Clock className="h-3 w-3 mr-1" />
-          En attente
-        </Badge>;
-      case 'approved':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
-          <CheckCircle className="h-3 w-3 mr-1" />
-          Approuvée
-        </Badge>;
-      case 'rejected':
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300">
-          <XCircle className="h-3 w-3 mr-1" />
-          Rejetée
-        </Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
+    try {
+      const { error } = await supabase
+        .from('service_registrations')
+        .update({ 
+          status: 'rejected',
+          rejection_reason: rejectReason,
+          processed_by: user?.id,
+          processed_at: new Date().toISOString()
+        })
+        .eq('id', selectedRequest.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Demande rejetée",
+        description: "L'utilisateur a été notifié",
+      });
+
+      setSelectedRequest(null);
+      setRejectReason("");
+      fetchRequests();
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de rejeter la demande",
+        variant: "destructive",
+      });
     }
   };
 
-  const getRequestTypeLabel = (type: string) => {
-    const types: { [key: string]: string } = {
-      'free_access': 'Accès gratuit',
-      'basic_subscription': 'Abonnement Basique',
-      'premium_subscription': 'Abonnement Premium',
-      'institutional_subscription': 'Abonnement Institutionnel',
-      'consultation': 'Consultation sur place',
-      'reproduction': 'Demande de reproduction',
-      'research': 'Recherche académique',
-      'exhibition': 'Exposition',
-      'other': 'Autre'
+  const getStatusBadge = (status: string) => {
+    const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+      pending: { label: "En attente", variant: "default" },
+      active: { label: "Active", variant: "default" },
+      rejected: { label: "Rejetée", variant: "destructive" },
+      expired: { label: "Expirée", variant: "secondary" },
     };
-    return types[type] || type;
+
+    const config = statusConfig[status] || { label: status, variant: "secondary" };
+    return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
+  const getCategoryLabel = (category: string) => {
+    const categoryLabels: Record<string, string> = {
+      "Abonnements": "Abonnements",
+      "Reproduction": "Reproduction",
+      "Consultation": "Consultation",
+    };
+    return categoryLabels[category] || category;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Chargement...</div>
+      </div>
+    );
+  }
+
+  if (!user || !isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
   const pendingCount = requests.filter(r => r.status === 'pending').length;
-  const approvedCount = requests.filter(r => r.status === 'approved').length;
+  const activeCount = requests.filter(r => r.status === 'active').length;
   const rejectedCount = requests.filter(r => r.status === 'rejected').length;
 
   return (
@@ -299,8 +233,8 @@ export default function AccessRequestsManagement() {
     >
       <div className="min-h-screen bg-background">
         <AdminHeader 
-          title="Gestion des Demandes d'Accès"
-          subtitle="Traiter et gérer les demandes d'accès"
+          title="Gestion des Demandes d'Abonnement"
+          subtitle="Traiter et gérer toutes les demandes d'abonnement aux services BNRM"
         />
 
         <main className="container py-8">
@@ -316,9 +250,9 @@ export default function AccessRequestsManagement() {
                   Retour
                 </Button>
                 <div>
-                  <h1 className="text-3xl font-bold">Demandes d'Accès</h1>
+                  <h1 className="text-3xl font-bold">Demandes d'Abonnement</h1>
                   <p className="text-muted-foreground">
-                    Gérer les demandes d'accès
+                    Gérer toutes les demandes d'abonnement aux services BNRM
                   </p>
                 </div>
               </div>
@@ -350,11 +284,11 @@ export default function AccessRequestsManagement() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Approuvées</CardTitle>
+                  <CardTitle className="text-sm font-medium">Actives</CardTitle>
                   <CheckCircle className="h-4 w-4 text-green-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{approvedCount}</div>
+                  <div className="text-2xl font-bold">{activeCount}</div>
                   <p className="text-xs text-muted-foreground">Acceptées</p>
                 </CardContent>
               </Card>
@@ -375,8 +309,9 @@ export default function AccessRequestsManagement() {
             <Card>
               <CardHeader>
                 <CardTitle>Filtres</CardTitle>
+                <CardDescription>Filtrer les demandes par statut et catégorie</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Statut</label>
@@ -387,24 +322,24 @@ export default function AccessRequestsManagement() {
                       <SelectContent>
                         <SelectItem value="all">Tous les statuts</SelectItem>
                         <SelectItem value="pending">En attente</SelectItem>
-                        <SelectItem value="approved">Approuvées</SelectItem>
-                        <SelectItem value="rejected">Rejetées</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="rejected">Rejetée</SelectItem>
+                        <SelectItem value="expired">Expirée</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Type de demande</label>
-                    <Select value={typeFilter} onValueChange={setTypeFilter}>
+                    <label className="text-sm font-medium">Catégorie</label>
+                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Tous les types" />
+                        <SelectValue placeholder="Toutes les catégories" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Tous les types</SelectItem>
-                        <SelectItem value="free_access">Accès gratuit</SelectItem>
-                        <SelectItem value="basic_subscription">Abonnement Basique</SelectItem>
-                        <SelectItem value="premium_subscription">Abonnement Premium</SelectItem>
-                        <SelectItem value="institutional_subscription">Abonnement Institutionnel</SelectItem>
+                        <SelectItem value="all">Toutes les catégories</SelectItem>
+                        <SelectItem value="Abonnements">Abonnements</SelectItem>
+                        <SelectItem value="Reproduction">Reproduction</SelectItem>
+                        <SelectItem value="Consultation">Consultation</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -416,130 +351,165 @@ export default function AccessRequestsManagement() {
             <Card>
               <CardHeader>
                 <CardTitle>Liste des demandes ({filteredRequests.length})</CardTitle>
-                <CardDescription>
-                  Gérer et traiter les demandes d'accès
-                </CardDescription>
+                <CardDescription>Toutes les demandes d'abonnement</CardDescription>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-muted-foreground">Chargement...</div>
                   </div>
                 ) : filteredRequests.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Aucune demande trouvée</p>
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <AlertTriangle className="h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Aucune demande</h3>
+                    <p className="text-muted-foreground">
+                      Aucune demande ne correspond aux critères sélectionnés
+                    </p>
                   </div>
                 ) : (
-                  <div className="rounded-md border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Demandeur</TableHead>
-                          <TableHead>Manuscrit</TableHead>
-                          <TableHead>Type</TableHead>
-                          <TableHead>Statut</TableHead>
-                          <TableHead>Actions</TableHead>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Utilisateur</TableHead>
+                        <TableHead>Service</TableHead>
+                        <TableHead>Catégorie</TableHead>
+                        <TableHead>Région</TableHead>
+                        <TableHead>Tarif</TableHead>
+                        <TableHead>Statut</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredRequests.map((request) => (
+                        <TableRow key={request.id}>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <Calendar className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm">
+                                {format(new Date(request.created_at), 'dd/MM/yyyy', { locale: fr })}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <User className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <div className="font-medium">
+                                  {request.registration_data.firstName} {request.registration_data.lastName}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {request.registration_data.email}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  CNIE: {request.registration_data.cnie}
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="font-medium">{request.bnrm_services.nom_service}</div>
+                            {request.registration_data.manuscriptTitle && (
+                              <div className="text-xs text-muted-foreground">
+                                Document: {request.registration_data.manuscriptTitle}
+                              </div>
+                            )}
+                            {request.registration_data.pageCount && (
+                              <div className="text-xs text-muted-foreground">
+                                Pages: {request.registration_data.pageCount}
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {getCategoryLabel(request.bnrm_services.categorie)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm">
+                              {request.registration_data.region}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {request.registration_data.ville}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {request.bnrm_tarifs ? (
+                              <div>
+                                <div className="font-medium">
+                                  {request.bnrm_tarifs.montant} {request.bnrm_tarifs.devise}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {request.bnrm_tarifs.periode_validite}
+                                </div>
+                              </div>
+                            ) : (
+                              <Badge variant="secondary">Gratuit</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(request.status)}
+                          </TableCell>
+                          <TableCell>
+                            {request.status === 'pending' && (
+                              <div className="flex items-center space-x-2">
+                                <Button
+                                  size="sm"
+                                  variant="default"
+                                  onClick={() => handleApprove(request.id)}
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-1" />
+                                  Approuver
+                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      variant="destructive"
+                                      onClick={() => setSelectedRequest(request)}
+                                    >
+                                      <XCircle className="h-4 w-4 mr-1" />
+                                      Rejeter
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Rejeter la demande</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Veuillez indiquer la raison du rejet de cette demande.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <Textarea
+                                      placeholder="Raison du rejet..."
+                                      value={rejectReason}
+                                      onChange={(e) => setRejectReason(e.target.value)}
+                                      className="min-h-[100px]"
+                                    />
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel onClick={() => {
+                                        setSelectedRequest(null);
+                                        setRejectReason("");
+                                      }}>
+                                        Annuler
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction onClick={handleReject}>
+                                        Confirmer le rejet
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </div>
+                            )}
+                            {request.status === 'rejected' && request.rejection_reason && (
+                              <div className="text-xs text-muted-foreground">
+                                Motif: {request.rejection_reason}
+                              </div>
+                            )}
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredRequests.map((request) => (
-                          <TableRow key={request.id}>
-                            <TableCell>
-                              <div className="flex items-center text-sm">
-                                <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                                {format(new Date(request.created_at), 'dd MMM yyyy', { locale: fr })}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div>
-                                <div className="font-medium flex items-center">
-                                  <User className="h-4 w-4 mr-2 text-muted-foreground" />
-                                  {request.profiles?.first_name} {request.profiles?.last_name}
-                                </div>
-                                {request.profiles?.institution && (
-                                  <div className="text-sm text-muted-foreground ml-6">
-                                    {request.profiles.institution}
-                                  </div>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div>
-                                <div className="font-medium">{request.manuscripts?.title}</div>
-                                <div className="text-sm text-muted-foreground">
-                                  {request.manuscripts?.author}
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline">
-                                {getRequestTypeLabel(request.request_type)}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              {getStatusBadge(request.status)}
-                            </TableCell>
-                            <TableCell>
-                              {request.status === 'pending' && (
-                                <div className="flex space-x-2">
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <Button size="sm" variant="outline" className="text-green-600">
-                                        <CheckCircle className="h-4 w-4" />
-                                      </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle>Approuver la demande ?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                          Voulez-vous approuver cette demande d'accès ?
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <AlertDialogFooter>
-                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                        <AlertDialogAction
-                                          onClick={() => updateRequestStatus(request.id, 'approved')}
-                                        >
-                                          Approuver
-                                        </AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
-
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <Button size="sm" variant="outline" className="text-red-600">
-                                        <XCircle className="h-4 w-4" />
-                                      </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle>Rejeter la demande ?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                          Voulez-vous rejeter cette demande d'accès ?
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <AlertDialogFooter>
-                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                        <AlertDialogAction
-                                          onClick={() => updateRequestStatus(request.id, 'rejected')}
-                                          className="bg-red-600 hover:bg-red-700"
-                                        >
-                                          Rejeter
-                                        </AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
-                                </div>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </CardContent>
             </Card>
