@@ -1042,14 +1042,14 @@ export function DepositValidationWorkflow() {
         </CardContent>
       </Card>
 
-      <Sheet open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
-        <SheetContent side="right" className="w-full sm:max-w-4xl overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Validation de la Demande de Dépôt Légal</SheetTitle>
-            <SheetDescription>
+      <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Validation de la Demande de Dépôt Légal</DialogTitle>
+            <DialogDescription>
               N° {selectedRequest?.request_number}
-            </SheetDescription>
-          </SheetHeader>
+            </DialogDescription>
+          </DialogHeader>
           {selectedRequest && (
             <div className="space-y-6">
               {/* Alerte de détection de doublons */}
@@ -1332,8 +1332,8 @@ export function DepositValidationWorkflow() {
               )}
             </div>
           )}
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       {/* View-Only Details Sheet */}
       <Sheet open={isViewDetailsOpen} onOpenChange={setIsViewDetailsOpen}>
