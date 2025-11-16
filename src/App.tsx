@@ -67,6 +67,7 @@ const BNRMPortal = lazy(() => import("./pages/BNRMPortal"));
 const BNRMTariffsPage = lazy(() => import("./pages/BNRMTariffsPage"));
 const BNRMBackOffice = lazy(() => import("./pages/BNRMBackOffice"));
 const ServicesCatalog = lazy(() => import("./pages/ServicesCatalog"));
+const PublicServices = lazy(() => import("./pages/PublicServices"));
 const GestionReservationsOuvrages = lazy(() => import("./pages/GestionReservationsOuvrages"));
 const BibliographiesNationales = lazy(() => import("./pages/BibliographiesNationales"));
 const ReservationEspaces = lazy(() => import("./pages/ReservationEspaces"));
@@ -370,6 +371,8 @@ const App = () => {
           {/* Payment & Wallet Routes */}
           <Route path="/services-bnrm" element={<PaymentServices />} />
           <Route path="/services-paiement" element={<PaymentServices />} />
+          <Route path="/abonnements" element={<PublicServices />} />
+          <Route path="/services-location" element={<PublicServices />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/portefeuille" element={<Wallet />} />
           <Route path="/e-wallet" element={<Wallet />} />
