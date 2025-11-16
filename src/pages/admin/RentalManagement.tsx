@@ -24,6 +24,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -385,18 +392,18 @@ export default function RentalManagement() {
           </TabsContent>
         </Tabs>
 
-        {/* Dialog Détails */}
-        <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Détails de la demande</DialogTitle>
-              <DialogDescription>
+        {/* Side Panel Détails */}
+        <Sheet open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
+          <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle>Détails de la demande</SheetTitle>
+              <SheetDescription>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="font-medium">{selectedRequest?.request_number}</span>
                   {selectedRequest && getStatusBadge(selectedRequest.status)}
                 </div>
-              </DialogDescription>
-            </DialogHeader>
+              </SheetDescription>
+            </SheetHeader>
             {selectedRequest && (
               <div className="space-y-6">
                 {/* Informations sur l'événement */}
@@ -565,8 +572,8 @@ export default function RentalManagement() {
                 </div>
               </div>
             )}
-          </DialogContent>
-        </Dialog>
+          </SheetContent>
+        </Sheet>
 
         {/* Dialog Validation */}
         <Dialog open={validationDialogOpen} onOpenChange={setValidationDialogOpen}>
