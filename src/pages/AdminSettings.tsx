@@ -33,7 +33,7 @@ export default function AdminSettings() {
     },
     {
       icon: MapPin,
-      title: "Gestion des Locations",
+      title: "Demandes de Locations",
       description: "Gérer les demandes de location d'espaces et la disponibilité",
       href: "/admin/rental-management",
       permission: "requests.manage",
