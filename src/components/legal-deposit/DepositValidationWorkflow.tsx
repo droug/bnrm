@@ -1335,17 +1335,17 @@ export function DepositValidationWorkflow() {
         </SheetContent>
       </Sheet>
 
-      {/* View-Only Details Dialog */}
-      <Dialog open={isViewDetailsOpen} onOpenChange={setIsViewDetailsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
+      {/* View-Only Details Sheet */}
+      <Sheet open={isViewDetailsOpen} onOpenChange={setIsViewDetailsOpen}>
+        <SheetContent className="w-full sm:max-w-4xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>
               Détails de la demande - {viewDetailsRequest?.request_number}
-            </DialogTitle>
-            <DialogDescription>
+            </SheetTitle>
+            <SheetDescription>
               Consultation en lecture seule des informations de la demande
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
           
           {viewDetailsRequest && (
             <>
@@ -1358,8 +1358,8 @@ export function DepositValidationWorkflow() {
               </div>
             </>
           )}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* Modale "En attente de traitement" */}
       <Dialog open={showPendingModal} onOpenChange={setShowPendingModal}>
