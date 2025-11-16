@@ -15,7 +15,7 @@ const CustomDialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "dialog-overlay fixed inset-0 bg-black/50 backdrop-filter backdrop-blur-sm",
+      "dialog-overlay fixed inset-0 bg-black/20 backdrop-filter backdrop-blur-sm",
       "data-[state=open]:animate-in data-[state=closed]:animate-out",
       "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className

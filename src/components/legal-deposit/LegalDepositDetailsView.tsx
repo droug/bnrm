@@ -615,7 +615,7 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
           )}
           
           {previewDocument && (
-            <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setPreviewDocument(null)}>
+            <div className="fixed inset-0 bg-black/20 z-50 flex items-center justify-center p-4" onClick={() => setPreviewDocument(null)}>
               <div className="bg-background rounded-lg max-w-4xl max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
                 <div className="sticky top-0 bg-background border-b p-4 flex items-center justify-between">
                   <h3 className="font-semibold">{previewDocument.label}</h3>
