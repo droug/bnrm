@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/hooks/useLanguage";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -215,13 +216,14 @@ const App = () => {
   useAutoSync(true);
   
   return (
-    <LanguageProvider>
-      <PerformanceOptimizer />
-      <ScrollToTop />
-      <Toaster />
-      <Sonner />
-      <Suspense fallback={<PageLoader />}>
-          <Routes>
+    <ThemeProvider>
+      <LanguageProvider>
+        <PerformanceOptimizer />
+        <ScrollToTop />
+        <Toaster />
+        <Sonner />
+        <Suspense fallback={<PageLoader />}>
+            <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/auth" element={<Auth />} />
@@ -457,6 +459,7 @@ const App = () => {
         </Suspense>
         <CookieBanner />
       </LanguageProvider>
+    </ThemeProvider>
   );
 };
 
