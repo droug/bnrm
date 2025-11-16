@@ -95,10 +95,16 @@ export default function AccessRequestsManagement() {
       
       setRequests(data || []);
       
-      // Extract unique service names
-      const uniqueServices = Array.from(
-        new Set(data?.map(r => r.bnrm_services.nom_service) || [])
-      ).sort();
+      // Load only subscription services (categorie = 'Abonnement')
+      const { data: subscriptionServices, error: servicesError } = await supabase
+        .from('bnrm_services')
+        .select('nom_service')
+        .eq('categorie', 'Abonnement')
+        .order('nom_service');
+      
+      if (servicesError) throw servicesError;
+      
+      const uniqueServices = subscriptionServices?.map(s => s.nom_service) || [];
       setServices(uniqueServices);
     } catch (error) {
       console.error('Error fetching requests:', error);
