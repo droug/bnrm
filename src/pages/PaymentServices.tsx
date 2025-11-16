@@ -22,7 +22,8 @@ import {
   Lock,
   Zap,
   Wrench,
-  Scan
+  Scan,
+  Package
 } from "lucide-react";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import { DailyPassForm } from "@/components/daily-pass/DailyPassForm";
@@ -175,6 +176,21 @@ export default function PaymentServices() {
         "Tarification adaptée"
       ],
       action: () => navigate("/cultural-activities-booking"),
+      available: true
+    },
+    {
+      id: "location-services",
+      title: "Services location à la demande",
+      description: "Louez nos espaces et équipements pour vos besoins",
+      icon: Package,
+      color: "from-blue-500 to-blue-600",
+      features: [
+        "Auditorium équipé",
+        "Salle de conférence",
+        "Espace enfants",
+        "Réservation de Box"
+      ],
+      action: () => navigate("/tarifs-bnrm"),
       available: true
     }
   ];
