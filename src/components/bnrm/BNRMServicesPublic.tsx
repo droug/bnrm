@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ServiceRegistrationDialog } from "@/components/bnrm/ServiceRegistrationDialog";
 import { BoxReservationDialog } from "@/components/bnrm/BoxReservationDialog";
+import { RentalRequestDialog } from "@/components/bnrm/RentalRequestDialog";
 import {
   Select,
   SelectContent,
@@ -66,8 +67,10 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
   const [boxReservationDialogOpen, setBoxReservationDialogOpen] = useState(false);
+  const [rentalDialogOpen, setRentalDialogOpen] = useState(false);
   const [selectedServiceForRegistration, setSelectedServiceForRegistration] = useState<BNRMService | null>(null);
   const [selectedTariffForRegistration, setSelectedTariffForRegistration] = useState<BNRMTariff | null>(null);
+  const [selectedRentalSpace, setSelectedRentalSpace] = useState<RentalSpace | null>(null);
   const [boxTariff, setBoxTariff] = useState<BNRMTariff | undefined>(undefined);
   const { toast } = useToast();
 
@@ -455,10 +458,8 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
                       
                       <Button 
                         onClick={() => {
-                          toast({
-                            title: "Formulaire de réservation",
-                            description: "Le formulaire de réservation sera bientôt disponible",
-                          });
+                          setSelectedRentalSpace(space);
+                          setRentalDialogOpen(true);
                         }}
                         className="w-full"
                       >
@@ -606,11 +607,19 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
         />
       )}
       
-      <BoxReservationDialog
+      <BoxReservationDialog 
         open={boxReservationDialogOpen}
         onOpenChange={setBoxReservationDialogOpen}
         tariff={boxTariff}
       />
+
+      {selectedRentalSpace && (
+        <RentalRequestDialog
+          open={rentalDialogOpen}
+          onOpenChange={setRentalDialogOpen}
+          space={selectedRentalSpace}
+        />
+      )}
     </div>
   );
 }
