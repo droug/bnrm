@@ -8090,6 +8090,8 @@ export type Database = {
           created_at: string | null
           id: string
           is_paid: boolean | null
+          processed_at: string | null
+          processed_by: string | null
           registration_data: Json
           service_id: string
           status: string
@@ -8102,6 +8104,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_paid?: boolean | null
+          processed_at?: string | null
+          processed_by?: string | null
           registration_data?: Json
           service_id: string
           status?: string
@@ -8114,6 +8118,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_paid?: boolean | null
+          processed_at?: string | null
+          processed_by?: string | null
           registration_data?: Json
           service_id?: string
           status?: string
