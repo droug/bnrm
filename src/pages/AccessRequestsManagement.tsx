@@ -39,6 +39,7 @@ interface ServiceRegistration {
     montant: number;
     devise: string;
     periode_validite: string;
+    condition_tarif?: string | null;
   } | null;
 }
 
@@ -381,6 +382,7 @@ export default function AccessRequestsManagement() {
                         <TableHead>Date</TableHead>
                         <TableHead>Utilisateur</TableHead>
                         <TableHead>Service</TableHead>
+                        <TableHead>Formule</TableHead>
                         <TableHead>Catégorie</TableHead>
                         <TableHead>Région</TableHead>
                         <TableHead>Tarif</TableHead>
@@ -427,6 +429,11 @@ export default function AccessRequestsManagement() {
                                 Pages: {request.registration_data.pageCount}
                               </div>
                             )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">
+                              {request.registration_data.formuleType || request.bnrm_tarifs?.condition_tarif || "Non spécifié"}
+                            </Badge>
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline">
@@ -513,6 +520,10 @@ export default function AccessRequestsManagement() {
                                       <div>
                                         <label className="text-sm font-medium text-muted-foreground">Service</label>
                                         <p className="text-sm font-medium">{request.bnrm_services.nom_service}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium text-muted-foreground">Type de formule</label>
+                                        <p className="text-sm font-medium">{request.registration_data.formuleType || request.bnrm_tarifs?.condition_tarif || "Non spécifié"}</p>
                                       </div>
                                       <div>
                                         <label className="text-sm font-medium text-muted-foreground">Catégorie</label>
