@@ -34,11 +34,11 @@ export default function BNRMTariffsPage() {
         <div className="flex items-center space-x-4">
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(-1)}
             className="flex items-center space-x-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Retour au tableau de bord</span>
+            <span>Retour</span>
           </Button>
         </div>
         
