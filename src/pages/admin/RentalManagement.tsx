@@ -42,6 +42,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { SpaceAvailabilityManagement } from "@/components/rental/SpaceAvailabilityManagement";
 
 interface RentalSpace {
   id: string;
@@ -223,6 +224,7 @@ export default function RentalManagement() {
           <TabsList>
             <TabsTrigger value="requests">Demandes de location</TabsTrigger>
             <TabsTrigger value="spaces">Espaces disponibles</TabsTrigger>
+            <TabsTrigger value="availability">Gestion disponibilité</TabsTrigger>
           </TabsList>
 
           {/* Demandes de location */}
