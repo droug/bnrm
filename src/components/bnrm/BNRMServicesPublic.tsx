@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, FileText, Printer, Users, BookOpen, Package } from "lucide-react";
+import { Search, FileText, Printer, Users, BookOpen, Package, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ServiceRegistrationDialog } from "@/components/bnrm/ServiceRegistrationDialog";
@@ -59,6 +60,7 @@ interface BNRMServicesPublicProps {
 }
 
 export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
+  const navigate = useNavigate();
   const [services, setServices] = useState<BNRMService[]>([]);
   const [tariffs, setTariffs] = useState<BNRMTariff[]>([]);
   const [rentalSpaces, setRentalSpaces] = useState<RentalSpace[]>([]);
@@ -209,6 +211,18 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
 
   return (
     <div className="space-y-6">
+      {/* Back Button */}
+      <div className="container mx-auto px-4">
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/services-bnrm")}
+          className="gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour
+        </Button>
+      </div>
+
       {/* Title */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4">
