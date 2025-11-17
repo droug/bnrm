@@ -47,7 +47,7 @@ export default function CmsPageRenderer({ slug, language = 'fr' }: CmsPageRender
         }
 
         const data = await response.json();
-        setPage(data.page);
+        setPage(data);
         setSections(data.sections || []);
 
       } catch (err: any) {
@@ -64,11 +64,10 @@ export default function CmsPageRenderer({ slug, language = 'fr' }: CmsPageRender
   const renderSection = (section: any) => {
     const props = {
       section,
-      language,
-      key: section.id
+      language
     };
 
-    switch (section.section_type) {
+    switch (section.type || section.section_type) {
       case 'hero':
         return <HeroSection {...props} />;
       case 'richtext':
@@ -113,9 +112,9 @@ export default function CmsPageRenderer({ slug, language = 'fr' }: CmsPageRender
     );
   }
 
-  const title = language === 'ar' ? page.title_ar || page.title_fr : page.title_fr;
-  const seoTitle = language === 'ar' ? page.seo_title_ar || page.seo_title_fr : page.seo_title_fr;
-  const seoDescription = language === 'ar' ? page.seo_description_ar || page.seo_description_fr : page.seo_description_fr;
+  const title = page.title;
+  const seoTitle = page.seo?.title;
+  const seoDescription = page.seo?.description;
 
   return (
     <>
@@ -124,11 +123,12 @@ export default function CmsPageRenderer({ slug, language = 'fr' }: CmsPageRender
         {seoDescription && <meta name="description" content={seoDescription} />}
         <meta property="og:title" content={seoTitle || title} />
         {seoDescription && <meta property="og:description" content={seoDescription} />}
-        {page.og_image && <meta property="og:image" content={page.og_image} />}
       </Helmet>
 
       <div className="cms-page" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-        {sections.map(section => renderSection(section))}
+        {sections.map((section, index) => (
+          <div key={index}>{renderSection(section)}</div>
+        ))}
       </div>
     </>
   );
