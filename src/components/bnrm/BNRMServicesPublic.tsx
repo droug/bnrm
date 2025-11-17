@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Search, FileText, Printer, Users, BookOpen, Package, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -65,8 +64,6 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
   const [tariffs, setTariffs] = useState<BNRMTariff[]>([]);
   const [rentalSpaces, setRentalSpaces] = useState<RentalSpace[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
   const [boxReservationDialogOpen, setBoxReservationDialogOpen] = useState(false);
   const [rentalDialogOpen, setRentalDialogOpen] = useState(false);
@@ -133,12 +130,7 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
     service.categorie !== "Inscription"
   );
 
-  const filteredSubscriptionServices = subscriptionServices.filter((service) => {
-    const matchesSearch = service.nom_service.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || service.categorie === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredSubscriptionServices = subscriptionServices;
 
   // Services de location à la demande - Charger depuis rental_spaces
   const locationSpacesDisplay = rentalSpaces.filter((space) => space.is_active);
@@ -163,12 +155,7 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
     displayOneTimeServices = true;
   }
 
-  const filteredOneTimeServices = oneTimeServices.filter((service) => {
-    const matchesSearch = service.nom_service.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || service.categorie === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredOneTimeServices = oneTimeServices;
 
   // Obtenir les tarifs pour un service spécifique
   const getTariffsForService = (serviceId: string) => {
@@ -241,19 +228,6 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
         </p>
       </div>
 
-      {/* Search */}
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher un service..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </div>
-
       {/* Tabs for Subscriptions and One-Time Services */}
       <Tabs defaultValue={filterType === "location" ? "services" : "abonnements"} className="w-full">
         {!filterType && (
@@ -265,23 +239,6 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
 
         {/* Subscriptions Tab */}
         {displaySubscriptions && <TabsContent value="abonnements" className="space-y-6 mt-6">
-          <div className="flex gap-4 items-center">
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-[200px] h-11 text-base font-medium">
-                <SelectValue placeholder="Catégorie" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover">
-                <SelectItem value="all" className="text-base">Toutes les catégories</SelectItem>
-                <SelectItem value="Dépôt légal" className="text-base">Dépôt légal</SelectItem>
-                <SelectItem value="Reproduction" className="text-base">Reproduction</SelectItem>
-                <SelectItem value="Recherche" className="text-base">Recherche</SelectItem>
-                <SelectItem value="Numérisation" className="text-base">Numérisation</SelectItem>
-                <SelectItem value="Formation" className="text-base">Formation</SelectItem>
-                <SelectItem value="Inscription" className="text-base">Inscription</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredSubscriptionServices.map((service) => {
               const serviceTariffs = getTariffsForService(service.id_service);
@@ -368,22 +325,6 @@ export function BNRMServicesPublic({ filterType }: BNRMServicesPublicProps) {
 
         {/* One-Time Services Tab */}
         {(displayLocationServices || displayOneTimeServices) && <TabsContent value="services" className="space-y-6 mt-6">
-          <div className="flex gap-4 items-center">
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-[200px] h-11 text-base font-medium">
-                <SelectValue placeholder="Catégorie" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover">
-                <SelectItem value="all" className="text-base">Toutes les catégories</SelectItem>
-                <SelectItem value="Dépôt légal" className="text-base">Dépôt légal</SelectItem>
-                <SelectItem value="Reproduction" className="text-base">Reproduction</SelectItem>
-                <SelectItem value="Recherche" className="text-base">Recherche</SelectItem>
-                <SelectItem value="Numérisation" className="text-base">Numérisation</SelectItem>
-                <SelectItem value="Formation" className="text-base">Formation</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Services Location à la demande - Grid Cards */}
           {displayLocationServices && locationSpacesDisplay.length > 0 && (
             <>
