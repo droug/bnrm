@@ -83,3 +83,10 @@ verify_jwt = false
 
 [functions.generate-restoration-pdf]
 verify_jwt = false
+
+# CMS Headless Functions
+[functions.cms-api]
+verify_jwt = false
+
+[functions.cms-admin-api]
+verify_jwt = true
