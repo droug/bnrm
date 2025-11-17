@@ -26,7 +26,7 @@ export default function MediaUploadDialog({ open, onOpenChange, onSuccess }: Med
     alt_ar: "",
     description_fr: "",
     description_ar: "",
-    media_type: "image" as "image" | "video" | "document" | "audio",
+    file_type: "image" as "image" | "video" | "document" | "audio",
     tags: "",
   });
 
@@ -36,13 +36,13 @@ export default function MediaUploadDialog({ open, onOpenChange, onSuccess }: Med
       setFile(selectedFile);
       // Auto-detect media type
       if (selectedFile.type.startsWith("image/")) {
-        setMetadata(prev => ({ ...prev, media_type: "image" }));
+        setMetadata(prev => ({ ...prev, file_type: "image" }));
       } else if (selectedFile.type.startsWith("video/")) {
-        setMetadata(prev => ({ ...prev, media_type: "video" }));
+        setMetadata(prev => ({ ...prev, file_type: "video" }));
       } else if (selectedFile.type.startsWith("audio/")) {
-        setMetadata(prev => ({ ...prev, media_type: "audio" }));
+        setMetadata(prev => ({ ...prev, file_type: "audio" }));
       } else {
-        setMetadata(prev => ({ ...prev, media_type: "document" }));
+        setMetadata(prev => ({ ...prev, file_type: "document" }));
       }
     }
   };
@@ -90,7 +90,7 @@ export default function MediaUploadDialog({ open, onOpenChange, onSuccess }: Med
           file_url: publicUrl,
           file_size_kb: Math.round(fileToUpload.size / 1024),
           mime_type: file.type,
-          media_type: metadata.media_type,
+          file_type: metadata.file_type,
           title_fr: metadata.title_fr || file.name,
           title_ar: metadata.title_ar,
           alt_fr: metadata.alt_fr,
@@ -115,7 +115,7 @@ export default function MediaUploadDialog({ open, onOpenChange, onSuccess }: Med
         alt_ar: "",
         description_fr: "",
         description_ar: "",
-        media_type: "image",
+        file_type: "image",
         tags: "",
       });
     } catch (error) {
@@ -152,10 +152,10 @@ export default function MediaUploadDialog({ open, onOpenChange, onSuccess }: Med
 
           {/* Media type */}
           <div>
-            <Label htmlFor="media_type">Type de média</Label>
+            <Label htmlFor="file_type">Type de média</Label>
             <Select
-              value={metadata.media_type}
-              onValueChange={(value) => setMetadata(prev => ({ ...prev, media_type: value as any }))}
+              value={metadata.file_type}
+              onValueChange={(value) => setMetadata(prev => ({ ...prev, file_type: value as any }))}
             >
               <SelectTrigger>
                 <SelectValue />
