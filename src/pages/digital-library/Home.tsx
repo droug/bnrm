@@ -12,6 +12,7 @@ import { ReservationRequestDialog } from "@/components/digital-library/Reservati
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Autoplay from "embla-carousel-autoplay";
+import { format } from "date-fns";
 import document1 from "@/assets/digital-library/document-1.jpg";
 import document2 from "@/assets/digital-library/document-2.jpg";
 import document3 from "@/assets/digital-library/document-3.jpg";
@@ -58,6 +59,10 @@ export default function DigitalLibraryHome() {
   }, [session]);
 
   const [newItems, setNewItems] = useState<any[]>([]);
+  const [featuredCollections, setFeaturedCollections] = useState<any[]>([]);
+  const [featuredThemes, setFeaturedThemes] = useState<any[]>([]);
+  const [newsArticles, setNewsArticles] = useState<any[]>([]);
+  const [statsData, setStatsData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -138,7 +143,6 @@ export default function DigitalLibraryHome() {
   };
 
   const handleConsultDocument = (item: any) => {
-    // Déterminer si c'est un manuscrit ou un document
     const isManuscript = item.type === 'Manuscrit' || item.file_type === 'manuscript';
     
     if (isManuscript) {
@@ -148,42 +152,135 @@ export default function DigitalLibraryHome() {
     }
   };
 
-  const featuredCollections = [
-    {
-      id: "books",
-      title: "Livres numériques",
-      icon: BookOpen,
-      count: "45,670",
-      href: "/digital-library/collections/books",
-    },
-    {
-      id: "periodicals",
-      title: "Revues et périodiques",
-      icon: FileText,
-      count: "8,320",
-      href: "/digital-library/collections/periodicals",
-    },
-    {
-      id: "photos",
-      title: "Photographies",
-      icon: Image,
-      count: "15,890",
-      href: "/digital-library/collections/photos",
-    },
-    {
-      id: "audiovisual",
-      title: "Archives A/V",
-      icon: Music,
-      count: "2,890",
-      href: "/digital-library/collections/audiovisual",
-    },
-  ];
+  useEffect(() => {
+    const loadHomeContent = async () => {
+      // Charger les collections depuis le CMS (tag: home-collection)
+      const { data: collections } = await supabase
+        .from('content')
+        .select('*')
+        .eq('content_type', 'page')
+        .eq('status', 'published')
+        .eq('is_featured', true)
+        .contains('tags', ['home-collection'])
+        .order('created_at', { ascending: false })
+        .limit(4);
+      
+      if (collections && collections.length > 0) {
+        setFeaturedCollections(collections.map(col => ({
+          id: col.id,
+          title: col.title,
+          icon: BookOpen,
+          count: col.meta_description || "0",
+          href: col.slug || '#',
+          image: col.featured_image_url || manuscritsAndalous,
+          description: col.excerpt
+        })));
+      } else {
+        // Valeurs par défaut
+        setFeaturedCollections([
+          {
+            id: "books",
+            title: "Livres numériques",
+            icon: BookOpen,
+            count: "45,670",
+            href: "/digital-library/collections/books",
+            image: manuscritsAndalous
+          },
+          {
+            id: "periodicals",
+            title: "Revues et périodiques",
+            icon: FileText,
+            count: "8,320",
+            href: "/digital-library/collections/periodicals",
+            image: manuscritsAndalous
+          },
+          {
+            id: "photos",
+            title: "Photographies",
+            icon: Image,
+            count: "15,890",
+            href: "/digital-library/collections/photos",
+            image: manuscritsAndalous
+          },
+          {
+            id: "audiovisual",
+            title: "Archives A/V",
+            icon: Music,
+            count: "2,890",
+            href: "/digital-library/collections/audiovisual",
+            image: manuscritsAndalous
+          },
+        ]);
+      }
 
-  const featuredThemes = [
-    { id: "history", title: "Histoire & Patrimoine", emoji: "🏛️", href: "/digital-library/themes/history" },
-    { id: "arts", title: "Arts & Culture", emoji: "🎨", href: "/digital-library/themes/arts" },
-    { id: "literature", title: "Littérature & Poésie", emoji: "✍️", href: "/digital-library/themes/literature" },
-  ];
+      // Charger les thèmes (tag: home-theme)
+      const { data: themes } = await supabase
+        .from('content')
+        .select('*')
+        .eq('content_type', 'page')
+        .eq('status', 'published')
+        .eq('is_featured', true)
+        .contains('tags', ['home-theme'])
+        .order('created_at', { ascending: false })
+        .limit(6);
+      
+      if (themes && themes.length > 0) {
+        setFeaturedThemes(themes.map(theme => ({
+          id: theme.id,
+          title: theme.title,
+          emoji: theme.meta_description || '📚',
+          href: theme.slug || '#'
+        })));
+      } else {
+        // Valeurs par défaut
+        setFeaturedThemes([
+          { id: "history", title: "Histoire & Patrimoine", emoji: "🏛️", href: "/digital-library/themes/history" },
+          { id: "arts", title: "Arts & Culture", emoji: "🎨", href: "/digital-library/themes/arts" },
+          { id: "literature", title: "Littérature & Poésie", emoji: "✍️", href: "/digital-library/themes/literature" },
+        ]);
+      }
+
+      // Charger les actualités
+      const { data: news } = await supabase
+        .from('content')
+        .select('*')
+        .eq('content_type', 'news')
+        .eq('status', 'published')
+        .eq('is_featured', true)
+        .order('published_at', { ascending: false })
+        .limit(2);
+      
+      if (news) {
+        setNewsArticles(news);
+      }
+
+      // Charger les statistiques (tag: home-stats)
+      const { data: stats } = await supabase
+        .from('content')
+        .select('*')
+        .eq('content_type', 'page')
+        .eq('status', 'published')
+        .contains('tags', ['home-stats'])
+        .order('created_at', { ascending: false })
+        .limit(3);
+      
+      if (stats && stats.length > 0) {
+        setStatsData(stats.map(stat => ({
+          label: stat.title,
+          value: stat.meta_description || '0'
+        })));
+      } else {
+        // Valeurs par défaut
+        setStatsData([
+          { label: "Manuscrits numérisés", value: "12,450" },
+          { label: "Documents historiques", value: "5,230" },
+          { label: "Images et cartes", value: "8,760" },
+        ]);
+      }
+    };
+
+    loadHomeContent();
+  }, []);
 
   return (
     <DigitalLibraryLayout>
@@ -372,77 +469,68 @@ export default function DigitalLibraryHome() {
       </section>
 
       {/* Latest News */}
-      <section className="bg-muted/30 py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
-              <Calendar className="h-8 w-8 text-primary" />
-              Actualités récentes
-            </h2>
-            <Link to="/digital-library/news">
-              <Button variant="outline">Toutes les actualités</Button>
-            </Link>
-          </div>
+      {newsArticles.length > 0 && (
+        <section className="bg-muted/30 py-12">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
+                <Calendar className="h-8 w-8 text-primary" />
+                Actualités récentes
+              </h2>
+              <Link to="/digital-library/news">
+                <Button variant="outline">Toutes les actualités</Button>
+              </Link>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <Badge className="w-fit mb-2">Nouvelle collection</Badge>
-                <CardTitle>Manuscrits andalous numérisés</CardTitle>
-                <CardDescription>
-                  Découvrez notre dernière collection de 150 manuscrits andalous du XIIe au XVe siècle
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link to="/digital-library/news/1">
-                  <Button variant="outline" className="w-full">Lire la suite</Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <Badge className="w-fit mb-2 bg-purple-100 text-purple-800">Exposition</Badge>
-                <CardTitle>Le Maroc à travers les âges</CardTitle>
-                <CardDescription>
-                  Une exposition virtuelle interactive sur l'histoire du Maroc
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link to="/digital-library/news/2">
-                  <Button variant="outline" className="w-full">Découvrir</Button>
-                </Link>
-              </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {newsArticles.map((article) => (
+                <Card key={article.id}>
+                  {article.featured_image_url && (
+                    <div className="aspect-video bg-muted relative overflow-hidden">
+                      <img 
+                        src={article.featured_image_url}
+                        alt={article.title}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                  )}
+                  <CardHeader>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                      <Calendar className="h-4 w-4" />
+                      <span>{article.published_at ? format(new Date(article.published_at), 'dd MMMM yyyy') : ''}</span>
+                    </div>
+                    <CardTitle>{article.title}</CardTitle>
+                    <CardDescription>{article.excerpt}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link to={`/digital-library/news/${article.id}`}>
+                      <Button variant="outline" className="w-full">Lire la suite</Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Quick Stats */}
-      <section className="container mx-auto px-4 py-12">
-        <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-2">
-          <CardContent className="py-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="text-4xl font-bold text-primary mb-2">100K+</div>
-                <div className="text-sm text-muted-foreground">Documents</div>
+      {statsData.length > 0 && (
+        <section className="container mx-auto px-4 py-12">
+          <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-2">
+            <CardContent className="py-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
+                {statsData.map((stat, index) => (
+                  <div key={index}>
+                    <div className="text-4xl font-bold text-primary mb-2">{stat.value}</div>
+                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  </div>
+                ))}
               </div>
-              <div>
-                <div className="text-4xl font-bold text-primary mb-2">45K+</div>
-                <div className="text-sm text-muted-foreground">Livres</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-primary mb-2">12K+</div>
-                <div className="text-sm text-muted-foreground">Manuscrits</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-primary mb-2">15K+</div>
-                <div className="text-sm text-muted-foreground">Images</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
+            </CardContent>
+          </Card>
+        </section>
+      )}
 
       {/* Reservation Dialog */}
       {selectedDocument && userProfile && (
