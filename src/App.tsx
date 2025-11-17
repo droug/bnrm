@@ -76,6 +76,11 @@ const ReservationEspaces = lazy(() => import("./pages/ReservationEspaces"));
 const Abonnements = lazy(() => import("./pages/Abonnements"));
 
 // Legal Deposit (lazy)
+const LegalDepositTypes = lazy(() => import("./pages/LegalDepositTypes"));
+const BooksDeposit = lazy(() => import("./pages/legal-deposit/BooksDeposit"));
+const PeriodicalsDeposit = lazy(() => import("./pages/legal-deposit/PeriodicalsDeposit"));
+const AudiovisualDeposit = lazy(() => import("./pages/legal-deposit/AudiovisualDeposit"));
+const SpecializedCollectionsDeposit = lazy(() => import("./pages/legal-deposit/SpecializedCollectionsDeposit"));
 const LegalDepositPage = lazy(() => import("./pages/LegalDepositPage"));
 const LegalDepositApprovals = lazy(() => import("./pages/LegalDepositApprovals"));
 const DynamicFormPage = lazy(() => import("./pages/DynamicFormPage"));
@@ -263,6 +268,11 @@ const App = () => {
         <Route path="/services-tarifs" element={<ServicesCatalog />} />
         <Route path="/bibliographies" element={<BibliographiesNationales />} />
         <Route path="/admin/legal-deposit" element={<LegalDepositPage />} />
+        <Route path="/depot-legal" element={<LegalDepositTypes />} />
+        <Route path="/depot-legal/livres" element={<BooksDeposit />} />
+        <Route path="/depot-legal/periodiques" element={<PeriodicalsDeposit />} />
+        <Route path="/depot-legal/audiovisuel" element={<AudiovisualDeposit />} />
+        <Route path="/depot-legal/collections-specialisees" element={<SpecializedCollectionsDeposit />} />
         <Route path="/form" element={<DynamicFormPage />} />
         <Route path="/admin/archiving" element={<ArchivingPage />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
