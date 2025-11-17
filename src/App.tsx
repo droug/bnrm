@@ -296,7 +296,7 @@ const App = () => {
         <Route path="/admin/committee" element={<CommitteeDashboard />} />
         <Route path="/legal-deposit/approvals" element={<LegalDepositApprovals />} />
         <Route path="/depot-legal/approbations" element={<LegalDepositApprovals />} />
-          <Route path="/digital-library" element={<DigitalLibraryHome />} />
+          <Route path="/digital-library" element={<CmsDynamicPage />} />
           <Route path="/digital-library/collections" element={<Collections />} />
           <Route path="/digital-library/collections/:collectionId" element={<CollectionDetails />} />
           <Route path="/digital-library/document/:documentId" element={<DocumentDetails />} />
