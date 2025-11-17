@@ -173,6 +173,14 @@ export default function DigitalLibraryBackoffice() {
 
   const menuCards = [
     {
+      icon: FileText,
+      title: "Système de Gestion de Contenu",
+      description: "CMS complet pour créer et gérer tout le contenu de la plateforme",
+      count: documents?.length || 0,
+      action: () => navigate('/admin/content-management'),
+      gradient: "from-violet-500 to-purple-600"
+    },
+    {
       icon: BookOpen,
       title: "Gestion des documents numérisés",
       description: "Ajout/suppression de documents, gestion des permissions et visibilité",
