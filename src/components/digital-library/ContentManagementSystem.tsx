@@ -11,8 +11,10 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   FileText, 
   Plus, 
@@ -35,9 +37,14 @@ import {
   Search,
   Filter,
   LayoutGrid,
-  List
+  List,
+  X,
+  Settings,
+  ChevronDown,
+  Send
 } from "lucide-react";
 import { format } from "date-fns";
+import WysiwygEditor from "@/components/cms/WysiwygEditor";
 
 type ContentType = 'page' | 'news' | 'event' | 'exhibition';
 type ContentStatus = 'draft' | 'published' | 'archived';
@@ -502,238 +509,255 @@ export default function ContentManagementSystem() {
         </CardContent>
       </Card>
 
-      {/* Editor Dialog */}
+      {/* Editor Dialog - WordPress Style */}
       <Dialog open={showEditor} onOpenChange={setShowEditor}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editingContent ? 'Modifier le contenu' : 'Nouveau contenu'}
-            </DialogTitle>
-            <DialogDescription>
-              Créez ou modifiez le contenu de votre bibliothèque numérique
-            </DialogDescription>
-          </DialogHeader>
-
-          <Tabs defaultValue="general" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="general">Général</TabsTrigger>
-              <TabsTrigger value="content">Contenu</TabsTrigger>
-              <TabsTrigger value="media">Médias</TabsTrigger>
-              <TabsTrigger value="seo">SEO</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="general" className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Titre *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Entrez le titre du contenu"
-                />
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 gap-0">
+          <div className="flex flex-col h-[95vh]">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b p-4 bg-muted/30">
+              <DialogTitle className="flex items-center gap-2">
+                <FileEdit className="h-5 w-5" />
+                {editingContent ? 'Modifier le contenu' : 'Nouveau contenu'}
+              </DialogTitle>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={closeEditor}>
+                  Annuler
+                </Button>
+                <Button onClick={() => saveContent.mutate()} disabled={!formData.title}>
+                  <Send className="h-4 w-4 mr-2" />
+                  {editingContent ? 'Mettre à jour' : 'Publier'}
+                </Button>
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="content_type">Type de contenu</Label>
-                  <Select
-                    value={formData.content_type}
-                    onValueChange={(value: ContentType) => 
-                      setFormData({ ...formData, content_type: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="page">Page</SelectItem>
-                      <SelectItem value="news">Actualité</SelectItem>
-                      <SelectItem value="event">Événement</SelectItem>
-                      <SelectItem value="exhibition">Exhibition</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div className="flex flex-1 overflow-hidden">
+              {/* Main Editor Area */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                <div className="max-w-4xl mx-auto space-y-6">
+                  <div className="space-y-2">
+                    <Input
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="Saisissez le titre ici"
+                      className="text-3xl font-bold border-0 focus-visible:ring-0 px-0 h-auto"
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="status">Statut</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value: ContentStatus) => 
-                      setFormData({ ...formData, status: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Brouillon</SelectItem>
-                      <SelectItem value="published">Publié</SelectItem>
-                      <SelectItem value="archived">Archivé</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="space-y-2">
+                    <Input
+                      value={formData.slug}
+                      onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                      placeholder="slug-de-lurl"
+                      className="text-sm text-muted-foreground border-0 focus-visible:ring-0 px-0"
+                    />
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-2">
+                    <WysiwygEditor
+                      value={formData.content_body}
+                      onChange={(value) => setFormData({ ...formData, content_body: value })}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Extrait</Label>
+                    <Textarea
+                      value={formData.excerpt}
+                      onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                      placeholder="Résumé optionnel du contenu..."
+                      rows={3}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Les extraits sont des résumés courts de votre contenu qui s'affichent dans les listes.
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="slug">Slug (URL)</Label>
-                <Input
-                  id="slug"
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="url-du-contenu"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Laissez vide pour générer automatiquement à partir du titre
-                </p>
-              </div>
+              {/* Sidebar */}
+              <div className="w-80 border-l bg-muted/20 overflow-y-auto">
+                <div className="p-4 space-y-6">
+                  {/* Publication */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Send className="h-4 w-4" />
+                        Publication
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Statut</Label>
+                        <Select
+                          value={formData.status}
+                          onValueChange={(value: ContentStatus) => 
+                            setFormData({ ...formData, status: value })
+                          }
+                        >
+                          <SelectTrigger className="h-8">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="draft">Brouillon</SelectItem>
+                            <SelectItem value="published">Publié</SelectItem>
+                            <SelectItem value="archived">Archivé</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="excerpt">Résumé</Label>
-                <Textarea
-                  id="excerpt"
-                  value={formData.excerpt}
-                  onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                  placeholder="Bref résumé du contenu"
-                  rows={3}
-                />
-              </div>
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="sidebar-visible"
+                          checked={formData.is_visible}
+                          onCheckedChange={(checked) => 
+                            setFormData({ ...formData, is_visible: checked })
+                          }
+                        />
+                        <Label htmlFor="sidebar-visible" className="text-sm">
+                          Visible pour le public
+                        </Label>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_visible"
-                  checked={formData.is_visible}
-                  onCheckedChange={(checked) => 
-                    setFormData({ ...formData, is_visible: checked })
-                  }
-                />
-                <Label htmlFor="is_visible">Visible pour le public</Label>
-              </div>
-            </TabsContent>
+                  {/* Type de contenu */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Type de contenu
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Select
+                        value={formData.content_type}
+                        onValueChange={(value: ContentType) => 
+                          setFormData({ ...formData, content_type: value })
+                        }
+                      >
+                        <SelectTrigger className="h-8">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="page">Page</SelectItem>
+                          <SelectItem value="news">Actualité</SelectItem>
+                          <SelectItem value="event">Événement</SelectItem>
+                          <SelectItem value="exhibition">Exhibition</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </CardContent>
+                  </Card>
 
-            <TabsContent value="content" className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="content_body">Contenu principal</Label>
-                <Textarea
-                  id="content_body"
-                  value={formData.content_body}
-                  onChange={(e) => setFormData({ ...formData, content_body: e.target.value })}
-                  placeholder="Contenu détaillé..."
-                  rows={15}
-                  className="font-mono text-sm"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Vous pouvez utiliser du HTML ou du Markdown
-                </p>
-              </div>
-            </TabsContent>
+                  {/* Image vedette */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <ImageIcon className="h-4 w-4" />
+                        Image vedette
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <Input
+                        value={formData.featured_image_url}
+                        onChange={(e) => 
+                          setFormData({ ...formData, featured_image_url: e.target.value })
+                        }
+                        placeholder="URL de l'image"
+                        className="h-8"
+                      />
+                      {formData.featured_image_url && (
+                        <div className="relative group">
+                          <img
+                            src={formData.featured_image_url}
+                            alt="Aperçu"
+                            className="w-full h-32 object-cover rounded border"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => setFormData({ ...formData, featured_image_url: '' })}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
 
-            <TabsContent value="media" className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="featured_image_url">URL de l'image vedette</Label>
-                <Input
-                  id="featured_image_url"
-                  value={formData.featured_image_url}
-                  onChange={(e) => 
-                    setFormData({ ...formData, featured_image_url: e.target.value })
-                  }
-                  placeholder="https://..."
-                />
-              </div>
+                  {/* SEO */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Globe className="h-4 w-4" />
+                        Référencement (SEO)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Titre SEO</Label>
+                        <Input
+                          value={formData.metadata.seo_title}
+                          onChange={(e) => 
+                            setFormData({
+                              ...formData,
+                              metadata: { ...formData.metadata, seo_title: e.target.value }
+                            })
+                          }
+                          placeholder="Titre optimisé"
+                          className="h-8"
+                          maxLength={60}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          {formData.metadata.seo_title.length}/60
+                        </p>
+                      </div>
 
-              {formData.featured_image_url && (
-                <div className="border rounded-lg p-4">
-                  <img
-                    src={formData.featured_image_url}
-                    alt="Aperçu"
-                    className="w-full max-h-64 object-contain"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Description SEO</Label>
+                        <Textarea
+                          value={formData.metadata.seo_description}
+                          onChange={(e) => 
+                            setFormData({
+                              ...formData,
+                              metadata: { ...formData.metadata, seo_description: e.target.value }
+                            })
+                          }
+                          placeholder="Description"
+                          rows={3}
+                          maxLength={160}
+                          className="resize-none"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          {formData.metadata.seo_description.length}/160
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Catégorie</Label>
+                        <Input
+                          value={formData.metadata.category}
+                          onChange={(e) => 
+                            setFormData({
+                              ...formData,
+                              metadata: { ...formData.metadata, category: e.target.value }
+                            })
+                          }
+                          placeholder="Culture, Histoire..."
+                          className="h-8"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              )}
-
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  <ImageIcon className="inline h-4 w-4 mr-2" />
-                  Conseil : Utilisez des images optimisées pour le web (format WebP, taille réduite)
-                </p>
               </div>
-            </TabsContent>
-
-            <TabsContent value="seo" className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="seo_title">Titre SEO</Label>
-                <Input
-                  id="seo_title"
-                  value={formData.metadata.seo_title}
-                  onChange={(e) => 
-                    setFormData({
-                      ...formData,
-                      metadata: { ...formData.metadata, seo_title: e.target.value }
-                    })
-                  }
-                  placeholder="Titre optimisé pour les moteurs de recherche"
-                  maxLength={60}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {formData.metadata.seo_title.length}/60 caractères
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="seo_description">Description SEO</Label>
-                <Textarea
-                  id="seo_description"
-                  value={formData.metadata.seo_description}
-                  onChange={(e) => 
-                    setFormData({
-                      ...formData,
-                      metadata: { ...formData.metadata, seo_description: e.target.value }
-                    })
-                  }
-                  placeholder="Description pour les moteurs de recherche"
-                  rows={3}
-                  maxLength={160}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {formData.metadata.seo_description.length}/160 caractères
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="category">Catégorie</Label>
-                <Input
-                  id="category"
-                  value={formData.metadata.category}
-                  onChange={(e) => 
-                    setFormData({
-                      ...formData,
-                      metadata: { ...formData.metadata, category: e.target.value }
-                    })
-                  }
-                  placeholder="Ex: Culture, Histoire, Événements"
-                />
-              </div>
-
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  <Globe className="inline h-4 w-4 mr-2" />
-                  Les métadonnées SEO améliorent la visibilité de votre contenu sur les moteurs de recherche
-                </p>
-              </div>
-            </TabsContent>
-          </Tabs>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={closeEditor}>
-              Annuler
-            </Button>
-            <Button onClick={() => saveContent.mutate()} disabled={!formData.title}>
-              <Save className="h-4 w-4 mr-2" />
-              {editingContent ? 'Mettre à jour' : 'Créer'}
-            </Button>
-          </DialogFooter>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
