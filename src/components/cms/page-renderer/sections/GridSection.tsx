@@ -1,9 +1,19 @@
+import { DynamicGridSection } from './DynamicGridSection';
+
 interface GridSectionProps {
   section: any;
   language: 'fr' | 'ar';
 }
 
 export function GridSection({ section, language }: GridSectionProps) {
+  const { dataSource } = section.props || {};
+  
+  // Si un dataSource est spécifié, utiliser le composant dynamique
+  if (dataSource) {
+    return <DynamicGridSection section={section} language={language} />;
+  }
+  
+  // Sinon, utiliser le rendu statique
   const title = language === 'ar' ? section.title_ar || section.title_fr : section.title_fr;
   const { columns = 3, items = [] } = section.props || {};
 
