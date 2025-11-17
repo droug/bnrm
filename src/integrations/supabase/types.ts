@@ -12141,6 +12141,10 @@ export type Database = {
         Args: { exhibition_uuid: string }
         Returns: undefined
       }
+      increment_webhook_counter: {
+        Args: { p_success: boolean; p_webhook_id: string }
+        Returns: undefined
+      }
       insert_activity_log: {
         Args: {
           p_action: string
@@ -12207,6 +12211,15 @@ export type Database = {
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      trigger_cms_webhook: {
+        Args: {
+          p_data?: Json
+          p_entity_id: string
+          p_entity_type: string
+          p_event_type: string
+        }
+        Returns: Json
+      }
       update_wallet_balance: {
         Args: {
           p_amount: number
