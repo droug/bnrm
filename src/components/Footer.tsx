@@ -85,7 +85,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
     { title: "e-Wallet BNRM", href: "/wallet" },
     { title: "Services BNRM", href: "/tarifs-bnrm" },
     { title: "Reproduction", href: "/reproduction" },
-    { title: "Dépôt légal", href: "/admin/legal-deposit" }
+    { title: "Dépôt légal", href: "/depot-legal" }
   ];
 
   const socialLinks = [

@@ -160,7 +160,7 @@ export default function PaymentServices() {
         "Paiement en ligne",
         "Certificat numérique"
       ],
-      action: () => navigate("/admin/legal-deposit"),
+      action: () => navigate("/depot-legal"),
       available: user ? true : false
     },
     {
