@@ -6231,39 +6231,90 @@ export type Database = {
       }
       notifications: {
         Row: {
+          action_completed: boolean | null
+          action_completed_at: string | null
+          action_label: string | null
+          action_url: string | null
+          category: string | null
           created_at: string
+          created_by: string | null
           data: Json | null
+          expires_at: string | null
           id: string
           is_read: boolean | null
           link: string | null
           message: string
+          module: string | null
+          notification_number: string | null
+          priority: number | null
           read_at: string | null
+          related_url: string | null
+          requires_action: boolean | null
+          short_message: string | null
+          source_record_id: string | null
+          source_table: string | null
           title: string
           type: string
+          type_code: string | null
+          updated_at: string | null
           user_id: string
         }
         Insert: {
+          action_completed?: boolean | null
+          action_completed_at?: string | null
+          action_label?: string | null
+          action_url?: string | null
+          category?: string | null
           created_at?: string
+          created_by?: string | null
           data?: Json | null
+          expires_at?: string | null
           id?: string
           is_read?: boolean | null
           link?: string | null
           message: string
+          module?: string | null
+          notification_number?: string | null
+          priority?: number | null
           read_at?: string | null
+          related_url?: string | null
+          requires_action?: boolean | null
+          short_message?: string | null
+          source_record_id?: string | null
+          source_table?: string | null
           title: string
           type: string
+          type_code?: string | null
+          updated_at?: string | null
           user_id: string
         }
         Update: {
+          action_completed?: boolean | null
+          action_completed_at?: string | null
+          action_label?: string | null
+          action_url?: string | null
+          category?: string | null
           created_at?: string
+          created_by?: string | null
           data?: Json | null
+          expires_at?: string | null
           id?: string
           is_read?: boolean | null
           link?: string | null
           message?: string
+          module?: string | null
+          notification_number?: string | null
+          priority?: number | null
           read_at?: string | null
+          related_url?: string | null
+          requires_action?: boolean | null
+          short_message?: string | null
+          source_record_id?: string | null
+          source_table?: string | null
           title?: string
           type?: string
+          type_code?: string | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
