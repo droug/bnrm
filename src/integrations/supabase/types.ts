@@ -1855,6 +1855,655 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_actualites: {
+        Row: {
+          body_ar: string | null
+          body_fr: string | null
+          category: string | null
+          chapo_ar: string | null
+          chapo_fr: string | null
+          created_at: string | null
+          created_by: string | null
+          date_publication: string | null
+          id: string
+          image_alt_ar: string | null
+          image_alt_fr: string | null
+          image_url: string | null
+          published_at: string | null
+          published_by: string | null
+          seo_description_ar: string | null
+          seo_description_fr: string | null
+          seo_title_ar: string | null
+          seo_title_fr: string | null
+          slug: string
+          status: string
+          tags: string[] | null
+          title_ar: string | null
+          title_fr: string
+          updated_at: string | null
+          updated_by: string | null
+          view_count: number | null
+          workflow_comments: Json | null
+        }
+        Insert: {
+          body_ar?: string | null
+          body_fr?: string | null
+          category?: string | null
+          chapo_ar?: string | null
+          chapo_fr?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          date_publication?: string | null
+          id?: string
+          image_alt_ar?: string | null
+          image_alt_fr?: string | null
+          image_url?: string | null
+          published_at?: string | null
+          published_by?: string | null
+          seo_description_ar?: string | null
+          seo_description_fr?: string | null
+          seo_title_ar?: string | null
+          seo_title_fr?: string | null
+          slug: string
+          status?: string
+          tags?: string[] | null
+          title_ar?: string | null
+          title_fr: string
+          updated_at?: string | null
+          updated_by?: string | null
+          view_count?: number | null
+          workflow_comments?: Json | null
+        }
+        Update: {
+          body_ar?: string | null
+          body_fr?: string | null
+          category?: string | null
+          chapo_ar?: string | null
+          chapo_fr?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          date_publication?: string | null
+          id?: string
+          image_alt_ar?: string | null
+          image_alt_fr?: string | null
+          image_url?: string | null
+          published_at?: string | null
+          published_by?: string | null
+          seo_description_ar?: string | null
+          seo_description_fr?: string | null
+          seo_title_ar?: string | null
+          seo_title_fr?: string | null
+          slug?: string
+          status?: string
+          tags?: string[] | null
+          title_ar?: string | null
+          title_fr?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          view_count?: number | null
+          workflow_comments?: Json | null
+        }
+        Relationships: []
+      }
+      cms_audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          ip_address: unknown
+          new_values: Json | null
+          old_values: Json | null
+          user_agent: string | null
+          user_id: string | null
+          user_name: string | null
+          user_role: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          ip_address?: unknown
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+          user_name?: string | null
+          user_role?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          ip_address?: unknown
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+          user_name?: string | null
+          user_role?: string | null
+        }
+        Relationships: []
+      }
+      cms_bannieres: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          end_date: string | null
+          id: string
+          image_alt_ar: string | null
+          image_alt_fr: string | null
+          image_url: string
+          is_active: boolean | null
+          link_label_ar: string | null
+          link_label_fr: string | null
+          link_url: string | null
+          position: string | null
+          priority: number | null
+          start_date: string | null
+          status: string
+          text_ar: string | null
+          text_fr: string | null
+          title_ar: string | null
+          title_fr: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          end_date?: string | null
+          id?: string
+          image_alt_ar?: string | null
+          image_alt_fr?: string | null
+          image_url: string
+          is_active?: boolean | null
+          link_label_ar?: string | null
+          link_label_fr?: string | null
+          link_url?: string | null
+          position?: string | null
+          priority?: number | null
+          start_date?: string | null
+          status?: string
+          text_ar?: string | null
+          text_fr?: string | null
+          title_ar?: string | null
+          title_fr?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          end_date?: string | null
+          id?: string
+          image_alt_ar?: string | null
+          image_alt_fr?: string | null
+          image_url?: string
+          is_active?: boolean | null
+          link_label_ar?: string | null
+          link_label_fr?: string | null
+          link_url?: string | null
+          position?: string | null
+          priority?: number | null
+          start_date?: string | null
+          status?: string
+          text_ar?: string | null
+          text_fr?: string | null
+          title_ar?: string | null
+          title_fr?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      cms_evenements: {
+        Row: {
+          affiche_alt_ar: string | null
+          affiche_alt_fr: string | null
+          affiche_url: string | null
+          created_at: string | null
+          created_by: string | null
+          cta_label_ar: string | null
+          cta_label_fr: string | null
+          cta_url: string | null
+          date_debut: string
+          date_fin: string
+          description_ar: string | null
+          description_fr: string | null
+          event_type: string | null
+          id: string
+          lieu_ar: string | null
+          lieu_fr: string | null
+          published_at: string | null
+          published_by: string | null
+          slug: string
+          status: string
+          tags: string[] | null
+          title_ar: string | null
+          title_fr: string
+          updated_at: string | null
+          updated_by: string | null
+          workflow_comments: Json | null
+        }
+        Insert: {
+          affiche_alt_ar?: string | null
+          affiche_alt_fr?: string | null
+          affiche_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          cta_label_ar?: string | null
+          cta_label_fr?: string | null
+          cta_url?: string | null
+          date_debut: string
+          date_fin: string
+          description_ar?: string | null
+          description_fr?: string | null
+          event_type?: string | null
+          id?: string
+          lieu_ar?: string | null
+          lieu_fr?: string | null
+          published_at?: string | null
+          published_by?: string | null
+          slug: string
+          status?: string
+          tags?: string[] | null
+          title_ar?: string | null
+          title_fr: string
+          updated_at?: string | null
+          updated_by?: string | null
+          workflow_comments?: Json | null
+        }
+        Update: {
+          affiche_alt_ar?: string | null
+          affiche_alt_fr?: string | null
+          affiche_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          cta_label_ar?: string | null
+          cta_label_fr?: string | null
+          cta_url?: string | null
+          date_debut?: string
+          date_fin?: string
+          description_ar?: string | null
+          description_fr?: string | null
+          event_type?: string | null
+          id?: string
+          lieu_ar?: string | null
+          lieu_fr?: string | null
+          published_at?: string | null
+          published_by?: string | null
+          slug?: string
+          status?: string
+          tags?: string[] | null
+          title_ar?: string | null
+          title_fr?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          workflow_comments?: Json | null
+        }
+        Relationships: []
+      }
+      cms_footer: {
+        Row: {
+          columns: Json | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          legal_text_ar: string | null
+          legal_text_fr: string | null
+          logos: Json | null
+          social_links: Json | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          columns?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          legal_text_ar?: string | null
+          legal_text_fr?: string | null
+          logos?: Json | null
+          social_links?: Json | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          columns?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          legal_text_ar?: string | null
+          legal_text_fr?: string | null
+          logos?: Json | null
+          social_links?: Json | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cms_media: {
+        Row: {
+          alt_ar: string | null
+          alt_fr: string | null
+          copyright: string | null
+          created_at: string | null
+          description_ar: string | null
+          description_fr: string | null
+          file_name: string
+          file_size_kb: number | null
+          file_type: string
+          file_url: string
+          folder: string | null
+          height: number | null
+          id: string
+          licence: string | null
+          tags: string[] | null
+          title_ar: string | null
+          title_fr: string | null
+          updated_at: string | null
+          uploaded_by: string | null
+          variants: Json | null
+          width: number | null
+        }
+        Insert: {
+          alt_ar?: string | null
+          alt_fr?: string | null
+          copyright?: string | null
+          created_at?: string | null
+          description_ar?: string | null
+          description_fr?: string | null
+          file_name: string
+          file_size_kb?: number | null
+          file_type: string
+          file_url: string
+          folder?: string | null
+          height?: number | null
+          id?: string
+          licence?: string | null
+          tags?: string[] | null
+          title_ar?: string | null
+          title_fr?: string | null
+          updated_at?: string | null
+          uploaded_by?: string | null
+          variants?: Json | null
+          width?: number | null
+        }
+        Update: {
+          alt_ar?: string | null
+          alt_fr?: string | null
+          copyright?: string | null
+          created_at?: string | null
+          description_ar?: string | null
+          description_fr?: string | null
+          file_name?: string
+          file_size_kb?: number | null
+          file_type?: string
+          file_url?: string
+          folder?: string | null
+          height?: number | null
+          id?: string
+          licence?: string | null
+          tags?: string[] | null
+          title_ar?: string | null
+          title_fr?: string | null
+          updated_at?: string | null
+          uploaded_by?: string | null
+          variants?: Json | null
+          width?: number | null
+        }
+        Relationships: []
+      }
+      cms_menus: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          items: Json | null
+          menu_code: string
+          menu_name: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          items?: Json | null
+          menu_code: string
+          menu_name: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          items?: Json | null
+          menu_code?: string
+          menu_name?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cms_pages: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          published_at: string | null
+          published_by: string | null
+          seo_canonical: string | null
+          seo_description_ar: string | null
+          seo_description_fr: string | null
+          seo_keywords_ar: string[] | null
+          seo_keywords_fr: string[] | null
+          seo_title_ar: string | null
+          seo_title_fr: string | null
+          slug: string
+          status: string
+          title_ar: string | null
+          title_fr: string
+          updated_at: string | null
+          updated_by: string | null
+          workflow_comments: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          published_at?: string | null
+          published_by?: string | null
+          seo_canonical?: string | null
+          seo_description_ar?: string | null
+          seo_description_fr?: string | null
+          seo_keywords_ar?: string[] | null
+          seo_keywords_fr?: string[] | null
+          seo_title_ar?: string | null
+          seo_title_fr?: string | null
+          slug: string
+          status?: string
+          title_ar?: string | null
+          title_fr: string
+          updated_at?: string | null
+          updated_by?: string | null
+          workflow_comments?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          published_at?: string | null
+          published_by?: string | null
+          seo_canonical?: string | null
+          seo_description_ar?: string | null
+          seo_description_fr?: string | null
+          seo_keywords_ar?: string[] | null
+          seo_keywords_fr?: string[] | null
+          seo_title_ar?: string | null
+          seo_title_fr?: string | null
+          slug?: string
+          status?: string
+          title_ar?: string | null
+          title_fr?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          workflow_comments?: Json | null
+        }
+        Relationships: []
+      }
+      cms_sections: {
+        Row: {
+          content_ar: string | null
+          content_fr: string | null
+          created_at: string | null
+          id: string
+          is_visible: boolean | null
+          order_index: number
+          page_id: string | null
+          props: Json | null
+          section_type: string
+          title_ar: string | null
+          title_fr: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content_ar?: string | null
+          content_fr?: string | null
+          created_at?: string | null
+          id?: string
+          is_visible?: boolean | null
+          order_index?: number
+          page_id?: string | null
+          props?: Json | null
+          section_type: string
+          title_ar?: string | null
+          title_fr?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content_ar?: string | null
+          content_fr?: string | null
+          created_at?: string | null
+          id?: string
+          is_visible?: boolean | null
+          order_index?: number
+          page_id?: string | null
+          props?: Json | null
+          section_type?: string
+          title_ar?: string | null
+          title_fr?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_sections_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "cms_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cms_webhook_logs: {
+        Row: {
+          completed_at: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          payload: Json | null
+          response_body: string | null
+          response_code: number | null
+          status: string | null
+          triggered_at: string | null
+          webhook_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          payload?: Json | null
+          response_body?: string | null
+          response_code?: number | null
+          status?: string | null
+          triggered_at?: string | null
+          webhook_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          response_body?: string | null
+          response_code?: number | null
+          status?: string | null
+          triggered_at?: string | null
+          webhook_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_webhook_logs_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "cms_webhooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cms_webhooks: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          error_count: number | null
+          id: string
+          is_active: boolean | null
+          last_triggered_at: string | null
+          success_count: number | null
+          trigger_events: string[] | null
+          updated_at: string | null
+          webhook_name: string
+          webhook_url: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          error_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          success_count?: number | null
+          trigger_events?: string[] | null
+          updated_at?: string | null
+          webhook_name: string
+          webhook_url: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          error_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          success_count?: number | null
+          trigger_events?: string[] | null
+          updated_at?: string | null
+          webhook_name?: string
+          webhook_url?: string
+        }
+        Relationships: []
+      }
       collections: {
         Row: {
           created_at: string | null
