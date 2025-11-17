@@ -48,6 +48,13 @@ export default function Administration() {
 
   const adminModules = [
     {
+      title: "Système de Gestion de Contenu",
+      description: "CMS complet pour créer et gérer tout le contenu de la plateforme",
+      icon: FileImage,
+      path: "/admin/content-management",
+      color: "bg-violet-100 text-violet-600",
+    },
+    {
       title: "Tableau de bord",
       description: "Vue d'ensemble, KPIs et statistiques",
       icon: LayoutDashboard,
