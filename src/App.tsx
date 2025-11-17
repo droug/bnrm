@@ -63,6 +63,7 @@ const SystemListsPage = lazy(() => import("./pages/SystemListsPage"));
 const WorkflowBPM = lazy(() => import("./pages/WorkflowBPM"));
 const CoteManagementPage = lazy(() => import("./pages/CoteManagementPage"));
 const CmsBackoffice = lazy(() => import("./pages/cms/CmsBackoffice"));
+const CmsDynamicPage = lazy(() => import("./pages/cms/CmsDynamicPage"));
 
 // BNRM Portal (lazy)
 const BNRMPortal = lazy(() => import("./pages/BNRMPortal"));
@@ -258,7 +259,8 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin/users" element={<UserManagement />} />
         <Route path="/admin/content" element={<ContentManagement />} />
-        <Route path="/admin/cms" element={<CmsBackoffice />} />
+            <Route path="/admin/cms" element={<CmsBackoffice />} />
+            <Route path="/page/:slug" element={<CmsDynamicPage />} />
           <Route path="/news" element={<News />} />
           <Route path="/practical-info" element={<PracticalInfo />} />
         <Route path="/settings" element={<Navigate to="/admin/roles" replace />} />
