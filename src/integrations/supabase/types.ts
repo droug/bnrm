@@ -4127,6 +4127,530 @@ export type Database = {
           },
         ]
       }
+      ged_document_access_log: {
+        Row: {
+          access_granted: boolean | null
+          accessed_at: string | null
+          action: string
+          denial_reason: string | null
+          document_id: string
+          id: string
+          ip_address: unknown
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          access_granted?: boolean | null
+          accessed_at?: string | null
+          action: string
+          denial_reason?: string | null
+          document_id: string
+          id?: string
+          ip_address?: unknown
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          access_granted?: boolean | null
+          accessed_at?: string | null
+          action?: string
+          denial_reason?: string | null
+          document_id?: string
+          id?: string
+          ip_address?: unknown
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ged_document_access_log_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "ged_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ged_document_annotations: {
+        Row: {
+          annotation_type: string
+          content: string
+          created_at: string | null
+          created_by: string
+          document_id: string
+          id: string
+          is_private: boolean | null
+          is_resolved: boolean | null
+          page_number: number | null
+          position_data: Json | null
+          resolved_at: string | null
+          resolved_by: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          annotation_type: string
+          content: string
+          created_at?: string | null
+          created_by: string
+          document_id: string
+          id?: string
+          is_private?: boolean | null
+          is_resolved?: boolean | null
+          page_number?: number | null
+          position_data?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          annotation_type?: string
+          content?: string
+          created_at?: string | null
+          created_by?: string
+          document_id?: string
+          id?: string
+          is_private?: boolean | null
+          is_resolved?: boolean | null
+          page_number?: number | null
+          position_data?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ged_document_annotations_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "ged_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ged_document_permissions: {
+        Row: {
+          can_delete: boolean | null
+          can_download: boolean | null
+          can_edit: boolean | null
+          can_share: boolean | null
+          can_sign: boolean | null
+          can_view: boolean | null
+          document_id: string
+          expires_at: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          role_name: string | null
+          user_id: string | null
+        }
+        Insert: {
+          can_delete?: boolean | null
+          can_download?: boolean | null
+          can_edit?: boolean | null
+          can_share?: boolean | null
+          can_sign?: boolean | null
+          can_view?: boolean | null
+          document_id: string
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          role_name?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          can_delete?: boolean | null
+          can_download?: boolean | null
+          can_edit?: boolean | null
+          can_share?: boolean | null
+          can_sign?: boolean | null
+          can_view?: boolean | null
+          document_id?: string
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          role_name?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ged_document_permissions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "ged_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ged_document_relations: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          relation_type: string
+          source_document_id: string
+          target_document_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          relation_type: string
+          source_document_id: string
+          target_document_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          relation_type?: string
+          source_document_id?: string
+          target_document_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ged_document_relations_source_document_id_fkey"
+            columns: ["source_document_id"]
+            isOneToOne: false
+            referencedRelation: "ged_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ged_document_relations_target_document_id_fkey"
+            columns: ["target_document_id"]
+            isOneToOne: false
+            referencedRelation: "ged_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ged_document_signatures: {
+        Row: {
+          document_id: string
+          id: string
+          ip_address: unknown
+          is_valid: boolean | null
+          signature_certificate: string | null
+          signature_data: Json
+          signature_type: string
+          signed_at: string | null
+          signer_email: string | null
+          signer_id: string
+          signer_name: string
+          signer_role: string | null
+          validated_at: string | null
+          validation_status: string | null
+        }
+        Insert: {
+          document_id: string
+          id?: string
+          ip_address?: unknown
+          is_valid?: boolean | null
+          signature_certificate?: string | null
+          signature_data: Json
+          signature_type: string
+          signed_at?: string | null
+          signer_email?: string | null
+          signer_id: string
+          signer_name: string
+          signer_role?: string | null
+          validated_at?: string | null
+          validation_status?: string | null
+        }
+        Update: {
+          document_id?: string
+          id?: string
+          ip_address?: unknown
+          is_valid?: boolean | null
+          signature_certificate?: string | null
+          signature_data?: Json
+          signature_type?: string
+          signed_at?: string | null
+          signer_email?: string | null
+          signer_id?: string
+          signer_name?: string
+          signer_role?: string | null
+          validated_at?: string | null
+          validation_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ged_document_signatures_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "ged_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ged_document_versions: {
+        Row: {
+          changes_description: string | null
+          checksum: string | null
+          created_at: string | null
+          created_by: string | null
+          document_id: string
+          file_path: string
+          file_size_bytes: number | null
+          file_url: string | null
+          id: string
+          version_notes: string | null
+          version_number: number
+        }
+        Insert: {
+          changes_description?: string | null
+          checksum?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          document_id: string
+          file_path: string
+          file_size_bytes?: number | null
+          file_url?: string | null
+          id?: string
+          version_notes?: string | null
+          version_number: number
+        }
+        Update: {
+          changes_description?: string | null
+          checksum?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          document_id?: string
+          file_path?: string
+          file_size_bytes?: number | null
+          file_url?: string | null
+          id?: string
+          version_notes?: string | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ged_document_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "ged_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ged_document_workflows: {
+        Row: {
+          completed_at: string | null
+          current_assignee: string | null
+          current_status: string | null
+          document_id: string
+          id: string
+          started_at: string | null
+          total_steps: number
+          workflow_data: Json | null
+          workflow_name: string
+          workflow_step: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          current_assignee?: string | null
+          current_status?: string | null
+          document_id: string
+          id?: string
+          started_at?: string | null
+          total_steps: number
+          workflow_data?: Json | null
+          workflow_name: string
+          workflow_step?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          current_assignee?: string | null
+          current_status?: string | null
+          document_id?: string
+          id?: string
+          started_at?: string | null
+          total_steps?: number
+          workflow_data?: Json | null
+          workflow_name?: string
+          workflow_step?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ged_document_workflows_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "ged_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ged_documents: {
+        Row: {
+          access_count: number | null
+          access_level: string | null
+          approved_at: string | null
+          approved_by: string | null
+          archival_date: string | null
+          checksum: string | null
+          confidentiality_level: number | null
+          created_at: string | null
+          created_by: string | null
+          custom_metadata: Json | null
+          deletion_date: string | null
+          description: string | null
+          document_category: string | null
+          document_number: string
+          document_title: string
+          document_type: string
+          file_extension: string | null
+          file_mime_type: string | null
+          file_name: string
+          file_path: string
+          file_size_bytes: number | null
+          file_url: string | null
+          id: string
+          indexed: boolean | null
+          is_latest_version: boolean | null
+          is_signed: boolean | null
+          keywords: string[] | null
+          last_accessed_at: string | null
+          ocr_processed: boolean | null
+          ocr_text: string | null
+          parent_document_id: string | null
+          preview_url: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
+          related_documents: string[] | null
+          requires_signature: boolean | null
+          retention_period_years: number | null
+          signature_data: Json | null
+          source_module: string
+          source_record_id: string | null
+          source_table: string | null
+          status: string | null
+          storage_location: string | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          updated_at: string | null
+          updated_by: string | null
+          version_number: number | null
+          workflow_status: string | null
+        }
+        Insert: {
+          access_count?: number | null
+          access_level?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          archival_date?: string | null
+          checksum?: string | null
+          confidentiality_level?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_metadata?: Json | null
+          deletion_date?: string | null
+          description?: string | null
+          document_category?: string | null
+          document_number: string
+          document_title: string
+          document_type: string
+          file_extension?: string | null
+          file_mime_type?: string | null
+          file_name: string
+          file_path: string
+          file_size_bytes?: number | null
+          file_url?: string | null
+          id?: string
+          indexed?: boolean | null
+          is_latest_version?: boolean | null
+          is_signed?: boolean | null
+          keywords?: string[] | null
+          last_accessed_at?: string | null
+          ocr_processed?: boolean | null
+          ocr_text?: string | null
+          parent_document_id?: string | null
+          preview_url?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          related_documents?: string[] | null
+          requires_signature?: boolean | null
+          retention_period_years?: number | null
+          signature_data?: Json | null
+          source_module: string
+          source_record_id?: string | null
+          source_table?: string | null
+          status?: string | null
+          storage_location?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          version_number?: number | null
+          workflow_status?: string | null
+        }
+        Update: {
+          access_count?: number | null
+          access_level?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          archival_date?: string | null
+          checksum?: string | null
+          confidentiality_level?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_metadata?: Json | null
+          deletion_date?: string | null
+          description?: string | null
+          document_category?: string | null
+          document_number?: string
+          document_title?: string
+          document_type?: string
+          file_extension?: string | null
+          file_mime_type?: string | null
+          file_name?: string
+          file_path?: string
+          file_size_bytes?: number | null
+          file_url?: string | null
+          id?: string
+          indexed?: boolean | null
+          is_latest_version?: boolean | null
+          is_signed?: boolean | null
+          keywords?: string[] | null
+          last_accessed_at?: string | null
+          ocr_processed?: boolean | null
+          ocr_text?: string | null
+          parent_document_id?: string | null
+          preview_url?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          related_documents?: string[] | null
+          requires_signature?: boolean | null
+          retention_period_years?: number | null
+          signature_data?: Json | null
+          source_module?: string
+          source_record_id?: string | null
+          source_table?: string | null
+          status?: string | null
+          storage_location?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          version_number?: number | null
+          workflow_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ged_documents_parent_document_id_fkey"
+            columns: ["parent_document_id"]
+            isOneToOne: false
+            referencedRelation: "ged_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       generated_documents: {
         Row: {
           document_data: Json
@@ -10786,6 +11310,10 @@ export type Database = {
       generate_content_slug: { Args: { title: string }; Returns: string }
       generate_deposit_number: { Args: never; Returns: string }
       generate_document_number: { Args: { doc_type: string }; Returns: string }
+      generate_ged_document_number: {
+        Args: { p_document_type: string }
+        Returns: string
+      }
       generate_program_contribution_reference: { Args: never; Returns: string }
       generate_proposal_number: { Args: never; Returns: string }
       generate_rental_request_number: { Args: never; Returns: string }
