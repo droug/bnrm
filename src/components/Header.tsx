@@ -9,6 +9,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import SmartChatBot from "@/components/SmartChatBot";
 import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
 import MessagingButton from "@/components/messaging/MessagingButton";
+import NotificationsButton from "@/components/notifications/NotificationsButton";
 // import { WatermarkContainer, Watermark } from "@/components/ui/watermark"; // Removed to fix runtime error
 import logoImage from "@/assets/logo-bnrm.png";
 import {
@@ -193,6 +194,9 @@ const Header = () => {
             
             {/* Messagerie */}
             {user && <MessagingButton isHomePage={isHomePage} />}
+            
+            {/* Notifications */}
+            {user && <NotificationsButton isHomePage={isHomePage} />}
             
             {/* Utilisateur */}
             {user ? (
