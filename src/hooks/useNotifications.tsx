@@ -15,20 +15,21 @@ export interface Notification {
   message: string;
   short_message: string | null;
   data: any;
-  is_read: boolean;
+  is_read: boolean | null;
   read_at: string | null;
-  priority: number;
-  status: string;
+  priority: number | null;
   source_table: string | null;
   source_record_id: string | null;
   related_url: string | null;
   link: string | null;
-  requires_action: boolean;
+  requires_action: boolean | null;
   action_url: string | null;
   action_label: string | null;
-  action_completed: boolean;
+  action_completed: boolean | null;
+  action_completed_at: string | null;
   expires_at: string | null;
   created_at: string;
+  created_by: string | null;
   updated_at: string | null;
 }
 
