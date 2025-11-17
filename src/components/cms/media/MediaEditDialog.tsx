@@ -80,7 +80,7 @@ export default function MediaEditDialog({ media, open, onOpenChange, onSuccess }
 
         <div className="space-y-4">
           {/* Preview */}
-          {media.media_type === "image" && (
+          {media.file_type === "image" && (
             <div className="rounded-lg overflow-hidden border">
               <img
                 src={media.file_url}

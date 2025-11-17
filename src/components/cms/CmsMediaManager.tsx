@@ -31,7 +31,7 @@ export default function CmsMediaManager() {
       }
 
       if (selectedType) {
-        query = query.eq("media_type", selectedType);
+        query = query.eq("file_type", selectedType);
       }
 
       const { data, error } = await query;
@@ -42,10 +42,10 @@ export default function CmsMediaManager() {
 
   const stats = {
     total: mediaFiles?.length || 0,
-    images: mediaFiles?.filter(m => m.media_type === "image").length || 0,
-    videos: mediaFiles?.filter(m => m.media_type === "video").length || 0,
-    documents: mediaFiles?.filter(m => m.media_type === "document").length || 0,
-    audio: mediaFiles?.filter(m => m.media_type === "audio").length || 0,
+    images: mediaFiles?.filter(m => m.file_type === "image").length || 0,
+    videos: mediaFiles?.filter(m => m.file_type === "video").length || 0,
+    documents: mediaFiles?.filter(m => m.file_type === "document").length || 0,
+    audio: mediaFiles?.filter(m => m.file_type === "audio").length || 0,
   };
 
   return (

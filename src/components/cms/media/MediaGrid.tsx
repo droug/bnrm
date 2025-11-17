@@ -22,7 +22,7 @@ interface MediaFile {
   id: string;
   file_name: string;
   file_url: string;
-  media_type: string;
+  file_type: string;
   title_fr: string | null;
   title_ar: string | null;
   file_size_kb: number | null;
@@ -122,7 +122,7 @@ export default function MediaGrid({ mediaFiles, isLoading, onRefetch }: MediaGri
             <CardContent className="p-0">
               {/* Media preview */}
               <div className="relative h-40 bg-muted flex items-center justify-center">
-                {media.media_type === "image" ? (
+                {media.file_type === "image" ? (
                   <img
                     src={media.file_url}
                     alt={media.title_fr || media.file_name}
@@ -130,11 +130,11 @@ export default function MediaGrid({ mediaFiles, isLoading, onRefetch }: MediaGri
                   />
                 ) : (
                   <div className="text-muted-foreground">
-                    {getMediaIcon(media.media_type)}
+                    {getMediaIcon(media.file_type)}
                   </div>
                 )}
                 <Badge className="absolute top-2 right-2" variant="secondary">
-                  {media.media_type}
+                  {media.file_type}
                 </Badge>
               </div>
 
