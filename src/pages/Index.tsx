@@ -59,7 +59,7 @@ const Index = () => {
   };
 
   const addFilter = (type: string) => {
-    const value = prompt(`Entrez la valeur pour ${getFilterLabel(type)}:`);
+    const value = prompt(`${language === 'ar' ? 'أدخل القيمة لـ' : 'Entrez la valeur pour'} ${getFilterLabel(type)}:`);
     if (value && value.trim()) {
       setActiveFilters(prev => [...prev, { type, value: value.trim() }]);
     }
@@ -75,15 +75,15 @@ const Index = () => {
   };
 
   const getFilterLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      author: "Auteur",
-      publisher: "Éditeur",
-      genre: "Genre",
-      publication_year: "Année de publication",
-      language: "Langue",
-      content_type: "Type de contenu"
+    const labels: Record<string, { fr: string; ar: string }> = {
+      author: { fr: "Auteur", ar: "المؤلف" },
+      publisher: { fr: "Éditeur", ar: "الناشر" },
+      genre: { fr: "Genre", ar: "النوع" },
+      publication_year: { fr: "Année de publication", ar: "سنة النشر" },
+      language: { fr: "Langue", ar: "اللغة" },
+      content_type: { fr: "Type de contenu", ar: "نوع المحتوى" }
     };
-    return labels[type] || type;
+    return labels[type]?.[language] || type;
   };
 
   if (showLegalDeposit && selectedDepositType) {
@@ -255,29 +255,29 @@ const Index = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start" className="w-56 bg-popover">
                           <DropdownMenuItem onClick={() => addFilter('author')} className="text-base font-medium">
-                            Auteur
+                            {language === 'ar' ? 'المؤلف' : 'Auteur'}
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => addFilter('publisher')} className="text-base font-medium">
-                            Éditeur
+                            {language === 'ar' ? 'الناشر' : 'Éditeur'}
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => addFilter('genre')} className="text-base font-medium">
-                            Genre
+                            {language === 'ar' ? 'النوع' : 'Genre'}
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => addFilter('publication_year')} className="text-base font-medium">
-                            Année de publication
+                            {language === 'ar' ? 'سنة النشر' : 'Année de publication'}
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => addFilter('language')} className="text-base font-medium">
-                            Langue
+                            {language === 'ar' ? 'اللغة' : 'Langue'}
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => addFilter('content_type')} className="text-base font-medium">
-                            Type de contenu
+                            {language === 'ar' ? 'نوع المحتوى' : 'Type de contenu'}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
 
                       <Input
                         type="search"
-                        placeholder="Explorez les trésors de la connaissance marocaine..."
+                        placeholder={language === 'ar' ? 'اكتشف كنوز المعرفة المغربية...' : 'Explorez les trésors de la connaissance marocaine...'}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
