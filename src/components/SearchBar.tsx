@@ -262,7 +262,7 @@ export default function SearchBar({
                 size="sm"
                 className={`
                   flex items-center gap-1 shrink-0
-                  ${variant === 'hero' ? 'text-white/90 hover:text-white border-white/20 hover:bg-white/10' : ''}
+                  ${variant === 'hero' ? 'text-white/90 hover:text-white border-white/20 hover:bg-white/10' : 'text-foreground'}
                 `}
               >
                 <Filter className="h-4 w-4" />
