@@ -23,7 +23,7 @@ import logoBnrm from "@/assets/logo-bnrm.png";
 
 const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {}) => {
   const currentYear = new Date().getFullYear();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
@@ -68,24 +68,24 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
   ];
 
   const legalLinks = [
-    { title: "Conditions d'utilisation", href: "#conditions" },
-    { title: "Mentions légales", href: "#mentions" },
-    { title: "Flux RSS", href: "#rss" },
-    { title: "Confidentialité", href: "#confidentialite" }
+    { title_fr: "Conditions d'utilisation", title_ar: "شروط الاستخدام", href: "#conditions" },
+    { title_fr: "Mentions légales", title_ar: "الإشعارات القانونية", href: "#mentions" },
+    { title_fr: "Flux RSS", title_ar: "تغذية RSS", href: "#rss" },
+    { title_fr: "Confidentialité", title_ar: "الخصوصية", href: "#confidentialite" }
   ];
 
   const supportLinks = [
-    { title: "FAQ", href: "#faq" },
-    { title: "Règlements", href: "#reglements" },
-    { title: "Contacts", href: "#contacts" },
-    { title: "Chatbot d'assistance", href: "#chatbot" }
+    { title_fr: "FAQ", title_ar: "الأسئلة الشائعة", href: "#faq" },
+    { title_fr: "Règlements", title_ar: "اللوائح", href: "#reglements" },
+    { title_fr: "Contacts", title_ar: "الاتصالات", href: "#contacts" },
+    { title_fr: "Chatbot d'assistance", title_ar: "روبوت المساعدة", href: "#chatbot" }
   ];
 
   const paymentLinks = [
-    { title: "e-Wallet BNRM", href: "/wallet" },
-    { title: "Services BNRM", href: "/tarifs-bnrm" },
-    { title: "Reproduction", href: "/reproduction" },
-    { title: "Dépôt légal", href: "/depot-legal" }
+    { title_fr: "e-Wallet BNRM", title_ar: "المحفظة الإلكترونية", href: "/wallet" },
+    { title_fr: "Services BNRM", title_ar: "خدمات المكتبة", href: "/tarifs-bnrm" },
+    { title_fr: "Reproduction", title_ar: "النسخ", href: "/reproduction" },
+    { title_fr: "Dépôt légal", title_ar: "الإيداع القانوني", href: "/depot-legal" }
   ];
 
   const socialLinks = [
@@ -163,7 +163,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
               <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-accent'}`}></span>
-              Aide et support
+              {language === 'ar' ? 'المساعدة والدعم' : 'Aide et support'}
             </h4>
             <ul className="space-y-3">
               {supportLinks.map((link, index) => (
@@ -172,7 +172,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                     href={link.href} 
                     className="text-sm opacity-80 hover:opacity-100 hover:translate-x-1 transition-all inline-block"
                   >
-                    {link.title}
+                    {language === 'ar' ? link.title_ar : link.title_fr}
                   </a>
                 </li>
               ))}
@@ -183,7 +183,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
               <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-accent'}`}></span>
-              Paiements
+              {language === 'ar' ? 'المدفوعات' : 'Paiements'}
             </h4>
             <ul className="space-y-3">
               {paymentLinks.map((link, index) => (
@@ -192,7 +192,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                     href={link.href} 
                     className="text-sm opacity-80 hover:opacity-100 hover:translate-x-1 transition-all inline-block"
                   >
-                    {link.title}
+                    {language === 'ar' ? link.title_ar : link.title_fr}
                   </a>
                 </li>
               ))}
@@ -235,15 +235,18 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
               <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-accent'}`}></span>
-              Nous suivre
+              {language === 'ar' ? 'تابعنا' : 'Nous suivre'}
             </h4>
             <p className="text-sm opacity-80 mb-4 leading-relaxed">
-              Restez informé de nos actualités et nouvelles acquisitions.
+              {language === 'ar'
+                ? 'ابق على اطلاع بأخبارنا والمقتنيات الجديدة.'
+                : 'Restez informé de nos actualités et nouvelles acquisitions.'
+              }
             </p>
             <form onSubmit={handleNewsletterSubscribe} className="space-y-3">
               <Input 
                 type="email" 
-                placeholder="Votre email"
+                placeholder={language === 'ar' ? 'بريدك الإلكتروني' : 'Votre email'}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isSubscribing}
@@ -263,15 +266,18 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                 {isSubscribing ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Abonnement...
+                    {language === 'ar' ? 'جارٍ الاشتراك...' : 'Abonnement...'}
                   </>
                 ) : (
-                  "S'abonner"
+                  language === 'ar' ? 'اشترك' : "S'abonner"
                 )}
               </Button>
             </form>
             <p className="text-xs opacity-60 mt-3 leading-relaxed">
-              En vous abonnant, vous acceptez de recevoir nos communications.
+              {language === 'ar'
+                ? 'من خلال الاشتراك، فإنك توافق على تلقي اتصالاتنا.'
+                : 'En vous abonnant, vous acceptez de recevoir nos communications.'
+              }
             </p>
           </div>
         </div>
@@ -288,7 +294,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                 href={link.href}
                 className="text-xs opacity-70 hover:opacity-100 transition-opacity"
               >
-                {link.title}
+                {language === 'ar' ? link.title_ar : link.title_fr}
               </a>
             ))}
           </div>

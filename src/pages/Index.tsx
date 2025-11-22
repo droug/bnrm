@@ -629,12 +629,12 @@ const Index = () => {
 
                 {/* Cartes sidebar avec différentes mosaïques */}
                 {[
-                  { title: "Aide & Support", subtitle: "FAQ, règlements, contacts", icon: MousePointer, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-moroccan-stars", border: "border-accent/25", shadow: "shadow-elegant hover:shadow-zellige", href: "/help" },
-                  { title: "Services numériques", subtitle: "Catalogue, reproduction", icon: Download, gradient: "bg-gradient-neutral", pattern: "bg-pattern-filigrane", border: "border-gold/25", shadow: "shadow-gold hover:shadow-mosaique", href: "/services-bnrm" },
-                  { title: "Pass journalier", subtitle: "Accès gratuit à la bibliothèque", icon: BadgeCheck, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-primary/25", shadow: "shadow-mosaique hover:shadow-zellige", href: "/services-bnrm?open=daily-pass" },
-                  { title: "Langues", subtitle: "", icon: Globe, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-highlight/25", shadow: "shadow-berber hover:shadow-gold", href: "#" },
-                  { title: "Accessibilité", subtitle: "Options d'accessibilité", icon: Accessibility, gradient: "bg-gradient-neutral", pattern: "bg-pattern-moroccan-stars", border: "border-royal/25", shadow: "shadow-royal hover:shadow-mosaique", href: "#" },
-                  { title: "Partager", subtitle: "", icon: Share2, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-filigrane", border: "border-primary/25", shadow: "shadow-mosaique hover:shadow-zellige", href: "#" }
+                  { title_fr: "Aide & Support", title_ar: "المساعدة والدعم", subtitle_fr: "FAQ, règlements, contacts", subtitle_ar: "الأسئلة الشائعة، اللوائح، الاتصالات", icon: MousePointer, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-moroccan-stars", border: "border-accent/25", shadow: "shadow-elegant hover:shadow-zellige", href: "/help" },
+                  { title_fr: "Services numériques", title_ar: "الخدمات الرقمية", subtitle_fr: "Catalogue, reproduction", subtitle_ar: "الفهرس، النسخ", icon: Download, gradient: "bg-gradient-neutral", pattern: "bg-pattern-filigrane", border: "border-gold/25", shadow: "shadow-gold hover:shadow-mosaique", href: "/services-bnrm" },
+                  { title_fr: "Pass journalier", title_ar: "تصريح يومي", subtitle_fr: "Accès gratuit à la bibliothèque", subtitle_ar: "دخول مجاني للمكتبة", icon: BadgeCheck, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-primary/25", shadow: "shadow-mosaique hover:shadow-zellige", href: "/services-bnrm?open=daily-pass" },
+                  { title_fr: "Langues", title_ar: "اللغات", subtitle_fr: "", subtitle_ar: "", icon: Globe, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-highlight/25", shadow: "shadow-berber hover:shadow-gold", href: "#" },
+                  { title_fr: "Accessibilité", title_ar: "إمكانية الوصول", subtitle_fr: "Options d'accessibilité", subtitle_ar: "خيارات الوصول", icon: Accessibility, gradient: "bg-gradient-neutral", pattern: "bg-pattern-moroccan-stars", border: "border-royal/25", shadow: "shadow-royal hover:shadow-mosaique", href: "#" },
+                  { title_fr: "Partager", title_ar: "مشاركة", subtitle_fr: "", subtitle_ar: "", icon: Share2, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-filigrane", border: "border-primary/25", shadow: "shadow-mosaique hover:shadow-zellige", href: "#" }
                 ].map((item, index) => (
                   <Link key={index} to={item.href}>
                     <Card className={`relative overflow-hidden group border-3 ${item.border} ${item.shadow} transition-all duration-500 cursor-pointer`}>
@@ -642,8 +642,14 @@ const Index = () => {
                       <div className={`absolute inset-0 ${item.gradient} opacity-85`}></div>
                       <CardContent className="p-4 text-center relative z-10">
                         <item.icon className="h-6 w-6 text-foreground mx-auto mb-2" />
-                        <h4 className="font-moroccan text-sm font-bold text-foreground">{item.title}</h4>
-                        {item.subtitle && <p className="text-xs text-muted-foreground mt-1">{item.subtitle}</p>}
+                        <h4 className="font-moroccan text-sm font-bold text-foreground">
+                          {language === 'ar' ? item.title_ar : item.title_fr}
+                        </h4>
+                        {((language === 'ar' && item.subtitle_ar) || (language === 'fr' && item.subtitle_fr)) && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {language === 'ar' ? item.subtitle_ar : item.subtitle_fr}
+                          </p>
+                        )}
                       </CardContent>
                     </Card>
                   </Link>
