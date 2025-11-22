@@ -92,7 +92,6 @@ const ProfessionalManagement = lazy(() => import("./pages/ProfessionalManagement
 const ProfessionalSignup = lazy(() => import("./pages/ProfessionalSignup"));
 
 // Digital Library (lazy)
-const DigitalLibraryModern = lazy(() => import("./pages/DigitalLibraryModern"));
 const DigitalLibraryHome = lazy(() => import("./pages/digital-library/Home"));
 const DigitalLibraryAdministration = lazy(() => import("./pages/digital-library/Administration"));
 const DigitalLibraryAdminDashboard = lazy(() => import("./pages/digital-library/AdminDashboard"));
@@ -297,7 +296,7 @@ const App = () => {
         <Route path="/admin/committee" element={<CommitteeDashboard />} />
         <Route path="/legal-deposit/approvals" element={<LegalDepositApprovals />} />
         <Route path="/depot-legal/approbations" element={<LegalDepositApprovals />} />
-          <Route path="/digital-library" element={<DigitalLibraryModern />} />
+          <Route path="/digital-library" element={<CmsDynamicPage />} />
           <Route path="/digital-library/collections" element={<Collections />} />
           <Route path="/digital-library/collections/:collectionId" element={<CollectionDetails />} />
           <Route path="/digital-library/document/:documentId" element={<DocumentDetails />} />

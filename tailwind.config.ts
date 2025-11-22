@@ -14,11 +14,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        'serif': ['IBM Plex Serif', 'Georgia', 'serif'],
-        'sans': ['Source Sans 3', 'system-ui', 'sans-serif'],
-        'arabic': ['Tajawal', 'Noto Sans Arabic', 'sans-serif'],
-        'display': ['IBM Plex Serif', 'serif'],
-        'body': ['Source Sans 3', 'sans-serif'],
+        'serif': ['Playfair Display', 'Crimson Text', 'serif'],
+        'sans': ['Inter', 'Noto Sans Arabic', 'sans-serif'],
+        'arabic': ['Amiri', 'Noto Sans Arabic', 'serif'],
+        'moroccan': ['Playfair Display', 'Amiri', 'serif'],
+        'elegant': ['Crimson Text', 'Playfair Display', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",

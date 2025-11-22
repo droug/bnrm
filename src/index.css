@@ -26,11 +26,11 @@ Enhanced Moroccan Heritage Design System
     --popover: 40 20% 94%;
     --popover-foreground: 30 15% 20%;
 
-    /* Bleu Zellige Subtil - Updated to Deep Teal for modern library */
-    --primary: 185 45% 39%; /* #1a4d5c - Deep teal for institutional feel */
+    /* Bleu Zellige Subtil */
+    --primary: 220 30% 45%;
     --primary-foreground: 44 15% 98%;
-    --primary-glow: 185 40% 50%;
-    --primary-deep: 185 50% 30%;
+    --primary-glow: 220 25% 55%;
+    --primary-deep: 220 35% 35%;
 
     /* Terre Cuite et Sable - Tons Neutres */
     --secondary: 35 25% 85%;
