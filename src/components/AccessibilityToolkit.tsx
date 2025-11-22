@@ -51,7 +51,7 @@ const defaultSettings: AccessibilitySettings = {
 export const AccessibilityToolkit = ({ className = "" }: { className?: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [settings, setSettings] = useState<AccessibilitySettings>(defaultSettings);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   console.log('AccessibilityToolkit rendered, isOpen:', isOpen);
 
@@ -129,11 +129,11 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
             className={`flex items-center gap-2 px-2 h-11 text-base font-medium ${className}`}
           >
             <Accessibility className="h-4 w-4" />
-            <span className="hidden sm:inline">Accessibilité</span>
+            <span className="hidden sm:inline">{language === 'ar' ? 'إمكانية الوصول' : 'Accessibilité'}</span>
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Outils d'accessibilité</p>
+          <p>{language === 'ar' ? 'أدوات إمكانية الوصول' : 'Outils d\'accessibilité'}</p>
         </TooltipContent>
       </Tooltip>
 
@@ -147,7 +147,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
           
           <CustomDialogHeader className="p-4 border-b border-border">
             <div className="flex items-center justify-between">
-              <CustomDialogTitle className="text-lg font-semibold">Accessibilité</CustomDialogTitle>
+              <CustomDialogTitle className="text-lg font-semibold">{language === 'ar' ? 'إمكانية الوصول' : 'Accessibilité'}</CustomDialogTitle>
               <Button
                 variant="ghost"
                 size="sm"
@@ -155,11 +155,11 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
                 className="text-muted-foreground hover:text-foreground flex items-center gap-1"
               >
                 <RotateCcw className="h-4 w-4" />
-                Réinitialiser
+                {language === 'ar' ? 'إعادة تعيين' : 'Réinitialiser'}
               </Button>
             </div>
             <CustomDialogDescription className="sr-only">
-              Ajustez les paramètres d'accessibilité pour améliorer votre expérience de navigation.
+              {language === 'ar' ? 'اضبط إعدادات إمكانية الوصول لتحسين تجربة التصفح الخاصة بك.' : 'Ajustez les paramètres d\'accessibilité pour améliorer votre expérience de navigation.'}
             </CustomDialogDescription>
           </CustomDialogHeader>
 
@@ -169,7 +169,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
               {/* Curseur */}
               <div className="flex flex-col items-center justify-center p-4 bg-muted/20 rounded-lg min-h-[80px]">
                 <MousePointer className="h-6 w-6 mb-2 text-muted-foreground" />
-                <span className="text-sm font-medium text-center">Curseur</span>
+                <span className="text-sm font-medium text-center">{language === 'ar' ? 'المؤشر' : 'Curseur'}</span>
                 <Slider
                   value={[settings.cursorSize]}
                   onValueChange={([value]) => updateSetting('cursorSize', value)}
@@ -183,7 +183,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
               {/* Espacement des mots */}
               <div className="flex flex-col items-center justify-center p-4 bg-muted/20 rounded-lg min-h-[80px]">
                 <div className="text-lg mb-2 text-muted-foreground font-bold">H</div>
-                <span className="text-sm font-medium text-center">Espacement des mots</span>
+                <span className="text-sm font-medium text-center">{language === 'ar' ? 'تباعد الكلمات' : 'Espacement des mots'}</span>
                 <span className="text-xs text-muted-foreground">{settings.wordSpacing}px</span>
                 <Slider
                   value={[settings.wordSpacing]}
@@ -198,7 +198,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
               {/* Espacement des lettres */}
               <div className="flex flex-col items-center justify-center p-4 bg-muted/20 rounded-lg min-h-[80px]">
                 <div className="text-lg mb-2 text-muted-foreground font-bold">A a</div>
-                <span className="text-sm font-medium text-center">Espacement des lettres</span>
+                <span className="text-sm font-medium text-center">{language === 'ar' ? 'تباعد الحروف' : 'Espacement des lettres'}</span>
                 <span className="text-xs text-muted-foreground">{settings.letterSpacing}px</span>
                 <Slider
                   value={[settings.letterSpacing]}
@@ -213,7 +213,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
               {/* Espacement des lignes */}
               <div className="flex flex-col items-center justify-center p-4 bg-muted/20 rounded-lg min-h-[80px]">
                 <div className="text-lg mb-2 text-muted-foreground">≡</div>
-                <span className="text-sm font-medium text-center">Espacement des lignes</span>
+                <span className="text-sm font-medium text-center">{language === 'ar' ? 'تباعد الأسطر' : 'Espacement des lignes'}</span>
                 <span className="text-xs text-muted-foreground">{settings.lineHeight}px</span>
                 <Slider
                   value={[settings.lineHeight]}
@@ -228,7 +228,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
               {/* Taille de texte */}
               <div className="flex flex-col items-center justify-center p-4 bg-muted/20 rounded-lg min-h-[80px]">
                 <Type className="h-6 w-6 mb-2 text-muted-foreground" />
-                <span className="text-sm font-medium text-center">Taille de texte</span>
+                <span className="text-sm font-medium text-center">{language === 'ar' ? 'حجم النص' : 'Taille de texte'}</span>
                 <span className="text-xs text-muted-foreground">{settings.fontSize}%</span>
                 <Slider
                   value={[settings.fontSize]}
@@ -243,7 +243,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
               {/* Contraste */}
               <div className="flex flex-col items-center justify-center p-4 bg-muted/20 rounded-lg min-h-[80px]">
                 <Eye className="h-6 w-6 mb-2 text-muted-foreground" />
-                <span className="text-sm font-medium text-center mb-2">Contraste</span>
+                <span className="text-sm font-medium text-center mb-2">{language === 'ar' ? 'التباين' : 'Contraste'}</span>
                 <div className="flex gap-1 flex-wrap justify-center">
                   <Button
                     variant={settings.contrast === 'normal' ? 'default' : 'outline'}
@@ -251,7 +251,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
                     onClick={() => updateSetting('contrast', 'normal')}
                     className="text-xs px-2 h-6"
                   >
-                    Normal
+                    {language === 'ar' ? 'عادي' : 'Normal'}
                   </Button>
                   <Button
                     variant={settings.contrast === 'light' ? 'default' : 'outline'}
@@ -259,7 +259,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
                     onClick={() => updateSetting('contrast', 'light')}
                     className="text-xs px-2 h-6"
                   >
-                    Léger
+                    {language === 'ar' ? 'خفيف' : 'Léger'}
                   </Button>
                   <Button
                     variant={settings.contrast === 'dark' ? 'default' : 'outline'}
@@ -267,7 +267,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
                     onClick={() => updateSetting('contrast', 'dark')}
                     className="text-xs px-2 h-6"
                   >
-                    Foncé
+                    {language === 'ar' ? 'داكن' : 'Foncé'}
                   </Button>
                 </div>
               </div>
@@ -275,7 +275,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
               {/* Saturation */}
               <div className="flex flex-col items-center justify-center p-4 bg-muted/20 rounded-lg min-h-[80px]">
                 <div className="w-6 h-6 mb-2 rounded-full bg-gradient-to-r from-red-500 to-blue-500"></div>
-                <span className="text-sm font-medium text-center mb-2">Saturation</span>
+                <span className="text-sm font-medium text-center mb-2">{language === 'ar' ? 'التشبع' : 'Saturation'}</span>
                 <div className="flex gap-1 flex-wrap justify-center">
                   <Button
                     variant={settings.saturation === 50 ? 'default' : 'outline'}
@@ -283,7 +283,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
                     onClick={() => updateSetting('saturation', 50)}
                     className="text-xs px-2 h-6"
                   >
-                    Faible
+                    {language === 'ar' ? 'منخفض' : 'Faible'}
                   </Button>
                   <Button
                     variant={settings.saturation === 100 ? 'default' : 'outline'}
@@ -291,7 +291,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
                     onClick={() => updateSetting('saturation', 100)}
                     className="text-xs px-2 h-6"
                   >
-                    Normal
+                    {language === 'ar' ? 'عادي' : 'Normal'}
                   </Button>
                   <Button
                     variant={settings.saturation === 150 ? 'default' : 'outline'}
@@ -299,7 +299,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
                     onClick={() => updateSetting('saturation', 150)}
                     className="text-xs px-2 h-6"
                   >
-                    Élevée
+                    {language === 'ar' ? 'مرتفع' : 'Élevée'}
                   </Button>
                 </div>
               </div>
@@ -311,14 +311,14 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
                 ) : (
                   <Play className="h-6 w-6 mb-2 text-muted-foreground" />
                 )}
-                <span className="text-sm font-medium text-center mb-2">Lecture</span>
+                <span className="text-sm font-medium text-center mb-2">{language === 'ar' ? 'القراءة' : 'Lecture'}</span>
                 <Button
                   variant={settings.isReading ? 'default' : 'outline'}
                   size="sm"
                   onClick={toggleReading}
                   className="text-xs px-3 h-6"
                 >
-                  {settings.isReading ? 'Arrêter' : 'Lire'}
+                  {settings.isReading ? (language === 'ar' ? 'إيقاف' : 'Arrêter') : (language === 'ar' ? 'قراءة' : 'Lire')}
                 </Button>
               </div>
             </div>
