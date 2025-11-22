@@ -25,7 +25,7 @@ import zelligePattern6 from "@/assets/zellige-pattern-6.jpg";
 import LegalDepositDeclaration from "@/components/LegalDepositDeclaration";
 
 const Index = () => {
-  const { t } = useLanguage(); // Utiliser le hook au lieu de créer un nouveau provider
+  const { t, language } = useLanguage(); // Utiliser le hook au lieu de créer un nouveau provider
   const navigate = useNavigate();
   const [showLegalDeposit, setShowLegalDeposit] = useState(false);
   const [selectedDepositType, setSelectedDepositType] = useState<"monographie" | "periodique" | "bd_logiciels" | "collections_specialisees" | null>(null);
@@ -157,12 +157,17 @@ const Index = () => {
                 </div>
                 
                 <p className="text-2xl md:text-3xl text-white/95 font-light mb-8 drop-shadow-lg">
-                  Gardienne du patrimoine millénaire marocain
+                  {language === 'ar' 
+                    ? 'حارسة التراث الألفي المغربي'
+                    : 'Gardienne du patrimoine millénaire marocain'
+                  }
                 </p>
                 
                 <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed drop-shadow-lg mb-8">
-                  La Bibliothèque Nationale du Royaume du Maroc forme les futurs citoyens du Maroc et du monde entier 
-                  en préservant et en partageant le patrimoine culturel et intellectuel marocain
+                  {language === 'ar'
+                    ? 'تعمل المكتبة الوطنية للمملكة المغربية على تكوين مواطني المغرب والعالم أجمع من خلال حفظ ومشاركة التراث الثقافي والفكري المغربي'
+                    : 'La Bibliothèque Nationale du Royaume du Maroc forme les futurs citoyens du Maroc et du monde entier en préservant et en partageant le patrimoine culturel et intellectuel marocain'
+                  }
                 </p>
               </div>
             </div>
@@ -172,25 +177,25 @@ const Index = () => {
               <Link to="/digital-library">
                 <Button className="py-6 px-8 bg-slate-100/90 hover:bg-slate-200/90 text-slate-700 shadow-lg backdrop-blur-sm">
                   <BookOpen className="h-5 w-5 mr-2" />
-                  Explorer
+                  {language === 'ar' ? 'استكشف' : 'Explorer'}
                 </Button>
               </Link>
               <Link to="/manuscripts-platform">
                 <Button className="py-6 px-8 bg-blue-50/90 hover:bg-blue-100/90 text-blue-700 shadow-lg backdrop-blur-sm">
                   <Book className="h-5 w-5 mr-2" />
-                  Manuscrits
+                  {language === 'ar' ? 'المخطوطات' : 'Manuscrits'}
                 </Button>
               </Link>
               <Link to="/abonnements">
                 <Button className="py-6 px-8 bg-amber-50/90 hover:bg-amber-100/90 text-amber-700 shadow-lg backdrop-blur-sm">
                   <Download className="h-5 w-5 mr-2" />
-                  Accès
+                  {language === 'ar' ? 'الوصول' : 'Accès'}
                 </Button>
               </Link>
               <Link to="/help">
                 <Button className="py-6 px-8 bg-purple-50/90 hover:bg-purple-100/90 text-purple-700 shadow-lg backdrop-blur-sm">
                   <Users className="h-5 w-5 mr-2" />
-                  Aide
+                  {language === 'ar' ? 'المساعدة' : 'Aide'}
                 </Button>
               </Link>
             </div>
@@ -300,7 +305,10 @@ const Index = () => {
                       </Button>
                     </div>
                     <p className="text-muted-foreground mt-4 italic font-elegant">
-                      "Découvrez des siècles de savoir et de patrimoine culturel - Utilisez les filtres pour affiner votre recherche"
+                      {language === 'ar'
+                        ? '"اكتشف قروناً من المعرفة والتراث الثقافي - استخدم الفلاتر لتحسين بحثك"'
+                        : '"Découvrez des siècles de savoir et de patrimoine culturel - Utilisez les filtres pour affiner votre recherche"'
+                      }
                     </p>
                   </div>
                 </div>
@@ -324,10 +332,13 @@ const Index = () => {
                           <Gem className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-bounce" />
                         </div>
                         <h3 className="text-xl font-moroccan font-bold text-white">
-                          Actualités & Publications
+                          {language === 'ar' ? 'الأخبار والمنشورات' : 'Actualités & Publications'}
                         </h3>
                         <p className="text-white/95 font-elegant text-sm">
-                          Découvrez les dernières nouvelles, événements et publications de la BNRM
+                          {language === 'ar'
+                            ? 'اكتشف آخر الأخبار والفعاليات والمنشورات الخاصة بالمكتبة الوطنية'
+                            : 'Découvrez les dernières nouvelles, événements et publications de la BNRM'
+                          }
                         </p>
                       </CardContent>
                     </Card>
@@ -349,10 +360,13 @@ const Index = () => {
                           <Star className="absolute -top-2 -right-2 h-6 w-6 text-gold fill-gold/70 animate-pulse" />
                         </div>
                         <h3 className="text-xl font-moroccan font-bold text-white">
-                          Bibliothèque Numérique
+                          {language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}
                         </h3>
                         <p className="text-white/95 font-elegant text-sm">
-                          Collections manuscrites, fonds documentaires et trésors numériques
+                          {language === 'ar'
+                            ? 'مجموعات المخطوطات والأرصدة الوثائقية والكنوز الرقمية'
+                            : 'Collections manuscrites, fonds documentaires et trésors numériques'
+                          }
                         </p>
                       </CardContent>
                     </Card>
@@ -374,10 +388,13 @@ const Index = () => {
                           <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-bounce" />
                         </div>
                         <h3 className="text-xl font-moroccan font-bold text-white">
-                          Plateforme Manuscrits
+                          {language === 'ar' ? 'منصة المخطوطات' : 'Plateforme Manuscrits'}
                         </h3>
                         <p className="text-white/95 font-elegant text-sm">
-                          Manuscrits BNRM & institutions partenaires marocaines
+                          {language === 'ar'
+                            ? 'مخطوطات المكتبة الوطنية والمؤسسات الشريكة المغربية'
+                            : 'Manuscrits BNRM & institutions partenaires marocaines'
+                          }
                         </p>
                       </CardContent>
                     </Card>
@@ -403,10 +420,13 @@ const Index = () => {
                           <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-cbm-primary animate-pulse" />
                         </div>
                         <h3 className="text-xl font-moroccan font-bold text-foreground">
-                          Portail CBM
+                          {language === 'ar' ? 'بوابة CBM' : 'Portail CBM'}
                         </h3>
                         <p className="text-foreground/80 font-elegant text-sm">
-                          Catalogue des Bibliothèques Marocaines - Réseau National
+                          {language === 'ar'
+                            ? 'فهرس المكتبات المغربية - الشبكة الوطنية'
+                            : 'Catalogue des Bibliothèques Marocaines - Réseau National'
+                          }
                         </p>
                       </CardContent>
                     </Card>
@@ -432,10 +452,13 @@ const Index = () => {
                           <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-pulse" />
                         </div>
                         <h3 className="text-xl font-moroccan font-bold text-foreground">
-                          Plateforme Kitab
+                          {language === 'ar' ? 'منصة كتاب' : 'Plateforme Kitab'}
                         </h3>
                         <p className="text-muted-foreground font-elegant text-sm">
-                          Bibliothèque Numérique de l'Édition Marocaine
+                          {language === 'ar'
+                            ? 'المكتبة الرقمية للنشر المغربي'
+                            : 'Bibliothèque Numérique de l\'Édition Marocaine'
+                          }
                         </p>
                       </CardContent>
                     </Card>
@@ -457,10 +480,13 @@ const Index = () => {
                           <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-gold animate-pulse" />
                         </div>
                         <h3 className="text-xl font-moroccan font-bold text-foreground">
-                          Services des Activités Culturelles
+                          {language === 'ar' ? 'خدمات الأنشطة الثقافية' : 'Services des Activités Culturelles'}
                         </h3>
                         <p className="text-muted-foreground font-elegant text-sm">
-                          Réservez vos places pour les événements, conférences et activités culturelles
+                          {language === 'ar'
+                            ? 'احجز أماكنك للفعاليات والمؤتمرات والأنشطة الثقافية'
+                            : 'Réservez vos places pour les événements, conférences et activités culturelles'
+                          }
                         </p>
                       </CardContent>
                     </Card>
@@ -474,7 +500,9 @@ const Index = () => {
                   <div className="absolute inset-0 bg-gradient-mosaique opacity-95"></div>
                   <CardContent className="p-8 relative z-10">
                     <div className="text-center mb-6">
-                      <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">Dépôt Légal</h3>
+                      <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">
+                        {language === 'ar' ? 'الإيداع القانوني' : 'Dépôt Légal'}
+                      </h3>
                       <div className="w-32 h-2 bg-gradient-neutral mx-auto rounded-full shadow-gold"></div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -487,7 +515,7 @@ const Index = () => {
                           className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 w-full"
                           onClick={() => handleLegalDepositClick("monographie")}
                         >
-                          Livres
+                          {language === 'ar' ? 'الكتب' : 'Livres'}
                         </Button>
                       </SimpleTooltip>
                       
@@ -500,7 +528,7 @@ const Index = () => {
                           className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 w-full"
                           onClick={() => handleLegalDepositClick("periodique")}
                         >
-                          Périodiques
+                          {language === 'ar' ? 'الدوريات' : 'Périodiques'}
                         </Button>
                       </SimpleTooltip>
                       
@@ -513,7 +541,7 @@ const Index = () => {
                           className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 w-full"
                           onClick={() => handleLegalDepositClick("bd_logiciels")}
                         >
-                          Audio-visuel & Logiciels
+                          {language === 'ar' ? 'السمعي البصري والبرمجيات' : 'Audio-visuel & Logiciels'}
                         </Button>
                       </SimpleTooltip>
                       
@@ -526,7 +554,7 @@ const Index = () => {
                           className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 w-full"
                           onClick={() => handleLegalDepositClick("collections_specialisees")}
                         >
-                          Collections Spécialisées
+                          {language === 'ar' ? 'المجموعات المتخصصة' : 'Collections Spécialisées'}
                         </Button>
                       </SimpleTooltip>
                       <Button
@@ -534,7 +562,7 @@ const Index = () => {
                         className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 md:col-span-2"
                         onClick={() => navigate("/signup")}
                       >
-                        Inscription
+                        {language === 'ar' ? 'التسجيل' : 'Inscription'}
                       </Button>
                     </div>
                   </CardContent>
@@ -547,15 +575,17 @@ const Index = () => {
                   <div className="absolute inset-0 bg-gradient-mosaique opacity-95"></div>
                   <CardContent className="p-8 relative z-10">
                     <div className="text-center mb-6">
-                      <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">Services Rapides</h3>
+                      <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">
+                        {language === 'ar' ? 'خدمات سريعة' : 'Services Rapides'}
+                      </h3>
                       <div className="w-32 h-2 bg-gradient-neutral mx-auto rounded-full shadow-gold"></div>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                       {[
-                        { icon: BookOpen, label: "Réserver un document", color: "text-accent", bg: "bg-accent/10", border: "border-accent/25", href: "/cbn/reserver-ouvrage" },
-                        { icon: Download, label: "Reproduction", color: "text-highlight", bg: "bg-highlight/10", border: "border-highlight/25", href: "/demande-reproduction" },
-                        { icon: CreditCard, label: "Adhésions", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25", href: "/abonnements" },
-                         { icon: Calendar, label: "Événements", color: "text-gold", bg: "bg-gold/10", border: "border-gold/25", href: "/news" }
+                        { icon: BookOpen, label_fr: "Réserver un document", label_ar: "حجز وثيقة", color: "text-accent", bg: "bg-accent/10", border: "border-accent/25", href: "/cbn/reserver-ouvrage" },
+                        { icon: Download, label_fr: "Reproduction", label_ar: "النسخ", color: "text-highlight", bg: "bg-highlight/10", border: "border-highlight/25", href: "/demande-reproduction" },
+                        { icon: CreditCard, label_fr: "Adhésions", label_ar: "الاشتراكات", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25", href: "/abonnements" },
+                        { icon: Calendar, label_fr: "Événements", label_ar: "الفعاليات", color: "text-gold", bg: "bg-gold/10", border: "border-gold/25", href: "/news" }
                         ].map((service, index) => (
                           <div 
                             key={index} 
@@ -564,7 +594,9 @@ const Index = () => {
                           >
                            <div className="absolute inset-0 bg-pattern-filigrane opacity-10 group-hover:opacity-20 transition-opacity duration-300"></div>
                            <service.icon className={`h-10 w-10 ${service.color} mx-auto mb-3 relative z-10`} />
-                           <p className="text-sm font-semibold text-foreground font-serif relative z-10">{service.label}</p>
+                           <p className="text-sm font-semibold text-foreground font-serif relative z-10">
+                             {language === 'ar' ? service.label_ar : service.label_fr}
+                           </p>
                          </div>
                        ))}
                     </div>
@@ -585,9 +617,11 @@ const Index = () => {
                       <div className="w-16 h-16 bg-gradient-neutral rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-mosaique transform group-hover:scale-110 transition-transform duration-300 border-2 border-primary/20">
                         <Users className="h-8 w-8 text-primary" />
                       </div>
-                      <h4 className="font-moroccan font-bold text-foreground mb-3">Mon Espace</h4>
+                      <h4 className="font-moroccan font-bold text-foreground mb-3">
+                        {language === 'ar' ? 'مساحتي' : 'Mon Espace'}
+                      </h4>
                       <Button size="sm" className="w-full bg-gradient-primary shadow-gold hover:shadow-mosaique font-serif">
-                        Connexion
+                        {language === 'ar' ? 'تسجيل الدخول' : 'Connexion'}
                       </Button>
                     </CardContent>
                   </Card>
