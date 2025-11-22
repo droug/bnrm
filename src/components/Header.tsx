@@ -683,7 +683,7 @@ const Header = () => {
                 variant="compact"
                 showSuggestions={true}
                 className="w-full border-2 border-primary/20 rounded-xl hover:border-primary/40 transition-all duration-300 shadow-sm focus-within:shadow-md"
-                placeholder="Recherche avancée dans nos collections..."
+                placeholder={language === 'ar' ? 'بحث متقدم في مجموعاتنا...' : 'Recherche avancée dans nos collections...'}
               />
             </div>
             
@@ -732,7 +732,7 @@ const Header = () => {
               variant="compact"
               showSuggestions={true}
               className="w-full border-2 border-primary/20 rounded-xl shadow-sm"
-              placeholder="Recherche avancée..."
+              placeholder={language === 'ar' ? 'بحث متقدم...' : 'Recherche avancée...'}
             />
           </div>
         )}

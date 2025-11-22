@@ -235,11 +235,11 @@ export default function SearchBar({
                 className="gap-1 bg-primary/10 text-primary border border-primary/20"
               >
                 <span className="text-xs font-medium">
-                  {filter.type === 'author' ? 'Auteur' : 
-                   filter.type === 'publisher' ? 'Éditeur' :
-                   filter.type === 'genre' ? 'Genre' :
-                   filter.type === 'publication_year' ? 'Année' :
-                   filter.type === 'language' ? 'Langue' : filter.type}
+                  {filter.type === 'author' ? (language === 'ar' ? 'المؤلف' : 'Auteur') : 
+                   filter.type === 'publisher' ? (language === 'ar' ? 'الناشر' : 'Éditeur') :
+                   filter.type === 'genre' ? (language === 'ar' ? 'النوع' : 'Genre') :
+                   filter.type === 'publication_year' ? (language === 'ar' ? 'السنة' : 'Année') :
+                   filter.type === 'language' ? (language === 'ar' ? 'اللغة' : 'Langue') : filter.type}
                   : {filter.value}
                 </span>
                 <button
@@ -266,42 +266,42 @@ export default function SearchBar({
                 `}
               >
                 <Filter className="h-4 w-4" />
-                <span className="hidden sm:inline">Filtres</span>
+                <span className="hidden sm:inline">{language === 'ar' ? 'الفلاتر' : 'Filtres'}</span>
                 <ChevronDown className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56 bg-background border-border z-50">
-              <DropdownMenuLabel>Filtrer par</DropdownMenuLabel>
+              <DropdownMenuLabel>{language === 'ar' ? 'تصفية حسب' : 'Filtrer par'}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => {
-                const value = prompt("Nom de l'auteur:");
+                const value = prompt(language === 'ar' ? 'اسم المؤلف:' : "Nom de l'auteur:");
                 if (value) addFilter('author', value);
               }}>
-                <span>Auteur</span>
+                <span>{language === 'ar' ? 'المؤلف' : 'Auteur'}</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => {
-                const value = prompt("Nom de l'éditeur:");
+                const value = prompt(language === 'ar' ? 'اسم الناشر:' : "Nom de l'éditeur:");
                 if (value) addFilter('publisher', value);
               }}>
-                <span>Éditeur</span>
+                <span>{language === 'ar' ? 'الناشر' : 'Éditeur'}</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => {
-                const value = prompt("Genre:");
+                const value = prompt(language === 'ar' ? 'النوع:' : "Genre:");
                 if (value) addFilter('genre', value);
               }}>
-                <span>Genre</span>
+                <span>{language === 'ar' ? 'النوع' : 'Genre'}</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => {
-                const value = prompt("Année (ex: 2024):");
+                const value = prompt(language === 'ar' ? 'السنة (مثال: 2024):' : "Année (ex: 2024):");
                 if (value) addFilter('publication_year', value);
               }}>
-                <span>Année de publication</span>
+                <span>{language === 'ar' ? 'سنة النشر' : 'Année de publication'}</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => {
-                const value = prompt("Langue (ar/fr/en):");
+                const value = prompt(language === 'ar' ? 'اللغة (ar/fr/en):' : "Langue (ar/fr/en):");
                 if (value) addFilter('language', value);
               }}>
-                <span>Langue</span>
+                <span>{language === 'ar' ? 'اللغة' : 'Langue'}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -337,7 +337,7 @@ export default function SearchBar({
                 size="sm"
                 onClick={clearSearch}
                 className={`absolute ${language === 'ar' ? 'left-12' : 'right-12'} top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-destructive/10 z-10`}
-                title="Effacer la recherche"
+                title={language === 'ar' ? 'مسح البحث' : 'Effacer la recherche'}
               >
                 <X className={`h-5 w-5 ${variant === 'hero' ? 'text-white hover:text-white' : 'text-destructive hover:text-destructive'} transition-colors`} />
               </Button>
