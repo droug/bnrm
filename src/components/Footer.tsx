@@ -59,12 +59,12 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
   };
 
   const quickLinks = [
-    { title: t('header.catalog'), href: "#catalogue" },
-    { title: t('header.collections'), href: "#collections" },
-    { title: t('footer.hours'), href: "/practical-info" },
-    { title: t('footer.about'), href: "#inscription" },
-    { title: t('header.services'), href: "#depot-legal" },
-    { title: t('footer.contact'), href: "#contact" }
+    { title_fr: "Catalogue", title_ar: "الفهرس", href: "#catalogue" },
+    { title_fr: "Collections", title_ar: "المجموعات", href: "#collections" },
+    { title_fr: "Horaires", title_ar: "المواعيد", href: "/practical-info" },
+    { title_fr: "À propos", title_ar: "حول", href: "#inscription" },
+    { title_fr: "Services", title_ar: "الخدمات", href: "#depot-legal" },
+    { title_fr: "Contact", title_ar: "اتصل بنا", href: "#contact" }
   ];
 
   const legalLinks = [
@@ -116,8 +116,12 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
             
             <p className="text-sm opacity-90 leading-relaxed">
               {isKitabPage 
-                ? "Kitab, la plateforme digitale dédiée à l'édition marocaine et à la promotion de l'industrie nationale du livre."
-                : "La Bibliothèque Nationale du Royaume du Maroc, gardienne du patrimoine écrit et promotrice du savoir au service de tous."
+                ? (language === 'ar' 
+                    ? "كتاب، المنصة الرقمية المخصصة للنشر المغربي وتعزيز الصناعة الوطنية للكتاب."
+                    : "Kitab, la plateforme digitale dédiée à l'édition marocaine et à la promotion de l'industrie nationale du livre.")
+                : (language === 'ar'
+                    ? "المكتبة الوطنية للمملكة المغربية، حارسة التراث المكتوب ومروجة المعرفة في خدمة الجميع."
+                    : "La Bibliothèque Nationale du Royaume du Maroc, gardienne du patrimoine écrit et promotrice du savoir au service de tous.")
               }
             </p>
             
@@ -152,7 +156,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                     href={link.href} 
                     className="text-sm opacity-80 hover:opacity-100 hover:translate-x-1 transition-all inline-block"
                   >
-                    {link.title}
+                    {language === 'ar' ? link.title_ar : link.title_fr}
                   </a>
                 </li>
               ))}
