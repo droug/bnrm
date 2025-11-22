@@ -245,12 +245,13 @@ const Index = () => {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            variant="transparent"
+                            variant="outline"
                             size="sm"
-                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-11 px-3 bg-white/5 hover:bg-white/10 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all"
+                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-11 px-3 bg-white hover:bg-gray-50 border-2 border-gray-300 text-gray-900 shadow-lg hover:shadow-xl transition-all"
                           >
-                            <Filter className="h-4 w-4 mr-2 text-white" />
-                            <ChevronDown className="h-4 w-4 text-white" />
+                            <Filter className="h-4 w-4 mr-2 text-gray-900" />
+                            <span className="font-medium">{language === 'ar' ? 'الفلاتر' : 'Filtres'}</span>
+                            <ChevronDown className="h-4 w-4 ml-1 text-gray-900" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start" className="w-56 bg-popover">
