@@ -15,11 +15,18 @@ import {
   Eye, 
   Loader2,
   FileText,
-  Globe
+  Globe,
+  Layout,
+  Newspaper,
+  Calendar,
+  Flag
 } from "lucide-react";
 import ContentTranslationManager from "@/components/ContentTranslationManager";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 const LANGUAGES = [
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
@@ -31,6 +38,8 @@ const LANGUAGES = [
 export default function TranslationManagementPage() {
   const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
   const [selectedContentTitle, setSelectedContentTitle] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<string>('content');
+  const [searchKey, setSearchKey] = useState('');
   const queryClient = useQueryClient();
 
   const { data: contents, isLoading } = useQuery({
@@ -128,12 +137,75 @@ export default function TranslationManagementPage() {
     return { translations: translations.length, approved, pending, missing };
   };
 
+  // Query pour les actualités
+  const { data: actualites } = useQuery({
+    queryKey: ['cms-actualites-translations'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cms_actualites')
+        .select('id, title_fr, title_ar, chapo_fr, chapo_ar, status')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Query pour les événements
+  const { data: evenements } = useQuery({
+    queryKey: ['cms-evenements-translations'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cms_evenements')
+        .select('id, title_fr, title_ar, description_fr, description_ar, status')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Query pour les bannières
+  const { data: bannieres } = useQuery({
+    queryKey: ['cms-bannieres-translations'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cms_bannieres')
+        .select('id, title_fr, title_ar, text_fr, text_ar, status')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const getTranslationStatus = (item: any, type: 'actualite' | 'evenement' | 'banniere') => {
+    let completed = 0;
+    let total = 2; // FR et AR minimum
+
+    if (type === 'actualite') {
+      if (item.title_fr && item.title_ar) completed++;
+      if (item.chapo_fr && item.chapo_ar) completed++;
+      total = 2;
+    } else if (type === 'evenement') {
+      if (item.title_fr && item.title_ar) completed++;
+      if (item.description_fr && item.description_ar) completed++;
+      total = 2;
+    } else if (type === 'banniere') {
+      if (item.title_fr && item.title_ar) completed++;
+      if (item.text_fr && item.text_ar) completed++;
+      total = 2;
+    }
+
+    return { completed, total, percentage: (completed / total) * 100 };
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <AdminHeader
         title="Gestion des Traductions"
         badgeText="Multilingue"
-        subtitle="Gérez les traductions automatiques de tout le contenu"
+        subtitle="Gérez toutes les traductions du système : contenu, interface et CMS"
       />
 
       <main className="container py-8">
@@ -265,60 +337,241 @@ export default function TranslationManagementPage() {
           </CardContent>
         </Card>
 
-        {/* Liste des contenus */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Contenus à traduire
-            </CardTitle>
-            <CardDescription>
-              Cliquez sur un contenu pour gérer ses traductions
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {contents?.map((content) => {
-                  const stats = getContentStats(content);
-                  
-                  return (
-                    <div
-                      key={content.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-colors"
-                      onClick={() => {
-                        setSelectedContentId(content.id);
-                        setSelectedContentTitle(content.title);
-                      }}
-                    >
-                      <div className="flex-1">
-                        <h3 className="font-medium">{content.title}</h3>
-                        <div className="flex gap-2 mt-1">
-                          <Badge variant="outline">{content.content_type}</Badge>
-                          <Badge variant={stats.approved === 4 ? "default" : "secondary"}>
-                            {stats.approved} / 4 validées
-                          </Badge>
-                          {stats.missing > 0 && (
-                            <Badge variant="destructive">
-                              {stats.missing} manquantes
+        {/* Onglets pour différents types de traductions */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="content" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Contenu
+            </TabsTrigger>
+            <TabsTrigger value="ui" className="flex items-center gap-2">
+              <Layout className="h-4 w-4" />
+              Interface UI
+            </TabsTrigger>
+            <TabsTrigger value="actualites" className="flex items-center gap-2">
+              <Newspaper className="h-4 w-4" />
+              Actualités
+            </TabsTrigger>
+            <TabsTrigger value="evenements" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Événements
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Onglet Contenu */}
+          <TabsContent value="content" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Contenus du catalogue
+                </CardTitle>
+                <CardDescription>
+                  Cliquez sur un contenu pour gérer ses traductions dans les 4 langues
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {contents?.map((content) => {
+                      const stats = getContentStats(content);
+                      
+                      return (
+                        <div
+                          key={content.id}
+                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-colors"
+                          onClick={() => {
+                            setSelectedContentId(content.id);
+                            setSelectedContentTitle(content.title);
+                          }}
+                        >
+                          <div className="flex-1">
+                            <h3 className="font-medium">{content.title}</h3>
+                            <div className="flex gap-2 mt-1">
+                              <Badge variant="outline">{content.content_type}</Badge>
+                              <Badge variant={stats.approved === 4 ? "default" : "secondary"}>
+                                {stats.approved} / 4 validées
+                              </Badge>
+                              {stats.missing > 0 && (
+                                <Badge variant="destructive">
+                                  {stats.missing} manquantes
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Onglet Interface UI */}
+          <TabsContent value="ui" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Layout className="h-5 w-5" />
+                  Traductions de l'interface
+                </CardTitle>
+                <CardDescription>
+                  Gérez les labels, boutons et messages de l'interface utilisateur
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Rechercher une clé de traduction..."
+                        value={searchKey}
+                        onChange={(e) => setSearchKey(e.target.value)}
+                      />
+                    </div>
+                    <Button>
+                      <Languages className="h-4 w-4 mr-2" />
+                      Ajouter une clé
+                    </Button>
+                  </div>
+
+                  <div className="bg-muted/50 rounded-lg p-6 text-center">
+                    <Globe className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-lg font-semibold mb-2">Traductions d'interface</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Les traductions de l'interface (labels, boutons, messages) sont actuellement gérées dans le fichier 
+                      <code className="mx-1 px-2 py-1 bg-background rounded">src/hooks/useLanguage.tsx</code>
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Pour modifier ces traductions, veuillez éditer directement le fichier ou créer un système de gestion dynamique.
+                    </p>
+                    <div className="mt-4 p-4 bg-background rounded-lg text-left">
+                      <p className="text-xs font-medium mb-2">Exemple de structure :</p>
+                      <pre className="text-xs text-muted-foreground">
+{`translations = {
+  fr: { 'header.title': '...' },
+  ar: { 'header.title': '...' },
+  ber: { 'header.title': '...' },
+  en: { 'header.title': '...' }
+}`}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Onglet Actualités */}
+          <TabsContent value="actualites" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Newspaper className="h-5 w-5" />
+                  Actualités CMS
+                </CardTitle>
+                <CardDescription>
+                  État des traductions des articles d'actualités (FR ↔ AR)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {actualites?.map((article) => {
+                    const status = getTranslationStatus(article, 'actualite');
+                    return (
+                      <div
+                        key={article.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                      >
+                        <div className="flex-1">
+                          <h3 className="font-medium">{article.title_fr || article.title_ar}</h3>
+                          <div className="flex gap-2 mt-1">
+                            <Badge variant="outline">{article.status}</Badge>
+                            <Badge variant={status.completed === status.total ? "default" : "secondary"}>
+                              {status.completed} / {status.total} champs
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {article.title_fr && article.title_ar ? (
+                            <Badge variant="default" className="gap-1">
+                              <CheckCircle className="h-3 w-3" />
+                              FR+AR
+                            </Badge>
+                          ) : (
+                            <Badge variant="destructive" className="gap-1">
+                              <XCircle className="h-3 w-3" />
+                              Incomplet
                             </Badge>
                           )}
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Onglet Événements */}
+          <TabsContent value="evenements" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Événements CMS
+                </CardTitle>
+                <CardDescription>
+                  État des traductions des événements culturels (FR ↔ AR)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {evenements?.map((event) => {
+                    const status = getTranslationStatus(event, 'evenement');
+                    return (
+                      <div
+                        key={event.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                      >
+                        <div className="flex-1">
+                          <h3 className="font-medium">{event.title_fr || event.title_ar}</h3>
+                          <div className="flex gap-2 mt-1">
+                            <Badge variant="outline">{event.status}</Badge>
+                            <Badge variant={status.completed === status.total ? "default" : "secondary"}>
+                              {status.completed} / {status.total} champs
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {event.title_fr && event.title_ar ? (
+                            <Badge variant="default" className="gap-1">
+                              <CheckCircle className="h-3 w-3" />
+                              FR+AR
+                            </Badge>
+                          ) : (
+                            <Badge variant="destructive" className="gap-1">
+                              <XCircle className="h-3 w-3" />
+                              Incomplet
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Dialog pour gérer les traductions d'un contenu */}
         <Dialog 
