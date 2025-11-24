@@ -7,7 +7,11 @@ import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
 import SEOHead from "@/components/seo/SEOHead";
 import SEOImage from "@/components/seo/SEOImage";
-import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Gem, Filter, ChevronDown, X, Network, CreditCard, BadgeCheck } from "lucide-react";
+import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Gem, Filter, ChevronDown, X, Network, CreditCard, BadgeCheck, Clock, MapPin } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { fr, ar } from "date-fns/locale";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +36,37 @@ const Index = () => {
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<Array<{ type: string; value: string }>>([]);
+
+  // Récupérer les actualités récentes
+  const { data: actualites } = useQuery({
+    queryKey: ['home-actualites'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cms_actualites')
+        .select('*')
+        .eq('status', 'published')
+        .order('date_publication', { ascending: false })
+        .limit(3);
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  // Récupérer les événements à venir
+  const { data: evenements } = useQuery({
+    queryKey: ['home-evenements'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cms_evenements')
+        .select('*')
+        .eq('status', 'published')
+        .gte('date_debut', new Date().toISOString())
+        .order('date_debut', { ascending: true })
+        .limit(3);
+      if (error) throw error;
+      return data;
+    }
+  });
 
   // Vérifier si le popup d'accueil doit être affiché
   useEffect(() => {
@@ -309,6 +344,128 @@ const Index = () => {
                         : '"Découvrez des siècles de savoir et de patrimoine culturel - Utilisez les filtres pour affiner votre recherche"'
                       }
                     </p>
+                  </div>
+                </div>
+
+                {/* Section Actualités / Événements */}
+                <div className="mb-12 relative">
+                  <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-10 rounded-2xl"></div>
+                  <div className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-amber-50 dark:from-slate-900 dark:via-blue-900 dark:to-amber-900 p-8 rounded-2xl shadow-lg border border-primary/20">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                        <Calendar className="h-8 w-8 text-primary" />
+                        {language === 'ar' ? 'الأخبار والفعاليات' : 'Actualités & Événements'}
+                      </h2>
+                      <Link to="/news">
+                        <Button variant="outline" className="gap-2 border-primary/40 hover:bg-primary/10">
+                          {language === 'ar' ? 'عرض الكل' : 'Voir tout'}
+                          <ChevronDown className="h-4 w-4 rotate-[-90deg]" />
+                        </Button>
+                      </Link>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      {/* Actualités */}
+                      <div>
+                        <h3 className="text-xl font-semibold mb-4 text-blue-700 dark:text-blue-300 flex items-center gap-2">
+                          <FileText className="h-5 w-5" />
+                          {language === 'ar' ? 'آخر الأخبار' : 'Dernières actualités'}
+                        </h3>
+                        <div className="space-y-4">
+                          {actualites && actualites.length > 0 ? (
+                            actualites.slice(0, 3).map((actu) => (
+                              <Link key={actu.id} to={`/news/${actu.slug}`}>
+                                <Card className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500 hover:border-l-blue-600">
+                                  <CardContent className="p-4">
+                                    <div className="flex gap-3">
+                                      {actu.image_url && (
+                                        <img 
+                                          src={actu.image_url} 
+                                          alt={language === 'ar' ? actu.image_alt_ar || '' : actu.image_alt_fr || ''}
+                                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                                        />
+                                      )}
+                                      <div className="flex-1 min-w-0">
+                                        <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
+                                          {language === 'ar' ? actu.title_ar || actu.title_fr : actu.title_fr}
+                                        </h4>
+                                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                                          {language === 'ar' ? actu.chapo_ar || actu.chapo_fr : actu.chapo_fr}
+                                        </p>
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                          <Clock className="h-3 w-3" />
+                                          {actu.date_publication && format(new Date(actu.date_publication), 'dd MMMM yyyy', { locale: language === 'ar' ? ar : fr })}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </Link>
+                            ))
+                          ) : (
+                            <p className="text-muted-foreground text-center py-8">
+                              {language === 'ar' ? 'لا توجد أخبار حالياً' : 'Aucune actualité pour le moment'}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Événements */}
+                      <div>
+                        <h3 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-300 flex items-center gap-2">
+                          <Calendar className="h-5 w-5" />
+                          {language === 'ar' ? 'الفعاليات القادمة' : 'Événements à venir'}
+                        </h3>
+                        <div className="space-y-4">
+                          {evenements && evenements.length > 0 ? (
+                            evenements.slice(0, 3).map((event) => (
+                              <Link key={event.id} to={`/evenements/${event.slug}`}>
+                                <Card className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-amber-500 hover:border-l-amber-600">
+                                  <CardContent className="p-4">
+                                    <div className="flex gap-3">
+                                      {event.affiche_url && (
+                                        <img 
+                                          src={event.affiche_url} 
+                                          alt={language === 'ar' ? event.affiche_alt_ar || '' : event.affiche_alt_fr || ''}
+                                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                                        />
+                                      )}
+                                      <div className="flex-1 min-w-0">
+                                        <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
+                                          {language === 'ar' ? event.title_ar || event.title_fr : event.title_fr}
+                                        </h4>
+                                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                                          {language === 'ar' ? event.description_ar || event.description_fr : event.description_fr}
+                                        </p>
+                                        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+                                          <div className="flex items-center gap-2">
+                                            <Clock className="h-3 w-3" />
+                                            {format(new Date(event.date_debut), 'dd MMM yyyy', { locale: language === 'ar' ? ar : fr })}
+                                            {event.date_fin && event.date_debut !== event.date_fin && (
+                                              <> - {format(new Date(event.date_fin), 'dd MMM yyyy', { locale: language === 'ar' ? ar : fr })}</>
+                                            )}
+                                          </div>
+                                          {(event.lieu_fr || event.lieu_ar) && (
+                                            <div className="flex items-center gap-2">
+                                              <MapPin className="h-3 w-3" />
+                                              {language === 'ar' ? event.lieu_ar || event.lieu_fr : event.lieu_fr}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </Link>
+                            ))
+                          ) : (
+                            <p className="text-muted-foreground text-center py-8">
+                              {language === 'ar' ? 'لا توجد فعاليات قادمة' : 'Aucun événement prévu'}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
