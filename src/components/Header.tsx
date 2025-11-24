@@ -192,7 +192,7 @@ const Header = () => {
   const showBackButton = !isHomePage && !isDigitalLibraryHome && !isManuscriptsPlatformHome;
 
   return (
-    <header className={`sticky top-0 z-50 border-b-2 shadow-lg ${isHomePage ? 'bg-transparent border-transparent' : 'bg-background/95 backdrop-blur-lg border-primary/20'}`}>
+    <header className={`sticky top-0 z-50 border-b-2 shadow-lg ${isHomePage ? 'bg-slate-900/80 backdrop-blur-lg border-white/20' : 'bg-background/95 backdrop-blur-lg border-primary/20'}`}>
       <div className={`container mx-auto px-4 ${isHomePage ? 'text-white' : ''}`}>
         {/* Bannière ultra-compacte */}
         <div className={`flex justify-between items-center py-2 ${isHomePage ? 'border-b border-white/20' : 'border-b border-primary/20'}`}>

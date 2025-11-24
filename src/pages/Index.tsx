@@ -130,7 +130,7 @@ const Index = () => {
           <Header />
           
           {/* Bannière moderne avec header intégré */}
-          <section className="relative min-h-screen overflow-hidden pt-4">
+          <section className="relative min-h-screen overflow-hidden pt-20">
             {/* Image de fond - Bâtiment BNRM de nuit - claire à 100% */}
             <div 
               className="absolute inset-0 bg-cover bg-center bg-no-repeat"
