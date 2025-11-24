@@ -348,122 +348,211 @@ const Index = () => {
                 </div>
 
                 {/* Section Actualités / Événements */}
-                <div className="mb-12 relative">
-                  <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-10 rounded-2xl"></div>
-                  <div className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-amber-50 dark:from-slate-900 dark:via-blue-900 dark:to-amber-900 p-8 rounded-2xl shadow-lg border border-primary/20">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                        <Calendar className="h-8 w-8 text-primary" />
-                        {language === 'ar' ? 'الأخبار والفعاليات' : 'Actualités & Événements'}
-                      </h2>
-                      <Link to="/news">
-                        <Button variant="outline" className="gap-2 border-primary/40 hover:bg-primary/10">
-                          {language === 'ar' ? 'عرض الكل' : 'Voir tout'}
-                          <ChevronDown className="h-4 w-4 rotate-[-90deg]" />
-                        </Button>
-                      </Link>
-                    </div>
+                <div className="mb-12">
+                  <div className="py-16 bg-gradient-to-b from-slate-50 to-white relative">
+                    <div className="container mx-auto px-4">
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-8">
+                        <div>
+                          <div className="inline-block bg-orange-500 text-white px-4 py-1 text-sm font-semibold mb-3">
+                            BNRM
+                          </div>
+                          <h2 className="text-4xl font-bold mb-2 text-slate-900">
+                            {language === 'ar' ? 'الأخبار والفعاليات' : 'Actualités & Événements'}
+                          </h2>
+                          <div className="w-20 h-1 bg-orange-500 mb-3"></div>
+                          <p className="text-slate-600">
+                            {language === 'ar' 
+                              ? 'تابع آخر الأخبار والفعاليات الخاصة بالمكتبة الوطنية'
+                              : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'}
+                          </p>
+                        </div>
+                        <Link 
+                          to="/news"
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded text-sm font-medium transition-colors"
+                        >
+                          View all
+                        </Link>
+                      </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {/* Actualités */}
-                      <div>
-                        <h3 className="text-xl font-semibold mb-4 text-blue-700 dark:text-blue-300 flex items-center gap-2">
-                          <FileText className="h-5 w-5" />
-                          {language === 'ar' ? 'آخر الأخبار' : 'Dernières actualités'}
-                        </h3>
-                        <div className="space-y-4">
-                          {actualites && actualites.length > 0 ? (
-                            actualites.slice(0, 3).map((actu) => (
-                              <Link key={actu.id} to={`/news/${actu.slug}`}>
-                                <Card className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500 hover:border-l-blue-600">
-                                  <CardContent className="p-4">
-                                    <div className="flex gap-3">
-                                      {actu.image_url && (
-                                        <img 
-                                          src={actu.image_url} 
-                                          alt={language === 'ar' ? actu.image_alt_ar || '' : actu.image_alt_fr || ''}
-                                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
-                                        />
-                                      )}
-                                      <div className="flex-1 min-w-0">
-                                        <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
-                                          {language === 'ar' ? actu.title_ar || actu.title_fr : actu.title_fr}
-                                        </h4>
-                                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                                          {language === 'ar' ? actu.chapo_ar || actu.chapo_fr : actu.chapo_fr}
-                                        </p>
-                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                          <Clock className="h-3 w-3" />
-                                          {actu.date_publication && format(new Date(actu.date_publication), 'dd MMMM yyyy', { locale: language === 'ar' ? ar : fr })}
-                                        </div>
-                                      </div>
+                      {/* Grid Layout */}
+                      <div className="grid md:grid-cols-2 gap-6">
+                        {/* Large Card - First News Item */}
+                        {actualites && actualites.length > 0 && (
+                          <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200 hover:shadow-md transition-shadow">
+                            <Link to={`/news/${actualites[0].slug}`} className="block">
+                              <div className="p-6">
+                                <div className="inline-block bg-orange-500 text-white px-3 py-1 text-xs font-semibold mb-4">
+                                  Bnrma
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                  <div>
+                                    <h3 className="text-xl font-bold mb-3 text-slate-900">
+                                      {language === 'ar' ? actualites[0].title_ar || actualites[0].title_fr : actualites[0].title_fr}
+                                    </h3>
+                                    <p className="text-slate-600 text-sm mb-4 line-clamp-4">
+                                      {language === 'ar' ? actualites[0].chapo_ar || actualites[0].chapo_fr : actualites[0].chapo_fr}
+                                    </p>
+                                    <button className="flex items-center gap-2 text-sm font-medium text-slate-900 hover:text-orange-500 transition-colors">
+                                      Button <span className="text-orange-500">→</span>
+                                    </button>
+                                  </div>
+                                  {actualites[0].image_url && (
+                                    <img 
+                                      src={actualites[0].image_url} 
+                                      alt={language === 'ar' ? actualites[0].title_ar || actualites[0].title_fr : actualites[0].title_fr}
+                                      className="w-full h-64 object-cover rounded"
+                                    />
+                                  )}
+                                </div>
+                              </div>
+                            </Link>
+                          </div>
+                        )}
+
+                        {/* Right Column - Two Cards */}
+                        <div className="space-y-6">
+                          {/* Second News/Event Item */}
+                          {(actualites && actualites.length > 1 ? actualites[1] : evenements && evenements.length > 0 ? evenements[0] : null) && (
+                            <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200 hover:shadow-md transition-shadow">
+                              <Link to={actualites && actualites.length > 1 ? `/news/${actualites[1].slug}` : `/evenements/${evenements[0].slug}`} className="block">
+                                <div className="flex gap-4 p-6">
+                                  <div className="flex-1">
+                                    <div className="inline-block bg-orange-500 text-white px-3 py-1 text-xs font-semibold mb-3">
+                                      Bnrma
                                     </div>
-                                  </CardContent>
-                                </Card>
+                                    <h3 className="text-lg font-bold mb-2 text-slate-900 line-clamp-2">
+                                      {actualites && actualites.length > 1 
+                                        ? (language === 'ar' ? actualites[1].title_ar || actualites[1].title_fr : actualites[1].title_fr)
+                                        : (language === 'ar' ? evenements[0].title_ar || evenements[0].title_fr : evenements[0].title_fr)}
+                                    </h3>
+                                    <p className="text-slate-600 text-sm line-clamp-3">
+                                      {actualites && actualites.length > 1 
+                                        ? (language === 'ar' ? actualites[1].chapo_ar || actualites[1].chapo_fr : actualites[1].chapo_fr)
+                                        : (language === 'ar' ? evenements[0].description_ar || evenements[0].description_fr : evenements[0].description_fr)}
+                                    </p>
+                                  </div>
+                                  {((actualites && actualites.length > 1 && actualites[1].image_url) || (evenements && evenements.length > 0 && evenements[0].affiche_url)) && (
+                                    <img 
+                                      src={actualites && actualites.length > 1 ? actualites[1].image_url : evenements[0].affiche_url} 
+                                      alt=""
+                                      className="w-40 h-40 object-cover rounded"
+                                    />
+                                  )}
+                                </div>
                               </Link>
-                            ))
-                          ) : (
-                            <p className="text-muted-foreground text-center py-8">
-                              {language === 'ar' ? 'لا توجد أخبار حالياً' : 'Aucune actualité pour le moment'}
-                            </p>
+                            </div>
+                          )}
+
+                          {/* Third News/Event Item */}
+                          {(actualites && actualites.length > 2 ? actualites[2] : evenements && evenements.length > 1 ? evenements[1] : null) && (
+                            <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200 hover:shadow-md transition-shadow">
+                              <Link to={actualites && actualites.length > 2 ? `/news/${actualites[2].slug}` : `/evenements/${evenements[1].slug}`} className="block">
+                                <div className="flex gap-4 p-6">
+                                  <div className="flex-1">
+                                    <div className="inline-block bg-orange-500 text-white px-3 py-1 text-xs font-semibold mb-3">
+                                      Bnrma
+                                    </div>
+                                    <h3 className="text-lg font-bold mb-2 text-slate-900 line-clamp-2">
+                                      {actualites && actualites.length > 2
+                                        ? (language === 'ar' ? actualites[2].title_ar || actualites[2].title_fr : actualites[2].title_fr)
+                                        : (language === 'ar' ? evenements[1].title_ar || evenements[1].title_fr : evenements[1].title_fr)}
+                                    </h3>
+                                    <p className="text-slate-600 text-sm line-clamp-3">
+                                      {actualites && actualites.length > 2
+                                        ? (language === 'ar' ? actualites[2].chapo_ar || actualites[2].chapo_fr : actualites[2].chapo_fr)
+                                        : (language === 'ar' ? evenements[1].description_ar || evenements[1].description_fr : evenements[1].description_fr)}
+                                    </p>
+                                  </div>
+                                  {((actualites && actualites.length > 2 && actualites[2].image_url) || (evenements && evenements.length > 1 && evenements[1].affiche_url)) && (
+                                    <img 
+                                      src={actualites && actualites.length > 2 ? actualites[2].image_url : evenements[1].affiche_url} 
+                                      alt=""
+                                      className="w-40 h-40 object-cover rounded"
+                                    />
+                                  )}
+                                </div>
+                              </Link>
+                            </div>
                           )}
                         </div>
                       </div>
 
-                      {/* Événements */}
-                      <div>
-                        <h3 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-300 flex items-center gap-2">
-                          <Calendar className="h-5 w-5" />
-                          {language === 'ar' ? 'الفعاليات القادمة' : 'Événements à venir'}
-                        </h3>
-                        <div className="space-y-4">
-                          {evenements && evenements.length > 0 ? (
-                            evenements.slice(0, 3).map((event) => (
-                              <Link key={event.id} to={`/evenements/${event.slug}`}>
-                                <Card className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-amber-500 hover:border-l-amber-600">
-                                  <CardContent className="p-4">
-                                    <div className="flex gap-3">
-                                      {event.affiche_url && (
-                                        <img 
-                                          src={event.affiche_url} 
-                                          alt={language === 'ar' ? event.affiche_alt_ar || '' : event.affiche_alt_fr || ''}
-                                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
-                                        />
-                                      )}
-                                      <div className="flex-1 min-w-0">
-                                        <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
-                                          {language === 'ar' ? event.title_ar || event.title_fr : event.title_fr}
-                                        </h4>
-                                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                                          {language === 'ar' ? event.description_ar || event.description_fr : event.description_fr}
-                                        </p>
-                                        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                                          <div className="flex items-center gap-2">
-                                            <Clock className="h-3 w-3" />
-                                            {format(new Date(event.date_debut), 'dd MMM yyyy', { locale: language === 'ar' ? ar : fr })}
-                                            {event.date_fin && event.date_debut !== event.date_fin && (
-                                              <> - {format(new Date(event.date_fin), 'dd MMM yyyy', { locale: language === 'ar' ? ar : fr })}</>
-                                            )}
-                                          </div>
-                                          {(event.lieu_fr || event.lieu_ar) && (
-                                            <div className="flex items-center gap-2">
-                                              <MapPin className="h-3 w-3" />
-                                              {language === 'ar' ? event.lieu_ar || event.lieu_fr : event.lieu_fr}
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              </Link>
-                            ))
-                          ) : (
-                            <p className="text-muted-foreground text-center py-8">
-                              {language === 'ar' ? 'لا توجد فعاليات قادمة' : 'Aucun événement prévu'}
-                            </p>
-                          )}
-                        </div>
+                      {/* Bottom Row - Two Cards */}
+                      <div className="grid md:grid-cols-2 gap-6 mt-6">
+                        {/* Fourth Item */}
+                        {(evenements && evenements.length > 0 ? evenements[evenements.length > 2 ? 2 : 0] : null) && (
+                          <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200 hover:shadow-md transition-shadow">
+                            <Link to={`/evenements/${evenements[evenements.length > 2 ? 2 : 0].slug}`} className="block">
+                              <div className="p-6">
+                                <div className="inline-block bg-orange-500 text-white px-3 py-1 text-xs font-semibold mb-4">
+                                  Bnrma
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                  <div>
+                                    <h3 className="text-xl font-bold mb-3 text-slate-900">
+                                      {language === 'ar' 
+                                        ? evenements[evenements.length > 2 ? 2 : 0].title_ar || evenements[evenements.length > 2 ? 2 : 0].title_fr 
+                                        : evenements[evenements.length > 2 ? 2 : 0].title_fr}
+                                    </h3>
+                                    <p className="text-slate-600 text-sm mb-4 line-clamp-4">
+                                      {language === 'ar' 
+                                        ? evenements[evenements.length > 2 ? 2 : 0].description_ar || evenements[evenements.length > 2 ? 2 : 0].description_fr 
+                                        : evenements[evenements.length > 2 ? 2 : 0].description_fr}
+                                    </p>
+                                    <button className="flex items-center gap-2 text-sm font-medium text-slate-900 hover:text-orange-500 transition-colors">
+                                      Button <span className="text-orange-500">→</span>
+                                    </button>
+                                  </div>
+                                  {evenements[evenements.length > 2 ? 2 : 0].affiche_url && (
+                                    <img 
+                                      src={evenements[evenements.length > 2 ? 2 : 0].affiche_url} 
+                                      alt=""
+                                      className="w-full h-48 object-cover rounded"
+                                    />
+                                  )}
+                                </div>
+                              </div>
+                            </Link>
+                          </div>
+                        )}
+
+                        {/* Fifth Item */}
+                        {(evenements && evenements.length > 1 ? evenements[evenements.length > 3 ? 3 : 1] : null) && (
+                          <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200 hover:shadow-md transition-shadow">
+                            <Link to={`/evenements/${evenements[evenements.length > 3 ? 3 : 1].slug}`} className="block">
+                              <div className="p-6">
+                                <div className="inline-block bg-orange-500 text-white px-3 py-1 text-xs font-semibold mb-4">
+                                  Bnrma
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                  <div>
+                                    <h3 className="text-xl font-bold mb-3 text-slate-900">
+                                      {language === 'ar' 
+                                        ? evenements[evenements.length > 3 ? 3 : 1].title_ar || evenements[evenements.length > 3 ? 3 : 1].title_fr 
+                                        : evenements[evenements.length > 3 ? 3 : 1].title_fr}
+                                    </h3>
+                                    <p className="text-slate-600 text-sm mb-4 line-clamp-4">
+                                      {language === 'ar' 
+                                        ? evenements[evenements.length > 3 ? 3 : 1].description_ar || evenements[evenements.length > 3 ? 3 : 1].description_fr 
+                                        : evenements[evenements.length > 3 ? 3 : 1].description_fr}
+                                    </p>
+                                    <button className="flex items-center gap-2 text-sm font-medium text-slate-900 hover:text-orange-500 transition-colors">
+                                      Button <span className="text-orange-500">→</span>
+                                    </button>
+                                  </div>
+                                  {evenements[evenements.length > 3 ? 3 : 1].affiche_url && (
+                                    <img 
+                                      src={evenements[evenements.length > 3 ? 3 : 1].affiche_url} 
+                                      alt=""
+                                      className="w-full h-48 object-cover rounded"
+                                    />
+                                  )}
+                                </div>
+                              </div>
+                            </Link>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
