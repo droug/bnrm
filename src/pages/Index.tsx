@@ -364,7 +364,7 @@ const Index = () => {
                           <p className="text-slate-600">
                             {language === 'ar' 
                               ? 'تابع آخر الأخبار والفعاليات الخاصة بالمكتبة الوطنية'
-                              : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'}
+                              : 'Suivez les dernières actualités et événements de la Bibliothèque Nationale'}
                           </p>
                         </div>
                         <Link 
