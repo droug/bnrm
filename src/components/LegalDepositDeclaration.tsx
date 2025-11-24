@@ -33,6 +33,7 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { useSystemList } from "@/hooks/useSystemList";
 import { useDependentList } from "@/hooks/useDependentList";
 import { useLegalDepositStorage } from "@/hooks/useLegalDepositStorage";
+import Header from "@/components/Header";
 
 interface Publisher {
   id: string;
@@ -3970,11 +3971,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
     }
   };
 
-  if (currentStep === "type_selection") {
-    const isBDLogiciels = depositType === 'bd_logiciels';
-    
-    return (
-      <Card className="w-full max-w-md mx-auto">
+  // Contenu de l'étape actuelle
+  const renderStepContent = () => {
+    if (currentStep === "type_selection") {
+      const isBDLogiciels = depositType === 'bd_logiciels';
+      
+      return (
+        <Card className="w-full max-w-md mx-auto">
         <CardHeader>
           <CardTitle className="text-center">
             {language === 'ar' ? 'نوع المستخدم' : 'Type d\'utilisateur'}
@@ -4023,10 +4026,10 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           </Button>
         </CardFooter>
       </Card>
-    );
-  }
+      );
+    }
 
-  if (currentStep === "editor_auth") {
+    if (currentStep === "editor_auth") {
     const isBDLogiciels = depositType === 'bd_logiciels';
     const roleLabel = isBDLogiciels ? 
       (language === 'ar' ? 'المنتج' : 'producteur') : 
@@ -4203,10 +4206,10 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           </div>
         </CardFooter>
       </Card>
-    );
-  }
+      );
+    }
 
-  if (currentStep === "printer_auth") {
+    if (currentStep === "printer_auth") {
     const isBDLogiciels = depositType === 'bd_logiciels';
     const roleLabel = isBDLogiciels ? 
       (language === 'ar' ? 'الموزع' : 'distributeur') : 
@@ -4367,13 +4370,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           </div>
         </CardFooter>
       </Card>
-    );
-  }
+      );
+    }
 
-  if (currentStep === "form_filling") {
-    return (
-      <>
-        <div className="w-full max-w-6xl mx-auto space-y-4">
+    if (currentStep === "form_filling") {
+      return (
+        <>
+          <div className="w-full max-w-6xl mx-auto space-y-4">
           <Button
             variant="ghost"
             onClick={() => setCurrentStep("printer_auth")}
@@ -4561,13 +4564,13 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             </ScrollableDialogFooter>
           </ScrollableDialogContent>
         </ScrollableDialog>
-      </>
-    );
-  }
+        </>
+      );
+    }
 
-  if (currentStep === "confirmation") {
-    return (
-      <Card className="w-full max-w-2xl mx-auto">
+    if (currentStep === "confirmation") {
+      return (
+        <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
           <div className="text-center">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
@@ -4609,8 +4612,19 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           </Button>
         </CardFooter>
       </Card>
-    );
-  }
+      );
+    }
 
-  return null;
+    return null;
+  };
+
+  // Render avec Header fixe
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <Header />
+      <main className="flex-1 container mx-auto px-4 py-8">
+        {renderStepContent()}
+      </main>
+    </div>
+  );
 }
