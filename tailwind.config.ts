@@ -14,13 +14,44 @@ export default {
     },
     extend: {
       fontFamily: {
-        'serif': ['Playfair Display', 'Crimson Text', 'serif'],
-        'sans': ['Inter', 'Noto Sans Arabic', 'sans-serif'],
-        'arabic': ['Amiri', 'Noto Sans Arabic', 'serif'],
-        'moroccan': ['Playfair Display', 'Amiri', 'serif'],
-        'elegant': ['Crimson Text', 'Playfair Display', 'serif'],
+        // BNRM Official Typography - French: Times New Roman, Georgia (serif with empattements)
+        'serif': ['Georgia', 'Times New Roman', 'serif'],
+        'french': ['Georgia', 'Times New Roman', 'serif'],
+        'sans': ['system-ui', '-apple-system', 'sans-serif'],
+        // BNRM Official Typography - Arabic: Traditional calligraphy
+        'arabic': ['Amiri', 'Noto Naskh Arabic', 'Noto Sans Arabic', 'serif'],
+        'moroccan': ['Georgia', 'Amiri', 'serif'],
+        'elegant': ['Georgia', 'Times New Roman', 'serif'],
       },
       colors: {
+        // BNRM Official Color Families
+        slate: {
+          surface: "hsl(var(--slate-surface))",
+          light: "hsl(var(--slate-light))",
+          border: "hsl(var(--slate-border))",
+          'text-light': "hsl(var(--slate-text-light))",
+          text: "hsl(var(--slate-text))",
+          base: "hsl(var(--slate-base))",
+          'base-dark': "hsl(var(--slate-base-dark))",
+        },
+        blue: {
+          surface: "hsl(var(--blue-surface))",
+          light: "hsl(var(--blue-light))",
+          soft: "hsl(var(--blue-soft))",
+          primary: "hsl(var(--blue-primary))",
+          'primary-dark': "hsl(var(--blue-primary-dark))",
+          deep: "hsl(var(--blue-deep))",
+          dark: "hsl(var(--blue-dark))",
+        },
+        amber: {
+          surface: "hsl(var(--amber-surface))",
+          light: "hsl(var(--amber-light))",
+          soft: "hsl(var(--amber-soft))",
+          primary: "hsl(var(--amber-primary))",
+          'primary-dark': "hsl(var(--amber-primary-dark))",
+          deep: "hsl(var(--amber-deep))",
+          dark: "hsl(var(--amber-dark))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

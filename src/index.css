@@ -16,54 +16,84 @@ Enhanced Moroccan Heritage Design System
 
 @layer base {
   :root {
-    /* Palette Neutres - Style filaire épuré */
-    --background: 0 0% 98%; /* Blanc cassé */
-    --foreground: 0 0% 20%;
+    /* === BNRM OFFICIAL COLOR PALETTE === */
+    /* Based on official brand guidelines - Slate, Blue, Amber families */
+    
+    /* Slate Family - Neutral surfaces */
+    --slate-surface: 210 40% 98%; /* #F8FAFC */
+    --slate-light: 214 32% 96%; /* #F1F5F9 */
+    --slate-border: 214 32% 91%; /* #E2E8F0 */
+    --slate-text-light: 215 16% 65%; /* #94A3B8 */
+    --slate-text: 215 20% 47%; /* #64748B */
+    --slate-base: 217 23% 27%; /* #334155 */
+    --slate-base-dark: 217 33% 17%; /* #1E293B */
+    
+    /* Blue Family - Primary brand colors */
+    --blue-surface: 214 100% 97%; /* #EFF6FF */
+    --blue-light: 214 95% 93%; /* #DBEAFE */
+    --blue-soft: 213 94% 78%; /* #93C5FD */
+    --blue-primary: 221 91% 60%; /* #3B82F6 - Official BNRM Blue */
+    --blue-primary-dark: 221 83% 53%; /* #2563EB */
+    --blue-deep: 221 77% 48%; /* #1D4ED8 */
+    --blue-dark: 221 68% 33%; /* #1E3A8A */
+    
+    /* Amber Family - Accent colors */
+    --amber-surface: 48 100% 95%; /* #FFFBE9 */
+    --amber-light: 48 96% 89%; /* #FEF3C7 */
+    --amber-soft: 45 96% 64%; /* #FCD34D */
+    --amber-primary: 43 96% 50%; /* #F59E0B */
+    --amber-primary-dark: 32 95% 44%; /* #D97706 */
+    --amber-deep: 27 91% 37%; /* #B45309 */
+    --amber-dark: 25 81% 26%; /* #78350F */
+    
+    /* Semantic tokens mapped to BNRM palette */
+    --background: var(--slate-surface);
+    --foreground: var(--slate-base-dark);
 
-    --card: 40 20% 94%;
-    --card-foreground: 30 15% 20%;
+    --card: var(--slate-light);
+    --card-foreground: var(--slate-base-dark);
 
-    --popover: 40 20% 94%;
-    --popover-foreground: 30 15% 20%;
+    --popover: var(--slate-light);
+    --popover-foreground: var(--slate-base-dark);
 
-    /* Bleu Zellige Subtil */
-    --primary: 220 30% 45%;
-    --primary-foreground: 44 15% 98%;
-    --primary-glow: 220 25% 55%;
-    --primary-deep: 220 35% 35%;
+    /* Primary: Official BNRM Blue */
+    --primary: var(--blue-primary);
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: var(--blue-soft);
+    --primary-deep: var(--blue-deep);
 
-    /* Terre Cuite et Sable - Tons Neutres */
-    --secondary: 35 25% 85%;
-    --secondary-foreground: 30 15% 20%;
-    --secondary-warm: 30 30% 80%;
+    /* Secondary: Amber tones for warmth */
+    --secondary: var(--amber-light);
+    --secondary-foreground: var(--slate-base-dark);
+    --secondary-warm: var(--amber-soft);
 
-    /* Tons neutres doux */
-    --muted: 40 15% 90%;
-    --muted-foreground: 35 10% 40%;
+    /* Muted: Slate neutral tones */
+    --muted: var(--slate-light);
+    --muted-foreground: var(--slate-text);
 
-    /* Vert Olive Subtil */
-    --accent: 155 25% 45%;
-    --accent-foreground: 44 15% 98%;
-    --accent-glow: 155 20% 55%;
-    --accent-bright: 155 30% 50%;
+    /* Accent: Amber for emphasis */
+    --accent: var(--amber-primary);
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: var(--amber-soft);
+    --accent-bright: var(--amber-primary-dark);
 
-    /* Brique Douce */
-    --highlight: 12 35% 65%;
-    --highlight-foreground: 44 15% 98%;
-    --highlight-deep: 8 40% 55%;
+    /* Highlight: Deep amber */
+    --highlight: var(--amber-deep);
+    --highlight-foreground: 0 0% 100%;
+    --highlight-deep: var(--amber-dark);
 
-    /* Or Ancien - Mosaïque */
-    --gold: 48 40% 65%;
-    --gold-foreground: 30 15% 20%;
-    --gold-bright: 50 45% 60%;
+    /* Gold: Legacy support - mapped to amber */
+    --gold: var(--amber-soft);
+    --gold-foreground: var(--slate-base-dark);
+    --gold-bright: var(--amber-primary);
 
-    /* Corail Doux */
-    --coral: 15 30% 70%;
-    --coral-foreground: 44 15% 98%;
+    /* Coral: Legacy support - mapped to amber */
+    --coral: var(--amber-primary);
+    --coral-foreground: 0 0% 100%;
 
-    /* Violet Mosaïque */
-    --royal: 280 25% 60%;
-    --royal-foreground: 44 15% 98%;
+    /* Royal: Legacy support - mapped to blue */
+    --royal: var(--blue-primary-dark);
+    --royal-foreground: 0 0% 100%;
 
     /* === CBM Portal Specific Colors === */
     /* Palette distinctive pour le Catalogue des Bibliothèques Marocaines */
@@ -131,20 +161,20 @@ Enhanced Moroccan Heritage Design System
     --shadow-kitab: 0 4px 20px -4px hsl(var(--kitab-primary) / 0.25), 0 2px 8px -2px hsl(var(--kitab-accent) / 0.15);
     --shadow-kitab-strong: 0 8px 32px -8px hsl(var(--kitab-primary) / 0.35), 0 4px 12px -2px hsl(var(--kitab-secondary) / 0.2);
 
-    --destructive: 0 50% 60%;
-    --destructive-foreground: 44 15% 98%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 40 15% 85%;
-    --input: 40 20% 90%;
-    --ring: 220 30% 45%;
+    --border: var(--slate-border);
+    --input: var(--slate-light);
+    --ring: var(--blue-primary);
 
-    /* Dégradés Mosaïques Zellige */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)), hsl(var(--secondary-warm)));
-    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)), hsl(var(--secondary)));
-    --gradient-neutral: linear-gradient(45deg, hsl(var(--secondary)) 0%, hsl(var(--muted)) 25%, hsl(var(--card)) 50%, hsl(var(--secondary-warm)) 75%, hsl(var(--background)) 100%);
-    --gradient-zellige-main: linear-gradient(60deg, hsl(var(--primary) / 0.8) 0%, hsl(var(--accent) / 0.6) 35%, hsl(var(--gold) / 0.7) 70%, hsl(var(--secondary)) 100%);
-    --gradient-mosaique: linear-gradient(120deg, hsl(var(--muted)) 0%, hsl(var(--card)) 33%, hsl(var(--secondary)) 66%, hsl(var(--background)) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--secondary)));
+    /* BNRM Official Gradients - Blue & Amber combinations */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--blue-primary)), hsl(var(--blue-soft)), hsl(var(--blue-light)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--amber-primary)), hsl(var(--amber-soft)), hsl(var(--amber-light)));
+    --gradient-neutral: linear-gradient(45deg, hsl(var(--slate-light)) 0%, hsl(var(--slate-surface)) 100%);
+    --gradient-zellige-main: linear-gradient(60deg, hsl(var(--blue-primary)) 0%, hsl(var(--amber-primary)) 100%);
+    --gradient-mosaique: linear-gradient(120deg, hsl(var(--slate-surface)) 0%, hsl(var(--blue-surface)) 50%, hsl(var(--amber-surface)) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--slate-light)));
     
     /* Motifs Zellige Complexes et Raffinés */
     
@@ -269,41 +299,42 @@ Enhanced Moroccan Heritage Design System
   }
 
   .dark {
-    --background: 25 25% 8%;
-    --foreground: 45 15% 95%;
+    /* Dark mode with BNRM official palette */
+    --background: var(--slate-base-dark);
+    --foreground: var(--slate-surface);
 
-    --card: 25 20% 10%;
-    --card-foreground: 45 15% 95%;
+    --card: var(--slate-base);
+    --card-foreground: var(--slate-surface);
 
-    --popover: 25 20% 10%;
-    --popover-foreground: 45 15% 95%;
+    --popover: var(--slate-base);
+    --popover-foreground: var(--slate-surface);
 
-    --primary: 215 60% 70%;
-    --primary-foreground: 25 25% 8%;
-    --primary-glow: 215 50% 60%;
+    --primary: var(--blue-soft);
+    --primary-foreground: var(--slate-base-dark);
+    --primary-glow: var(--blue-light);
 
-    --secondary: 25 15% 15%;
-    --secondary-foreground: 45 15% 95%;
+    --secondary: var(--slate-base);
+    --secondary-foreground: var(--slate-surface);
 
-    --muted: 25 15% 12%;
-    --muted-foreground: 45 10% 65%;
+    --muted: var(--slate-base);
+    --muted-foreground: var(--slate-text-light);
 
-    --accent: 160 40% 50%;
-    --accent-foreground: 25 25% 8%;
-    --accent-glow: 160 35% 45%;
+    --accent: var(--amber-soft);
+    --accent-foreground: var(--slate-base-dark);
+    --accent-glow: var(--amber-light);
 
-    --highlight: 15 60% 60%;
-    --highlight-foreground: 25 25% 8%;
+    --highlight: var(--amber-primary);
+    --highlight-foreground: var(--slate-base-dark);
 
-    --gold: 45 70% 65%;
-    --gold-foreground: 25 25% 8%;
+    --gold: var(--amber-soft);
+    --gold-foreground: var(--slate-base-dark);
 
-    --destructive: 0 60% 60%;
-    --destructive-foreground: 25 25% 8%;
+    --destructive: 0 60% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 25 15% 20%;
-    --input: 25 15% 15%;
-    --ring: 215 60% 70%;
+    --border: var(--slate-text);
+    --input: var(--slate-base);
+    --ring: var(--blue-soft);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -341,14 +372,49 @@ Enhanced Moroccan Heritage Design System
     }
   }
 
-  /* Improved text rendering for Arabic and Berber scripts */
+  /* BNRM Official Typography - Improved text rendering */
   .font-arabic {
-    font-family: 'Noto Sans Arabic', 'Arial Unicode MS', sans-serif;
+    font-family: 'Amiri', 'Noto Naskh Arabic', 'Noto Sans Arabic', 'Arial Unicode MS', serif;
+    font-feature-settings: 'calt' 1, 'liga' 1, 'dlig' 1;
+  }
+
+  .font-french {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-feature-settings: 'liga' 1, 'kern' 1;
   }
 
   .font-berber {
     font-family: 'Noto Sans Tifinagh', 'Arial Unicode MS', sans-serif;
   }
+
+  /* BNRM Official Icons - Material Symbols */
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'liga';
+  }
+
+  /* Icon variants following BNRM guidelines */
+  .icon-interactive {
+    color: hsl(var(--blue-primary)); /* #3B82F6 - Official interactive color */
+  }
+
+  .icon-sm { font-size: 18px; }
+  .icon-md { font-size: 24px; }
+  .icon-lg { font-size: 32px; }
+  .icon-xl { font-size: 48px; }
 
   /* Form sections styling - loc.gov inspired */
   .form-section {
