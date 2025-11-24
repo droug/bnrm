@@ -34,6 +34,7 @@ import { useSystemList } from "@/hooks/useSystemList";
 import { useDependentList } from "@/hooks/useDependentList";
 import { useLegalDepositStorage } from "@/hooks/useLegalDepositStorage";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 interface Publisher {
   id: string;
@@ -4625,6 +4626,7 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
       <main className="flex-1 container mx-auto px-4 py-8">
         {renderStepContent()}
       </main>
+      <Footer />
     </div>
   );
 }

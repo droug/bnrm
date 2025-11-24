@@ -88,15 +88,13 @@ const Index = () => {
 
   if (showLegalDeposit && selectedDepositType) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <LegalDepositDeclaration 
-          depositType={selectedDepositType}
-          onClose={() => {
-            setShowLegalDeposit(false);
-            setSelectedDepositType(null);
-          }}
-        />
-      </div>
+      <LegalDepositDeclaration 
+        depositType={selectedDepositType}
+        onClose={() => {
+          setShowLegalDeposit(false);
+          setSelectedDepositType(null);
+        }}
+      />
     );
   }
 
@@ -132,7 +130,7 @@ const Index = () => {
           <Header />
           
           {/* Bannière moderne avec header intégré */}
-          <section className="relative h-screen overflow-hidden -mt-[140px]">
+          <section className="relative min-h-screen overflow-hidden pt-4">
             {/* Image de fond - Bâtiment BNRM de nuit - claire à 100% */}
             <div 
               className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -146,7 +144,7 @@ const Index = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60"></div>
             
             {/* Contenu en haut */}
-            <div className="relative z-10 h-full flex flex-col pt-[180px] px-4">
+            <div className="relative z-10 h-full flex flex-col pt-8 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <div className="flex items-center justify-center space-x-4 mb-6">
                   <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-2xl" />
