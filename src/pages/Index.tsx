@@ -380,10 +380,10 @@ const Index = () => {
                       <div className="grid md:grid-cols-3 gap-6">
                         {/* First News Item - Featured */}
                         {actualites && actualites.length > 0 && (
-                          <div className="md:col-span-2 bg-card rounded-xl shadow-md overflow-hidden border hover:shadow-xl transition-all group">
-                            <Link to={`/news/${actualites[0].slug}`} className="block h-full">
+                          <div className="md:col-span-2 bg-card rounded-xl shadow-md overflow-hidden border hover:shadow-xl transition-all group flex flex-col">
+                            <Link to={`/news/${actualites[0].slug}`} className="flex flex-col h-full">
                               {actualites[0].image_url && (
-                                <div className="relative h-64 overflow-hidden">
+                                <div className="relative h-64 overflow-hidden flex-shrink-0">
                                   <img 
                                     src={actualites[0].image_url} 
                                     alt={language === 'ar' ? actualites[0].image_alt_ar || actualites[0].title_ar || actualites[0].title_fr : actualites[0].image_alt_fr || actualites[0].title_fr}
@@ -396,14 +396,14 @@ const Index = () => {
                                   </div>
                                 </div>
                               )}
-                              <div className="p-6">
+                              <div className="p-6 flex flex-col flex-grow">
                                 <h3 className="text-2xl font-bold mb-3 text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
                                   {language === 'ar' ? actualites[0].title_ar || actualites[0].title_fr : actualites[0].title_fr}
                                 </h3>
-                                <p className="text-muted-foreground mb-4 line-clamp-3">
+                                <p className="text-muted-foreground mb-4 line-clamp-3 flex-grow">
                                   {language === 'ar' ? actualites[0].chapo_ar || actualites[0].chapo_fr : actualites[0].chapo_fr}
                                 </p>
-                                <div className="flex items-center gap-2 text-sm font-medium text-primary group-hover:gap-3 transition-all">
+                                <div className="flex items-center gap-2 text-sm font-medium text-primary group-hover:gap-3 transition-all mt-auto">
                                   {language === 'ar' ? 'اقرأ المزيد' : 'Lire la suite'}
                                   <span className="text-lg">→</span>
                                 </div>
@@ -413,13 +413,13 @@ const Index = () => {
                         )}
 
                         {/* Second & Third Items - Compact Cards */}
-                        <div className="space-y-6">
+                        <div className="flex flex-col gap-6">
                           {/* Second News Item */}
                           {actualites && actualites.length > 1 && (
-                            <div className="bg-card rounded-xl shadow-md overflow-hidden border hover:shadow-xl transition-all group">
-                              <Link to={`/news/${actualites[1].slug}`} className="block">
+                            <div className="bg-card rounded-xl shadow-md overflow-hidden border hover:shadow-xl transition-all group flex flex-col flex-1">
+                              <Link to={`/news/${actualites[1].slug}`} className="flex flex-col h-full">
                                 {actualites[1].image_url && (
-                                  <div className="relative h-48 overflow-hidden">
+                                  <div className="relative h-48 overflow-hidden flex-shrink-0">
                                     <img 
                                       src={actualites[1].image_url} 
                                       alt={language === 'ar' ? actualites[1].image_alt_ar || actualites[1].title_ar || actualites[1].title_fr : actualites[1].image_alt_fr || actualites[1].title_fr}
@@ -427,14 +427,14 @@ const Index = () => {
                                     />
                                   </div>
                                 )}
-                                <div className="p-5">
-                                  <span className="inline-block bg-primary/10 text-primary px-2.5 py-1 text-xs font-semibold mb-2 rounded">
+                                <div className="p-5 flex flex-col flex-grow">
+                                  <span className="inline-block bg-primary/10 text-primary px-2.5 py-1 text-xs font-semibold mb-2 rounded w-fit">
                                     {actualites[1].category || 'BNRM'}
                                   </span>
                                   <h3 className="text-lg font-bold mb-2 text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
                                     {language === 'ar' ? actualites[1].title_ar || actualites[1].title_fr : actualites[1].title_fr}
                                   </h3>
-                                  <p className="text-muted-foreground text-sm line-clamp-2">
+                                  <p className="text-muted-foreground text-sm line-clamp-2 flex-grow">
                                     {language === 'ar' ? actualites[1].chapo_ar || actualites[1].chapo_fr : actualites[1].chapo_fr}
                                   </p>
                                 </div>
@@ -444,10 +444,10 @@ const Index = () => {
 
                           {/* Third News Item or Event */}
                           {(actualites && actualites.length > 2 ? actualites[2] : evenements && evenements.length > 0 ? evenements[0] : null) && (
-                            <div className="bg-card rounded-xl shadow-md overflow-hidden border hover:shadow-xl transition-all group">
-                              <Link to={actualites && actualites.length > 2 ? `/news/${actualites[2].slug}` : `/evenements/${evenements[0].slug}`} className="block">
+                            <div className="bg-card rounded-xl shadow-md overflow-hidden border hover:shadow-xl transition-all group flex flex-col flex-1">
+                              <Link to={actualites && actualites.length > 2 ? `/news/${actualites[2].slug}` : `/evenements/${evenements[0].slug}`} className="flex flex-col h-full">
                                 {((actualites && actualites.length > 2 && actualites[2].image_url) || (evenements && evenements.length > 0 && evenements[0].affiche_url)) && (
-                                  <div className="relative h-48 overflow-hidden">
+                                  <div className="relative h-48 overflow-hidden flex-shrink-0">
                                     <img 
                                       src={actualites && actualites.length > 2 ? actualites[2].image_url : evenements[0].affiche_url} 
                                       alt={actualites && actualites.length > 2 
@@ -457,8 +457,8 @@ const Index = () => {
                                     />
                                   </div>
                                 )}
-                                <div className="p-5">
-                                  <span className="inline-block bg-primary/10 text-primary px-2.5 py-1 text-xs font-semibold mb-2 rounded">
+                                <div className="p-5 flex flex-col flex-grow">
+                                  <span className="inline-block bg-primary/10 text-primary px-2.5 py-1 text-xs font-semibold mb-2 rounded w-fit">
                                     {actualites && actualites.length > 2 ? (actualites[2].category || 'BNRM') : 'Événement'}
                                   </span>
                                   <h3 className="text-lg font-bold mb-2 text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
@@ -466,7 +466,7 @@ const Index = () => {
                                       ? (language === 'ar' ? actualites[2].title_ar || actualites[2].title_fr : actualites[2].title_fr)
                                       : (language === 'ar' ? evenements[0].title_ar || evenements[0].title_fr : evenements[0].title_fr)}
                                   </h3>
-                                  <p className="text-muted-foreground text-sm line-clamp-2">
+                                  <p className="text-muted-foreground text-sm line-clamp-2 flex-grow">
                                     {actualites && actualites.length > 2
                                       ? (language === 'ar' ? actualites[2].chapo_ar || actualites[2].chapo_fr : actualites[2].chapo_fr)
                                       : (language === 'ar' ? evenements[0].description_ar || evenements[0].description_fr : evenements[0].description_fr)}
