@@ -352,16 +352,16 @@ const Index = () => {
                   <div className="py-16 bg-gradient-to-b from-slate-50 to-white relative">
                     <div className="container mx-auto px-4">
                       {/* Header */}
-                      <div className="flex items-start justify-between mb-8">
-                        <div>
-                          <div className="inline-block bg-orange-500 text-white px-4 py-1 text-sm font-semibold mb-3">
+                      <div className="flex items-start justify-between mb-10">
+                        <div className="max-w-2xl">
+                          <div className="inline-block bg-primary text-primary-foreground px-4 py-1.5 text-sm font-semibold mb-4 rounded">
                             BNRM
                           </div>
-                          <h2 className="text-4xl font-bold mb-2 text-slate-900">
+                          <h2 className="text-4xl md:text-5xl font-bold mb-3 text-foreground">
                             {language === 'ar' ? 'الأخبار والفعاليات' : 'Actualités & Événements'}
                           </h2>
-                          <div className="w-20 h-1 bg-orange-500 mb-3"></div>
-                          <p className="text-slate-600">
+                          <div className="w-24 h-1 bg-primary mb-4 rounded-full"></div>
+                          <p className="text-muted-foreground text-lg">
                             {language === 'ar' 
                               ? 'تابع آخر الأخبار والفعاليات الخاصة بالمكتبة الوطنية'
                               : 'Suivez les dernières actualités et événements de la Bibliothèque Nationale'}
@@ -369,190 +369,113 @@ const Index = () => {
                         </div>
                         <Link 
                           to="/news"
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded text-sm font-medium transition-colors"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg text-sm font-semibold transition-all hover:shadow-lg flex items-center gap-2"
                         >
-                          View all
+                          {language === 'ar' ? 'عرض الكل' : 'Tout voir'}
+                          <span className="text-lg">→</span>
                         </Link>
                       </div>
 
-                      {/* Grid Layout */}
-                      <div className="grid md:grid-cols-2 gap-6">
-                        {/* Large Card - First News Item */}
+                      {/* Grid Layout - Optimized for 3 items */}
+                      <div className="grid md:grid-cols-3 gap-6">
+                        {/* First News Item - Featured */}
                         {actualites && actualites.length > 0 && (
-                          <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200 hover:shadow-md transition-shadow">
-                            <Link to={`/news/${actualites[0].slug}`} className="block">
-                              <div className="p-6">
-                                <div className="inline-block bg-orange-500 text-white px-3 py-1 text-xs font-semibold mb-4">
-                                  Bnrma
-                                </div>
-                                <div className="grid md:grid-cols-2 gap-6">
-                                  <div>
-                                    <h3 className="text-xl font-bold mb-3 text-slate-900">
-                                      {language === 'ar' ? actualites[0].title_ar || actualites[0].title_fr : actualites[0].title_fr}
-                                    </h3>
-                                    <p className="text-slate-600 text-sm mb-4 line-clamp-4">
-                                      {language === 'ar' ? actualites[0].chapo_ar || actualites[0].chapo_fr : actualites[0].chapo_fr}
-                                    </p>
-                                    <button className="flex items-center gap-2 text-sm font-medium text-slate-900 hover:text-orange-500 transition-colors">
-                                      Button <span className="text-orange-500">→</span>
-                                    </button>
+                          <div className="md:col-span-2 bg-card rounded-xl shadow-md overflow-hidden border hover:shadow-xl transition-all group">
+                            <Link to={`/news/${actualites[0].slug}`} className="block h-full">
+                              {actualites[0].image_url && (
+                                <div className="relative h-64 overflow-hidden">
+                                  <img 
+                                    src={actualites[0].image_url} 
+                                    alt={language === 'ar' ? actualites[0].image_alt_ar || actualites[0].title_ar || actualites[0].title_fr : actualites[0].image_alt_fr || actualites[0].title_fr}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  />
+                                  <div className="absolute top-4 left-4">
+                                    <span className="bg-primary text-primary-foreground px-3 py-1.5 text-xs font-semibold rounded-full">
+                                      {actualites[0].category || 'BNRM'}
+                                    </span>
                                   </div>
-                                  {actualites[0].image_url && (
-                                    <img 
-                                      src={actualites[0].image_url} 
-                                      alt={language === 'ar' ? actualites[0].title_ar || actualites[0].title_fr : actualites[0].title_fr}
-                                      className="w-full h-64 object-cover rounded"
-                                    />
-                                  )}
+                                </div>
+                              )}
+                              <div className="p-6">
+                                <h3 className="text-2xl font-bold mb-3 text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
+                                  {language === 'ar' ? actualites[0].title_ar || actualites[0].title_fr : actualites[0].title_fr}
+                                </h3>
+                                <p className="text-muted-foreground mb-4 line-clamp-3">
+                                  {language === 'ar' ? actualites[0].chapo_ar || actualites[0].chapo_fr : actualites[0].chapo_fr}
+                                </p>
+                                <div className="flex items-center gap-2 text-sm font-medium text-primary group-hover:gap-3 transition-all">
+                                  {language === 'ar' ? 'اقرأ المزيد' : 'Lire la suite'}
+                                  <span className="text-lg">→</span>
                                 </div>
                               </div>
                             </Link>
                           </div>
                         )}
 
-                        {/* Right Column - Two Cards */}
+                        {/* Second & Third Items - Compact Cards */}
                         <div className="space-y-6">
-                          {/* Second News/Event Item */}
-                          {(actualites && actualites.length > 1 ? actualites[1] : evenements && evenements.length > 0 ? evenements[0] : null) && (
-                            <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200 hover:shadow-md transition-shadow">
-                              <Link to={actualites && actualites.length > 1 ? `/news/${actualites[1].slug}` : `/evenements/${evenements[0].slug}`} className="block">
-                                <div className="flex gap-4 p-6">
-                                  <div className="flex-1">
-                                    <div className="inline-block bg-orange-500 text-white px-3 py-1 text-xs font-semibold mb-3">
-                                      Bnrma
-                                    </div>
-                                    <h3 className="text-lg font-bold mb-2 text-slate-900 line-clamp-2">
-                                      {actualites && actualites.length > 1 
-                                        ? (language === 'ar' ? actualites[1].title_ar || actualites[1].title_fr : actualites[1].title_fr)
-                                        : (language === 'ar' ? evenements[0].title_ar || evenements[0].title_fr : evenements[0].title_fr)}
-                                    </h3>
-                                    <p className="text-slate-600 text-sm line-clamp-3">
-                                      {actualites && actualites.length > 1 
-                                        ? (language === 'ar' ? actualites[1].chapo_ar || actualites[1].chapo_fr : actualites[1].chapo_fr)
-                                        : (language === 'ar' ? evenements[0].description_ar || evenements[0].description_fr : evenements[0].description_fr)}
-                                    </p>
-                                  </div>
-                                  {((actualites && actualites.length > 1 && actualites[1].image_url) || (evenements && evenements.length > 0 && evenements[0].affiche_url)) && (
+                          {/* Second News Item */}
+                          {actualites && actualites.length > 1 && (
+                            <div className="bg-card rounded-xl shadow-md overflow-hidden border hover:shadow-xl transition-all group">
+                              <Link to={`/news/${actualites[1].slug}`} className="block">
+                                {actualites[1].image_url && (
+                                  <div className="relative h-48 overflow-hidden">
                                     <img 
-                                      src={actualites && actualites.length > 1 ? actualites[1].image_url : evenements[0].affiche_url} 
-                                      alt=""
-                                      className="w-40 h-40 object-cover rounded"
+                                      src={actualites[1].image_url} 
+                                      alt={language === 'ar' ? actualites[1].image_alt_ar || actualites[1].title_ar || actualites[1].title_fr : actualites[1].image_alt_fr || actualites[1].title_fr}
+                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     />
-                                  )}
+                                  </div>
+                                )}
+                                <div className="p-5">
+                                  <span className="inline-block bg-primary/10 text-primary px-2.5 py-1 text-xs font-semibold mb-2 rounded">
+                                    {actualites[1].category || 'BNRM'}
+                                  </span>
+                                  <h3 className="text-lg font-bold mb-2 text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
+                                    {language === 'ar' ? actualites[1].title_ar || actualites[1].title_fr : actualites[1].title_fr}
+                                  </h3>
+                                  <p className="text-muted-foreground text-sm line-clamp-2">
+                                    {language === 'ar' ? actualites[1].chapo_ar || actualites[1].chapo_fr : actualites[1].chapo_fr}
+                                  </p>
                                 </div>
                               </Link>
                             </div>
                           )}
 
-                          {/* Third News/Event Item */}
-                          {(actualites && actualites.length > 2 ? actualites[2] : evenements && evenements.length > 1 ? evenements[1] : null) && (
-                            <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200 hover:shadow-md transition-shadow">
-                              <Link to={actualites && actualites.length > 2 ? `/news/${actualites[2].slug}` : `/evenements/${evenements[1].slug}`} className="block">
-                                <div className="flex gap-4 p-6">
-                                  <div className="flex-1">
-                                    <div className="inline-block bg-orange-500 text-white px-3 py-1 text-xs font-semibold mb-3">
-                                      Bnrma
-                                    </div>
-                                    <h3 className="text-lg font-bold mb-2 text-slate-900 line-clamp-2">
-                                      {actualites && actualites.length > 2
-                                        ? (language === 'ar' ? actualites[2].title_ar || actualites[2].title_fr : actualites[2].title_fr)
-                                        : (language === 'ar' ? evenements[1].title_ar || evenements[1].title_fr : evenements[1].title_fr)}
-                                    </h3>
-                                    <p className="text-slate-600 text-sm line-clamp-3">
-                                      {actualites && actualites.length > 2
-                                        ? (language === 'ar' ? actualites[2].chapo_ar || actualites[2].chapo_fr : actualites[2].chapo_fr)
-                                        : (language === 'ar' ? evenements[1].description_ar || evenements[1].description_fr : evenements[1].description_fr)}
-                                    </p>
-                                  </div>
-                                  {((actualites && actualites.length > 2 && actualites[2].image_url) || (evenements && evenements.length > 1 && evenements[1].affiche_url)) && (
+                          {/* Third News Item or Event */}
+                          {(actualites && actualites.length > 2 ? actualites[2] : evenements && evenements.length > 0 ? evenements[0] : null) && (
+                            <div className="bg-card rounded-xl shadow-md overflow-hidden border hover:shadow-xl transition-all group">
+                              <Link to={actualites && actualites.length > 2 ? `/news/${actualites[2].slug}` : `/evenements/${evenements[0].slug}`} className="block">
+                                {((actualites && actualites.length > 2 && actualites[2].image_url) || (evenements && evenements.length > 0 && evenements[0].affiche_url)) && (
+                                  <div className="relative h-48 overflow-hidden">
                                     <img 
-                                      src={actualites && actualites.length > 2 ? actualites[2].image_url : evenements[1].affiche_url} 
-                                      alt=""
-                                      className="w-40 h-40 object-cover rounded"
+                                      src={actualites && actualites.length > 2 ? actualites[2].image_url : evenements[0].affiche_url} 
+                                      alt={actualites && actualites.length > 2 
+                                        ? (language === 'ar' ? actualites[2].image_alt_ar || actualites[2].title_ar || actualites[2].title_fr : actualites[2].image_alt_fr || actualites[2].title_fr)
+                                        : (language === 'ar' ? evenements[0].title_ar || evenements[0].title_fr : evenements[0].title_fr)}
+                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     />
-                                  )}
+                                  </div>
+                                )}
+                                <div className="p-5">
+                                  <span className="inline-block bg-primary/10 text-primary px-2.5 py-1 text-xs font-semibold mb-2 rounded">
+                                    {actualites && actualites.length > 2 ? (actualites[2].category || 'BNRM') : 'Événement'}
+                                  </span>
+                                  <h3 className="text-lg font-bold mb-2 text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
+                                    {actualites && actualites.length > 2
+                                      ? (language === 'ar' ? actualites[2].title_ar || actualites[2].title_fr : actualites[2].title_fr)
+                                      : (language === 'ar' ? evenements[0].title_ar || evenements[0].title_fr : evenements[0].title_fr)}
+                                  </h3>
+                                  <p className="text-muted-foreground text-sm line-clamp-2">
+                                    {actualites && actualites.length > 2
+                                      ? (language === 'ar' ? actualites[2].chapo_ar || actualites[2].chapo_fr : actualites[2].chapo_fr)
+                                      : (language === 'ar' ? evenements[0].description_ar || evenements[0].description_fr : evenements[0].description_fr)}
+                                  </p>
                                 </div>
                               </Link>
                             </div>
                           )}
                         </div>
-                      </div>
-
-                      {/* Bottom Row - Two Cards */}
-                      <div className="grid md:grid-cols-2 gap-6 mt-6">
-                        {/* Fourth Item */}
-                        {(evenements && evenements.length > 0 ? evenements[evenements.length > 2 ? 2 : 0] : null) && (
-                          <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200 hover:shadow-md transition-shadow">
-                            <Link to={`/evenements/${evenements[evenements.length > 2 ? 2 : 0].slug}`} className="block">
-                              <div className="p-6">
-                                <div className="inline-block bg-orange-500 text-white px-3 py-1 text-xs font-semibold mb-4">
-                                  Bnrma
-                                </div>
-                                <div className="grid md:grid-cols-2 gap-6">
-                                  <div>
-                                    <h3 className="text-xl font-bold mb-3 text-slate-900">
-                                      {language === 'ar' 
-                                        ? evenements[evenements.length > 2 ? 2 : 0].title_ar || evenements[evenements.length > 2 ? 2 : 0].title_fr 
-                                        : evenements[evenements.length > 2 ? 2 : 0].title_fr}
-                                    </h3>
-                                    <p className="text-slate-600 text-sm mb-4 line-clamp-4">
-                                      {language === 'ar' 
-                                        ? evenements[evenements.length > 2 ? 2 : 0].description_ar || evenements[evenements.length > 2 ? 2 : 0].description_fr 
-                                        : evenements[evenements.length > 2 ? 2 : 0].description_fr}
-                                    </p>
-                                    <button className="flex items-center gap-2 text-sm font-medium text-slate-900 hover:text-orange-500 transition-colors">
-                                      Button <span className="text-orange-500">→</span>
-                                    </button>
-                                  </div>
-                                  {evenements[evenements.length > 2 ? 2 : 0].affiche_url && (
-                                    <img 
-                                      src={evenements[evenements.length > 2 ? 2 : 0].affiche_url} 
-                                      alt=""
-                                      className="w-full h-48 object-cover rounded"
-                                    />
-                                  )}
-                                </div>
-                              </div>
-                            </Link>
-                          </div>
-                        )}
-
-                        {/* Fifth Item */}
-                        {(evenements && evenements.length > 1 ? evenements[evenements.length > 3 ? 3 : 1] : null) && (
-                          <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200 hover:shadow-md transition-shadow">
-                            <Link to={`/evenements/${evenements[evenements.length > 3 ? 3 : 1].slug}`} className="block">
-                              <div className="p-6">
-                                <div className="inline-block bg-orange-500 text-white px-3 py-1 text-xs font-semibold mb-4">
-                                  Bnrma
-                                </div>
-                                <div className="grid md:grid-cols-2 gap-6">
-                                  <div>
-                                    <h3 className="text-xl font-bold mb-3 text-slate-900">
-                                      {language === 'ar' 
-                                        ? evenements[evenements.length > 3 ? 3 : 1].title_ar || evenements[evenements.length > 3 ? 3 : 1].title_fr 
-                                        : evenements[evenements.length > 3 ? 3 : 1].title_fr}
-                                    </h3>
-                                    <p className="text-slate-600 text-sm mb-4 line-clamp-4">
-                                      {language === 'ar' 
-                                        ? evenements[evenements.length > 3 ? 3 : 1].description_ar || evenements[evenements.length > 3 ? 3 : 1].description_fr 
-                                        : evenements[evenements.length > 3 ? 3 : 1].description_fr}
-                                    </p>
-                                    <button className="flex items-center gap-2 text-sm font-medium text-slate-900 hover:text-orange-500 transition-colors">
-                                      Button <span className="text-orange-500">→</span>
-                                    </button>
-                                  </div>
-                                  {evenements[evenements.length > 3 ? 3 : 1].affiche_url && (
-                                    <img 
-                                      src={evenements[evenements.length > 3 ? 3 : 1].affiche_url} 
-                                      alt=""
-                                      className="w-full h-48 object-cover rounded"
-                                    />
-                                  )}
-                                </div>
-                              </div>
-                            </Link>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
