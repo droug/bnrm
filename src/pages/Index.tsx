@@ -6,7 +6,7 @@ import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools"
 import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
 import SEOHead from "@/components/seo/SEOHead";
-import { Search, Book, BookOpen, Users, Download, Calendar, Globe, Accessibility, Share2, MousePointer, CreditCard, BadgeCheck, UserPlus, Filter, Scroll } from "lucide-react";
+import { Search, Book, BookOpen, Users, Download, Calendar, Globe, Accessibility, Share2, MousePointer, CreditCard, BadgeCheck, UserPlus, Filter, Scroll, HelpCircle } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,6 +85,17 @@ const Index = () => {
                   : 'Préservation et valorisation du patrimoine manuscrit marocain. Découvrez des milliers de manuscrits anciens numérisés avec la technologie IIIF dans un cadre architectural exceptionnel.'
                 }
               </p>
+              
+              <div>
+                <Button 
+                  size="lg"
+                  onClick={() => navigate('/help')}
+                  className="bg-[#e67e22] hover:bg-[#d35400] text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+                >
+                  <HelpCircle className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+                  {language === 'ar' ? 'المساعدة والدعم' : 'Aide & Support'}
+                </Button>
+              </div>
             </div>
           </div>
         </section>
