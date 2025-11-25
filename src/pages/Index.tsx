@@ -286,9 +286,9 @@ const Index = () => {
                         className="w-full h-16 text-lg bg-white/98 shadow-zellige border-3 border-gold/30 focus:border-primary pl-40 pr-32 rounded-full font-serif"
                       />
 
-                      {/* Liste des filtres simple, affichée sous le champ de recherche pour éviter tout rognage */}
+                      {/* Liste des filtres simple, affichée juste sous le champ de recherche */}
                       {showFilterMenu && (
-                        <div className="mt-3 ml-2 inline-block w-56 bg-white border-2 border-gray-300 rounded-lg shadow-xl text-left">
+                        <div className="mt-2 w-56 bg-white border-2 border-gray-300 rounded-lg shadow-xl text-left">
                           <div className="py-2">
                             <button
                               onClick={() => { addFilter('author'); setShowFilterMenu(false); }}
