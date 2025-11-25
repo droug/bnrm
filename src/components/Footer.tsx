@@ -98,7 +98,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
   return (
     <footer className={isKitabPage 
       ? "bg-gradient-to-br from-orange-50 via-orange-50/80 to-rose-50 text-foreground border-t border-orange-100" 
-      : "bg-primary text-primary-foreground"
+      : "bg-white text-foreground border-t"
     }>
       <div className="container mx-auto px-4 py-16">
         {/* Section principale - Informations et liens */}
@@ -131,10 +131,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                   key={index}
                   variant="ghost" 
                   size="icon"
-                  className={isKitabPage 
-                    ? "opacity-70 hover:opacity-100 hover:bg-muted"
-                    : "opacity-70 hover:opacity-100 hover:bg-white/10"
-                  }
+                  className="opacity-70 hover:opacity-100 hover:bg-muted"
                   aria-label={social.label}
                 >
                   {social.icon}
@@ -146,7 +143,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           {/* Col 2: Liens rapides */}
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
-              <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-accent'}`}></span>
+              <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-primary'}`}></span>
               {t('footer.quickLinks')}
             </h4>
             <ul className="space-y-3">
@@ -166,7 +163,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           {/* Col 3: Aide et support */}
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
-              <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-accent'}`}></span>
+              <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-primary'}`}></span>
               {language === 'ar' ? 'المساعدة والدعم' : 'Aide et support'}
             </h4>
             <ul className="space-y-3">
@@ -186,7 +183,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           {/* Col 4: Paiements & Services */}
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
-              <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-accent'}`}></span>
+              <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-primary'}`}></span>
               {language === 'ar' ? 'المدفوعات' : 'Paiements'}
             </h4>
             <ul className="space-y-3">
@@ -206,26 +203,26 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           {/* Col 5: Contact */}
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
-              <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-accent'}`}></span>
+              <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-primary'}`}></span>
               {t('footer.contact')}
             </h4>
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
-                <MapPin className={`h-4 w-4 mt-1 flex-shrink-0 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-accent'}`} />
+                <MapPin className={`h-4 w-4 mt-1 flex-shrink-0 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-primary'}`} />
                 <p className="text-sm opacity-80 leading-relaxed">{t('footer.location')}</p>
               </div>
               <div className="flex items-center space-x-3">
-                <Phone className={`h-4 w-4 flex-shrink-0 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-accent'}`} />
+                <Phone className={`h-4 w-4 flex-shrink-0 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-primary'}`} />
                 <span className="text-sm opacity-80">+212 537 27 16 33</span>
               </div>
               <div className="flex items-center space-x-3">
-                <Mail className={`h-4 w-4 flex-shrink-0 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-accent'}`} />
+                <Mail className={`h-4 w-4 flex-shrink-0 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-primary'}`} />
                 <span className="text-sm opacity-80">
                   {isKitabPage ? 'kitab@bnrm.ma' : 'contact@bnrm.ma'}
                 </span>
               </div>
               <div className="flex items-start space-x-3">
-                <Clock className={`h-4 w-4 mt-1 flex-shrink-0 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-accent'}`} />
+                <Clock className={`h-4 w-4 mt-1 flex-shrink-0 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-primary'}`} />
                 <div className="text-sm opacity-80 space-y-1">
                   <p>{t('footer.monday')}</p>
                   <p>{t('footer.saturday')}</p>
@@ -238,7 +235,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           {/* Col 6: Newsletter */}
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
-              <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-accent'}`}></span>
+              <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-primary'}`}></span>
               {language === 'ar' ? 'تابعنا' : 'Nous suivre'}
             </h4>
             <p className="text-sm opacity-80 mb-4 leading-relaxed">
@@ -256,7 +253,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                 disabled={isSubscribing}
                 className={isKitabPage
                   ? "bg-background border-input text-sm"
-                  : "bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:border-white/40 text-sm"
+                  : "bg-background border-input text-sm"
                 }
               />
               <Button 
@@ -264,7 +261,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                 disabled={isSubscribing}
                 className={isKitabPage 
                   ? "w-full bg-[hsl(var(--kitab-accent))] hover:bg-[hsl(var(--kitab-accent))]/90 text-white font-medium text-sm" 
-                  : "w-full bg-accent hover:bg-accent/90 text-accent-foreground font-medium text-sm"
+                  : "w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm"
                 }
               >
                 {isSubscribing ? (
@@ -286,7 +283,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           </div>
         </div>
 
-        <Separator className={isKitabPage ? "bg-border mb-8" : "bg-white/20 mb-8"} />
+        <Separator className={isKitabPage ? "bg-border mb-8" : "bg-border mb-8"} />
 
         {/* Section du bas - Copyright et liens légaux */}
         <div className="space-y-6">
