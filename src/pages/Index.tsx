@@ -363,7 +363,7 @@ const Index = () => {
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                   />
                                   <div className="absolute top-4 left-4">
-                                    <span className="bg-primary text-primary-foreground px-3 py-1.5 text-xs font-semibold rounded-full">
+                                    <span className="bg-primary text-primary-foreground px-3 py-1.5 text-xs font-bold rounded-full shadow-lg border-2 border-white/20">
                                       {actualites[0].category || 'BNRM'}
                                     </span>
                                   </div>
@@ -401,7 +401,7 @@ const Index = () => {
                                   </div>
                                 )}
                                 <div className="p-5 flex flex-col flex-grow">
-                                  <span className="inline-block bg-primary/10 text-primary px-2.5 py-1 text-xs font-semibold mb-2 rounded w-fit">
+                                  <span className="inline-block bg-primary/30 text-primary px-2.5 py-1 text-xs font-bold mb-2 rounded w-fit border border-primary/40">
                                     {actualites[1].category || 'BNRM'}
                                   </span>
                                   <h3 className="text-lg font-bold mb-2 text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
@@ -431,7 +431,7 @@ const Index = () => {
                                   </div>
                                 )}
                                 <div className="p-5 flex flex-col flex-grow">
-                                  <span className="inline-block bg-primary/10 text-primary px-2.5 py-1 text-xs font-semibold mb-2 rounded w-fit">
+                                  <span className="inline-block bg-primary/30 text-primary px-2.5 py-1 text-xs font-bold mb-2 rounded w-fit border border-primary/40">
                                     {actualites && actualites.length > 2 ? (actualites[2].category || 'BNRM') : 'Événement'}
                                   </span>
                                   <h3 className="text-lg font-bold mb-2 text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
