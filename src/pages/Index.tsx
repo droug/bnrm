@@ -12,13 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SimpleSelect } from "@/components/SimpleSelect";
 import bnrmBuildingNight from "@/assets/bnrm-building-night.jpg";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
 import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
@@ -123,34 +117,20 @@ const Index = () => {
                   </div>
                   
                   <div className="flex flex-col md:flex-row gap-3">
-                    <Select value={searchFilter} onValueChange={setSearchFilter}>
-                      <SelectTrigger className="w-full md:w-[200px] h-14 bg-background border-2 hover:border-primary/50 transition-colors">
-                        <Filter className="h-4 w-4 mr-2" />
-                        <SelectValue placeholder={language === 'ar' ? 'الفئة' : 'Catégorie'} />
-                      </SelectTrigger>
-                      <SelectContent 
-                        className="bg-background z-50 border-2" 
-                        position="popper"
-                        sideOffset={5}
-                        align="start"
-                      >
-                        <SelectItem value="all">
-                          {language === 'ar' ? 'الكل' : 'Tout'}
-                        </SelectItem>
-                        <SelectItem value="books">
-                          {language === 'ar' ? 'كتب' : 'Livres'}
-                        </SelectItem>
-                        <SelectItem value="manuscripts">
-                          {language === 'ar' ? 'مخطوطات' : 'Manuscrits'}
-                        </SelectItem>
-                        <SelectItem value="documents">
-                          {language === 'ar' ? 'وثائق' : 'Documents'}
-                        </SelectItem>
-                        <SelectItem value="periodicals">
-                          {language === 'ar' ? 'دوريات' : 'Périodiques'}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <SimpleSelect
+                      value={searchFilter}
+                      onValueChange={setSearchFilter}
+                      options={[
+                        { value: "all", label: language === 'ar' ? 'الكل' : 'Tout' },
+                        { value: "books", label: language === 'ar' ? 'كتب' : 'Livres' },
+                        { value: "manuscripts", label: language === 'ar' ? 'مخطوطات' : 'Manuscrits' },
+                        { value: "documents", label: language === 'ar' ? 'وثائق' : 'Documents' },
+                        { value: "periodicals", label: language === 'ar' ? 'دوريات' : 'Périodiques' },
+                      ]}
+                      placeholder={language === 'ar' ? 'الفئة' : 'Catégorie'}
+                      icon={<Filter className="h-4 w-4" />}
+                      className="w-full md:w-[200px]"
+                    />
                     
                     <div className="relative flex-1">
                       <Input
