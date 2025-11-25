@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SimpleSelect } from "@/components/SimpleSelect";
-import bnrmBuildingNight from "@/assets/bnrm-building-night.jpg";
+import bnrmBuildingNight from "@/assets/bnrm-hero.jpg";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
 import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
 import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
