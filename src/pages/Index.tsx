@@ -275,49 +275,6 @@ const Index = () => {
                           <ChevronDown className={`h-4 w-4 ml-1 text-gray-900 transition-transform ${showFilterMenu ? 'rotate-180' : ''}`} />
                         </Button>
                         
-                        {/* Liste des filtres - Simple dropdown en dessous */}
-                        {showFilterMenu && (
-                          <div className="absolute left-2 top-16 w-56 bg-white border-2 border-gray-300 rounded-lg shadow-xl z-[9999]">
-                            <div className="py-2">
-                              <button
-                                onClick={() => { addFilter('author'); setShowFilterMenu(false); }}
-                                className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
-                              >
-                                {language === 'ar' ? 'المؤلف' : 'Auteur'}
-                              </button>
-                              <button
-                                onClick={() => { addFilter('publisher'); setShowFilterMenu(false); }}
-                                className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
-                              >
-                                {language === 'ar' ? 'الناشر' : 'Éditeur'}
-                              </button>
-                              <button
-                                onClick={() => { addFilter('genre'); setShowFilterMenu(false); }}
-                                className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
-                              >
-                                {language === 'ar' ? 'النوع' : 'Genre'}
-                              </button>
-                              <button
-                                onClick={() => { addFilter('publication_year'); setShowFilterMenu(false); }}
-                                className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
-                              >
-                                {language === 'ar' ? 'سنة النشر' : 'Année de publication'}
-                              </button>
-                              <button
-                                onClick={() => { addFilter('language'); setShowFilterMenu(false); }}
-                                className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
-                              >
-                                {language === 'ar' ? 'اللغة' : 'Langue'}
-                              </button>
-                              <button
-                                onClick={() => { addFilter('content_type'); setShowFilterMenu(false); }}
-                                className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
-                              >
-                                {language === 'ar' ? 'نوع المحتوى' : 'Type de contenu'}
-                              </button>
-                            </div>
-                          </div>
-                        )}
                       </div>
 
                       <Input
