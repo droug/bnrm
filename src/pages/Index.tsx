@@ -75,15 +75,6 @@ const Index = () => {
           
           <div className="relative z-10 container mx-auto px-4 h-full flex items-center min-h-[70vh]">
             <div className="max-w-2xl">
-              <div className="mb-6">
-                <span className="inline-block px-4 py-2 bg-white/90 backdrop-blur-sm text-primary text-sm font-medium rounded-md">
-                  {language === 'ar' 
-                    ? 'التراث الوطني المغربي'
-                    : 'Patrimoine National Marocain'
-                  }
-                </span>
-              </div>
-              
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
                 {t('header.title')}
               </h1>
