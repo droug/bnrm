@@ -1,77 +1,30 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
 import SEOHead from "@/components/seo/SEOHead";
-import SEOImage from "@/components/seo/SEOImage";
-import { Search, Book, BookOpen, Users, FileText, Download, Calendar, Globe, Accessibility, Share2, MousePointer, Star, Sparkles, Gem, Filter, ChevronDown, X, Network, CreditCard, BadgeCheck, Clock, MapPin } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { fr, ar } from "date-fns/locale";
+import { Search, Book, BookOpen, Users, Download, Calendar, Globe, Accessibility, Share2, MousePointer, CreditCard, BadgeCheck } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useState as useReactState } from "react";
-import { SimpleTooltip } from "@/components/ui/simple-tooltip";
 import bnrmBuildingNight from "@/assets/bnrm-building-night.jpg";
-import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
 import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
 import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
 import zelligePattern5 from "@/assets/zellige-pattern-5.jpg";
 import zelligePattern6 from "@/assets/zellige-pattern-6.jpg";
-import LegalDepositDeclaration from "@/components/LegalDepositDeclaration";
 import { DigitalServicesCarousel } from "@/components/DigitalServicesCarousel";
 
 const Index = () => {
-  const { t, language } = useLanguage(); // Utiliser le hook au lieu de créer un nouveau provider
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
-  const [showLegalDeposit, setShowLegalDeposit] = useState(false);
-  const [selectedDepositType, setSelectedDepositType] = useState<"monographie" | "periodique" | "bd_logiciels" | "collections_specialisees" | null>(null);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilters, setActiveFilters] = useState<Array<{ type: string; value: string }>>([]);
-  const [showFilterMenu, setShowFilterMenu] = useState(false);
 
-  // Récupérer les actualités récentes
-  const { data: actualites } = useQuery({
-    queryKey: ['home-actualites'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('cms_actualites')
-        .select('*')
-        .eq('status', 'published')
-        .order('date_publication', { ascending: false })
-        .limit(3);
-      if (error) throw error;
-      return data;
-    }
-  });
-
-  // Récupérer les événements à venir
-  const { data: evenements } = useQuery({
-    queryKey: ['home-evenements'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('cms_evenements')
-        .select('*')
-        .eq('status', 'published')
-        .gte('date_debut', new Date().toISOString())
-        .order('date_debut', { ascending: true })
-        .limit(3);
-      if (error) throw error;
-      return data;
-    }
-  });
-
-  // Vérifier si le popup d'accueil doit être affiché
   useEffect(() => {
     const hasSeenWelcome = sessionStorage.getItem('bnrm-welcome-popup-dismissed');
     if (!hasSeenWelcome) {
@@ -82,772 +35,215 @@ const Index = () => {
     }
   }, []);
 
-  // Fermer le menu des filtres quand on clique ailleurs
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (showFilterMenu && !target.closest('.filter-menu-container')) {
-        setShowFilterMenu(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showFilterMenu]);
-
-  const handleLegalDepositClick = (type: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees") => {
-    setSelectedDepositType(type);
-    setShowLegalDeposit(true);
-  };
-
   const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (searchQuery) params.set('q', searchQuery);
-    activeFilters.forEach(filter => {
-      params.set(filter.type, filter.value);
-    });
-    navigate(`/search?${params.toString()}`);
-  };
-
-  const addFilter = (type: string) => {
-    const value = prompt(`${language === 'ar' ? 'أدخل القيمة لـ' : 'Entrez la valeur pour'} ${getFilterLabel(type)}:`);
-    if (value && value.trim()) {
-      setActiveFilters(prev => [...prev, { type, value: value.trim() }]);
+    if (searchQuery) {
+      navigate(`/search?q=${searchQuery}`);
     }
   };
-
-  const removeFilter = (index: number) => {
-    setActiveFilters(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-    setActiveFilters([]);
-  };
-
-  const getFilterLabel = (type: string) => {
-    const labels: Record<string, { fr: string; ar: string }> = {
-      author: { fr: "Auteur", ar: "المؤلف" },
-      publisher: { fr: "Éditeur", ar: "الناشر" },
-      genre: { fr: "Genre", ar: "النوع" },
-      publication_year: { fr: "Année de publication", ar: "سنة النشر" },
-      language: { fr: "Langue", ar: "اللغة" },
-      content_type: { fr: "Type de contenu", ar: "نوع المحتوى" }
-    };
-    return labels[type]?.[language] || type;
-  };
-
-  if (showLegalDeposit && selectedDepositType) {
-    return (
-      <LegalDepositDeclaration 
-        depositType={selectedDepositType}
-        onClose={() => {
-          setShowLegalDeposit(false);
-          setSelectedDepositType(null);
-        }}
-      />
-    );
-  }
 
   return (
     <>
       <SEOHead
         title="Accueil"
-        description="Bibliothèque Nationale du Royaume du Maroc - Gardienne du patrimoine écrit marocain et porte d'accès au savoir universel. Collections de manuscrits, livres rares et ressources numériques."
-        keywords={["bibliothèque maroc", "BNRM", "manuscrits marocains", "patrimoine culturel", "bibliothèque numérique", "dépôt légal", "recherche documentaire"]}
+        description="Bibliothèque Nationale du Royaume du Maroc - Gardienne du patrimoine écrit marocain et porte d'accès au savoir universel."
+        keywords={["bibliothèque maroc", "BNRM", "manuscrits marocains", "patrimoine culturel"]}
       />
       
-      {/* Popup d'accueil */}
       <WelcomePopup 
         isOpen={showWelcomePopup} 
         onClose={() => setShowWelcomePopup(false)} 
       />
       
-      {/* Popup d'accueil */}
-      {/* <WelcomePopup 
-        isOpen={showWelcomePopup} 
-        onClose={() => setShowWelcomePopup(false)} 
-      /> */}
-      <div className="min-h-screen bg-background relative overflow-hidden">
-        {/* Arrière-plan de la page avec mosaïques zellige raffinées */}
-        <div className="fixed inset-0 z-0">
-          <div className="absolute inset-0 bg-pattern-zellige-complex opacity-25"></div>
-          <div className="absolute inset-0 bg-pattern-mosaique-geometric opacity-20"></div>
-          <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-15"></div>
-          <div className="absolute inset-0 bg-pattern-filigrane opacity-10"></div>
-        </div>
+      <div className="min-h-screen bg-background">
+        <Header />
         
-        <div className="relative z-10">
-          <Header />
+        {/* Hero Banner */}
+        <section className="relative min-h-screen overflow-hidden pt-20">
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ 
+              backgroundImage: `url(${bnrmBuildingNight})`,
+              filter: 'brightness(1.2) contrast(1.1)'
+            }}
+          />
           
-          {/* Bannière moderne avec header intégré */}
-          <section className="relative min-h-screen overflow-hidden pt-20">
-            {/* Image de fond - Bâtiment BNRM de nuit - claire à 100% */}
-            <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{ 
-                backgroundImage: `url(${bnrmBuildingNight})`,
-                filter: 'brightness(1.2) contrast(1.1)'
-              }}
-            ></div>
-            
-            {/* Gradient overlay subtil pour améliorer la lisibilité */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60"></div>
-            
-            {/* Contenu en haut */}
-            <div className="relative z-10 h-full flex flex-col pt-8 px-4">
-              <div className="max-w-4xl mx-auto text-center">
-                <div className="flex items-center justify-center space-x-4 mb-6">
-                  <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-2xl" />
-                  <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white drop-shadow-2xl">
-                    {t('header.title')}
-                  </h1>
-                  <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-2xl" />
-                </div>
-                
-                <p className="text-2xl md:text-3xl text-white/95 font-light mb-8 drop-shadow-lg">
-                  {language === 'ar' 
-                    ? 'حارسة التراث الألفي المغربي'
-                    : 'Gardienne du patrimoine millénaire marocain'
-                  }
-                </p>
-                
-                <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed drop-shadow-lg mb-8">
-                  {language === 'ar'
-                    ? 'تعمل المكتبة الوطنية للمملكة المغربية على تكوين مواطني المغرب والعالم أجمع من خلال حفظ ومشاركة التراث الثقافي والفكري المغربي'
-                    : 'La Bibliothèque Nationale du Royaume du Maroc forme les futurs citoyens du Maroc et du monde entier en préservant et en partageant le patrimoine culturel et intellectuel marocain'
-                  }
-                </p>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+          
+          <div className="relative z-10 h-full flex flex-col pt-8 px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="flex items-center justify-center space-x-4 mb-6">
+                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-2xl" />
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white drop-shadow-2xl">
+                  {t('header.title')}
+                </h1>
+                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-2xl" />
               </div>
-            </div>
-
-          </section>
-          
-          {/* Main Layout avec arrière-plans enrichis */}
-          <main className="container mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
               
-              {/* Zone principale avec arrière-plans zellige */}
-              <div className="xl:col-span-3 space-y-8">
-                
-                {/* Zone de recherche avec mosaïques raffinées */}
-                <div className="text-center mb-10 relative">
-                  <div className="absolute inset-0 bg-pattern-zellige-complex opacity-35 rounded-3xl blur-sm"></div>
-                  <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-25 rounded-3xl"></div>
-                  <div className="max-w-2xl mx-auto relative bg-gradient-mosaique backdrop-blur-md p-8 rounded-3xl shadow-mosaique border-3 border-gold/25 overflow-visible">
-                    <h2 className="text-2xl font-moroccan font-bold text-foreground mb-4">
-                      {t('header.search')}
-                    </h2>
-                    
-                    {/* Filtres actifs */}
-                    {activeFilters.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-4 justify-center">
-                        {activeFilters.map((filter, index) => (
-                          <Badge
-                            key={index}
-                            variant="secondary"
-                            className="pl-3 pr-2 py-1 text-sm bg-primary/10 text-primary border border-primary/20"
-                          >
-                            <span className="font-semibold">{getFilterLabel(filter.type)}:</span>
-                            <span className="ml-1">{filter.value}</span>
-                            <button
-                              onClick={() => removeFilter(index)}
-                              className="ml-2 hover:text-destructive transition-colors"
-                              aria-label="Supprimer le filtre"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="relative z-30">
-                      {/* Menu des filtres - Version simple */}
-                      <div className="relative filter-menu-container">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowFilterMenu(!showFilterMenu)}
-                          className="absolute left-2 top-2 z-10 h-12 px-3 bg-white hover:bg-gray-50 border-2 border-gray-300 text-gray-900 shadow-lg hover:shadow-xl transition-all"
-                        >
-                          <Filter className="h-4 w-4 mr-2 text-gray-900" />
-                          <span className="font-medium">{language === 'ar' ? 'الفلاتر' : 'Filtres'}</span>
-                          <ChevronDown className={`h-4 w-4 ml-1 text-gray-900 transition-transform ${showFilterMenu ? 'rotate-180' : ''}`} />
-                        </Button>
-                        
-                      </div>
-
-                      <Input
-                        type="search"
-                        placeholder={language === 'ar' ? 'ابحث في الفهرس...' : 'Rechercher dans le catalogue...'}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                        className="w-full h-16 text-lg bg-white/98 shadow-zellige border-3 border-gold/30 focus:border-primary pl-40 pr-32 rounded-full font-serif"
-                      />
-
-                      {/* Liste des filtres simple, affichée juste sous le champ de recherche */}
-                      {showFilterMenu && (
-                        <div className="mt-2 w-56 bg-white border-2 border-gray-300 rounded-lg shadow-xl text-left">
-                          <div className="py-2">
-                            <button
-                              onClick={() => { addFilter('author'); setShowFilterMenu(false); }}
-                              className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
-                            >
-                              {language === 'ar' ? 'المؤلف' : 'Auteur'}
-                            </button>
-                            <button
-                              onClick={() => { addFilter('publisher'); setShowFilterMenu(false); }}
-                              className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
-                            >
-                              {language === 'ar' ? 'الناشر' : 'Éditeur'}
-                            </button>
-                            <button
-                              onClick={() => { addFilter('genre'); setShowFilterMenu(false); }}
-                              className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
-                            >
-                              {language === 'ar' ? 'النوع' : 'Genre'}
-                            </button>
-                            <button
-                              onClick={() => { addFilter('publication_year'); setShowFilterMenu(false); }}
-                              className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
-                            >
-                              {language === 'ar' ? 'سنة النشر' : 'Année de publication'}
-                            </button>
-                            <button
-                              onClick={() => { addFilter('language'); setShowFilterMenu(false); }}
-                              className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
-                            >
-                              {language === 'ar' ? 'اللغة' : 'Langue'}
-                            </button>
-                            <button
-                              onClick={() => { addFilter('content_type'); setShowFilterMenu(false); }}
-                              className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
-                            >
-                              {language === 'ar' ? 'نوع المحتوى' : 'Type de contenu'}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Bouton de suppression */}
-                      {searchQuery && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={clearSearch}
-                          className="absolute right-20 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full hover:bg-destructive/10 text-destructive"
-                        >
-                          <X className="h-5 w-5" />
-                        </Button>
-                      )}
-
-                      <Button 
-                        size="lg"
-                        onClick={handleSearch}
-                        className="absolute right-2 top-2 h-12 w-12 rounded-full bg-gradient-neutral shadow-gold hover:shadow-berber transition-all duration-300 transform hover:scale-105"
-                      >
-                        <Search className="h-6 w-6" />
-                      </Button>
-                    </div>
-                    <p className="text-muted-foreground mt-4 italic font-elegant">
-                      {language === 'ar'
-                        ? '"اكتشف قروناً من المعرفة والتراث الثقافي - استخدم الفلاتر لتحسين بحثك"'
-                        : '"Découvrez des siècles de savoir et de patrimoine culturel - Utilisez les filtres pour affiner votre recherche"'
-                      }
-                    </p>
-                  </div>
-                </div>
-
-                {/* Section Actualités / Événements */}
-                <div className="mb-12">
-                  <div className="py-16 bg-gradient-to-b from-slate-50 to-white relative">
-                    <div className="container mx-auto px-4">
-                      {/* Header */}
-                      <div className="flex items-start justify-between mb-10">
-                        <div className="max-w-2xl">
-                          <div className="inline-block bg-primary text-primary-foreground px-4 py-1.5 text-sm font-semibold mb-4 rounded">
-                            BNRM
-                          </div>
-                          <h2 className="text-4xl md:text-5xl font-bold mb-3 text-foreground">
-                            {language === 'ar' ? 'الأخبار والفعاليات' : 'Actualités & Événements'}
-                          </h2>
-                          <div className="w-24 h-1 bg-primary mb-4 rounded-full"></div>
-                          <p className="text-muted-foreground text-lg">
-                            {language === 'ar' 
-                              ? 'تابع آخر الأخبار والفعاليات الخاصة بالمكتبة الوطنية'
-                              : 'Suivez les dernières actualités et événements de la Bibliothèque Nationale'}
-                          </p>
-                        </div>
-                        <Link 
-                          to="/news"
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg text-sm font-semibold transition-all hover:shadow-lg flex items-center gap-2"
-                        >
-                          {language === 'ar' ? 'عرض الكل' : 'Tout voir'}
-                          <span className="text-lg">→</span>
-                        </Link>
-                      </div>
-
-                      {/* Grid Layout - Optimized for 3 items */}
-                      <div className="grid md:grid-cols-3 gap-6">
-                        {/* First News Item - Featured */}
-                        {actualites && actualites.length > 0 && (
-                          <div className="md:col-span-2 bg-card rounded-xl shadow-md overflow-hidden border hover:shadow-xl transition-all group flex flex-col">
-                            <Link to={`/news/${actualites[0].slug}`} className="flex flex-col h-full">
-                              {actualites[0].image_url && (
-                                <div className="relative h-64 overflow-hidden flex-shrink-0">
-                                  <img 
-                                    src={actualites[0].image_url} 
-                                    alt={language === 'ar' ? actualites[0].image_alt_ar || actualites[0].title_ar || actualites[0].title_fr : actualites[0].image_alt_fr || actualites[0].title_fr}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                  />
-                                  <div className="absolute top-4 left-4">
-                                    <span className="bg-primary text-primary-foreground px-3 py-1.5 text-xs font-bold rounded-full shadow-lg border-2 border-white/20">
-                                      {actualites[0].category || 'BNRM'}
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-                              <div className="p-6 flex flex-col flex-grow">
-                                <h3 className="text-2xl font-bold mb-3 text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
-                                  {language === 'ar' ? actualites[0].title_ar || actualites[0].title_fr : actualites[0].title_fr}
-                                </h3>
-                                <p className="text-muted-foreground mb-4 line-clamp-3 flex-grow">
-                                  {language === 'ar' ? actualites[0].chapo_ar || actualites[0].chapo_fr : actualites[0].chapo_fr}
-                                </p>
-                                <div className="flex items-center gap-2 text-sm font-medium text-primary group-hover:gap-3 transition-all mt-auto">
-                                  {language === 'ar' ? 'اقرأ المزيد' : 'Lire la suite'}
-                                  <span className="text-lg">→</span>
-                                </div>
-                              </div>
-                            </Link>
-                          </div>
-                        )}
-
-                        {/* Second & Third Items - Compact Cards */}
-                        <div className="flex flex-col gap-6">
-                          {/* Second News Item */}
-                          {actualites && actualites.length > 1 && (
-                            <div className="bg-card rounded-xl shadow-md overflow-hidden border hover:shadow-xl transition-all group flex flex-col flex-1">
-                              <Link to={`/news/${actualites[1].slug}`} className="flex flex-col h-full">
-                                {actualites[1].image_url && (
-                                  <div className="relative h-48 overflow-hidden flex-shrink-0">
-                                    <img 
-                                      src={actualites[1].image_url} 
-                                      alt={language === 'ar' ? actualites[1].image_alt_ar || actualites[1].title_ar || actualites[1].title_fr : actualites[1].image_alt_fr || actualites[1].title_fr}
-                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    />
-                                  </div>
-                                )}
-                                <div className="p-5 flex flex-col flex-grow">
-                                  <span className="inline-block bg-primary/30 text-primary px-2.5 py-1 text-xs font-bold mb-2 rounded w-fit border border-primary/40">
-                                    {actualites[1].category || 'BNRM'}
-                                  </span>
-                                  <h3 className="text-lg font-bold mb-2 text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
-                                    {language === 'ar' ? actualites[1].title_ar || actualites[1].title_fr : actualites[1].title_fr}
-                                  </h3>
-                                  <p className="text-muted-foreground text-sm line-clamp-2 flex-grow">
-                                    {language === 'ar' ? actualites[1].chapo_ar || actualites[1].chapo_fr : actualites[1].chapo_fr}
-                                  </p>
-                                </div>
-                              </Link>
-                            </div>
-                          )}
-
-                          {/* Third News Item or Event */}
-                          {(actualites && actualites.length > 2 ? actualites[2] : evenements && evenements.length > 0 ? evenements[0] : null) && (
-                            <div className="bg-card rounded-xl shadow-md overflow-hidden border hover:shadow-xl transition-all group flex flex-col flex-1">
-                              <Link to={actualites && actualites.length > 2 ? `/news/${actualites[2].slug}` : `/evenements/${evenements[0].slug}`} className="flex flex-col h-full">
-                                {((actualites && actualites.length > 2 && actualites[2].image_url) || (evenements && evenements.length > 0 && evenements[0].affiche_url)) && (
-                                  <div className="relative h-48 overflow-hidden flex-shrink-0">
-                                    <img 
-                                      src={actualites && actualites.length > 2 ? actualites[2].image_url : evenements[0].affiche_url} 
-                                      alt={actualites && actualites.length > 2 
-                                        ? (language === 'ar' ? actualites[2].image_alt_ar || actualites[2].title_ar || actualites[2].title_fr : actualites[2].image_alt_fr || actualites[2].title_fr)
-                                        : (language === 'ar' ? evenements[0].title_ar || evenements[0].title_fr : evenements[0].title_fr)}
-                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    />
-                                  </div>
-                                )}
-                                <div className="p-5 flex flex-col flex-grow">
-                                  <span className="inline-block bg-primary/30 text-primary px-2.5 py-1 text-xs font-bold mb-2 rounded w-fit border border-primary/40">
-                                    {actualites && actualites.length > 2 ? (actualites[2].category || 'BNRM') : 'Événement'}
-                                  </span>
-                                  <h3 className="text-lg font-bold mb-2 text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
-                                    {actualites && actualites.length > 2
-                                      ? (language === 'ar' ? actualites[2].title_ar || actualites[2].title_fr : actualites[2].title_fr)
-                                      : (language === 'ar' ? evenements[0].title_ar || evenements[0].title_fr : evenements[0].title_fr)}
-                                  </h3>
-                                  <p className="text-muted-foreground text-sm line-clamp-2 flex-grow">
-                                    {actualites && actualites.length > 2
-                                      ? (language === 'ar' ? actualites[2].chapo_ar || actualites[2].chapo_fr : actualites[2].chapo_fr)
-                                      : (language === 'ar' ? evenements[0].description_ar || evenements[0].description_fr : evenements[0].description_fr)}
-                                  </p>
-                                </div>
-                              </Link>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section Nos Principales Plateformes */}
-                <div className="relative py-20 my-12 overflow-hidden">
-                  {/* Fond bleu marine foncé */}
-                  <div className="absolute inset-0 bg-[rgb(32,45,94)]"></div>
-                  
-                  {/* Forme géométrique en haut à droite */}
-                  <div className="absolute top-0 right-0 w-1/4 h-2/3">
-                    <svg viewBox="0 0 300 500" className="w-full h-full" preserveAspectRatio="none">
-                      <polygon points="100,0 300,0 300,500 300,400" fill="rgba(0,0,0,0.15)" />
-                    </svg>
-                  </div>
-                  
-                  <div className="container mx-auto px-4 relative z-10">
-                    {/* Header Section */}
-                    <div className="mb-12 max-w-2xl">
-                      <div className="inline-block bg-[rgb(255,140,0)] text-white px-4 py-1.5 text-xs font-bold uppercase mb-4 rounded">
-                        Plateformes
-                      </div>
-                      <h2 className="text-5xl font-bold text-white mb-4">
-                        {language === 'ar' ? 'منصاتنا الرئيسية' : 'Nos Principales Plateformes'}
-                      </h2>
-                      <div className="w-64 h-1 bg-[rgb(255,140,0)] mb-6"></div>
-                      <p className="text-white/80 text-base leading-relaxed">
-                        {language === 'ar' 
-                          ? 'اكتشف منصاتنا الرقمية المتخصصة للوصول إلى مجموعاتنا وخدماتنا'
-                          : 'Découvrez nos plateformes numériques spécialisées pour accéder à nos collections et services'
-                        }
-                      </p>
-                    </div>
-
-                    {/* Content Section - Horizontal Layout */}
-                    <div className="flex gap-6">
-                      {/* Main Platform Block 01 - Bibliothèque Numérique (70%) */}
-                      <div className="flex-[7]">
-                        <div className="relative bg-white rounded-lg shadow-2xl overflow-hidden h-[500px]">
-                          {/* Angular Tab with Number */}
-                          <div className="absolute top-12 left-0 z-20">
-                            <div className="relative bg-[rgb(90,140,230)] text-white px-8 py-4 font-bold text-5xl shadow-lg">
-                              01
-                              <div className="absolute right-0 top-0 w-0 h-0 border-t-[35px] border-t-[rgb(90,140,230)] border-r-[25px] border-r-transparent translate-x-full"></div>
-                              <div className="absolute right-0 bottom-0 w-0 h-0 border-b-[35px] border-b-[rgb(90,140,230)] border-r-[25px] border-r-transparent translate-x-full"></div>
-                            </div>
-                          </div>
-
-                          <div className="pt-32 px-12 pb-8 h-full flex flex-col">
-                            <h3 className="text-4xl font-bold text-[rgb(18,25,60)] mb-4">
-                              {language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}
-                            </h3>
-                            <p className="text-gray-600 mb-6 text-sm leading-relaxed">
-                              {language === 'ar'
-                                ? 'منصة رقمية شاملة للوصول إلى مجموعاتنا الرقمية من المخطوطات والوثائق التراثية والكنوز الثقافية. تبسيط الإجراءات وتتبع طلباتك بكل سهولة.'
-                                : 'Plateforme numérique complète pour accéder à nos collections numériques de manuscrits, documents patrimoniaux et trésors culturels. Simplifiez vos démarches et suivez vos demandes en toute facilité.'
-                              }
-                            </p>
-                            
-                            {/* Central Professional Image */}
-                            <div className="relative flex-1 rounded overflow-hidden shadow-xl cursor-pointer group"
-                                 onClick={() => navigate('/digital-library')}>
-                              <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-gray-100"></div>
-                              <img 
-                                src={zelligePattern5}
-                                alt="Bibliothèque Numérique"
-                                className="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="text-center">
-                                  <Book className="w-20 h-20 text-[rgb(90,140,230)] mx-auto mb-3 stroke-[1.5]" />
-                                  <p className="text-[rgb(18,25,60)] font-bold text-lg uppercase tracking-wide">
-                                    {language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Vertical Side Label on LEFT */}
-                          <div className="absolute left-6 top-1/2 -translate-y-1/2 -rotate-90 origin-left">
-                            <p className="text-[rgb(18,25,60)]/30 font-bold text-base tracking-[0.15em] uppercase whitespace-nowrap">
-                              {language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Vertical Panels Section - Right Side (30%) */}
-                      <div className="flex-[3] grid grid-cols-4 gap-3">
-                        {/* Panel 02 - Activités Culturelles */}
-                        <div className="relative h-[500px] rounded overflow-hidden shadow-xl group cursor-pointer"
-                             onClick={() => navigate('/cultural-activities')}>
-                          <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900"></div>
-                          <img 
-                            src={zelligePattern3}
-                            alt=""
-                            className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
-                          />
-                          
-                          {/* Number Badge - Star Shape */}
-                          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="relative w-10 h-10">
-                              <div className="absolute inset-0 bg-[rgb(59,130,246)] rotate-45 rounded-[6px] shadow-lg" />
-                              <div className="absolute inset-1 bg-[rgb(59,130,246)] rounded-[6px]" />
-                              <span className="relative flex h-full w-full items-center justify-center text-white text-sm font-bold tracking-wide">
-                                02
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Vertical Label at BOTTOM - Full Text Visible */}
-                          <div className="absolute left-1/2 bottom-6 -translate-x-1/2 rotate-90 origin-center">
-                            <p className="text-white font-bold text-[10px] tracking-[0.25em] uppercase whitespace-nowrap">
-                              {language === 'ar' ? 'الأنشطة الثقافية' : 'ACTIVITÉS CULTURELLES'}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Panel 03 - Réseau CBM */}
-                        <div className="relative h-[500px] rounded overflow-hidden shadow-xl group cursor-pointer"
-                             onClick={() => navigate('/cbm')}>
-                          <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900"></div>
-                          <img 
-                            src={zelligePattern2}
-                            alt=""
-                            className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
-                          />
-                          
-                          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="relative w-10 h-10">
-                              <div className="absolute inset-0 bg-[rgb(59,130,246)] rotate-45 rounded-[6px] shadow-lg" />
-                              <div className="absolute inset-1 bg-[rgb(59,130,246)] rounded-[6px]" />
-                              <span className="relative flex h-full w-full items-center justify-center text-white text-sm font-bold tracking-wide">
-                                03
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="absolute left-1/2 bottom-6 -translate-x-1/2 rotate-90 origin-center">
-                            <p className="text-white font-bold text-[10px] tracking-[0.25em] uppercase whitespace-nowrap">
-                              {language === 'ar' ? 'شبكة المكتبات' : 'RÉSEAU CBM'}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Panel 04 - Kitab */}
-                        <div className="relative h-[500px] rounded overflow-hidden shadow-xl group cursor-pointer"
-                             onClick={() => navigate('/plateforme-manuscrits')}>
-                          <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900"></div>
-                          <img 
-                            src={zelligePattern6}
-                            alt=""
-                            className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
-                          />
-                          
-                          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="relative w-10 h-10">
-                              <div className="absolute inset-0 bg-[rgb(59,130,246)] rotate-45 rounded-[6px] shadow-lg" />
-                              <div className="absolute inset-1 bg-[rgb(59,130,246)] rounded-[6px]" />
-                              <span className="relative flex h-full w-full items-center justify-center text-white text-sm font-bold tracking-wide">
-                                04
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="absolute left-1/2 bottom-6 -translate-x-1/2 rotate-90 origin-center">
-                            <p className="text-white font-bold text-[10px] tracking-[0.25em] uppercase whitespace-nowrap">
-                              KITAB
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Panel 05 - Manuscrits */}
-                        <div className="relative h-[500px] rounded overflow-hidden shadow-xl group cursor-pointer"
-                             onClick={() => navigate('/plateforme-manuscrits')}>
-                          <div className="absolute inset-0 bg-gradient-to-br from-amber-600 to-orange-700"></div>
-                          <img 
-                            src={zelligePattern1}
-                            alt=""
-                            className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
-                          />
-
-                          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="relative w-10 h-10">
-                              <div className="absolute inset-0 bg-[rgb(59,130,246)] rotate-45 rounded-[6px] shadow-lg" />
-                              <div className="absolute inset-1 bg-[rgb(59,130,246)] rounded-[6px]" />
-                              <span className="relative flex h-full w-full items-center justify-center text-white text-sm font-bold tracking-wide">
-                                05
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="absolute left-1/2 bottom-6 -translate-x-1/2 rotate-90 origin-center">
-                            <p className="text-white font-bold text-[10px] tracking-[0.25em] uppercase whitespace-nowrap">
-                              {language === 'ar' ? 'مخطوطات' : 'MANUSCRITS'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section Nos services Numériques */}
-                <div className="mb-12">
-                  <div className="py-16 bg-gradient-to-b from-slate-50 to-white relative">
-                    <div className="container mx-auto px-4">
-                      {/* Header */}
-                      <div className="flex items-start justify-between mb-10">
-                        <div className="max-w-2xl">
-                          <div className="inline-block bg-primary text-primary-foreground px-4 py-1.5 text-sm font-semibold mb-4 rounded">
-                            SERVICES
-                          </div>
-                          <h2 className="text-4xl md:text-5xl font-bold mb-3 text-foreground">
-                            {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
-                          </h2>
-                          <div className="w-24 h-1 bg-primary mb-4 rounded-full"></div>
-                          <p className="text-muted-foreground text-lg">
-                            {language === 'ar' 
-                              ? 'اكتشف مجموعة واسعة من الخدمات الرقمية المتاحة للباحثين والمستخدمين'
-                              : 'Découvrez une large gamme de services numériques disponibles pour les chercheurs et les utilisateurs'}
-                          </p>
-                        </div>
-                        <Link 
-                          to="/services-bnrm"
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg text-sm font-semibold transition-all hover:shadow-lg flex items-center gap-2"
-                        >
-                          {language === 'ar' ? 'عرض الكل' : 'Tous les services'}
-                          <span className="text-lg">→</span>
-                        </Link>
-                      </div>
-
-                      {/* Carousel de services */}
-                      <DigitalServicesCarousel language={language === 'ar' ? 'ar' : 'fr'} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Services rapides avec mosaïques zellige raffinées */}
-                <Card className="relative overflow-hidden border-3 border-gold/25 shadow-mosaique">
-                  <div className="absolute inset-0 bg-pattern-zellige-complex opacity-30"></div>
-                  <div className="absolute inset-0 bg-pattern-filigrane opacity-20"></div>
-                  <div className="absolute inset-0 bg-gradient-mosaique opacity-95"></div>
-                  <CardContent className="p-8 relative z-10">
-                    <div className="text-center mb-6">
-                      <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">
-                        {language === 'ar' ? 'الإيداع القانوني' : 'Dépôt Légal'}
-                      </h3>
-                      <div className="w-32 h-2 bg-gradient-neutral mx-auto rounded-full shadow-gold"></div>
-                    </div>
-                    <div className="flex justify-center">
-                      <Button
-                        size="lg"
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 md:col-span-2"
-                        onClick={() => navigate("/signup")}
-                      >
-                        {language === 'ar' ? 'التسجيل' : 'Inscription'}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Services rapides avec mosaïques zellige raffinées */}
-                <Card className="relative overflow-hidden border-3 border-gold/25 shadow-mosaique">
-                  <div className="absolute inset-0 bg-pattern-zellige-complex opacity-30"></div>
-                  <div className="absolute inset-0 bg-pattern-filigrane opacity-20"></div>
-                  <div className="absolute inset-0 bg-gradient-mosaique opacity-95"></div>
-                  <CardContent className="p-8 relative z-10">
-                    <div className="text-center mb-6">
-                      <h3 className="text-2xl font-moroccan font-bold text-foreground mb-3">
-                        {language === 'ar' ? 'خدمات سريعة' : 'Services Rapides'}
-                      </h3>
-                      <div className="w-32 h-2 bg-gradient-neutral mx-auto rounded-full shadow-gold"></div>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                      {[
-                        { icon: BookOpen, label_fr: "Réserver un document", label_ar: "حجز وثيقة", color: "text-accent", bg: "bg-accent/10", border: "border-accent/25", href: "/cbn/reserver-ouvrage" },
-                        { icon: Download, label_fr: "Reproduction", label_ar: "النسخ", color: "text-highlight", bg: "bg-highlight/10", border: "border-highlight/25", href: "/demande-reproduction" },
-                        { icon: CreditCard, label_fr: "Adhésions", label_ar: "الاشتراكات", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25", href: "/abonnements" },
-                        { icon: Calendar, label_fr: "Événements", label_ar: "الفعاليات", color: "text-gold", bg: "bg-gold/10", border: "border-gold/25", href: "/news" }
-                        ].map((service, index) => (
-                          <div 
-                            key={index} 
-                            className={`text-center p-5 rounded-2xl ${service.bg} hover:shadow-zellige transition-all duration-300 transform hover:scale-105 border-2 ${service.border} relative overflow-hidden group cursor-pointer`}
-                            onClick={() => service.href && navigate(service.href)}
-                          >
-                           <div className="absolute inset-0 bg-pattern-filigrane opacity-10 group-hover:opacity-20 transition-opacity duration-300"></div>
-                           <service.icon className={`h-10 w-10 ${service.color} mx-auto mb-3 relative z-10`} />
-                           <p className="text-sm font-semibold text-foreground font-serif relative z-10">
-                             {language === 'ar' ? service.label_ar : service.label_fr}
-                           </p>
-                         </div>
-                       ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Sidebar avec mosaïques et tons neutres */}
-              <div className="xl:col-span-1 flex flex-col gap-6">
-                
-                {/* Mon espace avec mosaïques raffinées */}
-                <Link to="/auth">
-                  <Card className="relative overflow-hidden group border-3 border-primary/25 shadow-mosaique hover:shadow-zellige transition-all duration-500 cursor-pointer">
-                    <div className="absolute inset-0 bg-pattern-filigrane opacity-15 group-hover:opacity-25 transition-opacity duration-500"></div>
-                    <div className="absolute inset-0 bg-pattern-zellige-tiles opacity-10 group-hover:opacity-20 transition-opacity duration-500"></div>
-                    <div className="absolute inset-0 bg-gradient-mosaique opacity-90"></div>
-                    <CardContent className="p-5 text-center relative z-10">
-                      <div className="w-16 h-16 bg-gradient-neutral rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-mosaique transform group-hover:scale-110 transition-transform duration-300 border-2 border-primary/20">
-                        <Users className="h-8 w-8 text-primary" />
-                      </div>
-                      <h4 className="font-moroccan font-bold text-foreground mb-3">
-                        {language === 'ar' ? 'مساحتي' : 'Mon Espace'}
-                      </h4>
-                      <Button size="sm" className="w-full bg-gradient-primary shadow-gold hover:shadow-mosaique font-serif">
-                        {language === 'ar' ? 'تسجيل الدخول' : 'Connexion'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Link>
-
-                {/* Cartes sidebar avec différentes mosaïques */}
-                {[
-                  { title_fr: "Aide & Support", title_ar: "المساعدة والدعم", subtitle_fr: "FAQ, règlements, contacts", subtitle_ar: "الأسئلة الشائعة، اللوائح، الاتصالات", icon: MousePointer, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-moroccan-stars", border: "border-accent/25", shadow: "shadow-elegant hover:shadow-zellige", href: "/help" },
-                  { title_fr: "Services numériques", title_ar: "الخدمات الرقمية", subtitle_fr: "Catalogue, reproduction", subtitle_ar: "الفهرس، النسخ", icon: Download, gradient: "bg-gradient-neutral", pattern: "bg-pattern-filigrane", border: "border-gold/25", shadow: "shadow-gold hover:shadow-mosaique", href: "/services-bnrm" },
-                  { title_fr: "Pass journalier", title_ar: "تصريح يومي", subtitle_fr: "Accès gratuit à la bibliothèque", subtitle_ar: "دخول مجاني للمكتبة", icon: BadgeCheck, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-primary/25", shadow: "shadow-mosaique hover:shadow-zellige", href: "/services-bnrm?open=daily-pass" },
-                  { title_fr: "Langues", title_ar: "اللغات", subtitle_fr: "", subtitle_ar: "", icon: Globe, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-highlight/25", shadow: "shadow-berber hover:shadow-gold", href: "#" },
-                  { title_fr: "Accessibilité", title_ar: "إمكانية الوصول", subtitle_fr: "Options d'accessibilité", subtitle_ar: "خيارات الوصول", icon: Accessibility, gradient: "bg-gradient-neutral", pattern: "bg-pattern-moroccan-stars", border: "border-royal/25", shadow: "shadow-royal hover:shadow-mosaique", href: "#" },
-                  { title_fr: "Partager", title_ar: "مشاركة", subtitle_fr: "", subtitle_ar: "", icon: Share2, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-filigrane", border: "border-primary/25", shadow: "shadow-mosaique hover:shadow-zellige", href: "#" }
-                ].map((item, index) => (
-                  <Link key={index} to={item.href}>
-                    <Card className={`relative overflow-hidden group border-3 ${item.border} ${item.shadow} transition-all duration-500 cursor-pointer`}>
-                      <div className={`absolute inset-0 ${item.pattern} opacity-15 group-hover:opacity-25 transition-opacity duration-500`}></div>
-                      <div className={`absolute inset-0 ${item.gradient} opacity-85`}></div>
-                      <CardContent className="p-4 text-center relative z-10">
-                        <item.icon className="h-6 w-6 text-foreground mx-auto mb-2" />
-                        <h4 className="font-moroccan text-sm font-bold text-foreground">
-                          {language === 'ar' ? item.title_ar : item.title_fr}
-                        </h4>
-                        {((language === 'ar' && item.subtitle_ar) || (language === 'fr' && item.subtitle_fr)) && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {language === 'ar' ? item.subtitle_ar : item.subtitle_fr}
-                          </p>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
+              <p className="text-2xl md:text-3xl text-white/95 font-light mb-8 drop-shadow-lg">
+                {language === 'ar' 
+                  ? 'حارسة التراث الألفي المغربي'
+                  : 'Gardienne du patrimoine millénaire marocain'
+                }
+              </p>
             </div>
-          </main>
-          
-          <Footer />
-          
-          {/* Outils globaux (Accessibilité + Chatbot) */}
-          <GlobalAccessibilityTools />
-        </div>
+          </div>
+        </section>
+        
+        {/* Main Content */}
+        <main className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+            
+            {/* Main Area */}
+            <div className="xl:col-span-3 space-y-8">
+              
+              {/* Search Section */}
+              <div className="text-center mb-10">
+                <div className="max-w-2xl mx-auto bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-lg">
+                  <h2 className="text-2xl font-bold text-foreground mb-4">
+                    {t('header.search')}
+                  </h2>
+                  
+                  <div className="relative">
+                    <Input
+                      type="search"
+                      placeholder={language === 'ar' ? 'ابحث في الفهرس...' : 'Rechercher dans le catalogue...'}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                      className="w-full h-16 text-lg bg-white shadow-md border-2 pr-16 rounded-full"
+                    />
+                    
+                    <Button 
+                      size="lg"
+                      onClick={handleSearch}
+                      className="absolute right-2 top-2 h-12 w-12 rounded-full"
+                    >
+                      <Search className="h-6 w-6" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Platforms Section */}
+              <div className="relative py-20 my-12 overflow-hidden bg-[rgb(32,45,94)] rounded-lg">
+                <div className="container mx-auto px-4 relative z-10">
+                  <div className="mb-12">
+                    <h2 className="text-5xl font-bold text-white mb-4">
+                      {language === 'ar' ? 'منصاتنا الرئيسية' : 'Nos Principales Plateformes'}
+                    </h2>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[
+                      { title: language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique', path: '/digital-library', image: zelligePattern5 },
+                      { title: language === 'ar' ? 'الأنشطة الثقافية' : 'Activités Culturelles', path: '/cultural-activities', image: zelligePattern3 },
+                      { title: 'CBM', path: '/cbm', image: zelligePattern2 },
+                      { title: 'Kitab', path: '/kitab', image: zelligePattern6 },
+                      { title: language === 'ar' ? 'مخطوطات' : 'Manuscrits', path: '/plateforme-manuscrits', image: zelligePattern1 }
+                    ].map((platform, index) => (
+                      <div 
+                        key={index}
+                        className="relative h-64 rounded-lg overflow-hidden shadow-xl group cursor-pointer"
+                        onClick={() => navigate(platform.path)}
+                      >
+                        <img 
+                          src={platform.image}
+                          alt={platform.title}
+                          className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900" />
+                        <div className="relative h-full flex items-center justify-center">
+                          <h3 className="text-white font-bold text-2xl">{platform.title}</h3>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Digital Services Section */}
+              <div className="mb-12">
+                <div className="py-16 bg-gradient-to-b from-slate-50 to-white rounded-lg">
+                  <div className="container mx-auto px-4">
+                    <div className="mb-10">
+                      <h2 className="text-4xl md:text-5xl font-bold mb-3 text-foreground">
+                        {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
+                      </h2>
+                    </div>
+
+                    <DigitalServicesCarousel language={language === 'ar' ? 'ar' : 'fr'} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Services */}
+              <Card className="shadow-lg">
+                <CardContent className="p-8">
+                  <h3 className="text-2xl font-bold text-foreground mb-6 text-center">
+                    {language === 'ar' ? 'خدمات سريعة' : 'Services Rapides'}
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {[
+                      { icon: BookOpen, label_fr: "Réserver un document", label_ar: "حجز وثيقة", href: "/cbn/reserver-ouvrage" },
+                      { icon: Download, label_fr: "Reproduction", label_ar: "النسخ", href: "/demande-reproduction" },
+                      { icon: CreditCard, label_fr: "Adhésions", label_ar: "الاشتراكات", href: "/abonnements" },
+                      { icon: Calendar, label_fr: "Événements", label_ar: "الفعاليات", href: "/news" }
+                    ].map((service, index) => (
+                      <div 
+                        key={index} 
+                        className="text-center p-5 rounded-2xl bg-primary/10 hover:shadow-lg transition-all cursor-pointer"
+                        onClick={() => service.href && navigate(service.href)}
+                      >
+                        <service.icon className="h-10 w-10 text-primary mx-auto mb-3" />
+                        <p className="text-sm font-semibold text-foreground">
+                          {language === 'ar' ? service.label_ar : service.label_fr}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Sidebar */}
+            <div className="xl:col-span-1 flex flex-col gap-6">
+              <Card className="cursor-pointer hover:shadow-lg transition-all" onClick={() => navigate('/auth')}>
+                <CardContent className="p-5 text-center">
+                  <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Users className="h-8 w-8 text-primary" />
+                  </div>
+                  <h4 className="font-bold text-foreground mb-3">
+                    {language === 'ar' ? 'مساحتي' : 'Mon Espace'}
+                  </h4>
+                  <Button size="sm" className="w-full">
+                    {language === 'ar' ? 'تسجيل الدخول' : 'Connexion'}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {[
+                { title_fr: "Aide & Support", title_ar: "المساعدة والدعم", icon: MousePointer, href: "/help" },
+                { title_fr: "Services numériques", title_ar: "الخدمات الرقمية", icon: Download, href: "/services-bnrm" },
+                { title_fr: "Pass journalier", title_ar: "تصريح يومي", icon: BadgeCheck, href: "/services-bnrm?open=daily-pass" },
+                { title_fr: "Langues", title_ar: "اللغات", icon: Globe, href: "#" },
+                { title_fr: "Accessibilité", title_ar: "إمكانية الوصول", icon: Accessibility, href: "#" },
+                { title_fr: "Partager", title_ar: "مشاركة", icon: Share2, href: "#" }
+              ].map((item, index) => (
+                <Card key={index} className="cursor-pointer hover:shadow-lg transition-all" onClick={() => navigate(item.href)}>
+                  <CardContent className="p-4 text-center">
+                    <item.icon className="h-6 w-6 text-foreground mx-auto mb-2" />
+                    <h4 className="text-sm font-bold text-foreground">
+                      {language === 'ar' ? item.title_ar : item.title_fr}
+                    </h4>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </main>
+        
+        <Footer />
+        <GlobalAccessibilityTools />
       </div>
     </>
   );
