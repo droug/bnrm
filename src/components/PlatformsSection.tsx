@@ -54,14 +54,14 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
     <div className="relative py-20 my-12 overflow-hidden bg-[rgb(32,45,94)] rounded-lg">
       <div className="container mx-auto px-4 relative z-10">
         <div className="mb-12">
-          <Badge className="bg-orange-500 hover:bg-orange-600 text-white mb-3">
+          <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
             BNRM
-          </Badge>
-          <h2 className="text-4xl font-bold text-white mb-3 relative inline-block">
+          </p>
+          <h2 className="text-4xl font-bold text-white mb-4">
             {language === 'ar' ? 'منصاتنا الرئيسية' : 'Nos Principales Plateformes'}
-            <div className="absolute bottom-0 left-0 w-32 h-1 bg-orange-500"></div>
           </h2>
-          <p className="text-white/80 mt-4">
+          <div className="w-24 h-1 bg-orange-500 mb-4"></div>
+          <p className="text-white/80">
             {language === 'ar' 
               ? 'اكتشف منصاتنا الرقمية'
               : 'Découvrez nos plateformes numériques'

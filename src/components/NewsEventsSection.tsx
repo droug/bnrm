@@ -40,14 +40,14 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
         {/* Header */}
         <div className="flex items-start justify-between mb-8">
           <div>
-            <Badge className="bg-orange-500 hover:bg-orange-600 text-white mb-3">
+            <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
               BNRM
-            </Badge>
-            <h2 className="text-4xl font-bold text-[#1e3a8a] mb-3 relative inline-block">
+            </p>
+            <h2 className="text-4xl font-bold text-[#1e3a8a] mb-4">
               Actualités & Événements
-              <div className="absolute bottom-0 left-0 w-32 h-1 bg-orange-500"></div>
             </h2>
-            <p className="text-muted-foreground mt-4">
+            <div className="w-24 h-1 bg-orange-500 mb-4"></div>
+            <p className="text-muted-foreground">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </p>
           </div>
