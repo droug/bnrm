@@ -10,24 +10,18 @@ interface DonationSectionProps {
 export const DonationSection = ({ language }: DonationSectionProps) => {
   const navigate = useNavigate();
 
-  const donationAmounts = [
-    { amount: 100, label: "100 DH" },
-    { amount: 500, label: "500 DH" },
-    { amount: 1000, label: "1000 DH" },
-    { amount: 0, label: language === 'ar' ? 'مبلغ آخر' : 'Autre montant' }
-  ];
-
-  const handleDonation = (amount: number) => {
-    // Navigate to donation page with amount
-    navigate(`/donation?amount=${amount}`);
+  const handleDonation = () => {
+    // Navigate to donation page
+    navigate(`/donation`);
   };
 
   return (
-    <div className="mb-12">
-      <Card className="relative overflow-hidden border-2 border-orange-200 shadow-2xl bg-gradient-to-br from-orange-50 via-white to-blue-50">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100 rounded-full blur-3xl opacity-30 -mr-32 -mt-32" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-30 -ml-32 -mb-32" />
+    <div className="py-16 bg-gradient-to-b from-slate-50 to-white rounded-lg mb-12">
+      <div className="container mx-auto px-4">
+        <Card className="relative overflow-hidden border-2 border-orange-200 shadow-2xl bg-gradient-to-br from-orange-50 via-white to-blue-50">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100 rounded-full blur-3xl opacity-30 -mr-32 -mt-32" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-30 -ml-32 -mb-32" />
         
         <CardContent className="relative z-10 p-8 md:p-12">
           <div className="max-w-4xl mx-auto">
@@ -96,30 +90,10 @@ export const DonationSection = ({ language }: DonationSectionProps) => {
               </div>
             </div>
 
-            {/* Donation Amounts */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border-2 border-dashed border-orange-200 mb-6">
-              <p className="text-center font-semibold text-foreground mb-4">
-                {language === 'ar' ? 'اختر مبلغ التبرع:' : 'Choisissez le montant de votre don :'}
-              </p>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {donationAmounts.map((item, index) => (
-                  <Button
-                    key={index}
-                    onClick={() => handleDonation(item.amount)}
-                    variant="outline"
-                    className="h-16 text-lg font-bold border-2 border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white hover:scale-105 transition-all shadow-sm"
-                  >
-                    {item.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
             {/* Main CTA */}
             <div className="text-center">
               <Button
-                onClick={() => handleDonation(0)}
+                onClick={handleDonation}
                 size="lg"
                 className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-10 py-6 text-lg font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all hover:scale-105"
               >
@@ -137,6 +111,7 @@ export const DonationSection = ({ language }: DonationSectionProps) => {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };

@@ -169,9 +169,6 @@ const Index = () => {
               {/* News and Events Section */}
               <NewsEventsSection language={language} />
 
-              {/* Donation Section */}
-              <DonationSection language={language} />
-
               {/* Platforms Section */}
               <PlatformsSection language={language} />
 
@@ -297,6 +294,9 @@ const Index = () => {
                   </Card>
                 </div>
               </div>
+
+              {/* Donation Section */}
+              <DonationSection language={language} />
           </div>
         </main>
         
