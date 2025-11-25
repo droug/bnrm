@@ -94,10 +94,7 @@ const Index = () => {
         
         {/* Main Content */}
         <main className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-            
-            {/* Main Area */}
-            <div className="xl:col-span-3 space-y-8">
+          <div className="space-y-8">
               
               {/* Search Section */}
               <div className="text-center mb-10">
@@ -195,11 +192,6 @@ const Index = () => {
                   </div>
                 </CardContent>
               </Card>
-            </div>
-
-            {/* Sidebar */}
-            <div className="xl:col-span-1 flex flex-col gap-6">
-            </div>
           </div>
         </main>
         
