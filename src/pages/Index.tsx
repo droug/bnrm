@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useState as useReactState } from "react";
 import { SimpleTooltip } from "@/components/ui/simple-tooltip";
 import bnrmBuildingNight from "@/assets/bnrm-building-night.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
@@ -36,6 +37,7 @@ const Index = () => {
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<Array<{ type: string; value: string }>>([]);
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
 
   // Récupérer les actualités récentes
   const { data: actualites } = useQuery({
@@ -78,6 +80,19 @@ const Index = () => {
       return () => clearTimeout(timer);
     }
   }, []);
+
+  // Fermer le menu des filtres quand on clique ailleurs
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (showFilterMenu && !target.closest('.filter-menu-container')) {
+        setShowFilterMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showFilterMenu]);
 
   const handleLegalDepositClick = (type: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees") => {
     setSelectedDepositType(type);
@@ -247,40 +262,63 @@ const Index = () => {
                     )}
 
                     <div className="relative">
-                      {/* Menu des filtres */}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-11 px-3 bg-white hover:bg-gray-50 border-2 border-gray-300 text-gray-900 shadow-lg hover:shadow-xl transition-all"
-                          >
-                            <Filter className="h-4 w-4 mr-2 text-gray-900" />
-                            <span className="font-medium">{language === 'ar' ? 'الفلاتر' : 'Filtres'}</span>
-                            <ChevronDown className="h-4 w-4 ml-1 text-gray-900" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-56 bg-popover">
-                          <DropdownMenuItem onClick={() => addFilter('author')} className="text-base font-medium">
-                            {language === 'ar' ? 'المؤلف' : 'Auteur'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => addFilter('publisher')} className="text-base font-medium">
-                            {language === 'ar' ? 'الناشر' : 'Éditeur'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => addFilter('genre')} className="text-base font-medium">
-                            {language === 'ar' ? 'النوع' : 'Genre'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => addFilter('publication_year')} className="text-base font-medium">
-                            {language === 'ar' ? 'سنة النشر' : 'Année de publication'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => addFilter('language')} className="text-base font-medium">
-                            {language === 'ar' ? 'اللغة' : 'Langue'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => addFilter('content_type')} className="text-base font-medium">
-                            {language === 'ar' ? 'نوع المحتوى' : 'Type de contenu'}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      {/* Menu des filtres - Version simple */}
+                      <div className="relative filter-menu-container">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowFilterMenu(!showFilterMenu)}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-11 px-3 bg-white hover:bg-gray-50 border-2 border-gray-300 text-gray-900 shadow-lg hover:shadow-xl transition-all"
+                        >
+                          <Filter className="h-4 w-4 mr-2 text-gray-900" />
+                          <span className="font-medium">{language === 'ar' ? 'الفلاتر' : 'Filtres'}</span>
+                          <ChevronDown className={`h-4 w-4 ml-1 text-gray-900 transition-transform ${showFilterMenu ? 'rotate-180' : ''}`} />
+                        </Button>
+                        
+                        {/* Liste des filtres - Simple dropdown en dessous */}
+                        {showFilterMenu && (
+                          <div className="absolute left-2 top-14 w-56 bg-white border-2 border-gray-300 rounded-lg shadow-xl z-20">
+                            <div className="py-2">
+                              <button
+                                onClick={() => { addFilter('author'); setShowFilterMenu(false); }}
+                                className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
+                              >
+                                {language === 'ar' ? 'المؤلف' : 'Auteur'}
+                              </button>
+                              <button
+                                onClick={() => { addFilter('publisher'); setShowFilterMenu(false); }}
+                                className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
+                              >
+                                {language === 'ar' ? 'الناشر' : 'Éditeur'}
+                              </button>
+                              <button
+                                onClick={() => { addFilter('genre'); setShowFilterMenu(false); }}
+                                className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
+                              >
+                                {language === 'ar' ? 'النوع' : 'Genre'}
+                              </button>
+                              <button
+                                onClick={() => { addFilter('publication_year'); setShowFilterMenu(false); }}
+                                className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
+                              >
+                                {language === 'ar' ? 'سنة النشر' : 'Année de publication'}
+                              </button>
+                              <button
+                                onClick={() => { addFilter('language'); setShowFilterMenu(false); }}
+                                className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
+                              >
+                                {language === 'ar' ? 'اللغة' : 'Langue'}
+                              </button>
+                              <button
+                                onClick={() => { addFilter('content_type'); setShowFilterMenu(false); }}
+                                className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
+                              >
+                                {language === 'ar' ? 'نوع المحتوى' : 'Type de contenu'}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
 
                       <Input
                         type="search"
