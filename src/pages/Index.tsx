@@ -128,7 +128,12 @@ const Index = () => {
                         <Filter className="h-4 w-4 mr-2" />
                         <SelectValue placeholder={language === 'ar' ? 'الفئة' : 'Catégorie'} />
                       </SelectTrigger>
-                      <SelectContent className="bg-background z-50">
+                      <SelectContent 
+                        className="bg-background z-50 border-2" 
+                        position="popper"
+                        sideOffset={5}
+                        align="start"
+                      >
                         <SelectItem value="all">
                           {language === 'ar' ? 'الكل' : 'Tout'}
                         </SelectItem>
