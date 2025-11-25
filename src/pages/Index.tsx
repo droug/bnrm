@@ -814,10 +814,6 @@ const Index = () => {
                 {/* Cartes sidebar avec différentes mosaïques */}
                 {[
                   { title_fr: "Aide & Support", title_ar: "المساعدة والدعم", subtitle_fr: "FAQ, règlements, contacts", subtitle_ar: "الأسئلة الشائعة، اللوائح، الاتصالات", icon: MousePointer, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-moroccan-stars", border: "border-accent/25", shadow: "shadow-elegant hover:shadow-zellige", href: "/help" },
-                  { title_fr: "Services numériques", title_ar: "الخدمات الرقمية", subtitle_fr: "Catalogue, reproduction", subtitle_ar: "الفهرس، النسخ", icon: Download, gradient: "bg-gradient-neutral", pattern: "bg-pattern-filigrane", border: "border-gold/25", shadow: "shadow-gold hover:shadow-mosaique", href: "/services-bnrm" },
-                  { title_fr: "Pass journalier", title_ar: "تصريح يومي", subtitle_fr: "Accès gratuit à la bibliothèque", subtitle_ar: "دخول مجاني للمكتبة", icon: BadgeCheck, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-primary/25", shadow: "shadow-mosaique hover:shadow-zellige", href: "/services-bnrm?open=daily-pass" },
-                  { title_fr: "Langues", title_ar: "اللغات", subtitle_fr: "", subtitle_ar: "", icon: Globe, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-zellige-tiles", border: "border-highlight/25", shadow: "shadow-berber hover:shadow-gold", href: "#" },
-                  { title_fr: "Accessibilité", title_ar: "إمكانية الوصول", subtitle_fr: "Options d'accessibilité", subtitle_ar: "خيارات الوصول", icon: Accessibility, gradient: "bg-gradient-neutral", pattern: "bg-pattern-moroccan-stars", border: "border-royal/25", shadow: "shadow-royal hover:shadow-mosaique", href: "#" },
                   { title_fr: "Partager", title_ar: "مشاركة", subtitle_fr: "", subtitle_ar: "", icon: Share2, gradient: "bg-gradient-mosaique", pattern: "bg-pattern-filigrane", border: "border-primary/25", shadow: "shadow-mosaique hover:shadow-zellige", href: "#" }
                 ].map((item, index) => (
                   <Link key={index} to={item.href}>
