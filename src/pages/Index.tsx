@@ -94,7 +94,7 @@ const Index = () => {
         
         {/* Main Content */}
         <main className="container mx-auto px-4 py-8">
-          <div className="space-y-8">
+          <div className="max-w-6xl mx-auto space-y-8">
               
               {/* Search Section */}
               <div className="text-center mb-10">
