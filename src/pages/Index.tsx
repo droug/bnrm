@@ -6,7 +6,7 @@ import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools"
 import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
 import SEOHead from "@/components/seo/SEOHead";
-import { Search, Book, BookOpen, Users, Download, Calendar, Globe, Accessibility, Share2, MousePointer, CreditCard, BadgeCheck, UserPlus, Filter } from "lucide-react";
+import { Search, Book, BookOpen, Users, Download, Calendar, Globe, Accessibility, Share2, MousePointer, CreditCard, BadgeCheck, UserPlus, Filter, Scroll } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,33 +63,58 @@ const Index = () => {
         <Header />
         
         {/* Hero Banner */}
-        <section className="relative min-h-screen overflow-hidden pt-20">
+        <section className="relative min-h-[70vh] overflow-hidden pt-20">
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{ 
               backgroundImage: `url(${bnrmBuildingNight})`,
-              filter: 'brightness(1.2) contrast(1.1)'
             }}
           />
           
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
           
-          <div className="relative z-10 h-full flex flex-col pt-8 px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="flex items-center justify-center space-x-4 mb-6">
-                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-2xl" />
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white drop-shadow-2xl">
-                  {t('header.title')}
-                </h1>
-                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-2xl" />
+          <div className="relative z-10 container mx-auto px-4 h-full flex items-center min-h-[70vh]">
+            <div className="max-w-2xl">
+              <div className="mb-6">
+                <span className="inline-block px-4 py-2 bg-white/90 backdrop-blur-sm text-primary text-sm font-medium rounded-md">
+                  {language === 'ar' 
+                    ? 'التراث الوطني المغربي'
+                    : 'Patrimoine National Marocain'
+                  }
+                </span>
               </div>
               
-              <p className="text-2xl md:text-3xl text-white/95 font-light mb-8 drop-shadow-lg">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                {t('header.title')}
+              </h1>
+              
+              <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
                 {language === 'ar' 
-                  ? 'حارسة التراث الألفي المغربي'
-                  : 'Gardienne du patrimoine millénaire marocain'
+                  ? 'الحفاظ على التراث المخطوط المغربي وتثمينه. اكتشف آلاف المخطوطات القديمة الرقمية بتقنية IIIF في إطار معماري استثنائي.'
+                  : 'Préservation et valorisation du patrimoine manuscrit marocain. Découvrez des milliers de manuscrits anciens numérisés avec la technologie IIIF dans un cadre architectural exceptionnel.'
                 }
               </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  size="lg"
+                  onClick={() => navigate('/digital-library')}
+                  className="bg-[#e67e22] hover:bg-[#d35400] text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+                >
+                  <BookOpen className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+                  {language === 'ar' ? 'استكشف المجموعات' : 'Explorer les collections'}
+                </Button>
+                
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  onClick={() => navigate('/plateforme-manuscrits')}
+                  className="bg-white/90 backdrop-blur-sm text-primary hover:bg-white border-2 border-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+                >
+                  <Scroll className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+                  {language === 'ar' ? 'عارض المخطوطات' : 'Visionneuse de manuscrits'}
+                </Button>
+              </div>
             </div>
           </div>
         </section>
