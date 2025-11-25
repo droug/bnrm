@@ -1,16 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { FileText, Printer, Search, BookOpen, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
+  CarouselApi,
 } from "@/components/ui/carousel";
 
 interface BNRMService {
@@ -42,10 +38,24 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
   const [services, setServices] = useState<BNRMService[]>([]);
   const [tariffs, setTariffs] = useState<BNRMTariff[]>([]);
   const [loading, setLoading] = useState(true);
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     fetchServices();
   }, []);
+
+  useEffect(() => {
+    if (!api) return;
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap());
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
 
   const fetchServices = async () => {
     try {
@@ -75,33 +85,15 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
     }
   };
 
-  const getTariffsForService = (serviceId: string) => {
-    return tariffs.filter(t => t.id_service === serviceId);
-  };
-
-  const getCategoryColor = (category: string) => {
-    const colors: Record<string, string> = {
-      "Dépôt légal": "bg-blue-100 text-blue-800",
-      "Reproduction": "bg-green-100 text-green-800",
-      "Recherche": "bg-purple-100 text-purple-800",
-      "Numérisation": "bg-orange-100 text-orange-800",
-      "Formation": "bg-pink-100 text-pink-800",
-      "Inscription": "bg-blue-100 text-blue-800",
-    };
-    return colors[category] || "bg-gray-100 text-gray-800";
-  };
-
-  const getCategoryIcon = (category: string) => {
-    const icons: Record<string, any> = {
-      "Dépôt légal": FileText,
-      "Reproduction": Printer,
-      "Recherche": Search,
-      "Numérisation": BookOpen,
-      "Formation": Users,
-      "Inscription": Users,
-    };
-    const Icon = icons[category] || FileText;
-    return <Icon className="h-5 w-5" />;
+  const getServiceImage = (index: number) => {
+    const images = [
+      "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80",
+      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",
+      "https://images.unsplash.com/photo-1568667256549-094345857637?w=800&q=80",
+      "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800&q=80",
+      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&q=80",
+    ];
+    return images[index % images.length];
   };
 
   if (loading) {
@@ -112,129 +104,127 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
     );
   }
 
-  return (
-    <Carousel
-      opts={{
-        align: "start",
-        loop: true,
-      }}
-      className="w-full"
-    >
-      <CarouselContent className="-ml-4">
-        {/* Premier élément - Dépôt Légal */}
-        <CarouselItem className="pl-4 md:basis-1/2 lg:basis-1/3">
-          <Card className="hover:shadow-lg transition-shadow flex flex-col h-full">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  <CardTitle className="text-lg">
-                    {language === 'ar' ? 'الإيداع القانوني' : 'Dépôt Légal'}
-                  </CardTitle>
-                </div>
-              </div>
-              <Badge className="bg-blue-100 text-blue-800 w-fit">
-                Service Essentiel
-              </Badge>
-            </CardHeader>
-            <CardContent className="flex flex-col flex-1">
-              <div className="flex-1 space-y-3 mb-4">
-                <CardDescription className="text-sm">
-                  {language === 'ar'
-                    ? 'قم بإيداع مطبوعاتك ووثائقك وفقاً للقانون. خدمة إلزامية للناشرين والمؤلفين.'
-                    : 'Déposez vos publications et documents selon la loi. Service obligatoire pour les éditeurs et auteurs.'}
-                </CardDescription>
-                <div className="text-sm">
-                  <span className="font-semibold">
-                    {language === 'ar' ? 'الأنواع المتاحة :' : 'Types disponibles :'}
-                  </span>
-                  <ul className="list-disc list-inside mt-2 space-y-1 text-xs text-muted-foreground">
-                    <li>{language === 'ar' ? 'الكتب والمنشورات' : 'Livres et monographies'}</li>
-                    <li>{language === 'ar' ? 'الدوريات والمجلات' : 'Périodiques et magazines'}</li>
-                    <li>{language === 'ar' ? 'السمعي البصري' : 'Audio-visuel et logiciels'}</li>
-                    <li>{language === 'ar' ? 'المجموعات المتخصصة' : 'Collections spécialisées'}</li>
-                  </ul>
-                </div>
-              </div>
-              <Button 
-                className="w-full"
-                onClick={() => handleLegalDepositClick("monographie")}
-              >
-                {language === 'ar' ? 'ابدأ الإيداع' : 'Commencer le dépôt'}
-              </Button>
-            </CardContent>
-          </Card>
-        </CarouselItem>
+  const allServices = [
+    {
+      id: 'depot-legal',
+      title: language === 'ar' ? 'الإيداع القانوني' : 'Dépôt Légal',
+      description: language === 'ar' 
+        ? 'قم بإيداع مطبوعاتك ووثائقك وفقاً للقانون. خدمة إلزامية للناشرين والمؤلفين.'
+        : 'Déposez vos publications et documents selon la loi. Service obligatoire pour les éditeurs et auteurs.',
+      category: language === 'ar' ? 'خدمة أساسية' : 'Service Essentiel',
+      readTime: language === 'ar' ? '5 دقائق' : '5 min read',
+      onClick: () => handleLegalDepositClick("monographie")
+    },
+    ...services.map((service, index) => ({
+      id: service.id_service,
+      title: service.nom_service,
+      description: service.description || '',
+      category: service.categorie,
+      readTime: language === 'ar' ? '5 دقائق' : '5 min read',
+      onClick: () => navigate('/services-bnrm')
+    }))
+  ];
 
-        {/* Services depuis la base de données */}
-        {services.map((service) => {
-          const serviceTariffs = getTariffsForService(service.id_service);
-          
-          return (
-            <CarouselItem key={service.id_service} className="pl-4 md:basis-1/2 lg:basis-1/3">
-              <Card className="hover:shadow-lg transition-shadow flex flex-col h-full">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      {getCategoryIcon(service.categorie)}
-                      <CardTitle className="text-lg">{service.nom_service}</CardTitle>
-                    </div>
+  return (
+    <div className="relative">
+      <Carousel
+        setApi={setApi}
+        opts={{
+          align: "start",
+          loop: false,
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="-ml-4">
+          {allServices.map((service, index) => (
+            <CarouselItem key={service.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+              <div 
+                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group h-full flex flex-col"
+                onClick={service.onClick}
+              >
+                {/* Image */}
+                <div className="relative h-56 overflow-hidden">
+                  <img 
+                    src={getServiceImage(index)}
+                    alt={service.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="p-6 flex flex-col flex-1">
+                  {/* Category and Read Time */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-500 text-white">
+                      {service.category}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {service.readTime}
+                    </span>
                   </div>
-                  <Badge className={getCategoryColor(service.categorie)}>
-                    {service.categorie}
-                  </Badge>
-                </CardHeader>
-                <CardContent className="flex flex-col flex-1">
-                  <div className="flex-1 space-y-3 mb-4">
-                    {service.description && (
-                      <CardDescription className="text-sm">
-                        {service.description}
-                      </CardDescription>
-                    )}
-                    {service.public_cible && (
-                      <div className="text-sm">
-                        <span className="font-semibold">Public cible : </span>
-                        {service.public_cible}
-                      </div>
-                    )}
-                    
-                    {serviceTariffs.length > 0 && (
-                      <div className="space-y-2 pt-2 border-t">
-                        <div className="font-semibold text-sm">Tarifs :</div>
-                        {serviceTariffs.slice(0, 2).map((tariff) => (
-                          <div key={tariff.id_tarif} className="bg-muted/30 p-2 rounded-lg">
-                            <div className="flex items-center justify-between">
-                              <div className="text-xs">
-                                <div className="font-medium">{tariff.condition_tarif}</div>
-                              </div>
-                              <div className="text-sm font-bold text-primary">
-                                {tariff.montant} {tariff.devise}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                        {serviceTariffs.length > 2 && (
-                          <p className="text-xs text-muted-foreground">
-                            +{serviceTariffs.length - 2} autres tarifs disponibles
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <Button 
-                    className="w-full"
-                    onClick={() => navigate('/services-bnrm')}
-                  >
-                    {language === 'ar' ? 'اكتشف المزيد' : 'En savoir plus'}
-                  </Button>
-                </CardContent>
-              </Card>
+
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-foreground mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                    {service.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
+                    {service.description}
+                  </p>
+                </div>
+              </div>
             </CarouselItem>
-          );
-        })}
-      </CarouselContent>
-      <CarouselPrevious className="hidden md:flex" />
-      <CarouselNext className="hidden md:flex" />
-    </Carousel>
+          ))}
+        </CarouselContent>
+      </Carousel>
+
+      {/* Navigation Controls */}
+      <div className="flex items-center justify-between mt-8">
+        {/* Pagination Dots */}
+        <div className="flex gap-2">
+          {Array.from({ length: count }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => api?.scrollTo(index)}
+              className={`h-2 rounded-full transition-all ${
+                index === current 
+                  ? 'w-8 bg-orange-500' 
+                  : 'w-2 bg-slate-300 hover:bg-slate-400'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Arrow Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => api?.scrollPrev()}
+            disabled={current === 0}
+            className={`p-3 rounded-lg transition-colors ${
+              current === 0
+                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+            }`}
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => api?.scrollNext()}
+            disabled={current === count - 1}
+            className={`p-3 rounded-lg transition-colors ${
+              current === count - 1
+                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}
+            aria-label="Next slide"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
