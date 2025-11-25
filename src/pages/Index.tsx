@@ -233,7 +233,7 @@ const Index = () => {
                 <div className="text-center mb-10 relative">
                   <div className="absolute inset-0 bg-pattern-zellige-complex opacity-35 rounded-3xl blur-sm"></div>
                   <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-25 rounded-3xl"></div>
-                  <div className="max-w-2xl mx-auto relative bg-gradient-mosaique backdrop-blur-md p-8 rounded-3xl shadow-mosaique border-3 border-gold/25">
+                  <div className="max-w-2xl mx-auto relative bg-gradient-mosaique backdrop-blur-md p-8 rounded-3xl shadow-mosaique border-3 border-gold/25 overflow-visible">
                     <h2 className="text-2xl font-moroccan font-bold text-foreground mb-4">
                       {t('header.search')}
                     </h2>
@@ -261,14 +261,14 @@ const Index = () => {
                       </div>
                     )}
 
-                    <div className="relative">
+                    <div className="relative z-30">
                       {/* Menu des filtres - Version simple */}
                       <div className="relative filter-menu-container">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => setShowFilterMenu(!showFilterMenu)}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-11 px-3 bg-white hover:bg-gray-50 border-2 border-gray-300 text-gray-900 shadow-lg hover:shadow-xl transition-all"
+                          className="absolute left-2 top-2 z-10 h-12 px-3 bg-white hover:bg-gray-50 border-2 border-gray-300 text-gray-900 shadow-lg hover:shadow-xl transition-all"
                         >
                           <Filter className="h-4 w-4 mr-2 text-gray-900" />
                           <span className="font-medium">{language === 'ar' ? 'الفلاتر' : 'Filtres'}</span>
@@ -277,7 +277,7 @@ const Index = () => {
                         
                         {/* Liste des filtres - Simple dropdown en dessous */}
                         {showFilterMenu && (
-                          <div className="absolute left-2 top-14 w-56 bg-white border-2 border-gray-300 rounded-lg shadow-xl z-20">
+                          <div className="absolute left-2 top-16 w-56 bg-white border-2 border-gray-300 rounded-lg shadow-xl z-[9999]">
                             <div className="py-2">
                               <button
                                 onClick={() => { addFilter('author'); setShowFilterMenu(false); }}
