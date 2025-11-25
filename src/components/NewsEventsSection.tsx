@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Language } from "@/hooks/useLanguage";
+import eventRoiImage from "@/assets/event-roi-mohammed-6.png";
+import eventTurquieImage from "@/assets/event-turquie-bnrm.png";
 
 interface NewsEventsSectionProps {
   language: Language;
@@ -87,31 +89,37 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Image 1 - Roi Mohammed VI */}
             <div 
-              className="aspect-[3/4] bg-gradient-to-br from-amber-600 via-yellow-600 to-orange-700 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+              className="aspect-[3/4] rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform relative group"
               onClick={() => navigate('/news/1')}
             >
-              <div className="w-full h-full flex items-center justify-center relative">
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
-                <div className="absolute inset-0 flex items-end p-4">
-                  <Badge className="bg-amber-500/90 backdrop-blur-sm text-white">
-                    Événement Royal
-                  </Badge>
-                </div>
+              <img 
+                src={eventRoiImage} 
+                alt="Sa Majesté le Roi Mohammed VI"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute inset-0 flex items-end p-4">
+                <Badge className="bg-amber-500/90 backdrop-blur-sm text-white">
+                  Événement Royal
+                </Badge>
               </div>
             </div>
 
             {/* Image 2 - Visite Turquie */}
             <div 
-              className="aspect-[3/4] bg-gradient-to-br from-red-700 via-red-600 to-red-800 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+              className="aspect-[3/4] rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform relative group"
               onClick={() => navigate('/news/2')}
             >
-              <div className="w-full h-full flex items-center justify-center relative">
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
-                <div className="absolute inset-0 flex items-end p-4">
-                  <Badge className="bg-blue-500/90 backdrop-blur-sm text-white">
-                    Coopération
-                  </Badge>
-                </div>
+              <img 
+                src={eventTurquieImage} 
+                alt="Visite à la Bibliothèque Nationale de Turquie"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute inset-0 flex items-end p-4">
+                <Badge className="bg-blue-500/90 backdrop-blur-sm text-white">
+                  Coopération
+                </Badge>
               </div>
             </div>
           </div>
