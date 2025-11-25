@@ -95,6 +95,11 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       "https://images.unsplash.com/photo-1568667256549-094345857637?w=800&q=80",
       "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800&q=80",
       "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&q=80",
+      "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&q=80",
+      "https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=800&q=80",
+      "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=80",
+      "https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=800&q=80",
+      "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=800&q=80",
     ];
     return images[index % images.length];
   };
@@ -107,19 +112,31 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
     );
   }
 
-  const allServices = services.map((service) => {
-    const serviceTariffs = getTariffsForService(service.id_service);
-    const firstTariff = serviceTariffs[0];
-    
-    return {
-      id: service.id_service,
-      title: service.nom_service,
-      description: service.description || '',
-      category: service.categorie,
-      tariff: firstTariff ? `${firstTariff.montant} ${firstTariff.devise}` : null,
-      onClick: () => navigate('/services-bnrm')
-    };
-  });
+  const allServices = [
+    {
+      id: 'depot-legal',
+      title: language === 'ar' ? 'الإيداع القانوني' : 'Dépôt Légal',
+      description: language === 'ar' 
+        ? 'قم بإيداع مطبوعاتك ووثائقك وفقاً للقانون. خدمة إلزامية للناشرين والمؤلفين.'
+        : 'Déposez vos publications et documents selon la loi. Service obligatoire pour les éditeurs et auteurs.',
+      category: language === 'ar' ? 'خدمة أساسية' : 'Service Essentiel',
+      tariff: null,
+      onClick: () => handleLegalDepositClick("monographie")
+    },
+    ...services.map((service) => {
+      const serviceTariffs = getTariffsForService(service.id_service);
+      const firstTariff = serviceTariffs[0];
+      
+      return {
+        id: service.id_service,
+        title: service.nom_service,
+        description: service.description || '',
+        category: service.categorie,
+        tariff: firstTariff ? `${firstTariff.montant} ${firstTariff.devise}` : null,
+        onClick: () => navigate('/services-bnrm')
+      };
+    })
+  ];
 
   return (
     <div className="relative">
