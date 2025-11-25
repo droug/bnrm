@@ -22,6 +22,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
       title_ar: "الملك يعلن الإغلاق النهائي لملف الصحراء",
       excerpt_fr: "Sa Majesté le Roi Mohammed VI a présidé une cérémonie historique marquant une nouvelle ère pour le Royaume.",
       excerpt_ar: "ترأس جلالة الملك محمد السادس حفلا تاريخيا يعلن عهدا جديدا للمملكة.",
+      image: eventRoiImage,
     },
     {
       id: 2,
@@ -31,6 +32,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
       title_ar: "مديرة المكتبة الوطنية في زيارة إلى مكتبة تركيا الوطنية",
       excerpt_fr: "Madame Samira El Malizi renforce les liens culturels lors d'une visite officielle en Turquie.",
       excerpt_ar: "السيدة سميرة المليزي تعزز الروابط الثقافية خلال زيارة رسمية إلى تركيا.",
+      image: eventTurquieImage,
     },
   ];
 
@@ -60,18 +62,30 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
         </div>
 
         {/* Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column - Text Articles */}
-          <div className="space-y-6">
-            {news.map((item) => (
-              <div 
-                key={item.id}
-                className="group cursor-pointer"
-                onClick={() => navigate(`/news/${item.id}`)}
-              >
-                <Badge variant="outline" className="mb-2 text-xs">
-                  {language === 'ar' ? item.tag_ar : item.tag_fr}
-                </Badge>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {news.map((item) => (
+            <div 
+              key={item.id}
+              className="group cursor-pointer rounded-lg overflow-hidden bg-white shadow-md hover:shadow-xl transition-all"
+              onClick={() => navigate(`/news/${item.id}`)}
+            >
+              {/* Image */}
+              <div className="relative aspect-[16/9] overflow-hidden">
+                <img 
+                  src={item.image} 
+                  alt={language === 'ar' ? item.title_ar : item.title_fr}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute top-4 left-4">
+                  <Badge variant="outline" className="bg-white/90 backdrop-blur-sm border-0">
+                    {language === 'ar' ? item.tag_ar : item.tag_fr}
+                  </Badge>
+                </div>
+              </div>
+              
+              {/* Content */}
+              <div className="p-6">
                 <h3 className="text-xl font-bold text-[#1e3a8a] mb-2 group-hover:text-blue-600 transition-colors">
                   {language === 'ar' ? item.title_ar : item.title_fr}
                 </h3>
@@ -82,47 +96,8 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
                   Button <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
               </div>
-            ))}
-          </div>
-
-          {/* Right Column - Images */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Image 1 - Roi Mohammed VI */}
-            <div 
-              className="aspect-[3/4] rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform relative group"
-              onClick={() => navigate('/news/1')}
-            >
-              <img 
-                src={eventRoiImage} 
-                alt="Sa Majesté le Roi Mohammed VI"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute inset-0 flex items-end p-4">
-                <Badge className="bg-amber-500/90 backdrop-blur-sm text-white">
-                  Événement Royal
-                </Badge>
-              </div>
             </div>
-
-            {/* Image 2 - Visite Turquie */}
-            <div 
-              className="aspect-[3/4] rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform relative group"
-              onClick={() => navigate('/news/2')}
-            >
-              <img 
-                src={eventTurquieImage} 
-                alt="Visite à la Bibliothèque Nationale de Turquie"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute inset-0 flex items-end p-4">
-                <Badge className="bg-blue-500/90 backdrop-blur-sm text-white">
-                  Coopération
-                </Badge>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
