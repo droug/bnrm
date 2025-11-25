@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { RubElHizb } from "@/components/RubElHizb";
 import bibliothequeNumerique from "@/assets/bibliotheque-numerique.jpg";
 import kitabBackground from "@/assets/kitab-background.jpg";
 import manuscritsBackground from "@/assets/manuscrits-background.jpg";
@@ -105,11 +104,8 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 
                 {/* Number Badge */}
                 <div className="absolute top-8 right-8 z-10">
-                  <div className="relative w-16 h-16 flex items-center justify-center">
-                    <RubElHizb className="absolute inset-0 w-full h-full" color="#1e40af" />
-                    <span className="relative z-10 font-bold text-2xl text-white drop-shadow-lg">
-                      {mainPlatform.number}
-                    </span>
+                  <div className="bg-primary text-primary-foreground font-bold text-2xl w-16 h-16 rounded-full flex items-center justify-center shadow-lg">
+                    {mainPlatform.number}
                   </div>
                 </div>
                 
@@ -193,11 +189,8 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       
                       {/* Number badge on spine */}
                       <div className="absolute top-6 left-1/2 -translate-x-1/2">
-                        <div className="relative w-8 h-8 flex items-center justify-center">
-                          <RubElHizb className="absolute inset-0 w-full h-full" color="#1e40af" />
-                          <span className="relative z-10 font-bold text-xs text-white drop-shadow-md">
-                            {platform.number}
-                          </span>
+                        <div className="bg-white/90 text-gray-800 font-bold text-sm w-8 h-8 rounded-full flex items-center justify-center shadow-md">
+                          {platform.number}
                         </div>
                       </div>
                       
