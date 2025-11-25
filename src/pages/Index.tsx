@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-// import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools"; // TEMPORAIREMENT DÉSACTIVÉ
-// import WelcomePopup from "@/components/WelcomePopup"; // TEMPORAIREMENT DÉSACTIVÉ
+import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
+import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
 import SEOHead from "@/components/seo/SEOHead";
 import SEOImage from "@/components/seo/SEOImage";
@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useState as useReactState } from "react";
 import { SimpleTooltip } from "@/components/ui/simple-tooltip";
 import bnrmBuildingNight from "@/assets/bnrm-building-night.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
@@ -70,16 +71,16 @@ const Index = () => {
     }
   });
 
-  // Vérifier si le popup d'accueil doit être affiché - TEMPORAIREMENT DÉSACTIVÉ
-  // useEffect(() => {
-  //   const hasSeenWelcome = sessionStorage.getItem('bnrm-welcome-popup-dismissed');
-  //   if (!hasSeenWelcome) {
-  //     const timer = setTimeout(() => {
-  //       setShowWelcomePopup(true);
-  //     }, 2000);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, []);
+  // Vérifier si le popup d'accueil doit être affiché
+  useEffect(() => {
+    const hasSeenWelcome = sessionStorage.getItem('bnrm-welcome-popup-dismissed');
+    if (!hasSeenWelcome) {
+      const timer = setTimeout(() => {
+        setShowWelcomePopup(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // Fermer le menu des filtres quand on clique ailleurs
   useEffect(() => {
@@ -156,11 +157,11 @@ const Index = () => {
         keywords={["bibliothèque maroc", "BNRM", "manuscrits marocains", "patrimoine culturel", "bibliothèque numérique", "dépôt légal", "recherche documentaire"]}
       />
       
-      {/* Popup d'accueil - TEMPORAIREMENT DÉSACTIVÉ */}
-      {/* <WelcomePopup 
+      {/* Popup d'accueil */}
+      <WelcomePopup 
         isOpen={showWelcomePopup} 
         onClose={() => setShowWelcomePopup(false)} 
-      /> */}
+      />
       
       {/* Popup d'accueil */}
       {/* <WelcomePopup 
@@ -844,8 +845,8 @@ const Index = () => {
           
           <Footer />
           
-          {/* Outils globaux (Accessibilité + Chatbot) - TEMPORAIREMENT DÉSACTIVÉ */}
-          {/* <GlobalAccessibilityTools /> */}
+          {/* Outils globaux (Accessibilité + Chatbot) */}
+          <GlobalAccessibilityTools />
         </div>
       </div>
     </>
