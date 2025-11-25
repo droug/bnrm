@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import bibliothequeNumerique from "@/assets/bibliotheque-numerique.jpg";
-import kitabBackground from "@/assets/kitab-vertical.jpg";
+import kitabBackground from "@/assets/kitab-book.jpg";
 import manuscritsBackground from "@/assets/manuscrits-background.jpg";
 import culturalActivitiesBackground from "@/assets/cultural-activities-background.jpg";
 import cbmBackground from "@/assets/cbm-background.jpg";
@@ -196,7 +196,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       <img 
                         src={platform.image}
                         alt={platform.title}
-                        className={`absolute inset-0 w-full h-full object-cover mix-blend-overlay ${index === 1 ? 'opacity-75' : 'opacity-10'}`}
+                        className={`absolute inset-0 w-full h-full object-cover ${index === 1 ? 'opacity-100' : 'opacity-10 mix-blend-overlay'}`}
                       />
                       
                       {/* Book binding lines */}
