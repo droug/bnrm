@@ -274,7 +274,6 @@ const Index = () => {
         </main>
         
         <Footer />
-        <GlobalAccessibilityTools />
         <FloatingButtons />
       </div>
     </>
