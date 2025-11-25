@@ -5,6 +5,7 @@ import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
 import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
 import zelligePattern5 from "@/assets/zellige-pattern-5.jpg";
 import zelligePattern6 from "@/assets/zellige-pattern-6.jpg";
+import bibliothequeNumerique from "@/assets/bibliotheque-numerique.jpg";
 
 interface PlatformsSectionProps {
   language: string;
@@ -19,7 +20,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
       ? 'استكشف مجموعاتنا الرقمية الغنية من الكتب والمخطوطات والوثائق التاريخية المتاحة للاستشارة عبر الإنترنت'
       : 'Explorez nos riches collections numériques de livres, manuscrits et documents historiques disponibles en consultation en ligne',
     path: '/digital-library',
-    image: zelligePattern5,
+    image: bibliothequeNumerique,
     number: '01'
   };
 
