@@ -49,9 +49,6 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
               Actualités & Événements
             </h2>
             <div className="w-24 h-1 bg-orange-500 mb-4"></div>
-            <p className="text-muted-foreground">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </p>
           </div>
           <Button 
             onClick={() => navigate('/news')}
@@ -93,7 +90,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
                   {language === 'ar' ? item.excerpt_ar : item.excerpt_fr}
                 </p>
                 <Button variant="ghost" size="sm" className="p-0 h-auto font-semibold group-hover:translate-x-1 transition-transform">
-                  Button <ArrowRight className="ml-1 h-4 w-4" />
+                  {language === 'ar' ? "المزيد من المعلومات" : "Plus d'infos"} <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
               </div>
             </div>
