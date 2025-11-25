@@ -157,7 +157,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                   'from-[#7c2d12] to-[#5a1f0a]', // Bordeaux
                 ];
                 
-                const heights = ['h-[380px]', 'h-[420px]', 'h-[400px]', 'h-[390px]'];
+                const heights = ['h-[400px]', 'h-[400px]', 'h-[400px]', 'h-[400px]'];
                 
                 return (
                   <div
