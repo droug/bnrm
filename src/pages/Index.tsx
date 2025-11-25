@@ -677,6 +677,37 @@ const Index = () => {
                             </p>
                           </div>
                         </div>
+
+                        {/* Plateforme 05 - Plateforme Manuscrits */}
+                        <div className="relative bg-gradient-to-br from-primary to-primary/80 rounded-2xl overflow-hidden shadow-xl group cursor-pointer h-64"
+                             onClick={() => navigate('/plateforme-manuscrits')}>
+                          <div className="absolute inset-0 bg-pattern-filigrane opacity-20"></div>
+                          <div className="absolute top-4 right-4 z-10">
+                            <div className="bg-white text-primary text-2xl font-bold w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
+                              05
+                            </div>
+                          </div>
+
+                          <div className="absolute inset-0 opacity-30 group-hover:opacity-40 transition-opacity">
+                            <img src={zelligePattern1} alt="" className="w-full h-full object-cover" />
+                          </div>
+
+                          <div className="relative h-full p-6 flex flex-col justify-end">
+                            <FileText className="w-12 h-12 text-white mb-3" />
+                            <h4 className="text-2xl font-moroccan font-bold text-white mb-2">
+                              {language === 'ar' ? 'منصة المخطوطات' : 'Plateforme Manuscrits'}
+                            </h4>
+                            <p className="text-white/90 text-sm">
+                              {language === 'ar' ? 'مخطوطات المكتبة الوطنية' : 'Manuscrits de la BNRM'}
+                            </p>
+                          </div>
+
+                          <div className="absolute right-0 top-1/2 -translate-y-1/2 rotate-90 origin-right">
+                            <p className="text-white/30 font-moroccan font-bold text-lg tracking-widest whitespace-nowrap">
+                              {language === 'ar' ? 'مخطوطات' : 'MANUSCRITS'}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
