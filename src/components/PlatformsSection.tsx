@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import bibliothequeNumerique from "@/assets/bibliotheque-numerique.jpg";
-import kitabBackground from "@/assets/kitab-text.jpg";
+import kitabBackground from "@/assets/kitab-vertical.jpg";
 import manuscritsBackground from "@/assets/manuscrits-background.jpg";
 import culturalActivitiesBackground from "@/assets/cultural-activities-background.jpg";
 import cbmBackground from "@/assets/cbm-background.jpg";
