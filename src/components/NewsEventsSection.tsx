@@ -54,7 +54,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
             onClick={() => navigate('/news')}
             className="bg-blue-600 hover:bg-blue-700"
           >
-            View all
+            Tout afficher
           </Button>
         </div>
 
