@@ -106,8 +106,8 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 {/* Number Badge */}
                 <div className="absolute top-8 right-8 z-10">
                   <div className="relative w-16 h-16 flex items-center justify-center">
-                    <RubElHizb className="absolute inset-0 w-full h-full" color="white" />
-                    <span className="relative z-10 font-bold text-2xl text-gray-900 drop-shadow-lg">
+                    <RubElHizb className="absolute inset-0 w-full h-full" color="#1e40af" />
+                    <span className="relative z-10 font-bold text-2xl text-white drop-shadow-lg">
                       {mainPlatform.number}
                     </span>
                   </div>
@@ -194,8 +194,8 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       {/* Number badge on spine */}
                       <div className="absolute top-6 left-1/2 -translate-x-1/2">
                         <div className="relative w-8 h-8 flex items-center justify-center">
-                          <RubElHizb className="absolute inset-0 w-full h-full" color="white" />
-                          <span className="relative z-10 font-bold text-xs text-gray-900 drop-shadow-md">
+                          <RubElHizb className="absolute inset-0 w-full h-full" color="#1e40af" />
+                          <span className="relative z-10 font-bold text-xs text-white drop-shadow-md">
                             {platform.number}
                           </span>
                         </div>
