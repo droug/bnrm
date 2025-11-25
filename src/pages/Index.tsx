@@ -140,7 +140,7 @@ const Index = () => {
                       </Badge>
                       <h2 className="text-4xl font-bold mb-3 text-[#1e3a8a] relative inline-block">
                         {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
-                        <div className="absolute bottom-0 left-0 w-32 h-1 bg-orange-500"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-1 bg-orange-500"></div>
                       </h2>
                       <p className="text-muted-foreground mt-4">
                         {language === 'ar'
@@ -161,9 +161,9 @@ const Index = () => {
                   <Badge className="bg-orange-500 hover:bg-orange-600 text-white mb-3">
                     BNRM
                   </Badge>
-                  <h2 className="text-4xl font-bold mb-3 text-[#1e3a8a] inline-block relative">
+                  <h2 className="text-4xl font-bold mb-3 text-[#1e3a8a] relative inline-block">
                     {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-orange-500"></div>
+                    <div className="absolute bottom-0 left-0 w-24 h-1 bg-orange-500"></div>
                   </h2>
                   <p className="text-muted-foreground mt-4">
                     {language === 'ar'
