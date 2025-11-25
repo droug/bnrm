@@ -6,12 +6,19 @@ import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools"
 import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
 import SEOHead from "@/components/seo/SEOHead";
-import { Search, Book, BookOpen, Users, Download, Calendar, Globe, Accessibility, Share2, MousePointer, CreditCard, BadgeCheck, UserPlus } from "lucide-react";
+import { Search, Book, BookOpen, Users, Download, Calendar, Globe, Accessibility, Share2, MousePointer, CreditCard, BadgeCheck, UserPlus, Filter } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import bnrmBuildingNight from "@/assets/bnrm-building-night.jpg";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
 import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
@@ -27,6 +34,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchFilter, setSearchFilter] = useState("all");
 
   useEffect(() => {
     const hasSeenWelcome = sessionStorage.getItem('bnrm-welcome-popup-dismissed');
@@ -39,8 +47,8 @@ const Index = () => {
   }, []);
 
   const handleSearch = () => {
-    if (searchQuery) {
-      navigate(`/search?q=${searchQuery}`);
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}&filter=${searchFilter}`);
     }
   };
 
@@ -97,32 +105,71 @@ const Index = () => {
           <div className="max-w-6xl mx-auto space-y-8">
               
               {/* Search Section */}
-              <div className="text-center mb-10">
-                <div className="max-w-2xl mx-auto bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-lg">
-                  <h2 className="text-2xl font-bold text-foreground mb-4">
-                    {t('header.search')}
-                  </h2>
-                  
-                  <div className="relative">
-                    <Input
-                      type="search"
-                      placeholder={language === 'ar' ? 'ابحث في الفهرس...' : 'Rechercher dans le catalogue...'}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                      className="w-full h-16 text-lg bg-white shadow-md border-2 pr-16 rounded-full"
-                    />
-                    
-                    <Button 
-                      size="lg"
-                      onClick={handleSearch}
-                      className="absolute right-2 top-2 h-12 w-12 rounded-full"
-                    >
-                      <Search className="h-6 w-6" />
-                    </Button>
+              <Card className="shadow-2xl border-2 border-primary/10 mb-12">
+                <CardContent className="p-8">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center">
+                      <Search className="h-8 w-8 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">
+                      {language === 'ar' ? 'البحث في الفهرس' : 'Rechercher dans le catalogue'}
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      {language === 'ar' 
+                        ? 'ابحث في مجموعاتنا الواسعة من الكتب والمخطوطات'
+                        : 'Explorez nos vastes collections de livres et manuscrits'
+                      }
+                    </p>
                   </div>
-                </div>
-              </div>
+                  
+                  <div className="flex flex-col md:flex-row gap-3">
+                    <Select value={searchFilter} onValueChange={setSearchFilter}>
+                      <SelectTrigger className="w-full md:w-[200px] h-14 bg-background border-2 hover:border-primary/50 transition-colors">
+                        <Filter className="h-4 w-4 mr-2" />
+                        <SelectValue placeholder={language === 'ar' ? 'الفئة' : 'Catégorie'} />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background z-50">
+                        <SelectItem value="all">
+                          {language === 'ar' ? 'الكل' : 'Tout'}
+                        </SelectItem>
+                        <SelectItem value="books">
+                          {language === 'ar' ? 'كتب' : 'Livres'}
+                        </SelectItem>
+                        <SelectItem value="manuscripts">
+                          {language === 'ar' ? 'مخطوطات' : 'Manuscrits'}
+                        </SelectItem>
+                        <SelectItem value="documents">
+                          {language === 'ar' ? 'وثائق' : 'Documents'}
+                        </SelectItem>
+                        <SelectItem value="periodicals">
+                          {language === 'ar' ? 'دوريات' : 'Périodiques'}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <div className="relative flex-1">
+                      <Input
+                        type="search"
+                        placeholder={language === 'ar' ? 'ابحث عن عنوان، مؤلف، موضوع...' : 'Rechercher un titre, auteur, sujet...'}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                        className="w-full h-14 text-base bg-background border-2 pr-16 hover:border-primary/50 focus:border-primary transition-colors"
+                        maxLength={200}
+                      />
+                      
+                      <Button 
+                        size="lg"
+                        onClick={handleSearch}
+                        className="absolute right-2 top-2 h-10 px-6 rounded-lg shadow-md hover:shadow-lg transition-all"
+                      >
+                        <Search className="h-5 w-5 mr-2" />
+                        {language === 'ar' ? 'بحث' : 'Rechercher'}
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* News and Events Section */}
               <NewsEventsSection language={language} />
