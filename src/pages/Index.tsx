@@ -71,16 +71,16 @@ const Index = () => {
     }
   });
 
-  // Vérifier si le popup d'accueil doit être affiché
-  useEffect(() => {
-    const hasSeenWelcome = sessionStorage.getItem('bnrm-welcome-popup-dismissed');
-    if (!hasSeenWelcome) {
-      const timer = setTimeout(() => {
-        setShowWelcomePopup(true);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
+  // Vérifier si le popup d'accueil doit être affiché - TEMPORAIREMENT DÉSACTIVÉ
+  // useEffect(() => {
+  //   const hasSeenWelcome = sessionStorage.getItem('bnrm-welcome-popup-dismissed');
+  //   if (!hasSeenWelcome) {
+  //     const timer = setTimeout(() => {
+  //       setShowWelcomePopup(true);
+  //     }, 2000);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, []);
 
   // Fermer le menu des filtres quand on clique ailleurs
   useEffect(() => {
@@ -157,11 +157,11 @@ const Index = () => {
         keywords={["bibliothèque maroc", "BNRM", "manuscrits marocains", "patrimoine culturel", "bibliothèque numérique", "dépôt légal", "recherche documentaire"]}
       />
       
-      {/* Popup d'accueil */}
-      <WelcomePopup 
+      {/* Popup d'accueil - TEMPORAIREMENT DÉSACTIVÉ */}
+      {/* <WelcomePopup 
         isOpen={showWelcomePopup} 
         onClose={() => setShowWelcomePopup(false)} 
-      />
+      /> */}
       
       {/* Popup d'accueil */}
       {/* <WelcomePopup 
