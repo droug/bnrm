@@ -64,8 +64,7 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       const { data: servicesData, error: servicesError } = await supabase
         .from("bnrm_services")
         .select("*")
-        .order("nom_service")
-        .limit(6);
+        .order("nom_service");
 
       if (servicesError) throw servicesError;
       setServices(servicesData || []);
@@ -83,6 +82,10 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
     } finally {
       setLoading(false);
     }
+  };
+
+  const getTariffsForService = (serviceId: string) => {
+    return tariffs.filter(t => t.id_service === serviceId);
   };
 
   const getServiceImage = (index: number) => {
@@ -104,24 +107,19 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
     );
   }
 
-  const allServices = [
-    {
-      id: 'depot-legal',
-      title: language === 'ar' ? 'الإيداع القانوني' : 'Dépôt Légal',
-      description: language === 'ar' 
-        ? 'قم بإيداع مطبوعاتك ووثائقك وفقاً للقانون. خدمة إلزامية للناشرين والمؤلفين.'
-        : 'Déposez vos publications et documents selon la loi. Service obligatoire pour les éditeurs et auteurs.',
-      category: language === 'ar' ? 'خدمة أساسية' : 'Service Essentiel',
-      onClick: () => handleLegalDepositClick("monographie")
-    },
-    ...services.map((service, index) => ({
+  const allServices = services.map((service) => {
+    const serviceTariffs = getTariffsForService(service.id_service);
+    const firstTariff = serviceTariffs[0];
+    
+    return {
       id: service.id_service,
       title: service.nom_service,
       description: service.description || '',
       category: service.categorie,
+      tariff: firstTariff ? `${firstTariff.montant} ${firstTariff.devise}` : null,
       onClick: () => navigate('/services-bnrm')
-    }))
-  ];
+    };
+  });
 
   return (
     <div className="relative">
@@ -164,9 +162,18 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
                   </h3>
 
                   {/* Description */}
-                  <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
+                  <p className="text-sm text-muted-foreground line-clamp-3 flex-1 mb-3">
                     {service.description}
                   </p>
+
+                  {/* Tariff */}
+                  {service.tariff && (
+                    <div className="pt-3 border-t border-border/30">
+                      <span className="text-lg font-bold text-primary">
+                        {service.tariff}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </CarouselItem>
