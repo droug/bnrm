@@ -28,6 +28,7 @@ import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
 import zelligePattern5 from "@/assets/zellige-pattern-5.jpg";
 import zelligePattern6 from "@/assets/zellige-pattern-6.jpg";
 import LegalDepositDeclaration from "@/components/LegalDepositDeclaration";
+import { DigitalServicesCarousel } from "@/components/DigitalServicesCarousel";
 
 const Index = () => {
   const { t, language } = useLanguage(); // Utiliser le hook au lieu de créer un nouveau provider
@@ -689,6 +690,41 @@ const Index = () => {
                           </div>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section Nos services Numériques */}
+                <div className="mb-12">
+                  <div className="py-16 bg-gradient-to-b from-slate-50 to-white relative">
+                    <div className="container mx-auto px-4">
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-10">
+                        <div className="max-w-2xl">
+                          <div className="inline-block bg-primary text-primary-foreground px-4 py-1.5 text-sm font-semibold mb-4 rounded">
+                            SERVICES
+                          </div>
+                          <h2 className="text-4xl md:text-5xl font-bold mb-3 text-foreground">
+                            {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
+                          </h2>
+                          <div className="w-24 h-1 bg-primary mb-4 rounded-full"></div>
+                          <p className="text-muted-foreground text-lg">
+                            {language === 'ar' 
+                              ? 'اكتشف مجموعة واسعة من الخدمات الرقمية المتاحة للباحثين والمستخدمين'
+                              : 'Découvrez une large gamme de services numériques disponibles pour les chercheurs et les utilisateurs'}
+                          </p>
+                        </div>
+                        <Link 
+                          to="/services-bnrm"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg text-sm font-semibold transition-all hover:shadow-lg flex items-center gap-2"
+                        >
+                          {language === 'ar' ? 'عرض الكل' : 'Tous les services'}
+                          <span className="text-lg">→</span>
+                        </Link>
+                      </div>
+
+                      {/* Carousel de services */}
+                      <DigitalServicesCarousel language={language === 'ar' ? 'ar' : 'fr'} handleLegalDepositClick={handleLegalDepositClick} />
                     </div>
                   </div>
                 </div>
