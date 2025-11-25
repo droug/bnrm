@@ -495,18 +495,13 @@ const Index = () => {
 
                 {/* Section Nos Principales Plateformes */}
                 <div className="relative py-20 my-12 overflow-hidden">
-                  {/* Fond blanc principal */}
-                  <div className="absolute inset-0 bg-white"></div>
+                  {/* Fond bleu marine foncé */}
+                  <div className="absolute inset-0 bg-[rgb(32,45,94)]"></div>
                   
-                  {/* Bordures géométriques bleu marine foncé */}
-                  <div className="absolute top-0 right-0 w-1/3 h-full">
-                    <svg viewBox="0 0 400 800" className="w-full h-full" preserveAspectRatio="none">
-                      <polygon points="100,0 400,0 400,800 0,800" fill="rgb(18, 25, 60)" />
-                    </svg>
-                  </div>
-                  <div className="absolute bottom-0 right-0 w-1/4 h-1/3">
-                    <svg viewBox="0 0 300 300" className="w-full h-full" preserveAspectRatio="none">
-                      <polygon points="0,100 300,0 300,300 0,300" fill="rgb(18, 25, 60)" />
+                  {/* Forme géométrique en haut à droite */}
+                  <div className="absolute top-0 right-0 w-1/4 h-2/3">
+                    <svg viewBox="0 0 300 500" className="w-full h-full" preserveAspectRatio="none">
+                      <polygon points="100,0 300,0 300,500 300,400" fill="rgba(0,0,0,0.15)" />
                     </svg>
                   </div>
                   
@@ -516,11 +511,11 @@ const Index = () => {
                       <div className="inline-block bg-[rgb(255,140,0)] text-white px-4 py-1.5 text-xs font-bold uppercase mb-4 rounded">
                         Plateformes
                       </div>
-                      <h2 className="text-5xl font-bold text-[rgb(18,25,60)] mb-4">
+                      <h2 className="text-5xl font-bold text-white mb-4">
                         {language === 'ar' ? 'منصاتنا الرئيسية' : 'Nos Principales Plateformes'}
                       </h2>
-                      <div className="w-32 h-1 bg-[rgb(255,140,0)] mb-6"></div>
-                      <p className="text-gray-600 text-base leading-relaxed">
+                      <div className="w-64 h-1 bg-[rgb(255,140,0)] mb-6"></div>
+                      <p className="text-white/80 text-base leading-relaxed">
                         {language === 'ar' 
                           ? 'اكتشف منصاتنا الرقمية المتخصصة للوصول إلى مجموعاتنا وخدماتنا'
                           : 'Découvrez nos plateformes numériques spécialisées pour accéder à nos collections et services'
@@ -528,173 +523,145 @@ const Index = () => {
                       </p>
                     </div>
 
-                    {/* Content Section */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                      {/* Main Platform Block 01 - Bibliothèque Numérique */}
-                      <div className="lg:col-span-7">
-                        <div className="relative bg-white rounded-lg shadow-2xl overflow-hidden border border-gray-200">
+                    {/* Content Section - Horizontal Layout */}
+                    <div className="flex gap-6">
+                      {/* Main Platform Block 01 - Bibliothèque Numérique (70%) */}
+                      <div className="flex-[7]">
+                        <div className="relative bg-white rounded-lg shadow-2xl overflow-hidden h-[500px]">
                           {/* Angular Tab with Number */}
-                          <div className="absolute top-8 left-0 z-20">
-                            <div className="relative bg-[rgb(100,149,237)] text-white px-10 py-4 font-bold text-4xl shadow-lg">
+                          <div className="absolute top-12 left-0 z-20">
+                            <div className="relative bg-[rgb(90,140,230)] text-white px-8 py-4 font-bold text-5xl shadow-lg">
                               01
-                              <div className="absolute right-0 top-0 w-0 h-0 border-t-[32px] border-t-[rgb(100,149,237)] border-r-[20px] border-r-transparent translate-x-full"></div>
-                              <div className="absolute right-0 bottom-0 w-0 h-0 border-b-[32px] border-b-[rgb(100,149,237)] border-r-[20px] border-r-transparent translate-x-full"></div>
+                              <div className="absolute right-0 top-0 w-0 h-0 border-t-[35px] border-t-[rgb(90,140,230)] border-r-[25px] border-r-transparent translate-x-full"></div>
+                              <div className="absolute right-0 bottom-0 w-0 h-0 border-b-[35px] border-b-[rgb(90,140,230)] border-r-[25px] border-r-transparent translate-x-full"></div>
                             </div>
                           </div>
 
-                          <div className="pt-24 p-8">
-                            <h3 className="text-3xl font-bold text-[rgb(18,25,60)] mb-4">
+                          <div className="pt-32 px-12 pb-8 h-full flex flex-col">
+                            <h3 className="text-4xl font-bold text-[rgb(18,25,60)] mb-4">
                               {language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}
                             </h3>
                             <p className="text-gray-600 mb-6 text-sm leading-relaxed">
                               {language === 'ar'
-                                ? 'منصة رقمية شاملة للوصول إلى مجموعاتنا الرقمية من المخطوطات والوثائق التراثية والكنوز الثقافية.'
-                                : 'Plateforme numérique complète pour accéder à nos collections numériques de manuscrits, documents patrimoniaux et trésors culturels.'
+                                ? 'منصة رقمية شاملة للوصول إلى مجموعاتنا الرقمية من المخطوطات والوثائق التراثية والكنوز الثقافية. تبسيط الإجراءات وتتبع طلباتك بكل سهولة.'
+                                : 'Plateforme numérique complète pour accéder à nos collections numériques de manuscrits, documents patrimoniaux et trésors culturels. Simplifiez vos démarches et suivez vos demandes en toute facilité.'
                               }
                             </p>
                             
                             {/* Central Professional Image */}
-                            <div className="relative h-72 rounded overflow-hidden mb-6 shadow-xl">
-                              <div className="absolute inset-0 bg-gradient-to-b from-gray-100 to-gray-200"></div>
+                            <div className="relative flex-1 rounded overflow-hidden shadow-xl cursor-pointer group"
+                                 onClick={() => navigate('/digital-library')}>
+                              <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-gray-100"></div>
                               <img 
                                 src={zelligePattern5}
                                 alt="Bibliothèque Numérique"
-                                className="w-full h-full object-cover opacity-40"
+                                className="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
                               />
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="text-center">
-                                  <Book className="w-24 h-24 text-[rgb(100,149,237)] mx-auto mb-4 stroke-[1.5]" />
-                                  <p className="text-[rgb(18,25,60)] font-bold text-xl uppercase tracking-wide">
+                                  <Book className="w-20 h-20 text-[rgb(90,140,230)] mx-auto mb-3 stroke-[1.5]" />
+                                  <p className="text-[rgb(18,25,60)] font-bold text-lg uppercase tracking-wide">
                                     {language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}
                                   </p>
                                 </div>
                               </div>
                             </div>
-
-                            <Link to="/digital-library">
-                              <Button className="w-full bg-[rgb(18,25,60)] hover:bg-[rgb(25,35,80)] text-white font-bold shadow-lg">
-                                {language === 'ar' ? 'استكشف المنصة' : 'Découvrir la plateforme'}
-                              </Button>
-                            </Link>
                           </div>
 
-                          {/* Vertical Side Label */}
-                          <div className="absolute left-4 top-1/2 -translate-y-1/2 -rotate-90 origin-left">
-                            <p className="text-[rgb(18,25,60)]/20 font-bold text-sm tracking-[0.3em] uppercase whitespace-nowrap">
+                          {/* Vertical Side Label on LEFT */}
+                          <div className="absolute left-6 top-1/2 -translate-y-1/2 -rotate-90 origin-left">
+                            <p className="text-[rgb(18,25,60)]/30 font-bold text-base tracking-[0.15em] uppercase whitespace-nowrap">
                               {language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}
                             </p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Gallery Section - Right Side Panels */}
-                      <div className="lg:col-span-5 grid grid-cols-2 lg:grid-cols-1 gap-3">
+                      {/* Vertical Panels Section - Right Side (30%) */}
+                      <div className="flex-[3] grid grid-cols-4 gap-3">
                         {/* Panel 02 - Activités Culturelles */}
-                        <div className="relative h-64 lg:h-48 rounded overflow-hidden shadow-lg group cursor-pointer"
+                        <div className="relative h-[500px] rounded overflow-hidden shadow-xl group cursor-pointer"
                              onClick={() => navigate('/cultural-activities')}>
-                          <div className="absolute inset-0 bg-[rgb(18,25,60)]"></div>
+                          <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900"></div>
                           <img 
                             src={zelligePattern3}
                             alt=""
-                            className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
+                            className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
                           />
                           
                           {/* Number Badge */}
-                          <div className="absolute top-4 right-4 z-10">
-                            <div className="bg-[rgb(100,149,237)] text-white text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center shadow-lg">
+                          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
+                            <div className="bg-[rgb(90,140,230)] text-white text-sm font-bold w-9 h-9 rounded-full flex items-center justify-center shadow-lg">
                               02
                             </div>
                           </div>
 
-                          {/* Content */}
-                          <div className="relative h-full flex flex-col justify-end p-6">
-                            <Calendar className="w-10 h-10 text-white mb-2 stroke-[1.5]" />
-                          </div>
-
-                          {/* Vertical Label */}
-                          <div className="absolute right-6 bottom-6 rotate-90 origin-bottom-right">
-                            <p className="text-white font-bold text-xs tracking-[0.2em] uppercase whitespace-nowrap">
-                              {language === 'ar' ? 'الأنشطة الثقافية' : 'Activités Culturelles'}
+                          {/* Vertical Label at BOTTOM */}
+                          <div className="absolute left-1/2 bottom-8 -translate-x-1/2 rotate-90 origin-center">
+                            <p className="text-white font-bold text-xs tracking-[0.3em] uppercase whitespace-nowrap">
+                              {language === 'ar' ? 'ثقافية' : 'Activités Culturelles'}
                             </p>
                           </div>
                         </div>
 
                         {/* Panel 03 - Réseau CBM */}
-                        <div className="relative h-64 lg:h-48 rounded overflow-hidden shadow-lg group cursor-pointer"
+                        <div className="relative h-[500px] rounded overflow-hidden shadow-xl group cursor-pointer"
                              onClick={() => navigate('/cbm')}>
-                          <div className="absolute inset-0 bg-[rgb(18,25,60)]"></div>
+                          <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900"></div>
                           <img 
                             src={zelligePattern2}
                             alt=""
-                            className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
+                            className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
                           />
                           
-                          <div className="absolute top-4 right-4 z-10">
-                            <div className="bg-[rgb(100,149,237)] text-white text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center shadow-lg">
+                          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
+                            <div className="bg-[rgb(90,140,230)] text-white text-sm font-bold w-9 h-9 rounded-full flex items-center justify-center shadow-lg">
                               03
                             </div>
                           </div>
 
-                          <div className="relative h-full flex flex-col justify-end p-6">
-                            <Network className="w-10 h-10 text-white mb-2 stroke-[1.5]" />
-                          </div>
-
-                          <div className="absolute right-6 bottom-6 rotate-90 origin-bottom-right">
-                            <p className="text-white font-bold text-xs tracking-[0.2em] uppercase whitespace-nowrap">
-                              {language === 'ar' ? 'شبكة CBM' : 'Réseau CBM'}
+                          <div className="absolute left-1/2 bottom-8 -translate-x-1/2 rotate-90 origin-center">
+                            <p className="text-white font-bold text-xs tracking-[0.3em] uppercase whitespace-nowrap">
+                              {language === 'ar' ? 'شبكة' : 'Réseau CBM'}
                             </p>
                           </div>
                         </div>
 
                         {/* Panel 04 - Kitab */}
-                        <div className="relative h-64 lg:h-48 rounded overflow-hidden shadow-lg group cursor-pointer"
+                        <div className="relative h-[500px] rounded overflow-hidden shadow-xl group cursor-pointer"
                              onClick={() => navigate('/plateforme-manuscrits')}>
-                          <div className="absolute inset-0 bg-[rgb(18,25,60)]"></div>
+                          <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900"></div>
                           <img 
                             src={zelligePattern6}
                             alt=""
-                            className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
+                            className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
                           />
                           
-                          <div className="absolute top-4 right-4 z-10">
-                            <div className="bg-[rgb(100,149,237)] text-white text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center shadow-lg">
+                          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
+                            <div className="bg-[rgb(90,140,230)] text-white text-sm font-bold w-9 h-9 rounded-full flex items-center justify-center shadow-lg">
                               04
                             </div>
                           </div>
 
-                          <div className="relative h-full flex flex-col justify-end p-6">
-                            <BookOpen className="w-10 h-10 text-white mb-2 stroke-[1.5]" />
-                          </div>
-
-                          <div className="absolute right-6 bottom-6 rotate-90 origin-bottom-right">
-                            <p className="text-white font-bold text-xs tracking-[0.2em] uppercase whitespace-nowrap">
+                          <div className="absolute left-1/2 bottom-8 -translate-x-1/2 rotate-90 origin-center">
+                            <p className="text-white font-bold text-xs tracking-[0.3em] uppercase whitespace-nowrap">
                               KITAB
                             </p>
                           </div>
                         </div>
 
-                        {/* Panel 05 - Plateforme Manuscrits */}
-                        <div className="relative h-64 lg:h-48 rounded overflow-hidden shadow-lg group cursor-pointer"
+                        {/* Panel 05 - Manuscrits */}
+                        <div className="relative h-[500px] rounded overflow-hidden shadow-xl group cursor-pointer"
                              onClick={() => navigate('/plateforme-manuscrits')}>
-                          <div className="absolute inset-0 bg-[rgb(18,25,60)]"></div>
+                          <div className="absolute inset-0 bg-gradient-to-br from-amber-600 to-orange-700"></div>
                           <img 
                             src={zelligePattern1}
                             alt=""
-                            className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
+                            className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
                           />
-                          
-                          <div className="absolute top-4 right-4 z-10">
-                            <div className="bg-[rgb(100,149,237)] text-white text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center shadow-lg">
-                              05
-                            </div>
-                          </div>
 
-                          <div className="relative h-full flex flex-col justify-end p-6">
-                            <FileText className="w-10 h-10 text-white mb-2 stroke-[1.5]" />
-                          </div>
-
-                          <div className="absolute right-6 bottom-6 rotate-90 origin-bottom-right">
-                            <p className="text-white font-bold text-xs tracking-[0.2em] uppercase whitespace-nowrap">
+                          <div className="absolute left-1/2 bottom-8 -translate-x-1/2 rotate-90 origin-center">
+                            <p className="text-white font-bold text-xs tracking-[0.3em] uppercase whitespace-nowrap">
                               {language === 'ar' ? 'مخطوطات' : 'Manuscrits'}
                             </p>
                           </div>
