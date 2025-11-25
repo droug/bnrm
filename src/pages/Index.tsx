@@ -164,24 +164,16 @@ const Index = () => {
                   <h3 className="text-2xl font-bold text-foreground mb-6 text-center">
                     {language === 'ar' ? 'خدمات سريعة' : 'Services Rapides'}
                   </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {[
-                      { icon: BookOpen, label_fr: "Réserver un document", label_ar: "حجز وثيقة", href: "/cbn/reserver-ouvrage" },
-                      { icon: Download, label_fr: "Reproduction", label_ar: "النسخ", href: "/demande-reproduction" },
-                      { icon: CreditCard, label_fr: "Adhésions", label_ar: "الاشتراكات", href: "/abonnements" },
-                      { icon: Calendar, label_fr: "Événements", label_ar: "الفعاليات", href: "/news" }
-                    ].map((service, index) => (
-                      <div 
-                        key={index} 
-                        className="text-center p-5 rounded-2xl bg-primary/10 hover:shadow-lg transition-all cursor-pointer"
-                        onClick={() => service.href && navigate(service.href)}
-                      >
-                        <service.icon className="h-10 w-10 text-primary mx-auto mb-3" />
-                        <p className="text-sm font-semibold text-foreground">
-                          {language === 'ar' ? service.label_ar : service.label_fr}
-                        </p>
-                      </div>
-                    ))}
+                  <div className="grid grid-cols-1 gap-6 max-w-xs mx-auto">
+                    <div 
+                      className="text-center p-5 rounded-2xl bg-primary/10 hover:shadow-lg transition-all cursor-pointer"
+                      onClick={() => navigate('/abonnements')}
+                    >
+                      <CreditCard className="h-10 w-10 text-primary mx-auto mb-3" />
+                      <p className="text-sm font-semibold text-foreground">
+                        {language === 'ar' ? 'الاشتراكات' : 'Adhésions'}
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
