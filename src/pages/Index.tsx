@@ -197,10 +197,6 @@ const Index = () => {
 
               {[
                 { title_fr: "Aide & Support", title_ar: "المساعدة والدعم", icon: MousePointer, href: "/help" },
-                { title_fr: "Services numériques", title_ar: "الخدمات الرقمية", icon: Download, href: "/services-bnrm" },
-                { title_fr: "Pass journalier", title_ar: "تصريح يومي", icon: BadgeCheck, href: "/services-bnrm?open=daily-pass" },
-                { title_fr: "Langues", title_ar: "اللغات", icon: Globe, href: "#" },
-                { title_fr: "Accessibilité", title_ar: "إمكانية الوصول", icon: Accessibility, href: "#" },
                 { title_fr: "Partager", title_ar: "مشاركة", icon: Share2, href: "#" }
               ].map((item, index) => (
                 <Card key={index} className="cursor-pointer hover:shadow-lg transition-all" onClick={() => navigate(item.href)}>
