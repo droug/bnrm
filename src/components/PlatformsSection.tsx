@@ -70,37 +70,78 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
         </div>
 
         <div className="grid lg:grid-cols-[1fr,auto] gap-8 items-start">
-          {/* Main Platform - Left Side */}
-          <div className="relative bg-white rounded-lg overflow-hidden shadow-xl cursor-pointer group hover:shadow-2xl transition-all"
-               onClick={() => navigate(mainPlatform.path)}>
-            <div className="absolute top-6 left-0 z-10">
-              <div className="bg-primary text-primary-foreground font-bold text-3xl px-8 py-4 clip-path-arrow">
-                {mainPlatform.number}
-              </div>
-            </div>
-            
-            <div className="p-8 pt-24">
-              <h3 className="text-4xl font-bold text-foreground mb-4">
-                {mainPlatform.title}
-              </h3>
-              <p className="text-muted-foreground mb-8 leading-relaxed text-base">
-                {mainPlatform.description}
-              </p>
-              
-              <div className="relative h-72 rounded-lg overflow-hidden">
+          {/* Main Platform - Book Cover */}
+          <div 
+            className="relative cursor-pointer group"
+            onClick={() => navigate(mainPlatform.path)}
+            style={{ 
+              perspective: '2000px',
+              transformStyle: 'preserve-3d'
+            }}
+          >
+            <div 
+              className="relative w-full h-[600px] transition-all duration-500 ease-out"
+              style={{
+                transform: 'rotateY(-5deg)',
+                transformStyle: 'preserve-3d',
+              }}
+            >
+              {/* Book Cover Front */}
+              <div className="absolute inset-0 rounded-r-lg overflow-hidden shadow-2xl group-hover:shadow-3xl transition-all duration-500"
+                   style={{
+                     background: 'linear-gradient(to right, rgba(0,0,0,0.1) 0%, transparent 5%)',
+                   }}>
+                
+                {/* Cover Image */}
                 <img 
                   src={mainPlatform.image}
                   alt={mainPlatform.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
+                
+                {/* Dark overlay for text readability */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+                
+                {/* Number Badge */}
+                <div className="absolute top-8 right-8 z-10">
+                  <div className="bg-primary text-primary-foreground font-bold text-2xl w-16 h-16 rounded-full flex items-center justify-center shadow-lg">
+                    {mainPlatform.number}
+                  </div>
+                </div>
+                
+                {/* Book Title and Description */}
+                <div className="absolute inset-0 p-12 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-5xl font-bold text-white mb-6 drop-shadow-2xl leading-tight">
+                      {mainPlatform.title}
+                    </h3>
+                  </div>
+                  
+                  <div>
+                    <p className="text-white/95 text-lg leading-relaxed drop-shadow-lg mb-8">
+                      {mainPlatform.description}
+                    </p>
+                    
+                    {/* Decorative line */}
+                    <div className="w-32 h-1 bg-primary/80 rounded-full" />
+                  </div>
+                </div>
+                
+                {/* Book spine shadow effect */}
+                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black/30 to-transparent" />
+                
+                {/* Book edge highlight */}
+                <div className="absolute right-0 top-0 bottom-0 w-2 bg-gradient-to-l from-white/20 to-transparent" />
               </div>
-            </div>
-
-            {/* Vertical text on left edge */}
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-100 px-2 py-8">
-              <div className="transform -rotate-90 origin-center whitespace-nowrap text-sm font-bold text-gray-600">
-                {mainPlatform.title}
-              </div>
+              
+              {/* Book thickness/spine */}
+              <div 
+                className="absolute -left-4 top-0 bottom-0 w-4 bg-gradient-to-r from-[#5a3921] to-[#8B6F47] rounded-l-sm"
+                style={{
+                  transform: 'rotateY(-90deg)',
+                  transformOrigin: 'right',
+                }}
+              />
             </div>
           </div>
 
