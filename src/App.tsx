@@ -137,6 +137,8 @@ const RestorationRequest = lazy(() => import("./pages/RestorationRequest"));
 const RestorationRequests = lazy(() => import("./pages/admin/RestorationRequests"));
 const BankTransferInstructions = lazy(() => import("./pages/BankTransferInstructions"));
 const DemandeNumerisation = lazy(() => import("./pages/DemandeNumerisation"));
+const PassJournalier = lazy(() => import("./pages/PassJournalier"));
+const LocationService = lazy(() => import("./pages/LocationService"));
 
 // CBM Portal (lazy)
 const CBMPortal = lazy(() => import("./pages/CBMPortal"));
@@ -322,6 +324,8 @@ const App = () => {
         <Route path="/demande-reproduction" element={<DemandeReproduction />} />
         <Route path="/demande-restauration" element={<RestorationRequest />} />
         <Route path="/demande-numerisation" element={<DemandeNumerisation />} />
+        <Route path="/pass-journalier" element={<PassJournalier />} />
+        <Route path="/location-service" element={<LocationService />} />
         <Route path="/manuscripts" element={<Manuscripts />} />
         <Route path="/my-space" element={<MyLibrarySpace />} />
         <Route path="/help" element={<HelpPage />} />

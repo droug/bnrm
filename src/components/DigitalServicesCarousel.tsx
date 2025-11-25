@@ -112,7 +112,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
     );
   }
 
-  // Créer la liste fixe des 10 services à afficher
   const allServices = [
     {
       id: 'depot-legal',
@@ -128,63 +127,63 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       title: 'Abonnements à la BNRM',
       description: 'Inscrivez-vous pour accéder aux ressources et services de la bibliothèque.',
       category: 'Abonnement',
-      onClick: () => navigate('/services-bnrm')
+      onClick: () => navigate('/abonnements')
     },
     {
       id: 'espaces-culturels',
       title: 'Réservation des espaces culturels',
       description: 'Réservez nos espaces pour vos événements culturels et académiques.',
       category: 'Réservation',
-      onClick: () => navigate('/services-bnrm')
+      onClick: () => navigate('/reservation-espaces')
     },
     {
       id: 'pass-journalier',
       title: 'Pass journalier',
       description: services.find(s => s.nom_service === 'Pass journalier')?.description || 'Accès gratuit à la bibliothèque pour une journée.',
       category: 'Accès',
-      onClick: () => navigate('/services-bnrm')
+      onClick: () => navigate('/pass-journalier')
     },
     {
       id: 'reproduction',
       title: 'Reproduction de documents',
       description: 'Service de reproduction et numérisation de documents de la collection.',
       category: 'Service à la demande',
-      onClick: () => navigate('/services-bnrm')
+      onClick: () => navigate('/reproduction')
     },
     {
       id: 'restauration',
       title: 'Demande de restauration',
       description: services.find(s => s.nom_service === 'Restauration')?.description || 'Service de restauration et conservation de documents anciens.',
       category: 'Restauration',
-      onClick: () => navigate('/services-bnrm')
+      onClick: () => navigate('/demande-restauration')
     },
     {
       id: 'reservation-document',
       title: 'Réserver un document',
       description: 'Réservez des documents pour consultation sur place.',
       category: 'Service à la demande',
-      onClick: () => navigate('/services-bnrm')
+      onClick: () => navigate('/cbn/reserver-ouvrage')
     },
     {
       id: 'location',
       title: 'Location à la demande',
       description: 'Service de location de documents et ressources.',
       category: 'Service à la demande',
-      onClick: () => navigate('/services-bnrm')
+      onClick: () => navigate('/location-service')
     },
     {
       id: 'numerisation',
       title: 'Demande de numérisation',
       description: services.find(s => s.nom_service === 'Numérisation documents rares')?.description || 'Service professionnel de numérisation de documents.',
       category: 'Service à la demande',
-      onClick: () => navigate('/services-bnrm')
+      onClick: () => navigate('/demande-numerisation')
     },
     {
       id: 'ewallet',
       title: 'e-Wallet BNRM',
       description: 'Portefeuille électronique pour gérer vos paiements et transactions.',
       category: 'Service numérique',
-      onClick: () => navigate('/services-bnrm')
+      onClick: () => navigate('/wallet')
     }
   ];
 
