@@ -524,49 +524,49 @@ const Index = () => {
 
                     {/* Grille des plateformes */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                      {/* Plateforme principale - Dépôt Legal */}
+                      {/* Plateforme principale - Bibliothèque Numérique */}
                       <div className="lg:col-span-7">
                         <div className="relative bg-white rounded-2xl overflow-hidden shadow-2xl group h-full">
                           {/* Badge numéro */}
                           <div className="absolute top-6 left-6 z-20">
                             <div className="relative">
-                              <div className="bg-primary text-white text-4xl font-bold px-8 py-3 rounded-r-2xl shadow-xl border-l-8 border-gold">
+                              <div className="bg-accent text-white text-4xl font-bold px-8 py-3 rounded-r-2xl shadow-xl border-l-8 border-gold">
                                 01
                               </div>
-                              <div className="absolute -right-3 top-0 w-0 h-0 border-t-[30px] border-t-primary border-r-[15px] border-r-transparent"></div>
-                              <div className="absolute -right-3 bottom-0 w-0 h-0 border-b-[30px] border-b-primary border-r-[15px] border-r-transparent"></div>
+                              <div className="absolute -right-3 top-0 w-0 h-0 border-t-[30px] border-t-accent border-r-[15px] border-r-transparent"></div>
+                              <div className="absolute -right-3 bottom-0 w-0 h-0 border-b-[30px] border-b-accent border-r-[15px] border-r-transparent"></div>
                             </div>
                           </div>
 
                           <div className="p-8 pt-24">
-                            <h3 className="text-3xl font-moroccan font-bold text-primary mb-4">
-                              {language === 'ar' ? 'الإيداع القانوني' : 'Dépôt Legal'}
+                            <h3 className="text-3xl font-moroccan font-bold text-accent mb-4">
+                              {language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}
                             </h3>
                             <p className="text-muted-foreground mb-6 text-base leading-relaxed">
                               {language === 'ar'
-                                ? 'منصة رقمية شاملة للإيداع القانوني للمنشورات. تبسيط الإجراءات وتتبع طلباتك بكل سهولة.'
-                                : 'Plateforme numérique complète pour le dépôt légal des publications. Simplifiez vos démarches et suivez vos demandes en toute facilité.'
+                                ? 'منصة رقمية شاملة للوصول إلى مجموعاتنا الرقمية من المخطوطات والوثائق التراثية والكنوز الثقافية.'
+                                : 'Plateforme numérique complète pour accéder à nos collections numériques de manuscrits, documents patrimoniaux et trésors culturels.'
                               }
                             </p>
                             
                             {/* Image illustrative */}
                             <div className="relative h-64 rounded-xl overflow-hidden mb-6 group-hover:shadow-2xl transition-shadow">
-                              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10"></div>
+                              <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-primary/10"></div>
                               <img 
-                                src={zelligePattern1}
-                                alt="Dépôt Legal"
+                                src={zelligePattern5}
+                                alt="Bibliothèque Numérique"
                                 className="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
                               />
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="text-center">
-                                  <FileText className="w-20 h-20 text-primary mx-auto mb-4" />
-                                  <p className="text-primary font-bold text-xl">{language === 'ar' ? 'الإيداع القانوني' : 'Dépôt Legal'}</p>
+                                  <Book className="w-20 h-20 text-accent mx-auto mb-4" />
+                                  <p className="text-accent font-bold text-xl">{language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}</p>
                                 </div>
                               </div>
                             </div>
 
-                            <Link to="/depot-legal">
-                              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                            <Link to="/digital-library">
+                              <Button className="w-full bg-accent hover:bg-accent/90 text-white">
                                 {language === 'ar' ? 'استكشف المنصة' : 'Découvrir la plateforme'}
                               </Button>
                             </Link>
@@ -574,8 +574,8 @@ const Index = () => {
 
                           {/* Texte vertical sur le côté gauche */}
                           <div className="absolute left-0 top-1/2 -translate-y-1/2 -rotate-90 origin-left">
-                            <p className="text-primary/20 font-moroccan font-bold text-2xl tracking-widest whitespace-nowrap">
-                              {language === 'ar' ? 'الإيداع القانوني' : 'DÉPÔT LEGAL'}
+                            <p className="text-accent/20 font-moroccan font-bold text-2xl tracking-widest whitespace-nowrap">
+                              {language === 'ar' ? 'المكتبة الرقمية' : 'BIBLIOTHÈQUE NUMÉRIQUE'}
                             </p>
                           </div>
                         </div>
@@ -583,35 +583,35 @@ const Index = () => {
 
                       {/* Plateformes secondaires */}
                       <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
-                        {/* Plateforme 02 - Bibliothèque Numérique */}
-                        <div className="relative bg-gradient-to-br from-accent to-accent/80 rounded-2xl overflow-hidden shadow-xl group cursor-pointer h-64"
-                             onClick={() => navigate('/digital-library')}>
+                        {/* Plateforme 02 - Services des Activités culturelles */}
+                        <div className="relative bg-gradient-to-br from-highlight to-highlight/80 rounded-2xl overflow-hidden shadow-xl group cursor-pointer h-64"
+                             onClick={() => navigate('/cultural-activities')}>
                           <div className="absolute inset-0 bg-pattern-filigrane opacity-20"></div>
                           <div className="absolute top-4 right-4 z-10">
-                            <div className="bg-white text-accent text-2xl font-bold w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
+                            <div className="bg-white text-highlight text-2xl font-bold w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
                               02
                             </div>
                           </div>
                           
                           {/* Image en arrière-plan */}
                           <div className="absolute inset-0 opacity-30 group-hover:opacity-40 transition-opacity">
-                            <img src={zelligePattern5} alt="" className="w-full h-full object-cover" />
+                            <img src={zelligePattern3} alt="" className="w-full h-full object-cover" />
                           </div>
 
                           <div className="relative h-full p-6 flex flex-col justify-end">
-                            <Book className="w-12 h-12 text-white mb-3" />
+                            <Calendar className="w-12 h-12 text-white mb-3" />
                             <h4 className="text-2xl font-moroccan font-bold text-white mb-2">
-                              {language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}
+                              {language === 'ar' ? 'الأنشطة الثقافية' : 'Activités Culturelles'}
                             </h4>
                             <p className="text-white/90 text-sm">
-                              {language === 'ar' ? 'الوصول إلى المجموعات الرقمية' : 'Accès aux collections numériques'}
+                              {language === 'ar' ? 'الفعاليات والمعارض والأنشطة' : 'Événements, expositions et animations'}
                             </p>
                           </div>
 
                           {/* Texte vertical */}
                           <div className="absolute right-0 top-1/2 -translate-y-1/2 rotate-90 origin-right">
                             <p className="text-white/30 font-moroccan font-bold text-lg tracking-widest whitespace-nowrap">
-                              {language === 'ar' ? 'رقمية' : 'BIBLIOTHÈQUE NUMÉRIQUE'}
+                              {language === 'ar' ? 'ثقافية' : 'ACTIVITÉS CULTURELLES'}
                             </p>
                           </div>
                         </div>
