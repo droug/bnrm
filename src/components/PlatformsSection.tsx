@@ -6,6 +6,7 @@ import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
 import zelligePattern5 from "@/assets/zellige-pattern-5.jpg";
 import zelligePattern6 from "@/assets/zellige-pattern-6.jpg";
 import bibliothequeNumerique from "@/assets/bibliotheque-numerique.jpg";
+import kitabBackground from "@/assets/kitab-background.jpg";
 
 interface PlatformsSectionProps {
   language: string;
@@ -34,7 +35,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
     {
       title: 'Kitab',
       path: '/kitab',
-      image: zelligePattern6,
+      image: kitabBackground,
       number: '03'
     },
     {
