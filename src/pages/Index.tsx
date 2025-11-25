@@ -589,17 +589,17 @@ const Index = () => {
                             className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
                           />
                           
-                          {/* Number Badge */}
+                          {/* Number Badge - Rounded Rectangle */}
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="bg-[rgb(90,140,230)] text-white text-sm font-bold w-9 h-9 rounded-full flex items-center justify-center shadow-lg">
+                            <div className="bg-[rgb(90,140,230)] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                               02
                             </div>
                           </div>
 
-                          {/* Vertical Label at BOTTOM */}
-                          <div className="absolute left-1/2 bottom-8 -translate-x-1/2 rotate-90 origin-center">
-                            <p className="text-white font-bold text-xs tracking-[0.3em] uppercase whitespace-nowrap">
-                              {language === 'ar' ? 'ثقافية' : 'Activités Culturelles'}
+                          {/* Vertical Label at BOTTOM - Full Text Visible */}
+                          <div className="absolute left-1/2 bottom-6 -translate-x-1/2 rotate-90 origin-center">
+                            <p className="text-white font-bold text-[10px] tracking-[0.25em] uppercase whitespace-nowrap">
+                              {language === 'ar' ? 'الأنشطة الثقافية' : 'ACTIVITÉS CULTURELLES'}
                             </p>
                           </div>
                         </div>
@@ -615,14 +615,14 @@ const Index = () => {
                           />
                           
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="bg-[rgb(90,140,230)] text-white text-sm font-bold w-9 h-9 rounded-full flex items-center justify-center shadow-lg">
+                            <div className="bg-[rgb(90,140,230)] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                               03
                             </div>
                           </div>
 
-                          <div className="absolute left-1/2 bottom-8 -translate-x-1/2 rotate-90 origin-center">
-                            <p className="text-white font-bold text-xs tracking-[0.3em] uppercase whitespace-nowrap">
-                              {language === 'ar' ? 'شبكة' : 'Réseau CBM'}
+                          <div className="absolute left-1/2 bottom-6 -translate-x-1/2 rotate-90 origin-center">
+                            <p className="text-white font-bold text-[10px] tracking-[0.25em] uppercase whitespace-nowrap">
+                              {language === 'ar' ? 'شبكة المكتبات' : 'RÉSEAU CBM'}
                             </p>
                           </div>
                         </div>
@@ -638,13 +638,13 @@ const Index = () => {
                           />
                           
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="bg-[rgb(90,140,230)] text-white text-sm font-bold w-9 h-9 rounded-full flex items-center justify-center shadow-lg">
+                            <div className="bg-[rgb(90,140,230)] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                               04
                             </div>
                           </div>
 
-                          <div className="absolute left-1/2 bottom-8 -translate-x-1/2 rotate-90 origin-center">
-                            <p className="text-white font-bold text-xs tracking-[0.3em] uppercase whitespace-nowrap">
+                          <div className="absolute left-1/2 bottom-6 -translate-x-1/2 rotate-90 origin-center">
+                            <p className="text-white font-bold text-[10px] tracking-[0.25em] uppercase whitespace-nowrap">
                               KITAB
                             </p>
                           </div>
@@ -661,14 +661,14 @@ const Index = () => {
                           />
 
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="bg-[rgb(90,140,230)] text-white text-sm font-bold w-9 h-9 rounded-full flex items-center justify-center shadow-lg">
+                            <div className="bg-[rgb(90,140,230)] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                               05
                             </div>
                           </div>
 
-                          <div className="absolute left-1/2 bottom-8 -translate-x-1/2 rotate-90 origin-center">
-                            <p className="text-white font-bold text-xs tracking-[0.3em] uppercase whitespace-nowrap">
-                              {language === 'ar' ? 'مخطوطات' : 'Manuscrits'}
+                          <div className="absolute left-1/2 bottom-6 -translate-x-1/2 rotate-90 origin-center">
+                            <p className="text-white font-bold text-[10px] tracking-[0.25em] uppercase whitespace-nowrap">
+                              {language === 'ar' ? 'مخطوطات' : 'MANUSCRITS'}
                             </p>
                           </div>
                         </div>
