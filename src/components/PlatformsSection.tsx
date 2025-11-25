@@ -1,12 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
-import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
-import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
-import zelligePattern5 from "@/assets/zellige-pattern-5.jpg";
-import zelligePattern6 from "@/assets/zellige-pattern-6.jpg";
 import bibliothequeNumerique from "@/assets/bibliotheque-numerique.jpg";
 import kitabBackground from "@/assets/kitab-background.jpg";
+import manuscritsBackground from "@/assets/manuscrits-background.jpg";
+import culturalActivitiesBackground from "@/assets/cultural-activities-background.jpg";
+import cbmBackground from "@/assets/cbm-background.jpg";
 
 interface PlatformsSectionProps {
   language: string;
@@ -29,7 +27,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
     {
       title: language === 'ar' ? 'مخطوطات' : 'Manuscrits',
       path: '/plateforme-manuscrits',
-      image: zelligePattern1,
+      image: manuscritsBackground,
       number: '02'
     },
     {
@@ -41,13 +39,13 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
     {
       title: language === 'ar' ? 'الأنشطة الثقافية' : 'Activités Culturelles',
       path: '/cultural-activities',
-      image: zelligePattern3,
+      image: culturalActivitiesBackground,
       number: '04'
     },
     {
       title: 'CBM',
       path: '/cbm',
-      image: zelligePattern2,
+      image: cbmBackground,
       number: '05'
     }
   ];
