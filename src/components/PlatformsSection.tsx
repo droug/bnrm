@@ -61,7 +61,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
           </h2>
         </div>
 
-        <div className="grid lg:grid-cols-[1fr,auto] gap-6 items-start">
+        <div className="grid lg:grid-cols-[1fr,auto] gap-8 items-start">
           {/* Main Platform - Left Side */}
           <div className="relative bg-white rounded-lg overflow-hidden shadow-xl cursor-pointer group hover:shadow-2xl transition-all"
                onClick={() => navigate(mainPlatform.path)}>
@@ -96,41 +96,80 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
             </div>
           </div>
 
-          {/* Secondary Platforms - Right Side Grid */}
-          <div className="grid grid-rows-2 grid-cols-2 gap-4 w-[600px]">
-            {secondaryPlatforms.map((platform, index) => (
-              <div
-                key={platform.number}
-                className={`relative rounded-lg overflow-hidden shadow-lg cursor-pointer group hover:shadow-xl transition-all ${
-                  index === 3 ? 'col-span-2' : ''
-                }`}
-                style={{ height: index === 3 ? '180px' : '200px' }}
-                onClick={() => navigate(platform.path)}
-              >
-                <img 
-                  src={platform.image}
-                  alt={platform.title}
-                  className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-[#1a2850] to-[#0d1424]" />
+          {/* Bookshelf - Secondary Platforms as Books */}
+          <div className="relative">
+            {/* Bookshelf */}
+            <div className="flex gap-2 items-end pb-4 relative">
+              {secondaryPlatforms.map((platform, index) => {
+                const bookColors = [
+                  'from-[#8B4513] to-[#654321]', // Marron cuir
+                  'from-[#1e3a5f] to-[#0d1b2a]', // Bleu nuit
+                  'from-[#2d5016] to-[#1a3009]', // Vert forêt
+                  'from-[#7c2d12] to-[#5a1f0a]', // Bordeaux
+                ];
                 
-                {/* Number badge */}
-                <div className="absolute top-4 right-4 z-10">
-                  <div className="bg-primary text-primary-foreground font-bold text-lg w-12 h-12 rounded-full flex items-center justify-center">
-                    {platform.number}
+                const heights = ['h-[380px]', 'h-[420px]', 'h-[400px]', 'h-[390px]'];
+                
+                return (
+                  <div
+                    key={platform.number}
+                    className={`relative ${heights[index]} w-28 cursor-pointer group transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl`}
+                    onClick={() => navigate(platform.path)}
+                    style={{ 
+                      transformStyle: 'preserve-3d',
+                      perspective: '1000px'
+                    }}
+                  >
+                    {/* Book spine */}
+                    <div className={`absolute inset-0 bg-gradient-to-b ${bookColors[index]} rounded-sm shadow-lg`}>
+                      {/* Book texture overlay */}
+                      <div className="absolute inset-0 opacity-20" style={{
+                        backgroundImage: `linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.1) 50%, transparent 100%)`
+                      }} />
+                      
+                      {/* Pattern overlay */}
+                      <img 
+                        src={platform.image}
+                        alt={platform.title}
+                        className="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay"
+                      />
+                      
+                      {/* Book binding lines */}
+                      <div className="absolute top-0 left-0 w-1 h-full bg-black/20" />
+                      <div className="absolute top-0 right-0 w-1 h-full bg-white/10" />
+                      
+                      {/* Number badge on spine */}
+                      <div className="absolute top-6 left-1/2 -translate-x-1/2">
+                        <div className="bg-white/90 text-gray-800 font-bold text-sm w-8 h-8 rounded-full flex items-center justify-center shadow-md">
+                          {platform.number}
+                        </div>
+                      </div>
+                      
+                      {/* Book title - vertical */}
+                      <div className="absolute top-20 bottom-6 left-1/2 -translate-x-1/2 flex items-center justify-center">
+                        <div className="transform -rotate-90 origin-center whitespace-nowrap">
+                          <span className="text-white font-bold text-sm tracking-widest uppercase drop-shadow-md">
+                            {platform.title}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Book edge highlight */}
+                      <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/30 to-transparent" />
+                    </div>
+                    
+                    {/* Book top edge (visible when hovering) */}
+                    <div className={`absolute -top-1 inset-x-0 h-2 bg-gradient-to-r ${bookColors[index]} opacity-0 group-hover:opacity-100 transition-opacity rounded-t-sm`} />
                   </div>
-                </div>
-
-                {/* Vertical text */}
-                <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                  <div className="transform -rotate-90 origin-center whitespace-nowrap">
-                    <span className="text-white/80 font-bold text-sm tracking-wider uppercase">
-                      {platform.title}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+                );
+              })}
+            </div>
+            
+            {/* Shelf */}
+            <div className="w-full h-3 bg-gradient-to-b from-[#8B7355] to-[#6B5845] rounded-sm shadow-md relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </div>
+            <div className="w-full h-8 bg-gradient-to-b from-[#6B5845] to-[#4A3933] shadow-xl" />
           </div>
         </div>
       </div>
