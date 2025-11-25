@@ -5,6 +5,7 @@ import kitabBackground from "@/assets/kitab-background.jpg";
 import manuscritsBackground from "@/assets/manuscrits-background.jpg";
 import culturalActivitiesBackground from "@/assets/cultural-activities-background.jpg";
 import cbmBackground from "@/assets/cbm-background.jpg";
+import islamicPattern from "@/assets/islamic-calligraphy-pattern.jpg";
 
 interface PlatformsSectionProps {
   language: string;
@@ -51,20 +52,17 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
   ];
 
   return (
-    <div className="relative py-20 my-12 overflow-hidden bg-[rgb(32,45,94)] rounded-lg">
-      {/* Decorative geometric pattern in top-right corner */}
-      <div className="absolute top-0 right-0 w-64 h-64 opacity-30 pointer-events-none">
-        <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          {/* Large shape */}
-          <polygon points="256,0 256,180 180,256 80,256" fill="rgba(100,130,180,0.5)" />
-          {/* Medium shapes */}
-          <polygon points="180,0 256,76 256,0" fill="rgba(70,100,150,0.6)" />
-          <polygon points="100,180 180,256 100,256" fill="rgba(60,90,140,0.5)" />
-          {/* Small accent shapes */}
-          <polygon points="80,120 130,120 105,170" fill="rgba(120,150,200,0.4)" />
-          <polygon points="200,100 240,140 200,140" fill="rgba(80,110,160,0.5)" />
-        </svg>
-      </div>
+    <div className="relative py-20 my-12 overflow-hidden rounded-lg">
+      {/* Background image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ 
+          backgroundImage: `url(${islamicPattern})`,
+        }}
+      />
+      
+      {/* Dark overlay for content readability */}
+      <div className="absolute inset-0 bg-[rgb(32,45,94)]/85" />
       <div className="container mx-auto px-4 relative z-10">
         <div className="mb-12">
           <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
