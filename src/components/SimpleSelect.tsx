@@ -25,7 +25,9 @@ export function SimpleSelect({
   icon,
 }: SimpleSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const selectedOption = options.find((opt) => opt.value === value);
 
@@ -45,31 +47,53 @@ export function SimpleSelect({
     };
   }, [isOpen]);
 
-  return (
-    <div ref={containerRef} className={cn("relative", className)}>
-      {/* Trigger Button */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex h-14 w-full items-center justify-between rounded-md border-2 border-input bg-background px-4 py-2 text-base hover:border-primary/50 transition-colors focus:outline-none focus:border-primary"
-      >
-        <div className="flex items-center gap-2">
-          {icon}
-          <span className={cn(!selectedOption && "text-muted-foreground")}>
-            {selectedOption ? selectedOption.label : placeholder}
-          </span>
-        </div>
-        <ChevronDown
-          className={cn(
-            "h-4 w-4 transition-transform",
-            isOpen && "transform rotate-180"
-          )}
-        />
-      </button>
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, [isOpen]);
 
-      {/* Dropdown List */}
+  return (
+    <>
+      <div ref={containerRef} className={cn("relative", className)}>
+        {/* Trigger Button */}
+        <button
+          ref={buttonRef}
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex h-14 w-full items-center justify-between rounded-md border-2 border-input bg-background px-4 py-2 text-base hover:border-primary/50 transition-colors focus:outline-none focus:border-primary"
+        >
+          <div className="flex items-center gap-2">
+            {icon}
+            <span className={cn(!selectedOption && "text-muted-foreground")}>
+              {selectedOption ? selectedOption.label : placeholder}
+            </span>
+          </div>
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 transition-transform",
+              isOpen && "transform rotate-180"
+            )}
+          />
+        </button>
+      </div>
+
+      {/* Dropdown List - Rendered with fixed positioning */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-background border-2 border-input rounded-md shadow-lg z-50 max-h-[300px] overflow-auto">
+        <div
+          style={{
+            position: "fixed",
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+            width: `${dropdownPosition.width}px`,
+          }}
+          className="bg-background border-2 border-input rounded-md shadow-lg z-[100] max-h-[300px] overflow-auto"
+        >
           {options.map((option) => (
             <button
               key={option.value}
@@ -91,6 +115,6 @@ export function SimpleSelect({
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }
