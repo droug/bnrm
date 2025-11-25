@@ -153,8 +153,9 @@ const Index = () => {
                       
                       <Button 
                         size="lg"
+                        variant="outline"
                         onClick={handleSearch}
-                        className="absolute right-2 top-2 h-10 px-6 rounded-lg shadow-md hover:shadow-lg transition-all"
+                        className="absolute right-2 top-2 h-10 px-6 rounded-lg shadow-md hover:shadow-lg transition-all border-blue-600 text-black hover:bg-blue-50"
                       >
                         <Search className="h-5 w-5 mr-2" />
                         {language === 'ar' ? 'بحث' : 'Rechercher'}
