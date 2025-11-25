@@ -506,6 +506,11 @@ Enhanced Moroccan Heritage Design System
     line-height: calc(1.5 + var(--line-height-add, 0));
   }
 
+  /* Clip path utilities */
+  .clip-path-arrow {
+    clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
+  }
+
   /* Accessibility: contrast modes */
   body.contrast-light,
   body.contrast-light * {
