@@ -765,16 +765,13 @@ const Index = () => {
                       </h3>
                       <div className="w-32 h-2 bg-gradient-neutral mx-auto rounded-full shadow-gold"></div>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="flex justify-center">
                       {[
-                        { icon: BookOpen, label_fr: "Réserver un document", label_ar: "حجز وثيقة", color: "text-accent", bg: "bg-accent/10", border: "border-accent/25", href: "/cbn/reserver-ouvrage" },
-                        { icon: Download, label_fr: "Reproduction", label_ar: "النسخ", color: "text-highlight", bg: "bg-highlight/10", border: "border-highlight/25", href: "/demande-reproduction" },
-                        { icon: CreditCard, label_fr: "Adhésions", label_ar: "الاشتراكات", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25", href: "/abonnements" },
-                        { icon: Calendar, label_fr: "Événements", label_ar: "الفعاليات", color: "text-gold", bg: "bg-gold/10", border: "border-gold/25", href: "/news" }
+                        { icon: CreditCard, label_fr: "Adhésions", label_ar: "الاشتراكات", color: "text-royal", bg: "bg-royal/10", border: "border-royal/25", href: "/abonnements" }
                         ].map((service, index) => (
                           <div 
                             key={index} 
-                            className={`text-center p-5 rounded-2xl ${service.bg} hover:shadow-zellige transition-all duration-300 transform hover:scale-105 border-2 ${service.border} relative overflow-hidden group cursor-pointer`}
+                            className={`text-center p-5 rounded-2xl ${service.bg} hover:shadow-zellige transition-all duration-300 transform hover:scale-105 border-2 ${service.border} relative overflow-hidden group cursor-pointer w-64`}
                             onClick={() => service.href && navigate(service.href)}
                           >
                            <div className="absolute inset-0 bg-pattern-filigrane opacity-10 group-hover:opacity-20 transition-opacity duration-300"></div>
