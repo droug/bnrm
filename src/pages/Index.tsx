@@ -589,10 +589,18 @@ const Index = () => {
                             className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
                           />
                           
-                          {/* Number Badge - Rounded Rectangle */}
+                          {/* Number Badge - Star Shape */}
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="bg-[rgb(90,140,230)] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                              02
+                            <div className="relative w-12 h-12">
+                              <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
+                                <path d="M50,10 L60,40 L90,40 L65,60 L75,90 L50,70 L25,90 L35,60 L10,40 L40,40 Z" 
+                                      fill="rgb(90,140,230)" 
+                                      stroke="rgb(70,120,210)" 
+                                      strokeWidth="2"/>
+                              </svg>
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="text-white text-sm font-bold">02</span>
+                              </div>
                             </div>
                           </div>
 
@@ -615,8 +623,16 @@ const Index = () => {
                           />
                           
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="bg-[rgb(90,140,230)] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                              03
+                            <div className="relative w-12 h-12">
+                              <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
+                                <path d="M50,10 L60,40 L90,40 L65,60 L75,90 L50,70 L25,90 L35,60 L10,40 L40,40 Z" 
+                                      fill="rgb(90,140,230)" 
+                                      stroke="rgb(70,120,210)" 
+                                      strokeWidth="2"/>
+                              </svg>
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="text-white text-sm font-bold">03</span>
+                              </div>
                             </div>
                           </div>
 
@@ -638,8 +654,16 @@ const Index = () => {
                           />
                           
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="bg-[rgb(90,140,230)] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                              04
+                            <div className="relative w-12 h-12">
+                              <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
+                                <path d="M50,10 L60,40 L90,40 L65,60 L75,90 L50,70 L25,90 L35,60 L10,40 L40,40 Z" 
+                                      fill="rgb(90,140,230)" 
+                                      stroke="rgb(70,120,210)" 
+                                      strokeWidth="2"/>
+                              </svg>
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="text-white text-sm font-bold">04</span>
+                              </div>
                             </div>
                           </div>
 
@@ -661,8 +685,16 @@ const Index = () => {
                           />
 
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="bg-[rgb(90,140,230)] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                              05
+                            <div className="relative w-12 h-12">
+                              <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
+                                <path d="M50,10 L60,40 L90,40 L65,60 L75,90 L50,70 L25,90 L35,60 L10,40 L40,40 Z" 
+                                      fill="rgb(90,140,230)" 
+                                      stroke="rgb(70,120,210)" 
+                                      strokeWidth="2"/>
+                              </svg>
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="text-white text-sm font-bold">05</span>
+                              </div>
                             </div>
                           </div>
 
