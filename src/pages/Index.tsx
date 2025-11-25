@@ -135,14 +135,14 @@ const Index = () => {
                 <div className="py-16 bg-gradient-to-b from-slate-50 to-white rounded-lg">
                   <div className="container mx-auto px-4">
                     <div className="mb-10">
-                      <Badge className="bg-orange-500 hover:bg-orange-600 text-white mb-3">
+                      <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
                         BNRM
-                      </Badge>
-                      <h2 className="text-4xl font-bold mb-3 text-[#1e3a8a] relative inline-block">
+                      </p>
+                      <h2 className="text-4xl font-bold text-[#1e3a8a] mb-4">
                         {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
-                        <div className="absolute bottom-0 left-0 w-24 h-1 bg-orange-500"></div>
                       </h2>
-                      <p className="text-muted-foreground mt-4">
+                      <div className="w-24 h-1 bg-orange-500 mb-4"></div>
+                      <p className="text-muted-foreground">
                         {language === 'ar'
                           ? 'اكتشف مجموعة واسعة من الخدمات الرقمية المتاحة'
                           : 'Découvrez notre large gamme de services numériques disponibles'
@@ -158,14 +158,14 @@ const Index = () => {
               {/* Quick Links */}
               <div className="mb-12">
                 <div className="text-center mb-10">
-                  <Badge className="bg-orange-500 hover:bg-orange-600 text-white mb-3">
+                  <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
                     BNRM
-                  </Badge>
-                  <h2 className="text-4xl font-bold mb-3 text-[#1e3a8a] relative inline-block">
+                  </p>
+                  <h2 className="text-4xl font-bold text-[#1e3a8a] mb-4">
                     {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
-                    <div className="absolute bottom-0 left-0 w-24 h-1 bg-orange-500"></div>
                   </h2>
-                  <p className="text-muted-foreground mt-4">
+                  <div className="w-24 h-1 bg-orange-500 mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">
                     {language === 'ar'
                       ? 'الوصول السريع إلى خدماتنا الأساسية'
                       : 'Accès rapide à nos services essentiels'
