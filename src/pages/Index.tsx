@@ -213,7 +213,7 @@ const Index = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Card 
-                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50"
+                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100"
                     onClick={() => navigate('/signup')}
                   >
                     <CardContent className="p-8 text-center space-y-4">
@@ -232,7 +232,7 @@ const Index = () => {
                   </Card>
 
                   <Card 
-                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50"
+                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100"
                     onClick={() => navigate('/abonnements')}
                   >
                     <CardContent className="p-8 text-center space-y-4">
@@ -251,7 +251,7 @@ const Index = () => {
                   </Card>
 
                   <Card 
-                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50"
+                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100"
                     onClick={() => navigate('/help')}
                   >
                     <CardContent className="p-8 text-center space-y-4">
