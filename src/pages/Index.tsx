@@ -164,7 +164,7 @@ const Index = () => {
                   <h3 className="text-2xl font-bold text-foreground mb-6 text-center">
                     {language === 'ar' ? 'خدمات سريعة' : 'Services Rapides'}
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div 
                       className="text-center p-5 rounded-2xl bg-primary/10 hover:shadow-lg transition-all cursor-pointer"
                       onClick={() => navigate('/signup')}
@@ -183,6 +183,15 @@ const Index = () => {
                         {language === 'ar' ? 'الاشتراكات' : 'Adhésions'}
                       </p>
                     </div>
+                    <div 
+                      className="text-center p-5 rounded-2xl bg-primary/10 hover:shadow-lg transition-all cursor-pointer"
+                      onClick={() => navigate('/help')}
+                    >
+                      <MousePointer className="h-10 w-10 text-primary mx-auto mb-3" />
+                      <p className="text-sm font-semibold text-foreground">
+                        {language === 'ar' ? 'المساعدة والدعم' : 'Aide & Support'}
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -190,33 +199,6 @@ const Index = () => {
 
             {/* Sidebar */}
             <div className="xl:col-span-1 flex flex-col gap-6">
-              <Card className="cursor-pointer hover:shadow-lg transition-all" onClick={() => navigate('/auth')}>
-                <CardContent className="p-5 text-center">
-                  <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Users className="h-8 w-8 text-primary" />
-                  </div>
-                  <h4 className="font-bold text-foreground mb-3">
-                    {language === 'ar' ? 'مساحتي' : 'Mon Espace'}
-                  </h4>
-                  <Button size="sm" className="w-full">
-                    {language === 'ar' ? 'تسجيل الدخول' : 'Connexion'}
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {[
-                { title_fr: "Aide & Support", title_ar: "المساعدة والدعم", icon: MousePointer, href: "/help" },
-                { title_fr: "Partager", title_ar: "مشاركة", icon: Share2, href: "#" }
-              ].map((item, index) => (
-                <Card key={index} className="cursor-pointer hover:shadow-lg transition-all" onClick={() => navigate(item.href)}>
-                  <CardContent className="p-4 text-center">
-                    <item.icon className="h-6 w-6 text-foreground mx-auto mb-2" />
-                    <h4 className="text-sm font-bold text-foreground">
-                      {language === 'ar' ? item.title_ar : item.title_fr}
-                    </h4>
-                  </CardContent>
-                </Card>
-              ))}
             </div>
           </div>
         </main>
