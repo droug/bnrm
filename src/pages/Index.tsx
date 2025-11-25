@@ -493,6 +493,195 @@ const Index = () => {
                   </div>
                 </div>
 
+                {/* Section Nos Principales Plateformes */}
+                <div className="relative py-20 my-12 overflow-hidden">
+                  {/* Fond bleu marine avec motifs géométriques */}
+                  <div className="absolute inset-0 bg-[hsl(220,60%,15%)]"></div>
+                  <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-10"></div>
+                  <div className="absolute top-0 right-0 w-1/2 h-full opacity-20">
+                    <svg viewBox="0 0 400 400" className="w-full h-full">
+                      <polygon points="200,0 400,200 200,400" fill="currentColor" className="text-primary/20" />
+                    </svg>
+                  </div>
+                  
+                  <div className="container mx-auto px-4 relative z-10">
+                    {/* Header */}
+                    <div className="mb-12">
+                      <Badge className="mb-4 bg-primary text-primary-foreground px-4 py-1.5 text-sm font-bold">
+                        {language === 'ar' ? 'المنصات' : 'Plateformes'}
+                      </Badge>
+                      <h2 className="text-4xl md:text-5xl font-moroccan font-bold text-white mb-4">
+                        {language === 'ar' ? 'منصاتنا الرئيسية' : 'Nos Principales Plateformes'}
+                      </h2>
+                      <div className="w-64 h-1 bg-gradient-to-r from-gold via-gold/60 to-transparent mb-4"></div>
+                      <p className="text-white/80 text-lg max-w-2xl">
+                        {language === 'ar' 
+                          ? 'اكتشف منصاتنا الرقمية المتخصصة للوصول إلى مجموعاتنا وخدماتنا'
+                          : 'Découvrez nos plateformes numériques spécialisées pour accéder à nos collections et services'
+                        }
+                      </p>
+                    </div>
+
+                    {/* Grille des plateformes */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                      {/* Plateforme principale - Dépôt Legal */}
+                      <div className="lg:col-span-7">
+                        <div className="relative bg-white rounded-2xl overflow-hidden shadow-2xl group h-full">
+                          {/* Badge numéro */}
+                          <div className="absolute top-6 left-6 z-20">
+                            <div className="relative">
+                              <div className="bg-primary text-white text-4xl font-bold px-8 py-3 rounded-r-2xl shadow-xl border-l-8 border-gold">
+                                01
+                              </div>
+                              <div className="absolute -right-3 top-0 w-0 h-0 border-t-[30px] border-t-primary border-r-[15px] border-r-transparent"></div>
+                              <div className="absolute -right-3 bottom-0 w-0 h-0 border-b-[30px] border-b-primary border-r-[15px] border-r-transparent"></div>
+                            </div>
+                          </div>
+
+                          <div className="p-8 pt-24">
+                            <h3 className="text-3xl font-moroccan font-bold text-primary mb-4">
+                              {language === 'ar' ? 'الإيداع القانوني' : 'Dépôt Legal'}
+                            </h3>
+                            <p className="text-muted-foreground mb-6 text-base leading-relaxed">
+                              {language === 'ar'
+                                ? 'منصة رقمية شاملة للإيداع القانوني للمنشورات. تبسيط الإجراءات وتتبع طلباتك بكل سهولة.'
+                                : 'Plateforme numérique complète pour le dépôt légal des publications. Simplifiez vos démarches et suivez vos demandes en toute facilité.'
+                              }
+                            </p>
+                            
+                            {/* Image illustrative */}
+                            <div className="relative h-64 rounded-xl overflow-hidden mb-6 group-hover:shadow-2xl transition-shadow">
+                              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10"></div>
+                              <img 
+                                src={zelligePattern1}
+                                alt="Dépôt Legal"
+                                className="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="text-center">
+                                  <FileText className="w-20 h-20 text-primary mx-auto mb-4" />
+                                  <p className="text-primary font-bold text-xl">{language === 'ar' ? 'الإيداع القانوني' : 'Dépôt Legal'}</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <Link to="/depot-legal">
+                              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                                {language === 'ar' ? 'استكشف المنصة' : 'Découvrir la plateforme'}
+                              </Button>
+                            </Link>
+                          </div>
+
+                          {/* Texte vertical sur le côté gauche */}
+                          <div className="absolute left-0 top-1/2 -translate-y-1/2 -rotate-90 origin-left">
+                            <p className="text-primary/20 font-moroccan font-bold text-2xl tracking-widest whitespace-nowrap">
+                              {language === 'ar' ? 'الإيداع القانوني' : 'DÉPÔT LEGAL'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Plateformes secondaires */}
+                      <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
+                        {/* Plateforme 02 - Bibliothèque Numérique */}
+                        <div className="relative bg-gradient-to-br from-accent to-accent/80 rounded-2xl overflow-hidden shadow-xl group cursor-pointer h-64"
+                             onClick={() => navigate('/digital-library')}>
+                          <div className="absolute inset-0 bg-pattern-filigrane opacity-20"></div>
+                          <div className="absolute top-4 right-4 z-10">
+                            <div className="bg-white text-accent text-2xl font-bold w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
+                              02
+                            </div>
+                          </div>
+                          
+                          {/* Image en arrière-plan */}
+                          <div className="absolute inset-0 opacity-30 group-hover:opacity-40 transition-opacity">
+                            <img src={zelligePattern5} alt="" className="w-full h-full object-cover" />
+                          </div>
+
+                          <div className="relative h-full p-6 flex flex-col justify-end">
+                            <Book className="w-12 h-12 text-white mb-3" />
+                            <h4 className="text-2xl font-moroccan font-bold text-white mb-2">
+                              {language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}
+                            </h4>
+                            <p className="text-white/90 text-sm">
+                              {language === 'ar' ? 'الوصول إلى المجموعات الرقمية' : 'Accès aux collections numériques'}
+                            </p>
+                          </div>
+
+                          {/* Texte vertical */}
+                          <div className="absolute right-0 top-1/2 -translate-y-1/2 rotate-90 origin-right">
+                            <p className="text-white/30 font-moroccan font-bold text-lg tracking-widest whitespace-nowrap">
+                              {language === 'ar' ? 'رقمية' : 'BIBLIOTHÈQUE NUMÉRIQUE'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Plateforme 03 - Catalogue CBM */}
+                        <div className="relative bg-gradient-to-br from-royal to-royal/80 rounded-2xl overflow-hidden shadow-xl group cursor-pointer h-64"
+                             onClick={() => navigate('/cbm')}>
+                          <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-20"></div>
+                          <div className="absolute top-4 right-4 z-10">
+                            <div className="bg-white text-royal text-2xl font-bold w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
+                              03
+                            </div>
+                          </div>
+
+                          <div className="absolute inset-0 opacity-30 group-hover:opacity-40 transition-opacity">
+                            <img src={zelligePattern2} alt="" className="w-full h-full object-cover" />
+                          </div>
+
+                          <div className="relative h-full p-6 flex flex-col justify-end">
+                            <Network className="w-12 h-12 text-white mb-3" />
+                            <h4 className="text-2xl font-moroccan font-bold text-white mb-2">
+                              {language === 'ar' ? 'شبكة المكتبات' : 'Réseau CBM'}
+                            </h4>
+                            <p className="text-white/90 text-sm">
+                              {language === 'ar' ? 'الكتالوج الجماعي المغربي' : 'Catalogue Bibliographique Marocain'}
+                            </p>
+                          </div>
+
+                          <div className="absolute right-0 top-1/2 -translate-y-1/2 rotate-90 origin-right">
+                            <p className="text-white/30 font-moroccan font-bold text-lg tracking-widest whitespace-nowrap">
+                              {language === 'ar' ? 'شبكة' : 'RÉSEAU CBM'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Plateforme 04 - Kitab */}
+                        <div className="relative bg-gradient-to-br from-gold/90 to-gold/70 rounded-2xl overflow-hidden shadow-xl group cursor-pointer h-64"
+                             onClick={() => navigate('/plateforme-manuscrits')}>
+                          <div className="absolute inset-0 bg-pattern-zellige-tiles opacity-20"></div>
+                          <div className="absolute top-4 right-4 z-10">
+                            <div className="bg-white text-gold text-2xl font-bold w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
+                              04
+                            </div>
+                          </div>
+
+                          <div className="absolute inset-0 opacity-30 group-hover:opacity-40 transition-opacity">
+                            <img src={zelligePattern6} alt="" className="w-full h-full object-cover" />
+                          </div>
+
+                          <div className="relative h-full p-6 flex flex-col justify-end">
+                            <BookOpen className="w-12 h-12 text-white mb-3" />
+                            <h4 className="text-2xl font-moroccan font-bold text-white mb-2">
+                              {language === 'ar' ? 'كتاب' : 'Kitab'}
+                            </h4>
+                            <p className="text-white/90 text-sm">
+                              {language === 'ar' ? 'منصة المخطوطات الوطنية' : 'Plateforme nationale des manuscrits'}
+                            </p>
+                          </div>
+
+                          <div className="absolute right-0 top-1/2 -translate-y-1/2 rotate-90 origin-right">
+                            <p className="text-white/30 font-moroccan font-bold text-lg tracking-widest whitespace-nowrap">
+                              KITAB
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Grille de contenu avec mosaïques et tons neutres */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
