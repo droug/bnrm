@@ -326,7 +326,7 @@ const Index = () => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                        className="w-full h-16 text-lg bg-white/98 shadow-zellige border-3 border-gold/30 focus:border-primary pl-32 pr-32 rounded-full font-serif"
+                        className="w-full h-16 text-lg bg-white/98 shadow-zellige border-3 border-gold/30 focus:border-primary pl-40 pr-32 rounded-full font-serif"
                       />
 
                       {/* Liste des filtres simple, affichée sous le champ de recherche pour éviter tout rognage */}
