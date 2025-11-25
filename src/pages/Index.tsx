@@ -20,6 +20,7 @@ import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
 import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
 import zelligePattern5 from "@/assets/zellige-pattern-5.jpg";
 import zelligePattern6 from "@/assets/zellige-pattern-6.jpg";
+import islamicPattern from "@/assets/islamic-calligraphy-pattern.jpg";
 import { DigitalServicesCarousel } from "@/components/DigitalServicesCarousel";
 import { PlatformsSection } from "@/components/PlatformsSection";
 import { NewsEventsSection } from "@/components/NewsEventsSection";
@@ -213,10 +214,17 @@ const Index = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Card 
-                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100"
+                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100 relative overflow-hidden"
                     onClick={() => navigate('/signup')}
                   >
-                    <CardContent className="p-8 text-center space-y-4">
+                    <div 
+                      className="absolute inset-0 opacity-10 bg-cover bg-center"
+                      style={{ 
+                        backgroundImage: `url(${islamicPattern})`,
+                        transform: 'rotate(0deg) scale(1.2)'
+                      }}
+                    />
+                    <CardContent className="p-8 text-center space-y-4 relative z-10">
                       <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <UserPlus className="h-10 w-10 text-primary" />
                       </div>
@@ -232,10 +240,17 @@ const Index = () => {
                   </Card>
 
                   <Card 
-                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100"
+                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100 relative overflow-hidden"
                     onClick={() => navigate('/abonnements')}
                   >
-                    <CardContent className="p-8 text-center space-y-4">
+                    <div 
+                      className="absolute inset-0 opacity-10 bg-cover bg-center"
+                      style={{ 
+                        backgroundImage: `url(${islamicPattern})`,
+                        transform: 'rotate(15deg) scale(1.2)'
+                      }}
+                    />
+                    <CardContent className="p-8 text-center space-y-4 relative z-10">
                       <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <CreditCard className="h-10 w-10 text-primary" />
                       </div>
@@ -251,10 +266,17 @@ const Index = () => {
                   </Card>
 
                   <Card 
-                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100"
+                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100 relative overflow-hidden"
                     onClick={() => navigate('/help')}
                   >
-                    <CardContent className="p-8 text-center space-y-4">
+                    <div 
+                      className="absolute inset-0 opacity-10 bg-cover bg-center"
+                      style={{ 
+                        backgroundImage: `url(${islamicPattern})`,
+                        transform: 'rotate(-15deg) scale(1.2)'
+                      }}
+                    />
+                    <CardContent className="p-8 text-center space-y-4 relative z-10">
                       <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <MousePointer className="h-10 w-10 text-primary" />
                       </div>
