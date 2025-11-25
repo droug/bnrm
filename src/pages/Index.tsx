@@ -328,6 +328,50 @@ const Index = () => {
                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                         className="w-full h-16 text-lg bg-white/98 shadow-zellige border-3 border-gold/30 focus:border-primary pl-32 pr-32 rounded-full font-serif"
                       />
+
+                      {/* Liste des filtres simple, affichée sous le champ de recherche pour éviter tout rognage */}
+                      {showFilterMenu && (
+                        <div className="mt-3 ml-2 inline-block w-56 bg-white border-2 border-gray-300 rounded-lg shadow-xl text-left">
+                          <div className="py-2">
+                            <button
+                              onClick={() => { addFilter('author'); setShowFilterMenu(false); }}
+                              className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
+                            >
+                              {language === 'ar' ? 'المؤلف' : 'Auteur'}
+                            </button>
+                            <button
+                              onClick={() => { addFilter('publisher'); setShowFilterMenu(false); }}
+                              className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
+                            >
+                              {language === 'ar' ? 'الناشر' : 'Éditeur'}
+                            </button>
+                            <button
+                              onClick={() => { addFilter('genre'); setShowFilterMenu(false); }}
+                              className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
+                            >
+                              {language === 'ar' ? 'النوع' : 'Genre'}
+                            </button>
+                            <button
+                              onClick={() => { addFilter('publication_year'); setShowFilterMenu(false); }}
+                              className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
+                            >
+                              {language === 'ar' ? 'سنة النشر' : 'Année de publication'}
+                            </button>
+                            <button
+                              onClick={() => { addFilter('language'); setShowFilterMenu(false); }}
+                              className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
+                            >
+                              {language === 'ar' ? 'اللغة' : 'Langue'}
+                            </button>
+                            <button
+                              onClick={() => { addFilter('content_type'); setShowFilterMenu(false); }}
+                              className="w-full text-left px-4 py-2.5 text-base font-medium text-gray-900 hover:bg-gray-100 transition-colors"
+                            >
+                              {language === 'ar' ? 'نوع المحتوى' : 'Type de contenu'}
+                            </button>
+                          </div>
+                        </div>
+                      )}
                       
                       {/* Bouton de suppression */}
                       {searchQuery && (
