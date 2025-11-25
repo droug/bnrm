@@ -155,43 +155,70 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Quick Services */}
-              <Card className="shadow-lg">
-                <CardContent className="p-8">
-                  <h3 className="text-2xl font-bold text-foreground mb-6 text-center">
-                    {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div 
-                      className="text-center p-5 rounded-2xl bg-primary/10 hover:shadow-lg transition-all cursor-pointer"
-                      onClick={() => navigate('/signup')}
-                    >
-                      <UserPlus className="h-10 w-10 text-primary mx-auto mb-3" />
-                      <p className="text-sm font-semibold text-foreground">
+              {/* Quick Links */}
+              <div className="mb-12">
+                <h2 className="text-3xl font-bold text-foreground mb-8 text-center">
+                  {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <Card 
+                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50"
+                    onClick={() => navigate('/signup')}
+                  >
+                    <CardContent className="p-8 text-center space-y-4">
+                      <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <UserPlus className="h-10 w-10 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
                         {language === 'ar' ? 'تسجيل' : 'Inscription'}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {language === 'ar' 
+                          ? 'إنشاء حساب جديد للوصول إلى جميع خدماتنا' 
+                          : 'Créez votre compte pour accéder à tous nos services'}
                       </p>
-                    </div>
-                    <div 
-                      className="text-center p-5 rounded-2xl bg-primary/10 hover:shadow-lg transition-all cursor-pointer"
-                      onClick={() => navigate('/abonnements')}
-                    >
-                      <CreditCard className="h-10 w-10 text-primary mx-auto mb-3" />
-                      <p className="text-sm font-semibold text-foreground">
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50"
+                    onClick={() => navigate('/abonnements')}
+                  >
+                    <CardContent className="p-8 text-center space-y-4">
+                      <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <CreditCard className="h-10 w-10 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
                         {language === 'ar' ? 'الاشتراكات' : 'Adhésions'}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {language === 'ar' 
+                          ? 'اكتشف أنواع الاشتراكات والخدمات المتاحة' 
+                          : 'Découvrez nos différentes formules d\'adhésion'}
                       </p>
-                    </div>
-                    <div 
-                      className="text-center p-5 rounded-2xl bg-primary/10 hover:shadow-lg transition-all cursor-pointer"
-                      onClick={() => navigate('/help')}
-                    >
-                      <MousePointer className="h-10 w-10 text-primary mx-auto mb-3" />
-                      <p className="text-sm font-semibold text-foreground">
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50"
+                    onClick={() => navigate('/help')}
+                  >
+                    <CardContent className="p-8 text-center space-y-4">
+                      <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <MousePointer className="h-10 w-10 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
                         {language === 'ar' ? 'المساعدة والدعم' : 'Aide & Support'}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {language === 'ar' 
+                          ? 'احصل على المساعدة والدعم الذي تحتاجه' 
+                          : 'Obtenez l\'aide dont vous avez besoin'}
                       </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
           </div>
         </main>
         
