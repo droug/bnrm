@@ -5,6 +5,7 @@ import kitabBackground from "@/assets/kitab-background.jpg";
 import manuscritsBackground from "@/assets/manuscrits-background.jpg";
 import culturalActivitiesBackground from "@/assets/cultural-activities-background.jpg";
 import cbmBackground from "@/assets/cbm-background.jpg";
+import rubElHizb from "@/assets/rub-el-hizb.jpeg";
 
 interface PlatformsSectionProps {
   language: string;
@@ -104,8 +105,11 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 
                 {/* Number Badge */}
                 <div className="absolute top-8 right-8 z-10">
-                  <div className="bg-primary text-primary-foreground font-bold text-2xl w-16 h-16 rounded-full flex items-center justify-center shadow-lg">
-                    {mainPlatform.number}
+                  <div className="relative w-16 h-16 flex items-center justify-center">
+                    <img src={rubElHizb} alt="" className="absolute inset-0 w-full h-full object-contain" />
+                    <span className="relative z-10 font-bold text-2xl text-white drop-shadow-lg">
+                      {mainPlatform.number}
+                    </span>
                   </div>
                 </div>
                 
@@ -189,8 +193,11 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       
                       {/* Number badge on spine */}
                       <div className="absolute top-6 left-1/2 -translate-x-1/2">
-                        <div className="bg-white/90 text-gray-800 font-bold text-sm w-8 h-8 rounded-full flex items-center justify-center shadow-md">
-                          {platform.number}
+                        <div className="relative w-8 h-8 flex items-center justify-center">
+                          <img src={rubElHizb} alt="" className="absolute inset-0 w-full h-full object-contain" />
+                          <span className="relative z-10 font-bold text-xs text-white drop-shadow-md">
+                            {platform.number}
+                          </span>
                         </div>
                       </div>
                       
