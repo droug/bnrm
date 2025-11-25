@@ -319,7 +319,18 @@ const Header = () => {
             {/* Moved to floating button */}
             
             {/* Chatbot - icône seulement */}
-            {/* Moved to floating button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsChatBotOpen(!isChatBotOpen)}
+              className={`px-2 relative ${isChatBotOpen ? 'bg-primary/10' : ''}`}
+              title={language === 'ar' ? 'المساعد الذكي' : 'Assistant IA'}
+            >
+              <Bot className="h-4 w-4" />
+              {!isChatBotOpen && (
+                <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full"></div>
+              )}
+            </Button>
             
             {/* Messagerie */}
             {user && <MessagingButton isHomePage={false} />}
