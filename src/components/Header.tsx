@@ -192,10 +192,10 @@ const Header = () => {
   const showBackButton = !isHomePage && !isDigitalLibraryHome && !isManuscriptsPlatformHome;
 
   return (
-    <header className={`sticky top-0 z-50 border-b-2 shadow-lg ${isHomePage ? 'bg-slate-900/80 backdrop-blur-lg border-white/20' : 'bg-background/95 backdrop-blur-lg border-primary/20'}`}>
-      <div className={`container mx-auto px-4 ${isHomePage ? 'text-white' : ''}`}>
+    <header className="sticky top-0 z-50 border-b-2 shadow-lg bg-white backdrop-blur-lg border-border">
+      <div className="container mx-auto px-4">
         {/* Bannière ultra-compacte */}
-        <div className={`flex justify-between items-center py-2 ${isHomePage ? 'border-b border-white/20' : 'border-b border-primary/20'}`}>
+        <div className="flex justify-between items-center py-2 border-b border-border">
           {/* Logo + Titre compact */}
           <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <img src={logoImage} alt="Logo BNRM" className="h-10 w-auto" />
@@ -209,7 +209,7 @@ const Header = () => {
             <>
               {isManuscriptsPlatform && (
                 <Link to="/admin/manuscripts-backoffice">
-                  <Button variant="outline" size="sm" className={`gap-2 ${isHomePage ? 'border-white/40 text-white hover:bg-white/20' : 'border-gold/40 hover:border-gold hover:bg-gold/10'}`}>
+                  <Button variant="outline" size="sm" className="gap-2 border-gold/40 hover:border-gold hover:bg-gold/10">
                     <Shield className="h-4 w-4" />
                     <span className="hidden sm:inline">Gestion Manuscrits Numérisés</span>
                     <span className="sm:hidden">Gestion</span>
@@ -218,7 +218,7 @@ const Header = () => {
               )}
               {isDigitalLibrary && (
                 <Link to="/admin/digital-library">
-                  <Button variant="outline" size="sm" className={`gap-2 ${isHomePage ? 'border-white/40 text-white hover:bg-white/20' : 'border-gold/40 hover:border-gold hover:bg-gold/10'}`}>
+                  <Button variant="outline" size="sm" className="gap-2 border-gold/40 hover:border-gold hover:bg-gold/10">
                     <Shield className="h-4 w-4" />
                     <span className="hidden sm:inline">Gestion Bibliothèque Numérique</span>
                     <span className="sm:hidden">Gestion</span>
@@ -227,7 +227,7 @@ const Header = () => {
               )}
               {isCBMPortal && (
                 <Link to="/cbm/admin">
-                  <Button variant="outline" size="sm" className={`gap-2 ${isHomePage ? 'border-white/40 text-white hover:bg-white/20' : 'border-primary/40 hover:border-primary hover:bg-primary/10'}`}>
+                  <Button variant="outline" size="sm" className="gap-2 border-primary/40 hover:border-primary hover:bg-primary/10">
                     <Shield className="h-4 w-4" />
                     <span className="hidden sm:inline">Administration CBM</span>
                     <span className="sm:hidden">Admin CBM</span>
@@ -240,7 +240,7 @@ const Header = () => {
           {/* Mon Espace pour la plateforme des manuscrits */}
           {isManuscriptsPlatform && user && (
             <Link to="/mon-espace-manuscrits">
-              <Button variant="outline" size="sm" className={`gap-2 ${isHomePage ? 'border-white/40 text-white hover:bg-white/20' : ''}`}>
+              <Button variant="outline" size="sm" className="gap-2">
                 <User className="h-4 w-4" />
                 <span className="hidden sm:inline">Mon Espace</span>
               </Button>
@@ -252,7 +252,7 @@ const Header = () => {
             {/* Navigation Portails */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className={`gap-2 h-11 text-base font-medium ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
+                <Button variant="ghost" size="sm" className="gap-2 h-11 text-base font-medium">
                   <Building className="h-4 w-4" />
                   <span className="hidden md:inline">{language === 'ar' ? 'البوابات' : 'Portails'}</span>
                   <ChevronDown className="h-3 w-3" />
@@ -289,7 +289,7 @@ const Header = () => {
             {/* Langue - icône seulement sur mobile */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className={`gap-1 px-2 h-11 text-base font-medium ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
+                <Button variant="ghost" size="sm" className="gap-1 px-2 h-11 text-base font-medium">
                   <Globe className="h-4 w-4" />
                   <span className="hidden sm:inline">
                     {language === 'ar' && 'ع'}
@@ -316,14 +316,14 @@ const Header = () => {
             </DropdownMenu>
             
             {/* Accessibilité - icône seulement */}
-            <AccessibilityToolkit className={isHomePage ? 'text-white hover:bg-white/20' : ''} />
+            <AccessibilityToolkit />
             
             {/* Chatbot - icône seulement */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsChatBotOpen(!isChatBotOpen)}
-              className={`px-2 relative ${isChatBotOpen ? 'bg-primary/10' : ''} ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}
+              className={`px-2 relative ${isChatBotOpen ? 'bg-primary/10' : ''}`}
               title={language === 'ar' ? 'المساعد الذكي' : 'Assistant IA'}
             >
               <Bot className="h-4 w-4" />
@@ -333,17 +333,17 @@ const Header = () => {
             </Button>
             
             {/* Messagerie */}
-            {user && <MessagingButton isHomePage={isHomePage} />}
+            {user && <MessagingButton isHomePage={false} />}
             
             {/* Notifications */}
-            {user && <NotificationsButton isHomePage={isHomePage} />}
+            {user && <NotificationsButton isHomePage={false} />}
             
             {/* Utilisateur */}
             {user ? (
               <div className="flex items-center gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className={`gap-1 px-2 h-11 text-base font-medium ${isHomePage ? 'text-white hover:bg-white/20' : ''}`}>
+                    <Button variant="ghost" size="sm" className="gap-1 px-2 h-11 text-base font-medium">
                       <User className="h-4 w-4" />
                       <span className="hidden md:inline max-w-[80px] truncate">
                         {profile?.first_name || 'Compte'}
@@ -392,7 +392,7 @@ const Header = () => {
                   variant="ghost"
                   size="sm"
                   onClick={signOut}
-                  className={`px-2 ${isHomePage ? 'text-white hover:bg-white/20' : 'hover:bg-destructive/10 text-destructive'}`}
+                  className="px-2 hover:bg-destructive/10 text-destructive"
                   title={language === 'ar' ? 'تسجيل الخروج' : 'Déconnexion'}
                 >
                   <LogIn className="h-4 w-4 rotate-180" />
@@ -400,7 +400,7 @@ const Header = () => {
               </div>
             ) : (
               <Link to="/auth">
-                <Button size="sm" className={`gap-1 px-3 ${isHomePage ? 'bg-white text-primary hover:bg-white/90' : ''}`}>
+                <Button size="sm" className="gap-1 px-3">
                   <LogIn className="h-4 w-4" />
                   <span className="hidden sm:inline text-xs">{t('nav.login')}</span>
                 </Button>
@@ -437,7 +437,7 @@ const Header = () => {
             <NavigationMenuList className="space-x-1">
               {/* Découvrir */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3 ${isHomePage ? 'text-white hover:text-white' : ''}`} title={t('nav.discover')}>
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3" title={t('nav.discover')}>
                   <BookOpen className="w-4 h-4 mr-1" />
                   <span className="hidden lg:inline">{t('nav.discover')}</span>
                 </NavigationMenuTrigger>
@@ -471,7 +471,7 @@ const Header = () => {
 
               {/* Services */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3 ${isHomePage ? 'text-white hover:text-white' : ''}`} title={t('nav.services')}>
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3" title={t('nav.services')}>
                   <Users className="w-4 h-4 mr-1" />
                   <span className="hidden lg:inline">{t('nav.services')}</span>
                 </NavigationMenuTrigger>
@@ -505,7 +505,7 @@ const Header = () => {
 
               {/* Explorer */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3 ${isHomePage ? 'text-white hover:text-white' : ''}`} title={t('nav.explore')}>
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3" title={t('nav.explore')}>
                   <Book className="w-4 h-4 mr-1" />
                   <span className="hidden lg:inline">{t('nav.explore')}</span>
                 </NavigationMenuTrigger>
@@ -647,7 +647,7 @@ const Header = () => {
 
               {/* Collaborer avec nous */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={`bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3 ${isHomePage ? 'text-white hover:text-white' : ''}`}>
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3">
                   <Building className="w-4 h-4 mr-1" />
                   <span className="hidden lg:inline">{t('nav.collaborate')}</span>
                 </NavigationMenuTrigger>
