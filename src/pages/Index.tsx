@@ -19,6 +19,7 @@ import zelligePattern5 from "@/assets/zellige-pattern-5.jpg";
 import zelligePattern6 from "@/assets/zellige-pattern-6.jpg";
 import { DigitalServicesCarousel } from "@/components/DigitalServicesCarousel";
 import { PlatformsSection } from "@/components/PlatformsSection";
+import { NewsEventsSection } from "@/components/NewsEventsSection";
 
 const Index = () => {
   const { t, language } = useLanguage();
@@ -124,6 +125,9 @@ const Index = () => {
                   </div>
                 </div>
               </div>
+
+              {/* News and Events Section */}
+              <NewsEventsSection language={language} />
 
               {/* Platforms Section */}
               <PlatformsSection language={language} />
