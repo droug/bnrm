@@ -51,8 +51,9 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
             <div className="w-24 h-1 bg-orange-500 mb-4"></div>
           </div>
           <Button 
+            variant="outline"
             onClick={() => navigate('/news')}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="border-blue-600 text-black hover:bg-blue-50"
           >
             Tout afficher
           </Button>
