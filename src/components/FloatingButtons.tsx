@@ -15,7 +15,7 @@ export function FloatingButtons() {
   return (
     <>
       {/* Floating buttons container */}
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
+      <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3">
         {/* Accessibility button - scrolls to top where accessibility tools are */}
         <Button
           size="lg"
