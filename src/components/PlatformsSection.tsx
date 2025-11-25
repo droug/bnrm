@@ -63,8 +63,8 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
           </h2>
           <p className="text-white/80 mt-4">
             {language === 'ar' 
-              ? 'اكتشف خدماتنا ومنصاتنا الرقمية'
-              : 'Découvrez nos services et plateformes numériques'
+              ? 'اكتشف منصاتنا الرقمية'
+              : 'Découvrez nos plateformes numériques'
             }
           </p>
         </div>
