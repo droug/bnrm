@@ -6,7 +6,7 @@ import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools"
 import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
 import SEOHead from "@/components/seo/SEOHead";
-import { Search, Book, BookOpen, Users, Download, Calendar, Globe, Accessibility, Share2, MousePointer, CreditCard, BadgeCheck } from "lucide-react";
+import { Search, Book, BookOpen, Users, Download, Calendar, Globe, Accessibility, Share2, MousePointer, CreditCard, BadgeCheck, UserPlus } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -164,7 +164,16 @@ const Index = () => {
                   <h3 className="text-2xl font-bold text-foreground mb-6 text-center">
                     {language === 'ar' ? 'خدمات سريعة' : 'Services Rapides'}
                   </h3>
-                  <div className="grid grid-cols-1 gap-6 max-w-xs mx-auto">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div 
+                      className="text-center p-5 rounded-2xl bg-primary/10 hover:shadow-lg transition-all cursor-pointer"
+                      onClick={() => navigate('/signup')}
+                    >
+                      <UserPlus className="h-10 w-10 text-primary mx-auto mb-3" />
+                      <p className="text-sm font-semibold text-foreground">
+                        {language === 'ar' ? 'تسجيل' : 'Inscription'}
+                      </p>
+                    </div>
                     <div 
                       className="text-center p-5 rounded-2xl bg-primary/10 hover:shadow-lg transition-all cursor-pointer"
                       onClick={() => navigate('/abonnements')}
