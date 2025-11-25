@@ -18,6 +18,7 @@ import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
 import zelligePattern5 from "@/assets/zellige-pattern-5.jpg";
 import zelligePattern6 from "@/assets/zellige-pattern-6.jpg";
 import { DigitalServicesCarousel } from "@/components/DigitalServicesCarousel";
+import { PlatformsSection } from "@/components/PlatformsSection";
 
 const Index = () => {
   const { t, language } = useLanguage();
@@ -125,41 +126,7 @@ const Index = () => {
               </div>
 
               {/* Platforms Section */}
-              <div className="relative py-20 my-12 overflow-hidden bg-[rgb(32,45,94)] rounded-lg">
-                <div className="container mx-auto px-4 relative z-10">
-                  <div className="mb-12">
-                    <h2 className="text-5xl font-bold text-white mb-4">
-                      {language === 'ar' ? 'منصاتنا الرئيسية' : 'Nos Principales Plateformes'}
-                    </h2>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {[
-                      { title: language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique', path: '/digital-library', image: zelligePattern5 },
-                      { title: language === 'ar' ? 'الأنشطة الثقافية' : 'Activités Culturelles', path: '/cultural-activities', image: zelligePattern3 },
-                      { title: 'CBM', path: '/cbm', image: zelligePattern2 },
-                      { title: 'Kitab', path: '/kitab', image: zelligePattern6 },
-                      { title: language === 'ar' ? 'مخطوطات' : 'Manuscrits', path: '/plateforme-manuscrits', image: zelligePattern1 }
-                    ].map((platform, index) => (
-                      <div 
-                        key={index}
-                        className="relative h-64 rounded-lg overflow-hidden shadow-xl group cursor-pointer"
-                        onClick={() => navigate(platform.path)}
-                      >
-                        <img 
-                          src={platform.image}
-                          alt={platform.title}
-                          className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900" />
-                        <div className="relative h-full flex items-center justify-center">
-                          <h3 className="text-white font-bold text-2xl">{platform.title}</h3>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <PlatformsSection language={language} />
 
               {/* Digital Services Section */}
               <div className="mb-12">
