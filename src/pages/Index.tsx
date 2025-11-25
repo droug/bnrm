@@ -157,9 +157,21 @@ const Index = () => {
 
               {/* Quick Links */}
               <div className="mb-12">
-                <h2 className="text-3xl font-bold text-foreground mb-8 text-center">
-                  {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
-                </h2>
+                <div className="text-center mb-10">
+                  <Badge className="bg-orange-500 hover:bg-orange-600 text-white mb-3">
+                    BNRM
+                  </Badge>
+                  <h2 className="text-4xl font-bold mb-3 text-[#1e3a8a] inline-block relative">
+                    {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-orange-500"></div>
+                  </h2>
+                  <p className="text-muted-foreground mt-4">
+                    {language === 'ar'
+                      ? 'الوصول السريع إلى خدماتنا الأساسية'
+                      : 'Accès rapide à nos services essentiels'
+                    }
+                  </p>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Card 
                     className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50"
