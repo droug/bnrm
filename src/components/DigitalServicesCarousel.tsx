@@ -30,10 +30,9 @@ interface BNRMTariff {
 
 interface DigitalServicesCarouselProps {
   language: 'fr' | 'ar';
-  handleLegalDepositClick: (type: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees") => void;
 }
 
-export function DigitalServicesCarousel({ language, handleLegalDepositClick }: DigitalServicesCarouselProps) {
+export function DigitalServicesCarousel({ language }: DigitalServicesCarouselProps) {
   const navigate = useNavigate();
   const [services, setServices] = useState<BNRMService[]>([]);
   const [tariffs, setTariffs] = useState<BNRMTariff[]>([]);
@@ -120,7 +119,7 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
         ? 'قم بإيداع مطبوعاتك ووثائقك وفقاً للقانون. خدمة إلزامية للناشرين والمؤلفين.'
         : 'Déposez vos publications et documents selon la loi. Service obligatoire pour les éditeurs et auteurs.',
       category: language === 'ar' ? 'خدمة أساسية' : 'Service Essentiel',
-      onClick: () => handleLegalDepositClick("monographie")
+      onClick: () => navigate('/depot-legal')
     },
     {
       id: 'abonnements',

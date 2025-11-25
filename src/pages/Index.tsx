@@ -724,7 +724,7 @@ const Index = () => {
                       </div>
 
                       {/* Carousel de services */}
-                      <DigitalServicesCarousel language={language === 'ar' ? 'ar' : 'fr'} handleLegalDepositClick={handleLegalDepositClick} />
+                      <DigitalServicesCarousel language={language === 'ar' ? 'ar' : 'fr'} />
                     </div>
                   </div>
                 </div>
