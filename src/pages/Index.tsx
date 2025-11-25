@@ -141,7 +141,7 @@ const Index = () => {
                       <Badge className="bg-orange-500 hover:bg-orange-600 text-white mb-3">
                         BNRM
                       </Badge>
-                      <h2 className="text-4xl md:text-5xl font-bold mb-3 text-[#1e3a8a] relative inline-block">
+                      <h2 className="text-4xl font-bold mb-3 text-[#1e3a8a] relative inline-block">
                         {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
                         <div className="absolute bottom-0 left-0 w-32 h-1 bg-orange-500"></div>
                       </h2>

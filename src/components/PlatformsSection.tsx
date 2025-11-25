@@ -57,8 +57,8 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
           <Badge className="bg-orange-500 hover:bg-orange-600 text-white mb-3">
             BNRM
           </Badge>
-          <h2 className="text-5xl font-bold text-white mb-3 relative inline-block">
-            {language === 'ar' ? 'منصاتنا الرئيسية' : 'Nos Services Principaux'}
+          <h2 className="text-4xl font-bold text-white mb-3 relative inline-block">
+            {language === 'ar' ? 'منصاتنا الرئيسية' : 'Nos Principales Plateformes'}
             <div className="absolute bottom-0 left-0 w-32 h-1 bg-orange-500"></div>
           </h2>
           <p className="text-white/80 mt-4">
