@@ -322,7 +322,7 @@ const Index = () => {
 
                       <Input
                         type="search"
-                        placeholder={language === 'ar' ? 'اكتشف كنوز المعرفة المغربية...' : 'Explorez les trésors de la connaissance marocaine...'}
+                        placeholder={language === 'ar' ? 'ابحث في الفهرس...' : 'Rechercher dans le catalogue...'}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
