@@ -112,7 +112,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
         ? 'قم بإيداع مطبوعاتك ووثائقك وفقاً للقانون. خدمة إلزامية للناشرين والمؤلفين.'
         : 'Déposez vos publications et documents selon la loi. Service obligatoire pour les éditeurs et auteurs.',
       category: language === 'ar' ? 'خدمة أساسية' : 'Service Essentiel',
-      readTime: language === 'ar' ? '5 دقائق' : '5 min read',
       onClick: () => handleLegalDepositClick("monographie")
     },
     ...services.map((service, index) => ({
@@ -120,7 +119,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       title: service.nom_service,
       description: service.description || '',
       category: service.categorie,
-      readTime: language === 'ar' ? '5 دقائق' : '5 min read',
       onClick: () => navigate('/services-bnrm')
     }))
   ];
@@ -153,13 +151,10 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
 
                 {/* Content */}
                 <div className="p-6 flex flex-col flex-1">
-                  {/* Category and Read Time */}
-                  <div className="flex items-center gap-3 mb-4">
+                  {/* Category */}
+                  <div className="mb-4">
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-500 text-white">
                       {service.category}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      {service.readTime}
                     </span>
                   </div>
 
