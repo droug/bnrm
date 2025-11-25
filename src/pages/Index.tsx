@@ -94,27 +94,6 @@ const Index = () => {
                   : 'Préservation et valorisation du patrimoine manuscrit marocain. Découvrez des milliers de manuscrits anciens numérisés avec la technologie IIIF dans un cadre architectural exceptionnel.'
                 }
               </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  size="lg"
-                  onClick={() => navigate('/digital-library')}
-                  className="bg-[#e67e22] hover:bg-[#d35400] text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
-                >
-                  <BookOpen className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
-                  {language === 'ar' ? 'استكشف المجموعات' : 'Explorer les collections'}
-                </Button>
-                
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  onClick={() => navigate('/plateforme-manuscrits')}
-                  className="bg-white/90 backdrop-blur-sm text-primary hover:bg-white border-2 border-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
-                >
-                  <Scroll className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
-                  {language === 'ar' ? 'عارض المخطوطات' : 'Visionneuse de manuscrits'}
-                </Button>
-              </div>
             </div>
           </div>
         </section>
