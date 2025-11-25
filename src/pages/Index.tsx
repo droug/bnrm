@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
+import { FloatingButtons } from "@/components/FloatingButtons";
 import WelcomePopup from "@/components/WelcomePopup";
 import { useLanguage } from "@/hooks/useLanguage";
 import SEOHead from "@/components/seo/SEOHead";
@@ -274,6 +275,7 @@ const Index = () => {
         
         <Footer />
         <GlobalAccessibilityTools />
+        <FloatingButtons />
       </div>
     </>
   );
