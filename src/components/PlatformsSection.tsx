@@ -146,7 +146,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
           </div>
 
           {/* Bookshelf - Secondary Platforms as Books */}
-          <div className="relative">
+          <div className="relative h-[600px] flex flex-col justify-end">
             {/* Bookshelf */}
             <div className="flex gap-2 items-end pb-4 relative">
               {secondaryPlatforms.map((platform, index) => {
