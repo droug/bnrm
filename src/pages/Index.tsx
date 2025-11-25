@@ -741,58 +741,7 @@ const Index = () => {
                       </h3>
                       <div className="w-32 h-2 bg-gradient-neutral mx-auto rounded-full shadow-gold"></div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <SimpleTooltip 
-                        content="Déposez vos ouvrages imprimés, romans, essais et publications en un seul volume ou en série"
-                        side="top"
-                      >
-                        <Button
-                          size="lg"
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 w-full"
-                          onClick={() => handleLegalDepositClick("monographie")}
-                        >
-                          {language === 'ar' ? 'الكتب' : 'Livres'}
-                        </Button>
-                      </SimpleTooltip>
-                      
-                      <SimpleTooltip 
-                        content="Déclarez vos revues, magazines, journaux et toute publication à parution régulière"
-                        side="top"
-                      >
-                        <Button
-                          size="lg"
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 w-full"
-                          onClick={() => handleLegalDepositClick("periodique")}
-                        >
-                          {language === 'ar' ? 'الدوريات' : 'Périodiques'}
-                        </Button>
-                      </SimpleTooltip>
-                      
-                      <SimpleTooltip 
-                        content="Déposez vos supports audio-visuels, bases de données, logiciels et documents multimédias"
-                        side="top"
-                      >
-                        <Button
-                          size="lg"
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 w-full"
-                          onClick={() => handleLegalDepositClick("bd_logiciels")}
-                        >
-                          {language === 'ar' ? 'السمعي البصري والبرمجيات' : 'Audio-visuel & Logiciels'}
-                        </Button>
-                      </SimpleTooltip>
-                      
-                      <SimpleTooltip 
-                        content="Déclarez vos affiches, cartes géographiques, atlas, cartes postales, photos et plans"
-                        side="top"
-                      >
-                        <Button
-                          size="lg"
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 w-full"
-                          onClick={() => handleLegalDepositClick("collections_specialisees")}
-                        >
-                          {language === 'ar' ? 'المجموعات المتخصصة' : 'Collections Spécialisées'}
-                        </Button>
-                      </SimpleTooltip>
+                    <div className="flex justify-center">
                       <Button
                         size="lg"
                         className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 md:col-span-2"
