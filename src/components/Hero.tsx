@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, BookOpen, Scroll, Users, Book, Star } from "lucide-react";
-import heroImage from "@/assets/hero-library.jpg";
+import heroImage from "@/assets/bnrm-hero.jpg";
 import { useLanguage } from "@/hooks/useLanguage";
 
 const Hero = () => {
