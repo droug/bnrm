@@ -591,20 +591,12 @@ const Index = () => {
                           
                           {/* Number Badge - Star Shape */}
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="relative w-12 h-12">
-                              <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
-                                {/* 8-pointed star */}
-                                <path d="M50,5 L58,42 L95,42 L66,63 L74,100 L50,79 L26,100 L34,63 L5,42 L42,42 Z" 
-                                      fill="rgb(90,140,230)" 
-                                      stroke="rgb(60,110,200)" 
-                                      strokeWidth="1"/>
-                                <path d="M50,20 L55,45 L80,45 L60,58 L65,83 L50,70 L35,83 L40,58 L20,45 L45,45 Z" 
-                                      fill="rgb(110,160,250)" 
-                                      opacity="0.5"/>
-                              </svg>
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-white text-sm font-bold">02</span>
-                              </div>
+                            <div className="relative w-10 h-10">
+                              <div className="absolute inset-0 bg-[rgb(59,130,246)] rotate-45 rounded-[6px] shadow-lg" />
+                              <div className="absolute inset-1 bg-[rgb(59,130,246)] rounded-[6px]" />
+                              <span className="relative flex h-full w-full items-center justify-center text-white text-sm font-bold tracking-wide">
+                                02
+                              </span>
                             </div>
                           </div>
 
@@ -627,20 +619,12 @@ const Index = () => {
                           />
                           
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="relative w-12 h-12">
-                              <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
-                                {/* 8-pointed star */}
-                                <path d="M50,5 L58,42 L95,42 L66,63 L74,100 L50,79 L26,100 L34,63 L5,42 L42,42 Z" 
-                                      fill="rgb(90,140,230)" 
-                                      stroke="rgb(60,110,200)" 
-                                      strokeWidth="1"/>
-                                <path d="M50,20 L55,45 L80,45 L60,58 L65,83 L50,70 L35,83 L40,58 L20,45 L45,45 Z" 
-                                      fill="rgb(110,160,250)" 
-                                      opacity="0.5"/>
-                              </svg>
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-white text-sm font-bold">03</span>
-                              </div>
+                            <div className="relative w-10 h-10">
+                              <div className="absolute inset-0 bg-[rgb(59,130,246)] rotate-45 rounded-[6px] shadow-lg" />
+                              <div className="absolute inset-1 bg-[rgb(59,130,246)] rounded-[6px]" />
+                              <span className="relative flex h-full w-full items-center justify-center text-white text-sm font-bold tracking-wide">
+                                03
+                              </span>
                             </div>
                           </div>
 
@@ -662,20 +646,12 @@ const Index = () => {
                           />
                           
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="relative w-12 h-12">
-                              <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
-                                {/* 8-pointed star */}
-                                <path d="M50,5 L58,42 L95,42 L66,63 L74,100 L50,79 L26,100 L34,63 L5,42 L42,42 Z" 
-                                      fill="rgb(90,140,230)" 
-                                      stroke="rgb(60,110,200)" 
-                                      strokeWidth="1"/>
-                                <path d="M50,20 L55,45 L80,45 L60,58 L65,83 L50,70 L35,83 L40,58 L20,45 L45,45 Z" 
-                                      fill="rgb(110,160,250)" 
-                                      opacity="0.5"/>
-                              </svg>
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-white text-sm font-bold">04</span>
-                              </div>
+                            <div className="relative w-10 h-10">
+                              <div className="absolute inset-0 bg-[rgb(59,130,246)] rotate-45 rounded-[6px] shadow-lg" />
+                              <div className="absolute inset-1 bg-[rgb(59,130,246)] rounded-[6px]" />
+                              <span className="relative flex h-full w-full items-center justify-center text-white text-sm font-bold tracking-wide">
+                                04
+                              </span>
                             </div>
                           </div>
 
@@ -697,20 +673,12 @@ const Index = () => {
                           />
 
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                            <div className="relative w-12 h-12">
-                              <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
-                                {/* 8-pointed star */}
-                                <path d="M50,5 L58,42 L95,42 L66,63 L74,100 L50,79 L26,100 L34,63 L5,42 L42,42 Z" 
-                                      fill="rgb(90,140,230)" 
-                                      stroke="rgb(60,110,200)" 
-                                      strokeWidth="1"/>
-                                <path d="M50,20 L55,45 L80,45 L60,58 L65,83 L50,70 L35,83 L40,58 L20,45 L45,45 Z" 
-                                      fill="rgb(110,160,250)" 
-                                      opacity="0.5"/>
-                              </svg>
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-white text-sm font-bold">05</span>
-                              </div>
+                            <div className="relative w-10 h-10">
+                              <div className="absolute inset-0 bg-[rgb(59,130,246)] rotate-45 rounded-[6px] shadow-lg" />
+                              <div className="absolute inset-1 bg-[rgb(59,130,246)] rounded-[6px]" />
+                              <span className="relative flex h-full w-full items-center justify-center text-white text-sm font-bold tracking-wide">
+                                05
+                              </span>
                             </div>
                           </div>
 
