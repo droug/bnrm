@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -282,6 +283,18 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>
+      </div>
+
+      {/* View All Services Button */}
+      <div className="text-center mt-8">
+        <Button
+          onClick={() => navigate('/services-bnrm')}
+          size="lg"
+          className="group"
+        >
+          {language === 'ar' ? 'عرض جميع الخدمات' : 'Voir tous nos services'}
+          <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+        </Button>
       </div>
     </div>
   );
