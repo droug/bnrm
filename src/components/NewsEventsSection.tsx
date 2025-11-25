@@ -1,5 +1,4 @@
-import { Calendar, MapPin, ArrowRight } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -12,138 +11,110 @@ interface NewsEventsSectionProps {
 export function NewsEventsSection({ language }: NewsEventsSectionProps) {
   const navigate = useNavigate();
 
-  const featuredEvent = {
-    id: 1,
-    title_fr: "Sa Majesté le Roi Mohammed VI inaugure la nouvelle aile de la BNRM",
-    title_ar: "جلالة الملك محمد السادس يدشن الجناح الجديد للمكتبة الوطنية",
-    date: "2025-01-20",
-    location_fr: "Rabat, Maroc",
-    location_ar: "الرباط، المغرب",
-    category_fr: "Événement Royal",
-    category_ar: "حدث ملكي",
-    excerpt_fr: "Sa Majesté le Roi Mohammed VI a présidé la cérémonie d'inauguration de la nouvelle aile de la Bibliothèque Nationale, marquant une étape majeure dans la préservation du patrimoine culturel marocain.",
-    excerpt_ar: "ترأس جلالة الملك محمد السادس حفل افتتاح الجناح الجديد للمكتبة الوطنية، مما يشكل خطوة رئيسية في الحفاظ على التراث الثقافي المغربي.",
-    image: "royal",
-  };
-
-  const otherEvents = [
+  const news = [
     {
-      id: 2,
-      title_fr: "La Directrice de la BNRM en visite à la Bibliothèque Nationale de Turquie",
-      title_ar: "مديرة المكتبة الوطنية في زيارة إلى مكتبة تركيا الوطنية",
-      date: "2025-01-15",
-      location_fr: "Ankara, Turquie",
-      location_ar: "أنقرة، تركيا",
-      category_fr: "Coopération Internationale",
-      category_ar: "تعاون دولي",
-      excerpt_fr: "Madame Samira El Malizi, Directrice de la Bibliothèque Nationale du Royaume du Maroc, effectue une visite officielle à la Bibliothèque Nationale de Turquie pour renforcer la coopération bilatérale.",
-      excerpt_ar: "تقوم السيدة سميرة المليزي، مديرة المكتبة الوطنية للمملكة المغربية، بزيارة رسمية إلى مكتبة تركيا الوطنية لتعزيز التعاون الثنائي.",
+      id: 1,
+      tag_fr: "Actualité Royale",
+      tag_ar: "أخبار ملكية",
+      title_fr: "Le Roi annonce la clôture définitive du dossier du Sahara",
+      title_ar: "الملك يعلن الإغلاق النهائي لملف الصحراء",
+      excerpt_fr: "Sa Majesté le Roi Mohammed VI a présidé une cérémonie historique marquant une nouvelle ère pour le Royaume.",
+      excerpt_ar: "ترأس جلالة الملك محمد السادس حفلا تاريخيا يعلن عهدا جديدا للمملكة.",
     },
     {
-      id: 3,
-      title_fr: "Exposition : Manuscrits Andalous du XIIe siècle",
-      title_ar: "معرض: المخطوطات الأندلسية من القرن الثاني عشر",
-      date: "2025-01-25",
-      location_fr: "BNRM, Rabat",
-      location_ar: "المكتبة الوطنية، الرباط",
-      category_fr: "Exposition",
-      category_ar: "معرض",
-      excerpt_fr: "Découvrez une collection exceptionnelle de manuscrits andalous datant du XIIe siècle, témoins de l'âge d'or de la civilisation arabo-musulmane.",
-      excerpt_ar: "اكتشف مجموعة استثنائية من المخطوطات الأندلسية التي يعود تاريخها إلى القرن الثاني عشر، شاهدة على العصر الذهبي للحضارة العربية الإسلامية.",
+      id: 2,
+      tag_fr: "Coopération Internationale",
+      tag_ar: "تعاون دولي",
+      title_fr: "La Directrice de la BNRM en visite à la Bibliothèque Nationale de Turquie",
+      title_ar: "مديرة المكتبة الوطنية في زيارة إلى مكتبة تركيا الوطنية",
+      excerpt_fr: "Madame Samira El Malizi renforce les liens culturels lors d'une visite officielle en Turquie.",
+      excerpt_ar: "السيدة سميرة المليزي تعزز الروابط الثقافية خلال زيارة رسمية إلى تركيا.",
     },
   ];
 
   return (
-    <section className="py-12 bg-gradient-to-b from-slate-50 to-white">
+    <section className="py-16 bg-slate-50">
       <div className="container mx-auto px-4">
-        <div className="mb-8">
-          <h2 className="text-4xl font-bold text-foreground mb-2">
-            {language === 'ar' ? 'الأخبار والفعاليات' : 'Actualités & Événements'}
-          </h2>
-          <p className="text-muted-foreground">
-            {language === 'ar'
-              ? 'آخر الأخبار والفعاليات من المكتبة الوطنية'
-              : 'Dernières actualités et événements de la Bibliothèque Nationale'
-            }
-          </p>
+        {/* Header */}
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <Badge className="bg-orange-500 hover:bg-orange-600 text-white mb-3">
+              BNRM
+            </Badge>
+            <h2 className="text-4xl font-bold text-[#1e3a8a] mb-3 relative inline-block">
+              Actualités & Événements
+              <div className="absolute bottom-0 left-0 w-32 h-1 bg-orange-500"></div>
+            </h2>
+            <p className="text-muted-foreground mt-4">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            </p>
+          </div>
+          <Button 
+            onClick={() => navigate('/news')}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            View all
+          </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Featured Event */}
-          <Card 
-            className="lg:col-span-2 group hover:shadow-xl transition-all cursor-pointer overflow-hidden"
-            onClick={() => navigate(`/news/${featuredEvent.id}`)}
-          >
-            <div className="aspect-video bg-gradient-to-br from-amber-600 via-amber-700 to-amber-900 flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
-              <div className="relative z-10 text-center p-8">
-                <div className="w-20 h-20 mx-auto mb-4 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                  <Calendar className="h-10 w-10 text-white" />
-                </div>
-                <Badge className="bg-amber-500 text-white hover:bg-amber-600 mb-2">
-                  {language === 'ar' ? featuredEvent.category_ar : featuredEvent.category_fr}
-                </Badge>
-              </div>
-            </div>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-2 mb-3 text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                <span>{new Date(featuredEvent.date).toLocaleDateString(language === 'ar' ? 'ar-MA' : 'fr-FR')}</span>
-                <span className="mx-2">•</span>
-                <MapPin className="h-4 w-4" />
-                <span>{language === 'ar' ? featuredEvent.location_ar : featuredEvent.location_fr}</span>
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                {language === 'ar' ? featuredEvent.title_ar : featuredEvent.title_fr}
-              </h3>
-              <p className="text-muted-foreground mb-4 line-clamp-3">
-                {language === 'ar' ? featuredEvent.excerpt_ar : featuredEvent.excerpt_fr}
-              </p>
-              <Button variant="ghost" className="group-hover:translate-x-2 transition-transform">
-                {language === 'ar' ? 'اقرأ المزيد' : 'Lire la suite'}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Other Events */}
+        {/* Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column - Text Articles */}
           <div className="space-y-6">
-            {otherEvents.map((event) => (
-              <Card
-                key={event.id}
-                className="group hover:shadow-lg transition-all cursor-pointer"
-                onClick={() => navigate(`/news/${event.id}`)}
+            {news.map((item) => (
+              <div 
+                key={item.id}
+                className="group cursor-pointer"
+                onClick={() => navigate(`/news/${item.id}`)}
               >
-                <CardContent className="p-5">
-                  <Badge className="mb-2 bg-primary/10 text-primary hover:bg-primary/20">
-                    {language === 'ar' ? event.category_ar : event.category_fr}
-                  </Badge>
-                  <h4 className="font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                    {language === 'ar' ? event.title_ar : event.title_fr}
-                  </h4>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                    <Calendar className="h-3 w-3" />
-                    <span>{new Date(event.date).toLocaleDateString(language === 'ar' ? 'ar-MA' : 'fr-FR')}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {language === 'ar' ? event.excerpt_ar : event.excerpt_fr}
-                  </p>
-                </CardContent>
-              </Card>
+                <Badge variant="outline" className="mb-2 text-xs">
+                  {language === 'ar' ? item.tag_ar : item.tag_fr}
+                </Badge>
+                <h3 className="text-xl font-bold text-[#1e3a8a] mb-2 group-hover:text-blue-600 transition-colors">
+                  {language === 'ar' ? item.title_ar : item.title_fr}
+                </h3>
+                <p className="text-muted-foreground text-sm mb-3">
+                  {language === 'ar' ? item.excerpt_ar : item.excerpt_fr}
+                </p>
+                <Button variant="ghost" size="sm" className="p-0 h-auto font-semibold group-hover:translate-x-1 transition-transform">
+                  Button <ArrowRight className="ml-1 h-4 w-4" />
+                </Button>
+              </div>
             ))}
           </div>
-        </div>
 
-        <div className="text-center mt-8">
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => navigate('/news')}
-            className="group"
-          >
-            {language === 'ar' ? 'عرض جميع الأخبار والفعاليات' : 'Voir toutes les actualités et événements'}
-            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </Button>
+          {/* Right Column - Images */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Image 1 - Roi Mohammed VI */}
+            <div 
+              className="aspect-[3/4] bg-gradient-to-br from-amber-600 via-yellow-600 to-orange-700 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => navigate('/news/1')}
+            >
+              <div className="w-full h-full flex items-center justify-center relative">
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
+                <div className="absolute inset-0 flex items-end p-4">
+                  <Badge className="bg-amber-500/90 backdrop-blur-sm text-white">
+                    Événement Royal
+                  </Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* Image 2 - Visite Turquie */}
+            <div 
+              className="aspect-[3/4] bg-gradient-to-br from-red-700 via-red-600 to-red-800 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => navigate('/news/2')}
+            >
+              <div className="w-full h-full flex items-center justify-center relative">
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
+                <div className="absolute inset-0 flex items-end p-4">
+                  <Badge className="bg-blue-500/90 backdrop-blur-sm text-white">
+                    Coopération
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
