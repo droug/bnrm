@@ -113,10 +113,15 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 {/* Dark overlay for text readability */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
                 
-                {/* Number Badge */}
+                {/* Number Badge - Hexagon */}
                 <div className="absolute top-8 right-8 z-10">
-                  <div className="bg-primary text-primary-foreground font-bold text-2xl w-16 h-16 rounded-full flex items-center justify-center shadow-lg">
-                    {mainPlatform.number}
+                  <div className="relative w-16 h-16">
+                    <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-lg">
+                      <polygon points="50,5 90,30 90,70 50,95 10,70 10,30" className="fill-primary" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center text-primary-foreground font-bold text-2xl">
+                      {mainPlatform.number}
+                    </div>
                   </div>
                 </div>
                 
@@ -198,10 +203,53 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       <div className="absolute top-0 left-0 w-1 h-full bg-black/20" />
                       <div className="absolute top-0 right-0 w-1 h-full bg-white/10" />
                       
-                      {/* Number badge on spine */}
+                      {/* Number badge on spine - Unique geometric shapes */}
                       <div className="absolute top-6 left-1/2 -translate-x-1/2">
-                        <div className="bg-white/90 text-gray-800 font-bold text-sm w-8 h-8 rounded-full flex items-center justify-center shadow-md">
-                          {platform.number}
+                        <div className="relative w-8 h-8">
+                          {index === 0 && (
+                            // Diamond/Losange
+                            <>
+                              <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-md">
+                                <polygon points="50,10 90,50 50,90 10,50" className="fill-white/90" />
+                              </svg>
+                              <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-xs">
+                                {platform.number}
+                              </div>
+                            </>
+                          )}
+                          {index === 1 && (
+                            // Octagon
+                            <>
+                              <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-md">
+                                <polygon points="30,10 70,10 90,30 90,70 70,90 30,90 10,70 10,30" className="fill-white/90" />
+                              </svg>
+                              <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-xs">
+                                {platform.number}
+                              </div>
+                            </>
+                          )}
+                          {index === 2 && (
+                            // Pentagon
+                            <>
+                              <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-md">
+                                <polygon points="50,5 95,40 77,90 23,90 5,40" className="fill-white/90" />
+                              </svg>
+                              <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-xs">
+                                {platform.number}
+                              </div>
+                            </>
+                          )}
+                          {index === 3 && (
+                            // Star
+                            <>
+                              <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-md">
+                                <polygon points="50,5 61,35 92,35 67,55 78,85 50,65 22,85 33,55 8,35 39,35" className="fill-white/90" />
+                              </svg>
+                              <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-xs">
+                                {platform.number}
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
                       
