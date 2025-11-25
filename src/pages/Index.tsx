@@ -213,19 +213,10 @@ const Index = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Card 
-                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100 relative overflow-hidden"
+                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100"
                     onClick={() => navigate('/signup')}
                   >
-                    {/* Moroccan geometric pattern - top right */}
-                    <div className="absolute top-0 right-0 w-24 h-24 opacity-20 pointer-events-none">
-                      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                        <path d="M50,0 L75,25 L50,50 L25,25 Z" fill="currentColor" className="text-primary" />
-                        <path d="M75,25 L100,50 L75,75 L50,50 Z" fill="currentColor" className="text-primary/60" />
-                        <circle cx="50" cy="25" r="8" fill="currentColor" className="text-primary/40" />
-                        <circle cx="75" cy="50" r="6" fill="currentColor" className="text-primary/30" />
-                      </svg>
-                    </div>
-                    <CardContent className="p-8 text-center space-y-4 relative z-10">
+                    <CardContent className="p-8 text-center space-y-4">
                       <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <UserPlus className="h-10 w-10 text-primary" />
                       </div>
@@ -241,18 +232,10 @@ const Index = () => {
                   </Card>
 
                   <Card 
-                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100 relative overflow-hidden"
+                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100"
                     onClick={() => navigate('/abonnements')}
                   >
-                    {/* Moroccan star pattern - top right */}
-                    <div className="absolute top-0 right-0 w-28 h-28 opacity-20 pointer-events-none">
-                      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                        <polygon points="50,10 60,40 90,40 67,57 75,87 50,70 25,87 33,57 10,40 40,40" fill="currentColor" className="text-primary" />
-                        <circle cx="50" cy="50" r="15" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/50" />
-                        <circle cx="50" cy="50" r="8" fill="currentColor" className="text-primary/40" />
-                      </svg>
-                    </div>
-                    <CardContent className="p-8 text-center space-y-4 relative z-10">
+                    <CardContent className="p-8 text-center space-y-4">
                       <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <CreditCard className="h-10 w-10 text-primary" />
                       </div>
@@ -268,23 +251,10 @@ const Index = () => {
                   </Card>
 
                   <Card 
-                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100 relative overflow-hidden"
+                    className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100"
                     onClick={() => navigate('/help')}
                   >
-                    {/* Moroccan zellige pattern - top right */}
-                    <div className="absolute top-0 right-0 w-24 h-24 opacity-20 pointer-events-none">
-                      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                        <rect x="0" y="0" width="50" height="50" fill="currentColor" className="text-primary" />
-                        <rect x="50" y="0" width="50" height="50" fill="currentColor" className="text-primary/70" />
-                        <rect x="0" y="50" width="50" height="50" fill="currentColor" className="text-primary/50" />
-                        <rect x="50" y="50" width="50" height="50" fill="currentColor" className="text-primary/80" />
-                        <circle cx="25" cy="25" r="10" fill="white" opacity="0.3" />
-                        <circle cx="75" cy="25" r="10" fill="white" opacity="0.2" />
-                        <circle cx="25" cy="75" r="10" fill="white" opacity="0.25" />
-                        <circle cx="75" cy="75" r="10" fill="white" opacity="0.15" />
-                      </svg>
-                    </div>
-                    <CardContent className="p-8 text-center space-y-4 relative z-10">
+                    <CardContent className="p-8 text-center space-y-4">
                       <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <MousePointer className="h-10 w-10 text-primary" />
                       </div>
