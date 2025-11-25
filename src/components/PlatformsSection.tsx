@@ -218,7 +218,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       {/* Book title - vertical */}
                       <div className="absolute top-20 bottom-6 left-1/2 -translate-x-1/2 flex items-center justify-center">
                         <div className="transform -rotate-90 origin-center whitespace-nowrap">
-                          <span className="text-white font-bold text-sm tracking-widest uppercase drop-shadow-md">
+                          <span className="text-white font-bold text-base tracking-widest uppercase drop-shadow-md">
                             {platform.title}
                           </span>
                         </div>
