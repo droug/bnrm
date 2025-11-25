@@ -112,6 +112,23 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
     );
   }
 
+  // Services spécifiques à afficher
+  const allowedServiceNames = [
+    "Abonnements à la BNRM",
+    "Réservation des espaces culturels",
+    "Pass journalier",
+    "Reproduction de documents",
+    "Demande de restauration",
+    "Réserver un document",
+    "Location à la demande",
+    "Demande de numérisation",
+    "e-Wallet BNRM"
+  ];
+
+  const filteredServices = services.filter(service => 
+    allowedServiceNames.includes(service.nom_service)
+  );
+
   const allServices = [
     {
       id: 'depot-legal',
@@ -123,7 +140,7 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       tariff: null,
       onClick: () => handleLegalDepositClick("monographie")
     },
-    ...services.map((service) => {
+    ...filteredServices.map((service) => {
       const serviceTariffs = getTariffsForService(service.id_service);
       const firstTariff = serviceTariffs[0];
       
