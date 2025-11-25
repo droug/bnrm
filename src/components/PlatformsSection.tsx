@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
 import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
 import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
@@ -53,12 +54,19 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
     <div className="relative py-20 my-12 overflow-hidden bg-[rgb(32,45,94)] rounded-lg">
       <div className="container mx-auto px-4 relative z-10">
         <div className="mb-12">
-          <span className="inline-block px-4 py-1 bg-primary text-primary-foreground text-sm font-medium rounded mb-4">
-            {language === 'ar' ? 'خدماتنا' : 'SERVICES'}
-          </span>
-          <h2 className="text-5xl font-bold text-white mb-4">
+          <Badge className="bg-orange-500 hover:bg-orange-600 text-white mb-3">
+            BNRM
+          </Badge>
+          <h2 className="text-5xl font-bold text-white mb-3 relative inline-block">
             {language === 'ar' ? 'منصاتنا الرئيسية' : 'Nos Services Principaux'}
+            <div className="absolute bottom-0 left-0 w-32 h-1 bg-orange-500"></div>
           </h2>
+          <p className="text-white/80 mt-4">
+            {language === 'ar' 
+              ? 'اكتشف خدماتنا ومنصاتنا الرقمية'
+              : 'Découvrez nos services et plateformes numériques'
+            }
+          </p>
         </div>
 
         <div className="grid lg:grid-cols-[1fr,auto] gap-8 items-start">
