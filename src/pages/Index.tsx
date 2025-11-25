@@ -11,6 +11,7 @@ import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import bnrmBuildingNight from "@/assets/bnrm-building-night.jpg";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
 import zelligePattern2 from "@/assets/zellige-pattern-2.jpg";
@@ -137,9 +138,19 @@ const Index = () => {
                 <div className="py-16 bg-gradient-to-b from-slate-50 to-white rounded-lg">
                   <div className="container mx-auto px-4">
                     <div className="mb-10">
-                      <h2 className="text-4xl md:text-5xl font-bold mb-3 text-foreground">
+                      <Badge className="bg-orange-500 hover:bg-orange-600 text-white mb-3">
+                        BNRM
+                      </Badge>
+                      <h2 className="text-4xl md:text-5xl font-bold mb-3 text-[#1e3a8a] relative inline-block">
                         {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
+                        <div className="absolute bottom-0 left-0 w-32 h-1 bg-orange-500"></div>
                       </h2>
+                      <p className="text-muted-foreground mt-4">
+                        {language === 'ar'
+                          ? 'اكتشف مجموعة واسعة من الخدمات الرقمية المتاحة'
+                          : 'Découvrez notre large gamme de services numériques disponibles'
+                        }
+                      </p>
                     </div>
 
                     <DigitalServicesCarousel language={language === 'ar' ? 'ar' : 'fr'} />
