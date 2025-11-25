@@ -252,7 +252,7 @@ const translations = {
   },
   ar: {
     // Header
-    'header.title': 'الخزانة الوطنية للمملكة المغربية',
+    'header.title': 'المكتبة الوطنية للمملكة المغربية',
     'header.home': 'الرئيسية',
     'header.catalog': 'الفهرس',
     'header.collections': 'المجموعات الرقمية',
@@ -376,8 +376,8 @@ const translations = {
     'footer.sunday': 'الأحد: مغلق',
 
     // BNRM Administration
-    'bnrm.backoffice.title': 'المكتب الخلفي للخزانة الوطنية',
-    'bnrm.backoffice.subtitle': 'الإدارة المركزية لخدمات الخزانة الوطنية',
+    'bnrm.backoffice.title': 'المكتب الخلفي للمكتبة الوطنية',
+    'bnrm.backoffice.subtitle': 'الإدارة المركزية لخدمات المكتبة الوطنية',
     'bnrm.dashboard.tab': 'لوحة التحكم',
     'bnrm.services.tab': 'الخدمات',
     'bnrm.requests.tab': 'الطلبات',
@@ -391,8 +391,8 @@ const translations = {
     'bnrm.reports.btn': 'التقارير',
 
     // BNRM Services
-    'bnrm.services.title': 'خدمات الخزانة الوطنية',
-    'bnrm.services.description': 'إدارة خدمات الخزانة الوطنية وفقاً للقانون 67-99',
+    'bnrm.services.title': 'خدمات المكتبة الوطنية',
+    'bnrm.services.description': 'إدارة خدمات المكتبة الوطنية وفقاً للقانون 67-99',
     'bnrm.services.add': 'إضافة خدمة',
     'bnrm.services.code': 'رمز الخدمة',
     'bnrm.services.name': 'اسم الخدمة',
@@ -462,10 +462,10 @@ const translations = {
     'admin.legal.deposit.description': 'إدارة الإيداع القانوني',
     'admin.subscriptions.title': 'إدارة الاشتراكات',
     'admin.subscriptions.description': 'خطط واشتراكات المستخدمين',
-    'admin.bnrm.tariffs.title': 'إدارة تعريفات الخزانة الوطنية',
-    'admin.bnrm.tariffs.description': 'إدارة تعريفات وخدمات الخزانة الوطنية',
-    'admin.bnrm.backoffice.title': 'المكتب الخلفي للخزانة الوطنية',
-    'admin.bnrm.backoffice.description': 'واجهة إدارة الخزانة الوطنية',
+    'admin.bnrm.tariffs.title': 'إدارة تعريفات المكتبة الوطنية',
+    'admin.bnrm.tariffs.description': 'إدارة تعريفات وخدمات المكتبة الوطنية',
+    'admin.bnrm.backoffice.title': 'المكتب الخلفي للمكتبة الوطنية',
+    'admin.bnrm.backoffice.description': 'واجهة إدارة المكتبة الوطنية',
     'admin.workflow.title': 'إدارة سير العمل',
     'admin.workflow.description': 'تكوين عمليات الأعمال',
 
