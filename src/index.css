@@ -32,10 +32,10 @@ Enhanced Moroccan Heritage Design System
     --blue-surface: 214 100% 97%; /* #EFF6FF */
     --blue-light: 214 95% 93%; /* #DBEAFE */
     --blue-soft: 213 94% 78%; /* #93C5FD */
-    --blue-primary: 221 91% 60%; /* #3B82F6 - Official BNRM Blue */
-    --blue-primary-dark: 221 83% 53%; /* #2563EB */
-    --blue-deep: 221 77% 48%; /* #1D4ED8 */
-    --blue-dark: 221 68% 33%; /* #1E3A8A */
+    --blue-primary: 223 71% 40%; /* #1E40AF - Official BNRM Blue */
+    --blue-primary-dark: 223 71% 35%; /* Darker variant */
+    --blue-deep: 223 71% 30%; /* Deep variant */
+    --blue-dark: 223 71% 25%; /* Dark variant */
     
     /* Amber Family - Accent colors */
     --amber-surface: 48 100% 95%; /* #FFFBE9 */
