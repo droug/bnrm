@@ -205,14 +205,14 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       
                       {/* Number badge on spine - Unique geometric shapes */}
                       <div className="absolute top-6 left-1/2 -translate-x-1/2">
-                        <div className="relative w-8 h-8">
+                        <div className="relative w-10 h-10">
                           {index === 0 && (
                             // Diamond/Losange
                             <>
                               <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-md">
                                 <polygon points="50,10 90,50 50,90 10,50" className="fill-white/90" />
                               </svg>
-                              <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-xs">
+                              <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-sm">
                                 {platform.number}
                               </div>
                             </>
@@ -223,7 +223,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                               <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-md">
                                 <polygon points="30,10 70,10 90,30 90,70 70,90 30,90 10,70 10,30" className="fill-white/90" />
                               </svg>
-                              <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-xs">
+                              <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-sm">
                                 {platform.number}
                               </div>
                             </>
@@ -234,7 +234,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                               <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-md">
                                 <polygon points="50,5 95,40 77,90 23,90 5,40" className="fill-white/90" />
                               </svg>
-                              <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-xs">
+                              <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-sm">
                                 {platform.number}
                               </div>
                             </>
@@ -245,7 +245,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                               <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-md">
                                 <polygon points="50,5 61,35 92,35 67,55 78,85 50,65 22,85 33,55 8,35 39,35" className="fill-white/90" />
                               </svg>
-                              <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-xs">
+                              <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-sm">
                                 {platform.number}
                               </div>
                             </>
