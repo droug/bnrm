@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
-import WelcomePopup from "@/components/WelcomePopup";
+// import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools"; // TEMPORAIREMENT DÉSACTIVÉ
+// import WelcomePopup from "@/components/WelcomePopup"; // TEMPORAIREMENT DÉSACTIVÉ
 import { useLanguage } from "@/hooks/useLanguage";
 import SEOHead from "@/components/seo/SEOHead";
 import SEOImage from "@/components/seo/SEOImage";
@@ -18,7 +18,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useState as useReactState } from "react";
 import { SimpleTooltip } from "@/components/ui/simple-tooltip";
 import bnrmBuildingNight from "@/assets/bnrm-building-night.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
@@ -845,8 +844,8 @@ const Index = () => {
           
           <Footer />
           
-          {/* Outils globaux (Accessibilité + Chatbot) */}
-          <GlobalAccessibilityTools />
+          {/* Outils globaux (Accessibilité + Chatbot) - TEMPORAIREMENT DÉSACTIVÉ */}
+          {/* <GlobalAccessibilityTools /> */}
         </div>
       </div>
     </>
