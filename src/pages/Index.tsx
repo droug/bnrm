@@ -24,6 +24,7 @@ import islamicPattern from "@/assets/islamic-calligraphy-pattern.jpg";
 import { DigitalServicesCarousel } from "@/components/DigitalServicesCarousel";
 import { PlatformsSection } from "@/components/PlatformsSection";
 import { NewsEventsSection } from "@/components/NewsEventsSection";
+import { DonationSection } from "@/components/DonationSection";
 
 const Index = () => {
   const { t, language } = useLanguage();
@@ -167,6 +168,9 @@ const Index = () => {
 
               {/* News and Events Section */}
               <NewsEventsSection language={language} />
+
+              {/* Donation Section */}
+              <DonationSection language={language} />
 
               {/* Platforms Section */}
               <PlatformsSection language={language} />
