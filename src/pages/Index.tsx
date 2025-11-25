@@ -660,6 +660,12 @@ const Index = () => {
                             className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
                           />
 
+                          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
+                            <div className="bg-[rgb(90,140,230)] text-white text-sm font-bold w-9 h-9 rounded-full flex items-center justify-center shadow-lg">
+                              05
+                            </div>
+                          </div>
+
                           <div className="absolute left-1/2 bottom-8 -translate-x-1/2 rotate-90 origin-center">
                             <p className="text-white font-bold text-xs tracking-[0.3em] uppercase whitespace-nowrap">
                               {language === 'ar' ? 'مخطوطات' : 'Manuscrits'}
