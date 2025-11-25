@@ -112,23 +112,7 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
     );
   }
 
-  // Services spécifiques à afficher
-  const allowedServiceNames = [
-    "Abonnements à la BNRM",
-    "Réservation des espaces culturels",
-    "Pass journalier",
-    "Reproduction de documents",
-    "Demande de restauration",
-    "Réserver un document",
-    "Location à la demande",
-    "Demande de numérisation",
-    "e-Wallet BNRM"
-  ];
-
-  const filteredServices = services.filter(service => 
-    allowedServiceNames.includes(service.nom_service)
-  );
-
+  // Créer la liste fixe des 10 services à afficher
   const allServices = [
     {
       id: 'depot-legal',
@@ -140,19 +124,101 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       tariff: null,
       onClick: () => handleLegalDepositClick("monographie")
     },
-    ...filteredServices.map((service) => {
-      const serviceTariffs = getTariffsForService(service.id_service);
-      const firstTariff = serviceTariffs[0];
-      
-      return {
-        id: service.id_service,
-        title: service.nom_service,
-        description: service.description || '',
-        category: service.categorie,
-        tariff: firstTariff ? `${firstTariff.montant} ${firstTariff.devise}` : null,
-        onClick: () => navigate('/services-bnrm')
-      };
-    })
+    {
+      id: 'abonnements',
+      title: 'Abonnements à la BNRM',
+      description: 'Inscrivez-vous pour accéder aux ressources et services de la bibliothèque.',
+      category: 'Abonnement',
+      tariff: services.find(s => s.categorie === 'Abonnement') 
+        ? `${getTariffsForService(services.find(s => s.categorie === 'Abonnement')?.id_service || '')[0]?.montant || ''} ${getTariffsForService(services.find(s => s.categorie === 'Abonnement')?.id_service || '')[0]?.devise || ''}`
+        : null,
+      onClick: () => navigate('/services-bnrm')
+    },
+    {
+      id: 'espaces-culturels',
+      title: 'Réservation des espaces culturels',
+      description: 'Réservez nos espaces pour vos événements culturels et académiques.',
+      category: 'Réservation',
+      tariff: null,
+      onClick: () => navigate('/services-bnrm')
+    },
+    {
+      id: 'pass-journalier',
+      title: 'Pass journalier',
+      description: services.find(s => s.nom_service === 'Pass journalier')?.description || 'Accès gratuit à la bibliothèque pour une journée.',
+      category: 'Accès',
+      tariff: (() => {
+        const passService = services.find(s => s.nom_service === 'Pass journalier');
+        if (passService) {
+          const tariff = getTariffsForService(passService.id_service)[0];
+          return tariff ? `${tariff.montant} ${tariff.devise}` : null;
+        }
+        return null;
+      })(),
+      onClick: () => navigate('/services-bnrm')
+    },
+    {
+      id: 'reproduction',
+      title: 'Reproduction de documents',
+      description: 'Service de reproduction et numérisation de documents de la collection.',
+      category: 'Service à la demande',
+      tariff: null,
+      onClick: () => navigate('/services-bnrm')
+    },
+    {
+      id: 'restauration',
+      title: 'Demande de restauration',
+      description: services.find(s => s.nom_service === 'Restauration')?.description || 'Service de restauration et conservation de documents anciens.',
+      category: 'Restauration',
+      tariff: (() => {
+        const restService = services.find(s => s.nom_service === 'Restauration');
+        if (restService) {
+          const tariff = getTariffsForService(restService.id_service)[0];
+          return tariff ? `${tariff.montant} ${tariff.devise}` : null;
+        }
+        return null;
+      })(),
+      onClick: () => navigate('/services-bnrm')
+    },
+    {
+      id: 'reservation-document',
+      title: 'Réserver un document',
+      description: 'Réservez des documents pour consultation sur place.',
+      category: 'Service à la demande',
+      tariff: null,
+      onClick: () => navigate('/services-bnrm')
+    },
+    {
+      id: 'location',
+      title: 'Location à la demande',
+      description: 'Service de location de documents et ressources.',
+      category: 'Service à la demande',
+      tariff: null,
+      onClick: () => navigate('/services-bnrm')
+    },
+    {
+      id: 'numerisation',
+      title: 'Demande de numérisation',
+      description: services.find(s => s.nom_service === 'Numérisation documents rares')?.description || 'Service professionnel de numérisation de documents.',
+      category: 'Service à la demande',
+      tariff: (() => {
+        const numService = services.find(s => s.nom_service === 'Numérisation documents rares');
+        if (numService) {
+          const tariff = getTariffsForService(numService.id_service)[0];
+          return tariff ? `${tariff.montant} ${tariff.devise}` : null;
+        }
+        return null;
+      })(),
+      onClick: () => navigate('/services-bnrm')
+    },
+    {
+      id: 'ewallet',
+      title: 'e-Wallet BNRM',
+      description: 'Portefeuille électronique pour gérer vos paiements et transactions.',
+      category: 'Service numérique',
+      tariff: null,
+      onClick: () => navigate('/services-bnrm')
+    }
   ];
 
   return (
