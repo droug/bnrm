@@ -593,10 +593,14 @@ const Index = () => {
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
                             <div className="relative w-12 h-12">
                               <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
-                                <path d="M50,10 L60,40 L90,40 L65,60 L75,90 L50,70 L25,90 L35,60 L10,40 L40,40 Z" 
+                                {/* 8-pointed star */}
+                                <path d="M50,5 L58,42 L95,42 L66,63 L74,100 L50,79 L26,100 L34,63 L5,42 L42,42 Z" 
                                       fill="rgb(90,140,230)" 
-                                      stroke="rgb(70,120,210)" 
-                                      strokeWidth="2"/>
+                                      stroke="rgb(60,110,200)" 
+                                      strokeWidth="1"/>
+                                <path d="M50,20 L55,45 L80,45 L60,58 L65,83 L50,70 L35,83 L40,58 L20,45 L45,45 Z" 
+                                      fill="rgb(110,160,250)" 
+                                      opacity="0.5"/>
                               </svg>
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <span className="text-white text-sm font-bold">02</span>
@@ -625,10 +629,14 @@ const Index = () => {
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
                             <div className="relative w-12 h-12">
                               <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
-                                <path d="M50,10 L60,40 L90,40 L65,60 L75,90 L50,70 L25,90 L35,60 L10,40 L40,40 Z" 
+                                {/* 8-pointed star */}
+                                <path d="M50,5 L58,42 L95,42 L66,63 L74,100 L50,79 L26,100 L34,63 L5,42 L42,42 Z" 
                                       fill="rgb(90,140,230)" 
-                                      stroke="rgb(70,120,210)" 
-                                      strokeWidth="2"/>
+                                      stroke="rgb(60,110,200)" 
+                                      strokeWidth="1"/>
+                                <path d="M50,20 L55,45 L80,45 L60,58 L65,83 L50,70 L35,83 L40,58 L20,45 L45,45 Z" 
+                                      fill="rgb(110,160,250)" 
+                                      opacity="0.5"/>
                               </svg>
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <span className="text-white text-sm font-bold">03</span>
@@ -656,10 +664,14 @@ const Index = () => {
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
                             <div className="relative w-12 h-12">
                               <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
-                                <path d="M50,10 L60,40 L90,40 L65,60 L75,90 L50,70 L25,90 L35,60 L10,40 L40,40 Z" 
+                                {/* 8-pointed star */}
+                                <path d="M50,5 L58,42 L95,42 L66,63 L74,100 L50,79 L26,100 L34,63 L5,42 L42,42 Z" 
                                       fill="rgb(90,140,230)" 
-                                      stroke="rgb(70,120,210)" 
-                                      strokeWidth="2"/>
+                                      stroke="rgb(60,110,200)" 
+                                      strokeWidth="1"/>
+                                <path d="M50,20 L55,45 L80,45 L60,58 L65,83 L50,70 L35,83 L40,58 L20,45 L45,45 Z" 
+                                      fill="rgb(110,160,250)" 
+                                      opacity="0.5"/>
                               </svg>
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <span className="text-white text-sm font-bold">04</span>
@@ -687,10 +699,14 @@ const Index = () => {
                           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
                             <div className="relative w-12 h-12">
                               <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
-                                <path d="M50,10 L60,40 L90,40 L65,60 L75,90 L50,70 L25,90 L35,60 L10,40 L40,40 Z" 
+                                {/* 8-pointed star */}
+                                <path d="M50,5 L58,42 L95,42 L66,63 L74,100 L50,79 L26,100 L34,63 L5,42 L42,42 Z" 
                                       fill="rgb(90,140,230)" 
-                                      stroke="rgb(70,120,210)" 
-                                      strokeWidth="2"/>
+                                      stroke="rgb(60,110,200)" 
+                                      strokeWidth="1"/>
+                                <path d="M50,20 L55,45 L80,45 L60,58 L65,83 L50,70 L35,83 L40,58 L20,45 L45,45 Z" 
+                                      fill="rgb(110,160,250)" 
+                                      opacity="0.5"/>
                               </svg>
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <span className="text-white text-sm font-bold">05</span>
