@@ -121,7 +121,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
         ? 'قم بإيداع مطبوعاتك ووثائقك وفقاً للقانون. خدمة إلزامية للناشرين والمؤلفين.'
         : 'Déposez vos publications et documents selon la loi. Service obligatoire pour les éditeurs et auteurs.',
       category: language === 'ar' ? 'خدمة أساسية' : 'Service Essentiel',
-      tariff: null,
       onClick: () => handleLegalDepositClick("monographie")
     },
     {
@@ -129,9 +128,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       title: 'Abonnements à la BNRM',
       description: 'Inscrivez-vous pour accéder aux ressources et services de la bibliothèque.',
       category: 'Abonnement',
-      tariff: services.find(s => s.categorie === 'Abonnement') 
-        ? `${getTariffsForService(services.find(s => s.categorie === 'Abonnement')?.id_service || '')[0]?.montant || ''} ${getTariffsForService(services.find(s => s.categorie === 'Abonnement')?.id_service || '')[0]?.devise || ''}`
-        : null,
       onClick: () => navigate('/services-bnrm')
     },
     {
@@ -139,7 +135,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       title: 'Réservation des espaces culturels',
       description: 'Réservez nos espaces pour vos événements culturels et académiques.',
       category: 'Réservation',
-      tariff: null,
       onClick: () => navigate('/services-bnrm')
     },
     {
@@ -147,14 +142,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       title: 'Pass journalier',
       description: services.find(s => s.nom_service === 'Pass journalier')?.description || 'Accès gratuit à la bibliothèque pour une journée.',
       category: 'Accès',
-      tariff: (() => {
-        const passService = services.find(s => s.nom_service === 'Pass journalier');
-        if (passService) {
-          const tariff = getTariffsForService(passService.id_service)[0];
-          return tariff ? `${tariff.montant} ${tariff.devise}` : null;
-        }
-        return null;
-      })(),
       onClick: () => navigate('/services-bnrm')
     },
     {
@@ -162,7 +149,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       title: 'Reproduction de documents',
       description: 'Service de reproduction et numérisation de documents de la collection.',
       category: 'Service à la demande',
-      tariff: null,
       onClick: () => navigate('/services-bnrm')
     },
     {
@@ -170,14 +156,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       title: 'Demande de restauration',
       description: services.find(s => s.nom_service === 'Restauration')?.description || 'Service de restauration et conservation de documents anciens.',
       category: 'Restauration',
-      tariff: (() => {
-        const restService = services.find(s => s.nom_service === 'Restauration');
-        if (restService) {
-          const tariff = getTariffsForService(restService.id_service)[0];
-          return tariff ? `${tariff.montant} ${tariff.devise}` : null;
-        }
-        return null;
-      })(),
       onClick: () => navigate('/services-bnrm')
     },
     {
@@ -185,7 +163,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       title: 'Réserver un document',
       description: 'Réservez des documents pour consultation sur place.',
       category: 'Service à la demande',
-      tariff: null,
       onClick: () => navigate('/services-bnrm')
     },
     {
@@ -193,7 +170,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       title: 'Location à la demande',
       description: 'Service de location de documents et ressources.',
       category: 'Service à la demande',
-      tariff: null,
       onClick: () => navigate('/services-bnrm')
     },
     {
@@ -201,14 +177,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       title: 'Demande de numérisation',
       description: services.find(s => s.nom_service === 'Numérisation documents rares')?.description || 'Service professionnel de numérisation de documents.',
       category: 'Service à la demande',
-      tariff: (() => {
-        const numService = services.find(s => s.nom_service === 'Numérisation documents rares');
-        if (numService) {
-          const tariff = getTariffsForService(numService.id_service)[0];
-          return tariff ? `${tariff.montant} ${tariff.devise}` : null;
-        }
-        return null;
-      })(),
       onClick: () => navigate('/services-bnrm')
     },
     {
@@ -216,7 +184,6 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
       title: 'e-Wallet BNRM',
       description: 'Portefeuille électronique pour gérer vos paiements et transactions.',
       category: 'Service numérique',
-      tariff: null,
       onClick: () => navigate('/services-bnrm')
     }
   ];
@@ -262,18 +229,9 @@ export function DigitalServicesCarousel({ language, handleLegalDepositClick }: D
                   </h3>
 
                   {/* Description */}
-                  <p className="text-sm text-muted-foreground line-clamp-3 flex-1 mb-3">
+                  <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
                     {service.description}
                   </p>
-
-                  {/* Tariff */}
-                  {service.tariff && (
-                    <div className="pt-3 border-t border-border/30">
-                      <span className="text-lg font-bold text-primary">
-                        {service.tariff}
-                      </span>
-                    </div>
-                  )}
                 </div>
               </div>
             </CarouselItem>
