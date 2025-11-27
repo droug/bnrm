@@ -206,7 +206,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
   ];
 
   return (
-    <div className="relative">
+    <div className="relative" dir="ltr">
       <Carousel
         setApi={setApi}
         opts={{
