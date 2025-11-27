@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselApi,
+} from "@/components/ui/carousel";
 
 interface BNRMService {
   id_service: string;
@@ -32,10 +38,24 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
   const [services, setServices] = useState<BNRMService[]>([]);
   const [tariffs, setTariffs] = useState<BNRMTariff[]>([]);
   const [loading, setLoading] = useState(true);
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     fetchServices();
   }, []);
+
+  useEffect(() => {
+    if (!api) return;
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap());
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
 
   const fetchServices = async () => {
     try {
@@ -186,47 +206,96 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
   ];
 
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {allServices.map((service, index) => (
-          <div
-            key={service.id}
-            className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group h-full flex flex-col"
-            onClick={service.onClick}
-          >
-            {/* Image */}
-            <div className="relative h-56 overflow-hidden">
-              <img
-                src={getServiceImage(index)}
-                alt={service.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            </div>
+    <div className="relative">
+      <Carousel
+        setApi={setApi}
+        opts={{
+          align: "start",
+          loop: true,
+          slidesToScroll: 1,
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="-ml-4">
+          {allServices.map((service, index) => (
+            <CarouselItem key={service.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+              <div
+                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group h-full flex flex-col"
+                onClick={service.onClick}
+              >
+                {/* Image */}
+                <div className="relative h-56 overflow-hidden">
+                  <img
+                    src={getServiceImage(index)}
+                    alt={service.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
 
-            {/* Content */}
-            <div className="p-6 flex flex-col flex-1">
-              {/* Category */}
-              <div className="mb-4">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-500 text-white">
-                  {service.category}
-                </span>
+                {/* Content */}
+                <div className="p-6 flex flex-col flex-1">
+                  {/* Category */}
+                  <div className="mb-4">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-500 text-white">
+                      {service.category}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-foreground mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                    {service.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
+                    {service.description}
+                  </p>
+                </div>
               </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
 
-              {/* Title */}
-              <h3 className="text-xl font-bold text-foreground mb-3 line-clamp-2 group-hover:text-primary transition-colors">
-                {service.title}
-              </h3>
+      {/* Navigation Controls */}
+      <div className="flex items-center justify-between mt-8">
+        {/* Pagination Dots */}
+        <div className="flex gap-2">
+          {Array.from({ length: Math.min(count, 10) }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => api?.scrollTo(index)}
+              className={`h-2 rounded-full transition-all ${
+                index === current
+                  ? 'w-8 bg-orange-500'
+                  : 'w-2 bg-slate-300 hover:bg-slate-400'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
 
-              {/* Description */}
-              <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
-                {service.description}
-              </p>
-            </div>
-          </div>
-        ))}
+        {/* Arrow Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => api?.scrollPrev()}
+            className="p-3 rounded-lg transition-colors bg-blue-600 text-white hover:bg-blue-700"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => api?.scrollNext()}
+            className="p-3 rounded-lg transition-colors bg-blue-600 text-white hover:bg-blue-700"
+            aria-label="Next slide"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
-      <div className="text-center mt-4">
+      {/* View All Services Button */}
+      <div className="text-center mt-8">
         <Button
           onClick={() => navigate('/services-bnrm')}
           size="lg"
