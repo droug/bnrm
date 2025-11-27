@@ -72,13 +72,13 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
         <Html
           position={[0, 0, 0.1]}
           center
-          distanceFactor={0.2}
+          distanceFactor={0.12}
           style={{
             pointerEvents: 'none',
             userSelect: 'none',
           }}
         >
-          <div className="text-white font-extrabold text-8xl" style={{ textShadow: '0 6px 12px rgba(0,0,0,1)' }}>
+          <div className="text-white font-extrabold" style={{ fontSize: '240px', textShadow: '0 8px 16px rgba(0,0,0,1)' }}>
             {number}
           </div>
         </Html>
@@ -88,14 +88,14 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       <Html
         position={[0, 0.8, 0.35]}
         center
-        distanceFactor={0.3}
+        distanceFactor={0.18}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div style={{ width: '560px' }}>
-          <h3 className="text-white font-extrabold text-9xl text-center drop-shadow-2xl leading-tight">
+        <div style={{ width: '700px' }}>
+          <h3 className="text-white font-extrabold text-center drop-shadow-2xl leading-tight" style={{ fontSize: '280px' }}>
             {title}
           </h3>
         </div>
