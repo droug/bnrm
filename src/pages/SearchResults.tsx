@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/comp
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Search, Filter, SortAsc, SortDesc, Loader2, ChevronLeft, ChevronRight, X, Eye, Calendar } from "lucide-react";
+import { Search, Filter, SortAsc, SortDesc, Loader2, ChevronLeft, ChevronRight, X, Eye, Calendar, ArrowLeft } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
@@ -256,6 +256,19 @@ export default function SearchResults() {
 
   return (
     <div className="container mx-auto px-4 py-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+      {/* Back Button */}
+      <div className="mb-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {language === 'ar' ? 'رجوع' : 'Retour'}
+        </Button>
+      </div>
+
       {/* Search Header */}
       <div className="mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
