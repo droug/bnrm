@@ -283,7 +283,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
             className={`p-3 rounded-lg transition-colors ${
               current === 0
                 ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
             aria-label="Previous slide"
           >
