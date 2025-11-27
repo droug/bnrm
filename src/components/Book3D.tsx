@@ -103,13 +103,11 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
         }}
       >
         <div style={{ 
-          width: '150px', 
-          display: 'flex', 
-          justifyContent: 'center',
-          alignItems: 'center'
+          width: '120px', 
+          textAlign: 'center'
         }}>
           <h3
-            className="text-white font-extrabold text-center drop-shadow-2xl leading-tight"
+            className="text-white font-extrabold drop-shadow-2xl leading-tight"
             style={{
               fontSize: '90px',
               transform: 'scale(2)',
