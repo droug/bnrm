@@ -107,6 +107,9 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 
                 const heights = ['h-[550px]', 'h-[550px]', 'h-[550px]', 'h-[550px]'];
                 
+                // Different tilt angles for each book
+                const tiltAngles = ['-4deg', '3deg', '-5deg', '4deg'];
+                
                 return (
                   <div
                     key={platform.number}
@@ -114,7 +117,9 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                     onClick={() => navigate(platform.path)}
                     style={{ 
                       transformStyle: 'preserve-3d',
-                      perspective: '1000px'
+                      perspective: '1000px',
+                      transform: `rotate(${tiltAngles[index]})`,
+                      transformOrigin: 'bottom center'
                     }}
                   >
                     {/* Book spine */}
