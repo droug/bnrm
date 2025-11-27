@@ -93,6 +93,7 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       {/* Title text directly on book cover */}
       <Html
         position={[0, 0.5, 0.25]}
+        center
         distanceFactor={0.6}
         transform
         occlude
@@ -101,12 +102,13 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
           userSelect: 'none',
         }}
       >
-        <div style={{ width: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <h3
             className="text-white font-extrabold text-center drop-shadow-2xl leading-tight"
             style={{
               fontSize: '90px',
               transform: 'scale(2)',
+              whiteSpace: 'nowrap',
             }}
           >
             {title}
