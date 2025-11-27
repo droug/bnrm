@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +17,7 @@ import { SearchPagination } from "@/components/ui/search-pagination";
 
 export default function CBMRecherche() {
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchField, setSearchField] = useState("all");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -35,6 +37,28 @@ export default function CBMRecherche() {
   const [library, setLibrary] = useState("all");
   const [filterCM, setFilterCM] = useState(false);
   const [filterCBM, setFilterCBM] = useState(false);
+
+  // Automatically search if there's a query parameter in the URL
+  useEffect(() => {
+    const queryParam = searchParams.get('q');
+    const filterParam = searchParams.get('filter');
+    
+    if (queryParam) {
+      setSearchQuery(queryParam);
+      
+      // Set filter if provided
+      if (filterParam === 'cm') {
+        setFilterCM(true);
+      } else if (filterParam === 'cbm') {
+        setFilterCBM(true);
+      }
+      
+      // Trigger search after a short delay to ensure state is set
+      setTimeout(() => {
+        handleSimpleSearch();
+      }, 100);
+    }
+  }, []); // Run only once on mount
 
   const handleSimpleSearch = async () => {
     setIsSearching(true);
