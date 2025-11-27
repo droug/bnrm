@@ -48,6 +48,29 @@ Le Souverain a également appelé « sincèrement nos frères dans les camps de 
 
 Le Roi Mohammed VI a conclu en saluant les sacrifices consentis par les Forces Armées Royales et les Forces de sécurité, et en rendant hommage à la mémoire de Sa Majesté le Roi Hassan II, « Artisan de la Marche Verte ».`,
     },
+    2: {
+      id: 2,
+      title: "La Directrice de la BNRM en visite à la Bibliothèque Nationale de Turquie",
+      date: "2025-11-03",
+      category: "Coopération Internationale",
+      author: "Direction de la BNRM",
+      content: `Madame Samira El Malizi la Directrice de la Bibliothèque Nationale du Royaume du Maroc a effectué, ce 3 novembre 2025, une visite officielle à la Bibliothèque Nationale de Turquie, où elle a été accueillie par Monsieur Taner BEYOĞLU, Directeur Général.
+
+L'entretien a permis d'esquisser les fondations d'une coopération ambitieuse autour de la valorisation documentaire, de la digitalisation des fonds et du partage d'expertise.
+
+Cette rencontre ouvre une trajectoire de collaboration durable, porteuse d'initiatives concrètes et mutuellement avantageuses entre les deux institutions nationales.
+
+## Axes de coopération
+
+Les discussions ont porté sur plusieurs axes stratégiques majeurs :
+
+- La valorisation et la préservation du patrimoine documentaire
+- La digitalisation des fonds historiques et manuscrits
+- Le partage d'expertise technique et professionnelle
+- Le développement de programmes d'échange entre les deux institutions
+
+Cette visite s'inscrit dans la volonté de la BNRM de renforcer ses partenariats internationaux et de développer des collaborations stratégiques avec les grandes bibliothèques nationales à travers le monde.`,
+    },
   };
 
   const newsItem = newsItems[parseInt(newsId || "1")] || {
