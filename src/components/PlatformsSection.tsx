@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { Book3D } from "@/components/Book3D";
 import bibliothequeNumerique from "@/assets/bibliotheque-numerique.jpg";
 import kitabBackground from "@/assets/kitab-book.jpg";
 import manuscritsBackground from "@/assets/manuscrits-background.jpg";
@@ -81,84 +82,15 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
         </div>
 
         <div className="grid lg:grid-cols-[1fr,auto] gap-8 items-start">
-          {/* Main Platform - Book Cover */}
-          <div 
-            className="relative cursor-pointer group"
-            onClick={() => navigate(mainPlatform.path)}
-            style={{ 
-              perspective: '2000px',
-              transformStyle: 'preserve-3d'
-            }}
-          >
-            <div 
-              className="relative w-full h-[600px] transition-all duration-500 ease-out"
-              style={{
-                transform: 'rotateY(-5deg)',
-                transformStyle: 'preserve-3d',
-              }}
-            >
-              {/* Book Cover Front */}
-              <div className="absolute inset-0 rounded-r-lg overflow-hidden shadow-2xl group-hover:shadow-3xl transition-all duration-500"
-                   style={{
-                     background: 'linear-gradient(to right, rgba(0,0,0,0.1) 0%, transparent 5%)',
-                   }}>
-                
-                {/* Cover Image */}
-                <img 
-                  src={mainPlatform.image}
-                  alt={mainPlatform.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                
-                {/* Dark overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
-                
-                {/* Number Badge - Octagon */}
-                <div className="absolute top-8 right-8 z-10">
-                  <div className="relative w-16 h-16">
-                    <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-lg">
-                      <polygon points="50,5 82,18 95,50 82,82 50,95 18,82 5,50 18,18" className="fill-primary" />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center text-primary-foreground font-bold text-2xl">
-                      {mainPlatform.number}
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Book Title and Description */}
-                <div className="absolute inset-0 p-12 flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-5xl font-bold text-white mb-6 drop-shadow-2xl leading-tight">
-                      {mainPlatform.title}
-                    </h3>
-                  </div>
-                  
-                  <div>
-                    <p className="text-white/95 text-lg leading-relaxed drop-shadow-lg mb-8">
-                      {mainPlatform.description}
-                    </p>
-                    
-                    {/* Decorative line */}
-                    <div className="w-32 h-1 bg-primary/80 rounded-full" />
-                  </div>
-                </div>
-                
-                {/* Book spine shadow effect */}
-                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black/30 to-transparent" />
-                
-                {/* Book edge highlight */}
-                <div className="absolute right-0 top-0 bottom-0 w-2 bg-gradient-to-l from-white/20 to-transparent" />
-              </div>
-              
-              {/* Book thickness/spine */}
-              <div 
-                className="absolute -left-4 top-0 bottom-0 w-4 bg-gradient-to-r from-[#5a3921] to-[#8B6F47] rounded-l-sm"
-                style={{
-                  transform: 'rotateY(-90deg)',
-                  transformOrigin: 'right',
-                }}
-              />
-            </div>
+          {/* Main Platform - 3D Book */}
+          <div className="relative">
+            <Book3D
+              coverImage={mainPlatform.image}
+              title={mainPlatform.title}
+              description={mainPlatform.description}
+              number={mainPlatform.number}
+              onClick={() => navigate(mainPlatform.path)}
+            />
           </div>
 
           {/* Bookshelf - Secondary Platforms as Books */}
