@@ -105,10 +105,10 @@ const Index = () => {
         
         {/* Main Content */}
         <main className="container mx-auto px-4 py-8">
-          <div className="max-w-6xl mx-auto space-y-8">
+          <div className="max-w-6xl mx-auto space-y-4">
               
               {/* Search Section */}
-              <Card className="shadow-2xl border-2 border-primary/10 mb-12">
+              <Card className="shadow-2xl border-2 border-primary/10 mb-6">
                 <CardContent className="p-8">
                   <div className="text-center mb-6">
                     <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center">
@@ -170,7 +170,7 @@ const Index = () => {
               <NewsEventsSection language={language} />
 
               {/* Digital Services Section */}
-              <div className="mb-12">
+              <div className="mb-6">
                 <div className="py-16 bg-gradient-to-b from-slate-50 to-white rounded-lg">
                   <div className="container mx-auto px-4">
                     <div className="mb-10">
