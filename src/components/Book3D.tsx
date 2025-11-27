@@ -81,7 +81,7 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
           <div
             className="text-white font-extrabold"
             style={{
-              fontSize: '96px',
+              fontSize: '110px',
               textShadow: '0 2px 4px rgba(0,0,0,0.95)',
             }}
           >
