@@ -40,6 +40,10 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
+    // Extraire la première adresse IP du header x-forwarded-for
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : req.headers.get('x-real-ip');
+
     // Créer la transaction dans la base
     const { data: transaction, error: transactionError } = await supabaseClient
       .from('payment_transactions')
@@ -53,7 +57,7 @@ serve(async (req) => {
         reproduction_request_id: transactionType === 'reproduction' ? resourceId : null,
         legal_deposit_id: transactionType === 'legal_deposit' ? resourceId : null,
         metadata: metadata || {},
-        ip_address: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip'),
+        ip_address: clientIp,
         user_agent: req.headers.get('user-agent'),
       })
       .select()
