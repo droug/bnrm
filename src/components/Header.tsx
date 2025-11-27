@@ -215,7 +215,7 @@ const Header = () => {
           <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <img src={logoImage} alt="Logo BNRM" className="h-10 w-auto" />
             <span className="font-bold text-sm hidden lg:inline">
-              {t('header.title')}
+              {t('header.title')} (BNRM)
             </span>
           </Link>
           
