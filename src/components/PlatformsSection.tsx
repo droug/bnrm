@@ -113,11 +113,11 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 {/* Dark overlay for text readability */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
                 
-                {/* Number Badge - Hexagon */}
+                {/* Number Badge - Octagon */}
                 <div className="absolute top-8 right-8 z-10">
                   <div className="relative w-16 h-16">
                     <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-lg">
-                      <polygon points="50,5 90,30 90,70 50,95 10,70 10,30" className="fill-primary" />
+                      <polygon points="50,5 82,18 95,50 82,82 50,95 18,82 5,50 18,18" className="fill-primary" />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center text-primary-foreground font-bold text-2xl">
                       {mainPlatform.number}
@@ -203,11 +203,11 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       <div className="absolute top-0 left-0 w-1 h-full bg-black/20" />
                       <div className="absolute top-0 right-0 w-1 h-full bg-white/10" />
                       
-                      {/* Number badge on spine - Hexagon shape */}
+                      {/* Number badge on spine - Octagon shape */}
                       <div className="absolute top-6 left-1/2 -translate-x-1/2">
                         <div className="relative w-10 h-10">
                           <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-md">
-                            <polygon points="50,5 90,30 90,70 50,95 10,70 10,30" className="fill-white/90" />
+                            <polygon points="50,5 82,18 95,50 82,82 50,95 18,82 5,50 18,18" className="fill-white/90" />
                           </svg>
                           <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-sm">
                             {platform.number}
