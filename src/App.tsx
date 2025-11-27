@@ -265,6 +265,7 @@ const App = () => {
             <Route path="/admin/cms" element={<CmsBackoffice />} />
             <Route path="/page/:slug" element={<CmsDynamicPage />} />
           <Route path="/news" element={<News />} />
+          <Route path="/news/:newsId" element={<NewsDetails />} />
           <Route path="/practical-info" element={<PracticalInfo />} />
           <Route path="/donation" element={<Donation />} />
         <Route path="/settings" element={<Navigate to="/admin/roles" replace />} />
