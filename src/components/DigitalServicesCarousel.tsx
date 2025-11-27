@@ -144,7 +144,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
       id: 'pass-journalier',
       title: language === 'ar' ? 'بطاقة يومية' : 'Pass journalier',
       description: language === 'ar'
-        ? services.find(s => s.nom_service === 'Pass journalier')?.description || 'دخول مجاني إلى المكتبة ليوم واحد.'
+        ? 'دخول مجاني إلى المكتبة ليوم واحد.'
         : services.find(s => s.nom_service === 'Pass journalier')?.description || 'Accès gratuit à la bibliothèque pour une journée.',
       category: language === 'ar' ? 'وصول' : 'Accès',
       onClick: () => navigate('/pass-journalier')
@@ -162,7 +162,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
       id: 'restauration',
       title: language === 'ar' ? 'طلب الترميم' : 'Demande de restauration',
       description: language === 'ar'
-        ? services.find(s => s.nom_service === 'Restauration')?.description || 'خدمة ترميم وحفظ الوثائق القديمة.'
+        ? 'خدمة ترميم وحفظ الوثائق القديمة.'
         : services.find(s => s.nom_service === 'Restauration')?.description || 'Service de restauration et conservation de documents anciens.',
       category: language === 'ar' ? 'ترميم' : 'Restauration',
       onClick: () => navigate('/demande-restauration')
@@ -189,7 +189,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
       id: 'numerisation',
       title: language === 'ar' ? 'طلب الرقمنة' : 'Demande de numérisation',
       description: language === 'ar'
-        ? services.find(s => s.nom_service === 'Numérisation documents rares')?.description || 'خدمة احترافية لرقمنة الوثائق.'
+        ? 'خدمة احترافية لرقمنة الوثائق.'
         : services.find(s => s.nom_service === 'Numérisation documents rares')?.description || 'Service professionnel de numérisation de documents.',
       category: language === 'ar' ? 'خدمة حسب الطلب' : 'Service à la demande',
       onClick: () => navigate('/demande-numerisation')
