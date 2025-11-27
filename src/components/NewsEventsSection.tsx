@@ -46,7 +46,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
               BNRM
             </p>
             <h2 className="text-4xl font-bold text-[#1e3a8a] mb-4">
-              {language === 'ar' ? 'الأخبار والفعاليات' : 'Actualités & Événements'}
+              {language === 'ar' ? 'الأخبار و الأحداث' : 'Actualités & Événements'}
             </h2>
             <div className="w-24 h-1 bg-orange-500 mb-4"></div>
           </div>
