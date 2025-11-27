@@ -137,11 +137,11 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       
                       {/* Number badge on spine - Octagon shape */}
                       <div className="absolute top-6 left-1/2 -translate-x-1/2">
-                        <div className="relative w-10 h-10">
+                        <div className="relative w-14 h-14">
                           <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-md">
-                            <polygon points="50,5 82,18 95,50 82,82 50,95 18,82 5,50 18,18" className="fill-white/90" />
+                            <polygon points="50,5 82,18 95,50 82,82 50,95 18,82 5,50 18,18" className="fill-white/95" />
                           </svg>
-                          <div className="absolute inset-0 flex items-center justify-center text-gray-800 font-bold text-sm">
+                          <div className="absolute inset-0 flex items-center justify-center text-gray-900 font-bold text-xl">
                             {platform.number}
                           </div>
                         </div>
@@ -150,7 +150,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       {/* Book title - vertical at bottom */}
                       <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex items-center justify-center w-full px-2">
                         <div className="transform -rotate-90 origin-center whitespace-nowrap">
-                          <span className="text-white font-bold text-sm tracking-widest uppercase drop-shadow-md">
+                          <span className="text-white font-bold text-base tracking-[0.25em] uppercase drop-shadow-md">
                             {platform.title}
                           </span>
                         </div>
