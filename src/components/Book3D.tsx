@@ -58,7 +58,7 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       </mesh>
 
       {/* Number Badge - Octagon */}
-      <group position={[0.9, 1.4, 0.35]}>
+      <group position={[0.9, 1.4, 0.25]}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.2, 0.2, 0.05, 8]} />
           <meshStandardMaterial 
@@ -70,15 +70,22 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
           />
         </mesh>
         <Html
-          position={[0, 0, 0.1]}
+          position={[0, 0, 0.06]}
           center
-          distanceFactor={0.04}
+          distanceFactor={0.7}
           style={{
             pointerEvents: 'none',
             userSelect: 'none',
           }}
         >
-          <div className="text-white font-extrabold" style={{ fontSize: '720px', textShadow: '0 10px 20px rgba(0,0,0,1)' }}>
+          <div
+            className="text-white font-extrabold"
+            style={{
+              fontSize: '96px',
+              transform: 'scale(2.5)',
+              textShadow: '0 6px 12px rgba(0,0,0,0.95)',
+            }}
+          >
             {number}
           </div>
         </Html>
@@ -86,16 +93,22 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       
       {/* Title text directly on book cover */}
       <Html
-        position={[0, 0.8, 0.35]}
+        position={[0, 0.8, 0.25]}
         center
-        distanceFactor={0.06}
+        distanceFactor={0.6}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div style={{ width: '1200px' }}>
-          <h3 className="text-white font-extrabold text-center drop-shadow-2xl leading-tight" style={{ fontSize: '840px' }}>
+        <div style={{ width: '520px' }}>
+          <h3
+            className="text-white font-extrabold text-center drop-shadow-2xl leading-tight"
+            style={{
+              fontSize: '110px',
+              transform: 'scale(2.5)',
+            }}
+          >
             {title}
           </h3>
         </div>
