@@ -102,13 +102,12 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
           userSelect: 'none',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ width: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <h3
             className="text-white font-extrabold text-center drop-shadow-2xl leading-tight"
             style={{
               fontSize: '90px',
               transform: 'scale(2)',
-              whiteSpace: 'nowrap',
             }}
           >
             {title}
