@@ -58,7 +58,7 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       </mesh>
 
       {/* Number Badge - Octagon */}
-      <group position={[0.9, 1.4, 0.13]}>
+      <group position={[0.9, 1.4, 0.3]}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.2, 0.2, 0.05, 8]} />
           <meshStandardMaterial 
@@ -70,15 +70,15 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
           />
         </mesh>
         <Html
-          position={[0, 0, 0.045]}
+          position={[0, 0, 0.08]}
           center
-          distanceFactor={0.2}
+          distanceFactor={0.6}
           style={{
             pointerEvents: 'none',
             userSelect: 'none',
           }}
         >
-          <div className="text-white font-bold text-6xl" style={{ textShadow: '0 4px 8px rgba(0,0,0,0.9)' }}>
+          <div className="text-white font-bold text-4xl" style={{ textShadow: '0 4px 8px rgba(0,0,0,0.9)' }}>
             {number}
           </div>
         </Html>
@@ -86,16 +86,16 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       
       {/* Title text directly on book cover */}
       <Html
-        position={[0, 0.8, 0.13]}
+        position={[0, 0.8, 0.25]}
         center
-        distanceFactor={0.6}
+        distanceFactor={0.8}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
         <div style={{ width: '420px' }}>
-          <h3 className="text-white font-bold text-5xl text-center drop-shadow-2xl leading-tight">
+          <h3 className="text-white font-bold text-4xl text-center drop-shadow-2xl leading-tight">
             {title}
           </h3>
         </div>
