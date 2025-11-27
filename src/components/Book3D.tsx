@@ -104,7 +104,9 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       >
         <div style={{ 
           width: '130px', 
-          textAlign: 'center'
+          textAlign: 'center',
+          display: 'flex',
+          justifyContent: 'center'
         }}>
           <h3
             className="text-white font-extrabold drop-shadow-2xl leading-tight"
