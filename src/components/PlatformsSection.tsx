@@ -96,7 +96,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
           {/* Bookshelf - Secondary Platforms as Books */}
           <div className="relative h-[600px] flex flex-col justify-end">
             {/* Bookshelf */}
-            <div className="flex gap-2 items-end pb-4 relative">
+            <div className="flex gap-4 items-end pb-4 relative">
               {secondaryPlatforms.map((platform, index) => {
                 const bookColors = [
                   'from-[#C9984F] to-[#8B6F47]', // Or ancien
@@ -108,7 +108,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 const heights = ['h-[550px]', 'h-[550px]', 'h-[550px]', 'h-[550px]'];
                 
                 // All books tilted to the right
-                const tiltAngles = ['3deg', '4deg', '5deg', '3deg'];
+                const tiltAngles = ['2deg', '2.5deg', '3deg', '2deg'];
                 
                 return (
                   <div
@@ -119,7 +119,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       transformStyle: 'preserve-3d',
                       perspective: '1000px',
                       transform: `rotate(${tiltAngles[index]})`,
-                      transformOrigin: 'bottom center'
+                      transformOrigin: 'bottom left'
                     }}
                   >
                     {/* Book spine */}
