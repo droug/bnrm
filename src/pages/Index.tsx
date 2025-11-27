@@ -169,9 +169,6 @@ const Index = () => {
               {/* News and Events Section */}
               <NewsEventsSection language={language} />
 
-              {/* Platforms Section */}
-              <PlatformsSection language={language} />
-
               {/* Digital Services Section */}
               <div className="mb-12">
                 <div className="py-16 bg-gradient-to-b from-slate-50 to-white rounded-lg">
@@ -196,6 +193,9 @@ const Index = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Platforms Section */}
+              <PlatformsSection language={language} />
 
               {/* Quick Links */}
               <div className="mb-12">
