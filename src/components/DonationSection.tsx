@@ -103,7 +103,7 @@ export const DonationSection = ({ language }: DonationSectionProps) => {
               className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-10 py-6 text-lg font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all hover:scale-105"
             >
               <Heart className={`h-6 w-6 fill-white ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
-              {language === 'ar' ? 'تبرع الآن' : 'Faire un don maintenant'}
+              {language === 'ar' ? 'تبرع' : 'Faire un don'}
             </Button>
             
             <p className="text-xs text-white/60 mt-4">
