@@ -37,13 +37,14 @@ export default function CBMRecherche() {
   const [library, setLibrary] = useState("all");
   const [filterCM, setFilterCM] = useState(false);
   const [filterCBM, setFilterCBM] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
-  // Automatically search if there's a query parameter in the URL
+  // Initialize search from URL parameters
   useEffect(() => {
     const queryParam = searchParams.get('q');
     const filterParam = searchParams.get('filter');
     
-    if (queryParam) {
+    if (queryParam && !hasInitialized) {
       setSearchQuery(queryParam);
       
       // Set filter if provided
@@ -53,12 +54,16 @@ export default function CBMRecherche() {
         setFilterCBM(true);
       }
       
-      // Trigger search after a short delay to ensure state is set
-      setTimeout(() => {
-        handleSimpleSearch();
-      }, 100);
+      setHasInitialized(true);
     }
-  }, []); // Run only once on mount
+  }, [searchParams, hasInitialized]);
+
+  // Trigger search when query is initialized from URL
+  useEffect(() => {
+    if (hasInitialized && searchQuery) {
+      handleSimpleSearch();
+    }
+  }, [hasInitialized]);
 
   const handleSimpleSearch = async () => {
     setIsSearching(true);
