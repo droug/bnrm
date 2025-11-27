@@ -35,25 +35,25 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
     >
       {/* Book Cover Front */}
       <mesh position={[0, 0, 0.1]}>
-        <boxGeometry args={[2.0, 3.5, 0.05]} />
+        <boxGeometry args={[2.8, 3.5, 0.05]} />
         <meshStandardMaterial map={texture} />
       </mesh>
 
       {/* Book Back Cover */}
       <mesh position={[0, 0, -0.1]}>
-        <boxGeometry args={[2.0, 3.5, 0.05]} />
+        <boxGeometry args={[2.8, 3.5, 0.05]} />
         <meshStandardMaterial color="#5a3921" />
       </mesh>
 
       {/* Book Spine */}
-      <mesh position={[-1.025, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+      <mesh position={[-1.425, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
         <boxGeometry args={[0.2, 3.5, 0.05]} />
         <meshStandardMaterial color="#4a2f1a" />
       </mesh>
 
       {/* Book Pages */}
       <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[1.95, 3.45, 0.2]} />
+        <boxGeometry args={[2.75, 3.45, 0.2]} />
         <meshStandardMaterial color="#f5f5dc" roughness={0.8} />
       </mesh>
 
