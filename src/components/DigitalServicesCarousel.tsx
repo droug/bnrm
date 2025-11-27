@@ -211,7 +211,8 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
         setApi={setApi}
         opts={{
           align: "start",
-          loop: false,
+          loop: true,
+          slidesToScroll: 1,
         }}
         className="w-full"
       >
