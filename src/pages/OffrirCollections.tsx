@@ -12,7 +12,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { FloatingButtons } from "@/components/FloatingButtons";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SimpleSelect } from "@/components/ui/simple-select";
 
 export default function OffrirCollections() {
   const navigate = useNavigate();
@@ -126,26 +126,17 @@ export default function OffrirCollections() {
                   <Label htmlFor="donorType">
                     {language === 'ar' ? 'نوع المتبرع *' : 'Type de donateur *'}
                   </Label>
-                  <Select
+                  <SimpleSelect
+                    options={[
+                      { value: "individual", label: language === 'ar' ? 'فرد' : 'Particulier' },
+                      { value: "institution", label: language === 'ar' ? 'مؤسسة' : 'Institution' },
+                      { value: "association", label: language === 'ar' ? 'جمعية' : 'Association' },
+                    ]}
                     value={formData.donorType}
-                    onValueChange={(value) => setFormData({ ...formData, donorType: value })}
+                    onChange={(value) => setFormData({ ...formData, donorType: value })}
+                    placeholder={language === 'ar' ? 'اختر نوع المتبرع' : 'Sélectionnez le type'}
                     required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={language === 'ar' ? 'اختر نوع المتبرع' : 'Sélectionnez le type'} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="individual">
-                        {language === 'ar' ? 'فرد' : 'Particulier'}
-                      </SelectItem>
-                      <SelectItem value="institution">
-                        {language === 'ar' ? 'مؤسسة' : 'Institution'}
-                      </SelectItem>
-                      <SelectItem value="association">
-                        {language === 'ar' ? 'جمعية' : 'Association'}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
 
                 {/* Informations personnelles */}
@@ -249,38 +240,21 @@ export default function OffrirCollections() {
                     <Label htmlFor="collectionType">
                       {language === 'ar' ? 'نوع المجموعة *' : 'Type de collection *'}
                     </Label>
-                    <Select
+                    <SimpleSelect
+                      options={[
+                        { value: "manuscripts", label: language === 'ar' ? 'مخطوطات' : 'Manuscrits' },
+                        { value: "books", label: language === 'ar' ? 'كتب' : 'Livres' },
+                        { value: "periodicals", label: language === 'ar' ? 'دوريات' : 'Périodiques' },
+                        { value: "archives", label: language === 'ar' ? 'أرشيف' : 'Archives' },
+                        { value: "photos", label: language === 'ar' ? 'صور فوتوغرافية' : 'Photographies' },
+                        { value: "audiovisual", label: language === 'ar' ? 'سمعي بصري' : 'Audiovisuel' },
+                        { value: "other", label: language === 'ar' ? 'أخرى' : 'Autre' },
+                      ]}
                       value={formData.collectionType}
-                      onValueChange={(value) => setFormData({ ...formData, collectionType: value })}
+                      onChange={(value) => setFormData({ ...formData, collectionType: value })}
+                      placeholder={language === 'ar' ? 'اختر نوع المجموعة' : 'Sélectionnez le type'}
                       required
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={language === 'ar' ? 'اختر نوع المجموعة' : 'Sélectionnez le type'} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="manuscripts">
-                          {language === 'ar' ? 'مخطوطات' : 'Manuscrits'}
-                        </SelectItem>
-                        <SelectItem value="books">
-                          {language === 'ar' ? 'كتب' : 'Livres'}
-                        </SelectItem>
-                        <SelectItem value="periodicals">
-                          {language === 'ar' ? 'دوريات' : 'Périodiques'}
-                        </SelectItem>
-                        <SelectItem value="archives">
-                          {language === 'ar' ? 'أرشيف' : 'Archives'}
-                        </SelectItem>
-                        <SelectItem value="photos">
-                          {language === 'ar' ? 'صور فوتوغرافية' : 'Photographies'}
-                        </SelectItem>
-                        <SelectItem value="audiovisual">
-                          {language === 'ar' ? 'سمعي بصري' : 'Audiovisuel'}
-                        </SelectItem>
-                        <SelectItem value="other">
-                          {language === 'ar' ? 'أخرى' : 'Autre'}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    />
                   </div>
 
                   <div>
@@ -327,28 +301,17 @@ export default function OffrirCollections() {
                     <Label htmlFor="condition">
                       {language === 'ar' ? 'الحالة العامة' : 'État général'}
                     </Label>
-                    <Select
+                    <SimpleSelect
+                      options={[
+                        { value: "excellent", label: language === 'ar' ? 'ممتاز' : 'Excellent' },
+                        { value: "good", label: language === 'ar' ? 'جيد' : 'Bon' },
+                        { value: "fair", label: language === 'ar' ? 'مقبول' : 'Moyen' },
+                        { value: "poor", label: language === 'ar' ? 'ضعيف' : 'Médiocre' },
+                      ]}
                       value={formData.condition}
-                      onValueChange={(value) => setFormData({ ...formData, condition: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={language === 'ar' ? 'اختر الحالة' : 'Sélectionnez l\'état'} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="excellent">
-                          {language === 'ar' ? 'ممتاز' : 'Excellent'}
-                        </SelectItem>
-                        <SelectItem value="good">
-                          {language === 'ar' ? 'جيد' : 'Bon'}
-                        </SelectItem>
-                        <SelectItem value="fair">
-                          {language === 'ar' ? 'مقبول' : 'Moyen'}
-                        </SelectItem>
-                        <SelectItem value="poor">
-                          {language === 'ar' ? 'ضعيف' : 'Médiocre'}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                      onChange={(value) => setFormData({ ...formData, condition: value })}
+                      placeholder={language === 'ar' ? 'اختر الحالة' : 'Sélectionnez l\'état'}
+                    />
                   </div>
 
                   <div>
