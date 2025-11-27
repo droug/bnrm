@@ -45,7 +45,7 @@ const Index = () => {
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}&filter=${searchFilter}`);
+      navigate(`/cbm/recherche?q=${encodeURIComponent(searchQuery.trim())}&filter=${searchFilter}`);
     }
   };
 
