@@ -173,6 +173,21 @@ const Header = () => {
           }
         ]
       }
+    },
+    mecenat: {
+      title: { fr: "Mécénat", ar: "الرعاية" },
+      items: [
+        {
+          title: { fr: "Offrir des collections", ar: "تقديم مجموعات" },
+          desc: { fr: "Contribuez en offrant des collections à la bibliothèque", ar: "ساهم من خلال تقديم مجموعات إلى المكتبة" },
+          href: "/offrir-collections"
+        },
+        {
+          title: { fr: "Dons", ar: "التبرعات" },
+          desc: { fr: "Soutenez la bibliothèque par vos dons", ar: "ادعم المكتبة بتبرعاتك" },
+          href: "/dons"
+        }
+      ]
     }
   };
   
@@ -672,20 +687,31 @@ const Header = () => {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
+
+              {/* Mécénat */}
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3">
+                  <Users className="w-4 h-4 mr-1" />
+                  <span className="hidden lg:inline">{menuData.mecenat.title[language]}</span>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent className="z-50">
+                  <div className="grid gap-2 p-4 w-[500px] bg-popover border border-primary/20 shadow-xl">
+                    {menuData.mecenat.items.map((item, idx) => (
+                      <NavigationMenuLink key={idx} asChild>
+                        <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <div className="font-semibold">{item.title[language]}</div>
+                          <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
+                        </Link>
+                      </NavigationMenuLink>
+                    ))}
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
 
-          {/* Outils et Actions - Barre de recherche avancée et outils d'accessibilité */}
+          {/* Outils et Actions - outils d'accessibilité */}
           <div className="flex items-center space-x-4">
-            {/* Barre de recherche avancée - toujours visible */}
-            <div className="hidden sm:block w-80">
-              <SearchBar 
-                variant="compact"
-                showSuggestions={true}
-                className="w-full border-2 border-primary/20 rounded-xl hover:border-primary/40 transition-all duration-300 shadow-sm focus-within:shadow-md"
-                placeholder={language === 'ar' ? 'بحث متقدم في مجموعاتنا...' : 'Recherche avancée dans nos collections...'}
-              />
-            </div>
             
             {/* Outils d'accessibilité et assistance */}
             <div className="flex items-center space-x-2">
@@ -723,18 +749,6 @@ const Header = () => {
             </Button>
           </div>
         </div>
-        )}
-
-        {/* Barre de recherche mobile - toujours accessible */}
-        {!hideNavigation && (
-          <div className="pb-6 sm:hidden">
-            <SearchBar 
-              variant="compact"
-              showSuggestions={true}
-              className="w-full border-2 border-primary/20 rounded-xl shadow-sm"
-              placeholder={language === 'ar' ? 'بحث متقدم...' : 'Recherche avancée...'}
-            />
-          </div>
         )}
       </div>
 
