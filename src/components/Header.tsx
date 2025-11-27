@@ -179,7 +179,7 @@ const Header = () => {
       items: [
         {
           title: { fr: "Offrir des collections", ar: "تقديم مجموعات" },
-          desc: { fr: "Contribuez en offrant des collections à la bibliothèque", ar: "ساهم من خلال تقديم مجموعات إلى المكتبة" },
+          desc: { fr: "Enrichir le fonds documentaire de la bibliothéque", ar: "إغناء الرصيد الوثائقي للمكتبة" },
           href: "/offrir-collections"
         },
         {
