@@ -171,7 +171,7 @@ const Index = () => {
 
               {/* Digital Services Section */}
               <div className="mb-6">
-                <div className="py-16 bg-gradient-to-b from-slate-50 to-white rounded-lg">
+                <div className="py-8 bg-gradient-to-b from-slate-50 to-white rounded-lg">
                   <div className="container mx-auto px-4">
                     <div className="mb-10">
                       <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
