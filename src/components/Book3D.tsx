@@ -100,14 +100,14 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
-          width: '300px',
+          width: '200px',
         }}
       >
         <h3
           className="text-white font-extrabold text-center drop-shadow-2xl leading-tight"
           style={{
-            fontSize: '90px',
-            transform: 'scale(2)',
+            fontSize: '60px',
+            transform: 'scale(1.5)',
           }}
         >
           {title}
