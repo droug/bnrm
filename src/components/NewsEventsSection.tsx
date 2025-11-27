@@ -37,10 +37,10 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
   ];
 
   return (
-    <section className="py-12 bg-slate-50">
+    <section className="py-16 bg-slate-50">
       <div className="container mx-auto px-4">
         {/* Header with blue background */}
-        <div className="bg-[#1e3a8a] text-white px-8 py-6 rounded-lg mb-6">
+        <div className="bg-[#1e3a8a] text-white px-8 py-8 rounded-lg mb-8">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">

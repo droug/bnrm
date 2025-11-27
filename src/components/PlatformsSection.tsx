@@ -53,7 +53,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
   ];
 
   return (
-    <div className="relative py-12 my-6 overflow-hidden rounded-lg">
+    <div className="relative py-20 my-12 overflow-hidden rounded-lg">
       {/* Background image */}
       <div 
         className="absolute inset-0 bg-cover bg-center"
