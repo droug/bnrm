@@ -24,6 +24,7 @@ const HelpPage = lazy(() => import("./pages/HelpPage"));
 const News = lazy(() => import("./pages/News"));
 const PracticalInfo = lazy(() => import("./pages/PracticalInfo"));
 const Donation = lazy(() => import("./pages/Donation"));
+const OffrirCollections = lazy(() => import("./pages/OffrirCollections"));
 
 // Manuscripts Platform (lazy)
 const Manuscripts = lazy(() => import("./pages/Manuscripts"));
@@ -268,6 +269,7 @@ const App = () => {
           <Route path="/news/:newsId" element={<NewsDetails />} />
           <Route path="/practical-info" element={<PracticalInfo />} />
           <Route path="/donation" element={<Donation />} />
+          <Route path="/offrir-collections" element={<OffrirCollections />} />
         <Route path="/settings" element={<Navigate to="/admin/roles" replace />} />
         <Route path="/wysiwyg" element={<WysiwygPage />} />
             <Route path="/admin/bnrm-tariffs" element={<BNRMTariffsPage />} />
