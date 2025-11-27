@@ -77,13 +77,13 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
         <Html
           position={[0, 0, 0.03]}
           center
-          distanceFactor={0.8}
+          distanceFactor={0.6}
           style={{
             pointerEvents: 'none',
             userSelect: 'none',
           }}
         >
-          <div className="text-white font-bold text-sm" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+          <div className="text-white font-bold text-xl" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
             {number}
           </div>
         </Html>
@@ -93,14 +93,14 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       <Html
         position={[0, 0.8, 0.13]}
         center
-        distanceFactor={1.2}
+        distanceFactor={1}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div style={{ width: '280px' }}>
-          <h3 className="text-white font-bold text-lg text-center drop-shadow-2xl leading-tight">
+        <div style={{ width: '320px' }}>
+          <h3 className="text-white font-bold text-2xl text-center drop-shadow-2xl leading-tight">
             {title}
           </h3>
         </div>
@@ -110,14 +110,14 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       <Html
         position={[0, -0.8, 0.13]}
         center
-        distanceFactor={1.5}
+        distanceFactor={1.2}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div className="bg-black/60 px-4 py-2 rounded backdrop-blur-sm" style={{ width: '300px' }}>
-          <p className="text-white/95 text-xs text-center leading-relaxed">
+        <div className="bg-black/70 px-5 py-3 rounded backdrop-blur-sm" style={{ width: '340px' }}>
+          <p className="text-white/95 text-sm text-center leading-relaxed">
             {description.substring(0, 100)}...
           </p>
         </div>
