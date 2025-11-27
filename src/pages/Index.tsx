@@ -199,14 +199,14 @@ const Index = () => {
 
               {/* Quick Links */}
               <div className="mb-12">
-                <div className="text-center mb-10">
+                <div className={`mb-10 ${language === 'ar' ? 'text-center' : 'text-left'}`}>
                   <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
                     BNRM
                   </p>
                   <h2 className="text-4xl font-bold text-[#1e3a8a] mb-4">
                     {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
                   </h2>
-                  <div className="w-24 h-1 bg-orange-500 mx-auto mb-4"></div>
+                  <div className={`w-24 h-1 bg-orange-500 mb-4 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
                   <p className="text-muted-foreground">
                     {language === 'ar'
                       ? 'الوصول السريع إلى خدماتنا الأساسية'
