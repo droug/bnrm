@@ -60,10 +60,10 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       </mesh>
 
       {/* Number Badge - Octagon */}
-      <group position={[0.8, 1.3, 0.13]}>
-        {/* Octagon base */}
+      <group position={[0.9, 1.4, 0.13]}>
+        {/* Octagon base - smaller */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.35, 0.35, 0.08, 8]} />
+          <cylinderGeometry args={[0.2, 0.2, 0.05, 8]} />
           <meshStandardMaterial 
             color="#0066cc" 
             emissive="#0044aa" 
@@ -73,36 +73,53 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
           />
         </mesh>
         
-        {/* Number as HTML overlay on badge */}
+        {/* Number as HTML overlay on badge - smaller and centered */}
         <Html
-          position={[0, 0, 0.05]}
+          position={[0, 0, 0.03]}
           center
-          distanceFactor={1.5}
+          distanceFactor={0.8}
           style={{
             pointerEvents: 'none',
             userSelect: 'none',
           }}
         >
-          <div className="text-white font-bold text-2xl" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+          <div className="text-white font-bold text-sm" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
             {number}
           </div>
         </Html>
       </group>
       
-      {/* Title attached to book */}
+      {/* Title text directly on book cover */}
       <Html
-        position={[0, -2.2, 0.5]}
+        position={[0, 0.8, 0.13]}
         center
-        distanceFactor={2}
+        distanceFactor={1.2}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div className="bg-black/90 px-6 py-3 rounded-lg shadow-2xl backdrop-blur-sm" style={{ width: '400px' }}>
-          <h3 className="text-white font-bold text-xl text-center drop-shadow-lg">
+        <div style={{ width: '280px' }}>
+          <h3 className="text-white font-bold text-lg text-center drop-shadow-2xl leading-tight">
             {title}
           </h3>
+        </div>
+      </Html>
+      
+      {/* Description text on book cover */}
+      <Html
+        position={[0, -0.8, 0.13]}
+        center
+        distanceFactor={1.5}
+        style={{
+          pointerEvents: 'none',
+          userSelect: 'none',
+        }}
+      >
+        <div className="bg-black/60 px-4 py-2 rounded backdrop-blur-sm" style={{ width: '300px' }}>
+          <p className="text-white/95 text-xs text-center leading-relaxed">
+            {description.substring(0, 100)}...
+          </p>
         </div>
       </Html>
     </group>
@@ -148,12 +165,11 @@ export function Book3D({ coverImage, title, description, number, onClick }: Book
         </Canvas>
       </Suspense>
       
-      {/* Static overlay for description */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/95 via-black/70 to-transparent pointer-events-none z-10">
-        <p className="text-white/90 text-base leading-relaxed drop-shadow-lg">
+      {/* Static overlay for full description at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/95 via-black/60 to-transparent pointer-events-none z-10">
+        <p className="text-white/80 text-sm leading-relaxed drop-shadow-lg line-clamp-2">
           {description}
         </p>
-        <div className="w-24 h-1 bg-primary/80 rounded-full mt-4" />
       </div>
     </div>
   );
