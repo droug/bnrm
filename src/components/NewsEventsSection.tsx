@@ -39,24 +39,32 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
   return (
     <section className="py-16 bg-slate-50">
       <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-8">
-          <div>
-            <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
-              BNRM
-            </p>
-            <h2 className="text-4xl font-bold text-[#1e3a8a] mb-4">
-              {language === 'ar' ? 'الأخبار و الأحداث' : 'Actualités & Événements'}
-            </h2>
-            <div className="w-24 h-1 bg-orange-500 mb-4"></div>
+        {/* Header with blue background */}
+        <div className="bg-[#1e3a8a] text-white px-8 py-8 rounded-lg mb-8">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
+                BNRM
+              </p>
+              <h2 className="text-4xl font-bold mb-4">
+                {language === 'ar' ? 'الأخبار و الأحداث' : 'Actualités & Événements'}
+              </h2>
+              <div className="w-24 h-1 bg-orange-500 mb-4"></div>
+              <p className="text-lg text-white/90 max-w-2xl">
+                {language === 'ar' 
+                  ? 'اطلع على آخر الأخبار والفعاليات'
+                  : 'Découvrez les dernières actualités et événements'
+                }
+              </p>
+            </div>
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/news')}
+              className="border-white text-white hover:bg-white/10"
+            >
+              {language === 'ar' ? 'عرض الكل' : 'Tout afficher'}
+            </Button>
           </div>
-          <Button 
-            variant="outline"
-            onClick={() => navigate('/news')}
-            className="border-blue-600 text-black hover:bg-blue-50"
-          >
-            {language === 'ar' ? 'عرض الكل' : 'Tout afficher'}
-          </Button>
         </div>
 
         {/* Grid Layout */}
