@@ -76,7 +76,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute top-4 left-4">
-                  <Badge variant="outline" className="bg-white/90 backdrop-blur-sm border-0">
+                  <Badge variant="outline" className="bg-orange-500 text-white border-0">
                     {language === 'ar' ? item.tag_ar : item.tag_fr}
                   </Badge>
                 </div>
