@@ -279,9 +279,9 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
         <div className="flex gap-2">
           <button
             onClick={() => api?.scrollPrev()}
-            disabled={current === 0}
+            disabled={count <= 1}
             className={`p-3 rounded-lg transition-colors ${
-              current === 0
+              count <= 1
                 ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                 : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
@@ -291,9 +291,9 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
           </button>
           <button
             onClick={() => api?.scrollNext()}
-            disabled={current === count - 1}
+            disabled={count <= 1}
             className={`p-3 rounded-lg transition-colors ${
-              current === count - 1
+              count <= 1
                 ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                 : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
