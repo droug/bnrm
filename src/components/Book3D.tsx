@@ -92,7 +92,7 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       
       {/* Title text directly on book cover */}
       <Html
-        position={[-0.45, 0.25, 0.26]}
+        position={[-0.7, 0.25, 0.26]}
         center
         distanceFactor={0.6}
         transform
