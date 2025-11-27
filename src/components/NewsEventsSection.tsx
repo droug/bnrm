@@ -75,15 +75,13 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute top-4 left-4">
-                  <Badge variant="outline" className="bg-orange-500 text-white border-0">
-                    {language === 'ar' ? item.tag_ar : item.tag_fr}
-                  </Badge>
-                </div>
               </div>
               
               {/* Content */}
               <div className="p-6">
+                <Badge variant="outline" className="bg-orange-500 text-white border-0 mb-3">
+                  {language === 'ar' ? item.tag_ar : item.tag_fr}
+                </Badge>
                 <h3 className="text-xl font-bold text-[#1e3a8a] mb-2 group-hover:text-blue-600 transition-colors">
                   {language === 'ar' ? item.title_ar : item.title_fr}
                 </h3>
