@@ -106,22 +106,6 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
         </div>
       </Html>
       
-      {/* Description text on book cover */}
-      <Html
-        position={[0, -0.8, 0.13]}
-        center
-        distanceFactor={1}
-        style={{
-          pointerEvents: 'none',
-          userSelect: 'none',
-        }}
-      >
-        <div className="bg-black/70 px-6 py-4 rounded backdrop-blur-sm" style={{ width: '360px' }}>
-          <p className="text-white/95 text-base text-center leading-relaxed">
-            {description.substring(0, 120)}...
-          </p>
-        </div>
-      </Html>
     </group>
   );
 }
@@ -165,12 +149,6 @@ export function Book3D({ coverImage, title, description, number, onClick }: Book
         </Canvas>
       </Suspense>
       
-      {/* Static overlay for full description at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/95 via-black/60 to-transparent pointer-events-none z-10">
-        <p className="text-white/80 text-sm leading-relaxed drop-shadow-lg line-clamp-2">
-          {description}
-        </p>
-      </div>
     </div>
   );
 }
