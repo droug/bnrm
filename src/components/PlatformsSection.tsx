@@ -99,10 +99,10 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
             <div className="flex gap-2 items-end pb-4 relative">
               {secondaryPlatforms.map((platform, index) => {
                 const bookColors = [
-                  'from-[#8B4513] to-[#654321]', // Marron cuir
+                  'from-[#C9984F] to-[#8B6F47]', // Or ancien
                   'from-[#1e3a5f] to-[#0d1b2a]', // Bleu nuit
-                  'from-[#2d5016] to-[#1a3009]', // Vert forêt
-                  'from-[#7c2d12] to-[#5a1f0a]', // Bordeaux
+                  'from-[#B87333] to-[#8B5A2B]', // Cuivre
+                  'from-[#CD853F] to-[#8B5E3C]', // Bois doré
                 ];
                 
                 const heights = ['h-[550px]', 'h-[550px]', 'h-[550px]', 'h-[550px]'];
