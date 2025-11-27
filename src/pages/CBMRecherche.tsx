@@ -38,6 +38,7 @@ export default function CBMRecherche() {
   const [filterCM, setFilterCM] = useState(false);
   const [filterCBM, setFilterCBM] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   // Initialize search from URL parameters
   useEffect(() => {
@@ -67,6 +68,7 @@ export default function CBMRecherche() {
 
   const handleSimpleSearch = async () => {
     setIsSearching(true);
+    setHasSearched(true);
     
     try {
       let query: any = supabase.from('cbm_catalog').select('*', { count: 'exact' });
@@ -124,6 +126,7 @@ export default function CBMRecherche() {
 
   const handleAdvancedSearch = async () => {
     setIsSearching(true);
+    setHasSearched(true);
     
     try {
       let query: any = supabase.from('cbm_catalog').select('*', { count: 'exact' });
@@ -504,6 +507,7 @@ export default function CBMRecherche() {
         <CBMSearchWithSelection 
           searchResults={searchResults}
           isSearching={isSearching}
+          hasSearched={hasSearched}
           currentPage={currentPage}
           totalPages={Math.ceil(totalResults / itemsPerPage)}
           totalItems={totalResults}

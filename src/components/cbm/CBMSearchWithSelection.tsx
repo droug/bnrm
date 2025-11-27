@@ -32,6 +32,7 @@ interface CBMSearchWithSelectionProps {
   itemsPerPage: number;
   onPageChange: (page: number) => void;
   onItemsPerPageChange: (itemsPerPage: number) => void;
+  hasSearched?: boolean;
 }
 
 export function CBMSearchWithSelection({ 
@@ -43,7 +44,8 @@ export function CBMSearchWithSelection({
   totalItems,
   itemsPerPage,
   onPageChange,
-  onItemsPerPageChange
+  onItemsPerPageChange,
+  hasSearched = false
 }: CBMSearchWithSelectionProps) {
   const { toast } = useToast();
   const [documentsCache, setDocumentsCache] = useState<Record<string, any>>({});
@@ -166,10 +168,26 @@ export function CBMSearchWithSelection({
       )}
       
       {!isSearching && searchResults.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground">
-          <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          <p>Lancez une recherche pour afficher les résultats</p>
-        </div>
+        <Card className="border-2 border-muted">
+          <CardContent className="text-center py-12">
+            <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
+            {hasSearched ? (
+              <>
+                <p className="text-lg font-medium text-foreground mb-2">
+                  Aucun document trouvé
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Aucun document n'a été trouvé pour votre recherche. 
+                  Essayez avec d'autres mots-clés ou modifiez vos critères de recherche.
+                </p>
+              </>
+            ) : (
+              <p className="text-muted-foreground">
+                Lancez une recherche pour afficher les résultats
+              </p>
+            )}
+          </CardContent>
+        </Card>
       )}
     </div>
   );
