@@ -45,10 +45,10 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-b from-slate-50 to-white">
+    <section className="py-12 bg-gradient-to-b from-slate-50 to-white">
       <div className="container mx-auto px-4">
         {/* Header with blue background */}
-        <div className="bg-[#1e3a8a] text-white px-8 py-8 rounded-lg mb-8">
+        <div className="bg-[#1e3a8a] text-white px-8 py-6 rounded-lg mb-6">
           <div className={`${language === 'ar' ? 'text-center' : 'text-left'}`}>
             <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
               BNRM
@@ -67,7 +67,7 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
         </div>
 
         {/* Video Carousel */}
-        <div className="mb-8 px-12">
+        <div className="mb-6 px-12">
           <Carousel
             opts={{
               align: "start",
