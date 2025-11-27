@@ -60,7 +60,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
             <Button 
               variant="outline"
               onClick={() => navigate('/news')}
-              className="border-white text-white hover:bg-white/10"
+              className="bg-white text-black border-white hover:bg-gray-100"
             >
               {language === 'ar' ? 'عرض الكل' : 'Tout afficher'}
             </Button>
