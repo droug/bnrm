@@ -96,7 +96,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
           {/* Bookshelf - Secondary Platforms as Books */}
           <div className="relative h-[600px] flex flex-col justify-end">
             {/* Bookshelf */}
-            <div className="flex gap-4 items-end pb-4 relative">
+            <div className="flex gap-0 items-end pb-4 relative">
               {secondaryPlatforms.map((platform, index) => {
                 const bookColors = [
                   'from-[#C9984F] to-[#8B6F47]', // Or ancien
@@ -108,12 +108,15 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 const heights = ['h-[550px]', 'h-[550px]', 'h-[550px]', 'h-[550px]'];
                 
                 // All books tilted to the right
-                const tiltAngles = ['2deg', '2.5deg', '3deg', '2deg'];
+                const tiltAngles = ['2deg', '2deg', '2deg', '2deg'];
+                
+                // Negative margins to make books touch
+                const margins = index > 0 ? '-ml-1' : '';
                 
                 return (
                   <div
                     key={platform.number}
-                    className={`relative ${heights[index]} w-28 cursor-pointer group transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl`}
+                    className={`relative ${heights[index]} w-28 cursor-pointer group transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${margins}`}
                     onClick={() => navigate(platform.path)}
                     style={{ 
                       transformStyle: 'preserve-3d',
