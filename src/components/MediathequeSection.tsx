@@ -47,21 +47,23 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
   return (
     <section className="py-16 bg-gradient-to-b from-slate-50 to-white">
       <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className={`mb-12 ${language === 'ar' ? 'text-center' : 'text-left'}`}>
-          <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
-            BNRM
-          </p>
-          <h2 className="text-4xl font-bold text-[#1e3a8a] mb-4">
-            {language === 'ar' ? 'الوسائط المتعددة' : 'Médiathèque'}
-          </h2>
-          <div className={`w-24 h-1 bg-orange-500 mb-6 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
-          <p className="text-lg text-muted-foreground max-w-2xl">
-            {language === 'ar' 
-              ? 'استكشف مجموعاتنا الصوتية والمرئية الغنية'
-              : 'Explorez nos riches collections audiovisuelles et multimédias'
-            }
-          </p>
+        {/* Header with blue background */}
+        <div className="bg-[#1e3a8a] text-white px-8 py-8 rounded-lg mb-8">
+          <div className={`${language === 'ar' ? 'text-center' : 'text-left'}`}>
+            <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
+              BNRM
+            </p>
+            <h2 className="text-4xl font-bold mb-4">
+              {language === 'ar' ? 'الوسائط المتعددة' : 'Médiathèque'}
+            </h2>
+            <div className={`w-24 h-1 bg-orange-500 mb-6 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
+            <p className="text-lg text-white/90 max-w-2xl">
+              {language === 'ar' 
+                ? 'استكشف مجموعاتنا الصوتية والمرئية الغنية'
+                : 'Explorez nos riches collections audiovisuelles et multimédias'
+              }
+            </p>
+          </div>
         </div>
 
         {/* Video Carousel */}
