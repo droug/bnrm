@@ -70,7 +70,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
             BNRM
           </p>
           <h2 className="text-4xl font-bold text-white mb-4">
-            {language === 'ar' ? 'منصاتنا الرئيسية' : 'Nos Principales Plateformes'}
+            {language === 'ar' ? 'منصاتنا' : 'Nos Plateformes'}
           </h2>
           <div className="w-24 h-1 bg-orange-500 mb-4"></div>
           <p className="text-white/80">
