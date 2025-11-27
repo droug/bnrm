@@ -96,7 +96,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
           {/* Bookshelf - Secondary Platforms as Books */}
           <div className="relative h-[600px] flex flex-col justify-end">
             {/* Bookshelf */}
-            <div className="flex gap-0 items-end pb-4 relative">
+            <div className="flex gap-0 items-end pb-0 relative">
               {secondaryPlatforms.map((platform, index) => {
                 const bookColors = [
                   'from-[#C9984F] to-[#8B6F47]', // Or ancien
