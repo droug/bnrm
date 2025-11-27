@@ -1,5 +1,5 @@
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
-import { OrbitControls, useTexture } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, useTexture, Text } from '@react-three/drei';
 import { useRef, useState } from 'react';
 import * as THREE from 'three';
 
@@ -60,10 +60,31 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       </mesh>
 
       {/* Number Badge - Octagon */}
-      <mesh position={[0.8, 1.3, 0.13]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.05, 8]} />
-        <meshStandardMaterial color="#0066cc" emissive="#0066cc" emissiveIntensity={0.3} />
-      </mesh>
+      <group position={[0.8, 1.3, 0.13]}>
+        {/* Octagon base */}
+        <mesh rotation={[0, 0, 0]}>
+          <cylinderGeometry args={[0.35, 0.35, 0.08, 8]} />
+          <meshStandardMaterial 
+            color="#0066cc" 
+            emissive="#0066cc" 
+            emissiveIntensity={0.5}
+            metalness={0.3}
+            roughness={0.4}
+          />
+        </mesh>
+        
+        {/* Number text */}
+        <Text
+          position={[0, 0, 0.05]}
+          fontSize={0.25}
+          color="#ffffff"
+          anchorX="center"
+          anchorY="middle"
+          fontWeight="bold"
+        >
+          {number}
+        </Text>
+      </group>
       
       {/* Title overlay (simple plane for demonstration) */}
       {hovered && (
