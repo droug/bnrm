@@ -75,10 +75,10 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
           >
             <CarouselContent>
               {videos.map((video, index) => (
-                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/2">
                   <Card className="border-2 hover:border-orange-500/50 transition-colors">
-                    <CardContent className="p-4">
-                      <div className="aspect-video rounded-lg overflow-hidden mb-3">
+                    <CardContent className="p-6">
+                      <div className="aspect-video rounded-lg overflow-hidden mb-4">
                         <iframe
                           src={`https://www.youtube.com/embed/${video.id}`}
                           className="w-full h-full"
@@ -87,7 +87,7 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
                           title={video.title[language]}
                         />
                       </div>
-                      <h3 className="text-sm font-semibold text-center text-foreground">
+                      <h3 className="text-base font-semibold text-center text-foreground">
                         {video.title[language]}
                       </h3>
                     </CardContent>
