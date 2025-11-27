@@ -128,7 +128,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       <img 
                         src={platform.image}
                         alt={platform.title}
-                        className={`absolute inset-0 w-full h-full object-cover ${index === 1 ? 'opacity-100' : 'opacity-10 mix-blend-overlay'}`}
+                        className={`absolute inset-0 w-full h-full object-cover ${index === 1 ? 'opacity-100' : index === 3 ? 'opacity-5 mix-blend-overlay' : 'opacity-10 mix-blend-overlay'}`}
                       />
                       
                       {/* Book binding lines */}
