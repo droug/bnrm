@@ -124,65 +124,83 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
     },
     {
       id: 'abonnements',
-      title: 'Abonnements à la BNRM',
-      description: 'Inscrivez-vous pour accéder aux ressources et services de la bibliothèque.',
-      category: 'Abonnement',
+      title: language === 'ar' ? 'الاشتراكات في المكتبة الوطنية' : 'Abonnements à la BNRM',
+      description: language === 'ar'
+        ? 'سجل للوصول إلى موارد وخدمات المكتبة.'
+        : 'Inscrivez-vous pour accéder aux ressources et services de la bibliothèque.',
+      category: language === 'ar' ? 'اشتراك' : 'Abonnement',
       onClick: () => navigate('/abonnements')
     },
     {
       id: 'espaces-culturels',
-      title: 'Réservation des espaces culturels',
-      description: 'Réservez nos espaces pour vos événements culturels et académiques.',
-      category: 'Réservation',
+      title: language === 'ar' ? 'حجز الفضاءات الثقافية' : 'Réservation des espaces culturels',
+      description: language === 'ar'
+        ? 'احجز فضاءاتنا لفعالياتك الثقافية والأكاديمية.'
+        : 'Réservez nos espaces pour vos événements culturels et académiques.',
+      category: language === 'ar' ? 'حجز' : 'Réservation',
       onClick: () => navigate('/reservation-espaces')
     },
     {
       id: 'pass-journalier',
-      title: 'Pass journalier',
-      description: services.find(s => s.nom_service === 'Pass journalier')?.description || 'Accès gratuit à la bibliothèque pour une journée.',
-      category: 'Accès',
+      title: language === 'ar' ? 'بطاقة يومية' : 'Pass journalier',
+      description: language === 'ar'
+        ? services.find(s => s.nom_service === 'Pass journalier')?.description || 'دخول مجاني إلى المكتبة ليوم واحد.'
+        : services.find(s => s.nom_service === 'Pass journalier')?.description || 'Accès gratuit à la bibliothèque pour une journée.',
+      category: language === 'ar' ? 'وصول' : 'Accès',
       onClick: () => navigate('/pass-journalier')
     },
     {
       id: 'reproduction',
-      title: 'Reproduction de documents',
-      description: 'Service de reproduction et numérisation de documents de la collection.',
-      category: 'Service à la demande',
+      title: language === 'ar' ? 'نسخ الوثائق' : 'Reproduction de documents',
+      description: language === 'ar'
+        ? 'خدمة نسخ ورقمنة الوثائق من المجموعة.'
+        : 'Service de reproduction et numérisation de documents de la collection.',
+      category: language === 'ar' ? 'خدمة حسب الطلب' : 'Service à la demande',
       onClick: () => navigate('/reproduction')
     },
     {
       id: 'restauration',
-      title: 'Demande de restauration',
-      description: services.find(s => s.nom_service === 'Restauration')?.description || 'Service de restauration et conservation de documents anciens.',
-      category: 'Restauration',
+      title: language === 'ar' ? 'طلب الترميم' : 'Demande de restauration',
+      description: language === 'ar'
+        ? services.find(s => s.nom_service === 'Restauration')?.description || 'خدمة ترميم وحفظ الوثائق القديمة.'
+        : services.find(s => s.nom_service === 'Restauration')?.description || 'Service de restauration et conservation de documents anciens.',
+      category: language === 'ar' ? 'ترميم' : 'Restauration',
       onClick: () => navigate('/demande-restauration')
     },
     {
       id: 'reservation-document',
-      title: 'Réserver un document',
-      description: 'Réservez des documents pour consultation sur place.',
-      category: 'Service à la demande',
+      title: language === 'ar' ? 'حجز وثيقة' : 'Réserver un document',
+      description: language === 'ar'
+        ? 'احجز الوثائق للاطلاع عليها في المكان.'
+        : 'Réservez des documents pour consultation sur place.',
+      category: language === 'ar' ? 'خدمة حسب الطلب' : 'Service à la demande',
       onClick: () => navigate('/cbn/reserver-ouvrage')
     },
     {
       id: 'location',
-      title: 'Location à la demande',
-      description: 'Service de location de documents et ressources.',
-      category: 'Service à la demande',
+      title: language === 'ar' ? 'الإيجار حسب الطلب' : 'Location à la demande',
+      description: language === 'ar'
+        ? 'خدمة إيجار الوثائق والموارد.'
+        : 'Service de location de documents et ressources.',
+      category: language === 'ar' ? 'خدمة حسب الطلب' : 'Service à la demande',
       onClick: () => navigate('/location-service')
     },
     {
       id: 'numerisation',
-      title: 'Demande de numérisation',
-      description: services.find(s => s.nom_service === 'Numérisation documents rares')?.description || 'Service professionnel de numérisation de documents.',
-      category: 'Service à la demande',
+      title: language === 'ar' ? 'طلب الرقمنة' : 'Demande de numérisation',
+      description: language === 'ar'
+        ? services.find(s => s.nom_service === 'Numérisation documents rares')?.description || 'خدمة احترافية لرقمنة الوثائق.'
+        : services.find(s => s.nom_service === 'Numérisation documents rares')?.description || 'Service professionnel de numérisation de documents.',
+      category: language === 'ar' ? 'خدمة حسب الطلب' : 'Service à la demande',
       onClick: () => navigate('/demande-numerisation')
     },
     {
       id: 'ewallet',
-      title: 'e-Wallet BNRM',
-      description: 'Portefeuille électronique pour gérer vos paiements et transactions.',
-      category: 'Service numérique',
+      title: language === 'ar' ? 'المحفظة الإلكترونية' : 'e-Wallet BNRM',
+      description: language === 'ar'
+        ? 'محفظة إلكترونية لإدارة مدفوعاتك ومعاملاتك.'
+        : 'Portefeuille électronique pour gérer vos paiements et transactions.',
+      category: language === 'ar' ? 'خدمة رقمية' : 'Service numérique',
       onClick: () => navigate('/wallet')
     }
   ];

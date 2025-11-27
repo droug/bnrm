@@ -46,7 +46,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
               BNRM
             </p>
             <h2 className="text-4xl font-bold text-[#1e3a8a] mb-4">
-              Actualités & Événements
+              {language === 'ar' ? 'الأخبار والفعاليات' : 'Actualités & Événements'}
             </h2>
             <div className="w-24 h-1 bg-orange-500 mb-4"></div>
           </div>
@@ -55,7 +55,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
             onClick={() => navigate('/news')}
             className="border-blue-600 text-black hover:bg-blue-50"
           >
-            Tout afficher
+            {language === 'ar' ? 'عرض الكل' : 'Tout afficher'}
           </Button>
         </div>
 
