@@ -107,8 +107,8 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 
                 const heights = ['h-[550px]', 'h-[550px]', 'h-[550px]', 'h-[550px]'];
                 
-                // Different tilt angles for each book
-                const tiltAngles = ['-4deg', '3deg', '-5deg', '4deg'];
+                // All books tilted to the right
+                const tiltAngles = ['3deg', '4deg', '5deg', '3deg'];
                 
                 return (
                   <div
