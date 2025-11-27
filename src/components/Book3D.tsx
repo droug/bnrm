@@ -15,10 +15,8 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
   const meshRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   
-  // Load the cover texture
   const texture = useTexture(coverImage);
   
-  // Auto-rotate animation
   useFrame((state) => {
     if (meshRef.current && !hovered) {
       meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.2;
@@ -61,7 +59,6 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
 
       {/* Number Badge - Octagon */}
       <group position={[0.9, 1.4, 0.13]}>
-        {/* Octagon base - smaller */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.2, 0.2, 0.05, 8]} />
           <meshStandardMaterial 
@@ -72,18 +69,16 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
             roughness={0.3}
           />
         </mesh>
-        
-        {/* Number as HTML overlay on badge - larger and centered */}
         <Html
-          position={[0, 0, 0.035]}
+          position={[0, 0, 0.045]}
           center
-          distanceFactor={0.45}
+          distanceFactor={0.2}
           style={{
             pointerEvents: 'none',
             userSelect: 'none',
           }}
         >
-          <div className="text-white font-bold text-3xl" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+          <div className="text-white font-bold text-6xl" style={{ textShadow: '0 4px 8px rgba(0,0,0,0.9)' }}>
             {number}
           </div>
         </Html>
@@ -93,19 +88,18 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       <Html
         position={[0, 0.8, 0.13]}
         center
-        distanceFactor={0.9}
+        distanceFactor={0.6}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div style={{ width: '340px' }}>
-          <h3 className="text-white font-bold text-3xl text-center drop-shadow-2xl leading-tight">
+        <div style={{ width: '420px' }}>
+          <h3 className="text-white font-bold text-5xl text-center drop-shadow-2xl leading-tight">
             {title}
           </h3>
         </div>
       </Html>
-      
     </group>
   );
 }
@@ -122,13 +116,11 @@ export function Book3D({ coverImage, title, description, number, onClick }: Book
           camera={{ position: [0, 0, 5], fov: 50 }}
           gl={{ antialias: true, alpha: true }}
         >
-          {/* Lighting */}
           <ambientLight intensity={0.6} />
           <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
           <directionalLight position={[-5, 5, 5]} intensity={0.5} />
           <pointLight position={[0, 0, 5]} intensity={0.5} />
 
-          {/* Book */}
           <BookMesh 
             coverImage={coverImage}
             title={title}
@@ -137,7 +129,6 @@ export function Book3D({ coverImage, title, description, number, onClick }: Book
             onClick={onClick}
           />
 
-          {/* Controls */}
           <OrbitControls 
             enableZoom={true}
             enablePan={false}
@@ -148,7 +139,6 @@ export function Book3D({ coverImage, title, description, number, onClick }: Book
           />
         </Canvas>
       </Suspense>
-      
     </div>
   );
 }
