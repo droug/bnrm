@@ -60,25 +60,25 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       {/* Number Badge - Octagon */}
       <group position={[0.9, 1.4, 0.35]}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.28, 0.28, 0.06, 8]} />
+          <cylinderGeometry args={[0.2, 0.2, 0.05, 8]} />
           <meshStandardMaterial 
             color="#0066cc" 
             emissive="#0044aa" 
-            emissiveIntensity={0.7}
-            metalness={0.6}
-            roughness={0.25}
+            emissiveIntensity={0.6}
+            metalness={0.5}
+            roughness={0.3}
           />
         </mesh>
         <Html
           position={[0, 0, 0.1]}
           center
-          distanceFactor={0.25}
+          distanceFactor={0.2}
           style={{
             pointerEvents: 'none',
             userSelect: 'none',
           }}
         >
-          <div className="text-white font-bold text-7xl" style={{ textShadow: '0 6px 12px rgba(0,0,0,1)' }}>
+          <div className="text-white font-extrabold text-8xl" style={{ textShadow: '0 6px 12px rgba(0,0,0,1)' }}>
             {number}
           </div>
         </Html>
@@ -88,14 +88,14 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       <Html
         position={[0, 0.8, 0.35]}
         center
-        distanceFactor={0.35}
+        distanceFactor={0.3}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div style={{ width: '520px' }}>
-          <h3 className="text-white font-bold text-8xl text-center drop-shadow-2xl leading-tight">
+        <div style={{ width: '560px' }}>
+          <h3 className="text-white font-extrabold text-9xl text-center drop-shadow-2xl leading-tight">
             {title}
           </h3>
         </div>
