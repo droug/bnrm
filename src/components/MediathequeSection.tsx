@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { Music, Video, Headphones, Film, Mic, Library } from "lucide-react";
+import { Library } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface MediathequeSectionProps {
   language: string;
@@ -10,37 +17,31 @@ interface MediathequeSectionProps {
 export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
   const navigate = useNavigate();
 
-  const mediaTypes = [
+  const videos = [
     {
-      icon: Music,
-      title: { fr: "Musique", ar: "الموسيقى" },
-      desc: { fr: "Collections audio et partitions", ar: "مجموعات صوتية ونوتات موسيقية" },
+      id: "2hOKleHBUYs",
+      title: { fr: "Vidéo 1", ar: "فيديو 1" }
     },
     {
-      icon: Video,
-      title: { fr: "Vidéos", ar: "الفيديوهات" },
-      desc: { fr: "Documentaires et archives audiovisuelles", ar: "أفلام وثائقية وأرشيف سمعي بصري" },
+      id: "l02BjttZjmE",
+      title: { fr: "Vidéo 2", ar: "فيديو 2" }
     },
     {
-      icon: Headphones,
-      title: { fr: "Podcasts", ar: "بودكاست" },
-      desc: { fr: "Émissions et conférences enregistrées", ar: "برامج ومحاضرات مسجلة" },
+      id: "LDGq_sRVSog",
+      title: { fr: "Vidéo 3", ar: "فيديو 3" }
     },
     {
-      icon: Film,
-      title: { fr: "Cinéma", ar: "السينما" },
-      desc: { fr: "Films et archives cinématographiques", ar: "أفلام وأرشيف سينمائي" },
+      id: "5vA8lzi8tCU",
+      title: { fr: "Vidéo 4", ar: "فيديو 4" }
     },
     {
-      icon: Mic,
-      title: { fr: "Témoignages", ar: "شهادات" },
-      desc: { fr: "Histoires orales et témoignages", ar: "تاريخ شفوي وشهادات" },
+      id: "GjCFxTlnYac",
+      title: { fr: "Vidéo 5", ar: "فيديو 5" }
     },
     {
-      icon: Library,
-      title: { fr: "Archives", ar: "أرشيف" },
-      desc: { fr: "Documents multimédias historiques", ar: "وثائق متعددة الوسائط تاريخية" },
-    },
+      id: "ILx_Ooc9TqA",
+      title: { fr: "Vidéo 6", ar: "فيديو 6" }
+    }
   ];
 
   return (
@@ -63,31 +64,40 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
           </p>
         </div>
 
-        {/* Grid of Media Types */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {mediaTypes.map((media, index) => {
-            const Icon = media.icon;
-            return (
-              <Card 
-                key={index}
-                className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-orange-500/50"
-              >
-                <CardContent className="p-6">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-16 h-16 mb-4 bg-gradient-to-br from-orange-500/20 to-blue-900/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Icon className="h-8 w-8 text-orange-500 group-hover:text-blue-900 transition-colors" />
-                    </div>
-                    <h3 className="text-lg font-bold text-foreground mb-2">
-                      {media.title[language]}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {media.desc[language]}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+        {/* Video Carousel */}
+        <div className="mb-8 px-12">
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent>
+              {videos.map((video, index) => (
+                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                  <Card className="border-2 hover:border-orange-500/50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="aspect-video rounded-lg overflow-hidden mb-3">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${video.id}`}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          title={video.title[language]}
+                        />
+                      </div>
+                      <h3 className="text-sm font-semibold text-center text-foreground">
+                        {video.title[language]}
+                      </h3>
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
         </div>
 
         {/* CTA */}
