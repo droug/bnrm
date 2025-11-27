@@ -104,8 +104,8 @@ const Index = () => {
         </section>
         
         {/* Main Content */}
-        <main className="container mx-auto px-4 py-8">
-          <div className="max-w-6xl mx-auto space-y-8">
+        <main className="container mx-auto px-4 py-4">
+          <div className="max-w-6xl mx-auto space-y-6">
               
               {/* Search Section */}
               <Card className="shadow-2xl border-2 border-primary/10 mb-12">
@@ -170,8 +170,8 @@ const Index = () => {
               <NewsEventsSection language={language} />
 
               {/* Digital Services Section */}
-              <div className="mb-12">
-                <div className="py-16 bg-gradient-to-b from-slate-50 to-white rounded-lg">
+              <div className="mb-6">
+                <div className="py-12 bg-gradient-to-b from-slate-50 to-white rounded-lg">
                   <div className="container mx-auto px-4">
                     <div className="mb-10">
                       <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
@@ -198,8 +198,8 @@ const Index = () => {
               <PlatformsSection language={language} />
 
               {/* Quick Links */}
-              <div className="mb-12">
-                <div className={`mb-10 ${language === 'ar' ? 'text-center' : 'text-left'}`}>
+              <div className="mb-6">
+                <div className={`mb-8 ${language === 'ar' ? 'text-center' : 'text-left'}`}>
                   <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
                     BNRM
                   </p>
