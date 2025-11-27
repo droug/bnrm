@@ -9,8 +9,17 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const typesenseHost = Deno.env.get('TYPESENSE_HOST')!;
-const typesenseApiKey = Deno.env.get('TYPESENSE_API_KEY')!;
+const typesenseHost = Deno.env.get('TYPESENSE_HOST');
+const typesenseApiKey = Deno.env.get('TYPESENSE_API_KEY');
+
+// Validate Typesense configuration
+if (!typesenseHost || !typesenseHost.startsWith('http')) {
+  throw new Error(`TYPESENSE_HOST must be a valid URL starting with http:// or https://. Current value: ${typesenseHost || 'not set'}`);
+}
+
+if (!typesenseApiKey) {
+  throw new Error('TYPESENSE_API_KEY environment variable is not set');
+}
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
