@@ -73,64 +73,52 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
           />
         </mesh>
         
-        {/* Number as HTML overlay on badge - very large and visible */}
+        {/* Number as HTML overlay on badge - smaller and centered */}
         <Html
           position={[0, 0, 0.03]}
           center
-          distanceFactor={10}
+          distanceFactor={0.6}
           style={{
             pointerEvents: 'none',
             userSelect: 'none',
           }}
         >
-          <div className="text-white font-bold" style={{ 
-            fontSize: '48px',
-            textShadow: '0 0 20px rgba(0,0,0,1), 0 0 40px rgba(0,0,0,0.9), 0 4px 8px rgba(0,0,0,1)',
-            WebkitTextStroke: '2px rgba(0,0,0,0.8)',
-            letterSpacing: '2px'
-          }}>
+          <div className="text-white font-bold text-xl" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
             {number}
           </div>
         </Html>
       </group>
       
-      {/* Title text directly on book cover - very large and visible */}
+      {/* Title text directly on book cover */}
       <Html
         position={[0, 0.8, 0.13]}
         center
-        distanceFactor={15}
+        distanceFactor={1}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div style={{ width: '600px' }}>
-          <h3 className="text-white font-bold text-center drop-shadow-2xl leading-tight" style={{
-            fontSize: '56px',
-            textShadow: '0 0 30px rgba(0,0,0,1), 0 8px 16px rgba(0,0,0,1), 0 4px 8px rgba(0,0,0,0.9)',
-            WebkitTextStroke: '2px rgba(0,0,0,0.8)'
-          }}>
+        <div style={{ width: '320px' }}>
+          <h3 className="text-white font-bold text-2xl text-center drop-shadow-2xl leading-tight">
             {title}
           </h3>
         </div>
       </Html>
       
-      {/* Description text on book cover - very large and visible */}
+      {/* Description text on book cover */}
       <Html
         position={[0, -0.8, 0.13]}
         center
-        distanceFactor={18}
+        distanceFactor={1.2}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div className="bg-black/90 px-8 py-6 rounded-xl backdrop-blur-md border-2 border-white/40 shadow-2xl" style={{ width: '650px' }}>
-          <p className="text-white text-center leading-relaxed font-semibold" style={{
-            fontSize: '22px',
-            textShadow: '0 4px 8px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,1)'
-          }}>
-            {description.substring(0, 150)}...
+        <div className="bg-black/70 px-5 py-3 rounded backdrop-blur-sm" style={{ width: '340px' }}>
+          <p className="text-white/95 text-sm text-center leading-relaxed">
+            {description.substring(0, 100)}...
           </p>
         </div>
       </Html>
