@@ -84,8 +84,8 @@ const Index = () => {
               
               <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
                 {language === 'ar' 
-                  ? 'الحفاظ على التراث المخطوط المغربي وتثمينه. اكتشف آلاف المخطوطات القديمة الرقمية بتقنية IIIF في إطار معماري استثنائي.'
-                  : 'Préservation et valorisation du patrimoine manuscrit marocain. Découvrez des milliers de manuscrits anciens numérisés avec la technologie IIIF dans un cadre architectural exceptionnel.'
+                  ? 'الحفاظ على التراث المخطوط المغربي وتثمينه. اكتشف آلاف المخطوطات القديمة الرقمية في إطار معماري استثنائي.'
+                  : 'Préservation et valorisation du patrimoine manuscrit marocain. Découvrez des milliers de manuscrits anciens numérisés dans un cadre architectural exceptionnel.'
                 }
               </p>
               
