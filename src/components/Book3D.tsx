@@ -73,17 +73,17 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
           />
         </mesh>
         
-        {/* Number as HTML overlay on badge - smaller and centered */}
+        {/* Number as HTML overlay on badge - larger and centered */}
         <Html
-          position={[0, 0, 0.03]}
+          position={[0, 0, 0.035]}
           center
-          distanceFactor={0.6}
+          distanceFactor={0.45}
           style={{
             pointerEvents: 'none',
             userSelect: 'none',
           }}
         >
-          <div className="text-white font-bold text-xl" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+          <div className="text-white font-bold text-3xl" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
             {number}
           </div>
         </Html>
@@ -93,14 +93,14 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       <Html
         position={[0, 0.8, 0.13]}
         center
-        distanceFactor={1}
+        distanceFactor={0.9}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div style={{ width: '320px' }}>
-          <h3 className="text-white font-bold text-2xl text-center drop-shadow-2xl leading-tight">
+        <div style={{ width: '340px' }}>
+          <h3 className="text-white font-bold text-3xl text-center drop-shadow-2xl leading-tight">
             {title}
           </h3>
         </div>
@@ -110,15 +110,15 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
       <Html
         position={[0, -0.8, 0.13]}
         center
-        distanceFactor={1.2}
+        distanceFactor={1}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div className="bg-black/70 px-5 py-3 rounded backdrop-blur-sm" style={{ width: '340px' }}>
-          <p className="text-white/95 text-sm text-center leading-relaxed">
-            {description.substring(0, 100)}...
+        <div className="bg-black/70 px-6 py-4 rounded backdrop-blur-sm" style={{ width: '360px' }}>
+          <p className="text-white/95 text-base text-center leading-relaxed">
+            {description.substring(0, 120)}...
           </p>
         </div>
       </Html>
