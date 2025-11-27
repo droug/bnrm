@@ -62,8 +62,8 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
         }}
       />
       
-      {/* Dark overlay for content readability */}
-      <div className="absolute inset-0 bg-[rgb(32,45,94)]/85" />
+      {/* Light overlay for content readability */}
+      <div className="absolute inset-0 bg-black/20" />
       <div className="container mx-auto px-4 relative z-10">
         <div className="mb-12">
           <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
