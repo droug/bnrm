@@ -73,58 +73,61 @@ function BookMesh({ coverImage, title, description, number, onClick }: Book3DPro
           />
         </mesh>
         
-        {/* Number as HTML overlay on badge - larger and more visible */}
+        {/* Number as HTML overlay on badge - much larger */}
         <Html
           position={[0, 0, 0.03]}
           center
-          distanceFactor={0.4}
+          distanceFactor={0.08}
           style={{
             pointerEvents: 'none',
             userSelect: 'none',
           }}
         >
-          <div className="text-white font-bold text-3xl" style={{ 
-            textShadow: '0 0 10px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.8)',
-            WebkitTextStroke: '1px rgba(0,0,0,0.3)'
+          <div className="text-white font-bold" style={{ 
+            fontSize: '120px',
+            textShadow: '0 0 20px rgba(0,0,0,1), 0 0 40px rgba(0,0,0,0.9)',
+            WebkitTextStroke: '2px rgba(0,0,0,0.5)'
           }}>
             {number}
           </div>
         </Html>
       </group>
       
-      {/* Title text directly on book cover - larger and more visible */}
+      {/* Title text directly on book cover - much larger */}
       <Html
         position={[0, 0.8, 0.13]}
         center
-        distanceFactor={0.8}
+        distanceFactor={0.15}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div style={{ width: '380px' }}>
-          <h3 className="text-white font-bold text-3xl text-center drop-shadow-2xl leading-tight" style={{
-            textShadow: '0 0 20px rgba(0,0,0,1), 0 4px 8px rgba(0,0,0,0.9)',
-            WebkitTextStroke: '0.5px rgba(0,0,0,0.5)'
+        <div style={{ width: '1800px' }}>
+          <h3 className="text-white font-bold text-center drop-shadow-2xl leading-tight" style={{
+            fontSize: '140px',
+            textShadow: '0 0 30px rgba(0,0,0,1), 0 8px 16px rgba(0,0,0,0.9)',
+            WebkitTextStroke: '2px rgba(0,0,0,0.6)'
           }}>
             {title}
           </h3>
         </div>
       </Html>
       
-      {/* Description text on book cover - larger and more visible */}
+      {/* Description text on book cover - much larger */}
       <Html
         position={[0, -0.8, 0.13]}
         center
-        distanceFactor={1}
+        distanceFactor={0.2}
         style={{
           pointerEvents: 'none',
           userSelect: 'none',
         }}
       >
-        <div className="bg-black/85 px-6 py-4 rounded-lg backdrop-blur-md border border-white/20" style={{ width: '380px' }}>
-          <p className="text-white text-base text-center leading-relaxed font-medium" style={{
-            textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+        <div className="bg-black/90 px-8 py-6 rounded-lg backdrop-blur-md border-2 border-white/30" style={{ width: '1800px' }}>
+          <p className="text-white text-center leading-relaxed font-medium" style={{
+            fontSize: '70px',
+            textShadow: '0 4px 8px rgba(0,0,0,0.9)'
           }}>
             {description.substring(0, 120)}...
           </p>
