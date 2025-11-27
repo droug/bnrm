@@ -12316,6 +12316,7 @@ export type Database = {
         | "legal_deposit"
         | "service_bnrm"
         | "recharge_wallet"
+        | "donation"
       user_role:
         | "admin"
         | "librarian"
@@ -12533,6 +12534,7 @@ export const Constants = {
         "legal_deposit",
         "service_bnrm",
         "recharge_wallet",
+        "donation",
       ],
       user_role: [
         "admin",
