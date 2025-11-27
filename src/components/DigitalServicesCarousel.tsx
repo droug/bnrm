@@ -279,24 +279,14 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
         <div className="flex gap-2">
           <button
             onClick={() => api?.scrollPrev()}
-            disabled={count <= 1}
-            className={`p-3 rounded-lg transition-colors ${
-              count <= 1
-                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
+            className="p-3 rounded-lg transition-colors bg-blue-600 text-white hover:bg-blue-700"
             aria-label="Previous slide"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             onClick={() => api?.scrollNext()}
-            disabled={count <= 1}
-            className={`p-3 rounded-lg transition-colors ${
-              count <= 1
-                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
+            className="p-3 rounded-lg transition-colors bg-blue-600 text-white hover:bg-blue-700"
             aria-label="Next slide"
           >
             <ChevronRight className="h-5 w-5" />
