@@ -185,7 +185,7 @@ const Header = () => {
         {
           title: { fr: "Dons", ar: "التبرعات" },
           desc: { fr: "Soutenez la bibliothèque par vos dons", ar: "ادعم المكتبة بتبرعاتك" },
-          href: "/dons"
+          href: "/donation"
         }
       ]
     }
