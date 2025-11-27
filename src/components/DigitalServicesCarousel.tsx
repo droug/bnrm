@@ -216,9 +216,9 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-4">
+        <CarouselContent className="-ml-2">
           {allServices.map((service, index) => (
-            <CarouselItem key={service.id} className="pl-4 md:basis-1/2 lg:basis-1/5">
+            <CarouselItem key={service.id} className="pl-2 md:basis-1/2 lg:basis-1/3">
               <div
                 className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group h-full flex flex-col"
                 onClick={service.onClick}
