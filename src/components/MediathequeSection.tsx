@@ -20,7 +20,7 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
   const videos = [
     {
       id: "2hOKleHBUYs",
-      title: { fr: "Vidéo 1", ar: "فيديو 1" }
+      title: { fr: "Visite guidée de la BNRM", ar: "جولة إرشادية في BNRM" }
     },
     {
       id: "l02BjttZjmE",
