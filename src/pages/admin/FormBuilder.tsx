@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -24,7 +25,8 @@ import { initializeLegalDepositMonographForm } from "@/utils/initializeLegalDepo
 
 export default function FormBuilder() {
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { isAdmin, isLibrarian, loading: rolesLoading } = useSecureRoles();
   const [filter, setFilter] = useState<FormFilter>({
     platform: "bnrm",
     module: "",
@@ -74,7 +76,11 @@ export default function FormBuilder() {
     init();
   }, []);
 
-  if (!user || !profile || (profile.role !== 'admin' && profile.role !== 'librarian')) {
+  if (rolesLoading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+  }
+
+  if (!user || (!isAdmin && !isLibrarian)) {
     return <Navigate to="/auth" replace />;
   }
 

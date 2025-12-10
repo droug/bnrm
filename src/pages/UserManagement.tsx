@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -168,6 +169,7 @@ const ROLE_PERMISSIONS = {
 
 export default function UserManagement() {
   const { user, profile, loading } = useAuth();
+  const { isAdmin, loading: rolesLoading } = useSecureRoles();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -182,10 +184,10 @@ export default function UserManagement() {
   const [showEditDialog, setShowEditDialog] = useState(false);
 
   useEffect(() => {
-    if (user && profile?.role === 'admin') {
+    if (user && isAdmin) {
       fetchData();
     }
-  }, [user, profile]);
+  }, [user, isAdmin]);
 
   const fetchData = async () => {
     try {
@@ -419,7 +421,7 @@ export default function UserManagement() {
     });
   };
 
-  if (loading || isLoading) {
+  if (loading || rolesLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -427,7 +429,7 @@ export default function UserManagement() {
     );
   }
 
-  if (!user || profile?.role !== 'admin') {
+  if (!user || !isAdmin) {
     return <Navigate to="/dashboard" replace />;
   }
 

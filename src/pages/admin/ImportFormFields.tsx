@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -14,13 +15,18 @@ import { importFormFields, legalDepositMonographFields } from "@/utils/importFor
 import { toast } from "sonner";
 
 export default function ImportFormFields() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { isAdmin, isLibrarian, loading: rolesLoading } = useSecureRoles();
   const navigate = useNavigate();
   const [selectedForm, setSelectedForm] = useState<string>("");
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
 
-  if (!user || !profile || (profile.role !== 'admin' && profile.role !== 'librarian')) {
+  if (rolesLoading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+  }
+
+  if (!user || (!isAdmin && !isLibrarian)) {
     return <Navigate to="/auth" replace />;
   }
 

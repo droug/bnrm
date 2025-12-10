@@ -1,24 +1,20 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
 import { CommitteeManager } from "@/components/legal-deposit/CommitteeManager";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Navigate } from "react-router-dom";
 
 const CommitteeDashboard = () => {
-  const { user, loading, profile } = useAuth();
+  const { user } = useAuth();
+  const { isAdmin, isLibrarian, loading: rolesLoading } = useSecureRoles();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!loading && (!user || (profile && profile.role !== 'admin' && profile.role !== 'librarian'))) {
-      navigate('/');
-    }
-  }, [user, loading, profile, navigate]);
-
-  if (loading) {
+  if (rolesLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
@@ -26,8 +22,8 @@ const CommitteeDashboard = () => {
     );
   }
 
-  if (!user || (profile && profile.role !== 'admin' && profile.role !== 'librarian')) {
-    return null;
+  if (!user || (!isAdmin && !isLibrarian)) {
+    return <Navigate to="/" replace />;
   }
 
   return (
