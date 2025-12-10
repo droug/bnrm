@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { Navigate, useNavigate } from "react-router-dom";
 import KitabHeader from "@/components/KitabHeader";
 import Footer from "@/components/Footer";
@@ -7,11 +8,15 @@ import { Settings, BookPlus, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function KitabAdmin() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { isAdmin, loading: rolesLoading } = useSecureRoles();
   const navigate = useNavigate();
 
-  // Restrict access to admin only
-  if (!user || !profile || profile.role !== 'admin') {
+  if (rolesLoading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+  }
+
+  if (!user || !isAdmin) {
     return <Navigate to="/kitab" replace />;
   }
 

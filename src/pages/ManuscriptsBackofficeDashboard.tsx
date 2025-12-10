@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { Navigate, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -7,12 +8,15 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 export default function ManuscriptsBackofficeDashboard() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { isAdmin, isLibrarian, isProfessional, loading: rolesLoading } = useSecureRoles();
   const navigate = useNavigate();
 
-  // Bloquer l'accès aux comptes professionnels
-  const professionalRoles = ['editor', 'printer', 'producer'];
-  if (!user || !profile || !['admin', 'librarian'].includes(profile.role) || professionalRoles.includes(profile.role)) {
+  if (rolesLoading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+  }
+
+  if (!user || (!isAdmin && !isLibrarian) || isProfessional) {
     return <Navigate to="/dashboard" replace />;
   }
 

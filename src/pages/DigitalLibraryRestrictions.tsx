@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { Navigate, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -19,6 +20,7 @@ import { useState } from "react";
 
 export default function DigitalLibraryRestrictions() {
   const { user, profile } = useAuth();
+  const { isAdmin, isLibrarian, loading: rolesLoading } = useSecureRoles();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -28,7 +30,11 @@ export default function DigitalLibraryRestrictions() {
   const [reason, setReason] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
 
-  if (!user || !profile || !['admin', 'librarian'].includes(profile.role)) {
+  if (rolesLoading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+  }
+
+  if (!user || (!isAdmin && !isLibrarian)) {
     return <Navigate to="/" replace />;
   }
 

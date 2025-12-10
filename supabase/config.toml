@@ -49,7 +49,7 @@ verify_jwt = true
 
 # Microservices Architecture
 [functions.analytics-service]
-verify_jwt = false
+verify_jwt = true
 
 [functions.workflow-service]
 verify_jwt = true
@@ -58,7 +58,7 @@ verify_jwt = true
 verify_jwt = false
 
 [functions.document-service]
-verify_jwt = false
+verify_jwt = true
 
 [functions.content-service]
 verify_jwt = true
