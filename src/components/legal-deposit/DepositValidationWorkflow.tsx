@@ -143,12 +143,11 @@ export function DepositValidationWorkflow() {
       return;
     }
 
-    // Fusionner les données réelles avec les exemples pour la démonstration
-    const exampleRequests = getExampleRequests();
+    // Afficher uniquement les données réelles
     if (data && data.length > 0) {
-      setRequests([...exampleRequests, ...(data as any)]);
+      setRequests(data as any);
     } else {
-      setRequests(exampleRequests);
+      setRequests([]);
     }
   };
 
