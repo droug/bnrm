@@ -462,9 +462,9 @@ export function DepositValidationWorkflow() {
         
         setRequests(updatedRequests);
         
-        // Générer le document approprié
-        if (status === "approved" && validationType === "service") {
-          await generateValidationForm(selectedRequest!);
+        // Générer le document approprié selon le type d'approbation
+        if (status === "approved") {
+          await generateValidationForm(selectedRequest!, validationType);
         } else if (status === "rejected") {
           await generateRejectionLetter(selectedRequest!);
         }
@@ -520,9 +520,9 @@ export function DepositValidationWorkflow() {
 
       if (error) throw error;
 
-      // Générer le document approprié
-      if (status === "approved" && validationType === "service") {
-        await generateValidationForm(selectedRequest!);
+      // Générer le document approprié selon le type d'approbation
+      if (status === "approved") {
+        await generateValidationForm(selectedRequest!, validationType);
       } else if (status === "rejected") {
         await generateRejectionLetter(selectedRequest!);
       }
@@ -580,75 +580,318 @@ export function DepositValidationWorkflow() {
     }
   };
 
-  const generateValidationForm = async (request: DepositRequest) => {
+  // Helper function to add request details to PDF
+  const addRequestDetailsToPDF = (doc: jsPDF, request: DepositRequest, startY: number): number => {
+    let yPos = startY;
+    const metadata = request.metadata || {};
+    const customFields = metadata.customFields || {};
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const maxWidth = pageWidth - 2 * margin;
+
+    const checkNewPage = (neededSpace: number = 25) => {
+      if (yPos > 260) {
+        doc.addPage();
+        yPos = 20;
+      }
+    };
+
+    const addSection = (title: string) => {
+      checkNewPage(30);
+      doc.setFontSize(12);
+      doc.setFont(undefined, "bold");
+      doc.setTextColor(0, 51, 102);
+      doc.text(title, margin, yPos);
+      yPos += 2;
+      doc.setLineWidth(0.3);
+      doc.line(margin, yPos, margin + 80, yPos);
+      yPos += 8;
+      doc.setFont(undefined, "normal");
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+    };
+
+    const addField = (label: string, value: string | undefined | null) => {
+      if (!value) return;
+      checkNewPage();
+      doc.setFont(undefined, "bold");
+      doc.text(`${label}:`, margin, yPos);
+      doc.setFont(undefined, "normal");
+      const splitText = doc.splitTextToSize(value, maxWidth - 50);
+      doc.text(splitText, margin + 50, yPos);
+      yPos += 6 * Math.max(1, splitText.length);
+    };
+
+    // Informations générales
+    addSection("Informations Générales");
+    addField("N° Demande", request.request_number);
+    addField("Date de soumission", format(new Date(request.created_at), "dd/MM/yyyy à HH:mm", { locale: fr }));
+    addField("Type de support", request.support_type);
+    if (request.monograph_type) addField("Type de monographie", request.monograph_type);
+
+    // Publication
+    addSection("Identification de la Publication");
+    addField("Titre", request.title);
+    if (request.subtitle) addField("Sous-titre", request.subtitle);
+    addField("Auteur", request.author_name);
+    if (customFields.author_nationality) addField("Nationalité", customFields.author_nationality);
+    if (customFields.author_gender) addField("Genre", customFields.author_gender);
+    if (metadata.author_type) addField("Type d'auteur", metadata.author_type === 'physique' ? 'Personne physique' : 'Personne morale');
+    if (customFields.author_region) addField("Région", customFields.author_region);
+    if (customFields.author_city) addField("Ville", customFields.author_city);
+    if (customFields.publication_type) addField("Type de publication", customFields.publication_type);
+    if (customFields.publication_discipline) addField("Discipline", customFields.publication_discipline);
+    if (customFields.publication_language) addField("Langue", customFields.publication_language);
+    if (customFields.publication_pages) addField("Nombre de pages", customFields.publication_pages);
+    if (customFields.publication_isbn) addField("ISBN", customFields.publication_isbn);
+    if (customFields.publication_issn) addField("ISSN", customFields.publication_issn);
+    if (customFields.publication_year) addField("Année de publication", customFields.publication_year);
+    if (customFields.publication_edition) addField("Édition", customFields.publication_edition);
+
+    // Éditeur
+    if (metadata.publisher_name || customFields.publisher_name) {
+      addSection("Identification de l'Éditeur");
+      addField("Éditeur", metadata.publisher_name || customFields.publisher_name);
+      if (customFields.publisher_type) addField("Type d'éditeur", customFields.publisher_type);
+      if (customFields.publisher_address) addField("Adresse", customFields.publisher_address);
+      if (customFields.publisher_city) addField("Ville", customFields.publisher_city);
+      if (customFields.publication_date) addField("Date de publication prévue", customFields.publication_date);
+    }
+
+    // Imprimeur
+    if (metadata.printer_name || customFields.printer_name) {
+      addSection("Identification de l'Imprimeur");
+      addField("Imprimerie", metadata.printer_name || customFields.printer_name);
+      if (customFields.printer_tirage) addField("Nombre de tirage", customFields.printer_tirage);
+    }
+
+    // Distributeur (pour audiovisuel/logiciels)
+    if (customFields.distributor_name) {
+      addSection("Identification du Distributeur");
+      addField("Distributeur", customFields.distributor_name);
+      if (customFields.distributor_tirage) addField("Nombre de tirage", customFields.distributor_tirage);
+    }
+
+    // Producteur (pour audiovisuel)
+    if (customFields.producer_name) {
+      addSection("Identification du Producteur");
+      addField("Producteur", customFields.producer_name);
+    }
+
+    // Champs personnalisés supplémentaires
+    const displayedFields = [
+      'author_nationality', 'author_gender', 'author_region', 'author_city',
+      'publication_type', 'publication_discipline', 'publication_language', 
+      'publication_pages', 'publication_isbn', 'publication_issn', 'publication_year',
+      'publication_edition', 'publisher_name', 'publisher_type', 'publisher_address',
+      'publisher_city', 'publication_date', 'printer_name', 'printer_tirage',
+      'distributor_name', 'distributor_tirage', 'producer_name'
+    ];
+
+    const otherFields = Object.entries(customFields).filter(
+      ([key, value]) => !displayedFields.includes(key) && value
+    );
+
+    if (otherFields.length > 0) {
+      addSection("Informations Complémentaires");
+      otherFields.forEach(([key, value]) => {
+        const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        addField(label, value as string);
+      });
+    }
+
+    return yPos;
+  };
+
+  const generateValidationFormDLBN = async (request: DepositRequest) => {
     const doc = new jsPDF();
     
-    // En-tête officiel BNRM
     let yPos = await addBNRMHeader(doc);
     yPos += 10;
     
     doc.setFontSize(16);
-    doc.text("Formulaire Canevas de Validation", 105, yPos, { align: "center" });
+    doc.setFont(undefined, "bold");
+    doc.setTextColor(0, 51, 102);
+    doc.text("ATTESTATION DE VALIDATION - SERVICE DLBN", 105, yPos, { align: "center" });
+    yPos += 8;
+    
+    doc.setFontSize(11);
+    doc.setFont(undefined, "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text("Direction de la Légalisation et de la Bibliographie Nationale", 105, yPos, { align: "center" });
     yPos += 10;
     
     doc.setLineWidth(0.5);
+    doc.setDrawColor(0, 51, 102);
     doc.line(20, yPos, 190, yPos);
-    yPos += 10;
-    
-    doc.setFontSize(12);
-    doc.text("Numéro de demande:", 20, yPos);
-    doc.setFont(undefined, "bold");
-    doc.text(request.request_number, 80, yPos);
-    yPos += 10;
-    
-    doc.setFont(undefined, "normal");
-    doc.text("Date de validation:", 20, yPos);
-    doc.setFont(undefined, "bold");
-    doc.text(format(new Date(), "dd/MM/yyyy à HH:mm", { locale: fr }), 80, yPos);
     yPos += 15;
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.text(`Rabat, le ${format(new Date(), "dd MMMM yyyy", { locale: fr })}`, 140, yPos);
+    yPos += 15;
+
+    // Ajouter tous les détails
+    yPos = addRequestDetailsToPDF(doc, request, yPos);
+
+    // Section validation
+    yPos += 10;
+    doc.setFontSize(12);
+    doc.setFont(undefined, "bold");
+    doc.setTextColor(0, 102, 51);
+    doc.text("DÉCISION: VALIDÉ PAR LE SERVICE DLBN", 20, yPos);
+    yPos += 8;
     
     doc.setFont(undefined, "normal");
-    doc.setFontSize(14);
-    doc.text("Détails de la Publication", 20, yPos);
-    yPos += 2;
-    doc.setLineWidth(0.3);
-    doc.line(20, yPos, 100, yPos);
-    yPos += 8;
-    
-    doc.setFontSize(11);
-    doc.text("Titre:", 20, yPos);
-    yPos += 7;
-    doc.text(request.title, 20, yPos);
-    yPos += 8;
-    
-    if (request.subtitle) {
-      doc.text("Sous-titre:", 20, yPos);
-      yPos += 7;
-      doc.text(request.subtitle, 20, yPos);
-      yPos += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Date de validation: ${format(new Date(), "dd/MM/yyyy à HH:mm", { locale: fr })}`, 20, yPos);
+    yPos += 6;
+    if (comments) {
+      doc.text(`Observations: ${comments}`, 20, yPos);
     }
     
-    doc.text("Type de support:", 20, yPos);
-    yPos += 7;
-    doc.text(request.support_type, 20, yPos);
-    yPos += 15;
+    addBNRMFooter(doc, doc.getNumberOfPages());
+    doc.save(`Validation_DLBN_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
+  };
+
+  const generateValidationFormABN = async (request: DepositRequest) => {
+    const doc = new jsPDF();
     
-    doc.setFontSize(14);
-    doc.text("Validation Service DLBN", 20, yPos);
-    yPos += 2;
-    doc.line(20, yPos, 100, yPos);
+    let yPos = await addBNRMHeader(doc);
+    yPos += 10;
+    
+    doc.setFontSize(16);
+    doc.setFont(undefined, "bold");
+    doc.setTextColor(102, 0, 102);
+    doc.text("ATTESTATION DE VALIDATION - DÉPARTEMENT ABN", 105, yPos, { align: "center" });
     yPos += 8;
     
     doc.setFontSize(11);
-    doc.text("Statut: APPROUVÉ", 20, yPos);
-    yPos += 7;
-    doc.text(`Date: ${format(new Date(), "dd/MM/yyyy", { locale: fr })}`, 20, yPos);
+    doc.setFont(undefined, "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text("Agence Bibliographique Nationale", 105, yPos, { align: "center" });
+    yPos += 10;
     
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(102, 0, 102);
+    doc.line(20, yPos, 190, yPos);
+    yPos += 15;
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.text(`Rabat, le ${format(new Date(), "dd MMMM yyyy", { locale: fr })}`, 140, yPos);
+    yPos += 15;
+
+    // Ajouter tous les détails
+    yPos = addRequestDetailsToPDF(doc, request, yPos);
+
+    // Section validation
+    yPos += 10;
+    doc.setFontSize(12);
+    doc.setFont(undefined, "bold");
+    doc.setTextColor(102, 0, 102);
+    doc.text("DÉCISION: VALIDÉ PAR LE DÉPARTEMENT ABN", 20, yPos);
+    yPos += 8;
+    
+    doc.setFont(undefined, "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Date de validation: ${format(new Date(), "dd/MM/yyyy à HH:mm", { locale: fr })}`, 20, yPos);
+    yPos += 6;
+    if (comments) {
+      doc.text(`Observations: ${comments}`, 20, yPos);
+    }
+    
+    // Mention de validation précédente
+    if (request.service_validated_at) {
+      yPos += 10;
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Préalablement validé par le Service DLBN le ${format(new Date(request.service_validated_at), "dd/MM/yyyy", { locale: fr })}`, 20, yPos);
+    }
+    
+    addBNRMFooter(doc, doc.getNumberOfPages());
+    doc.save(`Validation_ABN_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
+  };
+
+  const generateValidationFormComite = async (request: DepositRequest) => {
+    const doc = new jsPDF();
+    
+    let yPos = await addBNRMHeader(doc);
+    yPos += 10;
+    
+    doc.setFontSize(16);
+    doc.setFont(undefined, "bold");
+    doc.setTextColor(0, 102, 51);
+    doc.text("ATTESTATION DE VALIDATION FINALE", 105, yPos, { align: "center" });
+    yPos += 8;
+    
+    doc.setFontSize(11);
+    doc.setFont(undefined, "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text("Comité de Validation du Dépôt Légal", 105, yPos, { align: "center" });
+    yPos += 10;
+    
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(0, 102, 51);
+    doc.line(20, yPos, 190, yPos);
+    yPos += 15;
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.text(`Rabat, le ${format(new Date(), "dd MMMM yyyy", { locale: fr })}`, 140, yPos);
+    yPos += 15;
+
+    // Ajouter tous les détails
+    yPos = addRequestDetailsToPDF(doc, request, yPos);
+
+    // Section validation finale
+    yPos += 10;
+    doc.setFontSize(12);
+    doc.setFont(undefined, "bold");
+    doc.setTextColor(0, 102, 51);
+    doc.text("DÉCISION FINALE: VALIDÉ PAR LE COMITÉ", 20, yPos);
+    yPos += 8;
+    
+    doc.setFont(undefined, "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Date de validation finale: ${format(new Date(), "dd/MM/yyyy à HH:mm", { locale: fr })}`, 20, yPos);
+    yPos += 6;
+    if (comments) {
+      doc.text(`Observations du comité: ${comments}`, 20, yPos);
+    }
+    
+    // Historique des validations
+    yPos += 10;
     doc.setFontSize(9);
-    doc.text("Ce document certifie la conformité de la demande de dépôt légal.", 105, 280, { align: "center" });
-    doc.text("Bibliothèque Nationale du Royaume du Maroc", 105, 287, { align: "center" });
+    doc.setTextColor(100, 100, 100);
+    doc.text("Historique des validations:", 20, yPos);
+    yPos += 5;
+    if (request.service_validated_at) {
+      doc.text(`• Service DLBN: ${format(new Date(request.service_validated_at), "dd/MM/yyyy", { locale: fr })}`, 25, yPos);
+      yPos += 4;
+    }
+    if (request.department_validated_at) {
+      doc.text(`• Département ABN: ${format(new Date(request.department_validated_at), "dd/MM/yyyy", { locale: fr })}`, 25, yPos);
+      yPos += 4;
+    }
+    doc.text(`• Comité de Validation: ${format(new Date(), "dd/MM/yyyy", { locale: fr })}`, 25, yPos);
     
-    doc.save(`Validation_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
+    addBNRMFooter(doc, doc.getNumberOfPages());
+    doc.save(`Validation_Comite_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
+  };
+
+  // Fonction générique pour compatibilité
+  const generateValidationForm = async (request: DepositRequest, validationType?: string) => {
+    if (validationType === "department") {
+      await generateValidationFormABN(request);
+    } else if (validationType === "committee") {
+      await generateValidationFormComite(request);
+    } else {
+      await generateValidationFormDLBN(request);
+    }
   };
 
   const generateRejectionLetter = async (request: DepositRequest) => {
@@ -1306,15 +1549,35 @@ export function DepositValidationWorkflow() {
               )}
 
               {/* Boutons de génération de documents */}
-              {selectedRequest.validated_by_service && (
-                <div className="flex gap-3 border-t pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => generateValidationForm(selectedRequest)}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Télécharger Formulaire de Validation
-                  </Button>
+              {(selectedRequest.validated_by_service || selectedRequest.validated_by_department || selectedRequest.validated_by_committee) && (
+                <div className="flex flex-wrap gap-3 border-t pt-4">
+                  {selectedRequest.validated_by_service && (
+                    <Button
+                      variant="outline"
+                      onClick={() => generateValidationFormDLBN(selectedRequest)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Attestation DLBN
+                    </Button>
+                  )}
+                  {selectedRequest.validated_by_department && (
+                    <Button
+                      variant="outline"
+                      onClick={() => generateValidationFormABN(selectedRequest)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Attestation ABN
+                    </Button>
+                  )}
+                  {selectedRequest.validated_by_committee && (
+                    <Button
+                      variant="outline"
+                      onClick={() => generateValidationFormComite(selectedRequest)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Attestation Comité
+                    </Button>
+                  )}
                 </div>
               )}
 
