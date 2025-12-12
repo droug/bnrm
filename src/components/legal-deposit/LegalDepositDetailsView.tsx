@@ -3,8 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { FileText, Image, File as FileIcon, Download, ExternalLink } from "lucide-react";
+import { FileText, Image, File as FileIcon, Download, ExternalLink, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 interface LegalDepositDetailsViewProps {
   request: any;
@@ -12,6 +13,42 @@ interface LegalDepositDetailsViewProps {
 
 export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProps) {
   const [previewDocument, setPreviewDocument] = useState<{ label: string; url: string; type: string } | null>(null);
+  const [downloadingFile, setDownloadingFile] = useState<string | null>(null);
+
+  const handleDownload = async (url: string, fileName?: string) => {
+    try {
+      setDownloadingFile(url);
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Erreur lors du téléchargement');
+      }
+      
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = fileName || 'document';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+      
+      toast({
+        title: "Téléchargement réussi",
+        description: `Le fichier ${fileName || 'document'} a été téléchargé.`,
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: "Erreur de téléchargement",
+        description: "Impossible de télécharger le fichier. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloadingFile(null);
+    }
+  };
   const renderAuthorInfo = () => {
     const metadata = request.metadata || {};
     const customFields = metadata.customFields || {};
@@ -595,12 +632,15 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
                       <Button
                         variant="outline"
                         size="sm"
-                        asChild
+                        onClick={() => handleDownload(doc.url, doc.fileName)}
+                        disabled={downloadingFile === doc.url}
                       >
-                        <a href={doc.url} target="_blank" rel="noopener noreferrer" download>
+                        {downloadingFile === doc.url ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
                           <Download className="h-4 w-4 mr-1" />
-                          Télécharger
-                        </a>
+                        )}
+                        Télécharger
                       </Button>
                     </>
                   ) : (
