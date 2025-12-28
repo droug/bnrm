@@ -29,7 +29,10 @@ interface DigitalLibraryLayoutProps {
 export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const { t, language, setLanguage } = useLanguage();
   const { isAuthenticated, isLibrarian } = useAccessControl();
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
+  
+  // Vérifier si l'utilisateur est admin ou bibliothécaire (compatible avec Header.tsx)
+  const canManageLibrary = isLibrarian || profile?.role === 'admin' || profile?.role === 'librarian';
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [showDigitizationDialog, setShowDigitizationDialog] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -139,7 +142,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             </div>
 
             {/* Bouton Gestion Bibliothèque Numérique pour admin/bibliothécaire */}
-            {isLibrarian && (
+            {canManageLibrary && (
               <Link to="/admin/digital-library">
                 <Button variant="outline" size="sm" className="gap-2 border-primary/40 hover:border-primary hover:bg-primary/10">
                   <Shield className="h-4 w-4" />
