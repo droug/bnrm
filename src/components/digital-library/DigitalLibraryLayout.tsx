@@ -1,7 +1,7 @@
 import { ReactNode, useState, useEffect } from "react";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
-import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit } from "lucide-react";
+import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useAuth } from "@/hooks/useAuth";
@@ -137,6 +137,17 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 </div>
               </Link>
             </div>
+
+            {/* Bouton Gestion Bibliothèque Numérique pour admin/bibliothécaire */}
+            {isLibrarian && (
+              <Link to="/admin/digital-library">
+                <Button variant="outline" size="sm" className="gap-2 border-primary/40 hover:border-primary hover:bg-primary/10">
+                  <Shield className="h-4 w-4" />
+                  <span className="hidden sm:inline">Gestion Bibliothèque Numérique</span>
+                  <span className="sm:hidden">Gestion</span>
+                </Button>
+              </Link>
+            )}
 
             {/* Language Selector, Theme Switcher & User Menu */}
             <div className="flex items-center gap-2">
