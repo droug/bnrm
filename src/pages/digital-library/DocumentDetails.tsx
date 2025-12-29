@@ -148,9 +148,11 @@ export default function DocumentDetails() {
         .from('profiles')
         .select('first_name, last_name')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading profile:', error);
+      }
 
       const { data: { user: authUser } } = await supabase.auth.getUser();
       
