@@ -3592,6 +3592,93 @@ export type Database = {
           },
         ]
       }
+      digital_library_access_restrictions: {
+        Row: {
+          access_level: string
+          allow_download: boolean | null
+          allow_embed: boolean | null
+          allow_full_consultation: boolean | null
+          allow_sharing: boolean | null
+          allowed_pages: number[] | null
+          block_print: boolean | null
+          block_right_click: boolean | null
+          block_screenshot: boolean | null
+          consultation_percentage: number | null
+          copyright_expires_at: string | null
+          copyright_holder: string | null
+          copyright_status: string | null
+          created_at: string | null
+          created_by: string | null
+          document_id: string
+          document_source: string
+          download_format: string[] | null
+          download_watermark: boolean | null
+          id: string
+          license_type: string | null
+          license_url: string | null
+          restriction_message_ar: string | null
+          restriction_message_fr: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          access_level?: string
+          allow_download?: boolean | null
+          allow_embed?: boolean | null
+          allow_full_consultation?: boolean | null
+          allow_sharing?: boolean | null
+          allowed_pages?: number[] | null
+          block_print?: boolean | null
+          block_right_click?: boolean | null
+          block_screenshot?: boolean | null
+          consultation_percentage?: number | null
+          copyright_expires_at?: string | null
+          copyright_holder?: string | null
+          copyright_status?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          document_id: string
+          document_source?: string
+          download_format?: string[] | null
+          download_watermark?: boolean | null
+          id?: string
+          license_type?: string | null
+          license_url?: string | null
+          restriction_message_ar?: string | null
+          restriction_message_fr?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          access_level?: string
+          allow_download?: boolean | null
+          allow_embed?: boolean | null
+          allow_full_consultation?: boolean | null
+          allow_sharing?: boolean | null
+          allowed_pages?: number[] | null
+          block_print?: boolean | null
+          block_right_click?: boolean | null
+          block_screenshot?: boolean | null
+          consultation_percentage?: number | null
+          copyright_expires_at?: string | null
+          copyright_holder?: string | null
+          copyright_status?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          document_id?: string
+          document_source?: string
+          download_format?: string[] | null
+          download_watermark?: boolean | null
+          id?: string
+          license_type?: string | null
+          license_url?: string | null
+          restriction_message_ar?: string | null
+          restriction_message_fr?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       digital_library_documents: {
         Row: {
           access_level: string | null

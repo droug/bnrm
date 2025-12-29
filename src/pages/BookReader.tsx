@@ -48,7 +48,8 @@ import {
   EyeOff,
   MousePointerClick,
   Heart,
-  Star
+  Star,
+  AlertCircle
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -101,6 +102,12 @@ const BookReader = () => {
   const [blockScreenCapture, setBlockScreenCapture] = useState(false);
   const [blockRightClick, setBlockRightClick] = useState(false);
   const [allowDownload, setAllowDownload] = useState(true);
+  const [allowSharing, setAllowSharing] = useState(true);
+  
+  // Access restrictions from database
+  const [accessRestrictions, setAccessRestrictions] = useState<any>(null);
+  const [consultationPercentage, setConsultationPercentage] = useState(100);
+  const [maxAllowedPage, setMaxAllowedPage] = useState(245);
   
   // Page access restriction settings
   const [restrictPageAccess, setRestrictPageAccess] = useState(false);
@@ -143,11 +150,59 @@ const BookReader = () => {
       
       setLoading(true);
       try {
+        // Charger les restrictions d'accès
+        const { data: restrictionsData } = await supabase
+          .from('digital_library_access_restrictions')
+          .select('*')
+          .eq('document_id', id)
+          .maybeSingle();
+        
+        if (restrictionsData) {
+          setAccessRestrictions(restrictionsData);
+          setBlockRightClick(restrictionsData.block_right_click || false);
+          setBlockScreenCapture(restrictionsData.block_screenshot || false);
+          setAllowDownload(restrictionsData.allow_download !== false);
+          setAllowSharing(restrictionsData.allow_sharing !== false);
+          setConsultationPercentage(restrictionsData.consultation_percentage || 100);
+          
+          // Calculer la page maximum autorisée
+          const percentage = restrictionsData.consultation_percentage || 100;
+          const maxPage = Math.ceil((245 * percentage) / 100);
+          setMaxAllowedPage(maxPage);
+          
+          // Si consultation partielle, activer les restrictions
+          if (!restrictionsData.allow_full_consultation) {
+            setRestrictPageAccess(true);
+            setStartPage(1);
+            setEndPage(maxPage);
+          }
+        }
+
+        // Essayer d'abord cbn_documents
+        const { data: cbnData, error: cbnError } = await supabase
+          .from('cbn_documents')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (cbnData && !cbnError) {
+          setDocumentData({
+            ...cbnData,
+            author: cbnData.author || 'Auteur inconnu',
+            title: cbnData.title,
+            excerpt: cbnData.notes || cbnData.physical_description,
+          });
+          setDocumentImage(manuscriptPage1);
+          setLoading(false);
+          return;
+        }
+
+        // Sinon essayer la table content
         const { data, error } = await supabase
           .from('content')
           .select('id, title, excerpt, content_type, published_at, file_url, file_type, tags, author_id')
           .eq('id', id)
-          .single();
+          .maybeSingle();
 
         if (data && !error) {
           // Load author info
@@ -157,7 +212,7 @@ const BookReader = () => {
               .from('profiles')
               .select('first_name, last_name')
               .eq('user_id', data.author_id)
-              .single();
+              .maybeSingle();
             
             if (authorData) {
               authorName = `${authorData.first_name || ''} ${authorData.last_name || ''}`.trim() || 'Auteur inconnu';
@@ -267,15 +322,31 @@ const BookReader = () => {
     }
   }, [blockScreenCapture]);
 
+  // Vérifier si une page est accessible
+  const isPageAccessible = (page: number): boolean => {
+    if (!accessRestrictions || accessRestrictions.allow_full_consultation) {
+      return true;
+    }
+    return page <= maxAllowedPage;
+  };
+
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(viewMode === "double" ? Math.max(1, currentPage - 2) : currentPage - 1);
+      const newPage = viewMode === "double" ? Math.max(1, currentPage - 2) : currentPage - 1;
+      setCurrentPage(newPage);
     }
   };
 
   const handleNextPage = () => {
+    const nextPage = viewMode === "double" ? Math.min(totalPages, currentPage + 2) : currentPage + 1;
+    
+    if (!isPageAccessible(nextPage)) {
+      toast.error(`Accès limité à ${consultationPercentage}% du document. ${accessRestrictions?.restriction_message_fr || 'Contactez la bibliothèque pour un accès complet.'}`);
+      return;
+    }
+    
     if (currentPage < totalPages) {
-      setCurrentPage(viewMode === "double" ? Math.min(totalPages, currentPage + 2) : currentPage + 1);
+      setCurrentPage(nextPage);
     }
   };
 
@@ -312,24 +383,37 @@ const BookReader = () => {
   };
 
   const goToPage = (page: number) => {
+    if (!isPageAccessible(page)) {
+      toast.error(`Cette page n'est pas accessible. Accès limité à ${consultationPercentage}% du document.`);
+      return;
+    }
     setCurrentPage(page);
     toast.success(`Navigation vers la page ${page}`);
   };
 
   const handleDownload = (format: string) => {
     if (!allowDownload) {
-      toast.error("Le téléchargement est désactivé pour ce document");
+      toast.error(accessRestrictions?.restriction_message_fr || "Le téléchargement est désactivé pour ce document protégé par le droit d'auteur");
       return;
     }
     toast.success(`Téléchargement en cours (${format})...`);
   };
 
   const handlePrint = () => {
+    if (accessRestrictions?.block_print) {
+      toast.error("L'impression est désactivée pour ce document protégé");
+      return;
+    }
     toast.success("Préparation de l'impression...");
     window.print();
   };
 
   const handleShare = (platform: string) => {
+    if (!allowSharing) {
+      toast.error("Le partage est désactivé pour ce document protégé par le droit d'auteur");
+      return;
+    }
+    
     const url = bookInfo.permalink;
     const text = `${bookInfo.title} - ${bookInfo.author}`;
     
@@ -422,6 +506,25 @@ const BookReader = () => {
           </div>
         </div>
       </div>
+
+      {/* Bannière d'alerte pour les restrictions d'accès */}
+      {accessRestrictions && !accessRestrictions.allow_full_consultation && (
+        <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2">
+          <div className="container mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+              <AlertCircle className="h-4 w-4" />
+              <span className="text-sm font-medium">
+                Aperçu limité à {consultationPercentage}% ({maxAllowedPage} pages sur {totalPages})
+              </span>
+            </div>
+            <Badge variant="outline" className="text-xs border-amber-500/50 text-amber-700 dark:text-amber-400">
+              {accessRestrictions.access_level === 'copyrighted' && 'Droits d\'auteur'}
+              {accessRestrictions.access_level === 'restricted' && 'Accès restreint'}
+              {accessRestrictions.access_level === 'internal' && 'Usage interne'}
+            </Badge>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 flex">
         {/* Left Sidebar - Book Info & Navigation */}

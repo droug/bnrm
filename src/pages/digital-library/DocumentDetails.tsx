@@ -47,6 +47,7 @@ export default function DocumentDetails() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [document, setDocument] = useState<any>(null);
+  const [accessRestrictions, setAccessRestrictions] = useState<any>(null);
   const [isManuscript, setIsManuscript] = useState(false);
   const [authorName, setAuthorName] = useState<string>("");
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -66,6 +67,15 @@ export default function DocumentDetails() {
     
     setLoading(true);
     try {
+      // Charger les restrictions d'accès
+      const { data: restrictionsData } = await supabase
+        .from('digital_library_access_restrictions')
+        .select('*')
+        .eq('document_id', documentId)
+        .maybeSingle();
+      
+      setAccessRestrictions(restrictionsData);
+
       // Essayer d'abord la table cbn_documents (source principale de la recherche)
       const { data: cbnData, error: cbnError } = await supabase
         .from('cbn_documents')
@@ -440,30 +450,121 @@ export default function DocumentDetails() {
                   Droits et licences
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {metadata.dc_rights && (
+              <CardContent className="space-y-4">
+                {/* Niveau d'accès */}
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-2">Niveau d'accès</p>
+                  <Badge 
+                    variant={
+                      accessRestrictions?.access_level === 'public' ? 'default' :
+                      accessRestrictions?.access_level === 'copyrighted' ? 'destructive' :
+                      accessRestrictions?.access_level === 'restricted' ? 'secondary' :
+                      accessRestrictions?.access_level === 'internal' ? 'outline' : 'default'
+                    }
+                    className="text-sm"
+                  >
+                    {accessRestrictions?.access_level === 'public' && '🔓 Libre accès'}
+                    {accessRestrictions?.access_level === 'copyrighted' && '🔒 Sous droits d\'auteur'}
+                    {accessRestrictions?.access_level === 'restricted' && '🔐 Accès restreint'}
+                    {accessRestrictions?.access_level === 'internal' && '🏛️ Usage interne'}
+                    {!accessRestrictions && '🔓 Libre accès'}
+                  </Badge>
+                </div>
+
+                {/* Statut des droits d'auteur */}
+                {accessRestrictions?.copyright_status && (
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Droits d'auteur</p>
-                    <p>{metadata.dc_rights}</p>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Statut des droits</p>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        {accessRestrictions.copyright_status === 'public_domain' && 'Domaine public'}
+                        {accessRestrictions.copyright_status === 'copyrighted' && 'Protégé par le droit d\'auteur'}
+                        {accessRestrictions.copyright_status === 'creative_commons' && 'Creative Commons'}
+                        {accessRestrictions.copyright_status === 'unknown' && 'Statut inconnu'}
+                      </Badge>
+                      {accessRestrictions.license_type && (
+                        <Badge variant="secondary" className="text-xs">
+                          {accessRestrictions.license_type}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 )}
-                
+
+                {/* Titulaire des droits */}
+                {accessRestrictions?.copyright_holder && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Titulaire des droits</p>
+                    <p className="text-sm">{accessRestrictions.copyright_holder}</p>
+                  </div>
+                )}
+
+                {/* Permissions */}
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Disponibilité</p>
-                  <div className="flex gap-2 mt-1">
-                    <Badge variant={canRead ? "default" : "secondary"}>
-                      {canRead ? "Consultable en ligne" : "Non consultable"}
+                  <p className="text-sm font-medium text-muted-foreground mb-2">Permissions</p>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant={accessRestrictions?.allow_full_consultation !== false ? "default" : "secondary"} className="text-xs">
+                      {accessRestrictions?.allow_full_consultation !== false 
+                        ? "✓ Consultation complète" 
+                        : `⚠ Aperçu ${accessRestrictions?.consultation_percentage || 10}%`}
                     </Badge>
-                    <Badge variant={canDownload ? "default" : "secondary"}>
-                      {canDownload ? "Téléchargeable" : "Non téléchargeable"}
+                    <Badge variant={accessRestrictions?.allow_download !== false ? "default" : "destructive"} className="text-xs">
+                      {accessRestrictions?.allow_download !== false ? "✓ Téléchargement" : "✗ Téléchargement interdit"}
+                    </Badge>
+                    <Badge variant={accessRestrictions?.allow_sharing !== false ? "default" : "secondary"} className="text-xs">
+                      {accessRestrictions?.allow_sharing !== false ? "✓ Partage" : "✗ Partage interdit"}
                     </Badge>
                   </div>
                 </div>
 
-                {document.copyright_expires_at && (
+                {/* Restrictions de sécurité */}
+                {(accessRestrictions?.block_right_click || accessRestrictions?.block_screenshot || accessRestrictions?.block_print) && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">Mesures de protection</p>
+                    <div className="flex flex-wrap gap-2">
+                      {accessRestrictions.block_screenshot && (
+                        <Badge variant="outline" className="text-xs">🛡️ Capture d'écran bloquée</Badge>
+                      )}
+                      {accessRestrictions.block_right_click && (
+                        <Badge variant="outline" className="text-xs">🛡️ Clic droit désactivé</Badge>
+                      )}
+                      {accessRestrictions.block_print && (
+                        <Badge variant="outline" className="text-xs">🛡️ Impression interdite</Badge>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Message de restriction */}
+                {accessRestrictions?.restriction_message_fr && (
+                  <div className="bg-muted/50 p-3 rounded-lg border">
+                    <p className="text-sm text-muted-foreground italic">
+                      {accessRestrictions.restriction_message_fr}
+                    </p>
+                  </div>
+                )}
+
+                {/* Expiration des droits */}
+                {(accessRestrictions?.copyright_expires_at || document.copyright_expires_at) && (
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Expiration des droits</p>
-                    <p>{new Date(document.copyright_expires_at).toLocaleDateString('fr-FR')}</p>
+                    <p className="text-sm">
+                      {new Date(accessRestrictions?.copyright_expires_at || document.copyright_expires_at).toLocaleDateString('fr-FR')}
+                    </p>
+                  </div>
+                )}
+
+                {/* Lien vers la licence */}
+                {accessRestrictions?.license_url && (
+                  <div>
+                    <a 
+                      href={accessRestrictions.license_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Voir les termes de la licence →
+                    </a>
                   </div>
                 )}
               </CardContent>
