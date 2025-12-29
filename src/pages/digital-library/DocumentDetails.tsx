@@ -167,12 +167,7 @@ export default function DocumentDetails() {
   };
 
   const handleRead = () => {
-    // Vérifier si le document est numérisé
-    if (!document?.file_url && !document?.digital_copy_url) {
-      toast.error("Ce document est catalogué mais n'est pas encore numérisé. Vous pouvez faire une demande de numérisation.");
-      return;
-    }
-    
+    // Tous les documents de la bibliothèque numérique sont numérisés
     if (isManuscript) {
       navigate(`/manuscript-reader/${documentId}`);
     } else {
