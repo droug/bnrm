@@ -481,29 +481,6 @@ export default function DocumentDetails() {
                   <BookOpen className="h-4 w-4 mr-2" />
                   Consulter le document
                 </Button>
-                
-                {canDownload && (
-                  <Button onClick={handleDownload} variant="outline" className="w-full">
-                    <Download className="h-4 w-4 mr-2" />
-                    Télécharger
-                  </Button>
-                )}
-
-                <Button onClick={handleShare} variant="outline" className="w-full">
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Partager
-                </Button>
-
-                {canRequestDigitization && (
-                  <Button 
-                    onClick={() => setShowDigitizationDialog(true)} 
-                    variant="secondary" 
-                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0"
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Demander la numérisation
-                  </Button>
-                )}
               </CardContent>
             </Card>
 
