@@ -66,12 +66,46 @@ export default function DocumentDetails() {
     
     setLoading(true);
     try {
-      // Essayer d'abord la table manuscripts
+      // Essayer d'abord la table cbn_documents (source principale de la recherche)
+      const { data: cbnData, error: cbnError } = await supabase
+        .from('cbn_documents')
+        .select('*')
+        .eq('id', documentId)
+        .maybeSingle();
+
+      if (cbnData && !cbnError) {
+        // Transformer les données cbn_documents pour correspondre au format attendu
+        setDocument({
+          ...cbnData,
+          description: cbnData.notes || cbnData.physical_description,
+          language: cbnData.support_type || 'Français',
+          tags: cbnData.keywords || cbnData.subject_headings || [],
+          status: 'published',
+          metadata: {
+            dc_creator: cbnData.author,
+            dc_publisher: cbnData.publisher,
+            dc_date: cbnData.publication_year?.toString(),
+            dc_format: cbnData.physical_description,
+            dc_identifier: cbnData.isbn || cbnData.issn || cbnData.cote,
+            dc_language: cbnData.support_type,
+            dc_subject: cbnData.subject_headings || cbnData.keywords || [],
+            marc_100: cbnData.author,
+            marc_260: cbnData.publisher ? `${cbnData.publication_place || ''} : ${cbnData.publisher}, ${cbnData.publication_year || ''}` : null,
+            marc_300: cbnData.physical_description,
+          }
+        });
+        setIsManuscript(cbnData.document_type === 'Manuscrit');
+        setAuthorName(cbnData.author || '');
+        setLoading(false);
+        return;
+      }
+
+      // Essayer ensuite la table manuscripts
       const { data: manuscriptData, error: manuscriptError } = await supabase
         .from('manuscripts')
         .select('*')
         .eq('id', documentId)
-        .single();
+        .maybeSingle();
 
       if (manuscriptData && !manuscriptError) {
         setDocument(manuscriptData);
@@ -81,26 +115,23 @@ export default function DocumentDetails() {
         return;
       }
 
-      // Sinon, essayer la table content avec l'auteur
+      // Sinon, essayer la table content
       const { data: contentData, error: contentError } = await supabase
         .from('content')
-        .select(`
-          *,
-          author:author_id(first_name, last_name)
-        `)
+        .select('*')
         .eq('id', documentId)
-        .single();
+        .maybeSingle();
 
-      if (contentError) throw contentError;
-      
-      // Construire le nom de l'auteur
-      const author = contentData.author as any;
-      if (author && author.first_name && author.last_name) {
-        setAuthorName(`${author.first_name} ${author.last_name}`);
+      if (contentData) {
+        setDocument(contentData);
+        setIsManuscript(false);
+        setLoading(false);
+        return;
       }
-      
-      setDocument(contentData);
-      setIsManuscript(false);
+
+      // Aucun document trouvé
+      console.error('Document not found in any table');
+      toast.error("Document non trouvé");
     } catch (error) {
       console.error('Error loading document:', error);
       toast.error("Erreur lors du chargement du document");
@@ -481,7 +512,94 @@ export default function DocumentDetails() {
               </CardContent>
             </Card>
 
-            {/* Informations complémentaires */}
+            {/* Informations du document catalogué (CBN) */}
+            {document.cote && !isManuscript && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Informations catalographiques</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm">
+                  <div>
+                    <p className="font-medium text-muted-foreground">Cote</p>
+                    <p className="font-mono">{document.cote}</p>
+                  </div>
+                  
+                  {document.document_type && (
+                    <div>
+                      <p className="font-medium text-muted-foreground">Type de document</p>
+                      <p>{document.document_type}</p>
+                    </div>
+                  )}
+
+                  {document.isbn && (
+                    <div>
+                      <p className="font-medium text-muted-foreground">ISBN</p>
+                      <p className="font-mono">{document.isbn}</p>
+                    </div>
+                  )}
+
+                  {document.issn && (
+                    <div>
+                      <p className="font-medium text-muted-foreground">ISSN</p>
+                      <p className="font-mono">{document.issn}</p>
+                    </div>
+                  )}
+
+                  {document.dewey_classification && (
+                    <div>
+                      <p className="font-medium text-muted-foreground">Classification Dewey</p>
+                      <p>{document.dewey_classification}</p>
+                    </div>
+                  )}
+
+                  {document.pages_count && (
+                    <div>
+                      <p className="font-medium text-muted-foreground">Nombre de pages</p>
+                      <p>{document.pages_count}</p>
+                    </div>
+                  )}
+
+                  {document.edition && (
+                    <div>
+                      <p className="font-medium text-muted-foreground">Édition</p>
+                      <p>{document.edition}</p>
+                    </div>
+                  )}
+
+                  {document.collection_name && (
+                    <div>
+                      <p className="font-medium text-muted-foreground">Collection</p>
+                      <p>{document.collection_name}</p>
+                    </div>
+                  )}
+
+                  {document.location && (
+                    <div>
+                      <p className="font-medium text-muted-foreground">Localisation</p>
+                      <p>{document.location}</p>
+                    </div>
+                  )}
+
+                  {document.physical_status && (
+                    <div>
+                      <p className="font-medium text-muted-foreground">État physique</p>
+                      <p>{document.physical_status}</p>
+                    </div>
+                  )}
+
+                  {document.consultation_mode && (
+                    <div>
+                      <p className="font-medium text-muted-foreground">Mode de consultation</p>
+                      <Badge variant={document.consultation_mode === 'libre' ? 'default' : 'secondary'}>
+                        {document.consultation_mode === 'libre' ? 'Libre accès' : 'Sur demande'}
+                      </Badge>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Informations du manuscrit */}
             {isManuscript && (
               <Card>
                 <CardHeader>
