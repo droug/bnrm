@@ -108,6 +108,8 @@ const BookReader = () => {
   const [accessRestrictions, setAccessRestrictions] = useState<any>(null);
   const [consultationPercentage, setConsultationPercentage] = useState(100);
   const [maxAllowedPage, setMaxAllowedPage] = useState(245);
+  const [hasValidSubscription, setHasValidSubscription] = useState(false);
+  const [userSubscription, setUserSubscription] = useState<any>(null);
   
   // Page access restriction settings
   const [restrictPageAccess, setRestrictPageAccess] = useState(false);
@@ -157,21 +159,70 @@ const BookReader = () => {
           .eq('document_id', id)
           .maybeSingle();
         
+        // Vérifier l'abonnement de l'utilisateur si nécessaire
+        let userHasValidSubscription = false;
+        let userSub = null;
+        
+        if (user && restrictionsData?.requires_subscription) {
+          const { data: subscriptionData } = await supabase
+            .from('service_subscriptions')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('status', 'active')
+            .gte('end_date', new Date().toISOString())
+            .maybeSingle();
+          
+          if (subscriptionData) {
+            userSub = subscriptionData;
+            // Vérifier si le type d'abonnement correspond
+            const requiredType = restrictionsData.required_subscription_type;
+            const userSubType = subscriptionData.subscription_type;
+            
+            // Hiérarchie: premium > researcher > standard
+            const subscriptionHierarchy: { [key: string]: number } = {
+              'standard': 1,
+              'researcher': 2,
+              'premium': 3
+            };
+            
+            const requiredLevel = subscriptionHierarchy[requiredType] || 0;
+            const userLevel = subscriptionHierarchy[userSubType] || 0;
+            
+            userHasValidSubscription = userLevel >= requiredLevel;
+          }
+          
+          setHasValidSubscription(userHasValidSubscription);
+          setUserSubscription(userSub);
+        } else {
+          setHasValidSubscription(true); // Pas d'abonnement requis
+        }
+        
         if (restrictionsData) {
           setAccessRestrictions(restrictionsData);
           setBlockRightClick(restrictionsData.block_right_click || false);
           setBlockScreenCapture(restrictionsData.block_screenshot || false);
-          setAllowDownload(restrictionsData.allow_download !== false);
-          setAllowSharing(restrictionsData.allow_sharing !== false);
-          setConsultationPercentage(restrictionsData.consultation_percentage || 100);
+          
+          // Si abonnement requis mais pas valide, appliquer les restrictions
+          const canFullAccess = !restrictionsData.requires_subscription || userHasValidSubscription;
+          
+          setAllowDownload(canFullAccess && restrictionsData.allow_download !== false);
+          setAllowSharing(canFullAccess && restrictionsData.allow_sharing !== false);
+          
+          // Calculer le pourcentage de consultation
+          let effectivePercentage = restrictionsData.consultation_percentage || 100;
+          if (restrictionsData.requires_subscription && !userHasValidSubscription) {
+            // Limiter à 10% pour les non-abonnés
+            effectivePercentage = Math.min(effectivePercentage, 10);
+          }
+          
+          setConsultationPercentage(effectivePercentage);
           
           // Calculer la page maximum autorisée
-          const percentage = restrictionsData.consultation_percentage || 100;
-          const maxPage = Math.ceil((245 * percentage) / 100);
+          const maxPage = Math.ceil((245 * effectivePercentage) / 100);
           setMaxAllowedPage(maxPage);
           
           // Si consultation partielle, activer les restrictions
-          if (!restrictionsData.allow_full_consultation) {
+          if (!restrictionsData.allow_full_consultation || (restrictionsData.requires_subscription && !userHasValidSubscription)) {
             setRestrictPageAccess(true);
             setStartPage(1);
             setEndPage(maxPage);
@@ -324,10 +375,28 @@ const BookReader = () => {
 
   // Vérifier si une page est accessible
   const isPageAccessible = (page: number): boolean => {
+    // Si pas de restrictions ou accès complet autorisé
     if (!accessRestrictions || accessRestrictions.allow_full_consultation) {
+      // Mais vérifier si un abonnement est requis
+      if (accessRestrictions?.requires_subscription && !hasValidSubscription) {
+        return page <= maxAllowedPage;
+      }
       return true;
     }
     return page <= maxAllowedPage;
+  };
+
+  // Message d'erreur pour les pages non accessibles
+  const getAccessDeniedMessage = (): string => {
+    if (accessRestrictions?.requires_subscription && !hasValidSubscription) {
+      const subscriptionName = 
+        accessRestrictions.required_subscription_type === 'standard' ? 'Adhésion Standard' :
+        accessRestrictions.required_subscription_type === 'researcher' ? 'Adhésion Chercheur' :
+        accessRestrictions.required_subscription_type === 'premium' ? 'Adhésion Premium' :
+        accessRestrictions.required_subscription_type;
+      return `Abonnement "${subscriptionName}" requis pour accéder au document complet. ${accessRestrictions.subscription_message || ''}`;
+    }
+    return accessRestrictions?.restriction_message_fr || 'Contactez la bibliothèque pour un accès complet.';
   };
 
   const handlePreviousPage = () => {
@@ -341,7 +410,7 @@ const BookReader = () => {
     const nextPage = viewMode === "double" ? Math.min(totalPages, currentPage + 2) : currentPage + 1;
     
     if (!isPageAccessible(nextPage)) {
-      toast.error(`Accès limité à ${consultationPercentage}% du document. ${accessRestrictions?.restriction_message_fr || 'Contactez la bibliothèque pour un accès complet.'}`);
+      toast.error(getAccessDeniedMessage());
       return;
     }
     
@@ -384,7 +453,7 @@ const BookReader = () => {
 
   const goToPage = (page: number) => {
     if (!isPageAccessible(page)) {
-      toast.error(`Cette page n'est pas accessible. Accès limité à ${consultationPercentage}% du document.`);
+      toast.error(getAccessDeniedMessage());
       return;
     }
     setCurrentPage(page);
@@ -508,20 +577,40 @@ const BookReader = () => {
       </div>
 
       {/* Bannière d'alerte pour les restrictions d'accès */}
-      {accessRestrictions && !accessRestrictions.allow_full_consultation && (
+      {accessRestrictions && (!accessRestrictions.allow_full_consultation || (accessRestrictions.requires_subscription && !hasValidSubscription)) && (
         <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2">
           <div className="container mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
               <AlertCircle className="h-4 w-4" />
               <span className="text-sm font-medium">
-                Aperçu limité à {consultationPercentage}% ({maxAllowedPage} pages sur {totalPages})
+                {accessRestrictions.requires_subscription && !hasValidSubscription 
+                  ? `Abonnement ${
+                      accessRestrictions.required_subscription_type === 'standard' ? 'Standard' :
+                      accessRestrictions.required_subscription_type === 'researcher' ? 'Chercheur' :
+                      accessRestrictions.required_subscription_type === 'premium' ? 'Premium' :
+                      accessRestrictions.required_subscription_type
+                    } requis - Aperçu limité à ${consultationPercentage}%`
+                  : `Aperçu limité à ${consultationPercentage}% (${maxAllowedPage} pages sur ${totalPages})`
+                }
               </span>
             </div>
-            <Badge variant="outline" className="text-xs border-amber-500/50 text-amber-700 dark:text-amber-400">
-              {accessRestrictions.access_level === 'copyrighted' && 'Droits d\'auteur'}
-              {accessRestrictions.access_level === 'restricted' && 'Accès restreint'}
-              {accessRestrictions.access_level === 'internal' && 'Usage interne'}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs border-amber-500/50 text-amber-700 dark:text-amber-400">
+                {accessRestrictions.access_level === 'copyrighted' && 'Droits d\'auteur'}
+                {accessRestrictions.access_level === 'restricted' && 'Accès restreint'}
+                {accessRestrictions.access_level === 'internal' && 'Usage interne'}
+              </Badge>
+              {accessRestrictions.requires_subscription && !hasValidSubscription && (
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  className="text-xs h-6 border-amber-500/50 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10"
+                  onClick={() => navigate('/subscription')}
+                >
+                  S'abonner
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       )}

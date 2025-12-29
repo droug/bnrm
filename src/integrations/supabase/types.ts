@@ -3616,8 +3616,11 @@ export type Database = {
           id: string
           license_type: string | null
           license_url: string | null
+          required_subscription_type: string | null
+          requires_subscription: boolean | null
           restriction_message_ar: string | null
           restriction_message_fr: string | null
+          subscription_message: string | null
           updated_at: string | null
           updated_by: string | null
         }
@@ -3644,8 +3647,11 @@ export type Database = {
           id?: string
           license_type?: string | null
           license_url?: string | null
+          required_subscription_type?: string | null
+          requires_subscription?: boolean | null
           restriction_message_ar?: string | null
           restriction_message_fr?: string | null
+          subscription_message?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -3672,8 +3678,11 @@ export type Database = {
           id?: string
           license_type?: string | null
           license_url?: string | null
+          required_subscription_type?: string | null
+          requires_subscription?: boolean | null
           restriction_message_ar?: string | null
           restriction_message_fr?: string | null
+          subscription_message?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
