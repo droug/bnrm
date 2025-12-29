@@ -479,7 +479,7 @@ export default function DocumentDetails() {
                       <div>
                         <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
                           Abonnement requis : {
-                            accessRestrictions.required_subscription_type === 'standard' ? 'Adhésion Standard' :
+                            accessRestrictions.required_subscription_type === 'basic' ? 'Adhésion Standard' :
                             accessRestrictions.required_subscription_type === 'researcher' ? 'Adhésion Chercheur' :
                             accessRestrictions.required_subscription_type === 'premium' ? 'Adhésion Premium' :
                             accessRestrictions.required_subscription_type

@@ -178,9 +178,9 @@ const BookReader = () => {
             const requiredType = restrictionsData.required_subscription_type;
             const userSubType = subscriptionData.subscription_type;
             
-            // Hiérarchie: premium > researcher > standard
+            // Hiérarchie: premium > researcher > basic
             const subscriptionHierarchy: { [key: string]: number } = {
-              'standard': 1,
+              'basic': 1,
               'researcher': 2,
               'premium': 3
             };
@@ -390,7 +390,7 @@ const BookReader = () => {
   const getAccessDeniedMessage = (): string => {
     if (accessRestrictions?.requires_subscription && !hasValidSubscription) {
       const subscriptionName = 
-        accessRestrictions.required_subscription_type === 'standard' ? 'Adhésion Standard' :
+        accessRestrictions.required_subscription_type === 'basic' ? 'Adhésion Standard' :
         accessRestrictions.required_subscription_type === 'researcher' ? 'Adhésion Chercheur' :
         accessRestrictions.required_subscription_type === 'premium' ? 'Adhésion Premium' :
         accessRestrictions.required_subscription_type;
@@ -585,7 +585,7 @@ const BookReader = () => {
               <span className="text-sm font-medium">
                 {accessRestrictions.requires_subscription && !hasValidSubscription 
                   ? `Abonnement ${
-                      accessRestrictions.required_subscription_type === 'standard' ? 'Standard' :
+                      accessRestrictions.required_subscription_type === 'basic' ? 'Standard' :
                       accessRestrictions.required_subscription_type === 'researcher' ? 'Chercheur' :
                       accessRestrictions.required_subscription_type === 'premium' ? 'Premium' :
                       accessRestrictions.required_subscription_type
