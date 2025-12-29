@@ -482,12 +482,10 @@ export default function DocumentDetails() {
                 <CardTitle className="text-lg">Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {canRead && (
-                  <Button onClick={handleRead} className="w-full">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Consulter le document
-                  </Button>
-                )}
+                <Button onClick={handleRead} className="w-full">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Consulter le document
+                </Button>
                 
                 {canDownload && (
                   <Button onClick={handleDownload} variant="outline" className="w-full">
