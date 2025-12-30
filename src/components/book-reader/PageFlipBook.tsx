@@ -1,6 +1,5 @@
-import { useRef, forwardRef } from "react";
+import { useRef, forwardRef, useState, useEffect, useCallback } from "react";
 import HTMLFlipBook from "react-pageflip";
-import { Card } from "@/components/ui/card";
 
 interface PageFlipBookProps {
   images: string[];
@@ -15,7 +14,7 @@ const Page = forwardRef<HTMLDivElement, { image: string; pageNumber: number; zoo
     return (
       <div ref={ref} className="page bg-white shadow-2xl">
         <div 
-          className="w-full h-full flex items-center justify-center overflow-hidden"
+          className="w-full h-full flex items-center justify-center overflow-hidden bg-white"
           style={{
             transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
             transformOrigin: 'center',
@@ -27,6 +26,7 @@ const Page = forwardRef<HTMLDivElement, { image: string; pageNumber: number; zoo
             alt={`Page ${pageNumber}`}
             className="w-full h-full object-contain"
             draggable={false}
+            style={{ maxWidth: '100%', maxHeight: '100%' }}
           />
         </div>
       </div>
@@ -38,17 +38,80 @@ Page.displayName = "Page";
 
 export const PageFlipBook = ({ images, currentPage, onPageChange, zoom, rotation }: PageFlipBookProps) => {
   const bookRef = useRef<any>();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 550, height: 733 });
+
+  // Calculate optimal dimensions based on container size
+  const calculateDimensions = useCallback(() => {
+    if (!containerRef.current) return;
+    
+    const container = containerRef.current;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    
+    // Target aspect ratio (3:4 for document pages)
+    const aspectRatio = 3 / 4;
+    
+    // Calculate max dimensions with padding
+    const maxWidth = containerWidth * 0.9; // 90% of container width
+    const maxHeight = containerHeight * 0.9; // 90% of container height
+    
+    let pageWidth: number;
+    let pageHeight: number;
+    
+    // Calculate based on height first
+    pageHeight = maxHeight;
+    pageWidth = pageHeight * aspectRatio;
+    
+    // If too wide, scale down by width
+    if (pageWidth * 2 > maxWidth) {
+      pageWidth = maxWidth / 2;
+      pageHeight = pageWidth / aspectRatio;
+    }
+    
+    // Ensure minimum dimensions
+    pageWidth = Math.max(280, Math.min(600, pageWidth));
+    pageHeight = Math.max(373, Math.min(800, pageHeight));
+    
+    setDimensions({ width: Math.round(pageWidth), height: Math.round(pageHeight) });
+  }, []);
+
+  useEffect(() => {
+    calculateDimensions();
+    
+    // Recalculate on window resize
+    const handleResize = () => {
+      calculateDimensions();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Also observe container size changes
+    const resizeObserver = new ResizeObserver(handleResize);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
+    };
+  }, [calculateDimensions]);
 
   return (
-    <div className="flex items-center justify-center w-full h-full">
+    <div 
+      ref={containerRef} 
+      className="flex items-center justify-center w-full h-full"
+      style={{ minHeight: '400px' }}
+    >
       <HTMLFlipBook
-        width={550}
-        height={733}
+        width={dimensions.width}
+        height={dimensions.height}
         size="stretch"
-        minWidth={315}
-        maxWidth={1000}
-        minHeight={420}
-        maxHeight={1350}
+        minWidth={280}
+        maxWidth={600}
+        minHeight={373}
+        maxHeight={800}
         maxShadowOpacity={0.5}
         showCover={true}
         mobileScrollSupport={true}
@@ -57,7 +120,7 @@ export const PageFlipBook = ({ images, currentPage, onPageChange, zoom, rotation
         style={{}}
         startPage={currentPage - 1}
         drawShadow={true}
-        flippingTime={1000}
+        flippingTime={800}
         usePortrait={true}
         startZIndex={0}
         autoSize={true}

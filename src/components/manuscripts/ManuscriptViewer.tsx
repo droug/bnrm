@@ -1001,8 +1001,8 @@ export function ManuscriptViewer() {
           )}
 
           {/* Page Display Area */}
-          <div className="flex-1 overflow-hidden bg-muted/20 flex items-center justify-center p-8">
-            <div className="max-w-6xl mx-auto w-full h-full flex items-center justify-center">
+          <div className="flex-1 overflow-hidden bg-muted/20 flex items-center justify-center p-4 md:p-8">
+            <div className="w-full h-full flex items-center justify-center">
               {viewMode === "double" ? (
                 <PageFlipBook 
                   images={generatePageImages()}
@@ -1013,13 +1013,13 @@ export function ManuscriptViewer() {
                 />
               ) : (
                 <div 
-                  className="bg-white shadow-2xl"
+                  className="bg-white shadow-2xl max-w-full max-h-full"
                   style={{
                     transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
                     transition: "transform 0.2s ease-out"
                   }}
                 >
-                  <div className="aspect-[3/4] w-[600px] overflow-hidden">
+                  <div className="aspect-[3/4] w-full max-w-[600px] h-auto max-h-[calc(100vh-200px)] overflow-hidden">
                     <img 
                       src={getCurrentPageImage()} 
                       alt={`Page ${currentPage}`}
