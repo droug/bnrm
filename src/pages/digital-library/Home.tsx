@@ -71,7 +71,7 @@ export default function DigitalLibraryHome() {
       try {
         const { data, error } = await supabase
           .from('content')
-          .select('id, title, excerpt, content_type, published_at, file_url, file_type, tags, author_id')
+          .select('id, title, excerpt, content_type, published_at, file_url, file_type, tags, author_id, featured_image_url')
           .eq('status', 'published')
           .order('published_at', { ascending: false })
           .limit(6);
@@ -103,8 +103,8 @@ export default function DigitalLibraryHome() {
           const formattedItems = data.map((item: any, index: number) => {
             const author = item.author_id ? authorsMap.get(item.author_id) : null;
             
-            // Utiliser l'image spécifique si elle existe, sinon utiliser l'image par défaut
-            const thumbnail = titleImageMap[item.title] || exampleImages[index % exampleImages.length];
+            // Utiliser featured_image_url si elle existe, sinon l'image spécifique par titre, sinon l'image par défaut
+            const thumbnail = item.featured_image_url || titleImageMap[item.title] || exampleImages[index % exampleImages.length];
             
             return {
               id: item.id,
