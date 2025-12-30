@@ -7120,6 +7120,7 @@ export type Database = {
           id: string
           is_restricted: boolean | null
           manual_pages: number[] | null
+          restricted_page_display: string | null
           restriction_mode: string | null
           start_page: number | null
           updated_at: string | null
@@ -7132,6 +7133,7 @@ export type Database = {
           id?: string
           is_restricted?: boolean | null
           manual_pages?: number[] | null
+          restricted_page_display?: string | null
           restriction_mode?: string | null
           start_page?: number | null
           updated_at?: string | null
@@ -7144,6 +7146,7 @@ export type Database = {
           id?: string
           is_restricted?: boolean | null
           manual_pages?: number[] | null
+          restricted_page_display?: string | null
           restriction_mode?: string | null
           start_page?: number | null
           updated_at?: string | null

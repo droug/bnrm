@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SimpleDropdown } from "@/components/cbn/SimpleDropdown";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Lock, Unlock, Search, Filter, FileText, X, Shield, Download, Camera, MousePointerClick, Layers, Eye, Info } from "lucide-react";
+import { Lock, Unlock, Search, Filter, FileText, X, Shield, Download, Camera, MousePointerClick, Layers, Eye, EyeOff, Info, Square } from "lucide-react";
 
 export function BatchRestrictionsManager() {
   const { toast } = useToast();
@@ -41,6 +41,7 @@ export function BatchRestrictionsManager() {
   const [allowDownload, setAllowDownload] = useState(true);
   const [allowScreenshot, setAllowScreenshot] = useState(true);
   const [allowRightClick, setAllowRightClick] = useState(true);
+  const [restrictedPageDisplay, setRestrictedPageDisplay] = useState<"blur" | "empty" | "hidden">("blur");
   
   // État pour le dialog de détails
   const [selectedDocumentForDetails, setSelectedDocumentForDetails] = useState<any>(null);
@@ -123,6 +124,7 @@ export function BatchRestrictionsManager() {
           allow_download: data.allowDownload,
           allow_screenshot: data.allowScreenshot,
           allow_right_click: data.allowRightClick,
+          restricted_page_display: data.restrictedPageDisplay,
         };
 
         const { error } = await supabase
@@ -231,6 +233,7 @@ export function BatchRestrictionsManager() {
       allowDownload,
       allowScreenshot,
       allowRightClick,
+      restrictedPageDisplay,
     });
   };
 
@@ -721,6 +724,20 @@ export function BatchRestrictionsManager() {
                         </Badge>
                       </span>
                     </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-sm font-semibold text-muted-foreground flex items-center gap-1">
+                        <EyeOff className="h-3 w-3" />
+                        Affichage pages restreintes:
+                      </span>
+                      <span className="col-span-2">
+                        <Badge variant="outline">
+                          {selectedDocumentForDetails.page_access_restrictions[0].restricted_page_display === 'blur' && 'Effet flou'}
+                          {selectedDocumentForDetails.page_access_restrictions[0].restricted_page_display === 'empty' && 'Page vide'}
+                          {selectedDocumentForDetails.page_access_restrictions[0].restricted_page_display === 'hidden' && 'Masqué'}
+                          {!selectedDocumentForDetails.page_access_restrictions[0].restricted_page_display && 'Effet flou (par défaut)'}
+                        </Badge>
+                      </span>
+                    </div>
                   </CardContent>
                 </Card>
               )}
@@ -1040,6 +1057,67 @@ export function BatchRestrictionsManager() {
                         checked={allowRightClick}
                         onCheckedChange={setAllowRightClick}
                       />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Affichage des pages non accessibles */}
+                <Card className="border-orange-200 dark:border-orange-800">
+                  <CardHeader className="pb-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 rounded-t-lg">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <EyeOff className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                      Affichage des pages non accessibles
+                    </CardTitle>
+                    <CardDescription>
+                      Choisissez comment les pages restreintes seront affichées aux visiteurs
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3 pt-4">
+                    <div className="grid gap-3">
+                      <Button
+                        type="button"
+                        variant={restrictedPageDisplay === "blur" ? "default" : "outline"}
+                        onClick={() => setRestrictedPageDisplay("blur")}
+                        className="w-full h-auto py-3 flex items-center gap-3 justify-start"
+                      >
+                        <Eye className="h-5 w-5" />
+                        <div className="text-left">
+                          <div className="font-semibold">Effet flou</div>
+                          <div className="text-xs opacity-80">Les pages sont visibles mais floues</div>
+                        </div>
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant={restrictedPageDisplay === "empty" ? "default" : "outline"}
+                        onClick={() => setRestrictedPageDisplay("empty")}
+                        className="w-full h-auto py-3 flex items-center gap-3 justify-start"
+                      >
+                        <Square className="h-5 w-5" />
+                        <div className="text-left">
+                          <div className="font-semibold">Page vide</div>
+                          <div className="text-xs opacity-80">Une page blanche avec un message</div>
+                        </div>
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant={restrictedPageDisplay === "hidden" ? "default" : "outline"}
+                        onClick={() => setRestrictedPageDisplay("hidden")}
+                        className="w-full h-auto py-3 flex items-center gap-3 justify-start"
+                      >
+                        <EyeOff className="h-5 w-5" />
+                        <div className="text-left">
+                          <div className="font-semibold">Masquer complètement</div>
+                          <div className="text-xs opacity-80">Les pages sont totalement invisibles</div>
+                        </div>
+                      </Button>
+                    </div>
+                    
+                    <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800 mt-3">
+                      <p className="text-xs text-blue-900 dark:text-blue-100">
+                        💡 <strong>Conseil :</strong> L'effet flou permet aux visiteurs de voir qu'il y a du contenu, tandis que les pages vides indiquent clairement qu'un contenu existe mais n'est pas accessible.
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
