@@ -1057,7 +1057,7 @@ const BookReader = () => {
 
           {/* Book Display Area */}
           {readingMode === "book" ? (
-            <div className="flex-1 overflow-hidden bg-muted/10 flex items-center justify-center p-8">
+            <div className="flex-1 overflow-hidden bg-muted/10 flex items-center justify-center p-4 md:p-8">
               {loading ? (
                 <div className="text-center">
                   <p className="text-muted-foreground">Chargement du document...</p>
@@ -1071,11 +1071,11 @@ const BookReader = () => {
                   rotation={rotation}
                 />
               ) : (
-                <div className="max-w-4xl mx-auto">
-                  <Card className="shadow-2xl">
+                <div className="w-full h-full flex items-center justify-center">
+                  <Card className="shadow-2xl max-w-full max-h-full">
                     <CardContent className="p-0">
                       <div 
-                        className="aspect-[3/4] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden"
+                        className="aspect-[3/4] w-full max-w-[600px] h-auto max-h-[calc(100vh-200px)] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden"
                         style={{ 
                           transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
                           transformOrigin: 'center',
