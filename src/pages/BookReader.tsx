@@ -136,6 +136,8 @@ const BookReader = () => {
   const [loading, setLoading] = useState(true);
   const [documentData, setDocumentData] = useState<any>(null);
   const [documentImage, setDocumentImage] = useState<string>("");
+  const [documentPages, setDocumentPages] = useState<string[]>([]);
+  const [actualTotalPages, setActualTotalPages] = useState(245);
   
   // Fictional manuscript pages (fallback)
   const manuscriptPages = [
@@ -251,7 +253,7 @@ const BookReader = () => {
         // Sinon essayer la table content
         const { data, error } = await supabase
           .from('content')
-          .select('id, title, excerpt, content_type, published_at, file_url, file_type, tags, author_id')
+          .select('id, title, excerpt, content_type, published_at, file_url, file_type, tags, author_id, page_count, pages_path')
           .eq('id', id)
           .maybeSingle();
 
@@ -275,16 +277,27 @@ const BookReader = () => {
             author: authorName
           });
 
-          // Set document image based on title or use file_url
-          const titleImageMap: { [key: string]: string } = {
-            "Archives Photographiques du Maroc Colonial": "/src/assets/digital-library/archives-photo-maroc.jpg",
-            "Collection de Cartes Anciennes": "/src/assets/digital-library/cartes-anciennes.jpg",
-            "Logiciel Patrimoine": "/src/assets/digital-library/logiciel-patrimoine.jpg",
-            "Manuscrits Andalous": "/src/assets/digital-library/manuscrits-andalous.jpg",
-            "Documents Administratifs Historiques": "/src/assets/digital-library/documents-administratifs.jpg",
-          };
+          // Si le document a des pages extraites
+          if (data.pages_path && data.page_count) {
+            const pages: string[] = [];
+            for (let i = 1; i <= data.page_count; i++) {
+              pages.push(`${data.pages_path}/page_${i}.jpg`);
+            }
+            setDocumentPages(pages);
+            setActualTotalPages(data.page_count);
+            setDocumentImage(pages[0]); // Première page comme image par défaut
+          } else {
+            // Set document image based on title or use file_url
+            const titleImageMap: { [key: string]: string } = {
+              "Archives Photographiques du Maroc Colonial": "/src/assets/digital-library/archives-photo-maroc.jpg",
+              "Collection de Cartes Anciennes": "/src/assets/digital-library/cartes-anciennes.jpg",
+              "Logiciel Patrimoine": "/src/assets/digital-library/logiciel-patrimoine.jpg",
+              "Manuscrits Andalous": "/src/assets/digital-library/manuscrits-andalous.jpg",
+              "Documents Administratifs Historiques": "/src/assets/digital-library/documents-administratifs.jpg",
+            };
 
-          setDocumentImage(titleImageMap[data.title] || data.file_url || manuscriptPage1);
+            setDocumentImage(titleImageMap[data.title] || data.file_url || manuscriptPage1);
+          }
         } else {
           console.error('Error loading document:', error);
           toast.error("Erreur lors du chargement du document");
@@ -300,9 +313,13 @@ const BookReader = () => {
     loadDocument();
   }, [id]);
   
-  const totalPages = 245;
+  const totalPages = actualTotalPages;
   
   const getCurrentPageImage = (page: number) => {
+    // Si le document a des pages extraites, les utiliser
+    if (documentPages.length > 0 && page <= documentPages.length) {
+      return documentPages[page - 1];
+    }
     // If we have a real document image, use it for all pages
     if (documentImage) {
       return documentImage;
@@ -313,6 +330,9 @@ const BookReader = () => {
 
   // Generate page images for flip book
   const generatePageImages = () => {
+    if (documentPages.length > 0) {
+      return documentPages;
+    }
     const images = [];
     for (let i = 0; i < totalPages; i++) {
       images.push(documentImage || manuscriptPages[i % manuscriptPages.length]);
