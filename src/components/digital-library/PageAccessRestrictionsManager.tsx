@@ -13,7 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, ChevronLeft, ChevronRight, Plus, Trash2, Shield, Download, Camera, MousePointerClick } from "lucide-react";
+import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, EyeOff, ChevronLeft, ChevronRight, Plus, Trash2, Shield, Download, Camera, MousePointerClick, Square } from "lucide-react";
 import { PageFlipBook } from "@/components/book-reader/PageFlipBook";
 
 export function PageAccessRestrictionsManager() {
@@ -45,6 +45,7 @@ export function PageAccessRestrictionsManager() {
   // Paramètres de sécurité
   const [allowDownload, setAllowDownload] = useState(true);
   const [allowScreenshot, setAllowScreenshot] = useState(true);
+  const [restrictedPageDisplay, setRestrictedPageDisplay] = useState<"blur" | "empty" | "hidden">("blur");
   const [allowRightClick, setAllowRightClick] = useState(true);
 
   // Fetch documents
@@ -129,6 +130,7 @@ export function PageAccessRestrictionsManager() {
         allow_download: data.allowDownload,
         allow_screenshot: data.allowScreenshot,
         allow_right_click: data.allowRightClick,
+        restricted_page_display: data.restrictedPageDisplay,
       };
 
       const { error } = await supabase
@@ -184,6 +186,7 @@ export function PageAccessRestrictionsManager() {
       setAllowDownload(restriction.allow_download !== false);
       setAllowScreenshot(restriction.allow_screenshot !== false);
       setAllowRightClick(restriction.allow_right_click !== false);
+      setRestrictedPageDisplay(restriction.restricted_page_display || "blur");
       
       // Reconstruire les plages à partir des pages manuelles
       if (restriction.restriction_mode === 'range' && restriction.manual_pages?.length > 0) {
@@ -229,6 +232,7 @@ export function PageAccessRestrictionsManager() {
       setAllowDownload(true);
       setAllowScreenshot(true);
       setAllowRightClick(true);
+      setRestrictedPageDisplay("blur");
     }
     
     setCurrentPreviewPage(1);
@@ -264,6 +268,7 @@ export function PageAccessRestrictionsManager() {
       allowDownload,
       allowScreenshot,
       allowRightClick,
+      restrictedPageDisplay,
     });
   };
 
@@ -1260,6 +1265,71 @@ export function PageAccessRestrictionsManager() {
                       <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
                         <p className="text-xs text-amber-900 dark:text-amber-100">
                           ⚠️ <strong>Note :</strong> Ces paramètres de sécurité s'appliquent au niveau du navigateur et peuvent être contournés par des utilisateurs techniques.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  {/* Affichage des pages non accessibles */}
+                  <Card className="shadow-md border-2 border-orange-200 dark:border-orange-800">
+                    <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 pb-3">
+                      <div className="flex items-center gap-2">
+                        <EyeOff className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                        <CardTitle className="text-base">Affichage des pages non accessibles</CardTitle>
+                      </div>
+                      <CardDescription className="text-xs">
+                        Choisissez comment les pages restreintes seront affichées aux visiteurs
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3 pt-4">
+                      <Button
+                        type="button"
+                        variant={restrictedPageDisplay === "blur" ? "default" : "outline"}
+                        onClick={() => setRestrictedPageDisplay("blur")}
+                        className="w-full h-auto py-4 flex items-center gap-3"
+                      >
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Eye className="h-5 w-5" />
+                        </div>
+                        <div className="text-left flex-1">
+                          <div className="font-semibold">Effet flou</div>
+                          <div className="text-xs opacity-80">Les pages sont visibles mais floues</div>
+                        </div>
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant={restrictedPageDisplay === "empty" ? "default" : "outline"}
+                        onClick={() => setRestrictedPageDisplay("empty")}
+                        className="w-full h-auto py-4 flex items-center gap-3"
+                      >
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Square className="h-5 w-5" />
+                        </div>
+                        <div className="text-left flex-1">
+                          <div className="font-semibold">Page vide</div>
+                          <div className="text-xs opacity-80">Une page blanche avec un message</div>
+                        </div>
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant={restrictedPageDisplay === "hidden" ? "default" : "outline"}
+                        onClick={() => setRestrictedPageDisplay("hidden")}
+                        className="w-full h-auto py-4 flex items-center gap-3"
+                      >
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <EyeOff className="h-5 w-5" />
+                        </div>
+                        <div className="text-left flex-1">
+                          <div className="font-semibold">Masquer complètement</div>
+                          <div className="text-xs opacity-80">Les pages sont totalement invisibles</div>
+                        </div>
+                      </Button>
+                      
+                      <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <p className="text-xs text-blue-900 dark:text-blue-100">
+                          💡 <strong>Conseil :</strong> L'effet flou permet aux visiteurs de voir qu'il y a du contenu, tandis que les pages vides indiquent clairement qu'un contenu existe mais n'est pas accessible.
                         </p>
                       </div>
                     </CardContent>
