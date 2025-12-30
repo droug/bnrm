@@ -2604,6 +2604,8 @@ export type Database = {
           location: string | null
           meta_description: string | null
           meta_title: string | null
+          page_count: number | null
+          pages_path: string | null
           published_at: string | null
           seo_keywords: string[] | null
           slug: string
@@ -2636,6 +2638,8 @@ export type Database = {
           location?: string | null
           meta_description?: string | null
           meta_title?: string | null
+          page_count?: number | null
+          pages_path?: string | null
           published_at?: string | null
           seo_keywords?: string[] | null
           slug: string
@@ -2668,6 +2672,8 @@ export type Database = {
           location?: string | null
           meta_description?: string | null
           meta_title?: string | null
+          page_count?: number | null
+          pages_path?: string | null
           published_at?: string | null
           seo_keywords?: string[] | null
           slug?: string
