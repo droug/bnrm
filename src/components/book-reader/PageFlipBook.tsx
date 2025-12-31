@@ -9,17 +9,14 @@ interface PageFlipBookProps {
   rotation: number;
 }
 
-const Page = forwardRef<HTMLDivElement, { image: string; pageNumber: number; zoom: number; rotation: number; isLeftPage: boolean }>(
-  ({ image, pageNumber, zoom, rotation, isLeftPage }, ref) => {
-    // Les pages de gauche (pages paires dans un livre) nécessitent une rotation de 180°
-    const pageRotation = isLeftPage ? rotation + 180 : rotation;
-    
+const Page = forwardRef<HTMLDivElement, { image: string; pageNumber: number; zoom: number; rotation: number }>(
+  ({ image, pageNumber, zoom, rotation }, ref) => {
     return (
       <div ref={ref} className="page bg-white shadow-2xl">
         <div 
           className="w-full h-full flex items-center justify-center overflow-hidden bg-white"
           style={{
-            transform: `scale(${zoom / 100}) rotate(${pageRotation}deg)`,
+            transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
             transformOrigin: 'center',
             transition: 'transform 0.3s ease'
           }}
@@ -141,7 +138,6 @@ export const PageFlipBook = ({ images, currentPage, onPageChange, zoom, rotation
             pageNumber={index + 1}
             zoom={zoom}
             rotation={rotation}
-            isLeftPage={index % 2 === 0}
           />
         ))}
       </HTMLFlipBook>
