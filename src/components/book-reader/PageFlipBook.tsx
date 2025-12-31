@@ -141,7 +141,7 @@ export const PageFlipBook = ({ images, currentPage, onPageChange, zoom, rotation
             pageNumber={index + 1}
             zoom={zoom}
             rotation={rotation}
-            isLeftPage={index % 2 === 1}
+            isLeftPage={index % 2 === 0}
           />
         ))}
       </HTMLFlipBook>
