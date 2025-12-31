@@ -151,8 +151,8 @@ const EditorSignupForm = () => {
                 <SelectValue placeholder="Sélectionnez la nature" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="etatique">Étatique</SelectItem>
-                <SelectItem value="non-etatique">Non étatique</SelectItem>
+                <SelectItem value="publique">Publique</SelectItem>
+                <SelectItem value="prive">Privé</SelectItem>
               </SelectContent>
             </Select>
           </div>
