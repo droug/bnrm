@@ -11,12 +11,17 @@ interface PageFlipBookProps {
 
 const Page = forwardRef<HTMLDivElement, { image: string; pageNumber: number; zoom: number; rotation: number }>(
   ({ image, pageNumber, zoom, rotation }, ref) => {
+    // Pages 11 et 12 nécessitent une rotation de 180° (problème de scan)
+    const pagesToRotate = [11, 12];
+    const additionalRotation = pagesToRotate.includes(pageNumber) ? 180 : 0;
+    const finalRotation = rotation + additionalRotation;
+    
     return (
       <div ref={ref} className="page bg-white shadow-2xl">
         <div 
           className="w-full h-full flex items-center justify-center overflow-hidden bg-white"
           style={{
-            transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
+            transform: `scale(${zoom / 100}) rotate(${finalRotation}deg)`,
             transformOrigin: 'center',
             transition: 'transform 0.3s ease'
           }}
