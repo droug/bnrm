@@ -98,10 +98,6 @@ export const PageFlipBook = ({ images, currentPage, onPageChange, zoom, rotation
     };
   }, [calculateDimensions]);
 
-  // Pour les documents arabes, inverser l'ordre des pages (lecture RTL)
-  const isRTL = true; // Livre arabe - lecture de droite à gauche
-  const displayImages = isRTL ? [...images].reverse() : images;
-
   return (
     <div 
       ref={containerRef} 
@@ -119,16 +115,10 @@ export const PageFlipBook = ({ images, currentPage, onPageChange, zoom, rotation
         maxShadowOpacity={0.5}
         showCover={true}
         mobileScrollSupport={true}
-        onFlip={(e: any) => {
-          const totalPages = images.length;
-          const flipPage = e.data + 1;
-          // Convertir la page affichée en page réelle pour RTL
-          const realPage = isRTL ? totalPages - flipPage + 1 : flipPage;
-          onPageChange(realPage);
-        }}
+        onFlip={(e: any) => onPageChange(e.data + 1)}
         className="book-container"
         style={{}}
-        startPage={isRTL ? images.length - currentPage : currentPage - 1}
+        startPage={currentPage - 1}
         drawShadow={true}
         flippingTime={800}
         usePortrait={true}
@@ -141,18 +131,15 @@ export const PageFlipBook = ({ images, currentPage, onPageChange, zoom, rotation
         disableFlipByClick={false}
         ref={bookRef}
       >
-        {displayImages.map((image, index) => {
-          const realPageNumber = isRTL ? images.length - index : index + 1;
-          return (
-            <Page 
-              key={index} 
-              image={image} 
-              pageNumber={realPageNumber}
-              zoom={zoom}
-              rotation={rotation}
-            />
-          );
-        })}
+        {images.map((image, index) => (
+          <Page 
+            key={index} 
+            image={image} 
+            pageNumber={index + 1}
+            zoom={zoom}
+            rotation={rotation}
+          />
+        ))}
       </HTMLFlipBook>
     </div>
   );
