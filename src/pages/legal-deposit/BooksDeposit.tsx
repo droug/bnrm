@@ -6,10 +6,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Book, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { AuthRequiredModal } from "@/components/AuthRequiredModal";
 
 export default function BooksDeposit() {
   const [showForm, setShowForm] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleStartDeclaration = () => {
+    if (user) {
+      setShowForm(true);
+    } else {
+      setShowAuthModal(true);
+    }
+  };
 
   if (showForm) {
     return <LegalDepositDeclaration depositType="monographie" onClose={() => setShowForm(false)} />;
@@ -80,7 +92,7 @@ export default function BooksDeposit() {
           <div className="text-center">
             <Button
               size="lg"
-              onClick={() => setShowForm(true)}
+              onClick={handleStartDeclaration}
               className="px-8"
             >
               <Book className="h-5 w-5 mr-2" />
@@ -91,6 +103,15 @@ export default function BooksDeposit() {
       </main>
       
       <Footer />
+
+      {/* Modal d'authentification */}
+      <AuthRequiredModal
+        open={showAuthModal}
+        onOpenChange={setShowAuthModal}
+        onSuccess={() => setShowForm(true)}
+        title="Connexion requise"
+        description="Veuillez vous connecter ou créer un compte éditeur pour effectuer un dépôt légal."
+      />
     </div>
   );
 }
