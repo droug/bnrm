@@ -59,7 +59,7 @@ export default function BooksDeposit() {
               </div>
               <div className="flex gap-3">
                 <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                <p className="text-muted-foreground">E-books et publications numériques</p>
+                <p className="text-muted-foreground">E-books</p>
               </div>
               <div className="flex gap-3">
                 <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
@@ -71,7 +71,7 @@ export default function BooksDeposit() {
               </div>
               <div className="flex gap-3">
                 <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                <p className="text-muted-foreground">Bandes dessinées et albums illustrés</p>
+                <p className="text-muted-foreground">Beaux-livres et expositions</p>
               </div>
             </CardContent>
           </Card>
