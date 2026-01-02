@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Building, Printer, Users, PenTool, Truck, Clapperboard } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EditorSignupForm from "@/components/EditorSignupForm";
@@ -14,8 +14,17 @@ import ProducerSignupForm from "@/components/ProducerSignupForm";
 import { WatermarkContainer } from "@/components/ui/watermark";
 
 const SignupPage = () => {
+  const [searchParams] = useSearchParams();
   const [selectedType, setSelectedType] = useState<string>("");
   const navigate = useNavigate();
+
+  // Pré-sélectionner le type depuis les paramètres URL
+  useEffect(() => {
+    const typeParam = searchParams.get("type");
+    if (typeParam && ["editor", "printer", "author", "distributor", "producer"].includes(typeParam)) {
+      setSelectedType(typeParam);
+    }
+  }, [searchParams]);
 
   const renderTypeSelection = () => (
     <div className="max-w-4xl mx-auto space-y-6">
