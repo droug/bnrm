@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,12 +71,13 @@ export function AuthRequiredModal({
     }
   };
 
-  // If user is already logged in, call onSuccess
-  if (user && open) {
-    onOpenChange(false);
-    onSuccess();
-    return null;
-  }
+  // If user becomes authenticated, trigger success
+  useEffect(() => {
+    if (user && open) {
+      onOpenChange(false);
+      onSuccess();
+    }
+  }, [user, open, onOpenChange, onSuccess]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
