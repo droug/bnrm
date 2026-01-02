@@ -24,7 +24,7 @@ interface CustomDialogContentProps extends React.HTMLAttributes<HTMLDivElement> 
   children: React.ReactNode;
   overlayClassName?: string;
   showOverlay?: boolean;
-  position?: "fixed" | "absolute";
+  position?: "fixed" | "absolute" | "sticky";
   centered?: boolean;
 }
 
@@ -50,10 +50,10 @@ export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialog
 
     if (!mounted) return null;
 
-    const positionClass = position === "fixed" ? "fixed" : "absolute";
-    const centeredClass = centered
+    const positionClass = position === "sticky" ? "sticky" : position === "fixed" ? "fixed" : "absolute";
+    const centeredClass = centered && position !== "sticky"
       ? "left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]"
-      : "";
+      : position === "sticky" ? "top-4" : "";
 
     const content = (
       <>
