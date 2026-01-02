@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CustomDialog, CustomDialogContent, CustomDialogHeader, CustomDialogTitle, CustomDialogDescription, CustomDialogClose } from "@/components/ui/custom-portal-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,11 @@ interface WelcomePopupProps {
 export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
   const { t } = useLanguage();
   const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [anchorTop, setAnchorTop] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (isOpen) setAnchorTop(window.scrollY + 16);
+  }, [isOpen]);
 
   console.log('WelcomePopup rendered, isOpen:', isOpen);
 
@@ -63,10 +68,14 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
 
   return (
     <CustomDialog open={isOpen} onOpenChange={handleClose} modal={false}>
-      <CustomDialogContent overlayClassName="!backdrop-blur-none !bg-transparent pointer-events-none" className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique !fixed !top-4 !right-4 !left-auto !translate-x-0 !translate-y-0 z-50 bg-background backdrop-blur-none">
+      <CustomDialogContent
+        showOverlay={false}
+        position="absolute"
+        centered={false}
+        style={anchorTop ? { top: anchorTop } : undefined}
+        className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique !right-4 !left-auto !translate-x-0 !translate-y-0 z-50 bg-background backdrop-blur-none"
+      >
         <CustomDialogClose onClose={handleClose} />
-        
-        {/* Header with Moroccan design */}
         <div className="relative overflow-hidden bg-gradient-zellige-main p-6 text-white">
           <div className="absolute inset-0 bg-pattern-zellige-complex opacity-30"></div>
           <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-20"></div>

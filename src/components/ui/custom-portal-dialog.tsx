@@ -23,10 +23,24 @@ export const CustomDialog = ({ open, onOpenChange, children }: CustomDialogProps
 interface CustomDialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   overlayClassName?: string;
+  showOverlay?: boolean;
+  position?: "fixed" | "absolute";
+  centered?: boolean;
 }
 
 export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialogContentProps>(
-  ({ className, overlayClassName, children, ...props }, ref) => {
+  (
+    {
+      className,
+      overlayClassName,
+      showOverlay = true,
+      position = "fixed",
+      centered = true,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     const [mounted, setMounted] = React.useState(false);
 
     React.useEffect(() => {
@@ -36,23 +50,32 @@ export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialog
 
     if (!mounted) return null;
 
+    const positionClass = position === "fixed" ? "fixed" : "absolute";
+    const centeredClass = centered
+      ? "left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]"
+      : "";
+
     const content = (
       <>
         {/* Overlay */}
-        <div
-          className={cn(
-            "dialog-overlay fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm animate-in fade-in-0",
-            overlayClassName
-          )}
-        />
-        
+        {showOverlay && (
+          <div
+            className={cn(
+              "dialog-overlay fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm animate-in fade-in-0",
+              overlayClassName
+            )}
+          />
+        )}
+
         {/* Content */}
         <div
           ref={ref}
           role="dialog"
-          aria-modal="true"
+          aria-modal={showOverlay ? true : undefined}
           className={cn(
-            "dialog-content fixed left-[50%] top-[50%] z-[61] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 sm:rounded-lg max-h-[90vh] overflow-y-auto",
+            "dialog-content z-[61] grid w-full max-w-lg gap-4 border bg-background p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 sm:rounded-lg max-h-[90vh] overflow-y-auto",
+            positionClass,
+            centeredClass,
             className
           )}
           {...props}
