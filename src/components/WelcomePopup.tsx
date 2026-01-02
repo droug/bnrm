@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CustomDialog, CustomDialogContent, CustomDialogHeader, CustomDialogTitle, CustomDialogDescription, CustomDialogClose } from "@/components/ui/custom-portal-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,11 +16,6 @@ interface WelcomePopupProps {
 export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
   const { t } = useLanguage();
   const [dontShowAgain, setDontShowAgain] = useState(false);
-  const [anchorTop, setAnchorTop] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (isOpen) setAnchorTop(window.scrollY + 16);
-  }, [isOpen]);
 
   console.log('WelcomePopup rendered, isOpen:', isOpen);
 
@@ -70,10 +65,9 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
     <CustomDialog open={isOpen} onOpenChange={handleClose} modal={false}>
       <CustomDialogContent
         showOverlay={false}
-        position="absolute"
+        position="sticky"
         centered={false}
-        style={anchorTop ? { top: anchorTop } : undefined}
-        className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique !right-4 !left-auto !translate-x-0 !translate-y-0 z-50 bg-background backdrop-blur-none"
+        className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique ml-auto mr-4 mt-4 z-50 bg-background backdrop-blur-none"
       >
         <CustomDialogClose onClose={handleClose} />
         <div className="relative overflow-hidden bg-gradient-zellige-main p-6 text-white">
