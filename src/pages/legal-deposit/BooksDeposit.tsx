@@ -8,19 +8,34 @@ import { Book, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthRequiredModal } from "@/components/AuthRequiredModal";
+import { UserTypeSelectionModal } from "@/components/legal-deposit/UserTypeSelectionModal";
 
 export default function BooksDeposit() {
   const [showForm, setShowForm] = useState(false);
+  const [showUserTypeModal, setShowUserTypeModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [selectedUserType, setSelectedUserType] = useState<"editeur" | "imprimeur" | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
 
   const handleStartDeclaration = () => {
+    setShowUserTypeModal(true);
+  };
+
+  const handleUserTypeSelect = (type: "editeur" | "imprimeur") => {
+    setSelectedUserType(type);
+    setShowUserTypeModal(false);
+    
     if (user) {
       setShowForm(true);
     } else {
       setShowAuthModal(true);
     }
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+    setShowForm(true);
   };
 
   if (showForm) {
@@ -104,13 +119,20 @@ export default function BooksDeposit() {
       
       <Footer />
 
+      {/* Modal de sélection du type d'utilisateur */}
+      <UserTypeSelectionModal
+        open={showUserTypeModal}
+        onOpenChange={setShowUserTypeModal}
+        onSelectType={handleUserTypeSelect}
+      />
+
       {/* Modal d'authentification */}
       <AuthRequiredModal
         open={showAuthModal}
         onOpenChange={setShowAuthModal}
-        onSuccess={() => setShowForm(true)}
+        onSuccess={handleAuthSuccess}
         title="Connexion requise"
-        description="Veuillez vous connecter ou créer un compte éditeur pour effectuer un dépôt légal."
+        description={`Veuillez vous connecter ou créer un compte ${selectedUserType === "imprimeur" ? "imprimeur" : "éditeur"} pour effectuer un dépôt légal.`}
       />
     </div>
   );
