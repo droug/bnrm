@@ -50,6 +50,9 @@ export default function BNRMPortal() {
                   <DropdownMenuItem onClick={() => navigate("/reservation-espaces")}>
                     Réservez nos espaces
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/depot-legal")}>
+                    Dépôt légal
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
