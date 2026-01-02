@@ -63,7 +63,7 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
 
   return (
     <CustomDialog open={isOpen} onOpenChange={handleClose} modal={false}>
-      <CustomDialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique !fixed !top-4 !right-4 !left-auto !translate-x-0 !translate-y-0 z-50 bg-background backdrop-blur-none">
+      <CustomDialogContent overlayClassName="!backdrop-blur-none !bg-transparent pointer-events-none" className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique !fixed !top-4 !right-4 !left-auto !translate-x-0 !translate-y-0 z-50 bg-background backdrop-blur-none">
         <CustomDialogClose onClose={handleClose} />
         
         {/* Header with Moroccan design */}

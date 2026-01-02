@@ -22,10 +22,11 @@ export const CustomDialog = ({ open, onOpenChange, children }: CustomDialogProps
 
 interface CustomDialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
+  overlayClassName?: string;
 }
 
 export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialogContentProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, overlayClassName, children, ...props }, ref) => {
     const [mounted, setMounted] = React.useState(false);
 
     React.useEffect(() => {
@@ -38,8 +39,11 @@ export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialog
     const content = (
       <>
         {/* Overlay */}
-        <div 
-          className="dialog-overlay fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm animate-in fade-in-0"
+        <div
+          className={cn(
+            "dialog-overlay fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm animate-in fade-in-0",
+            overlayClassName
+          )}
         />
         
         {/* Content */}
