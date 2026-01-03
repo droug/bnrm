@@ -113,10 +113,14 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
   
   const [customFieldsData, setCustomFieldsData] = useState<Record<string, any>>({});
   
-  // Si un type initial est fourni, sauter l'étape de sélection
-  const initialStep = initialUserType ? "form_filling" : "type_selection";
-  const [currentStep, setCurrentStep] = useState<"type_selection" | "editor_auth" | "printer_auth" | "form_filling" | "confirmation">(initialStep);
-  const [userType, setUserType] = useState<"editor" | "printer" | "producer" | "distributor" | null>(initialUserType || null);
+  // Si un type initial est fourni, sauter directement à form_filling
+  const [currentStep, setCurrentStep] = useState<"type_selection" | "editor_auth" | "printer_auth" | "form_filling" | "confirmation">(() => {
+    if (initialUserType) {
+      return "form_filling";
+    }
+    return "type_selection";
+  });
+  const [userType, setUserType] = useState<"editor" | "printer" | "producer" | "distributor" | null>(() => initialUserType || null);
   const [partnerConfirmed, setPartnerConfirmed] = useState(false);
   const [editorData, setEditorData] = useState<any>({});
   const [printerData, setPrinterData] = useState<any>({});
@@ -4383,7 +4387,14 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           <div className="w-full max-w-6xl mx-auto space-y-4">
           <Button
             variant="ghost"
-            onClick={() => setCurrentStep("printer_auth")}
+            onClick={() => {
+              // Si un type initial est fourni, fermer le formulaire; sinon retour à l'étape précédente
+              if (initialUserType) {
+                onClose();
+              } else {
+                setCurrentStep(userType === "printer" ? "printer_auth" : "editor_auth");
+              }
+            }}
             className="mb-2"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
