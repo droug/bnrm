@@ -333,24 +333,26 @@ const EditorSignupForm = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="googleMapsLink">Lien Google Maps *</Label>
-              <div className="flex gap-2">
-                <div className="flex items-center justify-center px-3 py-2 border border-input rounded-lg bg-muted/30">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
+            {formData.type === "morale" && (
+              <div className="space-y-2">
+                <Label htmlFor="googleMapsLink">Lien Google Maps *</Label>
+                <div className="flex gap-2">
+                  <div className="flex items-center justify-center px-3 py-2 border border-input rounded-lg bg-muted/30">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <Input
+                    id="googleMapsLink"
+                    value={formData.googleMapsLink}
+                    onChange={(e) => setFormData(prev => ({ ...prev, googleMapsLink: e.target.value }))}
+                    placeholder="https://maps.google.com/?q=..."
+                    className="flex-1"
+                  />
                 </div>
-                <Input
-                  id="googleMapsLink"
-                  value={formData.googleMapsLink}
-                  onChange={(e) => setFormData(prev => ({ ...prev, googleMapsLink: e.target.value }))}
-                  placeholder="https://maps.google.com/?q=..."
-                  className="flex-1"
-                />
+                <p className="text-xs text-muted-foreground">
+                  Collez le lien de localisation Google Maps de votre établissement
+                </p>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Collez le lien de localisation Google Maps de votre établissement
-              </p>
-            </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
