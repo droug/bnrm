@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { CustomDialog, CustomDialogContent, CustomDialogHeader, CustomDialogTitle, CustomDialogDescription, CustomDialogClose } from "@/components/ui/custom-portal-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +16,7 @@ interface WelcomePopupProps {
 
 export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
   console.log('WelcomePopup rendered, isOpen:', isOpen);
@@ -26,6 +28,11 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
     onClose();
   };
 
+  const handleActionClick = (path: string) => {
+    handleClose();
+    navigate(path);
+  };
+
   const quickActions = [
     {
       icon: BookOpen,
@@ -33,7 +40,8 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
       description: "Découvrez nos manuscrits et ouvrages patrimoniaux",
       color: "text-primary",
       bg: "bg-primary/10",
-      border: "border-primary/25"
+      border: "border-primary/25",
+      path: "/mediatheque"
     },
     {
       icon: FileText,
@@ -41,7 +49,8 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
       description: "Effectuez votre dépôt légal en ligne",
       color: "text-accent",
       bg: "bg-accent/10",
-      border: "border-accent/25"
+      border: "border-accent/25",
+      path: "/depot-legal"
     },
     {
       icon: Users,
@@ -49,7 +58,8 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
       description: "Rejoignez notre communauté de chercheurs",
       color: "text-highlight",
       bg: "bg-highlight/10",
-      border: "border-highlight/25"
+      border: "border-highlight/25",
+      path: "/auth"
     },
     {
       icon: Calendar,
@@ -57,7 +67,8 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
       description: "Découvrez nos expositions et conférences",
       color: "text-gold",
       bg: "bg-gold/10",
-      border: "border-gold/25"
+      border: "border-gold/25",
+      path: "/agenda"
     }
   ];
 
@@ -150,9 +161,10 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {quickActions.map((action, index) => (
-                  <div
+                  <button
                     key={index}
-                    className={`p-4 rounded-lg ${action.bg} border-2 ${action.border} hover:shadow-zellige transition-all duration-300 transform hover:scale-105 cursor-pointer group relative overflow-hidden`}
+                    onClick={() => handleActionClick(action.path)}
+                    className={`p-4 rounded-lg ${action.bg} border-2 ${action.border} hover:shadow-zellige transition-all duration-300 transform hover:scale-105 cursor-pointer group relative overflow-hidden text-left w-full`}
                   >
                     <div className="absolute inset-0 bg-pattern-filigrane opacity-5 group-hover:opacity-15 transition-opacity duration-300"></div>
                     <div className="flex items-start space-x-3 relative z-10">
@@ -162,7 +174,7 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
                         <p className="text-sm text-muted-foreground">{action.description}</p>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </CardContent>
