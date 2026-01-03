@@ -281,32 +281,6 @@ const EditorSignupForm = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="photoFile">Photo d'identité</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                  <input
-                    type="file"
-                    id="photoFile"
-                    accept="image/*"
-                    onChange={(e) => handleFileUpload("photoFile", e.target.files?.[0] || null)}
-                    className="hidden"
-                  />
-                  <label htmlFor="photoFile" className="cursor-pointer flex flex-col items-center gap-2">
-                    {formData.photoFile ? (
-                      <>
-                        <User className="h-8 w-8 text-primary" />
-                        <span className="text-sm text-primary font-medium">{formData.photoFile.name}</span>
-                      </>
-                    ) : (
-                      <>
-                        <User className="h-8 w-8 text-gray-400" />
-                        <span className="text-sm text-gray-600">Télécharger la photo d'identité</span>
-                        <span className="text-xs text-gray-500">Format portrait, fond clair recommandé</span>
-                      </>
-                    )}
-                  </label>
-                </div>
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="otherContact">Autre contact</Label>
