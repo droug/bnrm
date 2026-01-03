@@ -84,9 +84,10 @@ interface Distributor {
 interface LegalDepositDeclarationProps {
   depositType: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees";
   onClose: () => void;
+  initialUserType?: "editor" | "printer" | "producer";
 }
 
-export default function LegalDepositDeclaration({ depositType, onClose }: LegalDepositDeclarationProps) {
+export default function LegalDepositDeclaration({ depositType, onClose, initialUserType }: LegalDepositDeclarationProps) {
   const navigate = useNavigate();
   const { language, isRTL } = useLanguage();
   const { user } = useAuth();
@@ -111,8 +112,11 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
   }, [customFields]);
   
   const [customFieldsData, setCustomFieldsData] = useState<Record<string, any>>({});
-  const [currentStep, setCurrentStep] = useState<"type_selection" | "editor_auth" | "printer_auth" | "form_filling" | "confirmation">("type_selection");
-  const [userType, setUserType] = useState<"editor" | "printer" | "producer" | "distributor" | null>(null);
+  
+  // Si un type initial est fourni, sauter l'étape de sélection
+  const initialStep = initialUserType ? "form_filling" : "type_selection";
+  const [currentStep, setCurrentStep] = useState<"type_selection" | "editor_auth" | "printer_auth" | "form_filling" | "confirmation">(initialStep);
+  const [userType, setUserType] = useState<"editor" | "printer" | "producer" | "distributor" | null>(initialUserType || null);
   const [partnerConfirmed, setPartnerConfirmed] = useState(false);
   const [editorData, setEditorData] = useState<any>({});
   const [printerData, setPrinterData] = useState<any>({});
