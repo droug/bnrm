@@ -93,10 +93,12 @@ export default function ContentManagement() {
   const [editingContent, setEditingContent] = useState<Content | null>(null);
 
   useEffect(() => {
-    if (user && (profile?.role === 'admin' || profile?.role === 'librarian')) {
+    const hasAccess = user && profile && (profile.role === 'admin' || profile.role === 'librarian');
+    console.log('ContentManagement - Access check:', { user: !!user, profile, role: profile?.role, hasAccess });
+    if (hasAccess) {
       fetchContents();
     }
-  }, [user, profile]);
+  }, [user, profile?.role]);
 
   const fetchContents = async () => {
     try {
