@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Upload, Printer, AlertCircle, MapPin, Building, User } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
@@ -14,16 +14,27 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface PrinterFormData {
   type: "morale" | "physique";
-  logoFile?: File;
-  nameAr: string;
-  nameFr: string;
+  nature: string;
+  // Commun
   email: string;
   phone: string;
   googleMapsLink: string;
   region: string;
   city: string;
+  
+  // Personne morale
+  logoFile?: File;
+  nameAr: string;
+  nameFr: string;
   commerceRegistry: string;
   contactPerson: string;
+  
+  // Personne physique
+  cin?: string;
+  printerNameAr?: string;
+  printerNameFr?: string;
+  cinFile?: File;
+  otherContact?: string;
 }
 
 const PrinterSignupForm = () => {
@@ -31,10 +42,11 @@ const PrinterSignupForm = () => {
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [formData, setFormData] = useState<PrinterFormData>({
     type: "morale",
+    nature: "",
     nameAr: "",
     nameFr: "",
     email: "",
-    phone: "",
+    phone: "+212 ",
     googleMapsLink: "",
     region: "",
     city: "",
@@ -42,8 +54,8 @@ const PrinterSignupForm = () => {
     contactPerson: "",
   });
 
-  const handleFileUpload = (file: File | null) => {
-    setFormData(prev => ({ ...prev, logoFile: file }));
+  const handleFileUpload = (field: string, file: File | null) => {
+    setFormData(prev => ({ ...prev, [field]: file }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,14 +63,28 @@ const PrinterSignupForm = () => {
     
     const missingFields: string[] = [];
     
-    if (!formData.nameAr) missingFields.push("Nom de l'imprimeur (Arabe)");
-    if (!formData.nameFr) missingFields.push("Nom de l'imprimeur (Français)");
+    // Validation des champs communs
+    if (!formData.nature) missingFields.push("Nature de l'imprimeur");
     if (!formData.email) missingFields.push("Adresse email");
-    if (!formData.phone) missingFields.push("Téléphone");
-    if (!formData.googleMapsLink) missingFields.push("Lien Google Maps");
+    if (!formData.phone || formData.phone.trim() === "+212" || formData.phone.trim() === "+212 ") {
+      missingFields.push("Téléphone");
+    }
     if (!formData.region) missingFields.push("Région");
     if (!formData.city) missingFields.push("Ville");
-    if (!formData.commerceRegistry) missingFields.push("Registre de commerce");
+    
+    // Validation selon le type d'imprimeur
+    if (formData.type === "morale") {
+      if (!formData.nameAr) missingFields.push("Nom de l'imprimeur (Arabe)");
+      if (!formData.nameFr) missingFields.push("Nom de l'imprimeur (Français)");
+      if (!formData.commerceRegistry) missingFields.push("Registre de commerce");
+      if (!formData.googleMapsLink) missingFields.push("Lien Google Maps");
+    } else {
+      // Personne physique
+      if (!formData.printerNameAr) missingFields.push("Nom de l'imprimeur (Arabe)");
+      if (!formData.printerNameFr) missingFields.push("Nom de l'imprimeur (Français)");
+      if (!formData.cin) missingFields.push("Numéro CIN");
+      if (!formData.cinFile) missingFields.push("Copie numérisée de la CNIE");
+    }
     
     if (missingFields.length > 0) {
       setValidationErrors(missingFields);
@@ -130,52 +156,165 @@ const PrinterSignupForm = () => {
             </RadioGroup>
           </div>
 
-          {/* Nom de l'imprimeur */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="nameAr">Nom de l'imprimeur (Arabe) *</Label>
-              <ArabicInputWithKeyboard
-                value={formData.nameAr}
-                onChange={(value) => setFormData(prev => ({ ...prev, nameAr: value }))}
-                placeholder="اسم المطبعة"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="nameFr">Nom de l'imprimeur (Français) *</Label>
-              <Input
-                id="nameFr"
-                value={formData.nameFr}
-                onChange={(e) => setFormData(prev => ({ ...prev, nameFr: e.target.value }))}
-                placeholder="Nom de l'imprimeur"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Logo */}
+          {/* Nature de l'imprimeur */}
           <div className="space-y-2">
-            <Label htmlFor="logo">Logo de l'imprimeur</Label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-              <input
-                type="file"
-                id="logo"
-                accept="image/*"
-                onChange={(e) => handleFileUpload(e.target.files?.[0] || null)}
-                className="hidden"
-              />
-              <label htmlFor="logo" className="cursor-pointer flex flex-col items-center gap-2">
-                <Upload className="h-8 w-8 text-gray-400" />
-                <span className="text-sm text-gray-600">Cliquez pour télécharger le logo</span>
-                {formData.logoFile && (
-                  <span className="text-sm text-green-600">Fichier sélectionné: {formData.logoFile.name}</span>
-                )}
-              </label>
-            </div>
+            <Label htmlFor="nature">Nature de l'imprimeur *</Label>
+            <Select 
+              value={formData.nature}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, nature: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionnez la nature" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="publique">Publique</SelectItem>
+                <SelectItem value="prive">Privé</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Informations de contact */}
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold border-b pb-2">Informations de contact</h3>
+          <Tabs value={formData.type} className="w-full">
+            <TabsContent value="morale" className="space-y-4">
+              {/* Formulaire personne morale */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="nameAr">Nom de l'imprimeur (Arabe) *</Label>
+                  <ArabicInputWithKeyboard
+                    value={formData.nameAr}
+                    onChange={(value) => setFormData(prev => ({ ...prev, nameAr: value }))}
+                    placeholder="اسم المطبعة"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="nameFr">Nom de l'imprimeur (Français) *</Label>
+                  <Input
+                    id="nameFr"
+                    value={formData.nameFr}
+                    onChange={(e) => setFormData(prev => ({ ...prev, nameFr: e.target.value }))}
+                    placeholder="Nom de l'imprimeur"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="logo">Logo de l'imprimeur</Label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <input
+                    type="file"
+                    id="logo"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload("logoFile", e.target.files?.[0] || null)}
+                    className="hidden"
+                  />
+                  <label htmlFor="logo" className="cursor-pointer flex flex-col items-center gap-2">
+                    <Upload className="h-8 w-8 text-gray-400" />
+                    <span className="text-sm text-gray-600">Cliquez pour télécharger le logo</span>
+                    {formData.logoFile && (
+                      <span className="text-sm text-green-600">Fichier sélectionné: {formData.logoFile.name}</span>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="commerceRegistry">Registre de commerce *</Label>
+                <Input
+                  id="commerceRegistry"
+                  value={formData.commerceRegistry}
+                  onChange={(e) => setFormData(prev => ({ ...prev, commerceRegistry: e.target.value }))}
+                  placeholder="Numéro du registre de commerce"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contactPerson">Personne à contacter</Label>
+                <Input
+                  id="contactPerson"
+                  value={formData.contactPerson}
+                  onChange={(e) => setFormData(prev => ({ ...prev, contactPerson: e.target.value }))}
+                  placeholder="Nom de la personne de contact"
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="physique" className="space-y-4">
+              {/* Formulaire personne physique */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="printerNameAr">Nom de l'imprimeur (Arabe) *</Label>
+                  <Input
+                    id="printerNameAr"
+                    value={formData.printerNameAr || ""}
+                    onChange={(e) => setFormData(prev => ({ ...prev, printerNameAr: e.target.value }))}
+                    placeholder="اسم الطابع"
+                    dir="rtl"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="printerNameFr">Nom de l'imprimeur (Français) *</Label>
+                  <Input
+                    id="printerNameFr"
+                    value={formData.printerNameFr || ""}
+                    onChange={(e) => setFormData(prev => ({ ...prev, printerNameFr: e.target.value }))}
+                    placeholder="Nom de l'imprimeur"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cin">Numéro CIN *</Label>
+                <Input
+                  id="cin"
+                  value={formData.cin || ""}
+                  onChange={(e) => setFormData(prev => ({ ...prev, cin: e.target.value }))}
+                  placeholder="Numéro de la carte d'identité nationale"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cinFile">Copie numérisée de la CNIE *</Label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <input
+                    type="file"
+                    id="cinFile"
+                    accept="image/*,application/pdf"
+                    onChange={(e) => handleFileUpload("cinFile", e.target.files?.[0] || null)}
+                    className="hidden"
+                  />
+                  <label htmlFor="cinFile" className="cursor-pointer flex flex-col items-center gap-2">
+                    {formData.cinFile ? (
+                      <>
+                        <Upload className="h-8 w-8 text-primary" />
+                        <span className="text-sm text-primary font-medium">{formData.cinFile.name}</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                        </svg>
+                        <span className="text-sm text-gray-600">Télécharger la copie de la CNIE</span>
+                        <span className="text-xs text-gray-500">Recto et verso de votre carte nationale</span>
+                      </>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="otherContact">Autre contact</Label>
+                <Input
+                  id="otherContact"
+                  value={formData.otherContact || ""}
+                  onChange={(e) => setFormData(prev => ({ ...prev, otherContact: e.target.value }))}
+                  placeholder="Contact supplémentaire"
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          {/* Informations communes */}
+          <div className="space-y-4 border-t pt-4">
+            <h3 className="text-2xl font-semibold">Informations de contact</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -186,43 +325,52 @@ const PrinterSignupForm = () => {
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                   placeholder="email@exemple.com"
-                  required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Téléphone *</Label>
-                <PhoneInput
-                  id="phone"
-                  defaultCountry="MA"
-                  value={formData.phone}
-                  onChange={(value) => setFormData(prev => ({ ...prev, phone: value }))}
-                  placeholder="6 XX XX XX XX"
-                  required
-                />
+                <div className="flex gap-2">
+                  <div className="flex items-center gap-2 px-3 py-2 border border-input rounded-lg bg-muted/30 min-w-[100px]">
+                    <span className="text-lg">🇲🇦</span>
+                    <span className="text-sm font-medium">+212</span>
+                  </div>
+                  <Input
+                    id="phone"
+                    value={formData.phone.replace('+212', '').trim()}
+                    onChange={(e) => {
+                      const phoneNumber = e.target.value.replace(/[^\d\s]/g, '');
+                      setFormData(prev => ({ ...prev, phone: `+212 ${phoneNumber}` }));
+                    }}
+                    placeholder="6 XX XX XX XX"
+                    className="flex-1"
+                  />
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  L'indicatif du pays est ajouté automatiquement selon votre sélection.
+                  Indicatif du Maroc (+212) uniquement
                 </p>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="googleMapsLink">Lien Google Maps *</Label>
-              <div className="flex gap-2">
-                <div className="flex items-center justify-center px-3 py-2 border border-input rounded-lg bg-muted/30">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
+            {formData.type === "morale" && (
+              <div className="space-y-2">
+                <Label htmlFor="googleMapsLink">Lien Google Maps *</Label>
+                <div className="flex gap-2">
+                  <div className="flex items-center justify-center px-3 py-2 border border-input rounded-lg bg-muted/30">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <Input
+                    id="googleMapsLink"
+                    value={formData.googleMapsLink}
+                    onChange={(e) => setFormData(prev => ({ ...prev, googleMapsLink: e.target.value }))}
+                    placeholder="https://maps.google.com/?q=..."
+                    className="flex-1"
+                  />
                 </div>
-                <Input
-                  id="googleMapsLink"
-                  value={formData.googleMapsLink}
-                  onChange={(e) => setFormData(prev => ({ ...prev, googleMapsLink: e.target.value }))}
-                  placeholder="https://maps.google.com/?q=..."
-                  className="flex-1"
-                />
+                <p className="text-xs text-muted-foreground">
+                  Collez le lien de localisation Google Maps de votre établissement
+                </p>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Collez le lien de localisation Google Maps de votre établissement
-              </p>
-            </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -254,35 +402,8 @@ const PrinterSignupForm = () => {
                   value={formData.city}
                   onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
                   placeholder="Nom de la ville"
-                  required
                 />
               </div>
-            </div>
-          </div>
-
-          {/* Informations légales */}
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold border-b pb-2">Informations légales</h3>
-            
-            <div className="space-y-2">
-              <Label htmlFor="commerceRegistry">Registre de commerce *</Label>
-              <Input
-                id="commerceRegistry"
-                value={formData.commerceRegistry}
-                onChange={(e) => setFormData(prev => ({ ...prev, commerceRegistry: e.target.value }))}
-                placeholder="Numéro du registre de commerce"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="contactPerson">Personne à contacter</Label>
-              <Input
-                id="contactPerson"
-                value={formData.contactPerson}
-                onChange={(e) => setFormData(prev => ({ ...prev, contactPerson: e.target.value }))}
-                placeholder="Nom et fonction de la personne de contact"
-              />
             </div>
           </div>
 
