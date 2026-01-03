@@ -8,10 +8,13 @@ import { Book, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { UserTypeSelectionModal } from "@/components/legal-deposit/UserTypeSelectionModal";
+import { AuthChoiceModal } from "@/components/legal-deposit/AuthChoiceModal";
 
 export default function BooksDeposit() {
   const [showForm, setShowForm] = useState(false);
   const [showUserTypeModal, setShowUserTypeModal] = useState(false);
+  const [showAuthChoiceModal, setShowAuthChoiceModal] = useState(false);
+  const [selectedUserType, setSelectedUserType] = useState<"editeur" | "imprimeur">("editeur");
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -25,9 +28,9 @@ export default function BooksDeposit() {
     if (user) {
       setShowForm(true);
     } else {
-      // Rediriger vers la page d'inscription avec le type pré-sélectionné
-      const signupType = type === "editeur" ? "editor" : "printer";
-      navigate(`/signup?type=${signupType}&redirect=/depot-legal/livres`);
+      // Afficher la modale de choix connexion/inscription
+      setSelectedUserType(type);
+      setShowAuthChoiceModal(true);
     }
   };
 
@@ -117,6 +120,14 @@ export default function BooksDeposit() {
         open={showUserTypeModal}
         onOpenChange={setShowUserTypeModal}
         onSelectType={handleUserTypeSelect}
+      />
+
+      {/* Modal de choix connexion/inscription */}
+      <AuthChoiceModal
+        open={showAuthChoiceModal}
+        onOpenChange={setShowAuthChoiceModal}
+        userType={selectedUserType}
+        redirectPath="/depot-legal/livres"
       />
     </div>
   );
