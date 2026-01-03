@@ -100,27 +100,6 @@ const PrinterSignupForm = () => {
             </Alert>
           )}
           
-          {/* Logo */}
-          <div className="space-y-2">
-            <Label htmlFor="logo">Logo de l'imprimeur</Label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-              <input
-                type="file"
-                id="logo"
-                accept="image/*"
-                onChange={(e) => handleFileUpload(e.target.files?.[0] || null)}
-                className="hidden"
-              />
-              <label htmlFor="logo" className="cursor-pointer flex flex-col items-center gap-2">
-                <Upload className="h-8 w-8 text-gray-400" />
-                <span className="text-sm text-gray-600">Cliquez pour télécharger le logo</span>
-                {formData.logoFile && (
-                  <span className="text-sm text-green-600">Fichier sélectionné: {formData.logoFile.name}</span>
-                )}
-              </label>
-            </div>
-          </div>
-
           {/* Nom de l'imprimeur */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -140,6 +119,27 @@ const PrinterSignupForm = () => {
                 placeholder="Nom de l'imprimeur"
                 required
               />
+            </div>
+          </div>
+
+          {/* Logo */}
+          <div className="space-y-2">
+            <Label htmlFor="logo">Logo de l'imprimeur</Label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+              <input
+                type="file"
+                id="logo"
+                accept="image/*"
+                onChange={(e) => handleFileUpload(e.target.files?.[0] || null)}
+                className="hidden"
+              />
+              <label htmlFor="logo" className="cursor-pointer flex flex-col items-center gap-2">
+                <Upload className="h-8 w-8 text-gray-400" />
+                <span className="text-sm text-gray-600">Cliquez pour télécharger le logo</span>
+                {formData.logoFile && (
+                  <span className="text-sm text-green-600">Fichier sélectionné: {formData.logoFile.name}</span>
+                )}
+              </label>
             </div>
           </div>
 
