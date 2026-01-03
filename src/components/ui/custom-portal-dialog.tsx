@@ -24,8 +24,9 @@ interface CustomDialogContentProps extends React.HTMLAttributes<HTMLDivElement> 
   children: React.ReactNode;
   overlayClassName?: string;
   showOverlay?: boolean;
-  position?: "fixed" | "absolute" | "sticky";
+  position?: "fixed" | "absolute" | "sticky" | "static" | "relative";
   centered?: boolean;
+  portal?: boolean;
 }
 
 export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialogContentProps>(
@@ -36,6 +37,7 @@ export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialog
       showOverlay = true,
       position = "fixed",
       centered = true,
+      portal = true,
       children,
       ...props
     },
@@ -50,10 +52,23 @@ export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialog
 
     if (!mounted) return null;
 
-    const positionClass = position === "sticky" ? "sticky" : position === "fixed" ? "fixed" : "absolute";
-    const centeredClass = centered && position !== "sticky"
-      ? "left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]"
-      : position === "sticky" ? "top-4" : "";
+    const positionClass =
+      position === "sticky"
+        ? "sticky"
+        : position === "fixed"
+          ? "fixed"
+          : position === "relative"
+            ? "relative"
+            : position === "static"
+              ? "static"
+              : "absolute";
+
+    const centeredClass =
+      centered && (position === "fixed" || position === "absolute")
+        ? "left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]"
+        : position === "sticky"
+          ? "top-4"
+          : "";
 
     const content = (
       <>
@@ -85,7 +100,7 @@ export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialog
       </>
     );
 
-    return createPortal(content, document.body);
+    return portal ? createPortal(content, document.body) : content;
   }
 );
 CustomDialogContent.displayName = "CustomDialogContent";
