@@ -6,13 +6,44 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Newspaper, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { UserTypeSelectionModal } from "@/components/legal-deposit/UserTypeSelectionModal";
+import { AuthChoiceModal } from "@/components/legal-deposit/AuthChoiceModal";
 
 export default function PeriodicalsDeposit() {
   const [showForm, setShowForm] = useState(false);
+  const [showUserTypeModal, setShowUserTypeModal] = useState(false);
+  const [showAuthChoiceModal, setShowAuthChoiceModal] = useState(false);
+  const [selectedUserType, setSelectedUserType] = useState<"editeur" | "imprimeur">("editeur");
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleStartDeclaration = () => {
+    setShowUserTypeModal(true);
+  };
+
+  const handleUserTypeSelect = (type: "editeur" | "imprimeur") => {
+    setShowUserTypeModal(false);
+    setSelectedUserType(type);
+    
+    if (user) {
+      setShowForm(true);
+    } else {
+      setShowAuthChoiceModal(true);
+    }
+  };
+
+  // Mapper le type sélectionné vers le format attendu par LegalDepositDeclaration
+  const mappedUserType = selectedUserType === "editeur" ? "editor" : "printer";
 
   if (showForm) {
-    return <LegalDepositDeclaration depositType="periodique" onClose={() => setShowForm(false)} />;
+    return (
+      <LegalDepositDeclaration 
+        depositType="periodique" 
+        onClose={() => setShowForm(false)}
+        initialUserType={mappedUserType}
+      />
+    );
   }
 
   return (
@@ -80,7 +111,7 @@ export default function PeriodicalsDeposit() {
           <div className="text-center">
             <Button
               size="lg"
-              onClick={() => setShowForm(true)}
+              onClick={handleStartDeclaration}
               className="px-8"
             >
               <Newspaper className="h-5 w-5 mr-2" />
@@ -91,6 +122,21 @@ export default function PeriodicalsDeposit() {
       </main>
       
       <Footer />
+
+      {/* Modale de sélection du type de déclarant */}
+      <UserTypeSelectionModal
+        open={showUserTypeModal}
+        onOpenChange={setShowUserTypeModal}
+        onSelectType={handleUserTypeSelect}
+      />
+
+      {/* Modale de choix d'authentification */}
+      <AuthChoiceModal
+        open={showAuthChoiceModal}
+        onOpenChange={setShowAuthChoiceModal}
+        userType={selectedUserType}
+        redirectPath="/depot-legal/periodiques"
+      />
     </div>
   );
 }
