@@ -220,16 +220,6 @@ const EditorSignupForm = () => {
 
             <TabsContent value="physique" className="space-y-4">
               {/* Formulaire personne physique */}
-              <div className="space-y-2">
-                <Label htmlFor="cin">Numéro CIN *</Label>
-                <Input
-                  id="cin"
-                  value={formData.cin || ""}
-                  onChange={(e) => setFormData(prev => ({ ...prev, cin: e.target.value }))}
-                  placeholder="Numéro de la carte d'identité nationale"
-                />
-              </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="editorNameAr">Nom de l'éditeur (Arabe) *</Label>
@@ -250,6 +240,16 @@ const EditorSignupForm = () => {
                     placeholder="Nom de l'éditeur"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cin">Numéro CIN *</Label>
+                <Input
+                  id="cin"
+                  value={formData.cin || ""}
+                  onChange={(e) => setFormData(prev => ({ ...prev, cin: e.target.value }))}
+                  placeholder="Numéro de la carte d'identité nationale"
+                />
               </div>
 
               <div className="space-y-2">
