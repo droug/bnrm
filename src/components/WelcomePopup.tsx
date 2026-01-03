@@ -77,9 +77,9 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
       <CustomDialogContent
         showOverlay={false}
         portal={false}
-        position="sticky"
+        position="relative"
         centered={false}
-        className="!mx-auto !top-4 !z-[calc(var(--z-notification)+200)] max-w-4xl !max-h-none !overflow-visible p-0 border-3 border-gold/30 shadow-mosaique bg-background backdrop-blur-none"
+        className="mx-auto mt-4 z-10 max-w-4xl p-0 border-2 border-gold/30 shadow-lg bg-background rounded-lg"
       >
         <CustomDialogClose onClose={handleClose} />
         <div className="relative overflow-hidden bg-gradient-zellige-main p-6 text-white">
