@@ -105,10 +105,13 @@ const EditorSignupForm = () => {
     
     if (missingFields.length > 0) {
       toast({
-        title: "Champs obligatoires manquants",
+        title: "⚠️ Champs obligatoires manquants",
         description: `Veuillez remplir les champs suivants : ${missingFields.join(", ")}`,
         variant: "destructive",
+        duration: 8000,
       });
+      // Scroll to top to ensure user sees the form
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
