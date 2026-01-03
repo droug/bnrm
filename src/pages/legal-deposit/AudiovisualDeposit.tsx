@@ -7,15 +7,23 @@ import { Button } from "@/components/ui/button";
 import { Video, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { ProducerTypeSelectionModal } from "@/components/legal-deposit/ProducerTypeSelectionModal";
 import { AuthChoiceModal } from "@/components/legal-deposit/AuthChoiceModal";
 
 export default function AudiovisualDeposit() {
   const [showForm, setShowForm] = useState(false);
+  const [showUserTypeModal, setShowUserTypeModal] = useState(false);
   const [showAuthChoiceModal, setShowAuthChoiceModal] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
   const handleStartDeclaration = () => {
+    setShowUserTypeModal(true);
+  };
+
+  const handleUserTypeSelect = (type: "producteur") => {
+    setShowUserTypeModal(false);
+    
     if (user) {
       setShowForm(true);
     } else {
@@ -24,7 +32,13 @@ export default function AudiovisualDeposit() {
   };
 
   if (showForm) {
-    return <LegalDepositDeclaration depositType="bd_logiciels" onClose={() => setShowForm(false)} />;
+    return (
+      <LegalDepositDeclaration 
+        depositType="bd_logiciels" 
+        onClose={() => setShowForm(false)}
+        initialUserType="producer"
+      />
+    );
   }
 
   return (
@@ -104,7 +118,14 @@ export default function AudiovisualDeposit() {
       
       <Footer />
 
-      {/* Modal de choix connexion/inscription */}
+      {/* Modale de sélection du type de déclarant */}
+      <ProducerTypeSelectionModal
+        open={showUserTypeModal}
+        onOpenChange={setShowUserTypeModal}
+        onSelectType={handleUserTypeSelect}
+      />
+
+      {/* Modale de choix d'authentification */}
       <AuthChoiceModal
         open={showAuthChoiceModal}
         onOpenChange={setShowAuthChoiceModal}
