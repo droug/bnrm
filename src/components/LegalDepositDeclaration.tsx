@@ -4006,17 +4006,19 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
             }
           </Button>
           
-          <Button 
-            onClick={() => {
-              setUserType("printer");
-              setCurrentStep("printer_auth");
-            }}
-            className="w-full h-20 text-lg flex flex-col items-center justify-center gap-2"
-            variant="outline"
-          >
-            <FileText className="h-8 w-8" />
-            {language === 'ar' ? 'طابع' : 'Imprimeur'}
-          </Button>
+          {!isBDLogiciels && (
+            <Button 
+              onClick={() => {
+                setUserType("printer");
+                setCurrentStep("printer_auth");
+              }}
+              className="w-full h-20 text-lg flex flex-col items-center justify-center gap-2"
+              variant="outline"
+            >
+              <FileText className="h-8 w-8" />
+              {language === 'ar' ? 'طابع' : 'Imprimeur'}
+            </Button>
+          )}
         </CardContent>
         <CardFooter>
           <Button variant="ghost" onClick={onClose} className="w-full">
