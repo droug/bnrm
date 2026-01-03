@@ -122,7 +122,7 @@ const Header = () => {
           {
             title: { fr: "Dépôt légal", ar: "الإيداع القانوني" },
             desc: { fr: "Service obligatoire selon le Dahir n° 1-60-050 (1960)", ar: "خدمة إلزامية حسب الظهير رقم 1-60-050 (1960)" },
-            href: "/legal-deposit"
+            href: "/depot-legal"
           },
           {
             title: { fr: "Demande de reproduction", ar: "طلب النسخ" },
