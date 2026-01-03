@@ -27,6 +27,7 @@ interface PrinterFormData {
   nameAr: string;
   nameFr: string;
   commerceRegistry: string;
+  commerceRegistryFile?: File;
   contactPerson: string;
   
   // Personne physique
@@ -216,14 +217,41 @@ const PrinterSignupForm = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="commerceRegistry">Registre de commerce *</Label>
-                <Input
-                  id="commerceRegistry"
-                  value={formData.commerceRegistry}
-                  onChange={(e) => setFormData(prev => ({ ...prev, commerceRegistry: e.target.value }))}
-                  placeholder="Numéro du registre de commerce"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="commerceRegistry">Registre de commerce *</Label>
+                  <Input
+                    id="commerceRegistry"
+                    value={formData.commerceRegistry}
+                    onChange={(e) => setFormData(prev => ({ ...prev, commerceRegistry: e.target.value }))}
+                    placeholder="Numéro du registre de commerce"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="commerceRegistryFile">Pièce jointe RC *</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-3">
+                    <input
+                      type="file"
+                      id="commerceRegistryFile"
+                      accept="image/*,application/pdf"
+                      onChange={(e) => handleFileUpload("commerceRegistryFile", e.target.files?.[0] || null)}
+                      className="hidden"
+                    />
+                    <label htmlFor="commerceRegistryFile" className="cursor-pointer flex flex-col items-center gap-1">
+                      {formData.commerceRegistryFile ? (
+                        <>
+                          <Upload className="h-5 w-5 text-primary" />
+                          <span className="text-xs text-primary font-medium truncate max-w-full">{formData.commerceRegistryFile.name}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-5 w-5 text-gray-400" />
+                          <span className="text-xs text-gray-600">Télécharger le RC</span>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
