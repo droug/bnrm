@@ -759,25 +759,35 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
 
                 {isPeriodic === "yes" && (
-                  <div className="space-y-1.5 animate-fade-in md:col-span-2">
-                    <Label className="mb-1">Demande ISSN</Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsIssnModalOpen(true)}
-                      disabled={issnSubmitted}
-                      className="w-full md:w-auto"
-                    >
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Lien vers Formulaire ISSN
-                    </Button>
-                    {issnSubmitted && (
-                      <div className="flex items-center gap-2 text-sm text-green-600">
-                        <CheckCircle className="w-4 h-4" />
-                        Demande ISSN effectuée
-                      </div>
-                    )}
-                  </div>
+                  <>
+                    <div className="space-y-2 animate-fade-in">
+                      <Label>N° ISSN</Label>
+                      <Input 
+                        placeholder="Saisir le N° ISSN"
+                        value={formData.issnNumber || ""}
+                        onChange={(e) => setFormData({ ...formData, issnNumber: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1.5 animate-fade-in md:col-span-2">
+                      <Label className="mb-1">Demande ISSN</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsIssnModalOpen(true)}
+                        disabled={issnSubmitted}
+                        className="w-full md:w-auto"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Lien vers Formulaire ISSN
+                      </Button>
+                      {issnSubmitted && (
+                        <div className="flex items-center gap-2 text-sm text-green-600">
+                          <CheckCircle className="w-4 h-4" />
+                          Demande ISSN effectuée
+                        </div>
+                      )}
+                    </div>
+                  </>
                 )}
 
                 <div className="space-y-2">
