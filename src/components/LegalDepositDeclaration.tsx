@@ -1087,130 +1087,134 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
               </div>
             </div>
 
-            <Separator />
+            {supportType !== "electronic" && (
+              <>
+                <Separator />
 
-            {/* Identification de l'imprimeur */}
-            <div>
-              <h3 className="text-2xl font-semibold mb-4">Identification de l'imprimeur</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Imprimerie <span className="text-destructive">*</span></Label>
-                  {!selectedPrinter ? (
-                    <div className="relative">
-                      <Input
-                        placeholder="Rechercher une imprimerie..."
-                        value={printerSearch}
-                        onChange={(e) => setPrinterSearch(e.target.value)}
-                        className="pr-10"
-                      />
-                      {printerSearch && (
-                        <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
-                          {printers
-                            .filter(printer => 
-                              printer.name.toLowerCase().includes(printerSearch.toLowerCase())
-                            )
-                            .map((printer) => (
-                              <button
-                                key={printer.id}
-                                type="button"
-                                className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
-                                onClick={() => {
-                                  setSelectedPrinter(printer);
-                                  setPrinterSearch('');
-                                  setPrinterData({
-                                    name: printer.name,
-                                    phone: printer.phone || '',
-                                    email: printer.email || '',
-                                    googleMapsLink: printer.google_maps_link || '',
-                                    address: printer.address || '',
-                                    city: printer.city || '',
-                                    country: printer.country || 'Maroc',
-                                    ...printer
-                                  });
-                                }}
-                              >
-                                <div className="flex flex-col">
-                                  <span className="font-medium">{printer.name}</span>
-                                  {printer.city && (
-                                    <span className="text-sm text-muted-foreground">
-                                      {printer.city}, {printer.country}
-                                    </span>
-                                  )}
+                {/* Identification de l'imprimeur */}
+                <div>
+                  <h3 className="text-2xl font-semibold mb-4">Identification de l'imprimeur</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Imprimerie <span className="text-destructive">*</span></Label>
+                      {!selectedPrinter ? (
+                        <div className="relative">
+                          <Input
+                            placeholder="Rechercher une imprimerie..."
+                            value={printerSearch}
+                            onChange={(e) => setPrinterSearch(e.target.value)}
+                            className="pr-10"
+                          />
+                          {printerSearch && (
+                            <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                              {printers
+                                .filter(printer => 
+                                  printer.name.toLowerCase().includes(printerSearch.toLowerCase())
+                                )
+                                .map((printer) => (
+                                  <button
+                                    key={printer.id}
+                                    type="button"
+                                    className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                                    onClick={() => {
+                                      setSelectedPrinter(printer);
+                                      setPrinterSearch('');
+                                      setPrinterData({
+                                        name: printer.name,
+                                        phone: printer.phone || '',
+                                        email: printer.email || '',
+                                        googleMapsLink: printer.google_maps_link || '',
+                                        address: printer.address || '',
+                                        city: printer.city || '',
+                                        country: printer.country || 'Maroc',
+                                        ...printer
+                                      });
+                                    }}
+                                  >
+                                    <div className="flex flex-col">
+                                      <span className="font-medium">{printer.name}</span>
+                                      {printer.city && (
+                                        <span className="text-sm text-muted-foreground">
+                                          {printer.city}, {printer.country}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </button>
+                                ))}
+                              {printers.filter(printer => 
+                                printer.name.toLowerCase().includes(printerSearch.toLowerCase())
+                              ).length === 0 && (
+                                <div className="px-4 py-3">
+                                  <div className="text-sm text-muted-foreground mb-2">
+                                    Aucune imprimerie trouvée
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full"
+                                    onClick={async () => {
+                                      const newName = printerSearch;
+                                      const { data, error } = await supabase
+                                        .from('printers')
+                                        .insert([{ name: newName }])
+                                        .select('id, name, city, country, address, phone, email, google_maps_link')
+                                        .single();
+                                      
+                                      if (error) {
+                                        toast.error('Erreur lors de l\'ajout de l\'imprimerie');
+                                      } else if (data) {
+                                        setPrinters([...printers, data as unknown as Printer]);
+                                        setSelectedPrinter(data as unknown as Printer);
+                                        setPrinterSearch('');
+                                        toast.success('Imprimerie ajoutée avec succès');
+                                      }
+                                    }}
+                                  >
+                                    + Ajouter "{printerSearch}"
+                                  </Button>
                                 </div>
-                              </button>
-                            ))}
-                          {printers.filter(printer => 
-                            printer.name.toLowerCase().includes(printerSearch.toLowerCase())
-                          ).length === 0 && (
-                            <div className="px-4 py-3">
-                              <div className="text-sm text-muted-foreground mb-2">
-                                Aucune imprimerie trouvée
-                              </div>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="w-full"
-                                onClick={async () => {
-                                  const newName = printerSearch;
-                                  const { data, error } = await supabase
-                                    .from('printers')
-                                    .insert([{ name: newName }])
-                                    .select('id, name, city, country, address, phone, email, google_maps_link')
-                                    .single();
-                                  
-                                  if (error) {
-                                    toast.error('Erreur lors de l\'ajout de l\'imprimerie');
-                                  } else if (data) {
-                                    setPrinters([...printers, data as unknown as Printer]);
-                                    setSelectedPrinter(data as unknown as Printer);
-                                    setPrinterSearch('');
-                                    toast.success('Imprimerie ajoutée avec succès');
-                                  }
-                                }}
-                              >
-                                + Ajouter "{printerSearch}"
-                              </Button>
+                              )}
                             </div>
                           )}
                         </div>
+                      ) : (
+                        <div className="p-3 bg-primary/10 rounded-md flex justify-between items-start">
+                          <div>
+                            <p className="font-medium">{selectedPrinter.name}</p>
+                            {selectedPrinter.city && (
+                              <p className="text-sm text-muted-foreground">
+                                {selectedPrinter.city}, {selectedPrinter.country}
+                              </p>
+                            )}
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedPrinter(null)}
+                          >
+                            Modifier
+                          </Button>
+                        </div>
                       )}
                     </div>
-                  ) : (
-                    <div className="p-3 bg-primary/10 rounded-md flex justify-between items-start">
-                      <div>
-                        <p className="font-medium">{selectedPrinter.name}</p>
-                        {selectedPrinter.city && (
-                          <p className="text-sm text-muted-foreground">
-                            {selectedPrinter.city}, {selectedPrinter.country}
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedPrinter(null)}
-                      >
-                        Modifier
-                      </Button>
+
+                    <div className="space-y-2">
+                      <Label>Nombre de tirage</Label>
+                      <Input 
+                        type="number" 
+                        placeholder="Nombre de tirage"
+                        value={printRun}
+                        onChange={(e) => setPrintRun(e.target.value)}
+                      />
                     </div>
-                  )}
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Nombre de tirage</Label>
-                  <Input 
-                    type="number" 
-                    placeholder="Nombre de tirage"
-                    value={printRun}
-                    onChange={(e) => setPrintRun(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <Separator />
+                <Separator />
+              </>
+            )}
           </>
         );
       }
@@ -1739,146 +1743,150 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                </div>
              </div>
 
-            <Separator />
+            {formData.supportType !== "electronic" && (
+              <>
+                <Separator />
 
-            {/* Identification de l'Imprimeur */}
-            <div>
-              <h3 className="text-2xl font-semibold mb-4">Identification de l'Imprimeur</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Imprimerie <span className="text-destructive">*</span></Label>
-                  {!selectedPrinter ? (
-                    <div className="relative">
-                      <Input
-                        placeholder="Rechercher une imprimerie..."
-                        value={printerSearch}
-                        onChange={(e) => setPrinterSearch(e.target.value)}
-                        className="pr-10"
-                      />
-                      {printerSearch && (
-                        <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
-                          {printers
-                            .filter(printer => 
-                              printer.name.toLowerCase().includes(printerSearch.toLowerCase())
-                            )
-                            .map((printer) => (
-                              <button
-                                key={printer.id}
-                                type="button"
-                                className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
-                                onClick={() => {
-                                  setSelectedPrinter(printer);
-                                  setPrinterSearch('');
-                                  setPrinterData({
-                                    name: printer.name,
-                                    phone: printer.phone || '',
-                                    email: printer.email || '',
-                                    googleMapsLink: printer.google_maps_link || '',
-                                    address: printer.address || '',
-                                    city: printer.city || '',
-                                    country: printer.country || 'Maroc',
-                                    ...printer
-                                  });
-                                }}
-                              >
-                                <div className="flex flex-col">
-                                  <span className="font-medium">{printer.name}</span>
-                                  {printer.city && (
-                                    <span className="text-sm text-muted-foreground">
-                                      {printer.city}, {printer.country}
-                                    </span>
-                                  )}
+                {/* Identification de l'Imprimeur */}
+                <div>
+                  <h3 className="text-2xl font-semibold mb-4">Identification de l'Imprimeur</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Imprimerie <span className="text-destructive">*</span></Label>
+                      {!selectedPrinter ? (
+                        <div className="relative">
+                          <Input
+                            placeholder="Rechercher une imprimerie..."
+                            value={printerSearch}
+                            onChange={(e) => setPrinterSearch(e.target.value)}
+                            className="pr-10"
+                          />
+                          {printerSearch && (
+                            <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                              {printers
+                                .filter(printer => 
+                                  printer.name.toLowerCase().includes(printerSearch.toLowerCase())
+                                )
+                                .map((printer) => (
+                                  <button
+                                    key={printer.id}
+                                    type="button"
+                                    className="w-full text-left px-4 py-2 hover:bg-accent transition-colors"
+                                    onClick={() => {
+                                      setSelectedPrinter(printer);
+                                      setPrinterSearch('');
+                                      setPrinterData({
+                                        name: printer.name,
+                                        phone: printer.phone || '',
+                                        email: printer.email || '',
+                                        googleMapsLink: printer.google_maps_link || '',
+                                        address: printer.address || '',
+                                        city: printer.city || '',
+                                        country: printer.country || 'Maroc',
+                                        ...printer
+                                      });
+                                    }}
+                                  >
+                                    <div className="flex flex-col">
+                                      <span className="font-medium">{printer.name}</span>
+                                      {printer.city && (
+                                        <span className="text-sm text-muted-foreground">
+                                          {printer.city}, {printer.country}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </button>
+                                ))}
+                              {printers.filter(printer => 
+                                printer.name.toLowerCase().includes(printerSearch.toLowerCase())
+                              ).length === 0 && (
+                                <div className="px-4 py-3">
+                                  <div className="text-sm text-muted-foreground mb-2">
+                                    Aucune imprimerie trouvée
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full"
+                                    onClick={async () => {
+                                      const newName = printerSearch;
+                                      const { data, error } = await supabase
+                                        .from('printers')
+                                        .insert([{ name: newName }])
+                                        .select('id, name, city, country, address, phone, email, google_maps_link')
+                                        .single();
+                                      
+                                      if (error) {
+                                        toast.error('Erreur lors de l\'ajout de l\'imprimerie');
+                                      } else if (data) {
+                                        setPrinters([...printers, data as unknown as Printer]);
+                                        setSelectedPrinter(data as unknown as Printer);
+                                        setPrinterSearch('');
+                                        toast.success('Imprimerie ajoutée avec succès');
+                                      }
+                                    }}
+                                  >
+                                    + Ajouter "{printerSearch}"
+                                  </Button>
                                 </div>
-                              </button>
-                            ))}
-                          {printers.filter(printer => 
-                            printer.name.toLowerCase().includes(printerSearch.toLowerCase())
-                          ).length === 0 && (
-                            <div className="px-4 py-3">
-                              <div className="text-sm text-muted-foreground mb-2">
-                                Aucune imprimerie trouvée
-                              </div>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="w-full"
-                                onClick={async () => {
-                                  const newName = printerSearch;
-                                  const { data, error } = await supabase
-                                    .from('printers')
-                                    .insert([{ name: newName }])
-                                    .select('id, name, city, country, address, phone, email, google_maps_link')
-                                    .single();
-                                  
-                                  if (error) {
-                                    toast.error('Erreur lors de l\'ajout de l\'imprimerie');
-                                  } else if (data) {
-                                    setPrinters([...printers, data as unknown as Printer]);
-                                    setSelectedPrinter(data as unknown as Printer);
-                                    setPrinterSearch('');
-                                    toast.success('Imprimerie ajoutée avec succès');
-                                  }
-                                }}
-                              >
-                                + Ajouter "{printerSearch}"
-                              </Button>
+                              )}
                             </div>
                           )}
                         </div>
+                      ) : (
+                        <div className="p-3 bg-primary/10 rounded-md flex justify-between items-start">
+                          <div>
+                            <p className="font-medium">{selectedPrinter.name}</p>
+                            {selectedPrinter.city && (
+                              <p className="text-sm text-muted-foreground">
+                                {selectedPrinter.city}, {selectedPrinter.country}
+                              </p>
+                            )}
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedPrinter(null)}
+                          >
+                            Modifier
+                          </Button>
+                        </div>
                       )}
                     </div>
-                  ) : (
-                    <div className="p-3 bg-primary/10 rounded-md flex justify-between items-start">
-                      <div>
-                        <p className="font-medium">{selectedPrinter.name}</p>
-                        {selectedPrinter.city && (
-                          <p className="text-sm text-muted-foreground">
-                            {selectedPrinter.city}, {selectedPrinter.country}
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedPrinter(null)}
-                      >
-                        Modifier
-                      </Button>
+
+                    <div className="space-y-2">
+                      <Label>Nombre de tirage</Label>
+                      <Input 
+                        type="number" 
+                        placeholder="Nombre de tirage"
+                        value={printRun}
+                        onChange={(e) => setPrintRun(e.target.value)}
+                      />
                     </div>
-                  )}
-                </div>
 
-                <div className="space-y-2">
-                  <Label>Nombre de tirage</Label>
-                  <Input 
-                    type="number" 
-                    placeholder="Nombre de tirage"
-                    value={printRun}
-                    onChange={(e) => setPrintRun(e.target.value)}
-                  />
+                    {/* Champs personnalisés */}
+                    {customFields
+                      .filter((field) => field.section_key === "printer_info")
+                      .map((field) => (
+                        <DynamicFieldRenderer
+                          key={field.id}
+                          field={field}
+                          language={language}
+                          value={customFieldsData[field.field_key]}
+                          onChange={(value) =>
+                            setCustomFieldsData((prev) => ({
+                              ...prev,
+                              [field.field_key]: value,
+                            }))
+                          }
+                        />
+                      ))}
+                  </div>
                 </div>
-
-                {/* Champs personnalisés */}
-                {customFields
-                  .filter((field) => field.section_key === "printer_info")
-                  .map((field) => (
-                    <DynamicFieldRenderer
-                      key={field.id}
-                      field={field}
-                      language={language}
-                      value={customFieldsData[field.field_key]}
-                      onChange={(value) =>
-                        setCustomFieldsData((prev) => ({
-                          ...prev,
-                          [field.field_key]: value,
-                        }))
-                      }
-                    />
-                  ))}
-               </div>
-             </div>
+              </>
+            )}
 
             {/* Champs personnalisés pour la section Documents requis */}
             {customFields.filter((field) => field.section_key === "required_documents").length > 0 && (
