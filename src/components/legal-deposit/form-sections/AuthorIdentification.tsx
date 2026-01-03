@@ -57,7 +57,7 @@ export function AuthorIdentification({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                {authorType === 'morale' ? 'Nom de la collectivité' : 'Nom de l\'auteur'} *
+                {authorType === 'morale' ? 'Nom de la collectivité' : 'Nom et prénom de l\'auteur'} *
               </FormLabel>
               <FormControl>
                 <Input placeholder="Nom complet" {...field} />
