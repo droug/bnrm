@@ -73,6 +73,9 @@ export default function PeriodicalsDeposit() {
             <p className="text-xl text-muted-foreground">
               Formulaire de déclaration pour les journaux, magazines et revues
             </p>
+            <p className="text-sm text-red-600 mt-2 font-medium">
+              Pour accéder au formulaire de demande de dépôt légal, il est obligatoire de disposer d'un compte Éditeur et d'un compte Imprimeur
+            </p>
           </div>
 
           {/* Informations */}
