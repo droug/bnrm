@@ -78,11 +78,35 @@ const EditorSignupForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation basique
-    if (!formData.email || !formData.phone || !formData.googleMapsLink) {
+    const missingFields: string[] = [];
+    
+    // Validation des champs communs
+    if (!formData.nature) missingFields.push("Nature de l'éditeur");
+    if (!formData.email) missingFields.push("Adresse email");
+    if (!formData.phone || formData.phone.trim() === "+212" || formData.phone.trim() === "+212 ") {
+      missingFields.push("Téléphone");
+    }
+    if (!formData.region) missingFields.push("Région");
+    if (!formData.city) missingFields.push("Ville");
+    
+    // Validation selon le type d'éditeur
+    if (formData.type === "morale") {
+      if (!formData.nameAr) missingFields.push("Nom de l'éditeur (Arabe)");
+      if (!formData.nameFr) missingFields.push("Nom de l'éditeur (Français)");
+      if (!formData.commerceRegistry) missingFields.push("Registre de commerce");
+      if (!formData.googleMapsLink) missingFields.push("Lien Google Maps");
+    } else {
+      // Personne physique
+      if (!formData.editorNameAr) missingFields.push("Nom de l'éditeur (Arabe)");
+      if (!formData.editorNameFr) missingFields.push("Nom de l'éditeur (Français)");
+      if (!formData.cin) missingFields.push("Numéro CIN");
+      if (!formData.cinFile) missingFields.push("Copie numérisée de la CNIE");
+    }
+    
+    if (missingFields.length > 0) {
       toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs obligatoires",
+        title: "Champs obligatoires manquants",
+        description: `Veuillez remplir les champs suivants : ${missingFields.join(", ")}`,
         variant: "destructive",
       });
       return;
