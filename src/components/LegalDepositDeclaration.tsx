@@ -4008,17 +4008,14 @@ export default function LegalDepositDeclaration({ depositType, onClose }: LegalD
           
           <Button 
             onClick={() => {
-              setUserType(isBDLogiciels ? "distributor" : "printer");
+              setUserType("printer");
               setCurrentStep("printer_auth");
             }}
             className="w-full h-20 text-lg flex flex-col items-center justify-center gap-2"
             variant="outline"
           >
             <FileText className="h-8 w-8" />
-            {language === 'ar' ? 
-              (isBDLogiciels ? 'موزع' : 'طابع') : 
-              (isBDLogiciels ? 'Distributeur' : 'Imprimeur')
-            }
+            {language === 'ar' ? 'طابع' : 'Imprimeur'}
           </Button>
         </CardContent>
         <CardFooter>
