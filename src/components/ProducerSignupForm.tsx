@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { PhoneInput } from "@/components/ui/phone-input";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const producerSchema = z.object({
   firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
@@ -33,6 +35,7 @@ type ProducerFormData = z.infer<typeof producerSchema>;
 const ProducerSignupForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [phoneValue, setPhoneValue] = useState("");
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const { toast } = useToast();
 
   const {
@@ -45,10 +48,10 @@ const ProducerSignupForm = () => {
   });
 
   const onSubmit = async (data: ProducerFormData) => {
+    setValidationErrors([]);
     setIsSubmitting(true);
     try {
       // TODO: Implement actual signup logic with Supabase
-      console.log("Producer signup data:", data);
       toast({
         title: "Demande d'inscription envoyée",
         description: "Votre demande d'inscription en tant que producteur a été envoyée. Vous recevrez une confirmation par email.",
@@ -64,6 +67,26 @@ const ProducerSignupForm = () => {
     }
   };
 
+  const onError = (formErrors: any) => {
+    const errorMessages: string[] = [];
+    if (formErrors.firstName) errorMessages.push("Prénom du responsable");
+    if (formErrors.lastName) errorMessages.push("Nom du responsable");
+    if (formErrors.email) errorMessages.push("Email professionnel");
+    if (formErrors.phone) errorMessages.push("Téléphone");
+    if (formErrors.companyName) errorMessages.push("Nom de l'entreprise");
+    if (formErrors.companyRegistrationNumber) errorMessages.push("Numéro RC");
+    if (formErrors.taxIdentificationNumber) errorMessages.push("Identifiant fiscal");
+    if (formErrors.address) errorMessages.push("Adresse de l'entreprise");
+    if (formErrors.city) errorMessages.push("Ville");
+    if (formErrors.productionType) errorMessages.push("Type de production");
+    if (formErrors.productionCapacity) errorMessages.push("Capacité de production");
+    if (formErrors.yearsOfExperience) errorMessages.push("Années d'expérience");
+    if (formErrors.description) errorMessages.push("Présentation de l'entreprise");
+    
+    setValidationErrors(errorMessages);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
@@ -73,7 +96,23 @@ const ProducerSignupForm = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
+          {/* Message d'erreur de validation */}
+          {validationErrors.length > 0 && (
+            <Alert variant="destructive" className="border-2 border-destructive bg-destructive/10">
+              <AlertCircle className="h-5 w-5" />
+              <AlertTitle className="text-lg font-semibold">Champs obligatoires manquants</AlertTitle>
+              <AlertDescription>
+                <p className="mb-2">Veuillez remplir les champs suivants :</p>
+                <ul className="list-disc list-inside space-y-1">
+                  {validationErrors.map((error, index) => (
+                    <li key={index} className="font-medium">{error}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName">Prénom du responsable *</Label>

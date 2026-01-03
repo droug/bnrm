@@ -5,10 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Printer } from "lucide-react";
+import { Upload, Printer, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface PrinterFormData {
   logoFile?: File;
@@ -25,6 +26,7 @@ interface PrinterFormData {
 
 const PrinterSignupForm = () => {
   const { toast } = useToast();
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [formData, setFormData] = useState<PrinterFormData>({
     nameAr: "",
     nameFr: "",
@@ -44,18 +46,24 @@ const PrinterSignupForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation basique
-    if (!formData.nameAr || !formData.nameFr || !formData.email || !formData.phone || !formData.address || !formData.commerceRegistry) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs obligatoires",
-        variant: "destructive",
-      });
+    const missingFields: string[] = [];
+    
+    if (!formData.nameAr) missingFields.push("Nom de l'imprimeur (Arabe)");
+    if (!formData.nameFr) missingFields.push("Nom de l'imprimeur (Français)");
+    if (!formData.email) missingFields.push("Adresse email");
+    if (!formData.phone) missingFields.push("Téléphone");
+    if (!formData.address) missingFields.push("Adresse physique");
+    if (!formData.region) missingFields.push("Région");
+    if (!formData.city) missingFields.push("Ville");
+    if (!formData.commerceRegistry) missingFields.push("Registre de commerce");
+    
+    if (missingFields.length > 0) {
+      setValidationErrors(missingFields);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-
-    // Ici, vous pourriez envoyer les données à votre API
-    console.log("Données du formulaire imprimeur:", formData);
+    
+    setValidationErrors([]);
     
     toast({
       title: "Demande soumise",
@@ -76,6 +84,22 @@ const PrinterSignupForm = () => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Message d'erreur de validation */}
+          {validationErrors.length > 0 && (
+            <Alert variant="destructive" className="border-2 border-destructive bg-destructive/10">
+              <AlertCircle className="h-5 w-5" />
+              <AlertTitle className="text-lg font-semibold">Champs obligatoires manquants</AlertTitle>
+              <AlertDescription>
+                <p className="mb-2">Veuillez remplir les champs suivants :</p>
+                <ul className="list-disc list-inside space-y-1">
+                  {validationErrors.map((error, index) => (
+                    <li key={index} className="font-medium">{error}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
+          
           {/* Logo */}
           <div className="space-y-2">
             <Label htmlFor="logo">Logo de l'imprimeur</Label>
