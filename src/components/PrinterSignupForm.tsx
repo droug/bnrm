@@ -5,13 +5,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Printer, AlertCircle, MapPin } from "lucide-react";
+import { Upload, Printer, AlertCircle, MapPin, Building, User } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface PrinterFormData {
+  type: "morale" | "physique";
   logoFile?: File;
   nameAr: string;
   nameFr: string;
@@ -28,6 +30,7 @@ const PrinterSignupForm = () => {
   const { toast } = useToast();
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [formData, setFormData] = useState<PrinterFormData>({
+    type: "morale",
     nameAr: "",
     nameFr: "",
     email: "",
@@ -100,6 +103,33 @@ const PrinterSignupForm = () => {
             </Alert>
           )}
           
+          {/* Type d'imprimeur */}
+          <div className="space-y-3">
+            <Label>Type d'imprimeur</Label>
+            <RadioGroup 
+              value={formData.type} 
+              onValueChange={(value: "morale" | "physique") => 
+                setFormData(prev => ({ ...prev, type: value }))
+              }
+              className="flex gap-6"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="morale" id="morale" />
+                <Label htmlFor="morale" className="flex items-center gap-2">
+                  <Building className="h-4 w-4" />
+                  Personne morale
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="physique" id="physique" />
+                <Label htmlFor="physique" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Personne physique
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+
           {/* Nom de l'imprimeur */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
