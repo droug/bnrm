@@ -88,6 +88,7 @@ export default function ContentEditor({ content, onSave, onCancel }: ContentEdit
 
   const [newTag, setNewTag] = useState('');
   const [newKeyword, setNewKeyword] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -331,15 +332,44 @@ export default function ContentEditor({ content, onSave, onCancel }: ContentEdit
                 </div>
 
                 <div>
-                  <Label htmlFor="content_body">Contenu *</Label>
-                  <Textarea
-                    id="content_body"
-                    value={formData.content_body}
-                    onChange={(e) => setFormData(prev => ({ ...prev, content_body: e.target.value }))}
-                    placeholder="Rédigez votre contenu ici..."
-                    rows={15}
-                    className="font-mono"
-                  />
+                  <div className="flex items-center justify-between mb-2">
+                    <Label htmlFor="content_body">Contenu *</Label>
+                    <div className="flex gap-2">
+                      <Button 
+                        type="button" 
+                        variant={showPreview ? "outline" : "default"} 
+                        size="sm"
+                        onClick={() => setShowPreview(false)}
+                      >
+                        Éditer
+                      </Button>
+                      <Button 
+                        type="button" 
+                        variant={showPreview ? "default" : "outline"} 
+                        size="sm"
+                        onClick={() => setShowPreview(true)}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        Aperçu
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {showPreview ? (
+                    <div 
+                      className="border rounded-md p-4 min-h-[360px] max-h-[500px] overflow-auto bg-background prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: formData.content_body }}
+                    />
+                  ) : (
+                    <Textarea
+                      id="content_body"
+                      value={formData.content_body}
+                      onChange={(e) => setFormData(prev => ({ ...prev, content_body: e.target.value }))}
+                      placeholder="Rédigez votre contenu ici..."
+                      rows={15}
+                      className="font-mono"
+                    />
+                  )}
                   <p className="text-xs text-muted-foreground mt-1">
                     Vous pouvez utiliser du HTML pour la mise en forme
                   </p>
