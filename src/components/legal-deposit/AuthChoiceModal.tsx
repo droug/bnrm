@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 interface AuthChoiceModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  userType: "editeur" | "imprimeur";
+  userType: "editeur" | "imprimeur" | "producteur";
   redirectPath: string;
 }
 
@@ -17,7 +17,7 @@ export const AuthChoiceModal = ({
   redirectPath 
 }: AuthChoiceModalProps) => {
   const navigate = useNavigate();
-  const signupType = userType === "editeur" ? "editor" : "printer";
+  const signupType = userType === "editeur" ? "editor" : userType === "producteur" ? "producer" : "printer";
 
   const handleLogin = () => {
     onOpenChange(false);
@@ -64,7 +64,7 @@ export const AuthChoiceModal = ({
             <div className="text-left">
               <div className="font-medium">Créer un compte</div>
               <div className="text-xs opacity-80">
-                {userType === "editeur" ? "Compte Éditeur" : "Compte Imprimeur"}
+                {userType === "editeur" ? "Compte Éditeur" : userType === "producteur" ? "Compte Producteur" : "Compte Imprimeur"}
               </div>
             </div>
           </Button>
