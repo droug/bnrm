@@ -104,10 +104,7 @@ export default function ContentManagement() {
     try {
       const { data, error } = await supabase
         .from('content')
-        .select(`
-          *,
-          profiles:author_id (first_name, last_name)
-        `)
+        .select('*')
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
