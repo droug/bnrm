@@ -318,6 +318,14 @@ const ProducerSignupForm = () => {
             )}
           </div>
 
+          <div className="bg-muted p-4 rounded-lg">
+            <h4 className="font-semibold mb-2">Note importante :</h4>
+            <p className="text-sm text-muted-foreground">
+              Votre demande sera examinée par nos services dans un délai de 10 jours ouvrables. 
+              Vous recevrez une confirmation par email une fois votre compte validé.
+            </p>
+          </div>
+
           <Button
             type="submit"
             className="w-full"
