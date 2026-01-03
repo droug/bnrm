@@ -1,27 +1,23 @@
 import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Building, Printer, Users, PenTool, Truck, Clapperboard } from "lucide-react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowLeft, Building, Printer, Clapperboard } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EditorSignupForm from "@/components/EditorSignupForm";
 import PrinterSignupForm from "@/components/PrinterSignupForm";
-import AuthorSignupForm from "@/components/AuthorSignupForm";
-import DistributorSignupForm from "@/components/DistributorSignupForm";
 import ProducerSignupForm from "@/components/ProducerSignupForm";
 import { WatermarkContainer } from "@/components/ui/watermark";
 
 const SignupPage = () => {
   const [searchParams] = useSearchParams();
   const [selectedType, setSelectedType] = useState<string>("");
-  const navigate = useNavigate();
 
   // Pré-sélectionner le type depuis les paramètres URL
   useEffect(() => {
     const typeParam = searchParams.get("type");
-    if (typeParam && ["editor", "printer", "author", "distributor", "producer"].includes(typeParam)) {
+    if (typeParam && ["editor", "printer", "producer"].includes(typeParam)) {
       setSelectedType(typeParam);
     }
   }, [searchParams]);
@@ -35,7 +31,7 @@ const SignupPage = () => {
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Compte éditeur */}
         <Card 
           className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-accent flex flex-col"
@@ -84,30 +80,6 @@ const SignupPage = () => {
           </CardContent>
         </Card>
 
-        {/* Compte distributeur */}
-        <Card 
-          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-muted flex flex-col"
-          onClick={() => setSelectedType("distributor")}
-        >
-          <CardHeader className="text-center">
-            <Truck className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <CardTitle>Compte Distributeur</CardTitle>
-            <CardDescription>
-              Pour les distributeurs et diffuseurs
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col">
-            <ul className="text-sm text-muted-foreground space-y-2 flex-1">
-              <li>• Distribution d'ouvrages</li>
-              <li>• Gestion de réseau commercial</li>
-              <li>• Logistique et stockage</li>
-            </ul>
-            <Button variant="outline" className="w-full mt-4">
-              Créer un compte distributeur
-            </Button>
-          </CardContent>
-        </Card>
-
         {/* Compte producteur */}
         <Card 
           className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50 flex flex-col"
@@ -128,30 +100,6 @@ const SignupPage = () => {
             </ul>
             <Button variant="outline" className="w-full mt-4">
               Créer un compte producteur
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Compte auteur */}
-        <Card 
-          className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-secondary flex flex-col"
-          onClick={() => setSelectedType("author")}
-        >
-          <CardHeader className="text-center">
-            <PenTool className="h-12 w-12 mx-auto mb-4 text-secondary" />
-            <CardTitle>Compte Auteur</CardTitle>
-            <CardDescription>
-              Pour les auteurs et écrivains
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col">
-            <ul className="text-sm text-muted-foreground space-y-2 flex-1">
-              <li>• Dépôt de vos œuvres</li>
-              <li>• Protection de vos droits d'auteur</li>
-              <li>• Gestion de votre portfolio littéraire</li>
-            </ul>
-            <Button variant="outline" className="w-full mt-4">
-              Créer un compte auteur
             </Button>
           </CardContent>
         </Card>
@@ -181,16 +129,12 @@ const SignupPage = () => {
                 <h1 className="text-2xl font-bold">
                   {selectedType === "editor" && "Inscription Éditeur"}
                   {selectedType === "printer" && "Inscription Imprimeur"}
-                  {selectedType === "author" && "Inscription Auteur"}
-                  {selectedType === "distributor" && "Inscription Distributeur"}
                   {selectedType === "producer" && "Inscription Producteur"}
                 </h1>
               </div>
 
               {selectedType === "editor" && <EditorSignupForm />}
               {selectedType === "printer" && <PrinterSignupForm />}
-              {selectedType === "author" && <AuthorSignupForm />}
-              {selectedType === "distributor" && <DistributorSignupForm />}
               {selectedType === "producer" && <ProducerSignupForm />}
             </div>
           )}
