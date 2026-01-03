@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Printer, AlertCircle } from "lucide-react";
+import { Upload, Printer, AlertCircle, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
@@ -17,7 +17,7 @@ interface PrinterFormData {
   nameFr: string;
   email: string;
   phone: string;
-  address: string;
+  googleMapsLink: string;
   region: string;
   city: string;
   commerceRegistry: string;
@@ -32,7 +32,7 @@ const PrinterSignupForm = () => {
     nameFr: "",
     email: "",
     phone: "",
-    address: "",
+    googleMapsLink: "",
     region: "",
     city: "",
     commerceRegistry: "",
@@ -52,7 +52,7 @@ const PrinterSignupForm = () => {
     if (!formData.nameFr) missingFields.push("Nom de l'imprimeur (Français)");
     if (!formData.email) missingFields.push("Adresse email");
     if (!formData.phone) missingFields.push("Téléphone");
-    if (!formData.address) missingFields.push("Adresse physique");
+    if (!formData.googleMapsLink) missingFields.push("Lien Google Maps");
     if (!formData.region) missingFields.push("Région");
     if (!formData.city) missingFields.push("Ville");
     if (!formData.commerceRegistry) missingFields.push("Registre de commerce");
@@ -176,15 +176,22 @@ const PrinterSignupForm = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Adresse physique *</Label>
-              <Textarea
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                placeholder="Adresse complète de l'imprimerie"
-                rows={3}
-                required
-              />
+              <Label htmlFor="googleMapsLink">Lien Google Maps *</Label>
+              <div className="flex gap-2">
+                <div className="flex items-center justify-center px-3 py-2 border border-input rounded-lg bg-muted/30">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <Input
+                  id="googleMapsLink"
+                  value={formData.googleMapsLink}
+                  onChange={(e) => setFormData(prev => ({ ...prev, googleMapsLink: e.target.value }))}
+                  placeholder="https://maps.google.com/?q=..."
+                  className="flex-1"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Collez le lien de localisation Google Maps de votre établissement
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
