@@ -7,7 +7,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, User, Building, X, MapPin } from "lucide-react";
+import { Upload, User, Building, X, MapPin, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
@@ -55,6 +56,7 @@ const EditorSignupForm = () => {
   const [editors, setEditors] = useState<Array<{ id: string; name: string }>>([]);
   const [editorSearch, setEditorSearch] = useState("");
   const [showEditorDropdown, setShowEditorDropdown] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   useEffect(() => {
     fetchEditors();
@@ -104,16 +106,14 @@ const EditorSignupForm = () => {
     }
     
     if (missingFields.length > 0) {
-      toast({
-        title: "⚠️ Champs obligatoires manquants",
-        description: `Veuillez remplir les champs suivants : ${missingFields.join(", ")}`,
-        variant: "destructive",
-        duration: 8000,
-      });
-      // Scroll to top to ensure user sees the form
+      setValidationErrors(missingFields);
+      // Scroll to top to ensure user sees the error message
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
+    
+    // Clear errors if validation passes
+    setValidationErrors([]);
 
     // Form data NOT logged for privacy - contains personal/business information
     
@@ -140,6 +140,22 @@ const EditorSignupForm = () => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Message d'erreur de validation */}
+          {validationErrors.length > 0 && (
+            <Alert variant="destructive" className="border-2 border-destructive bg-destructive/10">
+              <AlertCircle className="h-5 w-5" />
+              <AlertTitle className="text-lg font-semibold">Champs obligatoires manquants</AlertTitle>
+              <AlertDescription>
+                <p className="mb-2">Veuillez remplir les champs suivants :</p>
+                <ul className="list-disc list-inside space-y-1">
+                  {validationErrors.map((error, index) => (
+                    <li key={index} className="font-medium">{error}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
+          
           {/* Type d'éditeur */}
           <div className="space-y-3">
             <Label>Type d'éditeur</Label>
