@@ -24,18 +24,21 @@ export default function BooksDeposit() {
 
   const handleUserTypeSelect = (type: "editeur" | "imprimeur") => {
     setShowUserTypeModal(false);
+    setSelectedUserType(type);
     
     if (user) {
       setShowForm(true);
     } else {
       // Afficher la modale de choix connexion/inscription
-      setSelectedUserType(type);
       setShowAuthChoiceModal(true);
     }
   };
 
+  // Mapper le type sélectionné vers le format attendu par LegalDepositDeclaration
+  const mappedUserType = selectedUserType === "editeur" ? "editor" : "printer";
+
   if (showForm) {
-    return <LegalDepositDeclaration depositType="monographie" onClose={() => setShowForm(false)} />;
+    return <LegalDepositDeclaration depositType="monographie" onClose={() => setShowForm(false)} initialUserType={mappedUserType} />;
   }
 
   return (
