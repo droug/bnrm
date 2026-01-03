@@ -19,20 +19,19 @@ export default function BooksDeposit() {
   const { user } = useAuth();
 
   const handleStartDeclaration = () => {
-    if (user) {
-      // Si connecté, aller directement au formulaire
-      setShowForm(true);
-    } else {
-      // Si non connecté, afficher la modale de sélection du type
-      setShowUserTypeModal(true);
-    }
+    setShowUserTypeModal(true);
   };
 
   const handleUserTypeSelect = (type: "editeur" | "imprimeur") => {
     setShowUserTypeModal(false);
-    // Afficher la modale de choix connexion/inscription
-    setSelectedUserType(type);
-    setShowAuthChoiceModal(true);
+    
+    if (user) {
+      setShowForm(true);
+    } else {
+      // Afficher la modale de choix connexion/inscription
+      setSelectedUserType(type);
+      setShowAuthChoiceModal(true);
+    }
   };
 
   if (showForm) {
