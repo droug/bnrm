@@ -6,10 +6,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Video, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { AuthChoiceModal } from "@/components/legal-deposit/AuthChoiceModal";
 
 export default function AudiovisualDeposit() {
   const [showForm, setShowForm] = useState(false);
+  const [showAuthChoiceModal, setShowAuthChoiceModal] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleStartDeclaration = () => {
+    if (user) {
+      setShowForm(true);
+    } else {
+      setShowAuthChoiceModal(true);
+    }
+  };
 
   if (showForm) {
     return <LegalDepositDeclaration depositType="bd_logiciels" onClose={() => setShowForm(false)} />;
@@ -80,7 +92,7 @@ export default function AudiovisualDeposit() {
           <div className="text-center">
             <Button
               size="lg"
-              onClick={() => setShowForm(true)}
+              onClick={handleStartDeclaration}
               className="px-8"
             >
               <Video className="h-5 w-5 mr-2" />
@@ -91,6 +103,14 @@ export default function AudiovisualDeposit() {
       </main>
       
       <Footer />
+
+      {/* Modal de choix connexion/inscription */}
+      <AuthChoiceModal
+        open={showAuthChoiceModal}
+        onOpenChange={setShowAuthChoiceModal}
+        userType="producteur"
+        redirectPath="/depot-legal/audiovisuel"
+      />
     </div>
   );
 }
