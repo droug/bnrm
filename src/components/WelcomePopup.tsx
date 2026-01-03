@@ -67,7 +67,7 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
         showOverlay={false}
         position="fixed"
         centered={false}
-        className="!fixed !top-4 !left-1/2 !-translate-x-1/2 !right-auto !bottom-auto !z-[calc(var(--z-notification)+200)] max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique bg-background backdrop-blur-none"
+        className="!fixed !bottom-6 !right-6 !top-auto !left-auto !translate-x-0 !translate-y-0 !transform-none !z-[calc(var(--z-notification)+200)] max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-3 border-gold/30 shadow-mosaique bg-background backdrop-blur-none"
       >
         <CustomDialogClose onClose={handleClose} />
         <div className="relative overflow-hidden bg-gradient-zellige-main p-6 text-white">
