@@ -55,12 +55,12 @@ const Header = () => {
           {
             title: { fr: "Visites virtuelles", ar: "الجولات الافتراضية" },
             desc: { fr: "Explorez la bibliothèque depuis chez vous", ar: "استكشف المكتبة من منزلك" },
-            href: "/visites-virtuelles"
+            href: "/page/visites-virtuelles"
           },
           {
             title: { fr: "Nos donateurs", ar: "متبرعونا" },
             desc: { fr: "Recherchez par donateurs ou par œuvre", ar: "ابحث حسب المتبرعين أو العمل" },
-            href: "/donateurs"
+            href: "/page/donateurs"
           }
         ]
       },
@@ -70,17 +70,17 @@ const Header = () => {
           {
             title: { fr: "Histoire de la bibliothèque", ar: "تاريخ المكتبة" },
             desc: { fr: "Missions et valeurs prônées", ar: "المهام والقيم المؤيدة" },
-            href: "/histoire"
+            href: "/page/histoire"
           },
           {
             title: { fr: "Mot de la Direction", ar: "كلمة الإدارة" },
             desc: { fr: "Message du directeur de la BNRM", ar: "رسالة مدير المكتبة" },
-            href: "/mot-direction"
+            href: "/page/mot-direction"
           },
           {
             title: { fr: "Organigramme", ar: "الهيكل التنظيمي" },
             desc: { fr: "Structure organisationnelle de la BNRM", ar: "الهيكل التنظيمي للمكتبة" },
-            href: "/organigramme"
+            href: "/page/organigramme"
           }
         ]
       }
@@ -149,7 +149,7 @@ const Header = () => {
           {
             title: { fr: "Ils parlent de nous", ar: "يتحدثون عنا" },
             desc: { fr: "La BNRM dans les médias et publications", ar: "المكتبة في وسائل الإعلام والمنشورات" },
-            href: "/ils-parlent-de-nous"
+            href: "/page/ils-parlent-de-nous"
           }
         ]
       },
@@ -159,17 +159,17 @@ const Header = () => {
           {
             title: { fr: "Programmation culturelle", ar: "البرمجة الثقافية" },
             desc: { fr: "Découvrez nos activités culturelles", ar: "اكتشف أنشطتنا الثقافية" },
-            href: "/programmation-culturelle"
+            href: "/page/programmation-culturelle"
           },
           {
             title: { fr: "Agenda", ar: "الأجندة" },
             desc: { fr: "Calendrier de nos événements", ar: "تقويم فعالياتنا" },
-            href: "/agenda"
+            href: "/page/agenda"
           },
           {
             title: { fr: "Nos expositions", ar: "معارضنا" },
             desc: { fr: "Expositions actuelles et passées", ar: "المعارض الحالية والسابقة" },
-            href: "/expositions"
+            href: "/page/expositions"
           }
         ]
       }
