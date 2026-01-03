@@ -2614,7 +2614,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Lien Google Maps <span className="text-destructive">*</span></Label>
+                  <Label>Lien Google Maps</Label>
                   <Input 
                     placeholder="https://maps.google.com/?q=..."
                     value={distributorData.googleMapsLink || ''}
@@ -2626,7 +2626,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>Téléphone <span className="text-destructive">*</span></Label>
+                  <Label>Téléphone</Label>
                   <Input 
                     placeholder="Numéro de téléphone"
                     value={distributorData.phone || ''}
@@ -2635,7 +2635,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>Email <span className="text-destructive">*</span></Label>
+                  <Label>Email</Label>
                   <Input 
                     type="email" 
                     placeholder="Adresse email"
