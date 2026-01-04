@@ -95,7 +95,7 @@ const BookReader = () => {
   const [rotation, setRotation] = useState(0);
   const [pageRotations, setPageRotations] = useState<Record<number, number>>({});
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [viewMode, setViewMode] = useState<"single" | "double">("single");
+  const [viewMode, setViewMode] = useState<"single" | "double" | "scroll">("single");
   const [readingMode, setReadingMode] = useState<"book" | "audio">("book");
   
   // User interaction states
@@ -1169,22 +1169,33 @@ const BookReader = () => {
               </div>
 
               {/* View Mode */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <Button 
                   variant={viewMode === "single" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setViewMode("single")}
+                  title="Mode page simple"
                 >
-                  <FileText className="h-4 w-4 mr-2" />
+                  <FileText className="h-4 w-4 mr-1" />
                   Simple
                 </Button>
                 <Button 
                   variant={viewMode === "double" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setViewMode("double")}
+                  title="Mode livre (double page)"
                 >
-                  <BookOpen className="h-4 w-4 mr-2" />
+                  <BookOpen className="h-4 w-4 mr-1" />
                   Double
+                </Button>
+                <Button 
+                  variant={viewMode === "scroll" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setViewMode("scroll")}
+                  title="Mode défilement vertical"
+                >
+                  <ChevronDown className="h-4 w-4 mr-1" />
+                  Scroll
                 </Button>
               </div>
 
@@ -1252,7 +1263,7 @@ const BookReader = () => {
 
           {/* Book Display Area */}
           {readingMode === "book" ? (
-            <div className="flex-1 overflow-hidden bg-muted/10 flex items-center justify-center p-4 md:p-8">
+            <div className={`flex-1 ${viewMode === "scroll" ? "overflow-y-auto" : "overflow-hidden"} bg-muted/10 ${viewMode === "scroll" ? "" : "flex items-center justify-center"} p-4 md:p-8`}>
               {loading ? (
                 <div className="text-center">
                   <p className="text-muted-foreground">Chargement du document...</p>
@@ -1266,6 +1277,76 @@ const BookReader = () => {
                   rotation={rotation}
                   pageRotations={pageRotations}
                 />
+              ) : viewMode === "scroll" ? (
+                /* Mode défilement vertical */
+                <div className="flex flex-col items-center gap-6 pb-8">
+                  {generatePageImages().map((pageImage, index) => {
+                    const pageNum = index + 1;
+                    const isAccessible = isPageAccessible(pageNum);
+                    
+                    return (
+                      <div 
+                        key={pageNum} 
+                        className="relative"
+                        id={`page-${pageNum}`}
+                      >
+                        {/* Numéro de page */}
+                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                          <Badge variant="secondary" className="text-xs">
+                            Page {pageNum}
+                          </Badge>
+                        </div>
+                        
+                        <Card className="shadow-xl">
+                          <CardContent className="p-0">
+                            <div 
+                              className="w-full max-w-[600px] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden"
+                              style={{
+                                transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[pageNum] ?? 0)}deg)`,
+                                transformOrigin: 'center',
+                                transition: 'transform 0.3s ease'
+                              }}
+                            >
+                              {isAccessible ? (
+                                <img 
+                                  src={pageImage}
+                                  alt={`Page ${pageNum}`}
+                                  className="w-full h-auto object-contain"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <div className="w-full aspect-[3/4] flex items-center justify-center bg-muted/50">
+                                  <div className="text-center p-8">
+                                    <AlertCircle className="h-12 w-12 mx-auto mb-4 text-amber-500" />
+                                    <p className="text-muted-foreground text-sm">
+                                      {getAccessDeniedMessage()}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                              {bookmarks.includes(pageNum) && (
+                                <Badge className="absolute top-4 right-4 bg-primary/90">
+                                  <Bookmark className="h-3 w-3 mr-1 fill-current" />
+                                  Marqué
+                                </Badge>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                        
+                        {/* Bouton marque-page */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="absolute top-2 right-2"
+                          onClick={() => toggleBookmark(pageNum)}
+                        >
+                          <Bookmark className={`h-4 w-4 ${bookmarks.includes(pageNum) ? "fill-current text-primary" : ""}`} />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <Card className="shadow-2xl max-w-full max-h-full">
