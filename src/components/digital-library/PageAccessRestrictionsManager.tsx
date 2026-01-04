@@ -595,9 +595,9 @@ export function PageAccessRestrictionsManager() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-hidden flex gap-6 py-6">
+          <div className="flex-1 overflow-hidden flex gap-6 py-6 min-h-0">
             {/* Prévisualisation de l'ouvrage - Style BookReader */}
-            <div className="flex-1 flex flex-col gap-4">
+            <div className="flex-1 flex flex-col gap-4 min-h-0">
               <Card className="flex-1 flex flex-col overflow-hidden shadow-xl">
                 <CardHeader className="bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border-b px-6 py-4">
                   <div className="flex items-center justify-between">
@@ -778,7 +778,9 @@ export function PageAccessRestrictionsManager() {
             </div>
 
             {/* Panneau de configuration - Droite */}
-            <div className="w-96 space-y-6 overflow-y-auto pr-2">
+            <div className="w-96 space-y-4 overflow-y-auto pr-2 max-h-full"
+              style={{ maxHeight: 'calc(95vh - 180px)' }}
+            >
               {/* Activer/Désactiver la restriction */}
               <Card className="shadow-md">
                 <CardContent className="p-6">
