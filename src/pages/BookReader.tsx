@@ -11,6 +11,7 @@ import manuscriptPage2 from "@/assets/manuscript-page-2.jpg";
 import manuscriptPage3 from "@/assets/manuscript-page-3.jpg";
 import manuscriptPage4 from "@/assets/manuscript-page-4.jpg";
 import { PageFlipBook } from "@/components/book-reader/PageFlipBook";
+import { DocumentSearchInBook } from "@/components/digital-library/DocumentSearchInBook";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +50,8 @@ import {
   MousePointerClick,
   Heart,
   Star,
-  AlertCircle
+  AlertCircle,
+  Search
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -137,6 +139,8 @@ const BookReader = () => {
   const [documentData, setDocumentData] = useState<any>(null);
   const [documentImage, setDocumentImage] = useState<string>("");
   const [documentPages, setDocumentPages] = useState<string[]>([]);
+  const [isOcrProcessed, setIsOcrProcessed] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [actualTotalPages, setActualTotalPages] = useState(245);
   
   // Fictional manuscript pages (fallback)
@@ -229,6 +233,17 @@ const BookReader = () => {
             setStartPage(1);
             setEndPage(maxPage);
           }
+        }
+
+        // Essayer d'abord digital_library_documents pour vérifier l'état OCR
+        const { data: dlData } = await supabase
+          .from('digital_library_documents')
+          .select('id, ocr_processed, title, author, publication_year')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (dlData) {
+          setIsOcrProcessed(dlData.ocr_processed || false);
         }
 
         // Essayer d'abord cbn_documents
@@ -1050,6 +1065,14 @@ const BookReader = () => {
                 <Button variant="outline" size="sm" onClick={toggleFullscreen}>
                   {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
                 </Button>
+                <Button 
+                  variant={showSearch ? "default" : "outline"} 
+                  size="sm" 
+                  onClick={() => setShowSearch(!showSearch)}
+                  title="Recherche par mot clé"
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
               </div>
 
               {/* Reading Mode */}
@@ -1219,6 +1242,18 @@ const BookReader = () => {
             </div>
           )}
         </main>
+
+        {/* Document Search Panel */}
+        {showSearch && id && (
+          <DocumentSearchInBook 
+            documentId={id}
+            onPageSelect={(pageNumber, highlightText) => {
+              goToPage(pageNumber);
+              setShowSearch(false);
+            }}
+            isOcrProcessed={isOcrProcessed}
+          />
+        )}
       </div>
 
       <Footer />

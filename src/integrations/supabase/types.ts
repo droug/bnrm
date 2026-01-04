@@ -3817,6 +3817,50 @@ export type Database = {
           },
         ]
       }
+      digital_library_pages: {
+        Row: {
+          created_at: string
+          document_id: string
+          id: string
+          image_url: string | null
+          ocr_text: string | null
+          page_number: number
+          paragraphs: Json | null
+          updated_at: string
+          word_coordinates: Json | null
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          id?: string
+          image_url?: string | null
+          ocr_text?: string | null
+          page_number: number
+          paragraphs?: Json | null
+          updated_at?: string
+          word_coordinates?: Json | null
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          id?: string
+          image_url?: string | null
+          ocr_text?: string | null
+          page_number?: number
+          paragraphs?: Json | null
+          updated_at?: string
+          word_coordinates?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "digital_library_pages_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "digital_library_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       digitization_requests: {
         Row: {
           admin_notes: string | null
@@ -12283,6 +12327,19 @@ export type Database = {
       record_daily_pass_usage: {
         Args: { p_service_id?: string; p_user_id: string }
         Returns: Json
+      }
+      search_digital_library_pages: {
+        Args: {
+          p_context_words?: number
+          p_document_id: string
+          p_query: string
+        }
+        Returns: {
+          match_count: number
+          ocr_text: string
+          page_id: string
+          page_number: number
+        }[]
       }
       search_knowledge_base: {
         Args: {
