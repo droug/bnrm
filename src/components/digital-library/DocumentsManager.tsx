@@ -1009,6 +1009,20 @@ export default function DocumentsManager() {
 
                     <FormField
                       control={form.control}
+                      name="author"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Auteur</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Nom de l'auteur" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
                       name="file_type"
                       render={({ field }) => (
                         <FormItem>
@@ -1026,6 +1040,52 @@ export default function DocumentsManager() {
                               <SelectItem value="audio">Audio</SelectItem>
                               <SelectItem value="manuscrit">Manuscrit</SelectItem>
                               <SelectItem value="periodique">Périodique</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="publication_date"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Date de publication</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="date" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="digitization_source"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Source de numérisation</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Sélectionner" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="internal">
+                                <div className="flex flex-col">
+                                  <span className="font-medium">Collections numérisées</span>
+                                  <span className="text-xs text-muted-foreground">Numérisé par la BNRM</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="external">
+                                <div className="flex flex-col">
+                                  <span className="font-medium">Ressources numériques</span>
+                                  <span className="text-xs text-muted-foreground">Reçu déjà numérisé</span>
+                                </div>
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
