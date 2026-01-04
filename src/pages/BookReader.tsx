@@ -684,7 +684,7 @@ const BookReader = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
       <Header />
       
       {/* Breadcrumb with Language Selector */}
@@ -762,9 +762,9 @@ const BookReader = () => {
         </div>
       )}
 
-      <div className="flex-1 flex">
+      <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Left Sidebar - Book Info & Navigation */}
-        <aside className="w-80 bg-muted/30 border-r overflow-y-auto">
+        <aside className="w-80 shrink-0 bg-muted/30 border-r min-h-0">
           <ScrollArea className="h-full">
             <div className="p-6 space-y-6">
               <Button 
@@ -1120,7 +1120,7 @@ const BookReader = () => {
         </aside>
 
         {/* Main Content - Book Viewer */}
-        <main className="flex-1 flex flex-col">
+        <main className="flex-1 min-w-0 flex flex-col min-h-0 overflow-hidden">
           {/* Toolbar - Sticky */}
           <div className="bg-muted/30 border-b p-3 sticky top-0 z-20">
             <div className="flex items-center justify-between gap-4">
