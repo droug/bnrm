@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -764,7 +763,7 @@ const BookReader = () => {
 
       <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Left Sidebar - Book Info & Navigation */}
-        <aside className="w-80 shrink-0 bg-muted/30 border-r min-h-0">
+        <aside className="w-80 shrink-0 bg-muted/30 border-r min-h-0 overflow-hidden">
           <ScrollArea className="h-full">
             <div className="p-6 space-y-6">
               <Button 
@@ -1280,7 +1279,7 @@ const BookReader = () => {
 
           {/* Book Display Area */}
           {readingMode === "book" ? (
-            <div className={`flex-1 ${viewMode === "scroll" ? "overflow-y-auto" : "overflow-hidden"} bg-muted/10 ${viewMode === "scroll" ? "" : "flex items-center justify-center"} p-4 md:p-8`}>
+            <div className={`flex-1 min-h-0 ${viewMode === "scroll" ? "overflow-y-auto overscroll-contain" : "overflow-hidden"} bg-muted/10 ${viewMode === "scroll" ? "" : "flex items-center justify-center"} p-4 md:p-8`}>
               {loading ? (
                 <div className="text-center">
                   <p className="text-muted-foreground">Chargement du document...</p>
@@ -1515,7 +1514,6 @@ const BookReader = () => {
         documentTitle={documentData?.title}
       />
 
-      <Footer />
     </div>
   );
 };
