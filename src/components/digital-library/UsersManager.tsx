@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -58,6 +59,10 @@ export default function UsersManager() {
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState<string>("all");
+  const roleButtonRef = useRef<HTMLButtonElement>(null);
+  const statusButtonRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [statusDropdownPosition, setStatusDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
@@ -525,8 +530,19 @@ export default function UsersManager() {
                 <div className="relative">
                   <Label>Rôle *</Label>
                   <button
+                    ref={roleButtonRef}
                     type="button"
-                    onClick={() => setEditRoleOpen(!editRoleOpen)}
+                    onClick={() => {
+                      if (roleButtonRef.current) {
+                        const rect = roleButtonRef.current.getBoundingClientRect();
+                        setDropdownPosition({
+                          top: rect.bottom + window.scrollY,
+                          left: rect.left + window.scrollX,
+                          width: rect.width
+                        });
+                      }
+                      setEditRoleOpen(!editRoleOpen);
+                    }}
                     className="w-full flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   >
                     <span>{ROLE_OPTIONS.find(r => r.value === editRole)?.label || "Sélectionner"}</span>
@@ -534,8 +550,11 @@ export default function UsersManager() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
-                  {editRoleOpen && (
-                    <ul className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-[100] max-h-60 overflow-y-auto">
+                  {editRoleOpen && createPortal(
+                    <ul 
+                      className="fixed bg-background border border-border rounded-md shadow-lg z-[9999] max-h-60 overflow-y-auto"
+                      style={{ top: dropdownPosition.top, left: dropdownPosition.left, width: dropdownPosition.width }}
+                    >
                       {ROLE_OPTIONS.map(role => (
                         <li
                           key={role.value}
@@ -545,14 +564,26 @@ export default function UsersManager() {
                           {role.label}
                         </li>
                       ))}
-                    </ul>
+                    </ul>,
+                    document.body
                   )}
                 </div>
                 <div className="relative">
                   <Label>Statut</Label>
                   <button
+                    ref={statusButtonRef}
                     type="button"
-                    onClick={() => setEditStatusOpen(!editStatusOpen)}
+                    onClick={() => {
+                      if (statusButtonRef.current) {
+                        const rect = statusButtonRef.current.getBoundingClientRect();
+                        setStatusDropdownPosition({
+                          top: rect.bottom + window.scrollY,
+                          left: rect.left + window.scrollX,
+                          width: rect.width
+                        });
+                      }
+                      setEditStatusOpen(!editStatusOpen);
+                    }}
                     className="w-full flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   >
                     <span>{editStatus === "true" ? "Approuvé" : "En attente"}</span>
@@ -560,8 +591,11 @@ export default function UsersManager() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
-                  {editStatusOpen && (
-                    <ul className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-[100]">
+                  {editStatusOpen && createPortal(
+                    <ul 
+                      className="fixed bg-background border border-border rounded-md shadow-lg z-[9999]"
+                      style={{ top: statusDropdownPosition.top, left: statusDropdownPosition.left, width: statusDropdownPosition.width }}
+                    >
                       <li
                         onClick={() => { setEditStatus("true"); setEditStatusOpen(false); }}
                         className={`px-3 py-2 text-sm cursor-pointer hover:bg-accent ${editStatus === "true" ? "bg-accent/50 font-medium" : ""}`}
@@ -574,7 +608,8 @@ export default function UsersManager() {
                       >
                         En attente
                       </li>
-                    </ul>
+                    </ul>,
+                    document.body
                   )}
                 </div>
               </div>
