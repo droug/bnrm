@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PortalSelect } from "@/components/ui/portal-select";
 import { Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -153,20 +153,16 @@ export default function MediaUploadDialog({ open, onOpenChange, onSuccess }: Med
           {/* Media type */}
           <div>
             <Label htmlFor="file_type">Type de média</Label>
-            <Select
+            <PortalSelect
               value={metadata.file_type}
-              onValueChange={(value) => setMetadata(prev => ({ ...prev, file_type: value as any }))}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="image">Image</SelectItem>
-                <SelectItem value="video">Vidéo</SelectItem>
-                <SelectItem value="audio">Audio</SelectItem>
-                <SelectItem value="document">Document</SelectItem>
-              </SelectContent>
-            </Select>
+              onChange={(value) => setMetadata(prev => ({ ...prev, file_type: value as any }))}
+              options={[
+                { value: "image", label: "Image" },
+                { value: "video", label: "Vidéo" },
+                { value: "audio", label: "Audio" },
+                { value: "document", label: "Document" },
+              ]}
+            />
           </div>
 
           {/* Bilingual fields */}

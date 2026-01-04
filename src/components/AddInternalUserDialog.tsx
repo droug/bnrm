@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PortalSelect } from "@/components/ui/portal-select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -272,25 +272,18 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="role">Rôle *</Label>
-                <Select
+                <PortalSelect
                   value={formData.role}
-                  onValueChange={(value) => {
+                  onChange={(value) => {
                     setFormData({ ...formData, role: value });
                     setSelectedRole(value);
                   }}
-                  required
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un rôle" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(INTERNAL_ROLES).map(([key, role]) => (
-                      <SelectItem key={key} value={key}>
-                        {role.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  placeholder="Sélectionner un rôle"
+                  options={Object.entries(INTERNAL_ROLES).map(([key, role]) => ({
+                    value: key,
+                    label: role.name
+                  }))}
+                />
               </div>
 
               {selectedRoleInfo && (

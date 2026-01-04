@@ -28,13 +28,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { PortalSelect } from "@/components/ui/portal-select";
 import {
   Popover,
   PopoverContent,
@@ -227,18 +221,16 @@ export function ReservationRequestDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type de support</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner le type de support" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="numerise">Document numérisé</SelectItem>
-                        <SelectItem value="physique">Document physique</SelectItem>
-                        <SelectItem value="en_cours_numerisation">En cours de numérisation</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <PortalSelect 
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Sélectionner le type de support"
+                      options={[
+                        { value: "numerise", label: "Document numérisé" },
+                        { value: "physique", label: "Document physique" },
+                        { value: "en_cours_numerisation", label: "En cours de numérisation" },
+                      ]}
+                    />
                     <FormDescription>
                       Sélectionnez le type de support du document que vous souhaitez consulter
                     </FormDescription>
@@ -301,20 +293,15 @@ export function ReservationRequestDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Heure souhaitée</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner une heure" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {AVAILABLE_HOURS.map((hour) => (
-                          <SelectItem key={hour} value={hour}>
-                            {hour}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <PortalSelect 
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Sélectionner une heure"
+                      options={AVAILABLE_HOURS.map((hour) => ({
+                        value: hour,
+                        label: hour
+                      }))}
+                    />
                     <FormDescription>
                       Horaires d'ouverture : 09:00 - 17:00
                     </FormDescription>
