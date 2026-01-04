@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -51,6 +51,8 @@ export default function UsersManager() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showBulkImportDialog, setShowBulkImportDialog] = useState(false);
   const [editingUser, setEditingUser] = useState<Profile | null>(null);
+  const [editStatus, setEditStatus] = useState<string>("true");
+  const [editStatusOpen, setEditStatusOpen] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState<string>("all");
@@ -227,9 +229,16 @@ export default function UsersManager() {
 
   const onSubmitEdit = (data: any) => {
     if (editingUser) {
-      updateUser.mutate({ ...data, id: editingUser.id });
+      updateUser.mutate({ ...data, id: editingUser.id, is_approved: editStatus === "true" });
     }
   };
+
+  // Reset edit status when opening edit dialog
+  useEffect(() => {
+    if (editingUser) {
+      setEditStatus(editingUser.is_approved ? "true" : "false");
+    }
+  }, [editingUser]);
 
   const getRoleBadge = (role: string) => {
     const roleOption = ROLE_OPTIONS.find(r => r.value === role);
@@ -524,17 +533,34 @@ export default function UsersManager() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
+                <div className="relative">
                   <Label>Statut</Label>
-                  <Select defaultValue={editingUser.is_approved ? "true" : "false"} onValueChange={(value) => register("is_approved").onChange({ target: { value: value === "true" } })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Approuvé</SelectItem>
-                      <SelectItem value="false">En attente</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <button
+                    type="button"
+                    onClick={() => setEditStatusOpen(!editStatusOpen)}
+                    className="w-full flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <span>{editStatus === "true" ? "Approuvé" : "En attente"}</span>
+                    <svg className={`w-4 h-4 text-muted-foreground transition-transform ${editStatusOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {editStatusOpen && (
+                    <ul className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-50">
+                      <li
+                        onClick={() => { setEditStatus("true"); setEditStatusOpen(false); }}
+                        className={`px-3 py-2 text-sm cursor-pointer hover:bg-accent ${editStatus === "true" ? "bg-accent/50 font-medium" : ""}`}
+                      >
+                        Approuvé
+                      </li>
+                      <li
+                        onClick={() => { setEditStatus("false"); setEditStatusOpen(false); }}
+                        className={`px-3 py-2 text-sm cursor-pointer hover:bg-accent ${editStatus === "false" ? "bg-accent/50 font-medium" : ""}`}
+                      >
+                        En attente
+                      </li>
+                    </ul>
+                  )}
                 </div>
               </div>
               <DialogFooter>
