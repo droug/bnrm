@@ -235,18 +235,39 @@ const BookReader = () => {
           }
         }
 
-        // Essayer d'abord digital_library_documents pour vérifier l'état OCR
-        const { data: dlData } = await supabase
+        // Essayer d'abord digital_library_documents
+        const { data: dlData, error: dlError } = await supabase
           .from('digital_library_documents')
-          .select('id, ocr_processed, title, author, publication_year')
+          .select('id, cbn_document_id, ocr_processed, title, author, publication_year, cover_image_url, pages_count, document_type')
           .eq('id', id)
           .maybeSingle();
 
-        if (dlData) {
+        if (dlData && !dlError) {
           setIsOcrProcessed(dlData.ocr_processed || false);
+          
+          // Utiliser les données de digital_library_documents directement
+          setDocumentData({
+            id: dlData.id,
+            title: dlData.title,
+            author: dlData.author || 'Auteur inconnu',
+            publication_year: dlData.publication_year,
+            document_type: dlData.document_type,
+            excerpt: `Document numérisé - ${dlData.pages_count || 50} pages`,
+          });
+          
+          // Utiliser la couverture du document
+          setDocumentImage(dlData.cover_image_url || manuscriptPage1);
+          
+          // Définir le nombre de pages
+          if (dlData.pages_count) {
+            setActualTotalPages(dlData.pages_count);
+          }
+          
+          setLoading(false);
+          return;
         }
 
-        // Essayer d'abord cbn_documents
+        // Essayer ensuite cbn_documents
         const { data: cbnData, error: cbnError } = await supabase
           .from('cbn_documents')
           .select('*')
