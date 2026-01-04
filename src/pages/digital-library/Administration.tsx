@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, Database, Users, Upload, BarChart3, FileImage,
-  Shield, Copyright, Settings, Image, FolderOpen, Lock
+  Shield, Copyright, Settings, Image, FolderOpen, Lock, Globe
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -123,6 +123,13 @@ export default function Administration() {
       icon: FolderOpen,
       path: "/admin/digital-library/requests-management",
       color: "bg-emerald-100 text-emerald-600",
+    },
+    {
+      title: "Bouquets électroniques",
+      description: "Configurer les abonnements aux ressources électroniques externes",
+      icon: Globe,
+      path: "/admin/digital-library/electronic-bundles",
+      color: "bg-sky-100 text-sky-600",
     },
     {
       title: "Paramètres techniques",
