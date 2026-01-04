@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CBNSearchWithSelection } from "@/components/cbn/CBNSearchWithSelection";
 import { ReproductionRequestDialog } from "@/components/cbn/ReproductionRequestDialog";
-import { FileText, ShoppingCart, ArrowLeft } from "lucide-react";
+import { FileText, ShoppingCart, ArrowLeft, BookOpen, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface SelectedDocument {
   id: string;
@@ -20,10 +22,92 @@ interface SelectedDocument {
 
 export default function DemandeReproduction() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [selectedDocuments, setSelectedDocuments] = useState<SelectedDocument[]>([]);
   const [showReproductionDialog, setShowReproductionDialog] = useState(false);
   const [currentDocument, setCurrentDocument] = useState<SelectedDocument | null>(null);
+  const [prefilledDocument, setPrefilledDocument] = useState<SelectedDocument | null>(null);
+
+  // Récupérer les paramètres de l'URL (documentId et documentTitle)
+  const documentIdFromUrl = searchParams.get('documentId');
+  const documentTitleFromUrl = searchParams.get('documentTitle');
+
+  // Charger les informations du document si un ID est passé en paramètre
+  useEffect(() => {
+    const loadDocumentFromUrl = async () => {
+      if (!documentIdFromUrl) return;
+
+      try {
+        // Essayer d'abord digital_library_documents
+        const { data: dlData } = await supabase
+          .from('digital_library_documents')
+          .select('id, title, author, publication_year, document_type, cbn_document_id')
+          .eq('id', documentIdFromUrl)
+          .maybeSingle();
+
+        if (dlData) {
+          // Récupérer la cote depuis cbn_documents si liée
+          let cote = '';
+          if (dlData.cbn_document_id) {
+            const { data: cbnData } = await supabase
+              .from('cbn_documents')
+              .select('cote')
+              .eq('id', dlData.cbn_document_id)
+              .maybeSingle();
+            cote = cbnData?.cote || '';
+          }
+
+          const doc: SelectedDocument = {
+            id: dlData.id,
+            title: dlData.title || documentTitleFromUrl || 'Document sans titre',
+            author: dlData.author || undefined,
+            year: dlData.publication_year?.toString() || undefined,
+            type: dlData.document_type || undefined,
+            cote: cote || undefined,
+          };
+          setPrefilledDocument(doc);
+          setSelectedDocuments([doc]);
+          return;
+        }
+
+        // Essayer ensuite cbn_documents
+        const { data: cbnData } = await supabase
+          .from('cbn_documents')
+          .select('id, title, author, publication_year, document_type, cote')
+          .eq('id', documentIdFromUrl)
+          .maybeSingle();
+
+        if (cbnData) {
+          const doc: SelectedDocument = {
+            id: cbnData.id,
+            title: cbnData.title || documentTitleFromUrl || 'Document sans titre',
+            author: cbnData.author || undefined,
+            year: cbnData.publication_year?.toString() || undefined,
+            type: cbnData.document_type || undefined,
+            cote: cbnData.cote || undefined,
+          };
+          setPrefilledDocument(doc);
+          setSelectedDocuments([doc]);
+          return;
+        }
+
+        // Si aucun document trouvé mais on a un titre, créer un document temporaire
+        if (documentTitleFromUrl) {
+          const doc: SelectedDocument = {
+            id: documentIdFromUrl,
+            title: documentTitleFromUrl,
+          };
+          setPrefilledDocument(doc);
+          setSelectedDocuments([doc]);
+        }
+      } catch (error) {
+        console.error('Error loading document from URL:', error);
+      }
+    };
+
+    loadDocumentFromUrl();
+  }, [documentIdFromUrl, documentTitleFromUrl]);
 
   // Nettoyer les résultats de recherche sauvegardés au démontage
   useEffect(() => {
@@ -87,9 +171,32 @@ export default function DemandeReproduction() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-primary mb-2">Demande de reproduction</h1>
           <p className="text-lg text-muted-foreground">
-            Recherchez et demandez la reproduction de documents du catalogue CBN
+            {prefilledDocument 
+              ? "Complétez votre demande de reproduction pour le document sélectionné"
+              : "Recherchez et demandez la reproduction de documents du catalogue CBN"
+            }
           </p>
         </div>
+
+        {/* Alerte document pré-sélectionné */}
+        {prefilledDocument && (
+          <Alert className="mb-6 border-primary/30 bg-primary/5">
+            <BookOpen className="h-4 w-4" />
+            <AlertDescription className="flex items-center justify-between">
+              <span>
+                Document pré-sélectionné depuis la bibliothèque numérique : <strong>{prefilledDocument.title}</strong>
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleOpenReproductionDialog(prefilledDocument)}
+              >
+                <FileText className="h-4 w-4 mr-1" />
+                Remplir la demande
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Panier de sélection */}
         {selectedDocuments.length > 0 && (
