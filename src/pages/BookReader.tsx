@@ -91,6 +91,7 @@ const BookReader = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
+  const [pageRotations, setPageRotations] = useState<Record<number, number>>({});
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "double">("single");
   const [readingMode, setReadingMode] = useState<"book" | "audio">("book");
@@ -143,6 +144,68 @@ const BookReader = () => {
   const [isOcrProcessed, setIsOcrProcessed] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [actualTotalPages, setActualTotalPages] = useState(245);
+
+  const getDefaultPageRotations = (docId?: string): Record<number, number> => {
+    if (!docId) return {};
+
+    // Corrections connues + correctifs spécifiques par document
+    const defaults: Record<string, number[]> = {
+      // Contes et Poèmes d'Islam: certaines pages scannées à l'envers
+      "6135d8a8-43c3-446f-8484-39c88f517978": [8],
+      // مطالب الشعب المغربي (mémoire projet): pages 11 & 12 inversées
+      "f74bf753-4018-41ae-b182-877fc7e192c1": [11, 12],
+    };
+
+    const pages = defaults[docId] ?? [];
+    return pages.reduce<Record<number, number>>((acc, page) => {
+      acc[page] = 180;
+      return acc;
+    }, {});
+  };
+
+  useEffect(() => {
+    if (!id) return;
+    const key = `dl_page_rotations:${id}`;
+    const defaults = getDefaultPageRotations(id);
+
+    let stored: Record<number, number> = {};
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
+        stored = Object.entries(parsed || {}).reduce<Record<number, number>>((acc, [k, v]) => {
+          const page = Number(k);
+          if (Number.isFinite(page) && typeof v === "number") acc[page] = v;
+          return acc;
+        }, {});
+      }
+    } catch {
+      stored = {};
+    }
+
+    setPageRotations({ ...defaults, ...stored });
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    const key = `dl_page_rotations:${id}`;
+    try {
+      localStorage.setItem(key, JSON.stringify(pageRotations));
+    } catch {
+      // ignore storage errors
+    }
+  }, [id, pageRotations]);
+
+  const togglePageRotation = (page: number) => {
+    setPageRotations((prev) => {
+      const current = prev[page] ?? 0;
+      const next = current === 180 ? 0 : 180;
+      const updated = { ...prev };
+      if (next === 0) delete updated[page];
+      else updated[page] = next;
+      return updated;
+    });
+  };
   
   // Fictional manuscript pages (fallback)
   const manuscriptPages = [
@@ -1101,15 +1164,36 @@ const BookReader = () => {
 
               {/* View Controls */}
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleRotate}>
-                  <RotateCw className="h-4 w-4" />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" title="Rotation">
+                      <RotateCw className="h-4 w-4" />
+                      <ChevronDown className="h-4 w-4 ml-2" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Rotation</DropdownMenuLabel>
+                    <DropdownMenuItem onClick={handleRotate}>
+                      Tourner l'affichage (90°)
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => togglePageRotation(currentPage)}>
+                      {pageRotations[currentPage] ? "Rétablir" : "Tourner"} la page {currentPage} (180°)
+                    </DropdownMenuItem>
+                    {viewMode === "double" && currentPage + 1 <= totalPages && (
+                      <DropdownMenuItem onClick={() => togglePageRotation(currentPage + 1)}>
+                        {pageRotations[currentPage + 1] ? "Rétablir" : "Tourner"} la page {currentPage + 1} (180°)
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
                 <Button variant="outline" size="sm" onClick={toggleFullscreen}>
                   {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
                 </Button>
-                <Button 
-                  variant={showSearch ? "default" : "outline"} 
-                  size="sm" 
+                <Button
+                  variant={showSearch ? "default" : "outline"}
+                  size="sm"
                   onClick={() => setShowSearch(!showSearch)}
                   title="Recherche par mot clé"
                 >
@@ -1154,6 +1238,7 @@ const BookReader = () => {
                   onPageChange={setCurrentPage}
                   zoom={zoom}
                   rotation={rotation}
+                  pageRotations={pageRotations}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
@@ -1161,8 +1246,8 @@ const BookReader = () => {
                     <CardContent className="p-0">
                       <div 
                         className="aspect-[3/4] w-full max-w-[600px] h-auto max-h-[calc(100vh-200px)] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden"
-                        style={{ 
-                          transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
+                        style={{
+                          transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[currentPage] ?? 0)}deg)`,
                           transformOrigin: 'center',
                           transition: 'transform 0.3s ease'
                         }}
