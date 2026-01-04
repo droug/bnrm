@@ -12,6 +12,7 @@ import manuscriptPage3 from "@/assets/manuscript-page-3.jpg";
 import manuscriptPage4 from "@/assets/manuscript-page-4.jpg";
 import { PageFlipBook } from "@/components/book-reader/PageFlipBook";
 import { DocumentSearchInBook } from "@/components/digital-library/DocumentSearchInBook";
+import { SidebarSearchInBook } from "@/components/digital-library/SidebarSearchInBook";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -686,9 +687,13 @@ const BookReader = () => {
               </Button>
 
               <Tabs defaultValue="info" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="info">Info</TabsTrigger>
                   <TabsTrigger value="chapters">Chapitres</TabsTrigger>
+                  <TabsTrigger value="search" className="flex items-center gap-1">
+                    <Search className="h-3 w-3" />
+                    <span className="hidden sm:inline">Recherche</span>
+                  </TabsTrigger>
                   <TabsTrigger value="bookmarks">
                     <Bookmark className="h-4 w-4" />
                   </TabsTrigger>
@@ -971,6 +976,16 @@ const BookReader = () => {
                       <span className="text-xs text-muted-foreground">p.{chapter.page}</span>
                     </Button>
                   ))}
+                </TabsContent>
+
+                <TabsContent value="search" className="mt-6">
+                  <SidebarSearchInBook 
+                    documentId={id || ''}
+                    onPageSelect={(pageNumber, highlightText) => {
+                      goToPage(pageNumber);
+                    }}
+                    isOcrProcessed={isOcrProcessed}
+                  />
                 </TabsContent>
 
                 <TabsContent value="bookmarks" className="space-y-2 mt-6">
