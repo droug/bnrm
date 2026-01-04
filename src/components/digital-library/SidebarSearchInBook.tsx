@@ -25,6 +25,32 @@ export function SidebarSearchInBook({ documentId, onPageSelect, isOcrProcessed =
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentResultIndex, setCurrentResultIndex] = useState(0);
+  const [hasOcrPages, setHasOcrPages] = useState<boolean | null>(null);
+
+  // Vérifier si le document a des pages OCR indexées
+  useEffect(() => {
+    const checkOcrPages = async () => {
+      if (!documentId || !isOcrProcessed) {
+        setHasOcrPages(false);
+        return;
+      }
+      
+      try {
+        const { count, error } = await supabase
+          .from('digital_library_pages')
+          .select('*', { count: 'exact', head: true })
+          .eq('document_id', documentId);
+        
+        if (error) throw error;
+        setHasOcrPages((count || 0) > 0);
+      } catch (error) {
+        console.error('Erreur vérification OCR:', error);
+        setHasOcrPages(false);
+      }
+    };
+
+    checkOcrPages();
+  }, [documentId, isOcrProcessed]);
 
   const performSearch = async () => {
     if (!query.trim() || query.length < 2) {
@@ -134,13 +160,30 @@ export function SidebarSearchInBook({ documentId, onPageSelect, isOcrProcessed =
 
   const totalMatches = results.reduce((sum, r) => sum + (r.match_count || 0), 0);
 
-  if (!isOcrProcessed) {
+  // Chargement en cours de la vérification OCR
+  if (hasOcrPages === null) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center py-8 text-muted-foreground">
+          <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin" />
+          <p className="text-sm">Vérification...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isOcrProcessed || !hasOcrPages) {
     return (
       <div className="space-y-4">
         <div className="text-center py-8 text-muted-foreground">
           <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
           <p className="text-sm font-medium">Recherche non disponible</p>
-          <p className="text-xs mt-2">Ce document n'a pas encore été traité par OCR.</p>
+          <p className="text-xs mt-2">
+            {!isOcrProcessed 
+              ? "Ce document n'a pas encore été traité par OCR."
+              : "Le texte OCR de ce document n'a pas encore été indexé."
+            }
+          </p>
           <p className="text-xs mt-1">La recherche textuelle sera disponible après le traitement.</p>
         </div>
       </div>
