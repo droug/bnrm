@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   BookOpen, Users, Eye, Download, TrendingUp, FileText, 
-  Settings, Database, Upload, BarChart3, Activity 
+  Settings, Database, Upload, BarChart3, Activity, Globe, Building2 
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -27,6 +27,8 @@ export default function AdminDashboard() {
     totalDownloads: 0,
     documentsThisMonth: 0,
     usersThisMonth: 0,
+    internalDigitized: 0,
+    externalDigitized: 0,
   });
   
   const [loading, setLoading] = useState(true);
@@ -90,6 +92,18 @@ export default function AdminDashboard() {
         .select("*", { count: "exact", head: true })
         .gte("created_at", startOfMonth.toISOString());
 
+      // Collections numérisées par BNRM (internal)
+      const { count: internalCount } = await supabase
+        .from("digital_library_documents")
+        .select("*", { count: "exact", head: true })
+        .eq("digitization_source", "internal");
+
+      // Ressources numériques reçues (external)
+      const { count: externalCount } = await supabase
+        .from("digital_library_documents")
+        .select("*", { count: "exact", head: true })
+        .eq("digitization_source", "external");
+
       setStats({
         totalDocuments: docsCount || 0,
         totalUsers: usersCount || 0,
@@ -97,6 +111,8 @@ export default function AdminDashboard() {
         totalDownloads: downloadsCount || 0,
         documentsThisMonth: docsThisMonth || 0,
         usersThisMonth: usersThisMonth || 0,
+        internalDigitized: internalCount || 0,
+        externalDigitized: externalCount || 0,
       });
     } catch (error: any) {
       console.error("Error loading stats:", error);
@@ -184,6 +200,25 @@ export default function AdminDashboard() {
     },
   ];
 
+  const digitizationKpis = [
+    {
+      title: "Collections numérisées",
+      description: "Documents numérisés par la BNRM",
+      value: stats.internalDigitized.toLocaleString(),
+      icon: Building2,
+      color: "text-cyan-600",
+      bgColor: "bg-cyan-100",
+    },
+    {
+      title: "Ressources numériques",
+      description: "Documents reçus déjà numérisés",
+      value: stats.externalDigitized.toLocaleString(),
+      icon: Globe,
+      color: "text-teal-600",
+      bgColor: "bg-teal-100",
+    },
+  ];
+
   return (
     <DigitalLibraryLayout>
       <div className="container mx-auto px-4 py-8">
@@ -247,6 +282,26 @@ export default function AdminDashboard() {
                   <p className="text-sm text-muted-foreground mb-1">{kpi.title}</p>
                   <p className="text-3xl font-bold mb-1">{kpi.value}</p>
                   <p className="text-xs text-green-600">{kpi.change}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Digitization Source KPIs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {digitizationKpis.map((kpi, index) => (
+            <Card key={index} className="border-l-4" style={{ borderLeftColor: kpi.color.includes('cyan') ? '#0891b2' : '#14b8a6' }}>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-lg ${kpi.bgColor}`}>
+                    <kpi.icon className={`h-6 w-6 ${kpi.color}`} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-muted-foreground">{kpi.title}</p>
+                    <p className="text-xs text-muted-foreground mb-1">{kpi.description}</p>
+                    <p className="text-3xl font-bold">{kpi.value}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
