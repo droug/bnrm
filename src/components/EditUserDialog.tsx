@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PortalSelect } from "@/components/ui/portal-select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -244,20 +244,19 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="role">Rôle *</Label>
-                <Select value={selectedRole} onValueChange={(value) => setValue("role", value as any)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Administrateur</SelectItem>
-                    <SelectItem value="librarian">Bibliothécaire</SelectItem>
-                    <SelectItem value="partner">Partenaire Institutionnel</SelectItem>
-                    <SelectItem value="researcher">Chercheur</SelectItem>
-                    <SelectItem value="subscriber">Abonné Premium</SelectItem>
-                    <SelectItem value="public_user">Grand Public</SelectItem>
-                    <SelectItem value="visitor">Visiteur (Legacy)</SelectItem>
-                  </SelectContent>
-                </Select>
+                <PortalSelect 
+                  value={selectedRole} 
+                  onChange={(value) => setValue("role", value as any)}
+                  options={[
+                    { value: "admin", label: "Administrateur" },
+                    { value: "librarian", label: "Bibliothécaire" },
+                    { value: "partner", label: "Partenaire Institutionnel" },
+                    { value: "researcher", label: "Chercheur" },
+                    { value: "subscriber", label: "Abonné Premium" },
+                    { value: "public_user", label: "Grand Public" },
+                    { value: "visitor", label: "Visiteur (Legacy)" },
+                  ]}
+                />
               </div>
 
               <div className="space-y-2">
@@ -318,16 +317,16 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({
               {selectedRole === 'subscriber' && (
                 <div className="space-y-2">
                   <Label htmlFor="subscription_type">Type d'abonnement</Label>
-                  <Select value={watch("subscription_type")} onValueChange={(value) => setValue("subscription_type", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionnez un type d'abonnement" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="monthly">Mensuel</SelectItem>
-                      <SelectItem value="yearly">Annuel</SelectItem>
-                      <SelectItem value="lifetime">À vie</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <PortalSelect 
+                    value={watch("subscription_type")} 
+                    onChange={(value) => setValue("subscription_type", value)}
+                    placeholder="Sélectionnez un type d'abonnement"
+                    options={[
+                      { value: "monthly", label: "Mensuel" },
+                      { value: "yearly", label: "Annuel" },
+                      { value: "lifetime", label: "À vie" },
+                    ]}
+                  />
                 </div>
               )}
             </div>

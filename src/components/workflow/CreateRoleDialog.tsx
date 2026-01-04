@@ -10,13 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { PortalSelect } from "@/components/ui/portal-select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
@@ -111,34 +105,27 @@ export function CreateRoleDialog({ open, onOpenChange, onSaved }: CreateRoleDial
             <Label htmlFor="module">
               Module <span className="text-destructive">*</span>
             </Label>
-            <Select value={module} onValueChange={setModule}>
-              <SelectTrigger id="module">
-                <SelectValue placeholder="Sélectionner un module..." />
-              </SelectTrigger>
-              <SelectContent>
-                {MODULES.map((mod) => (
-                  <SelectItem key={mod.value} value={mod.value}>
-                    {mod.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <PortalSelect 
+              value={module} 
+              onChange={setModule}
+              placeholder="Sélectionner un module..."
+              options={MODULES.map((mod) => ({
+                value: mod.value,
+                label: mod.label
+              }))}
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="role-level">Niveau du rôle</Label>
-            <Select value={roleLevel} onValueChange={setRoleLevel}>
-              <SelectTrigger id="role-level">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {ROLE_LEVELS.map((level) => (
-                  <SelectItem key={level.value} value={level.value}>
-                    {level.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <PortalSelect 
+              value={roleLevel} 
+              onChange={setRoleLevel}
+              options={ROLE_LEVELS.map((level) => ({
+                value: level.value,
+                label: level.label
+              }))}
+            />
           </div>
 
           <div className="space-y-2">
