@@ -1121,8 +1121,8 @@ const BookReader = () => {
 
         {/* Main Content - Book Viewer */}
         <main className="flex-1 flex flex-col">
-          {/* Toolbar */}
-          <div className="bg-muted/30 border-b p-3">
+          {/* Toolbar - Sticky */}
+          <div className="bg-muted/30 border-b p-3 sticky top-0 z-20">
             <div className="flex items-center justify-between gap-4">
               {/* Navigation Controls */}
               <div className="flex items-center gap-2">
