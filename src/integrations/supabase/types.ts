@@ -3705,6 +3705,7 @@ export type Database = {
           digital_collections: string[] | null
           digitization_date: string | null
           digitization_quality: string | null
+          digitization_source: string | null
           document_type: string | null
           download_enabled: boolean | null
           downloads_count: number | null
@@ -3739,6 +3740,7 @@ export type Database = {
           digital_collections?: string[] | null
           digitization_date?: string | null
           digitization_quality?: string | null
+          digitization_source?: string | null
           document_type?: string | null
           download_enabled?: boolean | null
           downloads_count?: number | null
@@ -3773,6 +3775,7 @@ export type Database = {
           digital_collections?: string[] | null
           digitization_date?: string | null
           digitization_quality?: string | null
+          digitization_source?: string | null
           document_type?: string | null
           download_enabled?: boolean | null
           downloads_count?: number | null
