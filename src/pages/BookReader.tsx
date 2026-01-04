@@ -1129,16 +1129,22 @@ const BookReader = () => {
                   variant="outline" 
                   size="sm"
                   onClick={() => {
-                    setCurrentPage(1);
-                    // En mode scroll, défiler vers le haut du conteneur
+                    // En mode scroll, le state currentPage ne reflète pas forcément la position réelle,
+                    // donc on force toujours un scroll vers le haut.
                     if (viewMode === "scroll") {
                       const scrollContainer = document.getElementById("scroll-container");
                       if (scrollContainer) {
                         scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+                      } else {
+                        window.scrollTo({ top: 0, behavior: "smooth" });
                       }
+                      setCurrentPage(1);
+                      return;
                     }
+
+                    setCurrentPage(1);
                   }}
-                  disabled={currentPage === 1}
+                  disabled={viewMode !== "scroll" && currentPage === 1}
                   title="Retour à la première page"
                 >
                   <ChevronsUp className="h-4 w-4" />
