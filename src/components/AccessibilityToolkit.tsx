@@ -70,9 +70,9 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
     if (settings.contrast !== 'normal') {
       document.body.classList.add(`contrast-${settings.contrast}`);
     }
-    
-    // Appliquer la saturation
-    document.body.style.filter = `saturate(${settings.saturation}%)`;
+
+    // Appliquer la saturation (NE PAS appliquer de filter quand saturation=100 sinon cela casse les modales position:fixed)
+    document.body.style.filter = settings.saturation === 100 ? '' : `saturate(${settings.saturation}%)`;
     
     // Curseur
     if (settings.cursorSize !== 1) {

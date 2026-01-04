@@ -3,6 +3,9 @@ import { createPortal } from "react-dom";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Note: applying CSS `filter` on <body> can break `position: fixed` portals.
+// We keep this dropdown as a body-portal with viewport-based positioning.
+
 interface PortalSelectOption {
   value: string;
   label: string;

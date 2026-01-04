@@ -46,8 +46,9 @@ export function FloatingButtons() {
     if (settings.contrast !== 'normal') {
       document.body.classList.add(`contrast-${settings.contrast}`);
     }
-    
-    document.body.style.filter = `saturate(${settings.saturation}%)`;
+
+    // Appliquer la saturation (NE PAS appliquer de filter quand saturation=100 sinon cela casse les modales position:fixed)
+    document.body.style.filter = settings.saturation === 100 ? '' : `saturate(${settings.saturation}%)`;
     
     if (settings.cursorSize !== 1) {
       document.body.style.cursor = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${24 * settings.cursorSize}' height='${24 * settings.cursorSize}' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M7.33 24l4.67-4.67V24zm9.33 0v-4.67L21.33 24zM0 16.67V12l4.67 4.67zm24 0L19.33 12v4.67z'/%3E%3C/svg%3E") ${12 * settings.cursorSize} ${12 * settings.cursorSize}, auto`;
