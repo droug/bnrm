@@ -534,7 +534,7 @@ export default function UsersManager() {
                     </svg>
                   </button>
                   {editRoleOpen && (
-                    <ul className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+                    <ul className="absolute bottom-full left-0 right-0 mb-1 bg-background border border-border rounded-md shadow-lg z-[100] max-h-60 overflow-y-auto">
                       {ROLE_OPTIONS.map(role => (
                         <li
                           key={role.value}
@@ -560,7 +560,7 @@ export default function UsersManager() {
                     </svg>
                   </button>
                   {editStatusOpen && (
-                    <ul className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-50">
+                    <ul className="absolute bottom-full left-0 right-0 mb-1 bg-background border border-border rounded-md shadow-lg z-[100]">
                       <li
                         onClick={() => { setEditStatus("true"); setEditStatusOpen(false); }}
                         className={`px-3 py-2 text-sm cursor-pointer hover:bg-accent ${editStatus === "true" ? "bg-accent/50 font-medium" : ""}`}
