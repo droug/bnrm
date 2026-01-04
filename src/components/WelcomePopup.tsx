@@ -1,12 +1,14 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CustomDialog, CustomDialogContent, CustomDialogHeader, CustomDialogTitle, CustomDialogDescription, CustomDialogClose } from "@/components/ui/custom-portal-dialog";
+import {
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogDescription,
+  CustomDialogClose,
+} from "@/components/ui/custom-portal-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { X, BookOpen, Calendar, Users, FileText, Star, Sparkles, Gift } from "lucide-react";
-import { useLanguage } from "@/hooks/useLanguage";
+import { BookOpen, Calendar, Users, FileText, Star, Sparkles, Gift } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 
 interface WelcomePopupProps {
@@ -15,9 +17,7 @@ interface WelcomePopupProps {
 }
 
 export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
-  const { t } = useLanguage();
   const navigate = useNavigate();
-  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   console.log('WelcomePopup rendered, isOpen:', isOpen);
 
@@ -72,39 +72,51 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
     }
   ];
 
+  if (!isOpen) return null;
+
   return (
-    <CustomDialog open={isOpen} onOpenChange={handleClose} modal={false}>
-      <CustomDialogContent
-        showOverlay={false}
-        portal={false}
-        position="relative"
-        centered={false}
-        className="mx-auto mt-4 !z-[9999] !max-h-none !overflow-visible max-w-4xl p-0 border-2 border-gold/30 shadow-lg bg-background rounded-lg"
-      >
+    <section
+      aria-label="Bienvenue à la BNRM"
+      className="mx-auto mt-4 max-w-4xl p-0 border-2 border-gold/30 shadow-lg bg-background rounded-lg"
+    >
+      <div className="relative">
         <CustomDialogClose onClose={handleClose} />
+
         <div className="relative overflow-hidden bg-gradient-zellige-main p-6 text-white">
           <div className="absolute inset-0 bg-pattern-zellige-complex opacity-30"></div>
           <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-20"></div>
-          
+
           <div className="relative z-10">
             <CustomDialogHeader>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-10 w-10 object-contain drop-shadow-lg" />
+                  <img
+                    src={emblemeMaroc}
+                    alt="Emblème du Maroc"
+                    className="h-10 w-10 object-contain drop-shadow-lg"
+                  />
                   <CustomDialogTitle className="text-2xl font-moroccan font-bold text-white">
                     Bienvenue à la BNRM
                   </CustomDialogTitle>
-                  <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-10 w-10 object-contain drop-shadow-lg" />
+                  <img
+                    src={emblemeMaroc}
+                    alt="Emblème du Maroc"
+                    className="h-10 w-10 object-contain drop-shadow-lg"
+                  />
                 </div>
               </div>
-              
+
               <CustomDialogDescription className="text-white/95 text-lg font-elegant italic text-center">
                 "Découvrez les trésors du patrimoine marocain millénaire"
               </CustomDialogDescription>
-              
+
               <div className="flex justify-center space-x-1 mt-3">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-4 w-4 text-gold fill-gold animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                  <Star
+                    key={i}
+                    className="h-4 w-4 text-gold fill-gold animate-pulse"
+                    style={{ animationDelay: `${i * 0.1}s` }}
+                  />
                 ))}
               </div>
             </CustomDialogHeader>
@@ -125,26 +137,29 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
                   Nouveau
                 </Badge>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="bg-gradient-mosaique p-4 rounded-lg border border-gold/20">
                   <h4 className="font-semibold text-foreground mb-2">📚 Nouvelle Collection Numérique</h4>
                   <p className="text-muted-foreground text-sm">
-                    Découvrez plus de 5000 manuscrits anciens désormais disponibles en ligne avec une navigation interactive et des outils de recherche avancés.
+                    Découvrez plus de 5000 manuscrits anciens désormais disponibles en ligne avec une
+                    navigation interactive et des outils de recherche avancés.
                   </p>
                 </div>
-                
+
                 <div className="bg-gradient-primary/10 p-4 rounded-lg border border-primary/20">
                   <h4 className="font-semibold text-foreground mb-2">🎭 Exposition Temporaire</h4>
                   <p className="text-muted-foreground text-sm">
-                    "L'Art de la Calligraphie Marocaine" - Du 15 janvier au 30 mars 2024. Découvrez l'évolution de l'écriture arabe au Maroc à travers les siècles.
+                    "L'Art de la Calligraphie Marocaine" - Du 15 janvier au 30 mars 2024. Découvrez
+                    l'évolution de l'écriture arabe au Maroc à travers les siècles.
                   </p>
                 </div>
-                
+
                 <div className="bg-gradient-accent/10 p-4 rounded-lg border border-accent/20">
                   <h4 className="font-semibold text-foreground mb-2">💻 Services Numériques Améliorés</h4>
                   <p className="text-muted-foreground text-sm">
-                    Nouveau système de réservation en ligne, téléchargement haute définition et assistant IA pour vous aider dans vos recherches.
+                    Nouveau système de réservation en ligne, téléchargement haute définition et assistant IA
+                    pour vous aider dans vos recherches.
                   </p>
                 </div>
               </div>
@@ -158,7 +173,7 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
               <h3 className="text-xl font-moroccan font-bold text-foreground mb-4 text-center">
                 Actions Rapides
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {quickActions.map((action, index) => (
                   <button
@@ -168,7 +183,9 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
                   >
                     <div className="absolute inset-0 bg-pattern-filigrane opacity-5 group-hover:opacity-15 transition-opacity duration-300"></div>
                     <div className="flex items-start space-x-3 relative z-10">
-                      <action.icon className={`h-6 w-6 ${action.color} mt-1 group-hover:scale-110 transition-transform duration-300`} />
+                      <action.icon
+                        className={`h-6 w-6 ${action.color} mt-1 group-hover:scale-110 transition-transform duration-300`}
+                      />
                       <div>
                         <h4 className="font-semibold text-foreground mb-1">{action.title}</h4>
                         <p className="text-sm text-muted-foreground">{action.description}</p>
@@ -192,8 +209,8 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
             </div>
           </div>
         </div>
-      </CustomDialogContent>
-    </CustomDialog>
+      </div>
+    </section>
   );
 };
 

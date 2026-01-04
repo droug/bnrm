@@ -59,7 +59,12 @@ const Index = () => {
 
       <div className="min-h-screen bg-background">
         <Header />
-        
+
+        <WelcomePopup
+          isOpen={showWelcomePopup}
+          onClose={() => setShowWelcomePopup(false)}
+        />
+
         {/* Hero Banner */}
         <section className="relative min-h-[70vh] overflow-hidden pt-20">
           <div 
@@ -100,11 +105,6 @@ const Index = () => {
         
         {/* Main Content */}
         <main className="container mx-auto px-4 py-8">
-          <WelcomePopup 
-            isOpen={showWelcomePopup} 
-            onClose={() => setShowWelcomePopup(false)} 
-          />
-          
           <div className="max-w-6xl mx-auto space-y-4">
               
               {/* Search Section */}
