@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown } from "lucide-react";
+import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil } from "lucide-react";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,6 +48,8 @@ export default function DocumentsManager() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingDocument, setEditingDocument] = useState<any>(null);
   const [showBulkDialog, setShowBulkDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterVisible, setFilterVisible] = useState<string>("all");
@@ -234,6 +236,43 @@ export default function DocumentsManager() {
     },
     onError: (error) => {
       toast({ 
+        title: "Erreur", 
+        description: error.message, 
+        variant: "destructive" 
+      });
+    }
+  });
+
+  // Update document
+  const updateDocument = useMutation({
+    mutationFn: async (values: z.infer<typeof documentSchema> & { id: string }) => {
+      const { error } = await supabase
+        .from('content')
+        .update({
+          title: values.title,
+          content_body: values.description || '',
+          download_enabled: values.download_enabled,
+          is_visible: values.is_visible,
+          social_share_enabled: values.social_share_enabled,
+          email_share_enabled: values.email_share_enabled,
+          copyright_expires_at: values.copyright_expires_at || null,
+          copyright_derogation: values.copyright_derogation,
+          file_url: values.file_url || null,
+          file_type: values.file_type || null,
+        })
+        .eq('id', values.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
+      setShowEditDialog(false);
+      setEditingDocument(null);
+      form.reset();
+      toast({ title: "Document modifié avec succès" });
+    },
+    onError: (error) => {
+      toast({
         title: "Erreur", 
         description: error.message, 
         variant: "destructive" 
@@ -931,6 +970,221 @@ export default function DocumentsManager() {
               </Form>
             </DialogContent>
           </Dialog>
+
+          {/* Edit Document Dialog */}
+          <Dialog open={showEditDialog} onOpenChange={(open) => {
+            setShowEditDialog(open);
+            if (!open) {
+              setEditingDocument(null);
+              form.reset();
+            }
+          }}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Modifier le document</DialogTitle>
+                <DialogDescription>
+                  Modifiez les informations du document
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit((values) => {
+                  if (editingDocument) {
+                    updateDocument.mutate({ ...values, id: editingDocument.id });
+                  }
+                })} className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem className="col-span-2">
+                          <FormLabel>Titre *</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Titre du document" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="file_type"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Type de document</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Sélectionner" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="livre">Livre</SelectItem>
+                              <SelectItem value="article">Article</SelectItem>
+                              <SelectItem value="video">Vidéo</SelectItem>
+                              <SelectItem value="audio">Audio</SelectItem>
+                              <SelectItem value="manuscrit">Manuscrit</SelectItem>
+                              <SelectItem value="periodique">Périodique</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="file_url"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>URL du fichier</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="https://..." />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem className="col-span-2">
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Textarea {...field} rows={3} placeholder="Description du document" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Permissions */}
+                  <div className="border rounded-lg p-4 space-y-4">
+                    <h3 className="font-semibold">Permissions et accès</h3>
+                    
+                    <FormField
+                      control={form.control}
+                      name="is_visible"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between">
+                          <div>
+                            <FormLabel>Visible sur le site</FormLabel>
+                            <FormDescription>Le document apparaît dans la bibliothèque</FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="download_enabled"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between">
+                          <div>
+                            <FormLabel>Téléchargement activé</FormLabel>
+                            <FormDescription>Autoriser le téléchargement du document</FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="social_share_enabled"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between">
+                          <div>
+                            <FormLabel>Partage sur réseaux sociaux</FormLabel>
+                            <FormDescription>Activer le partage social</FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="email_share_enabled"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between">
+                          <div>
+                            <FormLabel>Partage par email</FormLabel>
+                            <FormDescription>Activer l'envoi par email</FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Droits d'auteur */}
+                  <div className="border rounded-lg p-4 space-y-4">
+                    <h3 className="font-semibold">Droits d'auteur</h3>
+                    
+                    <FormField
+                      control={form.control}
+                      name="copyright_derogation"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between">
+                          <div>
+                            <FormLabel>Dérogation temporaire</FormLabel>
+                            <FormDescription>Document sous droits avec dérogation limitée</FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="copyright_expires_at"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Date d'expiration du copyright</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="date" />
+                          </FormControl>
+                          <FormDescription>
+                            Une alerte sera générée 3 mois avant l'expiration
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => {
+                      setShowEditDialog(false);
+                      setEditingDocument(null);
+                      form.reset();
+                    }}>
+                      Annuler
+                    </Button>
+                    <Button type="submit" disabled={updateDocument.isPending}>
+                      {updateDocument.isPending ? "Modification..." : "Enregistrer les modifications"}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </div>
 
       {/* Filters */}
@@ -1089,6 +1343,31 @@ export default function DocumentsManager() {
                           }}
                         >
                           <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setEditingDocument(doc);
+                            form.reset({
+                              title: doc.title || '',
+                              author: '',
+                              file_type: doc.file_type || '',
+                              publication_date: '',
+                              description: doc.content_body || '',
+                              file_url: doc.file_url || '',
+                              download_enabled: doc.download_enabled ?? true,
+                              is_visible: doc.is_visible ?? true,
+                              social_share_enabled: doc.social_share_enabled ?? true,
+                              email_share_enabled: doc.email_share_enabled ?? true,
+                              copyright_expires_at: doc.copyright_expires_at || '',
+                              copyright_derogation: doc.copyright_derogation ?? false,
+                              digitization_source: "internal",
+                            });
+                            setShowEditDialog(true);
+                          }}
+                        >
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           size="sm"
