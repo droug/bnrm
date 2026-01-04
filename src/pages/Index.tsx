@@ -56,14 +56,14 @@ const Index = () => {
         description="Bibliothèque Nationale du Royaume du Maroc - Gardienne du patrimoine écrit marocain et porte d'accès au savoir universel."
         keywords={["bibliothèque maroc", "BNRM", "manuscrits marocains", "patrimoine culturel"]}
       />
-      
-      <WelcomePopup 
-        isOpen={showWelcomePopup} 
-        onClose={() => setShowWelcomePopup(false)} 
-      />
-      
+
       <div className="min-h-screen bg-background">
         <Header />
+
+        <WelcomePopup 
+          isOpen={showWelcomePopup} 
+          onClose={() => setShowWelcomePopup(false)} 
+        />
         
         {/* Hero Banner */}
         <section className="relative min-h-[70vh] overflow-hidden pt-20">
