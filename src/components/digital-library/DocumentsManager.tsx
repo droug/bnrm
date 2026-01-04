@@ -40,6 +40,7 @@ const documentSchema = z.object({
   email_share_enabled: z.boolean().default(true),
   copyright_expires_at: z.string().optional(),
   copyright_derogation: z.boolean().default(false),
+  digitization_source: z.enum(["internal", "external"]).default("internal"),
 });
 
 export default function DocumentsManager() {
@@ -181,6 +182,7 @@ export default function DocumentsManager() {
       social_share_enabled: true,
       email_share_enabled: true,
       copyright_derogation: false,
+      digitization_source: "internal",
     },
   });
 
@@ -308,6 +310,7 @@ export default function DocumentsManager() {
       'partage_email',
       'derogation_copyright',
       'date_expiration_copyright',
+      'source_numerisation', // internal = numérisé BNRM, external = reçu numérisé
       'localisation',
       'tags',
       'mots_cles_seo',
@@ -743,6 +746,38 @@ export default function DocumentsManager() {
                           <FormControl>
                             <Input {...field} type="date" />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="digitization_source"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Source de numérisation</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Sélectionner" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="internal">
+                                <div className="flex flex-col">
+                                  <span className="font-medium">Collections numérisées</span>
+                                  <span className="text-xs text-muted-foreground">Numérisé par la BNRM</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="external">
+                                <div className="flex flex-col">
+                                  <span className="font-medium">Ressources numériques</span>
+                                  <span className="text-xs text-muted-foreground">Reçu déjà numérisé</span>
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}

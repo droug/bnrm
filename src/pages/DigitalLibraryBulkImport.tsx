@@ -78,11 +78,12 @@ export default function DigitalLibraryBulkImport() {
       'annee_publication',
       'langue',
       'mots_cles',
-      'url_fichier'
+      'url_fichier',
+      'source_numerisation'
     ];
     
     const csvContent = headers.join(',') + '\n' + 
-      'Exemple de titre,Auteur exemple,page,Description du document,2024,fr,histoire;culture,https://example.com/document.pdf';
+      'Exemple de titre,Auteur exemple,page,Description du document,2024,fr,histoire;culture,https://example.com/document.pdf,internal';
     
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
