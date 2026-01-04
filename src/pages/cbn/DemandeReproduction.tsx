@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CBNSearchWithSelection } from "@/components/cbn/CBNSearchWithSelection";
 import { ReproductionRequestDialog } from "@/components/cbn/ReproductionRequestDialog";
-import { FileText, ShoppingCart, ArrowLeft, BookOpen, Info } from "lucide-react";
+import { UnifiedDocumentSearch } from "@/components/reproduction/UnifiedDocumentSearch";
+import { FileText, ShoppingCart, ArrowLeft, BookOpen, Info, Search, Database } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UnifiedDocument } from "@/hooks/useUnifiedDocumentIndex";
 
 interface SelectedDocument {
   id: string;
@@ -138,6 +141,19 @@ export default function DemandeReproduction() {
     }
   };
 
+  // Handler pour les documents unifiés (depuis la GED)
+  const handleSelectUnifiedDocument = (doc: UnifiedDocument) => {
+    const selectedDoc: SelectedDocument = {
+      id: doc.id,
+      title: doc.title,
+      author: doc.author,
+      year: doc.publication_year?.toString(),
+      type: doc.document_type,
+      cote: doc.cote,
+    };
+    handleSelectDocument(selectedDoc);
+  };
+
   const handleOpenReproductionDialog = (doc?: SelectedDocument) => {
     const docToRequest = doc || selectedDocuments[0];
     if (!docToRequest) {
@@ -255,12 +271,48 @@ export default function DemandeReproduction() {
           </Card>
         )}
 
-        {/* Recherche dans le catalogue CBN */}
-        <CBNSearchWithSelection
-          onSelectDocument={handleSelectDocument}
-          selectedDocumentId={selectedDocuments[selectedDocuments.length - 1]?.id}
-          detailsRoute="reproduction"
-        />
+        {/* Onglets de recherche */}
+        <Tabs defaultValue="unified" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="unified" className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              Recherche unifiée (GED)
+            </TabsTrigger>
+            <TabsTrigger value="cbn" className="flex items-center gap-2">
+              <Search className="h-4 w-4" />
+              Catalogue CBN
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="unified">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="h-5 w-5" />
+                  Recherche dans tous les catalogues
+                </CardTitle>
+                <CardDescription>
+                  Recherchez parmi tous les documents indexés : bibliothèque numérique, catalogue CBN, manuscrits, catalogue CBM
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <UnifiedDocumentSearch
+                  onSelectDocument={handleSelectUnifiedDocument}
+                  selectedDocumentIds={selectedDocuments.map(d => d.id)}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="cbn">
+            {/* Recherche dans le catalogue CBN */}
+            <CBNSearchWithSelection
+              onSelectDocument={handleSelectDocument}
+              selectedDocumentId={selectedDocuments[selectedDocuments.length - 1]?.id}
+              detailsRoute="reproduction"
+            />
+          </TabsContent>
+        </Tabs>
 
         {/* Informations supplémentaires */}
         <Card className="mt-6">

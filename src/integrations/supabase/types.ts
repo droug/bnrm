@@ -8745,6 +8745,8 @@ export type Database = {
           color_mode: string | null
           content_id: string | null
           created_at: string | null
+          document_source_id: string | null
+          document_source_type: string | null
           formats: Database["public"]["Enums"]["reproduction_format"][]
           id: string
           manuscript_id: string | null
@@ -8756,12 +8758,15 @@ export type Database = {
           resolution_dpi: number | null
           title: string
           total_price: number | null
+          unified_document_id: string | null
           unit_price: number | null
         }
         Insert: {
           color_mode?: string | null
           content_id?: string | null
           created_at?: string | null
+          document_source_id?: string | null
+          document_source_type?: string | null
           formats?: Database["public"]["Enums"]["reproduction_format"][]
           id?: string
           manuscript_id?: string | null
@@ -8773,12 +8778,15 @@ export type Database = {
           resolution_dpi?: number | null
           title: string
           total_price?: number | null
+          unified_document_id?: string | null
           unit_price?: number | null
         }
         Update: {
           color_mode?: string | null
           content_id?: string | null
           created_at?: string | null
+          document_source_id?: string | null
+          document_source_type?: string | null
           formats?: Database["public"]["Enums"]["reproduction_format"][]
           id?: string
           manuscript_id?: string | null
@@ -8790,6 +8798,7 @@ export type Database = {
           resolution_dpi?: number | null
           title?: string
           total_price?: number | null
+          unified_document_id?: string | null
           unit_price?: number | null
         }
         Relationships: [
@@ -8812,6 +8821,13 @@ export type Database = {
             columns: ["request_id"]
             isOneToOne: false
             referencedRelation: "reproduction_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reproduction_items_unified_document_id_fkey"
+            columns: ["unified_document_id"]
+            isOneToOne: false
+            referencedRelation: "unified_document_index"
             referencedColumns: ["id"]
           },
         ]
@@ -10662,6 +10678,93 @@ export type Database = {
           },
         ]
       }
+      unified_document_index: {
+        Row: {
+          access_level: string | null
+          author: string | null
+          author_ar: string | null
+          cote: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          description: string | null
+          dewey_classification: string | null
+          digital_url: string | null
+          document_type: string | null
+          id: string
+          is_available_for_reproduction: boolean | null
+          is_digitized: boolean | null
+          keywords: string[] | null
+          language: string | null
+          last_sync_at: string | null
+          pages_count: number | null
+          physical_description: string | null
+          publication_year: number | null
+          publisher: string | null
+          source_id: string
+          source_type: string
+          subject_headings: string[] | null
+          title: string
+          title_ar: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_level?: string | null
+          author?: string | null
+          author_ar?: string | null
+          cote?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          dewey_classification?: string | null
+          digital_url?: string | null
+          document_type?: string | null
+          id?: string
+          is_available_for_reproduction?: boolean | null
+          is_digitized?: boolean | null
+          keywords?: string[] | null
+          language?: string | null
+          last_sync_at?: string | null
+          pages_count?: number | null
+          physical_description?: string | null
+          publication_year?: number | null
+          publisher?: string | null
+          source_id: string
+          source_type: string
+          subject_headings?: string[] | null
+          title: string
+          title_ar?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_level?: string | null
+          author?: string | null
+          author_ar?: string | null
+          cote?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          dewey_classification?: string | null
+          digital_url?: string | null
+          document_type?: string | null
+          id?: string
+          is_available_for_reproduction?: boolean | null
+          is_digitized?: boolean | null
+          keywords?: string[] | null
+          language?: string | null
+          last_sync_at?: string | null
+          pages_count?: number | null
+          physical_description?: string | null
+          publication_year?: number | null
+          publisher?: string | null
+          source_id?: string
+          source_type?: string
+          subject_headings?: string[] | null
+          title?: string
+          title_ar?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       unread_messages: {
         Row: {
           conversation_id: string | null
@@ -12367,6 +12470,30 @@ export type Database = {
           page_number: number
         }[]
       }
+      search_unified_documents: {
+        Args: {
+          digitized_only?: boolean
+          limit_count?: number
+          offset_count?: number
+          search_query?: string
+          source_filter?: string
+          type_filter?: string
+        }
+        Returns: {
+          author: string
+          cote: string
+          cover_image_url: string
+          digital_url: string
+          document_type: string
+          id: string
+          is_digitized: boolean
+          publication_year: number
+          source_id: string
+          source_type: string
+          title: string
+          title_ar: string
+        }[]
+      }
       should_content_be_archived: {
         Args: {
           content_row: Record<string, unknown>
@@ -12376,6 +12503,17 @@ export type Database = {
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      sync_all_unified_documents: {
+        Args: never
+        Returns: {
+          source: string
+          synced: number
+        }[]
+      }
+      sync_unified_from_cbm: { Args: never; Returns: number }
+      sync_unified_from_cbn: { Args: never; Returns: number }
+      sync_unified_from_digital_library: { Args: never; Returns: number }
+      sync_unified_from_manuscripts: { Args: never; Returns: number }
       trigger_cms_webhook: {
         Args: {
           p_data?: Json

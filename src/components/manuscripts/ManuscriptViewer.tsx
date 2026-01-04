@@ -42,7 +42,8 @@ import {
   Shield,
   Info,
   Globe,
-  Hash
+  Hash,
+  FileImage
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -69,6 +70,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ReproductionAuthChoiceModal } from "@/components/digital-library/ReproductionAuthChoiceModal";
 
 interface Manuscript {
   id: string;
@@ -121,6 +123,7 @@ export function ManuscriptViewer() {
   const [searchText, setSearchText] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [manuscriptImage, setManuscriptImage] = useState<string>("");
+  const [showReproductionAuthModal, setShowReproductionAuthModal] = useState(false);
   
   // Fictional manuscript pages (fallback)
   const manuscriptPages = [
@@ -897,6 +900,24 @@ export function ManuscriptViewer() {
                 <Printer className="h-4 w-4" />
               </Button>
 
+              {/* Reproduction Request */}
+              <Button 
+                variant="default" 
+                size="sm"
+                onClick={() => {
+                  if (user) {
+                    const redirectUrl = `/demande-reproduction?documentId=${encodeURIComponent(id || '')}&documentTitle=${encodeURIComponent(manuscript?.title || '')}`;
+                    navigate(redirectUrl);
+                  } else {
+                    setShowReproductionAuthModal(true);
+                  }
+                }}
+                title="Demande de reproduction"
+              >
+                <FileImage className="h-4 w-4 mr-1" />
+                Reproduction
+              </Button>
+
               {/* Share */}
               <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
                 <DialogTrigger asChild>
@@ -1032,6 +1053,14 @@ export function ManuscriptViewer() {
           </div>
         </main>
       </div>
+
+      {/* Reproduction Auth Choice Modal */}
+      <ReproductionAuthChoiceModal
+        open={showReproductionAuthModal}
+        onOpenChange={setShowReproductionAuthModal}
+        documentId={id}
+        documentTitle={manuscript?.title}
+      />
     </div>
   );
 }
