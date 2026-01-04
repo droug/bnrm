@@ -53,6 +53,8 @@ export default function UsersManager() {
   const [editingUser, setEditingUser] = useState<Profile | null>(null);
   const [editStatus, setEditStatus] = useState<string>("true");
   const [editStatusOpen, setEditStatusOpen] = useState(false);
+  const [editRole, setEditRole] = useState<string>("visitor");
+  const [editRoleOpen, setEditRoleOpen] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState<string>("all");
@@ -229,14 +231,15 @@ export default function UsersManager() {
 
   const onSubmitEdit = (data: any) => {
     if (editingUser) {
-      updateUser.mutate({ ...data, id: editingUser.id, is_approved: editStatus === "true" });
+      updateUser.mutate({ ...data, id: editingUser.id, is_approved: editStatus === "true", role: editRole });
     }
   };
 
-  // Reset edit status when opening edit dialog
+  // Reset edit values when opening edit dialog
   useEffect(() => {
     if (editingUser) {
       setEditStatus(editingUser.is_approved ? "true" : "false");
+      setEditRole(editingUser.role || "visitor");
     }
   }, [editingUser]);
 
@@ -518,20 +521,31 @@ export default function UsersManager() {
                 <Input defaultValue={editingUser.research_field || ''} {...register("research_field")} />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div>
+                <div className="relative">
                   <Label>Rôle *</Label>
-                  <Select defaultValue={editingUser.role} onValueChange={(value) => register("role").onChange({ target: { value } })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
+                  <button
+                    type="button"
+                    onClick={() => setEditRoleOpen(!editRoleOpen)}
+                    className="w-full flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <span>{ROLE_OPTIONS.find(r => r.value === editRole)?.label || "Sélectionner"}</span>
+                    <svg className={`w-4 h-4 text-muted-foreground transition-transform ${editRoleOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {editRoleOpen && (
+                    <ul className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
                       {ROLE_OPTIONS.map(role => (
-                        <SelectItem key={role.value} value={role.value}>
+                        <li
+                          key={role.value}
+                          onClick={() => { setEditRole(role.value); setEditRoleOpen(false); }}
+                          className={`px-3 py-2 text-sm cursor-pointer hover:bg-accent ${editRole === role.value ? "bg-accent/50 font-medium" : ""}`}
+                        >
                           {role.label}
-                        </SelectItem>
+                        </li>
                       ))}
-                    </SelectContent>
-                  </Select>
+                    </ul>
+                  )}
                 </div>
                 <div className="relative">
                   <Label>Statut</Label>
