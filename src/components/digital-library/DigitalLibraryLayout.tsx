@@ -1,7 +1,7 @@
 import { ReactNode, useState, useEffect } from "react";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
-import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield } from "lucide-react";
+import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield, Library } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,6 +21,7 @@ import {
 import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
 import { DigitizationRequestDialog } from "@/components/digital-library/DigitizationRequestDialog";
 import { supabase } from "@/integrations/supabase/client";
+import { useElectronicBundles } from "@/hooks/useElectronicBundles";
 
 interface DigitalLibraryLayoutProps {
   children: ReactNode;
@@ -36,6 +37,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [showDigitizationDialog, setShowDigitizationDialog] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const { activeBundles } = useElectronicBundles();
 
   // Charger le profil utilisateur
   useEffect(() => {
@@ -348,6 +350,56 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Bouquets électroniques Dropdown - dynamique depuis la base */}
+            {activeBundles && activeBundles.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    aria-label="Accéder aux bouquets électroniques"
+                    aria-haspopup="true"
+                  >
+                    <Library className="h-4 w-4" aria-hidden="true" />
+                    Bouquets électroniques
+                    <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="bg-card z-50 min-w-[200px]">
+                  <DropdownMenuLabel>Ressources électroniques</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {activeBundles.map((bundle) => (
+                    <DropdownMenuItem 
+                      key={bundle.id} 
+                      className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
+                      onClick={() => {
+                        if (bundle.website_url) {
+                          window.open(bundle.website_url, '_blank');
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        {bundle.provider_logo_url ? (
+                          <img 
+                            src={bundle.provider_logo_url} 
+                            alt={bundle.provider}
+                            className="h-4 w-4 object-contain"
+                          />
+                        ) : (
+                          <Globe className="h-4 w-4" aria-hidden="true" />
+                        )}
+                        <div className="flex flex-col">
+                          <span>{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
+                          <span className="text-xs text-muted-foreground">{bundle.provider}</span>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             <Link to="/digital-library/news">
               <Button 

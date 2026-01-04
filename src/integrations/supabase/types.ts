@@ -4192,6 +4192,123 @@ export type Database = {
         }
         Relationships: []
       }
+      electronic_bundles: {
+        Row: {
+          access_type: string | null
+          api_authentication_type: string | null
+          api_base_url: string | null
+          api_headers: Json | null
+          api_key_name: string | null
+          api_query_params: Json | null
+          categories: string[] | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          description_ar: string | null
+          document_count: number | null
+          fulltext_endpoint: string | null
+          id: string
+          ip_authentication: boolean | null
+          ip_ranges: string[] | null
+          is_active: boolean | null
+          metadata_endpoint: string | null
+          name: string
+          name_ar: string | null
+          notes: string | null
+          provider: string
+          provider_logo_url: string | null
+          proxy_required: boolean | null
+          proxy_url: string | null
+          search_endpoint: string | null
+          sort_order: number | null
+          subjects: string[] | null
+          subscription_end_date: string | null
+          subscription_start_date: string | null
+          supported_formats: string[] | null
+          updated_at: string | null
+          updated_by: string | null
+          website_url: string | null
+        }
+        Insert: {
+          access_type?: string | null
+          api_authentication_type?: string | null
+          api_base_url?: string | null
+          api_headers?: Json | null
+          api_key_name?: string | null
+          api_query_params?: Json | null
+          categories?: string[] | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          description_ar?: string | null
+          document_count?: number | null
+          fulltext_endpoint?: string | null
+          id?: string
+          ip_authentication?: boolean | null
+          ip_ranges?: string[] | null
+          is_active?: boolean | null
+          metadata_endpoint?: string | null
+          name: string
+          name_ar?: string | null
+          notes?: string | null
+          provider: string
+          provider_logo_url?: string | null
+          proxy_required?: boolean | null
+          proxy_url?: string | null
+          search_endpoint?: string | null
+          sort_order?: number | null
+          subjects?: string[] | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          supported_formats?: string[] | null
+          updated_at?: string | null
+          updated_by?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          access_type?: string | null
+          api_authentication_type?: string | null
+          api_base_url?: string | null
+          api_headers?: Json | null
+          api_key_name?: string | null
+          api_query_params?: Json | null
+          categories?: string[] | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          description_ar?: string | null
+          document_count?: number | null
+          fulltext_endpoint?: string | null
+          id?: string
+          ip_authentication?: boolean | null
+          ip_ranges?: string[] | null
+          is_active?: boolean | null
+          metadata_endpoint?: string | null
+          name?: string
+          name_ar?: string | null
+          notes?: string | null
+          provider?: string
+          provider_logo_url?: string | null
+          proxy_required?: boolean | null
+          proxy_url?: string | null
+          search_endpoint?: string | null
+          sort_order?: number | null
+          subjects?: string[] | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          supported_formats?: string[] | null
+          updated_at?: string | null
+          updated_by?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       email_campaign_logs: {
         Row: {
           campaign_id: string | null
