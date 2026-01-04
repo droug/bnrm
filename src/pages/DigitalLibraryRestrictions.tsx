@@ -30,15 +30,7 @@ export default function DigitalLibraryRestrictions() {
   const [reason, setReason] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
 
-  if (rolesLoading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
-  }
-
-  if (!user || (!isAdmin && !isLibrarian)) {
-    return <Navigate to="/" replace />;
-  }
-
-  // Fetch download restrictions with user info
+  // All hooks MUST be called before any conditional returns
   const { data: restrictions, isLoading } = useQuery({
     queryKey: ['download-restrictions'],
     queryFn: async () => {
@@ -49,22 +41,20 @@ export default function DigitalLibraryRestrictions() {
       
       if (error) throw error;
       
-      // Fetch user profiles separately
       const userIds = restrictionsData?.map(r => r.user_id) || [];
       const { data: profiles } = await supabase
         .from('profiles_public')
         .select('id, first_name, last_name')
         .in('id', userIds);
       
-      // Merge the data
       return restrictionsData?.map(restriction => ({
         ...restriction,
         user_profile: profiles?.find(p => p.id === restriction.user_id)
       }));
-    }
+    },
+    enabled: !rolesLoading && !!user && (isAdmin || isLibrarian)
   });
 
-  // Fetch users for restriction
   const { data: users } = useQuery({
     queryKey: ['users-for-restriction'],
     queryFn: async () => {
@@ -75,10 +65,10 @@ export default function DigitalLibraryRestrictions() {
       
       if (error) throw error;
       return data;
-    }
+    },
+    enabled: !rolesLoading && !!user && (isAdmin || isLibrarian)
   });
 
-  // Add restriction mutation
   const addRestrictionMutation = useMutation({
     mutationFn: async () => {
       const restrictionData: any = {
@@ -137,6 +127,15 @@ export default function DigitalLibraryRestrictions() {
       });
     }
   });
+
+  // Conditional returns AFTER all hooks
+  if (rolesLoading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+  }
+
+  if (!user || (!isAdmin && !isLibrarian)) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
