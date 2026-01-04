@@ -13,6 +13,7 @@ import manuscriptPage4 from "@/assets/manuscript-page-4.jpg";
 import { PageFlipBook } from "@/components/book-reader/PageFlipBook";
 import { DocumentSearchInBook } from "@/components/digital-library/DocumentSearchInBook";
 import { SidebarSearchInBook } from "@/components/digital-library/SidebarSearchInBook";
+import { ReproductionAuthChoiceModal } from "@/components/digital-library/ReproductionAuthChoiceModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -52,7 +53,8 @@ import {
   Heart,
   Star,
   AlertCircle,
-  Search
+  Search,
+  FileImage
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -136,6 +138,9 @@ const BookReader = () => {
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [emailAddress, setEmailAddress] = useState("");
+  
+  // Reproduction auth modal
+  const [showReproductionAuthModal, setShowReproductionAuthModal] = useState(false);
   
   const [loading, setLoading] = useState(true);
   const [documentData, setDocumentData] = useState<any>(null);
@@ -1028,6 +1033,27 @@ const BookReader = () => {
                       />
                       {bookmarks.includes(currentPage) ? "Retirer marque-page" : "Ajouter marque-page"}
                     </Button>
+
+                    <Separator className="my-2" />
+
+                    <Button 
+                      variant="default" 
+                      className="w-full justify-start" 
+                      size="sm"
+                      onClick={() => {
+                        if (user) {
+                          // Utilisateur connecté: rediriger vers le formulaire de reproduction
+                          const redirectUrl = `/demande-reproduction?documentId=${encodeURIComponent(id || '')}&documentTitle=${encodeURIComponent(documentData?.title || '')}`;
+                          navigate(redirectUrl);
+                        } else {
+                          // Utilisateur non connecté: afficher la modale d'authentification
+                          setShowReproductionAuthModal(true);
+                        }
+                      }}
+                    >
+                      <FileImage className="h-4 w-4 mr-2" />
+                      Demande de reproduction
+                    </Button>
                   </div>
                 </TabsContent>
 
@@ -1382,6 +1408,14 @@ const BookReader = () => {
           />
         )}
       </div>
+
+      {/* Reproduction Auth Choice Modal */}
+      <ReproductionAuthChoiceModal
+        open={showReproductionAuthModal}
+        onOpenChange={setShowReproductionAuthModal}
+        documentId={id}
+        documentTitle={documentData?.title}
+      />
 
       <Footer />
     </div>
