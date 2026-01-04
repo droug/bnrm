@@ -56,13 +56,17 @@ export default function UsersManager() {
   const [editStatusOpen, setEditStatusOpen] = useState(false);
   const [editRole, setEditRole] = useState<string>("visitor");
   const [editRoleOpen, setEditRoleOpen] = useState(false);
+  const [editRestriction, setEditRestriction] = useState<string>("none");
+  const [editRestrictionOpen, setEditRestrictionOpen] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState<string>("all");
   const roleButtonRef = useRef<HTMLButtonElement>(null);
   const statusButtonRef = useRef<HTMLButtonElement>(null);
+  const restrictionButtonRef = useRef<HTMLButtonElement>(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const [statusDropdownPosition, setStatusDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [restrictionDropdownPosition, setRestrictionDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
@@ -78,8 +82,8 @@ export default function UsersManager() {
       
       if (profilesError) throw profilesError;
       
-      // Fetch roles for each user
-      const usersWithRoles = await Promise.all(
+      // Fetch roles and restrictions for each user
+      const usersWithRolesAndRestrictions = await Promise.all(
         (profilesData || []).map(async (profile) => {
           const { data: roleData } = await supabase
             .from('user_roles')
@@ -88,15 +92,25 @@ export default function UsersManager() {
             .order('granted_at', { ascending: false })
             .limit(1)
             .single();
+
+          // Check for active restriction
+          const { data: restrictionData } = await supabase
+            .from('download_restrictions')
+            .select('restriction_type')
+            .eq('user_id', profile.id)
+            .or('expires_at.is.null,expires_at.gt.now()')
+            .limit(1)
+            .single();
           
           return {
             ...profile,
-            role: roleData?.role || 'visitor'
+            role: roleData?.role || 'visitor',
+            restriction: restrictionData?.restriction_type || 'none'
           };
         })
       );
       
-      return usersWithRoles as Profile[];
+      return usersWithRolesAndRestrictions as (Profile & { restriction: string })[];
     }
   });
 
@@ -234,9 +248,38 @@ export default function UsersManager() {
     createUser.mutate(data);
   };
 
-  const onSubmitEdit = (data: any) => {
+  const onSubmitEdit = async (data: any) => {
     if (editingUser) {
-      updateUser.mutate({ ...data, id: editingUser.id, is_approved: editStatus === "true", role: editRole });
+      // Update user profile
+      await updateUser.mutateAsync({ ...data, id: editingUser.id, is_approved: editStatus === "true", role: editRole });
+      
+      // Handle restriction changes
+      const currentRestriction = (editingUser as any).restriction || 'none';
+      if (editRestriction !== currentRestriction) {
+        if (editRestriction === 'none') {
+          // Remove restriction
+          await supabase
+            .from('download_restrictions')
+            .delete()
+            .eq('user_id', editingUser.id);
+        } else {
+          // Add or update restriction
+          await supabase
+            .from('download_restrictions')
+            .delete()
+            .eq('user_id', editingUser.id);
+          
+          await supabase
+            .from('download_restrictions')
+            .insert({
+              user_id: editingUser.id,
+              restriction_type: editRestriction,
+              reason: editRestriction === 'temporary' ? 'Restriction temporaire' : 'Restriction permanente',
+              created_by: editingUser.id
+            });
+        }
+        queryClient.invalidateQueries({ queryKey: ['bn-users'] });
+      }
     }
   };
 
@@ -245,6 +288,7 @@ export default function UsersManager() {
     if (editingUser) {
       setEditStatus(editingUser.is_approved ? "true" : "false");
       setEditRole(editingUser.role || "visitor");
+      setEditRestriction((editingUser as any).restriction || "none");
     }
   }, [editingUser]);
 
@@ -607,6 +651,61 @@ export default function UsersManager() {
                         className={`px-3 py-2 text-sm cursor-pointer hover:bg-accent ${editStatus === "false" ? "bg-accent/50 font-medium" : ""}`}
                       >
                         En attente
+                      </li>
+                    </ul>,
+                    document.body
+                  )}
+                </div>
+              </div>
+              <div>
+                <Label>Restriction d'accès</Label>
+                <div className="relative">
+                  <button
+                    ref={restrictionButtonRef}
+                    type="button"
+                    onClick={() => {
+                      if (restrictionButtonRef.current) {
+                        const rect = restrictionButtonRef.current.getBoundingClientRect();
+                        setRestrictionDropdownPosition({
+                          top: rect.bottom + window.scrollY,
+                          left: rect.left + window.scrollX,
+                          width: rect.width
+                        });
+                      }
+                      setEditRestrictionOpen(!editRestrictionOpen);
+                    }}
+                    className="w-full flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <span>
+                      {editRestriction === "none" ? "Aucune restriction" : 
+                       editRestriction === "temporary" ? "Temporaire" : "Permanente"}
+                    </span>
+                    <svg className={`w-4 h-4 text-muted-foreground transition-transform ${editRestrictionOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {editRestrictionOpen && createPortal(
+                    <ul 
+                      className="fixed bg-background border border-border rounded-md shadow-lg z-[9999]"
+                      style={{ top: restrictionDropdownPosition.top, left: restrictionDropdownPosition.left, width: restrictionDropdownPosition.width }}
+                    >
+                      <li
+                        onClick={() => { setEditRestriction("none"); setEditRestrictionOpen(false); }}
+                        className={`px-3 py-2 text-sm cursor-pointer hover:bg-accent ${editRestriction === "none" ? "bg-accent/50 font-medium" : ""}`}
+                      >
+                        Aucune restriction
+                      </li>
+                      <li
+                        onClick={() => { setEditRestriction("temporary"); setEditRestrictionOpen(false); }}
+                        className={`px-3 py-2 text-sm cursor-pointer hover:bg-accent ${editRestriction === "temporary" ? "bg-accent/50 font-medium" : ""}`}
+                      >
+                        Temporaire
+                      </li>
+                      <li
+                        onClick={() => { setEditRestriction("permanent"); setEditRestrictionOpen(false); }}
+                        className={`px-3 py-2 text-sm cursor-pointer hover:bg-accent ${editRestriction === "permanent" ? "bg-accent/50 font-medium" : ""}`}
+                      >
+                        Permanente
                       </li>
                     </ul>,
                     document.body
