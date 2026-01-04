@@ -687,14 +687,14 @@ const BookReader = () => {
               </Button>
 
               <Tabs defaultValue="info" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="info">Info</TabsTrigger>
-                  <TabsTrigger value="chapters">Chapitres</TabsTrigger>
-                  <TabsTrigger value="search" className="flex items-center gap-1">
+                <TabsList className="flex flex-wrap h-auto gap-1 p-1">
+                  <TabsTrigger value="info" className="flex-1 min-w-[60px]">Info</TabsTrigger>
+                  <TabsTrigger value="chapters" className="flex-1 min-w-[80px]">Chapitres</TabsTrigger>
+                  <TabsTrigger value="search" className="flex-1 min-w-[90px] flex items-center justify-center gap-1">
                     <Search className="h-3 w-3" />
-                    <span className="hidden sm:inline">Recherche</span>
+                    Recherche
                   </TabsTrigger>
-                  <TabsTrigger value="bookmarks">
+                  <TabsTrigger value="bookmarks" className="px-3">
                     <Bookmark className="h-4 w-4" />
                   </TabsTrigger>
                 </TabsList>
