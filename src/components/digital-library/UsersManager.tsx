@@ -490,7 +490,8 @@ export default function UsersManager() {
       {/* Edit User Dialog */}
       {editingUser && (
         <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-visible">
+            <div className="max-h-[80vh] overflow-y-auto pr-2">
             <DialogHeader>
               <DialogTitle>Modifier l'Utilisateur</DialogTitle>
               <DialogDescription>Mettre à jour les informations et permissions</DialogDescription>
@@ -534,7 +535,7 @@ export default function UsersManager() {
                     </svg>
                   </button>
                   {editRoleOpen && (
-                    <ul className="absolute bottom-full left-0 right-0 mb-1 bg-background border border-border rounded-md shadow-lg z-[100] max-h-60 overflow-y-auto">
+                    <ul className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-[100] max-h-60 overflow-y-auto">
                       {ROLE_OPTIONS.map(role => (
                         <li
                           key={role.value}
@@ -560,7 +561,7 @@ export default function UsersManager() {
                     </svg>
                   </button>
                   {editStatusOpen && (
-                    <ul className="absolute bottom-full left-0 right-0 mb-1 bg-background border border-border rounded-md shadow-lg z-[100]">
+                    <ul className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-[100]">
                       <li
                         onClick={() => { setEditStatus("true"); setEditStatusOpen(false); }}
                         className={`px-3 py-2 text-sm cursor-pointer hover:bg-accent ${editStatus === "true" ? "bg-accent/50 font-medium" : ""}`}
@@ -586,6 +587,7 @@ export default function UsersManager() {
                 </Button>
               </DialogFooter>
             </form>
+            </div>
           </DialogContent>
         </Dialog>
       )}
