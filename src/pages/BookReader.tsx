@@ -244,8 +244,9 @@ const BookReader = () => {
           .maybeSingle();
 
         if (dlData && !dlError) {
+          const pagesCount = dlData.pages_count || 0;
           setIsOcrProcessed(dlData.ocr_processed || false);
-          
+
           // Utiliser les données de digital_library_documents directement
           setDocumentData({
             id: dlData.id,
@@ -253,17 +254,37 @@ const BookReader = () => {
             author: dlData.author || 'Auteur inconnu',
             publication_year: dlData.publication_year,
             document_type: dlData.document_type,
-            excerpt: `Document numérisé - ${dlData.pages_count || 50} pages`,
+            excerpt: `Document numérisé - ${pagesCount || 50} pages`,
           });
-          
-          // Utiliser la couverture du document
-          setDocumentImage(dlData.cover_image_url || manuscriptPage1);
-          
+
           // Définir le nombre de pages
-          if (dlData.pages_count) {
-            setActualTotalPages(dlData.pages_count);
+          if (pagesCount) {
+            setActualTotalPages(pagesCount);
           }
-          
+
+          // Si des images de pages existent dans /public/digital-library-pages/{documentId}/, les utiliser.
+          // (On évite de générer des centaines d'URLs pour les très gros documents.)
+          if (pagesCount > 0 && pagesCount <= 100) {
+            const firstPageUrl = `/digital-library-pages/${dlData.id}/page_1.jpg`;
+            const firstPageExists = await fetch(firstPageUrl, { method: 'HEAD' })
+              .then((r) => r.ok)
+              .catch(() => false);
+
+            if (firstPageExists) {
+              const pages = Array.from({ length: pagesCount }, (_, i) => (
+                `/digital-library-pages/${dlData.id}/page_${i + 1}.jpg`
+              ));
+              setDocumentPages(pages);
+              setDocumentImage(pages[0]);
+            } else {
+              setDocumentPages([]);
+              setDocumentImage(dlData.cover_image_url || manuscriptPage1);
+            }
+          } else {
+            setDocumentPages([]);
+            setDocumentImage(dlData.cover_image_url || manuscriptPage1);
+          }
+
           setLoading(false);
           return;
         }
