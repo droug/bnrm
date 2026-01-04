@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PortalSelect } from "@/components/ui/portal-select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil } from "lucide-react";
@@ -756,21 +757,21 @@ export default function DocumentsManager() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Type de document</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Sélectionner" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="livre">Livre</SelectItem>
-                              <SelectItem value="article">Article</SelectItem>
-                              <SelectItem value="video">Vidéo</SelectItem>
-                              <SelectItem value="audio">Audio</SelectItem>
-                              <SelectItem value="manuscrit">Manuscrit</SelectItem>
-                              <SelectItem value="periodique">Périodique</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <FormControl>
+                            <PortalSelect
+                              placeholder="Sélectionner"
+                              value={field.value}
+                              onChange={field.onChange}
+                              options={[
+                                { value: "livre", label: "Livre" },
+                                { value: "article", label: "Article" },
+                                { value: "video", label: "Vidéo" },
+                                { value: "audio", label: "Audio" },
+                                { value: "manuscrit", label: "Manuscrit" },
+                                { value: "periodique", label: "Périodique" },
+                              ]}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -796,27 +797,17 @@ export default function DocumentsManager() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Source de numérisation</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Sélectionner" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="internal">
-                                <div className="flex flex-col">
-                                  <span className="font-medium">Collections numérisées</span>
-                                  <span className="text-xs text-muted-foreground">Numérisé par la BNRM</span>
-                                </div>
-                              </SelectItem>
-                              <SelectItem value="external">
-                                <div className="flex flex-col">
-                                  <span className="font-medium">Ressources numériques</span>
-                                  <span className="text-xs text-muted-foreground">Reçu déjà numérisé</span>
-                                </div>
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <FormControl>
+                            <PortalSelect
+                              placeholder="Sélectionner"
+                              value={field.value}
+                              onChange={field.onChange}
+                              options={[
+                                { value: "internal", label: "Collections numérisées", description: "Numérisé par la BNRM" },
+                                { value: "external", label: "Ressources numériques", description: "Reçu déjà numérisé" },
+                              ]}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -1027,21 +1018,21 @@ export default function DocumentsManager() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Type de document</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Sélectionner" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="livre">Livre</SelectItem>
-                              <SelectItem value="article">Article</SelectItem>
-                              <SelectItem value="video">Vidéo</SelectItem>
-                              <SelectItem value="audio">Audio</SelectItem>
-                              <SelectItem value="manuscrit">Manuscrit</SelectItem>
-                              <SelectItem value="periodique">Périodique</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <FormControl>
+                            <PortalSelect
+                              placeholder="Sélectionner"
+                              value={field.value}
+                              onChange={field.onChange}
+                              options={[
+                                { value: "livre", label: "Livre" },
+                                { value: "article", label: "Article" },
+                                { value: "video", label: "Vidéo" },
+                                { value: "audio", label: "Audio" },
+                                { value: "manuscrit", label: "Manuscrit" },
+                                { value: "periodique", label: "Périodique" },
+                              ]}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -1067,27 +1058,17 @@ export default function DocumentsManager() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Source de numérisation</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Sélectionner" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="internal">
-                                <div className="flex flex-col">
-                                  <span className="font-medium">Collections numérisées</span>
-                                  <span className="text-xs text-muted-foreground">Numérisé par la BNRM</span>
-                                </div>
-                              </SelectItem>
-                              <SelectItem value="external">
-                                <div className="flex flex-col">
-                                  <span className="font-medium">Ressources numériques</span>
-                                  <span className="text-xs text-muted-foreground">Reçu déjà numérisé</span>
-                                </div>
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <FormControl>
+                            <PortalSelect
+                              placeholder="Sélectionner"
+                              value={field.value}
+                              onChange={field.onChange}
+                              options={[
+                                { value: "internal", label: "Collections numérisées", description: "Numérisé par la BNRM" },
+                                { value: "external", label: "Ressources numériques", description: "Reçu déjà numérisé" },
+                              ]}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
