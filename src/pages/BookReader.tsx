@@ -1130,9 +1130,12 @@ const BookReader = () => {
                   size="sm"
                   onClick={() => {
                     setCurrentPage(1);
-                    // En mode scroll, défiler vers le haut
+                    // En mode scroll, défiler vers le haut du conteneur
                     if (viewMode === "scroll") {
-                      document.getElementById("page-1")?.scrollIntoView({ behavior: "smooth" });
+                      const scrollContainer = document.getElementById("scroll-container");
+                      if (scrollContainer) {
+                        scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+                      }
                     }
                   }}
                   disabled={currentPage === 1}
@@ -1279,7 +1282,7 @@ const BookReader = () => {
 
           {/* Book Display Area */}
           {readingMode === "book" ? (
-            <div className={`flex-1 min-h-0 ${viewMode === "scroll" ? "overflow-y-auto overscroll-contain" : "overflow-hidden"} bg-muted/10 ${viewMode === "scroll" ? "" : "flex items-center justify-center"} p-4 md:p-8`}>
+            <div id="scroll-container" className={`flex-1 min-h-0 ${viewMode === "scroll" ? "overflow-y-auto overscroll-contain" : "overflow-hidden"} bg-muted/10 ${viewMode === "scroll" ? "" : "flex items-center justify-center"} p-4 md:p-8`}>
               {loading ? (
                 <div className="text-center">
                   <p className="text-muted-foreground">Chargement du document...</p>
