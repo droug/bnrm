@@ -351,26 +351,26 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Bouquets électroniques Dropdown - dynamique depuis la base */}
-            {activeBundles && activeBundles.length > 0 && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                    aria-label="Accéder aux bouquets électroniques"
-                    aria-haspopup="true"
-                  >
-                    <Library className="h-4 w-4" aria-hidden="true" />
-                    Bouquets électroniques
-                    <ChevronDown className="h-3 w-3" aria-hidden="true" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="bg-card z-50 min-w-[200px]">
-                  <DropdownMenuLabel>Ressources électroniques</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {activeBundles.map((bundle) => (
+            {/* Bouquets électroniques Dropdown - toujours visible */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  aria-label="Accéder aux bouquets électroniques"
+                  aria-haspopup="true"
+                >
+                  <Library className="h-4 w-4" aria-hidden="true" />
+                  Bouquets électroniques
+                  <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[200px]">
+                <DropdownMenuLabel>Ressources électroniques</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {activeBundles && activeBundles.length > 0 ? (
+                  activeBundles.map((bundle) => (
                     <DropdownMenuItem 
                       key={bundle.id} 
                       className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
@@ -396,10 +396,14 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                         </div>
                       </div>
                     </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+                  ))
+                ) : (
+                  <DropdownMenuItem disabled className="text-muted-foreground text-sm">
+                    Aucun bouquet disponible
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <Link to="/digital-library/news">
               <Button 
