@@ -768,7 +768,7 @@ const BookReader = () => {
             <div className="p-6 space-y-6">
               <Button 
                 variant="outline" 
-                onClick={() => navigate(-1)}
+                onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/bibliotheque-numerique')}
                 className="w-full"
               >
                 <ChevronLeft className="h-4 w-4 mr-2" />

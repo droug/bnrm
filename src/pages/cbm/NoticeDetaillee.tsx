@@ -344,7 +344,7 @@ export default function NoticeDetaillee() {
               }
               navigate(targetRoute, { state: { searchState: location.state.searchState } });
             } else {
-              navigate(-1);
+              window.history.length > 1 ? navigate(-1) : navigate('/cbm');
             }
           }}
         >

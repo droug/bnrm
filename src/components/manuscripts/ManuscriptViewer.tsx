@@ -445,7 +445,7 @@ export function ManuscriptViewer() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-destructive">Manuscrit non trouvé</p>
-          <Button onClick={() => navigate(-1)} className="mt-4">
+          <Button onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/plateforme-manuscrits')} className="mt-4">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Retour
           </Button>
@@ -462,7 +462,7 @@ export function ManuscriptViewer() {
           <div className="flex items-center justify-between gap-4">
             {/* Left: Back button and title */}
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+              <Button variant="ghost" size="sm" onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/plateforme-manuscrits')}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <div className="min-w-0 flex-1">

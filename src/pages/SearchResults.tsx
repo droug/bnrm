@@ -261,7 +261,7 @@ export default function SearchResults() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate(-1)}
+          onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />

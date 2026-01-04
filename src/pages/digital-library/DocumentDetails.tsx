@@ -239,7 +239,7 @@ export default function DocumentDetails() {
             <CardContent className="pt-8 pb-8 text-center">
               <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <p className="text-muted-foreground mb-4">Document non trouvé</p>
-              <Button onClick={() => navigate(-1)}>
+              <Button onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/bibliotheque-numerique')}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Retour
               </Button>
@@ -263,7 +263,7 @@ export default function DocumentDetails() {
         {/* Bouton retour */}
         <Button 
           variant="ghost" 
-          onClick={() => navigate(-1)}
+          onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/bibliotheque-numerique')}
           className="mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />

@@ -371,7 +371,7 @@ export function ReproductionRequestForm() {
 
           {/* Submit Button */}
           <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+            <Button type="button" variant="outline" onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}>
               {language === "ar" ? "إلغاء" : "Annuler"}
             </Button>
             <Button

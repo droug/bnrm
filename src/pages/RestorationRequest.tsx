@@ -642,7 +642,7 @@ export default function RestorationRequest() {
                 variant="outline"
                 onClick={() => {
                   setIsOpen(false);
-                  navigate(-1);
+                  window.history.length > 1 ? navigate(-1) : navigate('/');
                 }}
               >
                 Annuler

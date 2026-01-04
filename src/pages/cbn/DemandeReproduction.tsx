@@ -177,7 +177,13 @@ export default function DemandeReproduction() {
         <Button
           variant="ghost"
           className="mb-6"
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate('/');
+            }
+          }}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour
