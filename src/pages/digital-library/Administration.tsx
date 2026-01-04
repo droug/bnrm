@@ -104,13 +104,6 @@ export default function Administration() {
       color: "bg-cyan-100 text-cyan-600",
     },
     {
-      title: "Restrictions d'accès",
-      description: "Politique de téléchargement",
-      icon: Shield,
-      path: "/admin/digital-library/restrictions",
-      color: "bg-red-100 text-red-600",
-    },
-    {
       title: "Restriction d'accès aux pages",
       description: "Gestion des restrictions par page",
       icon: Lock,
