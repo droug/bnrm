@@ -700,21 +700,6 @@ const BookReader = () => {
                 </TabsList>
 
                 <TabsContent value="info" className="space-y-6 mt-6">
-                  {/* Thumbnail */}
-                  <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg overflow-hidden">
-                    {documentImage ? (
-                      <img 
-                        src={documentImage} 
-                        alt={bookInfo.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <FileText className="h-24 w-24 text-primary/40" />
-                      </div>
-                    )}
-                  </div>
-
                   {/* Book Details */}
                   <div>
                     <Badge variant="secondary" className="mb-3">{bookInfo.collection}</Badge>
