@@ -69,25 +69,16 @@ export default function DigitalLibraryHome() {
     const loadRecentDocuments = async () => {
       setLoading(true);
       try {
+        // Charger depuis digital_library_documents
         const { data, error } = await supabase
-          .from('content')
-          .select('id, title, excerpt, content_type, published_at, file_url, file_type, tags, author_id, featured_image_url')
-          .eq('status', 'published')
-          .order('published_at', { ascending: false })
+          .from('digital_library_documents')
+          .select('id, title, author, publication_year, document_type, cover_image_url, created_at, is_manuscript')
+          .eq('publication_status', 'published')
+          .is('deleted_at', null)
+          .order('created_at', { ascending: false })
           .limit(6);
 
         if (data && !error) {
-          // Charger les informations des auteurs
-          const authorIds = [...new Set(data.map(item => item.author_id).filter(Boolean))];
-          const { data: authorsData } = await supabase
-            .from('profiles')
-            .select('user_id, first_name, last_name')
-            .in('user_id', authorIds);
-
-          const authorsMap = new Map(
-            authorsData?.map(author => [author.user_id, author]) || []
-          );
-
           // Images réelles pour les exemples
           const exampleImages = [document1, document2, document3, document4, document5, document6];
           
@@ -101,28 +92,25 @@ export default function DigitalLibraryHome() {
           };
 
           const formattedItems = data.map((item: any, index: number) => {
-            const author = item.author_id ? authorsMap.get(item.author_id) : null;
-            
-            // Utiliser featured_image_url si elle existe, sinon l'image spécifique par titre, sinon l'image par défaut
-            const thumbnail = item.featured_image_url || titleImageMap[item.title] || exampleImages[index % exampleImages.length];
+            // Utiliser cover_image_url si elle existe, sinon l'image spécifique par titre, sinon l'image par défaut
+            const thumbnail = item.cover_image_url || titleImageMap[item.title] || exampleImages[index % exampleImages.length];
             
             return {
               id: item.id,
               title: item.title,
-              author: author 
-                ? `${author.first_name || ''} ${author.last_name || ''}`.trim() || 'Auteur inconnu'
-                : 'Auteur inconnu',
-              type: item.content_type === 'news' ? 'Article' : 
-                    item.content_type === 'event' ? 'Événement' : 
-                    item.content_type === 'exhibition' ? 'Exposition' : 'Page',
-              date: item.published_at,
-              isAvailable: !!item.file_url,
-              cote: item.file_type || 'DOC',
+              author: item.author || 'Auteur inconnu',
+              type: item.is_manuscript ? 'Manuscrit' : 
+                    item.document_type === 'book' ? 'Livre' : 
+                    item.document_type === 'article' ? 'Article' : 'Document',
+              date: item.created_at,
+              isAvailable: true,
+              cote: item.document_type?.toUpperCase() || 'DOC',
               thumbnail: thumbnail,
+              isManuscript: item.is_manuscript,
             };
           });
           
-          console.log('Loaded documents:', formattedItems);
+          console.log('Loaded digital library documents:', formattedItems);
           setNewItems(formattedItems);
         } else if (error) {
           console.error('Error loading documents:', error);
