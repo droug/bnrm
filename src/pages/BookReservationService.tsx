@@ -77,7 +77,7 @@ export default function BookReservationService() {
         <div className="mb-6 flex items-center justify-between">
           <Button
             variant="ghost"
-            onClick={() => navigate(-1)}
+            onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />

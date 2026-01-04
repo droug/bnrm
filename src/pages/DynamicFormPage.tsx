@@ -76,7 +76,7 @@ export default function DynamicFormPage() {
             onSubmit={handleSubmit}
             submitLabel={language === "ar" ? "إرسال الطلب" : "Soumettre la demande"}
             showBackButton
-            onBack={() => navigate(-1)}
+            onBack={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
           />
         ) : (
           <div className="text-center py-12">

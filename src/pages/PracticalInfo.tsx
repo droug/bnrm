@@ -136,7 +136,7 @@ const PracticalInfo = () => {
           <div className="max-w-3xl animate-fade-in">
             <Button
               variant="ghost"
-              onClick={() => navigate(-1)}
+              onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
               className="text-white hover:bg-white/10 mb-6 -ml-2"
             >
               <ArrowLeft className="mr-2 h-5 w-5" />
