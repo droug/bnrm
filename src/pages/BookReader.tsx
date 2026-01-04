@@ -54,6 +54,7 @@ import {
   Star,
   AlertCircle,
   Search,
+  ChevronsUp,
   FileImage
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
@@ -1125,6 +1126,22 @@ const BookReader = () => {
             <div className="flex items-center justify-between gap-4">
               {/* Navigation Controls */}
               <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    setCurrentPage(1);
+                    // En mode scroll, défiler vers le haut
+                    if (viewMode === "scroll") {
+                      document.getElementById("page-1")?.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }}
+                  disabled={currentPage === 1}
+                  title="Retour à la première page"
+                >
+                  <ChevronsUp className="h-4 w-4" />
+                </Button>
+                
                 <Button 
                   variant="outline" 
                   size="sm"
