@@ -130,6 +130,7 @@ const DigitalLibraryBulkImport = lazy(() => import("./pages/DigitalLibraryBulkIm
 const PageAccessRestrictionsBackoffice = lazy(() => import("./pages/PageAccessRestrictionsBackoffice"));
 const AccessPolicies = lazy(() => import("./pages/AccessPolicies"));
 const ContentManagementPage = lazy(() => import("./pages/ContentManagementPage"));
+const ElectronicBundlesAdmin = lazy(() => import("./pages/digital-library/ElectronicBundlesAdmin"));
 
 // Reproduction (lazy)
 const ReproductionPage = lazy(() => import("./pages/ReproductionPage"));
@@ -352,6 +353,7 @@ const App = () => {
           <Route path="/admin/digital-library/page-restrictions" element={<PageAccessRestrictionsBackoffice />} />
           <Route path="/admin/digital-library/settings" element={<DigitalLibraryAdminSettings />} />
           <Route path="/admin/digital-library/requests-management" element={<RequestsManagement />} />
+          <Route path="/admin/digital-library/electronic-bundles" element={<ElectronicBundlesAdmin />} />
           <Route path="/access-policies" element={<AccessPolicies />} />
           <Route path="/politiques-acces" element={<AccessPolicies />} />
           <Route path="/admin/professional-management" element={<ProfessionalManagement />} />
