@@ -28,11 +28,19 @@ import {
   Wand2,
   Image
 } from "lucide-react";
+import Tesseract from "tesseract.js";
 
 interface OcrPage {
   page_number: number;
   ocr_text: string;
 }
+
+const TESSERACT_LANG_MAP: Record<string, string> = {
+  ar: "ara",
+  fr: "fra",
+  en: "eng",
+  mixed: "ara+fra+eng",
+};
 
 export default function OcrImportTool() {
   const { toast } = useToast();
@@ -261,75 +269,77 @@ export default function OcrImportTool() {
     }
   };
 
-  // OCR automatique avec Qwen2-VL
+  // OCR automatique local avec Tesseract.js (open-source, sans API)
   const handleAutoOcrUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     setIsProcessing(true);
     setProgress(0);
-    setOcrProcessingStatus("Préparation des images...");
+    setOcrProcessingStatus("Initialisation du moteur OCR local...");
 
     try {
       const pages: OcrPage[] = [];
       const fileArray = Array.from(files).sort((a, b) => a.name.localeCompare(b.name));
-      
+      const tesseractLang = TESSERACT_LANG_MAP[ocrLanguage] ?? "eng";
+
       for (let i = 0; i < fileArray.length; i++) {
         const file = fileArray[i];
-        
+
         // Extraire le numéro de page du nom de fichier
         const match = file.name.match(/(\d+)/);
         const pageNum = match ? parseInt(match[1]) : i + 1;
-        
-        setOcrProcessingStatus(`Traitement OCR de la page ${pageNum}...`);
-        
+
+        setOcrProcessingStatus(`OCR local (Tesseract) : page ${pageNum}...`);
+
         // Convertir l'image en base64
         const base64 = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
-          reader.onload = () => {
-            const result = reader.result as string;
-            resolve(result);
-          };
+          reader.onload = () => resolve(reader.result as string);
           reader.onerror = reject;
           reader.readAsDataURL(file);
         });
 
-        // Appeler l'edge function Qwen-OCR
         try {
-          const { data, error } = await supabase.functions.invoke('qwen-ocr', {
-            body: { 
-              image: base64,
-              language: ocrLanguage 
-            }
+          let lastPct = -1;
+          const result = await Tesseract.recognize(base64, tesseractLang, {
+            logger: (m) => {
+              if (m.status === "recognizing text") {
+                const pct = Math.round((m.progress ?? 0) * 100);
+                if (pct !== lastPct) {
+                  lastPct = pct;
+                  setOcrProcessingStatus(`OCR local (Tesseract) : page ${pageNum}... ${pct}%`);
+                }
+              }
+            },
           });
 
-          if (error) {
-            console.error(`OCR error for page ${pageNum}:`, error);
-            toast({
-              title: `Erreur OCR page ${pageNum}`,
-              description: error.message,
-              variant: "destructive"
-            });
-          } else if (data?.text) {
-            pages.push({ page_number: pageNum, ocr_text: data.text.trim() });
+          const text = result?.data?.text?.trim?.() ?? "";
+          if (text) {
+            pages.push({ page_number: pageNum, ocr_text: text });
           }
         } catch (ocrError: any) {
-          console.error(`OCR failed for page ${pageNum}:`, ocrError);
+          console.error(`OCR local failed for page ${pageNum}:`, ocrError);
+          toast({
+            title: `Erreur OCR page ${pageNum}`,
+            description: ocrError?.message ?? "Erreur inconnue",
+            variant: "destructive",
+          });
         }
-        
+
         setProgress(Math.round(((i + 1) / fileArray.length) * 100));
       }
-      
+
       if (pages.length > 0) {
         setOcrPages(pages.sort((a, b) => a.page_number - b.page_number));
         toast({
           title: "OCR terminé",
-          description: `${pages.length} pages traitées avec succès`
+          description: `${pages.length} pages traitées avec succès (OCR local)`
         });
       } else {
         toast({
           title: "Aucun texte extrait",
-          description: "L'OCR n'a pas pu extraire de texte des images",
+          description: "L'OCR local n'a pas pu extraire de texte des images",
           variant: "destructive"
         });
       }
@@ -495,10 +505,9 @@ export default function OcrImportTool() {
               <TabsContent value="auto" className="space-y-4">
                 <Alert className="bg-primary/5 border-primary/20">
                   <Wand2 className="h-4 w-4 text-primary" />
-                  <AlertTitle>OCR automatique avec Qwen2-VL</AlertTitle>
+                  <AlertTitle>OCR automatique (local) - Tesseract.js</AlertTitle>
                   <AlertDescription>
-                    Utilisez l'IA Qwen2-VL pour extraire automatiquement le texte des images de pages.
-                    Supporte l'arabe, le français et les scripts mixtes.
+                    OCR open-source exécuté dans votre navigateur (sans clé API). Plus lent selon votre machine.
                   </AlertDescription>
                 </Alert>
                 
