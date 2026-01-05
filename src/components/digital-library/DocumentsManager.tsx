@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil, Wand2, Loader2, FileSearch, CheckCircle2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import OcrImportTool from "@/components/digital-library/import/OcrImportTool";
+import PdfOcrTool from "@/components/digital-library/import/PdfOcrTool";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -1669,7 +1670,18 @@ export default function DocumentsManager() {
         </TabsContent>
 
         <TabsContent value="ocr" className="space-y-6">
-          <OcrImportTool />
+          <Tabs defaultValue="pdf" className="w-full">
+            <TabsList>
+              <TabsTrigger value="pdf">OCR de PDF</TabsTrigger>
+              <TabsTrigger value="manual">Import manuel</TabsTrigger>
+            </TabsList>
+            <TabsContent value="pdf" className="mt-4">
+              <PdfOcrTool />
+            </TabsContent>
+            <TabsContent value="manual" className="mt-4">
+              <OcrImportTool />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="duplicates" className="space-y-6">
