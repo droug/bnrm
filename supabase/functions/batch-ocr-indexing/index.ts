@@ -191,7 +191,32 @@ serve(async (req) => {
       for (const pageNum of missingPages) {
         if (totalPagesProcessed >= MAX_PAGES_PER_RUN) break;
 
-        const imageUrl = `${baseUrl}/digital-library-pages/${doc.id}/page_${pageNum}.jpg`;
+        // Essayer différents formats de nommage
+        const possibleUrls = [
+          `${baseUrl}/digital-library-pages/${doc.id}/page_${pageNum}.jpg`,
+          `${baseUrl}/digital-library-pages/${doc.id}/page_${pageNum}.png`,
+          `${baseUrl}/digital-library-pages/${doc.id}/img_p${pageNum}_1.jpg`,
+          `${baseUrl}/digital-library-pages/${doc.id}/img_p${pageNum}_1.png`,
+        ];
+
+        let imageUrl = '';
+        for (const url of possibleUrls) {
+          try {
+            const checkResponse = await fetch(url, { method: 'HEAD' });
+            if (checkResponse.ok) {
+              imageUrl = url;
+              break;
+            }
+          } catch {
+            // Continue to next URL
+          }
+        }
+
+        if (!imageUrl) {
+          console.log(`Page ${pageNum}: No image found`);
+          docResults.pagesSkipped++;
+          continue;
+        }
         
         try {
           console.log(`Processing page ${pageNum}/${doc.pages_count} of ${doc.title}`);
