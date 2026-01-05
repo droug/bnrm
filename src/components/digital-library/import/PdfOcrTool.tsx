@@ -48,7 +48,7 @@ export default function PdfOcrTool() {
     try {
       const { data, error } = await supabase
         .from('digital_library_documents')
-        .select('id, title, total_pages')
+        .select('id, title, pages_count')
         .order('title');
       
       if (error) throw error;
@@ -443,7 +443,7 @@ export default function PdfOcrTool() {
                   ) : (
                     documents.map(doc => (
                       <SelectItem key={doc.id} value={doc.id}>
-                        {doc.title} ({doc.total_pages || '?'} pages)
+                        {doc.title} ({doc.pages_count || '?'} pages)
                       </SelectItem>
                     ))
                   )}
