@@ -6,7 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const DASHSCOPE_API_KEY = Deno.env.get('DASHSCOPE_API_KEY');
 
 // Alibaba Cloud DashScope API endpoint for Qwen-VL-OCR
 const DASHSCOPE_API_URL = 'https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
@@ -24,7 +23,9 @@ serve(async (req) => {
       throw new Error('No image data provided');
     }
 
-    if (!DASHSCOPE_API_KEY) {
+    // Read secret per-request so updates take effect without a redeploy/restart.
+    const dashscopeApiKey = (Deno.env.get('DASHSCOPE_API_KEY') ?? '').trim();
+    if (!dashscopeApiKey) {
       throw new Error('DASHSCOPE_API_KEY is not configured');
     }
 
@@ -67,7 +68,7 @@ serve(async (req) => {
     const response = await fetch(DASHSCOPE_API_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${DASHSCOPE_API_KEY}`,
+        'Authorization': `Bearer ${dashscopeApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
