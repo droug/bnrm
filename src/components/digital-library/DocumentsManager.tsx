@@ -2115,13 +2115,17 @@ export default function DocumentsManager() {
               <Label htmlFor="ocr-base-url">URL de base des images *</Label>
               <Input
                 id="ocr-base-url"
-                placeholder="https://example.com/images/document/"
+                placeholder="https://storage.example.com"
                 value={ocrBaseUrl}
                 onChange={(e) => setOcrBaseUrl(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">
-                L'URL de base où se trouvent les images des pages (ex: page_1.jpg, page_2.jpg...)
-              </p>
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p><strong>Formats d'URL recherchés :</strong></p>
+                <ul className="list-disc list-inside ml-2 space-y-0.5">
+                  <li>{ocrBaseUrl || "https://..."}/digital-library-pages/{ocrDocumentTarget?.id?.slice(0, 8)}.../<strong>page_1.jpg</strong></li>
+                  <li>{ocrBaseUrl || "https://..."}/digital-library-pages/{ocrDocumentTarget?.id?.slice(0, 8)}.../<strong>img_p1_1.jpg</strong></li>
+                </ul>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="ocr-language">Langue du document</Label>
@@ -2138,9 +2142,12 @@ export default function DocumentsManager() {
               </Select>
             </div>
             {ocrDocumentTarget?.pages_count && (
-              <div className="p-3 bg-muted rounded-lg">
+              <div className="p-3 bg-muted rounded-lg space-y-1">
                 <p className="text-sm">
                   <strong>Nombre de pages:</strong> {ocrDocumentTarget.pages_count}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Les images doivent être nommées page_1.jpg, page_2.jpg... ou img_p1_1.jpg, img_p2_1.jpg...
                 </p>
               </div>
             )}
