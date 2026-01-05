@@ -7,8 +7,10 @@ const corsHeaders = {
 };
 
 
-// Alibaba Cloud DashScope API endpoint for Qwen-VL-OCR
-const DASHSCOPE_API_URL = 'https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
+// Alibaba Cloud DashScope API endpoints for Qwen-VL-OCR
+// Note: some accounts/keys are region-bound; we try both Intl and CN endpoints.
+const DASHSCOPE_API_URL_INTL = 'https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
+const DASHSCOPE_API_URL_CN = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -65,19 +67,42 @@ serve(async (req) => {
 
     console.log('Sending request to DashScope API...');
 
-    const response = await fetch(DASHSCOPE_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${dashscopeApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+    const urlCandidates = Array.from(
+      new Set(
+        [
+          (Deno.env.get('DASHSCOPE_API_URL') ?? '').trim(),
+          DASHSCOPE_API_URL_INTL,
+          DASHSCOPE_API_URL_CN,
+        ].filter(Boolean)
+      )
+    );
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('DashScope API error:', response.status, errorText);
-      throw new Error(`DashScope API error: ${response.status} - ${errorText}`);
+    let response: Response | null = null;
+    let lastErrorText = '';
+    let lastStatus = 500;
+
+    for (const apiUrl of urlCandidates) {
+      const r = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${dashscopeApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (r.ok) {
+        response = r;
+        break;
+      }
+
+      lastStatus = r.status;
+      lastErrorText = await r.text();
+      console.error('DashScope API error:', { apiUrl, status: r.status, bodyPreview: lastErrorText.slice(0, 300) });
+    }
+
+    if (!response) {
+      throw new Error(`DashScope API error: ${lastStatus} - ${lastErrorText}`);
     }
 
     const result = await response.json();
@@ -112,13 +137,15 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in qwen-ocr function:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const status = errorMessage.includes('DashScope API error: 401') ? 401 : 500;
+
     return new Response(
       JSON.stringify({
         error: errorMessage,
         text: ''
       }),
       {
-        status: 500,
+        status,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
