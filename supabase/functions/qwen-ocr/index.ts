@@ -12,6 +12,28 @@ const corsHeaders = {
 const DASHSCOPE_API_URL_INTL = 'https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
 const DASHSCOPE_API_URL_CN = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
 
+function normalizeDashscopeApiKey(raw: string | null): string {
+  let v = (raw ?? '').trim();
+  if (!v) return '';
+
+  // Common paste mistakes:
+  // - "Bearer sk-..."
+  // - "DASHSCOPE_API_KEY=sk-..."
+  // - quoted values
+  if (v.includes('=') && !v.startsWith('sk-')) {
+    const parts = v.split('=');
+    v = (parts[parts.length - 1] ?? '').trim();
+  }
+
+  if (/^bearer\s+/i.test(v)) {
+    v = v.replace(/^bearer\s+/i, '').trim();
+  }
+
+  v = v.replace(/^['"]+|['"]+$/g, '').trim();
+
+  return v;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -25,11 +47,13 @@ serve(async (req) => {
       throw new Error('No image data provided');
     }
 
-    // Read secret per-request so updates take effect without a redeploy/restart.
-    const dashscopeApiKey = (Deno.env.get('DASHSCOPE_API_KEY') ?? '').trim();
+    // Read secret per-request so updates take effect quickly.
+    const dashscopeApiKey = normalizeDashscopeApiKey(Deno.env.get('DASHSCOPE_API_KEY'));
     if (!dashscopeApiKey) {
-      throw new Error('DASHSCOPE_API_KEY is not configured');
+      throw new Error('DASHSCOPE_API_KEY is not configured (expected a DashScope API Key, usually starting with "sk-")');
     }
+
+    console.log('DashScope key loaded:', { length: dashscopeApiKey.length, prefix: dashscopeApiKey.slice(0, 4) });
 
     console.log('Processing OCR request with Qwen-VL for language:', language);
 
