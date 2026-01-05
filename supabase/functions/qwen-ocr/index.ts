@@ -122,7 +122,16 @@ serve(async (req) => {
 
       lastStatus = r.status;
       lastErrorText = await r.text();
-      console.error('DashScope API error:', { apiUrl, status: r.status, bodyPreview: lastErrorText.slice(0, 300) });
+      console.error('DashScope API error:', {
+        apiUrl,
+        status: r.status,
+        keyHint: {
+          length: dashscopeApiKey.length,
+          prefix: dashscopeApiKey.slice(0, 4),
+          startsWithSk: dashscopeApiKey.startsWith('sk-'),
+        },
+        bodyPreview: lastErrorText.slice(0, 300),
+      });
     }
 
     if (!response) {
