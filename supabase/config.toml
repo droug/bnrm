@@ -93,3 +93,6 @@ verify_jwt = true
 
 [functions.cms-webhooks]
 verify_jwt = false
+
+[functions.qwen-ocr]
+verify_jwt = true

@@ -23,7 +23,10 @@ import {
   Loader2,
   Plus,
   Trash2,
-  BookOpen
+  BookOpen,
+  Languages,
+  Wand2,
+  Image
 } from "lucide-react";
 
 interface OcrPage {
@@ -42,6 +45,9 @@ export default function OcrImportTool() {
   const [progress, setProgress] = useState(0);
   const [bulkOcrText, setBulkOcrText] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [ocrLanguage, setOcrLanguage] = useState<string>("ar");
+  const [ocrProcessingStatus, setOcrProcessingStatus] = useState<string>("");
 
   // Récupérer les documents de la bibliothèque numérique
   const { data: documents, isLoading: loadingDocuments } = useQuery({
@@ -255,6 +261,96 @@ export default function OcrImportTool() {
     }
   };
 
+  // OCR automatique avec Qwen2-VL
+  const handleAutoOcrUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsProcessing(true);
+    setProgress(0);
+    setOcrProcessingStatus("Préparation des images...");
+
+    try {
+      const pages: OcrPage[] = [];
+      const fileArray = Array.from(files).sort((a, b) => a.name.localeCompare(b.name));
+      
+      for (let i = 0; i < fileArray.length; i++) {
+        const file = fileArray[i];
+        
+        // Extraire le numéro de page du nom de fichier
+        const match = file.name.match(/(\d+)/);
+        const pageNum = match ? parseInt(match[1]) : i + 1;
+        
+        setOcrProcessingStatus(`Traitement OCR de la page ${pageNum}...`);
+        
+        // Convertir l'image en base64
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result as string;
+            resolve(result);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        // Appeler l'edge function Qwen-OCR
+        try {
+          const { data, error } = await supabase.functions.invoke('qwen-ocr', {
+            body: { 
+              image: base64,
+              language: ocrLanguage 
+            }
+          });
+
+          if (error) {
+            console.error(`OCR error for page ${pageNum}:`, error);
+            toast({
+              title: `Erreur OCR page ${pageNum}`,
+              description: error.message,
+              variant: "destructive"
+            });
+          } else if (data?.text) {
+            pages.push({ page_number: pageNum, ocr_text: data.text.trim() });
+          }
+        } catch (ocrError: any) {
+          console.error(`OCR failed for page ${pageNum}:`, ocrError);
+        }
+        
+        setProgress(Math.round(((i + 1) / fileArray.length) * 100));
+      }
+      
+      if (pages.length > 0) {
+        setOcrPages(pages.sort((a, b) => a.page_number - b.page_number));
+        toast({
+          title: "OCR terminé",
+          description: `${pages.length} pages traitées avec succès`
+        });
+      } else {
+        toast({
+          title: "Aucun texte extrait",
+          description: "L'OCR n'a pas pu extraire de texte des images",
+          variant: "destructive"
+        });
+      }
+    } catch (error: any) {
+      console.error('Auto OCR error:', error);
+      toast({
+        title: "Erreur OCR",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+      setProgress(0);
+      setOcrProcessingStatus("");
+      // Reset file input
+      if (imageInputRef.current) {
+        imageInputRef.current.value = '';
+      }
+    }
+  };
+
   const handleSaveOcr = async () => {
     const validPages = ocrPages.filter(p => p.ocr_text.trim());
     if (validPages.length === 0) {
@@ -385,12 +481,101 @@ export default function OcrImportTool() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="manual" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-3">
+            <Tabs defaultValue="auto" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="auto">
+                  <Wand2 className="h-4 w-4 mr-1" />
+                  OCR Auto
+                </TabsTrigger>
                 <TabsTrigger value="manual">Saisie manuelle</TabsTrigger>
                 <TabsTrigger value="bulk">Texte en masse</TabsTrigger>
                 <TabsTrigger value="files">Fichiers texte</TabsTrigger>
               </TabsList>
+              
+              <TabsContent value="auto" className="space-y-4">
+                <Alert className="bg-primary/5 border-primary/20">
+                  <Wand2 className="h-4 w-4 text-primary" />
+                  <AlertTitle>OCR automatique avec Qwen2-VL</AlertTitle>
+                  <AlertDescription>
+                    Utilisez l'IA Qwen2-VL pour extraire automatiquement le texte des images de pages.
+                    Supporte l'arabe, le français et les scripts mixtes.
+                  </AlertDescription>
+                </Alert>
+                
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Langue principale</Label>
+                    <Select value={ocrLanguage} onValueChange={setOcrLanguage}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ar">
+                          <span className="flex items-center gap-2">
+                            <Languages className="h-4 w-4" />
+                            Arabe (العربية)
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="fr">
+                          <span className="flex items-center gap-2">
+                            <Languages className="h-4 w-4" />
+                            Français
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="mixed">
+                          <span className="flex items-center gap-2">
+                            <Languages className="h-4 w-4" />
+                            Mixte (Arabe + Français)
+                          </span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div 
+                  className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                  onClick={() => imageInputRef.current?.click()}
+                >
+                  <Image className="h-10 w-10 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-sm font-medium">Cliquez pour sélectionner des images</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Formats supportés : JPG, PNG, WEBP, TIFF
+                  </p>
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleAutoOcrUpload}
+                    className="hidden"
+                  />
+                </div>
+                
+                {isProcessing && (
+                  <div className="space-y-3 p-4 bg-muted/30 rounded-lg">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium">Traitement OCR en cours...</span>
+                      <span>{progress}%</span>
+                    </div>
+                    <Progress value={progress} />
+                    {ocrProcessingStatus && (
+                      <p className="text-xs text-muted-foreground">{ocrProcessingStatus}</p>
+                    )}
+                  </div>
+                )}
+                
+                {ocrPages.some(p => p.ocr_text.trim()) && !isProcessing && (
+                  <Alert className="bg-green-50 border-green-200">
+                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    <AlertTitle className="text-green-800">OCR terminé</AlertTitle>
+                    <AlertDescription className="text-green-700">
+                      {ocrPages.filter(p => p.ocr_text.trim()).length} pages ont été traitées avec succès.
+                      Vérifiez les résultats dans l'onglet "Saisie manuelle" puis cliquez sur "Indexer".
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </TabsContent>
               
               <TabsContent value="manual" className="space-y-4">
                 <div className="flex justify-between items-center">
