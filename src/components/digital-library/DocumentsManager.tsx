@@ -69,6 +69,10 @@ export default function DocumentsManager() {
   const [batchOcrRunning, setBatchOcrRunning] = useState(false);
   const [batchOcrResult, setBatchOcrResult] = useState<any>(null);
   const [ocrProcessingDocId, setOcrProcessingDocId] = useState<string | null>(null);
+  const [showOcrDialog, setShowOcrDialog] = useState(false);
+  const [ocrDocumentTarget, setOcrDocumentTarget] = useState<any>(null);
+  const [ocrBaseUrl, setOcrBaseUrl] = useState("");
+  const [ocrLanguage, setOcrLanguage] = useState("ar");
 
   // Exemple de doublons détectés
   const sampleDuplicates = [
@@ -354,24 +358,44 @@ export default function DocumentsManager() {
     }
   });
 
-  // OCR individuel pour un document
-  const handleSingleDocOcr = async (doc: any) => {
-    if (!doc.base_url) {
+  // Ouvrir le dialogue OCR pour un document
+  const openOcrDialog = (doc: any) => {
+    setOcrDocumentTarget(doc);
+    setOcrBaseUrl(doc.base_url || "");
+    setOcrLanguage(doc.language || "ar");
+    setShowOcrDialog(true);
+  };
+
+  // Lancer l'OCR avec les paramètres du dialogue
+  const runOcrForDocument = async () => {
+    if (!ocrDocumentTarget) return;
+    
+    if (!ocrBaseUrl.trim()) {
       toast({
         title: "Erreur",
-        description: "Ce document n'a pas de base_url configurée pour les images",
+        description: "Veuillez saisir l'URL de base des images",
         variant: "destructive"
       });
       return;
     }
 
-    setOcrProcessingDocId(doc.id);
+    setShowOcrDialog(false);
+    setOcrProcessingDocId(ocrDocumentTarget.id);
+    
     try {
+      // Mettre à jour le base_url du document si différent
+      if (ocrBaseUrl !== ocrDocumentTarget.base_url) {
+        await supabase
+          .from('digital_library_documents')
+          .update({ base_url: ocrBaseUrl, language: ocrLanguage })
+          .eq('id', ocrDocumentTarget.id);
+      }
+
       const { data, error } = await supabase.functions.invoke('batch-ocr-indexing', {
         body: {
-          documentId: doc.id,
-          language: doc.language || 'ar',
-          baseUrl: doc.base_url
+          documentId: ocrDocumentTarget.id,
+          language: ocrLanguage,
+          baseUrl: ocrBaseUrl
         }
       });
 
@@ -380,7 +404,7 @@ export default function DocumentsManager() {
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
       toast({
         title: "OCR terminé",
-        description: `${data?.processedPages || 0} pages traitées pour "${doc.title}"`
+        description: `${data?.processedPages || 0} pages traitées pour "${ocrDocumentTarget.title}"`
       });
     } catch (error: any) {
       toast({
@@ -390,6 +414,7 @@ export default function DocumentsManager() {
       });
     } finally {
       setOcrProcessingDocId(null);
+      setOcrDocumentTarget(null);
     }
   };
 
@@ -1493,7 +1518,7 @@ export default function DocumentsManager() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleSingleDocOcr(doc)}
+                          onClick={() => openOcrDialog(doc)}
                           disabled={ocrProcessingDocId === doc.id}
                           title="Lancer l'OCR"
                         >
@@ -2075,6 +2100,62 @@ export default function DocumentsManager() {
           </Dialog>
         </TabsContent>
       </Tabs>
+
+      {/* OCR Dialog */}
+      <Dialog open={showOcrDialog} onOpenChange={setShowOcrDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Configuration OCR</DialogTitle>
+            <DialogDescription>
+              Configurez les paramètres pour l'OCR du document "{ocrDocumentTarget?.title}"
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="ocr-base-url">URL de base des images *</Label>
+              <Input
+                id="ocr-base-url"
+                placeholder="https://example.com/images/document/"
+                value={ocrBaseUrl}
+                onChange={(e) => setOcrBaseUrl(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                L'URL de base où se trouvent les images des pages (ex: page_1.jpg, page_2.jpg...)
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ocr-language">Langue du document</Label>
+              <Select value={ocrLanguage} onValueChange={setOcrLanguage}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner la langue" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ar">Arabe</SelectItem>
+                  <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="en">Anglais</SelectItem>
+                  <SelectItem value="mixed">Mixte (Arabe/Français)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {ocrDocumentTarget?.pages_count && (
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-sm">
+                  <strong>Nombre de pages:</strong> {ocrDocumentTarget.pages_count}
+                </p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowOcrDialog(false)}>
+              Annuler
+            </Button>
+            <Button onClick={runOcrForDocument} disabled={!ocrBaseUrl.trim()}>
+              <Wand2 className="h-4 w-4 mr-2" />
+              Lancer l'OCR
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
