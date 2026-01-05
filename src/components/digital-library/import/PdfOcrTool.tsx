@@ -11,13 +11,23 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { FileUp, Loader2, FileText, CheckCircle2, AlertCircle, Download, Copy } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import Tesseract from 'tesseract.js';
 
 interface PageOcrResult {
   pageNumber: number;
   text: string;
   status: 'pending' | 'processing' | 'success' | 'error';
   error?: string;
+  confidence?: number;
 }
+
+// Map language codes to Tesseract language codes
+const TESSERACT_LANG_MAP: Record<string, string> = {
+  'ar': 'ara',
+  'fr': 'fra',
+  'en': 'eng',
+  'mixed': 'ara+fra+eng'
+};
 
 export default function PdfOcrTool() {
   const { toast } = useToast();
@@ -26,6 +36,7 @@ export default function PdfOcrTool() {
   const [language, setLanguage] = useState<string>("ar");
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentPageProgress, setCurrentPageProgress] = useState(0);
   const [pageResults, setPageResults] = useState<PageOcrResult[]>([]);
   const [selectedDocumentId, setSelectedDocumentId] = useState<string>("");
   const [documents, setDocuments] = useState<any[]>([]);
@@ -61,6 +72,7 @@ export default function PdfOcrTool() {
       setSelectedFile(file);
       setPageResults([]);
       setProgress(0);
+      setCurrentPageProgress(0);
     } else {
       toast({
         title: "Format invalide",
@@ -73,7 +85,7 @@ export default function PdfOcrTool() {
   // Convert PDF page to image using canvas
   const convertPdfPageToImage = async (pdfDoc: any, pageNum: number): Promise<string> => {
     const page = await pdfDoc.getPage(pageNum);
-    const scale = 2.0; // Higher scale for better OCR
+    const scale = 2.5; // Higher scale for better OCR accuracy
     const viewport = page.getViewport({ scale });
     
     const canvas = document.createElement('canvas');
@@ -89,19 +101,42 @@ export default function PdfOcrTool() {
     return canvas.toDataURL('image/png');
   };
 
+  // Perform OCR using Tesseract.js (local, open-source)
+  const performLocalOcr = async (imageData: string, lang: string): Promise<{ text: string; confidence: number }> => {
+    const tesseractLang = TESSERACT_LANG_MAP[lang] || 'eng';
+    
+    const result = await Tesseract.recognize(
+      imageData,
+      tesseractLang,
+      {
+        logger: (m) => {
+          if (m.status === 'recognizing text') {
+            setCurrentPageProgress(Math.round(m.progress * 100));
+          }
+        }
+      }
+    );
+    
+    return {
+      text: result.data.text.trim(),
+      confidence: result.data.confidence
+    };
+  };
+
   // Process PDF with OCR
   const processPdf = async () => {
     if (!selectedFile) return;
 
     setIsProcessing(true);
     setProgress(0);
+    setCurrentPageProgress(0);
     setPageResults([]);
 
     try {
       // Dynamically import PDF.js
       const pdfjsLib = await import('pdfjs-dist');
       
-      // Configure worker - use unpkg as fallback for better compatibility
+      // Configure worker
       pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
       // Load PDF
@@ -118,28 +153,32 @@ export default function PdfOcrTool() {
       }));
       setPageResults(initialResults);
 
+      toast({
+        title: "OCR local en cours",
+        description: `Utilisation de Tesseract.js (open-source) - ${numPages} pages à traiter`,
+      });
+
       // Process each page
       for (let i = 1; i <= numPages; i++) {
         setPageResults(prev => prev.map(r => 
           r.pageNumber === i ? { ...r, status: 'processing' } : r
         ));
+        setCurrentPageProgress(0);
 
         try {
           // Convert page to image
           const imageData = await convertPdfPageToImage(pdfDoc, i);
 
-          // Call OCR function
-          const { data, error } = await supabase.functions.invoke('qwen-ocr', {
-            body: {
-              image: imageData,
-              language: language
-            }
-          });
-
-          if (error) throw error;
+          // Perform local OCR with Tesseract.js
+          const { text, confidence } = await performLocalOcr(imageData, language);
 
           setPageResults(prev => prev.map(r => 
-            r.pageNumber === i ? { ...r, text: data.text || '', status: 'success' } : r
+            r.pageNumber === i ? { 
+              ...r, 
+              text: text || '', 
+              status: 'success',
+              confidence: Math.round(confidence)
+            } : r
           ));
 
         } catch (pageError: any) {
@@ -150,16 +189,11 @@ export default function PdfOcrTool() {
         }
 
         setProgress(Math.round((i / numPages) * 100));
-        
-        // Small delay to avoid rate limiting
-        if (i < numPages) {
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
       }
 
       toast({
         title: "OCR terminé",
-        description: `${numPages} pages traitées`
+        description: `${numPages} pages traitées avec Tesseract.js (local)`
       });
 
     } catch (error: any) {
@@ -266,6 +300,9 @@ export default function PdfOcrTool() {
 
   const successCount = pageResults.filter(r => r.status === 'success').length;
   const errorCount = pageResults.filter(r => r.status === 'error').length;
+  const avgConfidence = pageResults.filter(r => r.confidence).length > 0
+    ? Math.round(pageResults.filter(r => r.confidence).reduce((sum, r) => sum + (r.confidence || 0), 0) / pageResults.filter(r => r.confidence).length)
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -274,9 +311,10 @@ export default function PdfOcrTool() {
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
             OCR automatique de PDF
+            <Badge variant="secondary" className="ml-2">Tesseract.js - Local</Badge>
           </CardTitle>
           <CardDescription>
-            Uploadez un fichier PDF pour extraire automatiquement le texte de chaque page via OCR
+            Uploadez un fichier PDF pour extraire automatiquement le texte de chaque page via OCR local (open-source, sans API)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -311,9 +349,12 @@ export default function PdfOcrTool() {
                 <SelectItem value="ar">Arabe</SelectItem>
                 <SelectItem value="fr">Français</SelectItem>
                 <SelectItem value="en">Anglais</SelectItem>
-                <SelectItem value="mixed">Mixte</SelectItem>
+                <SelectItem value="mixed">Mixte (AR+FR+EN)</SelectItem>
               </SelectContent>
             </Select>
+            <p className="text-xs text-muted-foreground">
+              Tesseract.js téléchargera les modèles de langue nécessaires automatiquement (~15 Mo par langue)
+            </p>
           </div>
 
           {/* Process Button */}
@@ -330,14 +371,25 @@ export default function PdfOcrTool() {
             ) : (
               <>
                 <FileUp className="mr-2 h-4 w-4" />
-                Lancer l'OCR
+                Lancer l'OCR (Local)
               </>
             )}
           </Button>
 
           {/* Progress */}
           {isProcessing && (
-            <Progress value={progress} className="w-full" />
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Progression globale</span>
+                <span>{progress}%</span>
+              </div>
+              <Progress value={progress} className="w-full" />
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Page en cours</span>
+                <span>{currentPageProgress}%</span>
+              </div>
+              <Progress value={currentPageProgress} className="w-full h-2" />
+            </div>
           )}
         </CardContent>
       </Card>
@@ -357,6 +409,11 @@ export default function PdfOcrTool() {
                   <Badge variant="outline" className="bg-red-50">
                     <AlertCircle className="mr-1 h-3 w-3 text-red-600" />
                     {errorCount} erreurs
+                  </Badge>
+                )}
+                {avgConfidence > 0 && (
+                  <Badge variant="outline">
+                    Confiance: {avgConfidence}%
                   </Badge>
                 )}
               </div>
@@ -414,7 +471,14 @@ export default function PdfOcrTool() {
                         <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                       )}
                       {result.status === 'success' && (
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <>
+                          <CheckCircle2 className="h-4 w-4 text-green-600" />
+                          {result.confidence && (
+                            <span className="text-xs text-muted-foreground">
+                              ({result.confidence}% confiance)
+                            </span>
+                          )}
+                        </>
                       )}
                       {result.status === 'error' && (
                         <span className="text-sm text-red-600">{result.error}</span>
