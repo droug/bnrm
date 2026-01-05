@@ -68,6 +68,7 @@ export default function DocumentsManager() {
   const [currentPageImported, setCurrentPageImported] = useState(0);
   const [batchOcrRunning, setBatchOcrRunning] = useState(false);
   const [batchOcrResult, setBatchOcrResult] = useState<any>(null);
+  const [ocrProcessingDocId, setOcrProcessingDocId] = useState<string | null>(null);
 
   // Exemple de doublons détectés
   const sampleDuplicates = [
@@ -352,6 +353,45 @@ export default function DocumentsManager() {
       toast({ title: "Document supprimé" });
     }
   });
+
+  // OCR individuel pour un document
+  const handleSingleDocOcr = async (doc: any) => {
+    if (!doc.base_url) {
+      toast({
+        title: "Erreur",
+        description: "Ce document n'a pas de base_url configurée pour les images",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setOcrProcessingDocId(doc.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('batch-ocr-indexing', {
+        body: {
+          documentId: doc.id,
+          language: doc.language || 'ar',
+          baseUrl: doc.base_url
+        }
+      });
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
+      toast({
+        title: "OCR terminé",
+        description: `${data?.processedPages || 0} pages traitées pour "${doc.title}"`
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur OCR",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setOcrProcessingDocId(null);
+    }
+  };
 
   // Filter documents
   const filteredDocuments = documents?.filter(doc => {
@@ -1450,6 +1490,19 @@ export default function DocumentsManager() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex gap-2 justify-end">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleSingleDocOcr(doc)}
+                          disabled={ocrProcessingDocId === doc.id}
+                          title="Lancer l'OCR"
+                        >
+                          {ocrProcessingDocId === doc.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Wand2 className="h-4 w-4" />
+                          )}
+                        </Button>
                         <Button
                           size="sm"
                           variant="outline"
