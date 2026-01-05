@@ -454,10 +454,10 @@ export default function PdfOcrTool() {
               </Button>
             </div>
 
-            {/* Page Results */}
+            {/* Page Results - Éditable */}
             <ScrollArea className="h-[400px] border rounded-md p-4">
               <div className="space-y-4">
-                {pageResults.map((result) => (
+                {pageResults.map((result, index) => (
                   <div key={result.pageNumber} className="border-b pb-4 last:border-0">
                     <div className="flex items-center gap-2 mb-2">
                       <Badge variant={
@@ -483,11 +483,20 @@ export default function PdfOcrTool() {
                       {result.status === 'error' && (
                         <span className="text-sm text-red-600">{result.error}</span>
                       )}
+                      <span className="flex-1" />
+                      <span className="text-xs text-muted-foreground">
+                        {result.text?.length || 0} caractères
+                      </span>
                     </div>
-                    {result.text && (
+                    {(result.text || result.status === 'success') && (
                       <Textarea 
-                        value={result.text} 
-                        readOnly 
+                        value={result.text}
+                        onChange={(e) => {
+                          setPageResults(prev => prev.map((r, i) => 
+                            i === index ? { ...r, text: e.target.value } : r
+                          ));
+                        }}
+                        placeholder="Corrigez ou saisissez le texte OCR ici..."
                         className="min-h-[100px] text-sm font-mono"
                         dir={language === 'ar' ? 'rtl' : 'ltr'}
                       />
