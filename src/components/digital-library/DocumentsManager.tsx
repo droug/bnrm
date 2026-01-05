@@ -15,7 +15,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PortalSelect } from "@/components/ui/portal-select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil } from "lucide-react";
+import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil, Wand2, Loader2, FileSearch, CheckCircle2, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import OcrImportTool from "@/components/digital-library/import/OcrImportTool";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -63,6 +65,8 @@ export default function DocumentsManager() {
   const [keepSelection, setKeepSelection] = useState<"existing" | "imported" | "both">("both");
   const [currentPageExisting, setCurrentPageExisting] = useState(0);
   const [currentPageImported, setCurrentPageImported] = useState(0);
+  const [batchOcrRunning, setBatchOcrRunning] = useState(false);
+  const [batchOcrResult, setBatchOcrResult] = useState<any>(null);
 
   // Exemple de doublons détectés
   const sampleDuplicates = [
@@ -169,6 +173,42 @@ export default function DocumentsManager() {
       description: `Choix: ${keepSelection === "existing" ? "Conserver l'existant" : keepSelection === "imported" ? "Conserver l'importé" : "Conserver les deux"}`,
     });
     setShowCompareDialog(false);
+  };
+
+  const handleBatchOcr = async () => {
+    setBatchOcrRunning(true);
+    setBatchOcrResult(null);
+
+    try {
+      const baseUrl = window.location.origin;
+
+      const { data, error } = await supabase.functions.invoke('batch-ocr-indexing', {
+        body: {
+          language: 'ar',
+          baseUrl
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setBatchOcrResult(data);
+      toast({
+        title: "Indexation OCR terminée",
+        description: `${data.totalPagesProcessed} pages traitées`
+      });
+    } catch (error: any) {
+      console.error('Batch OCR error:', error);
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive"
+      });
+      setBatchOcrResult({ error: error.message });
+    } finally {
+      setBatchOcrRunning(false);
+    }
   };
 
   const getFieldComparison = (field: string, existingValue: any, importedValue: any) => {
@@ -625,12 +665,62 @@ export default function DocumentsManager() {
             Ajoutez, modifiez et gérez vos documents de la bibliothèque numérique
           </p>
         </div>
+        <Button 
+          onClick={handleBatchOcr}
+          disabled={batchOcrRunning}
+          className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+        >
+          {batchOcrRunning ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              OCR en cours...
+            </>
+          ) : (
+            <>
+              <Wand2 className="h-4 w-4 mr-2" />
+              OCR Auto (tous)
+            </>
+          )}
+        </Button>
       </div>
 
+      {batchOcrResult && (
+        <div>
+          {batchOcrResult.error ? (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Erreur</AlertTitle>
+              <AlertDescription>{batchOcrResult.error}</AlertDescription>
+            </Alert>
+          ) : (
+            <Alert className="bg-green-50 border-green-200">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <AlertTitle className="text-green-800">Indexation terminée</AlertTitle>
+              <AlertDescription className="text-green-700">
+                <p>{batchOcrResult.totalPagesProcessed} pages traitées sur {batchOcrResult.maxPagesPerRun} max par exécution.</p>
+                {batchOcrResult.documents?.map((doc: any, i: number) => (
+                  <div key={i} className="mt-1 text-xs">
+                    • <strong>{doc.title}</strong>: {doc.pagesProcessed} pages indexées
+                    {doc.errors?.length > 0 && ` (${doc.errors.length} erreurs)`}
+                  </div>
+                ))}
+                {batchOcrResult.totalPagesProcessed >= batchOcrResult.maxPagesPerRun && (
+                  <p className="mt-2 font-medium">Relancez pour continuer l'indexation des pages restantes.</p>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+      )}
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md">
+        <TabsList className="grid w-full grid-cols-3 max-w-lg">
           <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="duplicates">Gestion des doublons</TabsTrigger>
+          <TabsTrigger value="ocr" className="flex items-center gap-1">
+            <FileSearch className="h-4 w-4" />
+            OCR
+          </TabsTrigger>
+          <TabsTrigger value="duplicates">Doublons</TabsTrigger>
         </TabsList>
 
         <TabsContent value="documents" className="space-y-6">
@@ -1576,6 +1666,10 @@ export default function DocumentsManager() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+        </TabsContent>
+
+        <TabsContent value="ocr" className="space-y-6">
+          <OcrImportTool />
         </TabsContent>
 
         <TabsContent value="duplicates" className="space-y-6">
