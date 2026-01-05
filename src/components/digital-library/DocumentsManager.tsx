@@ -235,9 +235,8 @@ export default function DocumentsManager() {
     queryKey: ['digital-library-documents'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('content')
+        .from('digital_library_documents')
         .select('*')
-        .in('content_type', ['page', 'news'])
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -356,11 +355,11 @@ export default function DocumentsManager() {
 
   // Filter documents
   const filteredDocuments = documents?.filter(doc => {
-    const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         doc.content_body?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = doc.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         doc.author?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesVisible = filterVisible === "all" || 
-                          (filterVisible === "visible" && doc.is_visible) ||
-                          (filterVisible === "hidden" && !doc.is_visible);
+                          (filterVisible === "visible" && doc.publication_status === 'published') ||
+                          (filterVisible === "hidden" && doc.publication_status !== 'published');
     const matchesDownload = filterDownload === "all" ||
                            (filterDownload === "enabled" && doc.download_enabled) ||
                            (filterDownload === "disabled" && !doc.download_enabled);
@@ -1406,11 +1405,10 @@ export default function DocumentsManager() {
                 <TableRow>
                   <TableHead>Titre</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead className="text-center">Visible</TableHead>
+                  <TableHead>Auteur</TableHead>
                   <TableHead className="text-center">Téléchargement</TableHead>
-                  <TableHead className="text-center">Partage Social</TableHead>
-                  <TableHead className="text-center">Email</TableHead>
-                  <TableHead>Droits</TableHead>
+                  <TableHead className="text-center">Impression</TableHead>
+                  <TableHead>OCR</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -1421,47 +1419,33 @@ export default function DocumentsManager() {
                       <div>
                         <p className="font-medium">{doc.title}</p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(doc.created_at).toLocaleDateString()}
+                          {doc.created_at ? new Date(doc.created_at).toLocaleDateString() : '-'}
                         </p>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{doc.file_type || 'Non défini'}</Badge>
+                      <Badge variant="outline">{doc.document_type || doc.file_format || 'Non défini'}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">{doc.author || '-'}</span>
                     </TableCell>
                     <TableCell className="text-center">
                       <Switch
-                        checked={doc.is_visible}
-                        onCheckedChange={() => toggleField.mutate({ id: doc.id, field: 'is_visible', value: doc.is_visible })}
+                        checked={doc.download_enabled ?? false}
+                        onCheckedChange={() => toggleField.mutate({ id: doc.id, field: 'download_enabled', value: doc.download_enabled ?? false })}
                       />
                     </TableCell>
                     <TableCell className="text-center">
                       <Switch
-                        checked={doc.download_enabled}
-                        onCheckedChange={() => toggleField.mutate({ id: doc.id, field: 'download_enabled', value: doc.download_enabled })}
-                      />
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Switch
-                        checked={doc.social_share_enabled}
-                        onCheckedChange={() => toggleField.mutate({ id: doc.id, field: 'social_share_enabled', value: doc.social_share_enabled })}
-                      />
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Switch
-                        checked={doc.email_share_enabled}
-                        onCheckedChange={() => toggleField.mutate({ id: doc.id, field: 'email_share_enabled', value: doc.email_share_enabled })}
+                        checked={doc.print_enabled ?? false}
+                        onCheckedChange={() => toggleField.mutate({ id: doc.id, field: 'print_enabled', value: doc.print_enabled ?? false })}
                       />
                     </TableCell>
                     <TableCell>
-                      {doc.copyright_expires_at ? (
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          <span className="text-xs">
-                            {new Date(doc.copyright_expires_at).toLocaleDateString()}
-                          </span>
-                        </div>
+                      {doc.ocr_processed ? (
+                        <Badge variant="default" className="bg-green-600">Oui</Badge>
                       ) : (
-                        <span className="text-xs text-muted-foreground">Aucun</span>
+                        <Badge variant="secondary">Non</Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
@@ -1483,18 +1467,18 @@ export default function DocumentsManager() {
                             setEditingDocument(doc);
                             form.reset({
                               title: doc.title || '',
-                              author: '',
-                              file_type: doc.file_type || '',
-                              publication_date: '',
-                              description: doc.content_body || '',
-                              file_url: doc.file_url || '',
+                              author: doc.author || '',
+                              file_type: doc.file_format || '',
+                              publication_date: doc.publication_year?.toString() || '',
+                              description: '',
+                              file_url: doc.pdf_url || '',
                               download_enabled: doc.download_enabled ?? true,
-                              is_visible: doc.is_visible ?? true,
-                              social_share_enabled: doc.social_share_enabled ?? true,
-                              email_share_enabled: doc.email_share_enabled ?? true,
-                              copyright_expires_at: doc.copyright_expires_at || '',
-                              copyright_derogation: doc.copyright_derogation ?? false,
-                              digitization_source: "internal",
+                              is_visible: doc.publication_status === 'published',
+                              social_share_enabled: true,
+                              email_share_enabled: true,
+                              copyright_expires_at: '',
+                              copyright_derogation: false,
+                              digitization_source: (doc.digitization_source === 'external' ? 'external' : 'internal') as "internal" | "external",
                             });
                             setShowEditDialog(true);
                           }}
