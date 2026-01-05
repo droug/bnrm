@@ -172,7 +172,7 @@ export function SidebarSearchInBook({ documentId, onPageSelect, isOcrProcessed =
     );
   }
 
-  if (!isOcrProcessed || !hasOcrPages) {
+  if (!hasOcrPages) {
     return (
       <div className="space-y-4">
         <div className="text-center py-8 text-muted-foreground">
@@ -185,6 +185,14 @@ export function SidebarSearchInBook({ documentId, onPageSelect, isOcrProcessed =
             }
           </p>
           <p className="text-xs mt-1">La recherche textuelle sera disponible après le traitement.</p>
+          <a 
+            href="/admin/digital-library/documents" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mt-4 text-xs text-primary hover:underline"
+          >
+            → Accéder à l'outil d'import OCR
+          </a>
         </div>
       </div>
     );
