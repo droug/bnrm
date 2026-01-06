@@ -541,7 +541,7 @@ export default function DigitalLibraryHome() {
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <Link to="/digital-library/actualites">
+            <Link to="/digital-library/exposition-virtuelle">
               <Card className="group relative overflow-hidden border-2 border-transparent hover:border-purple-500/30 transition-all duration-500 bg-gradient-to-br from-card via-card to-purple-500/5 cursor-pointer">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600/0 via-purple-600/5 to-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
