@@ -72,15 +72,17 @@ export function AuthorIdentification({
           name="author.pseudonym"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Pseudonyme</FormLabel>
+              <FormLabel>{authorType === 'morale' ? 'Sigle' : 'Pseudonyme'}</FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="Saisir le pseudonyme de l'auteur (le cas échéant)" 
+                  placeholder={authorType === 'morale' ? 'Saisir le sigle de la collectivité (le cas échéant)' : 'Saisir le pseudonyme de l\'auteur (le cas échéant)'} 
                   {...field}
                 />
               </FormControl>
               <p className="text-xs text-muted-foreground">
-                À renseigner uniquement si l'auteur publie sous un autre nom.
+                {authorType === 'morale' 
+                  ? 'À renseigner si la collectivité utilise un sigle.' 
+                  : 'À renseigner uniquement si l\'auteur publie sous un autre nom.'}
               </p>
               <FormMessage />
             </FormItem>
