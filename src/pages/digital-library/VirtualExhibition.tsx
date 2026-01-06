@@ -684,12 +684,12 @@ export default function VirtualExhibition() {
             <div className="container mx-auto flex items-center justify-between">
               <Button
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/10"
+                className="border-white/50 text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm"
                 onClick={prevTourStep}
                 disabled={tourStep === 0}
               >
                 <ChevronLeft className="h-4 w-4 mr-2" />
-                Précédent
+                <span>Précédent</span>
               </Button>
 
               {/* Progress dots */}
