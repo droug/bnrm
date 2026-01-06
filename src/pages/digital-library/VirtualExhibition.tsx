@@ -296,7 +296,7 @@ export default function VirtualExhibition() {
               
               <h1 className="text-4xl md:text-6xl font-bold leading-tight">
                 Le Maroc
-                <span className="block bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">
+                <span className="block text-amber-400 pb-2">
                   à travers les âges
                 </span>
               </h1>
@@ -318,11 +318,11 @@ export default function VirtualExhibition() {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm"
+                  className="border-white/50 text-white hover:bg-white/20 backdrop-blur-sm bg-white/10"
                   onClick={() => timelineRef.current?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   <Info className="h-5 w-5 mr-2" />
-                  Explorer librement
+                  <span>Explorer librement</span>
                 </Button>
               </div>
 
