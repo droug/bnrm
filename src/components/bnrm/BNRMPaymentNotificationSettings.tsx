@@ -7,9 +7,11 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Bell, Save, Loader2, Mail, Smartphone, MonitorSpeaker, Users, FileText, CreditCard, CheckCircle, XCircle, Hash, Package, ClipboardCheck, UserPlus } from "lucide-react";
+import { Bell, Save, Loader2, Mail, Smartphone, MonitorSpeaker, Users, FileText, CreditCard, CheckCircle, XCircle, Hash, Package, ClipboardCheck, UserPlus, Settings, AlertTriangle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface NotificationChannel {
   email: boolean;
@@ -52,6 +54,24 @@ interface NotificationSettings {
   system_maintenance: NotificationConfig;
   new_content_published: NotificationConfig;
 }
+
+interface SMSSettings {
+  enabled: boolean;
+  provider: 'twilio' | 'infobip' | 'orange' | 'custom';
+  sender_id: string;
+  api_key_configured: boolean;
+  test_phone: string;
+  country_code: string;
+}
+
+const defaultSMSSettings: SMSSettings = {
+  enabled: false,
+  provider: 'twilio',
+  sender_id: 'BNRM',
+  api_key_configured: false,
+  test_phone: '',
+  country_code: '+212',
+};
 
 const defaultChannels: NotificationChannel = {
   email: true,
@@ -177,6 +197,7 @@ export function BNRMPaymentNotificationSettings() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<NotificationSettings>(defaultNotificationSettings);
+  const [smsSettings, setSmsSettings] = useState<SMSSettings>(defaultSMSSettings);
 
   useEffect(() => {
     fetchSettings();
@@ -185,6 +206,8 @@ export function BNRMPaymentNotificationSettings() {
   const fetchSettings = async () => {
     try {
       setLoading(true);
+      
+      // Fetch notification settings
       const { data, error } = await supabase
         .from("bnrm_parametres")
         .select("*")
@@ -195,6 +218,17 @@ export function BNRMPaymentNotificationSettings() {
       if (data && data.length > 0) {
         const savedSettings = JSON.parse(data[0].valeur);
         setSettings({ ...defaultNotificationSettings, ...savedSettings });
+      }
+
+      // Fetch SMS settings
+      const { data: smsData, error: smsError } = await supabase
+        .from("bnrm_parametres")
+        .select("*")
+        .eq("parametre", "sms_notification_settings");
+
+      if (!smsError && smsData && smsData.length > 0) {
+        const savedSmsSettings = JSON.parse(smsData[0].valeur);
+        setSmsSettings({ ...defaultSMSSettings, ...savedSmsSettings });
       }
     } catch (error: any) {
       console.error("Erreur:", error);
@@ -207,6 +241,7 @@ export function BNRMPaymentNotificationSettings() {
     try {
       setSaving(true);
 
+      // Save notification settings
       const { error } = await supabase
         .from("bnrm_parametres")
         .upsert({
@@ -218,6 +253,19 @@ export function BNRMPaymentNotificationSettings() {
         });
 
       if (error) throw error;
+
+      // Save SMS settings
+      const { error: smsError } = await supabase
+        .from("bnrm_parametres")
+        .upsert({
+          parametre: "sms_notification_settings",
+          valeur: JSON.stringify(smsSettings),
+          commentaire: "Paramètres d'abonnement SMS",
+        }, {
+          onConflict: "parametre"
+        });
+
+      if (smsError) throw smsError;
 
       toast({
         title: "Succès",
@@ -237,6 +285,10 @@ export function BNRMPaymentNotificationSettings() {
 
   const handleNotificationChange = (id: keyof NotificationSettings, config: NotificationConfig) => {
     setSettings((prev) => ({ ...prev, [id]: config }));
+  };
+
+  const handleSmsSettingsChange = (field: keyof SMSSettings, value: any) => {
+    setSmsSettings((prev) => ({ ...prev, [field]: value }));
   };
 
   if (loading) {
@@ -262,7 +314,7 @@ export function BNRMPaymentNotificationSettings() {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="inscriptions" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="inscriptions" className="text-xs">
               <Users className="h-4 w-4 mr-1" />
               Inscriptions
@@ -282,6 +334,10 @@ export function BNRMPaymentNotificationSettings() {
             <TabsTrigger value="general" className="text-xs">
               <Bell className="h-4 w-4 mr-1" />
               Général
+            </TabsTrigger>
+            <TabsTrigger value="sms" className="text-xs">
+              <Smartphone className="h-4 w-4 mr-1" />
+              Config SMS
             </TabsTrigger>
           </TabsList>
 
@@ -464,6 +520,183 @@ export function BNRMPaymentNotificationSettings() {
                 config={settings.new_content_published}
                 onChange={handleNotificationChange}
               />
+            </div>
+          </TabsContent>
+
+          {/* Configuration SMS */}
+          <TabsContent value="sms" className="space-y-6">
+            <div className="space-y-6">
+              {/* Activation globale SMS */}
+              <div className="flex items-center justify-between p-4 border rounded-lg bg-card">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Smartphone className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <Label className="text-base font-medium">Activer les notifications SMS</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Permet l'envoi de SMS pour les notifications configurées
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={smsSettings.enabled}
+                  onCheckedChange={(checked) => handleSmsSettingsChange('enabled', checked)}
+                />
+              </div>
+
+              {!smsSettings.enabled && (
+                <Alert>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    Les notifications SMS sont désactivées. Activez-les pour configurer les paramètres ci-dessous.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {smsSettings.enabled && (
+                <div className="space-y-6">
+                  {/* Fournisseur SMS */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="sms-provider">Fournisseur SMS</Label>
+                      <Select
+                        value={smsSettings.provider}
+                        onValueChange={(value) => handleSmsSettingsChange('provider', value)}
+                      >
+                        <SelectTrigger id="sms-provider">
+                          <SelectValue placeholder="Sélectionner un fournisseur" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="twilio">Twilio</SelectItem>
+                          <SelectItem value="infobip">Infobip</SelectItem>
+                          <SelectItem value="orange">Orange Business (Maroc)</SelectItem>
+                          <SelectItem value="custom">Personnalisé (API)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">
+                        Choisissez votre fournisseur de services SMS
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="country-code">Indicatif pays par défaut</Label>
+                      <Select
+                        value={smsSettings.country_code}
+                        onValueChange={(value) => handleSmsSettingsChange('country_code', value)}
+                      >
+                        <SelectTrigger id="country-code">
+                          <SelectValue placeholder="Sélectionner l'indicatif" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="+212">+212 (Maroc)</SelectItem>
+                          <SelectItem value="+33">+33 (France)</SelectItem>
+                          <SelectItem value="+34">+34 (Espagne)</SelectItem>
+                          <SelectItem value="+1">+1 (USA/Canada)</SelectItem>
+                          <SelectItem value="+44">+44 (Royaume-Uni)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">
+                        Utilisé pour les numéros sans indicatif
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Identifiant expéditeur */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="sender-id">Identifiant expéditeur (Sender ID)</Label>
+                      <Input
+                        id="sender-id"
+                        value={smsSettings.sender_id}
+                        onChange={(e) => handleSmsSettingsChange('sender_id', e.target.value)}
+                        placeholder="BNRM"
+                        maxLength={11}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Nom affiché comme expéditeur (max 11 caractères alphanumériques)
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="test-phone">Numéro de test</Label>
+                      <Input
+                        id="test-phone"
+                        value={smsSettings.test_phone}
+                        onChange={(e) => handleSmsSettingsChange('test_phone', e.target.value)}
+                        placeholder="0612345678"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Numéro pour envoyer des SMS de test
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Configuration API */}
+                  <div className="p-4 border rounded-lg bg-muted/30 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Settings className="h-4 w-4 text-muted-foreground" />
+                      <Label className="text-sm font-medium">Configuration API</Label>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium">Clé API {smsSettings.provider.charAt(0).toUpperCase() + smsSettings.provider.slice(1)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {smsSettings.api_key_configured 
+                            ? "✓ Configurée dans les secrets Supabase" 
+                            : "⚠ Non configurée - Les SMS ne seront pas envoyés"}
+                        </p>
+                      </div>
+                      <Button variant="outline" size="sm" asChild>
+                        <a 
+                          href="https://supabase.com/dashboard/project/safeppmznupzqkqmzjzt/settings/functions" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >
+                          Configurer les secrets
+                        </a>
+                      </Button>
+                    </div>
+
+                    <div className="text-xs text-muted-foreground space-y-1">
+                      <p><strong>Variables requises selon le fournisseur :</strong></p>
+                      {smsSettings.provider === 'twilio' && (
+                        <p>• TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN</p>
+                      )}
+                      {smsSettings.provider === 'infobip' && (
+                        <p>• INFOBIP_API_KEY, INFOBIP_BASE_URL</p>
+                      )}
+                      {smsSettings.provider === 'orange' && (
+                        <p>• ORANGE_CLIENT_ID, ORANGE_CLIENT_SECRET</p>
+                      )}
+                      {smsSettings.provider === 'custom' && (
+                        <p>• SMS_API_URL, SMS_API_KEY</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Bouton de test */}
+                  <div className="flex items-center gap-4">
+                    <Button 
+                      variant="outline" 
+                      disabled={!smsSettings.test_phone}
+                      onClick={() => {
+                        toast({
+                          title: "SMS de test",
+                          description: `Un SMS de test serait envoyé à ${smsSettings.country_code}${smsSettings.test_phone}`,
+                        });
+                      }}
+                    >
+                      <Smartphone className="mr-2 h-4 w-4" />
+                      Envoyer un SMS de test
+                    </Button>
+                    <span className="text-xs text-muted-foreground">
+                      Enverra un SMS au numéro de test configuré
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
