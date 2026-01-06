@@ -520,144 +520,196 @@ export default function DigitalLibraryHome() {
         </section>
       )}
 
-      {/* World Data Repositories Section */}
-      <section className="bg-muted/50 py-12">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-foreground flex items-center justify-center gap-3 mb-3">
-              <Globe className="h-8 w-8 text-primary" />
-              Réservoirs mondiaux de données et de métadonnées
+      {/* Section Réservoirs mondiaux */}
+      <section className="py-16 relative overflow-hidden">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/10" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM5Qzc1MDAiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+              <Globe className="h-4 w-4" />
+              Ressources internationales
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent">
+              Réservoirs mondiaux de données
             </h2>
-            <p className="text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-muted-foreground max-w-3xl mx-auto text-lg">
               Ces réservoirs permettent la centralisation et le partage du patrimoine documentaire et culturel à l'échelle internationale
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* RFN */}
-            <Card className="hover:shadow-lg transition-all hover:scale-[1.02] group">
-              <CardHeader>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Globe className="h-6 w-6 text-primary" />
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-primary/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <Card className="relative h-full bg-card/80 backdrop-blur-sm border-2 border-transparent hover:border-primary/30 transition-all duration-300 rounded-2xl overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-primary" />
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-gradient-to-br from-blue-500 to-primary rounded-xl shadow-lg">
+                      <Globe className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-1 group-hover:text-primary transition-colors">
+                        Réseau Francophone Numérique
+                      </CardTitle>
+                      <span className="text-xs font-medium text-primary/70 bg-primary/10 px-2 py-1 rounded-full">RFN</span>
+                    </div>
                   </div>
-                  <CardTitle className="text-lg">Réseau Francophone Numérique (RFN)</CardTitle>
-                </div>
-                <CardDescription className="text-sm">
-                  Principal réservoir de l'espace francophone regroupant les collections patrimoniales de bibliothèques nationales (France, Belgique, Suisse, Maroc, Sénégal). Objectif : préserver et diffuser le patrimoine documentaire commun aux 300 millions de francophones.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <a 
-                  href="https://rfnum.org/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
-                >
-                  Visiter le site <ExternalLink className="h-4 w-4" />
-                </a>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Principal réservoir de l'espace francophone regroupant les collections patrimoniales de bibliothèques nationales. Préserve et diffuse le patrimoine documentaire commun aux 300 millions de francophones.
+                  </p>
+                  <a 
+                    href="https://rfnum.org/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary hover:text-primary-foreground rounded-lg font-medium text-primary transition-all duration-300 group/link"
+                  >
+                    Explorer <ExternalLink className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+                  </a>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* Europeana */}
-            <Card className="hover:shadow-lg transition-all hover:scale-[1.02] group">
-              <CardHeader>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Globe className="h-6 w-6 text-primary" />
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <Card className="relative h-full bg-card/80 backdrop-blur-sm border-2 border-transparent hover:border-orange-400/30 transition-all duration-300 rounded-2xl overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-500 to-orange-500" />
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl shadow-lg">
+                      <Globe className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-1 group-hover:text-orange-500 transition-colors">
+                        Europeana
+                      </CardTitle>
+                      <span className="text-xs font-medium text-orange-600/70 bg-orange-500/10 px-2 py-1 rounded-full">Union Européenne</span>
+                    </div>
                   </div>
-                  <CardTitle className="text-lg">Europeana</CardTitle>
-                </div>
-                <CardDescription className="text-sm">
-                  Agrégateur central du patrimoine culturel européen. Opère au sein de l'Espace européen commun des données pour le patrimoine culturel, une initiative de l'Union européenne visant à moderniser la numérisation et la réutilisation des données culturelles.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <a 
-                  href="https://europeana.eu/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
-                >
-                  Visiter le site <ExternalLink className="h-4 w-4" />
-                </a>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Agrégateur central du patrimoine culturel européen. Initiative de l'UE visant à moderniser la numérisation et la réutilisation des données culturelles.
+                  </p>
+                  <a 
+                    href="https://www.europeana.eu/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/10 hover:bg-orange-500 hover:text-white rounded-lg font-medium text-orange-600 transition-all duration-300 group/link"
+                  >
+                    Explorer <ExternalLink className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+                  </a>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* IFLA */}
-            <Card className="hover:shadow-lg transition-all hover:scale-[1.02] group">
-              <CardHeader>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Globe className="h-6 w-6 text-primary" />
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <Card className="relative h-full bg-card/80 backdrop-blur-sm border-2 border-transparent hover:border-emerald-400/30 transition-all duration-300 rounded-2xl overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 to-emerald-500" />
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl shadow-lg">
+                      <Globe className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-1 group-hover:text-emerald-500 transition-colors">
+                        IFLA
+                      </CardTitle>
+                      <span className="text-xs font-medium text-emerald-600/70 bg-emerald-500/10 px-2 py-1 rounded-full">Normes internationales</span>
+                    </div>
                   </div>
-                  <CardTitle className="text-lg">IFLA</CardTitle>
-                </div>
-                <CardDescription className="text-sm">
-                  Fédération Internationale des Associations de Bibliothécaires. Définit les normes internationales (IFLA LRM) permettant l'interopérabilité entre les grands réservoirs mondiaux. Promeut le "Manifeste pour les bibliothèques numériques".
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <a 
-                  href="https://ifla.org/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
-                >
-                  Visiter le site <ExternalLink className="h-4 w-4" />
-                </a>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Fédération Internationale des Associations de Bibliothécaires. Définit les normes internationales (IFLA LRM) pour l'interopérabilité entre les grands réservoirs mondiaux.
+                  </p>
+                  <a 
+                    href="https://www.ifla.org/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500 hover:text-white rounded-lg font-medium text-emerald-600 transition-all duration-300 group/link"
+                  >
+                    Explorer <ExternalLink className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+                  </a>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* UNESCO Digital Library */}
-            <Card className="hover:shadow-lg transition-all hover:scale-[1.02] group">
-              <CardHeader>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Globe className="h-6 w-6 text-primary" />
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-sky-500/20 to-cyan-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <Card className="relative h-full bg-card/80 backdrop-blur-sm border-2 border-transparent hover:border-cyan-400/30 transition-all duration-300 rounded-2xl overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-500 to-cyan-500" />
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-xl shadow-lg">
+                      <Globe className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-1 group-hover:text-cyan-500 transition-colors">
+                        Bibliothèque Numérique UNESCO
+                      </CardTitle>
+                      <span className="text-xs font-medium text-cyan-600/70 bg-cyan-500/10 px-2 py-1 rounded-full">MONDIACULT</span>
+                    </div>
                   </div>
-                  <CardTitle className="text-lg">Bibliothèque Numérique de l'UNESCO</CardTitle>
-                </div>
-                <CardDescription className="text-sm">
-                  Réservoir mondial spécialisé dans les politiques culturelles et le patrimoine documentaire mondial, incluant les contributions de la conférence MONDIACULT.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <a 
-                  href="https://digitallibrary.un.org/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
-                >
-                  Visiter le site <ExternalLink className="h-4 w-4" />
-                </a>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Réservoir mondial spécialisé dans les politiques culturelles et le patrimoine documentaire mondial, incluant les contributions de la conférence MONDIACULT.
+                  </p>
+                  <a 
+                    href="https://unesdoc.unesco.org/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 hover:bg-cyan-500 hover:text-white rounded-lg font-medium text-cyan-600 transition-all duration-300 group/link"
+                  >
+                    Explorer <ExternalLink className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+                  </a>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* World Digital Library */}
-            <Card className="hover:shadow-lg transition-all hover:scale-[1.02] group">
-              <CardHeader>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Globe className="h-6 w-6 text-primary" />
+            <div className="group relative md:col-span-2 lg:col-span-1">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <Card className="relative h-full bg-card/80 backdrop-blur-sm border-2 border-transparent hover:border-purple-400/30 transition-all duration-300 rounded-2xl overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500" />
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-lg">
+                      <Globe className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-1 group-hover:text-purple-500 transition-colors">
+                        World Digital Library
+                      </CardTitle>
+                      <span className="text-xs font-medium text-purple-600/70 bg-purple-500/10 px-2 py-1 rounded-full">Library of Congress</span>
+                    </div>
                   </div>
-                  <CardTitle className="text-lg">World Digital Library (WDL)</CardTitle>
-                </div>
-                <CardDescription className="text-sm">
-                  Projet mené par la Library of Congress et l'UNESCO pour rendre accessibles des documents culturels rares de tous les pays du monde.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <a 
-                  href="https://www.loc.gov/collections/world-digital-library/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
-                >
-                  Visiter le site <ExternalLink className="h-4 w-4" />
-                </a>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Projet mené par la Library of Congress et l'UNESCO pour rendre accessibles des documents culturels rares de tous les pays du monde.
+                  </p>
+                  <a 
+                    href="https://www.loc.gov/collections/world-digital-library/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 hover:bg-purple-500 hover:text-white rounded-lg font-medium text-purple-600 transition-all duration-300 group/link"
+                  >
+                    Explorer <ExternalLink className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+                  </a>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </section>
