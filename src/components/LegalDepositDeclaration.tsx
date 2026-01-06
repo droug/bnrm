@@ -488,6 +488,11 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                                        field.label_fr?.toLowerCase().includes('nom de l\'auteur') ||
                                        field.label_fr?.toLowerCase().includes('name');
                     
+                    // Vérifier si c'est le champ "Pseudonyme"
+                    const isPseudonymField = field.field_key.toLowerCase().includes('pseudonym') ||
+                                            field.field_key.toLowerCase().includes('pseudonyme') ||
+                                            field.label_fr?.toLowerCase().includes('pseudonyme');
+                    
                     // Récupérer la valeur actuelle du type d'auteur depuis les différentes sources possibles
                     const currentAuthorTypeValue = customFieldsData["author_type"] || 
                                                    customFieldsData[field.field_key] || 
@@ -507,6 +512,11 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                     
                     console.log('DEBUG - isPersonnePhysique:', isPersonnePhysique, 'isPersonneMorale:', isPersonneMorale);
                     
+                    // Créer une copie du champ avec le label modifié si c'est le champ Pseudonyme et Personne Morale
+                    const modifiedField = isPseudonymField && isPersonneMorale 
+                      ? { ...field, label_fr: 'Sigle', label_ar: 'الاختصار' }
+                      : field;
+                    
                     // Ne pas afficher le champ "Nom de l'auteur" si on est en mode "Personne morale"
                     if (isNameField && isPersonneMorale) {
                       console.log('DEBUG - Hiding Nom de l\'auteur for Personne Morale');
@@ -517,7 +527,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                       <>
                         <DynamicFieldRenderer
                           key={field.id}
-                          field={field}
+                          field={modifiedField}
                           language={language}
                           value={customFieldsData[field.field_key]}
                           onChange={(value) => {
