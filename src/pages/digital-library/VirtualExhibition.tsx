@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,6 +42,14 @@ import manuscritsAndalous from "@/assets/digital-library/manuscrits-andalous.jpg
 import cartesAnciennes from "@/assets/digital-library/cartes-anciennes.jpg";
 import archivesPhotoMaroc from "@/assets/digital-library/archives-photo-maroc.jpg";
 
+// Default images fallback mapping
+const defaultImages: Record<string, string> = {
+  manuscript: manuscritsAndalous,
+  map: cartesAnciennes,
+  photo: archivesPhotoMaroc,
+  document: document1,
+};
+
 export default function VirtualExhibition() {
   const navigate = useNavigate();
   const [selectedEra, setSelectedEra] = useState("medieval");
@@ -54,6 +64,45 @@ export default function VirtualExhibition() {
   
   const timelineRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
+
+  // Fetch active exhibition
+  const { data: activeExhibition } = useQuery({
+    queryKey: ['active-virtual-exhibition'],
+    queryFn: async () => {
+      const now = new Date().toISOString();
+      const { data, error } = await supabase
+        .from('virtual_exhibitions')
+        .select('*')
+        .eq('is_active', true)
+        .lte('start_date', now)
+        .gte('end_date', now)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      return data;
+    }
+  });
+
+  // Fetch tour items for active exhibition
+  const { data: dbTourItems } = useQuery({
+    queryKey: ['exhibition-tour-items-public', activeExhibition?.id],
+    queryFn: async () => {
+      if (!activeExhibition?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('exhibition_tour_items')
+        .select('*')
+        .eq('exhibition_id', activeExhibition.id)
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!activeExhibition?.id
+  });
 
   // Timeline periods
   const timelinePeriods = [
@@ -135,77 +184,42 @@ export default function VirtualExhibition() {
 
   const currentGallery = galleryItems[selectedEra] || [];
 
-  // Tour items - all documents in order for the guided tour
-  const tourItems = [
+  // Default fallback tour items
+  const defaultTourItems = [
     { 
       id: "intro", 
-      type: "intro",
+      item_type: "intro",
       title: "Bienvenue dans l'exposition", 
       description: "Découvrez le patrimoine culturel marocain à travers une sélection de documents exceptionnels couvrant plus de 12 siècles d'histoire.",
-      image: manuscritsAndalous,
+      image_url: null,
       details: "Cette exposition virtuelle vous invite à un voyage à travers le temps, des premières traces de civilisation jusqu'à l'époque moderne."
     },
     { 
       id: "manuscript-1", 
-      type: "document",
+      item_type: "document",
       title: "Maqamat d'Al-Hariri", 
       description: "Chef-d'œuvre de la littérature arabe médiévale, ce manuscrit enluminé du XIIIe siècle illustre les aventures d'Abu Zayd.",
-      image: manuscritsAndalous,
+      image_url: null,
       year: "XIIIe siècle",
       origin: "Al-Andalus",
       technique: "Enluminure sur parchemin",
       dimensions: "32 x 24 cm",
-      details: "Ce manuscrit est l'un des plus beaux exemples de l'art de l'enluminure arabo-andalouse. Les miniatures représentent des scènes de la vie quotidienne avec une richesse de détails exceptionnelle."
-    },
-    { 
-      id: "map-1", 
-      type: "document",
-      title: "Atlas Al-Idrisi", 
-      description: "Carte du monde réalisée par le géographe Al-Idrisi pour le roi Roger II de Sicile.",
-      image: cartesAnciennes,
-      year: "1154",
-      origin: "Sicile",
-      technique: "Encre et pigments sur parchemin",
-      dimensions: "180 x 70 cm",
-      details: "Al-Idrisi a compilé les connaissances géographiques de son époque pour créer cette carte révolutionnaire, qui resta une référence pendant plusieurs siècles."
-    },
-    { 
-      id: "photo-1", 
-      type: "document",
-      title: "Fès - La Médina", 
-      description: "Vue panoramique de la médina de Fès, plus grande zone urbaine sans voiture du monde.",
-      image: archivesPhotoMaroc,
-      year: "1920",
-      origin: "Fès, Maroc",
-      technique: "Photographie argentique",
-      dimensions: "24 x 18 cm",
-      details: "Cette photographie témoigne de l'architecture traditionnelle préservée de la médina de Fès, inscrite au patrimoine mondial de l'UNESCO."
-    },
-    { 
-      id: "manuscript-2", 
-      type: "document",
-      title: "Traité de médecine d'Ibn Sina", 
-      description: "Copie marocaine du célèbre Canon de la médecine d'Avicenne.",
-      image: document1,
-      year: "XIVe siècle",
-      origin: "Fès",
-      technique: "Calligraphie sur papier",
-      dimensions: "28 x 20 cm",
-      details: "Ce traité encyclopédique a servi de référence médicale dans le monde islamique et en Europe pendant des siècles."
-    },
-    { 
-      id: "archive-1", 
-      type: "document",
-      title: "Dahir Royal", 
-      description: "Document officiel du Makhzen marocain portant le sceau du Sultan.",
-      image: document5,
-      year: "1850",
-      origin: "Rabat",
-      technique: "Calligraphie sur papier vergé",
-      dimensions: "45 x 30 cm",
-      details: "Les dahirs sont des décrets royaux qui ont régi l'administration du Maroc. Ce document témoigne de l'organisation politique du royaume au XIXe siècle."
+      details: "Ce manuscrit est l'un des plus beaux exemples de l'art de l'enluminure arabo-andalouse."
     },
   ];
+
+  // Use database tour items if available, otherwise use defaults
+  const tourItems = (dbTourItems && dbTourItems.length > 0) 
+    ? dbTourItems.map(item => ({
+        ...item,
+        image: item.image_url || defaultImages[item.item_type] || manuscritsAndalous,
+        type: item.item_type
+      }))
+    : defaultTourItems.map(item => ({
+        ...item,
+        image: manuscritsAndalous,
+        type: item.item_type
+      }));
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % featuredExhibits.length);
@@ -291,7 +305,7 @@ export default function VirtualExhibition() {
             <div className="text-white space-y-6">
               <Badge className="bg-white/10 text-white border-white/20 backdrop-blur-sm px-4 py-2">
                 <Layers className="h-4 w-4 mr-2" />
-                Exposition Virtuelle 2025
+                {activeExhibition?.title || "Exposition Virtuelle 2025"}
               </Badge>
               
               <h1 className="text-4xl md:text-6xl font-bold leading-tight">

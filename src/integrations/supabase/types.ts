@@ -4550,6 +4550,68 @@ export type Database = {
           },
         ]
       }
+      exhibition_tour_items: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          details: string | null
+          dimensions: string | null
+          display_order: number
+          exhibition_id: string
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          item_type: string
+          origin: string | null
+          technique: string | null
+          title: string
+          updated_at: string | null
+          year: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          details?: string | null
+          dimensions?: string | null
+          display_order?: number
+          exhibition_id: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          item_type?: string
+          origin?: string | null
+          technique?: string | null
+          title: string
+          updated_at?: string | null
+          year?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          details?: string | null
+          dimensions?: string | null
+          display_order?: number
+          exhibition_id?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          item_type?: string
+          origin?: string | null
+          technique?: string | null
+          title?: string
+          updated_at?: string | null
+          year?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exhibition_tour_items_exhibition_id_fkey"
+            columns: ["exhibition_id"]
+            isOneToOne: false
+            referencedRelation: "virtual_exhibitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exhibition_visits: {
         Row: {
           exhibition_id: string | null

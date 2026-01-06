@@ -15,10 +15,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Edit, Trash2, Eye, Calendar as CalendarIcon, Users, Image, FileText } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Calendar as CalendarIcon, Users, Image, FileText, Route } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import TourItemsManager from "./TourItemsManager";
 
 interface Exhibition {
   id: string;
@@ -39,6 +40,7 @@ export default function ExhibitionsManager() {
   const [editingExhibition, setEditingExhibition] = useState<Exhibition | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showResourcesDialog, setShowResourcesDialog] = useState<string | null>(null);
+  const [showTourItemsDialog, setShowTourItemsDialog] = useState<{ id: string; title: string } | null>(null);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
 
@@ -352,13 +354,23 @@ export default function ExhibitionsManager() {
                             variant="ghost"
                             size="sm"
                             onClick={() => setShowResourcesDialog(exhibition.id)}
+                            title="Ressources"
                           >
                             <FileText className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
+                            onClick={() => setShowTourItemsDialog({ id: exhibition.id, title: exhibition.title })}
+                            title="Visite guidée"
+                          >
+                            <Route className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => setDeletingId(exhibition.id)}
+                            title="Supprimer"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -539,6 +551,17 @@ export default function ExhibitionsManager() {
             </div>
           </div>
         </DialogContent>
+      </Dialog>
+
+      {/* Tour Items Dialog */}
+      <Dialog open={!!showTourItemsDialog} onOpenChange={() => setShowTourItemsDialog(null)}>
+        {showTourItemsDialog && (
+          <TourItemsManager
+            exhibitionId={showTourItemsDialog.id}
+            exhibitionTitle={showTourItemsDialog.title}
+            onClose={() => setShowTourItemsDialog(null)}
+          />
+        )}
       </Dialog>
 
       {/* Delete Confirmation */}
