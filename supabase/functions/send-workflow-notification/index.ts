@@ -112,6 +112,39 @@ serve(async (req) => {
         emailHtml = getRestorationEmailHtml(notification_type, requestData, additional_data);
         break;
 
+      case "cbm_adhesion_catalogue":
+        const { data: adhesionCatalogue } = await supabaseAdmin
+          .from("cbm_adhesions_catalogue")
+          .select("*")
+          .eq("id", request_id)
+          .single();
+        requestData = adhesionCatalogue;
+        emailSubject = getCBMAdhesionEmailSubject(notification_type, requestData, "catalogue");
+        emailHtml = getCBMAdhesionEmailHtml(notification_type, requestData, additional_data, "catalogue");
+        break;
+
+      case "cbm_adhesion_reseau":
+        const { data: adhesionReseau } = await supabaseAdmin
+          .from("cbm_adhesions_reseau")
+          .select("*")
+          .eq("id", request_id)
+          .single();
+        requestData = adhesionReseau;
+        emailSubject = getCBMAdhesionEmailSubject(notification_type, requestData, "reseau");
+        emailHtml = getCBMAdhesionEmailHtml(notification_type, requestData, additional_data, "reseau");
+        break;
+
+      case "cbm_formation":
+        const { data: formation } = await supabaseAdmin
+          .from("cbm_demandes_formation")
+          .select("*")
+          .eq("id", request_id)
+          .single();
+        requestData = formation;
+        emailSubject = getCBMFormationEmailSubject(notification_type, requestData);
+        emailHtml = getCBMFormationEmailHtml(notification_type, requestData, additional_data);
+        break;
+
       default:
         throw new Error(`Type de demande non supporté: ${request_type}`);
     }
@@ -496,6 +529,127 @@ function getRestorationEmailHtml(type: string, data: any, additionalData: any): 
     content += `<p>La restauration de votre manuscrit est en cours. Nous vous tiendrons informé de l'avancement.</p>`;
   } else if (type === "completed") {
     content += `<p>La restauration de votre manuscrit est terminée. Vous pouvez venir le récupérer.</p>`;
+  }
+
+  return getEmailBase(content);
+}
+
+// CBM Adhesion emails
+function getCBMAdhesionEmailSubject(type: string, data: any, adhesionType: string): string {
+  const typeLabel = adhesionType === "catalogue" ? "au Catalogue Collectif" : "au Réseau des Bibliothèques";
+  switch (type) {
+    case "created":
+      return `Demande d'adhésion ${typeLabel} enregistrée - ${data.nom_bibliotheque}`;
+    case "en_validation":
+      return `Votre demande d'adhésion est en cours de validation - ${data.nom_bibliotheque}`;
+    case "approved":
+      return `Votre demande d'adhésion ${typeLabel} a été approuvée - ${data.nom_bibliotheque}`;
+    case "rejected":
+      return `Décision concernant votre demande d'adhésion - ${data.nom_bibliotheque}`;
+    default:
+      return `Notification - Demande d'adhésion ${data.nom_bibliotheque}`;
+  }
+}
+
+function getCBMAdhesionEmailHtml(type: string, data: any, additionalData: any, adhesionType: string): string {
+  const typeLabel = adhesionType === "catalogue" ? "Catalogue Collectif du Maroc" : "Réseau des Bibliothèques du Maroc";
+  
+  let content = `
+    <h2 style="color: #002B45;">Notification - Adhésion au ${typeLabel}</h2>
+    <div class="info-box">
+      <p><strong>Bibliothèque:</strong> ${data.nom_bibliotheque}</p>
+      <p><strong>Type:</strong> ${data.type_bibliotheque || 'N/A'}</p>
+      <p><strong>Ville:</strong> ${data.ville || 'N/A'}</p>
+      <p><strong>Région:</strong> ${data.region || 'N/A'}</p>
+    </div>
+  `;
+
+  if (type === "created") {
+    content += `
+      <p>Votre demande d'adhésion au ${typeLabel} a été enregistrée avec succès.</p>
+      <p>Elle sera examinée par notre équipe et vous serez notifié de la décision.</p>
+    `;
+  } else if (type === "en_validation") {
+    content += `
+      <p>Votre demande d'adhésion est actuellement en cours de validation par le comité de pilotage.</p>
+      <p>Vous recevrez une notification dès qu'une décision sera prise.</p>
+    `;
+  } else if (type === "approved") {
+    content += `
+      <p>Nous avons le plaisir de vous informer que votre demande d'adhésion au ${typeLabel} a été <strong>approuvée</strong>.</p>
+      <p>Bienvenue dans le réseau ! Notre équipe vous contactera prochainement pour les prochaines étapes.</p>
+    `;
+  } else if (type === "rejected") {
+    content += `
+      <p>Nous regrettons de vous informer que votre demande d'adhésion n'a pas pu être acceptée.</p>
+      ${additionalData?.reason ? `<p><strong>Motif:</strong> ${additionalData.reason}</p>` : ''}
+      <p>N'hésitez pas à nous contacter pour plus d'informations.</p>
+    `;
+  }
+
+  return getEmailBase(content);
+}
+
+// CBM Formation emails
+function getCBMFormationEmailSubject(type: string, data: any): string {
+  const formationType = data.type_formation || 'Formation';
+  switch (type) {
+    case "created":
+      return `Demande de formation enregistrée - ${data.nom_organisme}`;
+    case "en_validation":
+      return `Votre demande de formation est en cours de validation - ${formationType}`;
+    case "approved":
+      return `Votre demande de formation a été approuvée - ${formationType}`;
+    case "rejected":
+      return `Décision concernant votre demande de formation - ${formationType}`;
+    default:
+      return `Notification - Demande de formation ${data.nom_organisme}`;
+  }
+}
+
+function getCBMFormationEmailHtml(type: string, data: any, additionalData: any): string {
+  const formationTypeLabels: Record<string, string> = {
+    formats_marc: "Formats MARC",
+    catalogage: "Catalogage",
+    indexation: "Indexation",
+    gestion_sigb: "Gestion SIGB",
+    services_numeriques: "Services numériques",
+    autre: "Autre"
+  };
+  
+  const formationType = formationTypeLabels[data.type_formation] || data.type_formation;
+  
+  let content = `
+    <h2 style="color: #002B45;">Notification - Demande de Formation</h2>
+    <div class="info-box">
+      <p><strong>Organisme:</strong> ${data.nom_organisme || 'N/A'}</p>
+      <p><strong>Type de formation:</strong> ${formationType}</p>
+      <p><strong>Contact:</strong> ${data.nom_contact || 'N/A'}</p>
+      <p><strong>Nombre de participants:</strong> ${data.nombre_participants || 'N/A'}</p>
+    </div>
+  `;
+
+  if (type === "created") {
+    content += `
+      <p>Votre demande de formation a été enregistrée avec succès.</p>
+      <p>Elle sera examinée par notre équipe et vous serez notifié de la décision.</p>
+    `;
+  } else if (type === "en_validation") {
+    content += `
+      <p>Votre demande de formation est actuellement en cours de validation par le comité de pilotage.</p>
+      <p>Vous recevrez une notification dès qu'une décision sera prise.</p>
+    `;
+  } else if (type === "approved") {
+    content += `
+      <p>Nous avons le plaisir de vous informer que votre demande de formation a été <strong>approuvée</strong>.</p>
+      <p>Notre équipe vous contactera prochainement pour organiser les sessions de formation.</p>
+    `;
+  } else if (type === "rejected") {
+    content += `
+      <p>Nous regrettons de vous informer que votre demande de formation n'a pas pu être acceptée.</p>
+      ${additionalData?.reason ? `<p><strong>Motif:</strong> ${additionalData.reason}</p>` : ''}
+      <p>N'hésitez pas à soumettre une nouvelle demande ultérieurement.</p>
+    `;
   }
 
   return getEmailBase(content);
