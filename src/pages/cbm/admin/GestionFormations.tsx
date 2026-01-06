@@ -92,12 +92,27 @@ export default function GestionFormations() {
 
   const handleApprove = async (id: string) => {
     try {
+      // Get formation data for email
+      const formation = formations?.find(f => f.id === id);
+
       const { error } = await supabase
         .from('cbm_demandes_formation')
         .update({ statut: 'en_validation' })
         .eq('id', id);
       
       if (error) throw error;
+
+      // Send email notification
+      if (formation?.email) {
+        await supabase.functions.invoke('send-workflow-notification', {
+          body: {
+            request_type: 'cbm_formation',
+            request_id: id,
+            notification_type: 'en_validation',
+            recipient_email: formation.email
+          }
+        });
+      }
 
       toast({
         title: "Demande envoyée en validation",
@@ -134,6 +149,19 @@ export default function GestionFormations() {
       
       if (error) throw error;
 
+      // Send email notification
+      if (selectedFormation.email) {
+        await supabase.functions.invoke('send-workflow-notification', {
+          body: {
+            request_type: 'cbm_formation',
+            request_id: selectedFormation.id,
+            notification_type: 'rejected',
+            recipient_email: selectedFormation.email,
+            additional_data: { reason: rejectionReason }
+          }
+        });
+      }
+
       toast({
         title: "Demande rejetée",
         description: "La demande a été rejetée avec succès.",
@@ -154,12 +182,27 @@ export default function GestionFormations() {
 
   const handleValidateByCommittee = async (id: string) => {
     try {
+      // Get formation data for email
+      const formation = formations?.find(f => f.id === id);
+
       const { error } = await supabase
         .from('cbm_demandes_formation')
         .update({ statut: 'approuve' })
         .eq('id', id);
       
       if (error) throw error;
+
+      // Send email notification
+      if (formation?.email) {
+        await supabase.functions.invoke('send-workflow-notification', {
+          body: {
+            request_type: 'cbm_formation',
+            request_id: id,
+            notification_type: 'approved',
+            recipient_email: formation.email
+          }
+        });
+      }
 
       toast({
         title: "Demande validée",

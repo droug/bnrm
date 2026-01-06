@@ -117,12 +117,32 @@ export default function GestionAdhesions() {
 
   const handleApprove = async (id: string, table: "cbm_adhesions_catalogue" | "cbm_adhesions_reseau") => {
     try {
+      // Get adhesion data for email
+      const { data: adhesionData } = await supabase
+        .from(table)
+        .select('*')
+        .eq('id', id)
+        .single();
+
       const { error } = await supabase
         .from(table)
         .update({ statut: 'en_validation' })
         .eq('id', id);
       
       if (error) throw error;
+
+      // Send email notification
+      if (adhesionData?.email) {
+        const requestType = table === "cbm_adhesions_catalogue" ? "cbm_adhesion_catalogue" : "cbm_adhesion_reseau";
+        await supabase.functions.invoke('send-workflow-notification', {
+          body: {
+            request_type: requestType,
+            request_id: id,
+            notification_type: 'en_validation',
+            recipient_email: adhesionData.email
+          }
+        });
+      }
 
       toast({
         title: "Demande envoyée en validation",
@@ -164,6 +184,20 @@ export default function GestionAdhesions() {
       
       if (error) throw error;
 
+      // Send email notification
+      if (selectedAdhesion.email) {
+        const requestType = selectedTable === "cbm_adhesions_catalogue" ? "cbm_adhesion_catalogue" : "cbm_adhesion_reseau";
+        await supabase.functions.invoke('send-workflow-notification', {
+          body: {
+            request_type: requestType,
+            request_id: selectedAdhesion.id,
+            notification_type: 'rejected',
+            recipient_email: selectedAdhesion.email,
+            additional_data: { reason: rejectionReason }
+          }
+        });
+      }
+
       toast({
         title: "Demande rejetée",
         description: "La demande a été rejetée avec succès.",
@@ -189,12 +223,32 @@ export default function GestionAdhesions() {
 
   const handleValidateByCommittee = async (id: string, table: "cbm_adhesions_catalogue" | "cbm_adhesions_reseau") => {
     try {
+      // Get adhesion data for email
+      const { data: adhesionData } = await supabase
+        .from(table)
+        .select('*')
+        .eq('id', id)
+        .single();
+
       const { error } = await supabase
         .from(table)
         .update({ statut: 'approuve' })
         .eq('id', id);
       
       if (error) throw error;
+
+      // Send email notification
+      if (adhesionData?.email) {
+        const requestType = table === "cbm_adhesions_catalogue" ? "cbm_adhesion_catalogue" : "cbm_adhesion_reseau";
+        await supabase.functions.invoke('send-workflow-notification', {
+          body: {
+            request_type: requestType,
+            request_id: id,
+            notification_type: 'approved',
+            recipient_email: adhesionData.email
+          }
+        });
+      }
 
       toast({
         title: "Demande validée",
