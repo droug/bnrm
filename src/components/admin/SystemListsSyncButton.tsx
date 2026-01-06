@@ -1,20 +1,39 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, CheckCircle2, AlertCircle } from "lucide-react";
+import { RefreshCw, CheckCircle2, AlertCircle, Globe, Database } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { systemListsSyncEngine } from "@/services/systemListsSync";
 import { SYSTEM_LISTS_DEFINITIONS } from "@/config/systemListsDefinitions";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 
 export const SystemListsSyncButton = () => {
   const [syncing, setSyncing] = useState(false);
   const [lastReport, setLastReport] = useState<any>(null);
   const { toast } = useToast();
 
+  // Statistiques par plateforme
+  const platformStats = useMemo(() => {
+    const stats: Record<string, number> = {};
+    SYSTEM_LISTS_DEFINITIONS.forEach(list => {
+      const platform = list.platform || 'BNRM';
+      stats[platform] = (stats[platform] || 0) + 1;
+    });
+    return stats;
+  }, []);
+
+  const platformColors: Record<string, string> = {
+    'BNRM': 'bg-blue-500',
+    'CBM': 'bg-green-500',
+    'DEPOT_LEGAL': 'bg-purple-500',
+    'MANUSCRIPTS': 'bg-amber-500',
+    'DIGITAL_LIBRARY': 'bg-cyan-500',
+  };
+
   const handleSync = async () => {
     setSyncing(true);
     try {
-      console.log(`🔄 Démarrage de la synchronisation de ${SYSTEM_LISTS_DEFINITIONS.length} listes...`);
+      console.log(`🔄 Démarrage de la synchronisation de ${SYSTEM_LISTS_DEFINITIONS.length} listes (toutes plateformes)...`);
       
       const report = await systemListsSyncEngine.autoSync(SYSTEM_LISTS_DEFINITIONS);
       setLastReport(report);
@@ -38,6 +57,29 @@ export const SystemListsSyncButton = () => {
 
   return (
     <div className="space-y-4">
+      {/* Statistiques par plateforme */}
+      <div className="p-4 bg-muted/50 rounded-lg border">
+        <div className="flex items-center gap-2 mb-3">
+          <Globe className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Listes par plateforme</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {Object.entries(platformStats).map(([platform, count]) => (
+            <Badge 
+              key={platform} 
+              variant="secondary"
+              className={`${platformColors[platform] || 'bg-gray-500'} text-white`}
+            >
+              {platform}: {count} listes
+            </Badge>
+          ))}
+        </div>
+        <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+          <Database className="h-4 w-4" />
+          <span>Total: {SYSTEM_LISTS_DEFINITIONS.length} listes système</span>
+        </div>
+      </div>
+
       <Button 
         onClick={handleSync} 
         disabled={syncing} 
@@ -52,7 +94,7 @@ export const SystemListsSyncButton = () => {
         ) : (
           <>
             <RefreshCw className="mr-2 h-4 w-4" />
-            Synchroniser toutes les listes système
+            Synchroniser toutes les listes (toutes plateformes)
           </>
         )}
       </Button>
@@ -84,8 +126,8 @@ export const SystemListsSyncButton = () => {
 
       <Alert>
         <AlertDescription className="text-sm">
-          <strong>ℹ️ Note :</strong> La synchronisation automatique s'exécute au démarrage de l'application. 
-          Ce bouton permet une synchronisation manuelle pour forcer la mise à jour immédiate.
+          <strong>ℹ️ Note :</strong> La synchronisation inclut toutes les plateformes (BNRM, CBM, Dépôt Légal, Manuscrits, Bibliothèque Numérique).
+          Elle s'exécute automatiquement au démarrage de l'application.
         </AlertDescription>
       </Alert>
     </div>
