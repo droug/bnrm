@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -22,9 +23,13 @@ import {
   Layers,
   ArrowRight,
   Star,
-  Eye
+  Eye,
+  X,
+  SkipForward,
+  RotateCcw,
+  Maximize2
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import document1 from "@/assets/digital-library/document-1.jpg";
 import document2 from "@/assets/digital-library/document-2.jpg";
 import document3 from "@/assets/digital-library/document-3.jpg";
@@ -36,9 +41,19 @@ import cartesAnciennes from "@/assets/digital-library/cartes-anciennes.jpg";
 import archivesPhotoMaroc from "@/assets/digital-library/archives-photo-maroc.jpg";
 
 export default function VirtualExhibition() {
+  const navigate = useNavigate();
   const [selectedEra, setSelectedEra] = useState("medieval");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  
+  // Tour mode states
+  const [isTourActive, setIsTourActive] = useState(false);
+  const [tourStep, setTourStep] = useState(0);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [isAutoPlay, setIsAutoPlay] = useState(false);
+  
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
 
   // Timeline periods
   const timelinePeriods = [
@@ -120,12 +135,141 @@ export default function VirtualExhibition() {
 
   const currentGallery = galleryItems[selectedEra] || [];
 
+  // Tour items - all documents in order for the guided tour
+  const tourItems = [
+    { 
+      id: "intro", 
+      type: "intro",
+      title: "Bienvenue dans l'exposition", 
+      description: "Découvrez le patrimoine culturel marocain à travers une sélection de documents exceptionnels couvrant plus de 12 siècles d'histoire.",
+      image: manuscritsAndalous,
+      details: "Cette exposition virtuelle vous invite à un voyage à travers le temps, des premières traces de civilisation jusqu'à l'époque moderne."
+    },
+    { 
+      id: "manuscript-1", 
+      type: "document",
+      title: "Maqamat d'Al-Hariri", 
+      description: "Chef-d'œuvre de la littérature arabe médiévale, ce manuscrit enluminé du XIIIe siècle illustre les aventures d'Abu Zayd.",
+      image: manuscritsAndalous,
+      year: "XIIIe siècle",
+      origin: "Al-Andalus",
+      technique: "Enluminure sur parchemin",
+      dimensions: "32 x 24 cm",
+      details: "Ce manuscrit est l'un des plus beaux exemples de l'art de l'enluminure arabo-andalouse. Les miniatures représentent des scènes de la vie quotidienne avec une richesse de détails exceptionnelle."
+    },
+    { 
+      id: "map-1", 
+      type: "document",
+      title: "Atlas Al-Idrisi", 
+      description: "Carte du monde réalisée par le géographe Al-Idrisi pour le roi Roger II de Sicile.",
+      image: cartesAnciennes,
+      year: "1154",
+      origin: "Sicile",
+      technique: "Encre et pigments sur parchemin",
+      dimensions: "180 x 70 cm",
+      details: "Al-Idrisi a compilé les connaissances géographiques de son époque pour créer cette carte révolutionnaire, qui resta une référence pendant plusieurs siècles."
+    },
+    { 
+      id: "photo-1", 
+      type: "document",
+      title: "Fès - La Médina", 
+      description: "Vue panoramique de la médina de Fès, plus grande zone urbaine sans voiture du monde.",
+      image: archivesPhotoMaroc,
+      year: "1920",
+      origin: "Fès, Maroc",
+      technique: "Photographie argentique",
+      dimensions: "24 x 18 cm",
+      details: "Cette photographie témoigne de l'architecture traditionnelle préservée de la médina de Fès, inscrite au patrimoine mondial de l'UNESCO."
+    },
+    { 
+      id: "manuscript-2", 
+      type: "document",
+      title: "Traité de médecine d'Ibn Sina", 
+      description: "Copie marocaine du célèbre Canon de la médecine d'Avicenne.",
+      image: document1,
+      year: "XIVe siècle",
+      origin: "Fès",
+      technique: "Calligraphie sur papier",
+      dimensions: "28 x 20 cm",
+      details: "Ce traité encyclopédique a servi de référence médicale dans le monde islamique et en Europe pendant des siècles."
+    },
+    { 
+      id: "archive-1", 
+      type: "document",
+      title: "Dahir Royal", 
+      description: "Document officiel du Makhzen marocain portant le sceau du Sultan.",
+      image: document5,
+      year: "1850",
+      origin: "Rabat",
+      technique: "Calligraphie sur papier vergé",
+      dimensions: "45 x 30 cm",
+      details: "Les dahirs sont des décrets royaux qui ont régi l'administration du Maroc. Ce document témoigne de l'organisation politique du royaume au XIXe siècle."
+    },
+  ];
+
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % featuredExhibits.length);
   };
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + featuredExhibits.length) % featuredExhibits.length);
+  };
+
+  const startTour = () => {
+    setIsTourActive(true);
+    setTourStep(0);
+    setSelectedItem(tourItems[0]);
+  };
+
+  const nextTourStep = () => {
+    if (tourStep < tourItems.length - 1) {
+      const nextStep = tourStep + 1;
+      setTourStep(nextStep);
+      setSelectedItem(tourItems[nextStep]);
+    } else {
+      // End of tour
+      setIsTourActive(false);
+      setTourStep(0);
+      setSelectedItem(null);
+    }
+  };
+
+  const prevTourStep = () => {
+    if (tourStep > 0) {
+      const prevStep = tourStep - 1;
+      setTourStep(prevStep);
+      setSelectedItem(tourItems[prevStep]);
+    }
+  };
+
+  const endTour = () => {
+    setIsTourActive(false);
+    setTourStep(0);
+    setSelectedItem(null);
+    setIsAutoPlay(false);
+  };
+
+  const restartTour = () => {
+    setTourStep(0);
+    setSelectedItem(tourItems[0]);
+  };
+
+  // Auto-play effect
+  useEffect(() => {
+    if (isAutoPlay && isTourActive) {
+      const timer = setTimeout(() => {
+        nextTourStep();
+      }, 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [isAutoPlay, isTourActive, tourStep]);
+
+  const openItemDetail = (item: any) => {
+    setSelectedItem({
+      ...item,
+      type: "document",
+      details: `Document de type ${item.type} datant de ${item.year}. Cette pièce fait partie de nos collections patrimoniales et témoigne de la richesse culturelle du Maroc.`
+    });
   };
 
   return (
@@ -163,13 +307,22 @@ export default function VirtualExhibition() {
               </p>
 
               <div className="flex flex-wrap gap-4 pt-4">
-                <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-orange-500/25">
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-orange-500/25"
+                  onClick={startTour}
+                >
                   <Play className="h-5 w-5 mr-2" />
                   Commencer la visite
                 </Button>
-                <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm"
+                  onClick={() => timelineRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                >
                   <Info className="h-5 w-5 mr-2" />
-                  En savoir plus
+                  Explorer librement
                 </Button>
               </div>
 
@@ -244,7 +397,7 @@ export default function VirtualExhibition() {
       </section>
 
       {/* Interactive Timeline */}
-      <section className="py-16 bg-gradient-to-b from-slate-900 to-background">
+      <section ref={timelineRef} className="py-16 bg-gradient-to-b from-slate-900 to-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-3">Explorez l'Histoire</h2>
@@ -290,7 +443,11 @@ export default function VirtualExhibition() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {currentGallery.map((item) => (
-                <Card key={item.id} className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300">
+                <Card 
+                  key={item.id} 
+                  className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300"
+                  onClick={() => openItemDetail(item)}
+                >
                   <div className="aspect-square relative overflow-hidden">
                     <img 
                       src={item.image}
@@ -406,6 +563,242 @@ export default function VirtualExhibition() {
           </Card>
         </div>
       </section>
+
+      {/* Tour Mode Overlay */}
+      {isTourActive && selectedItem && (
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
+          {/* Tour Controls - Top Bar */}
+          <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent">
+            <div className="flex items-center gap-4">
+              <Badge className="bg-amber-500 text-white">
+                {tourStep + 1} / {tourItems.length}
+              </Badge>
+              <span className="text-white/80 text-sm hidden md:block">Visite guidée</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/10"
+                onClick={() => setIsAutoPlay(!isAutoPlay)}
+              >
+                {isAutoPlay ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                <span className="ml-2 hidden md:inline">{isAutoPlay ? "Pause" : "Auto"}</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/10"
+                onClick={restartTour}
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/10"
+                onClick={endTour}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="container mx-auto px-4 py-20 max-h-screen overflow-y-auto">
+            <div className="grid lg:grid-cols-2 gap-8 items-center max-w-6xl mx-auto">
+              {/* Image */}
+              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+                <img 
+                  src={selectedItem.image}
+                  alt={selectedItem.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                {selectedItem.type !== "intro" && (
+                  <div className="absolute bottom-4 left-4 right-4 flex gap-2">
+                    <Button size="sm" variant="secondary" className="backdrop-blur-sm">
+                      <ZoomIn className="h-4 w-4 mr-1" />
+                      Agrandir
+                    </Button>
+                    <Button size="sm" variant="secondary" className="backdrop-blur-sm">
+                      <Maximize2 className="h-4 w-4 mr-1" />
+                      Plein écran
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="text-white space-y-6">
+                {selectedItem.type === "intro" ? (
+                  <>
+                    <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                      Introduction
+                    </Badge>
+                    <h2 className="text-3xl md:text-4xl font-bold">{selectedItem.title}</h2>
+                    <p className="text-xl text-white/80">{selectedItem.description}</p>
+                    <p className="text-white/60">{selectedItem.details}</p>
+                  </>
+                ) : (
+                  <>
+                    <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30">
+                      {selectedItem.year}
+                    </Badge>
+                    <h2 className="text-3xl md:text-4xl font-bold">{selectedItem.title}</h2>
+                    <p className="text-lg text-white/80">{selectedItem.description}</p>
+                    
+                    {/* Document Details */}
+                    <div className="grid grid-cols-2 gap-4 pt-4">
+                      {selectedItem.origin && (
+                        <div className="bg-white/5 rounded-lg p-3">
+                          <div className="text-xs text-white/50 uppercase tracking-wider">Origine</div>
+                          <div className="text-white font-medium">{selectedItem.origin}</div>
+                        </div>
+                      )}
+                      {selectedItem.technique && (
+                        <div className="bg-white/5 rounded-lg p-3">
+                          <div className="text-xs text-white/50 uppercase tracking-wider">Technique</div>
+                          <div className="text-white font-medium">{selectedItem.technique}</div>
+                        </div>
+                      )}
+                      {selectedItem.dimensions && (
+                        <div className="bg-white/5 rounded-lg p-3">
+                          <div className="text-xs text-white/50 uppercase tracking-wider">Dimensions</div>
+                          <div className="text-white font-medium">{selectedItem.dimensions}</div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <p className="text-white/60 text-sm border-l-2 border-amber-500/50 pl-4">
+                      {selectedItem.details}
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation - Bottom Bar */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+            <div className="container mx-auto flex items-center justify-between">
+              <Button
+                variant="outline"
+                className="border-white/30 text-white hover:bg-white/10"
+                onClick={prevTourStep}
+                disabled={tourStep === 0}
+              >
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Précédent
+              </Button>
+
+              {/* Progress dots */}
+              <div className="hidden md:flex gap-1">
+                {tourItems.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setTourStep(index);
+                      setSelectedItem(tourItems[index]);
+                    }}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      index === tourStep 
+                        ? 'w-6 bg-amber-400' 
+                        : index < tourStep
+                        ? 'bg-amber-400/50'
+                        : 'bg-white/30 hover:bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <Button
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+                onClick={nextTourStep}
+              >
+                {tourStep === tourItems.length - 1 ? (
+                  <>
+                    Terminer
+                    <X className="h-4 w-4 ml-2" />
+                  </>
+                ) : (
+                  <>
+                    Suivant
+                    <ChevronRight className="h-4 w-4 ml-2" />
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Auto-play progress bar */}
+          {isAutoPlay && (
+            <div className="absolute top-16 left-0 right-0 h-1 bg-white/10">
+              <div 
+                className="h-full bg-amber-500 transition-all duration-100"
+                style={{ 
+                  width: '100%',
+                  animation: 'shrink 8s linear forwards'
+                }}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Item Detail Dialog */}
+      <Dialog open={selectedItem !== null && !isTourActive} onOpenChange={() => setSelectedItem(null)}>
+        <DialogContent className="max-w-4xl">
+          {selectedItem && (
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="aspect-square rounded-lg overflow-hidden">
+                <img 
+                  src={selectedItem.image}
+                  alt={selectedItem.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="space-y-4">
+                <DialogHeader>
+                  <Badge className="w-fit mb-2">{selectedItem.type || selectedItem.year}</Badge>
+                  <DialogTitle className="text-2xl">{selectedItem.title}</DialogTitle>
+                  <DialogDescription>{selectedItem.description || selectedItem.details}</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3 pt-4">
+                  {selectedItem.year && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span>{selectedItem.year}</span>
+                    </div>
+                  )}
+                  {selectedItem.origin && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span>{selectedItem.origin}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-2 pt-4">
+                  <Button className="flex-1">
+                    <Eye className="h-4 w-4 mr-2" />
+                    Consulter
+                  </Button>
+                  <Button variant="outline">
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <style>{`
+        @keyframes shrink {
+          from { width: 100%; }
+          to { width: 0%; }
+        }
+      `}</style>
     </DigitalLibraryLayout>
   );
 }
