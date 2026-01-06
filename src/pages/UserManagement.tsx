@@ -324,12 +324,32 @@ export default function UserManagement() {
 
   const updateUserApproval = async (userId: string, isApproved: boolean) => {
     try {
+      // Récupérer l'utilisateur pour avoir son email
+      const userProfile = users.find(u => u.id === userId);
+      
       const { error } = await supabase
         .from('profiles')
         .update({ is_approved: isApproved, updated_at: new Date().toISOString() })
         .eq('id', userId);
 
       if (error) throw error;
+
+      // Envoyer l'email de notification
+      if (userProfile) {
+        const { data: authData } = await supabase.auth.admin.getUserById(userProfile.user_id);
+        const userEmail = authData?.user?.email;
+        
+        if (userEmail) {
+          await supabase.functions.invoke('send-registration-email', {
+            body: {
+              email_type: isApproved ? 'account_validated' : 'account_rejected',
+              recipient_email: userEmail,
+              recipient_name: `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim() || 'Utilisateur',
+              user_type: userProfile.role || 'visitor'
+            }
+          });
+        }
+      }
 
       toast({
         title: isApproved ? "Utilisateur approuvé" : "Approbation révoquée",

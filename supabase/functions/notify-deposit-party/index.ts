@@ -1,5 +1,6 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -31,7 +32,7 @@ serve(async (req) => {
       .select(`
         *,
         request:legal_deposit_requests(request_number, title),
-        user:profiles(first_name, last_name)
+        user:profiles(first_name, last_name, email)
       `)
       .eq("id", partyId)
       .single();
@@ -46,6 +47,9 @@ serve(async (req) => {
     if (authError) throw authError;
 
     const userEmail = authData.user.email;
+    const userName = party.user?.first_name && party.user?.last_name 
+      ? `${party.user.first_name} ${party.user.last_name}` 
+      : userEmail;
 
     if (!userEmail) {
       throw new Error("User email not found");
@@ -57,14 +61,83 @@ serve(async (req) => {
       producer: "Producteur",
     };
 
+    const roleLabel = roleLabels[party.party_role] || party.party_role;
+
     // Créer une notification dans la base de données
     await supabaseAdmin.from("deposit_notifications").insert({
       request_id: requestId,
       recipient_id: party.user_id,
       notification_type: "party_invitation",
       title: "Nouvelle demande de dépôt légal",
-      message: `Vous avez été invité en tant que ${roleLabels[party.party_role]} pour la demande de dépôt légal "${party.request.title}" (${party.request.request_number}).`,
+      message: `Vous avez été invité en tant que ${roleLabel} pour la demande de dépôt légal "${party.request.title}" (${party.request.request_number}).`,
     });
+
+    // Envoyer l'email via Resend
+    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+    
+    if (RESEND_API_KEY) {
+      const resend = new Resend(RESEND_API_KEY);
+      
+      const emailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #002B45 0%, #004d7a 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+            .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+            .info-box { background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #002B45; border-radius: 4px; }
+            .btn { display: inline-block; padding: 12px 30px; background: #002B45; color: white; text-decoration: none; border-radius: 4px; margin: 20px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Bibliothèque Nationale du Royaume du Maroc</h1>
+            </div>
+            <div class="content">
+              <h2>Bonjour ${userName},</h2>
+              
+              <p>Vous avez été désigné en tant que <strong>${roleLabel}</strong> pour une nouvelle demande de dépôt légal.</p>
+              
+              <div class="info-box">
+                <p><strong>Titre de l'œuvre:</strong> ${party.request.title}</p>
+                <p><strong>Numéro de demande:</strong> ${party.request.request_number}</p>
+                <p><strong>Votre rôle:</strong> ${roleLabel}</p>
+              </div>
+              
+              <p>Veuillez vous connecter à votre espace personnel pour consulter et valider cette demande.</p>
+              
+              <p style="text-align: center;">
+                <a href="https://www.bnrm.ma/my-space" class="btn">Accéder à mon espace</a>
+              </p>
+              
+              <p>Cordialement,<br><strong>L'équipe du Dépôt Légal - BNRM</strong></p>
+            </div>
+            <div class="footer">
+              <p>Bibliothèque Nationale du Royaume du Maroc<br>
+              Avenue Ibn Khaldoun, Rabat, Maroc<br>
+              Tél: +212 537 77 18 33 | Email: depot.legal@bnrm.ma</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      await resend.emails.send({
+        from: "BNRM Dépôt Légal <onboarding@resend.dev>",
+        to: [userEmail],
+        subject: `Invitation Dépôt Légal - ${party.request.request_number}`,
+        html: emailHtml,
+      });
+
+      console.log(`Email sent to ${userEmail} for party ${partyId}`);
+    } else {
+      console.warn("RESEND_API_KEY not configured, email not sent");
+    }
 
     // Mettre à jour la date de notification
     await supabaseAdmin
