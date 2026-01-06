@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail, GitBranch, List, Sliders, FolderTree, Wrench, Home, FormInput, Network, MapPin } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail, GitBranch, List, Sliders, FolderTree, Wrench, Home, FormInput, Network, MapPin, Bell } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -67,6 +67,14 @@ export default function AdminSettings() {
 
   // Autres cartes de paramétrage
   const otherCards = [
+    {
+      icon: Bell,
+      title: "Paramètres de Notifications",
+      description: "Configurer les notifications par email, système et SMS pour toutes les actions",
+      href: "/admin/notifications",
+      permission: "content.manage",
+      gradient: "from-rose-500 to-pink-600"
+    },
     {
       icon: ShieldCheck,
       title: "Gestion des Droits et Permissions",
