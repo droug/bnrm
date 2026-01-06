@@ -356,9 +356,11 @@ interface NotificationItemProps {
   icon: React.ReactNode;
   config: NotificationConfig;
   onChange: (id: keyof NotificationSettings, config: NotificationConfig) => void;
+  templateKey?: keyof EmailTemplates;
+  onEditTemplate?: (key: keyof EmailTemplates) => void;
 }
 
-function NotificationItem({ id, label, description, icon, config, onChange }: NotificationItemProps) {
+function NotificationItem({ id, label, description, icon, config, onChange, templateKey, onEditTemplate }: NotificationItemProps) {
   const handleEnabledChange = (enabled: boolean) => {
     onChange(id, { ...config, enabled });
   };
@@ -425,6 +427,18 @@ function NotificationItem({ id, label, description, icon, config, onChange }: No
               SMS
             </Label>
           </div>
+          
+          {templateKey && onEditTemplate && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="ml-auto text-xs"
+              onClick={() => onEditTemplate(templateKey)}
+            >
+              <FileEdit className="h-3 w-3 mr-1" />
+              Modifier le texte
+            </Button>
+          )}
         </div>
       )}
     </div>
@@ -438,7 +452,7 @@ export function BNRMPaymentNotificationSettings() {
   const [settings, setSettings] = useState<NotificationSettings>(defaultNotificationSettings);
   const [smsSettings, setSmsSettings] = useState<SMSSettings>(defaultSMSSettings);
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplates>(defaultEmailTemplates);
-  const [previewTemplate, setPreviewTemplate] = useState<{ key: string; template: EmailTemplate } | null>(null);
+  const [editingTemplate, setEditingTemplate] = useState<{ key: keyof EmailTemplates; template: EmailTemplate } | null>(null);
 
   useEffect(() => {
     fetchSettings();
@@ -470,6 +484,17 @@ export function BNRMPaymentNotificationSettings() {
       if (!smsError && smsData && smsData.length > 0) {
         const savedSmsSettings = JSON.parse(smsData[0].valeur);
         setSmsSettings({ ...defaultSMSSettings, ...savedSmsSettings });
+      }
+
+      // Fetch email templates
+      const { data: templatesData, error: templatesError } = await supabase
+        .from("bnrm_parametres")
+        .select("*")
+        .eq("parametre", "email_templates");
+
+      if (!templatesError && templatesData && templatesData.length > 0) {
+        const savedTemplates = JSON.parse(templatesData[0].valeur);
+        setEmailTemplates({ ...defaultEmailTemplates, ...savedTemplates });
       }
     } catch (error: any) {
       console.error("Erreur:", error);
@@ -508,6 +533,19 @@ export function BNRMPaymentNotificationSettings() {
 
       if (smsError) throw smsError;
 
+      // Save email templates
+      const { error: templatesError } = await supabase
+        .from("bnrm_parametres")
+        .upsert({
+          parametre: "email_templates",
+          valeur: JSON.stringify(emailTemplates),
+          commentaire: "Templates email des notifications",
+        }, {
+          onConflict: "parametre"
+        });
+
+      if (templatesError) throw templatesError;
+
       toast({
         title: "Succès",
         description: "Les paramètres de notifications ont été enregistrés",
@@ -532,6 +570,52 @@ export function BNRMPaymentNotificationSettings() {
     setSmsSettings((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleEditTemplate = (key: keyof EmailTemplates) => {
+    setEditingTemplate({ key, template: { ...emailTemplates[key] } });
+  };
+
+  const handleSaveTemplate = () => {
+    if (editingTemplate) {
+      setEmailTemplates(prev => ({
+        ...prev,
+        [editingTemplate.key]: editingTemplate.template
+      }));
+      setEditingTemplate(null);
+      toast({
+        title: "Template modifié",
+        description: "N'oubliez pas d'enregistrer les paramètres pour sauvegarder les modifications.",
+      });
+    }
+  };
+
+  const handleResetTemplate = (key: keyof EmailTemplates) => {
+    setEmailTemplates(prev => ({
+      ...prev,
+      [key]: defaultEmailTemplates[key]
+    }));
+    toast({
+      title: "Template réinitialisé",
+      description: "Le template a été restauré à sa valeur par défaut.",
+    });
+  };
+
+  const templateLabels: Record<keyof EmailTemplates, string> = {
+    user_registration: "Inscription reçue",
+    user_validation: "Compte validé",
+    user_rejection: "Inscription rejetée",
+    password_reset: "Réinitialisation mot de passe",
+    deposit_submission: "Dépôt légal soumis",
+    deposit_validation: "Dépôt légal validé",
+    deposit_rejection: "Dépôt légal rejeté",
+    number_attribution: "Attribution numéro ISBN/ISSN",
+    booking_request: "Réservation demandée",
+    booking_approval: "Réservation approuvée",
+    booking_rejection: "Réservation rejetée",
+    cbm_adhesion_approval: "Adhésion CBM approuvée",
+    cbm_adhesion_rejection: "Adhésion CBM rejetée",
+    cbm_formation_approval: "Formation CBM approuvée",
+  };
+
   if (loading) {
     return (
       <Card>
@@ -554,8 +638,63 @@ export function BNRMPaymentNotificationSettings() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {/* Dialog pour éditer un template */}
+        <Dialog open={!!editingTemplate} onOpenChange={(open) => !open && setEditingTemplate(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5" />
+                Modifier le template email
+              </DialogTitle>
+            </DialogHeader>
+            {editingTemplate && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Sujet de l'email</Label>
+                  <Input
+                    value={editingTemplate.template.subject}
+                    onChange={(e) => setEditingTemplate({
+                      ...editingTemplate,
+                      template: { ...editingTemplate.template, subject: e.target.value }
+                    })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Corps du message</Label>
+                  <Textarea
+                    value={editingTemplate.template.body}
+                    onChange={(e) => setEditingTemplate({
+                      ...editingTemplate,
+                      template: { ...editingTemplate.template, body: e.target.value }
+                    })}
+                    rows={12}
+                    className="font-mono text-sm"
+                  />
+                </div>
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    <strong>Variables disponibles :</strong> Utilisez la syntaxe {"{{variable}}"} pour insérer des valeurs dynamiques.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Exemples : {"{{nom}}"}, {"{{email}}"}, {"{{date}}"}, {"{{reference}}"}, {"{{titre}}"}, {"{{motif_rejet}}"}
+                  </p>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" onClick={() => setEditingTemplate(null)}>
+                    Annuler
+                  </Button>
+                  <Button onClick={handleSaveTemplate}>
+                    <Save className="mr-2 h-4 w-4" />
+                    Appliquer
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
         <Tabs defaultValue="inscriptions" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="inscriptions" className="text-xs">
               <Users className="h-4 w-4 mr-1" />
               Inscriptions
@@ -576,6 +715,10 @@ export function BNRMPaymentNotificationSettings() {
               <Bell className="h-4 w-4 mr-1" />
               Général
             </TabsTrigger>
+            <TabsTrigger value="templates" className="text-xs">
+              <Mail className="h-4 w-4 mr-1" />
+              Templates
+            </TabsTrigger>
             <TabsTrigger value="sms" className="text-xs">
               <Smartphone className="h-4 w-4 mr-1" />
               Config SMS
@@ -592,6 +735,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<UserPlus className="h-4 w-4 text-primary" />}
                 config={settings.user_registration}
                 onChange={handleNotificationChange}
+                templateKey="user_registration"
+                onEditTemplate={handleEditTemplate}
               />
               <NotificationItem
                 id="user_validation"
@@ -600,6 +745,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<CheckCircle className="h-4 w-4 text-green-600" />}
                 config={settings.user_validation}
                 onChange={handleNotificationChange}
+                templateKey="user_validation"
+                onEditTemplate={handleEditTemplate}
               />
               <NotificationItem
                 id="user_rejection"
@@ -608,6 +755,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<XCircle className="h-4 w-4 text-red-600" />}
                 config={settings.user_rejection}
                 onChange={handleNotificationChange}
+                templateKey="user_rejection"
+                onEditTemplate={handleEditTemplate}
               />
               <NotificationItem
                 id="password_reset"
@@ -616,6 +765,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<Mail className="h-4 w-4 text-blue-600" />}
                 config={settings.password_reset}
                 onChange={handleNotificationChange}
+                templateKey="password_reset"
+                onEditTemplate={handleEditTemplate}
               />
             </div>
           </TabsContent>
@@ -630,6 +781,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<FileText className="h-4 w-4 text-primary" />}
                 config={settings.deposit_submission}
                 onChange={handleNotificationChange}
+                templateKey="deposit_submission"
+                onEditTemplate={handleEditTemplate}
               />
               <NotificationItem
                 id="deposit_validation"
@@ -638,6 +791,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<CheckCircle className="h-4 w-4 text-green-600" />}
                 config={settings.deposit_validation}
                 onChange={handleNotificationChange}
+                templateKey="deposit_validation"
+                onEditTemplate={handleEditTemplate}
               />
               <NotificationItem
                 id="deposit_rejection"
@@ -646,6 +801,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<XCircle className="h-4 w-4 text-red-600" />}
                 config={settings.deposit_rejection}
                 onChange={handleNotificationChange}
+                templateKey="deposit_rejection"
+                onEditTemplate={handleEditTemplate}
               />
               <NotificationItem
                 id="number_attribution"
@@ -654,6 +811,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<Hash className="h-4 w-4 text-blue-600" />}
                 config={settings.number_attribution}
                 onChange={handleNotificationChange}
+                templateKey="number_attribution"
+                onEditTemplate={handleEditTemplate}
               />
               <NotificationItem
                 id="conformity_check"
@@ -684,6 +843,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<Package className="h-4 w-4 text-primary" />}
                 config={settings.booking_request}
                 onChange={handleNotificationChange}
+                templateKey="booking_request"
+                onEditTemplate={handleEditTemplate}
               />
               <NotificationItem
                 id="booking_approval"
@@ -692,6 +853,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<CheckCircle className="h-4 w-4 text-green-600" />}
                 config={settings.booking_approval}
                 onChange={handleNotificationChange}
+                templateKey="booking_approval"
+                onEditTemplate={handleEditTemplate}
               />
               <NotificationItem
                 id="booking_rejection"
@@ -700,6 +863,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<XCircle className="h-4 w-4 text-red-600" />}
                 config={settings.booking_rejection}
                 onChange={handleNotificationChange}
+                templateKey="booking_rejection"
+                onEditTemplate={handleEditTemplate}
               />
               <NotificationItem
                 id="booking_reminder"
@@ -730,6 +895,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<CheckCircle className="h-4 w-4 text-green-600" />}
                 config={settings.cbm_adhesion_approval}
                 onChange={handleNotificationChange}
+                templateKey="cbm_adhesion_approval"
+                onEditTemplate={handleEditTemplate}
               />
               <NotificationItem
                 id="cbm_formation_request"
@@ -738,6 +905,8 @@ export function BNRMPaymentNotificationSettings() {
                 icon={<ClipboardCheck className="h-4 w-4 text-blue-600" />}
                 config={settings.cbm_formation_request}
                 onChange={handleNotificationChange}
+                templateKey="cbm_formation_approval"
+                onEditTemplate={handleEditTemplate}
               />
             </div>
           </TabsContent>
@@ -762,6 +931,80 @@ export function BNRMPaymentNotificationSettings() {
                 onChange={handleNotificationChange}
               />
             </div>
+          </TabsContent>
+
+          {/* Templates Email */}
+          <TabsContent value="templates" className="space-y-4">
+            <div className="p-4 bg-muted/30 rounded-lg mb-4">
+              <p className="text-sm text-muted-foreground">
+                Gérez les templates des emails envoyés pour chaque type de notification. 
+                Utilisez la syntaxe {"{{variable}}"} pour insérer des données dynamiques.
+              </p>
+            </div>
+            
+            <ScrollArea className="h-[500px] pr-4">
+              <div className="space-y-3">
+                {(Object.keys(emailTemplates) as Array<keyof EmailTemplates>).map((key) => (
+                  <div key={key} className="p-4 border rounded-lg bg-card hover:bg-accent/5 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <Mail className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{templateLabels[key]}</p>
+                          <p className="text-xs text-muted-foreground truncate max-w-md">
+                            {emailTemplates[key].subject}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4 mr-1" />
+                              Aperçu
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle>{templateLabels[key]}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Sujet</Label>
+                                <p className="font-medium">{emailTemplates[key].subject}</p>
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Message</Label>
+                                <pre className="whitespace-pre-wrap text-sm p-4 bg-muted rounded-lg mt-1 font-sans">
+                                  {emailTemplates[key].body}
+                                </pre>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEditTemplate(key)}
+                        >
+                          <FileEdit className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleResetTemplate(key)}
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
           </TabsContent>
 
           {/* Configuration SMS */}
