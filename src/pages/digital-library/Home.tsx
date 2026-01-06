@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, FileText, Image, Music, Calendar, Sparkles } from "lucide-react";
+import { BookOpen, FileText, Image, Music, Calendar, Sparkles, Globe, ExternalLink } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import SEOHead from "@/components/seo/SEOHead";
@@ -519,6 +519,148 @@ export default function DigitalLibraryHome() {
           </Card>
         </section>
       )}
+
+      {/* World Data Repositories Section */}
+      <section className="bg-muted/50 py-12">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-foreground flex items-center justify-center gap-3 mb-3">
+              <Globe className="h-8 w-8 text-primary" />
+              Réservoirs mondiaux de données et de métadonnées
+            </h2>
+            <p className="text-muted-foreground max-w-3xl mx-auto">
+              Ces réservoirs permettent la centralisation et le partage du patrimoine documentaire et culturel à l'échelle internationale
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* RFN */}
+            <Card className="hover:shadow-lg transition-all hover:scale-[1.02] group">
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Globe className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-lg">Réseau Francophone Numérique (RFN)</CardTitle>
+                </div>
+                <CardDescription className="text-sm">
+                  Principal réservoir de l'espace francophone regroupant les collections patrimoniales de bibliothèques nationales (France, Belgique, Suisse, Maroc, Sénégal). Objectif : préserver et diffuser le patrimoine documentaire commun aux 300 millions de francophones.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <a 
+                  href="https://rfnum.org/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+                >
+                  Visiter le site <ExternalLink className="h-4 w-4" />
+                </a>
+              </CardContent>
+            </Card>
+
+            {/* Europeana */}
+            <Card className="hover:shadow-lg transition-all hover:scale-[1.02] group">
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Globe className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-lg">Europeana</CardTitle>
+                </div>
+                <CardDescription className="text-sm">
+                  Agrégateur central du patrimoine culturel européen. Opère au sein de l'Espace européen commun des données pour le patrimoine culturel, une initiative de l'Union européenne visant à moderniser la numérisation et la réutilisation des données culturelles.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <a 
+                  href="https://www.europeana.eu/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+                >
+                  Visiter le site <ExternalLink className="h-4 w-4" />
+                </a>
+              </CardContent>
+            </Card>
+
+            {/* IFLA */}
+            <Card className="hover:shadow-lg transition-all hover:scale-[1.02] group">
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Globe className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-lg">IFLA</CardTitle>
+                </div>
+                <CardDescription className="text-sm">
+                  Fédération Internationale des Associations de Bibliothécaires. Définit les normes internationales (IFLA LRM) permettant l'interopérabilité entre les grands réservoirs mondiaux. Promeut le "Manifeste pour les bibliothèques numériques".
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <a 
+                  href="https://www.ifla.org/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+                >
+                  Visiter le site <ExternalLink className="h-4 w-4" />
+                </a>
+              </CardContent>
+            </Card>
+
+            {/* UNESCO Digital Library */}
+            <Card className="hover:shadow-lg transition-all hover:scale-[1.02] group">
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Globe className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-lg">Bibliothèque Numérique de l'UNESCO</CardTitle>
+                </div>
+                <CardDescription className="text-sm">
+                  Réservoir mondial spécialisé dans les politiques culturelles et le patrimoine documentaire mondial, incluant les contributions de la conférence MONDIACULT.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <a 
+                  href="https://unesdoc.unesco.org/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+                >
+                  Visiter le site <ExternalLink className="h-4 w-4" />
+                </a>
+              </CardContent>
+            </Card>
+
+            {/* World Digital Library */}
+            <Card className="hover:shadow-lg transition-all hover:scale-[1.02] group">
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Globe className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-lg">World Digital Library (WDL)</CardTitle>
+                </div>
+                <CardDescription className="text-sm">
+                  Projet mené par la Library of Congress et l'UNESCO pour rendre accessibles des documents culturels rares de tous les pays du monde.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <a 
+                  href="https://www.loc.gov/collections/world-digital-library/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+                >
+                  Visiter le site <ExternalLink className="h-4 w-4" />
+                </a>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
 
       {/* Reservation Dialog */}
       {selectedDocument && userProfile && (
