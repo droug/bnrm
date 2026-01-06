@@ -574,7 +574,7 @@ export default function DigitalLibraryHome() {
               </CardHeader>
               <CardContent>
                 <a 
-                  href="https://www.europeana.eu/" 
+                  href="https://europeana.eu/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
@@ -599,7 +599,7 @@ export default function DigitalLibraryHome() {
               </CardHeader>
               <CardContent>
                 <a 
-                  href="https://www.ifla.org/" 
+                  href="https://ifla.org/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
@@ -624,7 +624,7 @@ export default function DigitalLibraryHome() {
               </CardHeader>
               <CardContent>
                 <a 
-                  href="https://unesdoc.unesco.org/" 
+                  href="https://digitallibrary.un.org/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
