@@ -7,7 +7,11 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Bell, Save, Loader2, Mail, Smartphone, MonitorSpeaker, Users, FileText, CreditCard, CheckCircle, XCircle, Hash, Package, ClipboardCheck, UserPlus, Settings, AlertTriangle } from "lucide-react";
+import { Bell, Save, Loader2, Mail, Smartphone, MonitorSpeaker, Users, FileText, CreditCard, CheckCircle, XCircle, Hash, Package, ClipboardCheck, UserPlus, Settings, AlertTriangle, FileEdit, Eye, RotateCcw } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -71,6 +75,241 @@ const defaultSMSSettings: SMSSettings = {
   api_key_configured: false,
   test_phone: '',
   country_code: '+212',
+};
+
+interface EmailTemplate {
+  subject: string;
+  body: string;
+}
+
+interface EmailTemplates {
+  user_registration: EmailTemplate;
+  user_validation: EmailTemplate;
+  user_rejection: EmailTemplate;
+  password_reset: EmailTemplate;
+  deposit_submission: EmailTemplate;
+  deposit_validation: EmailTemplate;
+  deposit_rejection: EmailTemplate;
+  number_attribution: EmailTemplate;
+  booking_request: EmailTemplate;
+  booking_approval: EmailTemplate;
+  booking_rejection: EmailTemplate;
+  cbm_adhesion_approval: EmailTemplate;
+  cbm_adhesion_rejection: EmailTemplate;
+  cbm_formation_approval: EmailTemplate;
+}
+
+const defaultEmailTemplates: EmailTemplates = {
+  user_registration: {
+    subject: "Confirmation de votre inscription - BNRM",
+    body: `Bonjour {{nom}},
+
+Nous avons bien reçu votre demande d'inscription sur le portail de la Bibliothèque Nationale du Royaume du Maroc.
+
+Votre demande est en cours d'examen par notre équipe. Vous recevrez une notification dès que votre compte sera validé.
+
+Type de compte demandé : {{type_compte}}
+Date de demande : {{date}}
+
+Cordialement,
+L'équipe BNRM`
+  },
+  user_validation: {
+    subject: "Votre compte a été validé - BNRM",
+    body: `Bonjour {{nom}},
+
+Nous avons le plaisir de vous informer que votre compte a été validé avec succès.
+
+Vous pouvez désormais vous connecter à notre portail et accéder à l'ensemble des services correspondant à votre profil.
+
+Lien de connexion : {{lien_connexion}}
+
+Cordialement,
+L'équipe BNRM`
+  },
+  user_rejection: {
+    subject: "Votre demande d'inscription n'a pas été acceptée - BNRM",
+    body: `Bonjour {{nom}},
+
+Nous avons examiné votre demande d'inscription et nous sommes au regret de vous informer qu'elle n'a pas pu être acceptée.
+
+Motif : {{motif_rejet}}
+
+Si vous pensez qu'il s'agit d'une erreur ou si vous souhaitez soumettre une nouvelle demande, n'hésitez pas à nous contacter.
+
+Cordialement,
+L'équipe BNRM`
+  },
+  password_reset: {
+    subject: "Réinitialisation de votre mot de passe - BNRM",
+    body: `Bonjour {{nom}},
+
+Vous avez demandé la réinitialisation de votre mot de passe.
+
+Cliquez sur le lien ci-dessous pour définir un nouveau mot de passe :
+{{lien_reinitialisation}}
+
+Ce lien expire dans 24 heures.
+
+Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.
+
+Cordialement,
+L'équipe BNRM`
+  },
+  deposit_submission: {
+    subject: "Confirmation de dépôt légal - BNRM",
+    body: `Bonjour {{nom}},
+
+Votre demande de dépôt légal a été enregistrée avec succès.
+
+Référence : {{reference}}
+Titre de l'œuvre : {{titre}}
+Type : {{type_depot}}
+Date de soumission : {{date}}
+
+Votre demande sera examinée dans les plus brefs délais.
+
+Cordialement,
+L'équipe Dépôt Légal - BNRM`
+  },
+  deposit_validation: {
+    subject: "Votre dépôt légal a été validé - BNRM",
+    body: `Bonjour {{nom}},
+
+Nous avons le plaisir de vous informer que votre dépôt légal a été validé.
+
+Référence : {{reference}}
+Titre : {{titre}}
+Numéro attribué : {{numero}}
+
+Vous pouvez consulter les détails dans votre espace personnel.
+
+Cordialement,
+L'équipe Dépôt Légal - BNRM`
+  },
+  deposit_rejection: {
+    subject: "Votre dépôt légal nécessite des corrections - BNRM",
+    body: `Bonjour {{nom}},
+
+Votre demande de dépôt légal nécessite des corrections.
+
+Référence : {{reference}}
+Titre : {{titre}}
+
+Observations : {{motif_rejet}}
+
+Veuillez apporter les corrections nécessaires et soumettre à nouveau votre demande.
+
+Cordialement,
+L'équipe Dépôt Légal - BNRM`
+  },
+  number_attribution: {
+    subject: "Attribution de numéro ISBN/ISSN - BNRM",
+    body: `Bonjour {{nom}},
+
+Un numéro a été attribué à votre publication.
+
+Titre : {{titre}}
+Type : {{type_numero}}
+Numéro attribué : {{numero}}
+
+Ce numéro est définitif et doit figurer sur tous les exemplaires de votre publication.
+
+Cordialement,
+L'équipe Dépôt Légal - BNRM`
+  },
+  booking_request: {
+    subject: "Confirmation de demande de réservation - BNRM",
+    body: `Bonjour {{nom}},
+
+Votre demande de réservation a été enregistrée.
+
+Espace : {{espace}}
+Date : {{date_debut}} au {{date_fin}}
+Événement : {{evenement}}
+Participants : {{participants}}
+
+Votre demande sera examinée et vous recevrez une confirmation sous 48h.
+
+Cordialement,
+L'équipe BNRM`
+  },
+  booking_approval: {
+    subject: "Votre réservation est confirmée - BNRM",
+    body: `Bonjour {{nom}},
+
+Nous avons le plaisir de confirmer votre réservation.
+
+Espace : {{espace}}
+Date : {{date_debut}} au {{date_fin}}
+Événement : {{evenement}}
+
+Montant total : {{montant}} MAD
+
+Veuillez vous présenter 30 minutes avant l'heure prévue.
+
+Cordialement,
+L'équipe BNRM`
+  },
+  booking_rejection: {
+    subject: "Votre demande de réservation n'a pas été acceptée - BNRM",
+    body: `Bonjour {{nom}},
+
+Nous sommes au regret de vous informer que votre demande de réservation n'a pas pu être acceptée.
+
+Espace demandé : {{espace}}
+Date : {{date_debut}} au {{date_fin}}
+
+Motif : {{motif_rejet}}
+
+N'hésitez pas à soumettre une nouvelle demande pour d'autres dates.
+
+Cordialement,
+L'équipe BNRM`
+  },
+  cbm_adhesion_approval: {
+    subject: "Votre adhésion au CBM est approuvée - BNRM",
+    body: `Bonjour {{nom}},
+
+Nous avons le plaisir de vous informer que votre demande d'adhésion au Catalogue Bibliographique Marocain a été approuvée.
+
+Bibliothèque : {{bibliotheque}}
+Type d'adhésion : {{type_adhesion}}
+
+Vous pouvez maintenant accéder aux services du CBM depuis votre espace.
+
+Cordialement,
+L'équipe CBM - BNRM`
+  },
+  cbm_adhesion_rejection: {
+    subject: "Votre demande d'adhésion au CBM - BNRM",
+    body: `Bonjour {{nom}},
+
+Votre demande d'adhésion au Catalogue Bibliographique Marocain n'a pas pu être acceptée.
+
+Bibliothèque : {{bibliotheque}}
+Motif : {{motif_rejet}}
+
+N'hésitez pas à nous contacter pour plus d'informations.
+
+Cordialement,
+L'équipe CBM - BNRM`
+  },
+  cbm_formation_approval: {
+    subject: "Votre demande de formation CBM est acceptée - BNRM",
+    body: `Bonjour {{nom}},
+
+Votre demande de formation a été acceptée.
+
+Type de formation : {{type_formation}}
+Organisme : {{organisme}}
+Nombre de participants : {{participants}}
+
+Notre équipe vous contactera prochainement pour planifier les sessions.
+
+Cordialement,
+L'équipe CBM - BNRM`
+  }
 };
 
 const defaultChannels: NotificationChannel = {
@@ -198,6 +437,8 @@ export function BNRMPaymentNotificationSettings() {
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<NotificationSettings>(defaultNotificationSettings);
   const [smsSettings, setSmsSettings] = useState<SMSSettings>(defaultSMSSettings);
+  const [emailTemplates, setEmailTemplates] = useState<EmailTemplates>(defaultEmailTemplates);
+  const [previewTemplate, setPreviewTemplate] = useState<{ key: string; template: EmailTemplate } | null>(null);
 
   useEffect(() => {
     fetchSettings();
