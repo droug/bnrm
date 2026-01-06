@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, FileText, Image, Music, Calendar, Sparkles, Globe, ExternalLink } from "lucide-react";
+import { BookOpen, FileText, Image, Music, Calendar, Sparkles, Globe, ExternalLink, Layers, Eye } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import SEOHead from "@/components/seo/SEOHead";
@@ -519,6 +519,83 @@ export default function DigitalLibraryHome() {
           </Card>
         </section>
       )}
+
+      {/* Section Exposition Virtuelle */}
+      <section className="py-16 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 via-background to-indigo-900/10" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 text-sm font-medium mb-4">
+              <Layers className="h-4 w-4" />
+              Découverte immersive
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              Exposition Virtuelle
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              Explorez l'histoire et le patrimoine du Maroc à travers nos expositions interactives
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            <Link to="/digital-library/actualites">
+              <Card className="group relative overflow-hidden border-2 border-transparent hover:border-purple-500/30 transition-all duration-500 bg-gradient-to-br from-card via-card to-purple-500/5 cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/0 via-purple-600/5 to-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                <CardContent className="p-8 md:p-12">
+                  <div className="flex flex-col md:flex-row items-center gap-8">
+                    {/* Image/Visual */}
+                    <div className="relative flex-shrink-0">
+                      <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 p-1 shadow-2xl shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow duration-500">
+                        <div className="w-full h-full rounded-xl bg-card flex items-center justify-center overflow-hidden">
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-full blur-xl animate-pulse" />
+                            <Layers className="h-24 w-24 text-purple-600 relative z-10 group-hover:scale-110 transition-transform duration-500" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="absolute -bottom-2 -right-2 px-3 py-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold rounded-full shadow-lg">
+                        NOUVEAU
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 text-center md:text-left">
+                      <h3 className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-purple-600 transition-colors">
+                        Le Maroc à travers les âges
+                      </h3>
+                      <p className="text-muted-foreground mb-6 leading-relaxed">
+                        Une exposition virtuelle interactive présentant l'histoire du Maroc à travers documents rares, 
+                        manuscrits anciens et photographies historiques. Découvrez des siècles de patrimoine culturel 
+                        dans une expérience immersive unique.
+                      </p>
+                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                        <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg shadow-purple-500/25 group-hover:shadow-purple-500/40 transition-all duration-300">
+                          <Eye className="h-4 w-4 mr-2" />
+                          Visiter l'exposition
+                        </Button>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <FileText className="h-4 w-4" />
+                            50+ documents
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Image className="h-4 w-4" />
+                            100+ images
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* Section Réservoirs mondiaux */}
       <section className="py-16 relative overflow-hidden">
