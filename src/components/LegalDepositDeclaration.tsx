@@ -1311,10 +1311,6 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
 
                 {/* Informations personnelles */}
-                <div className="space-y-2">
-                  <Label>Profession</Label>
-                  <Input placeholder="Profession" />
-                </div>
 
                  <div className="space-y-2">
                    <Label>Date de naissance</Label>
