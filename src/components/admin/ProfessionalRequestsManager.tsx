@@ -159,6 +159,21 @@ export function ProfessionalRequestsManager() {
         company_name: selectedRequest.company_name
       });
 
+      // Envoyer l'email de validation
+      const { data: authData } = await supabase.auth.admin.getUserById(selectedRequest.user_id);
+      const userEmail = authData?.user?.email;
+      
+      if (userEmail) {
+        await supabase.functions.invoke('send-registration-email', {
+          body: {
+            email_type: 'account_validated',
+            recipient_email: userEmail,
+            recipient_name: selectedRequest.registration_data?.contact_name || selectedRequest.company_name,
+            user_type: selectedRequest.professional_type
+          }
+        });
+      }
+
       toast({
         title: 'Demande approuvée',
         description: 'Le compte professionnel a été créé avec succès',
@@ -209,9 +224,25 @@ export function ProfessionalRequestsManager() {
         rejection_reason: rejectionReason
       });
 
+      // Envoyer l'email de rejet
+      const { data: authData } = await supabase.auth.admin.getUserById(selectedRequest.user_id);
+      const userEmail = authData?.user?.email;
+      
+      if (userEmail) {
+        await supabase.functions.invoke('send-registration-email', {
+          body: {
+            email_type: 'account_rejected',
+            recipient_email: userEmail,
+            recipient_name: selectedRequest.registration_data?.contact_name || selectedRequest.company_name,
+            user_type: selectedRequest.professional_type,
+            rejection_reason: rejectionReason
+          }
+        });
+      }
+
       toast({
         title: 'Demande rejetée',
-        description: 'La demande a été rejetée',
+        description: 'La demande a été rejetée et le demandeur a été notifié',
         variant: 'destructive'
       });
 

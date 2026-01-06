@@ -99,3 +99,6 @@ verify_jwt = true
 
 [functions.batch-ocr-indexing]
 verify_jwt = true
+
+[functions.send-registration-email]
+verify_jwt = false

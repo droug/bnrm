@@ -124,9 +124,7 @@ serve(async (req) => {
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     
     if (RESEND_API_KEY) {
-      // MODE TEST: Forcer l'envoi vers l'email de test
-      const testEmail = "useryouness@gmail.com";
-      console.log(`[MODE TEST] Email original: ${recipient_email} → Envoi vers: ${testEmail}`);
+      console.log(`Envoi email à: ${recipient_email}`);
       
       const resendResponse = await fetch("https://api.resend.com/emails", {
         method: "POST",
@@ -136,14 +134,9 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           from: "BNRM - Bibliothèque Nationale <onboarding@resend.dev>",
-          to: [testEmail],
-          subject: `[TEST - ${recipient_email}] ${emailSubject}`,
-          html: `<div style="background: #fff3cd; padding: 10px; margin-bottom: 20px; border: 1px solid #ffc107; border-radius: 4px;">
-                  <strong>⚠️ MODE TEST</strong><br/>
-                  Email destiné à: <strong>${recipient_email}</strong><br/>
-                  Envoyé à: <strong>${testEmail}</strong>
-                </div>
-                ${emailHtml}`,
+          to: [recipient_email],
+          subject: emailSubject,
+          html: emailHtml,
         }),
       });
 
@@ -153,7 +146,7 @@ serve(async (req) => {
         throw new Error("Erreur lors de l'envoi de l'email");
       }
 
-      console.log("Email sent successfully via Resend");
+      console.log("Email sent successfully via Resend to:", recipient_email);
     } else {
       console.log("RESEND_API_KEY not configured, email would have been sent to:", recipient_email);
     }
