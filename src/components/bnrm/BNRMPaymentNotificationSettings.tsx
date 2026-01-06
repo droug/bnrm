@@ -694,7 +694,7 @@ export function BNRMPaymentNotificationSettings() {
         </Dialog>
 
         <Tabs defaultValue="inscriptions" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="inscriptions" className="text-xs">
               <Users className="h-4 w-4 mr-1" />
               Inscriptions
@@ -714,10 +714,6 @@ export function BNRMPaymentNotificationSettings() {
             <TabsTrigger value="general" className="text-xs">
               <Bell className="h-4 w-4 mr-1" />
               Général
-            </TabsTrigger>
-            <TabsTrigger value="templates" className="text-xs">
-              <Mail className="h-4 w-4 mr-1" />
-              Templates
             </TabsTrigger>
             <TabsTrigger value="sms" className="text-xs">
               <Smartphone className="h-4 w-4 mr-1" />
@@ -931,80 +927,6 @@ export function BNRMPaymentNotificationSettings() {
                 onChange={handleNotificationChange}
               />
             </div>
-          </TabsContent>
-
-          {/* Templates Email */}
-          <TabsContent value="templates" className="space-y-4">
-            <div className="p-4 bg-muted/30 rounded-lg mb-4">
-              <p className="text-sm text-muted-foreground">
-                Gérez les templates des emails envoyés pour chaque type de notification. 
-                Utilisez la syntaxe {"{{variable}}"} pour insérer des données dynamiques.
-              </p>
-            </div>
-            
-            <ScrollArea className="h-[500px] pr-4">
-              <div className="space-y-3">
-                {(Object.keys(emailTemplates) as Array<keyof EmailTemplates>).map((key) => (
-                  <div key={key} className="p-4 border rounded-lg bg-card hover:bg-accent/5 transition-colors">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/10 rounded-lg">
-                          <Mail className="h-4 w-4 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">{templateLabels[key]}</p>
-                          <p className="text-xs text-muted-foreground truncate max-w-md">
-                            {emailTemplates[key].subject}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <Eye className="h-4 w-4 mr-1" />
-                              Aperçu
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle>{templateLabels[key]}</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <div>
-                                <Label className="text-xs text-muted-foreground">Sujet</Label>
-                                <p className="font-medium">{emailTemplates[key].subject}</p>
-                              </div>
-                              <div>
-                                <Label className="text-xs text-muted-foreground">Message</Label>
-                                <pre className="whitespace-pre-wrap text-sm p-4 bg-muted rounded-lg mt-1 font-sans">
-                                  {emailTemplates[key].body}
-                                </pre>
-                              </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleEditTemplate(key)}
-                        >
-                          <FileEdit className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => handleResetTemplate(key)}
-                        >
-                          <RotateCcw className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
           </TabsContent>
 
           {/* Configuration SMS */}
