@@ -3414,7 +3414,13 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
               renderFileUpload("summary", "Joindre le Résumé de la publication ou descriptif (format « PDF » moins de 2 MO)", true, "application/pdf")
             )}
             
-            {renderFileUpload("cin", depositType === "periodique" ? "Joindre une copie de la CNIE du Directeur de la publication" : "Joindre une copie de la CNIE de l'Auteur", true, "image/jpeg,application/pdf")}
+            {/* Pour périodiques: masquer CNIE si personne morale */}
+            {depositType === "periodique" && directorType !== "personne_morale" && (
+              renderFileUpload("cin", "Joindre une copie de la CNIE du Directeur de la publication", true, "image/jpeg,application/pdf")
+            )}
+            {depositType !== "periodique" && (
+              renderFileUpload("cin", "Joindre une copie de la CNIE de l'Auteur", true, "image/jpeg,application/pdf")
+            )}
             
             {/* Pièces conditionnelles selon le type de publication */}
             {depositType === "monographie" && publicationType === "THE" && (
