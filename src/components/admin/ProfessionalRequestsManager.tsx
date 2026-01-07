@@ -194,7 +194,7 @@ export function ProfessionalRequestsManager() {
         console.error("Erreur envoi email:", emailError);
         toast({
           title: 'Email non envoyé',
-          description: `Impossible d'envoyer l'email à ${userEmail}`,
+          description: `Impossible d'envoyer l'email à ${userEmail} : ${emailError.message || 'Erreur inconnue'}`,
           variant: 'destructive'
         });
       } else {

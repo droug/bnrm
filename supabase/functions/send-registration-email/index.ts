@@ -83,6 +83,26 @@ serve(async (req) => {
       html,
     });
 
+    // Resend renvoie { data, error } — il faut vérifier error
+    if (emailResult.error) {
+      console.error("Resend error:", emailResult.error);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: emailResult.error.message ?? "Erreur lors de l'envoi de l'email",
+          provider_error: {
+            statusCode: emailResult.error.statusCode,
+            name: emailResult.error.name,
+            message: emailResult.error.message,
+          },
+        }),
+        {
+          status: emailResult.error.statusCode ?? 502,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     console.log("Email sent successfully:", emailResult);
 
     // Trouver l'utilisateur par email pour créer la notification
