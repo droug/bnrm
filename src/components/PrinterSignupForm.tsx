@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PrinterFormData {
   type: "morale" | "physique";
@@ -95,10 +96,61 @@ const PrinterSignupForm = () => {
     
     setValidationErrors([]);
     
-    toast({
-      title: "Demande soumise",
-      description: "Votre demande d'inscription imprimeur a été soumise avec succès.",
-    });
+    try {
+      // Prepare registration data
+      const registrationData = {
+        type: formData.type,
+        nature: formData.nature,
+        email: formData.email,
+        phone: formData.phone,
+        google_maps_link: formData.googleMapsLink,
+        region: formData.region,
+        city: formData.city,
+        contact_name: formData.type === "morale" ? formData.contactPerson : formData.otherContact,
+        ...(formData.type === "morale" ? {
+          name_ar: formData.nameAr,
+          name_fr: formData.nameFr,
+          commerce_registry: formData.commerceRegistry,
+        } : {
+          name_ar: formData.printerNameAr,
+          name_fr: formData.printerNameFr,
+          cin: formData.cin,
+        })
+      };
+
+      const companyName = formData.type === "morale" 
+        ? formData.nameFr || formData.nameAr 
+        : formData.printerNameFr || formData.printerNameAr;
+
+      // Generate a temporary reference number
+      const tempRefNumber = `REQ-PR-${Date.now().toString(36).toUpperCase()}`;
+
+      // Insert into professional_registration_requests
+      const { error } = await supabase
+        .from('professional_registration_requests')
+        .insert({
+          professional_type: 'printer',
+          verified_deposit_number: tempRefNumber,
+          company_name: companyName,
+          registration_data: registrationData,
+          cndp_acceptance: true,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Demande soumise",
+        description: "Votre demande d'inscription imprimeur a été soumise avec succès. Vous recevrez une notification après validation par la BNRM.",
+      });
+    } catch (error: any) {
+      console.error("Erreur lors de la soumission:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'envoi de votre demande.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

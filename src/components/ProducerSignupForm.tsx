@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
 
 const producerSchema = z.object({
   firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
@@ -51,12 +52,48 @@ const ProducerSignupForm = () => {
     setValidationErrors([]);
     setIsSubmitting(true);
     try {
-      // TODO: Implement actual signup logic with Supabase
+      // Prepare registration data
+      const registrationData = {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        company_name: data.companyName,
+        company_registration_number: data.companyRegistrationNumber,
+        tax_identification_number: data.taxIdentificationNumber,
+        address: data.address,
+        city: data.city,
+        production_type: data.productionType,
+        production_capacity: data.productionCapacity,
+        website: data.website,
+        years_of_experience: data.yearsOfExperience,
+        description: data.description,
+        contact_name: `${data.firstName} ${data.lastName}`,
+      };
+
+      // Generate a temporary reference number
+      const tempRefNumber = `REQ-PD-${Date.now().toString(36).toUpperCase()}`;
+
+      // Insert into professional_registration_requests
+      const { error } = await supabase
+        .from('professional_registration_requests')
+        .insert({
+          professional_type: 'producer',
+          verified_deposit_number: tempRefNumber,
+          company_name: data.companyName,
+          registration_data: registrationData,
+          cndp_acceptance: true,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
       toast({
         title: "Demande d'inscription envoyée",
-        description: "Votre demande d'inscription en tant que producteur a été envoyée. Vous recevrez une confirmation par email.",
+        description: "Votre demande d'inscription en tant que producteur a été envoyée. Vous recevrez une notification après validation par la BNRM.",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Erreur lors de la soumission:", error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de l'envoi de votre demande.",
