@@ -94,6 +94,9 @@ const ProducerSignupForm = () => {
         <CardDescription>
           Rejoignez notre réseau de producteurs de contenus éditoriaux
         </CardDescription>
+        <p className="text-sm text-muted-foreground mt-2">
+          <span className="text-destructive font-medium">Note :</span> Les nouveaux comptes seront validés par la BNRM.
+        </p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
