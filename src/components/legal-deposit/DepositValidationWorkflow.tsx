@@ -122,9 +122,9 @@ export function DepositValidationWorkflow() {
       .order("created_at", { ascending: false });
 
     if (activeTab === "pending") {
-      query = query.in("status", ["brouillon", "soumis", "en_attente_validation_b", "en_attente_comite_validation"]);
+      query = query.in("status", ["brouillon", "soumis", "en_attente_validation_b"]);
     } else if (activeTab === "validated") {
-      query = query.in("status", ["valide_par_b", "valide_par_comite"]);
+      query = query.in("status", ["valide_par_b"]);
     } else if (activeTab === "rejected") {
       query = query.in("status", ["rejete", "rejete_par_b", "rejete_par_comite"]);
     }
@@ -388,9 +388,8 @@ export function DepositValidationWorkflow() {
   };
 
   const getValidationStep = (request: DepositRequest): number => {
-    if (request.validated_by_committee) return 3;
     if (request.validated_by_department) return 2;
-    if (request.validated_by_service) return 1;
+    if (request.validated_by_committee) return 1;
     return 0;
   };
 
@@ -398,11 +397,9 @@ export function DepositValidationWorkflow() {
     const step = getValidationStep(request);
     switch (step) {
       case 0:
-        return "Service DLBN";
+        return "Comité de Validation";
       case 1:
         return "Département ABN";
-      case 2:
-        return "Comité de Validation";
       default:
         return "Validé";
     }
@@ -425,31 +422,26 @@ export function DepositValidationWorkflow() {
             const updatedRequest = { ...req };
             
             if (status === "approved") {
-              if (validationType === "service") {
-                updatedRequest.validated_by_service = user!.id;
-                updatedRequest.service_validated_at = new Date().toISOString();
-                updatedRequest.service_validation_notes = comments || null;
+              if (validationType === "committee") {
+                updatedRequest.validated_by_committee = user!.id;
+                updatedRequest.committee_validated_at = new Date().toISOString();
+                updatedRequest.committee_validation_notes = comments || null;
                 updatedRequest.status = "en_attente_validation_b";
               } else if (validationType === "department") {
                 updatedRequest.validated_by_department = user!.id;
                 updatedRequest.department_validated_at = new Date().toISOString();
                 updatedRequest.department_validation_notes = comments || null;
-                updatedRequest.status = "en_attente_comite_validation";
-              } else if (validationType === "committee") {
-                updatedRequest.validated_by_committee = user!.id;
-                updatedRequest.committee_validated_at = new Date().toISOString();
-                updatedRequest.committee_validation_notes = comments || null;
-                updatedRequest.status = "valide_par_comite";
+                updatedRequest.status = "valide_par_b";
               }
             } else {
               updatedRequest.rejected_by = user!.id;
               updatedRequest.rejected_at = new Date().toISOString();
               updatedRequest.rejection_reason = customRejectionReason || comments || null;
               
-              if (validationType === "service") {
-                updatedRequest.status = "rejete_par_b";
-              } else if (validationType === "committee") {
+              if (validationType === "committee") {
                 updatedRequest.status = "rejete_par_comite";
+              } else if (validationType === "department") {
+                updatedRequest.status = "rejete_par_b";
               } else {
                 updatedRequest.status = "rejete";
               }
@@ -483,21 +475,16 @@ export function DepositValidationWorkflow() {
       const updateData: any = {};
 
       if (status === "approved") {
-        if (validationType === "service") {
-          updateData.validated_by_service = user!.id;
-          updateData.service_validated_at = new Date().toISOString();
-          updateData.service_validation_notes = comments || null;
+        if (validationType === "committee") {
+          updateData.validated_by_committee = user!.id;
+          updateData.committee_validated_at = new Date().toISOString();
+          updateData.committee_validation_notes = comments || null;
           updateData.status = "en_attente_validation_b";
         } else if (validationType === "department") {
           updateData.validated_by_department = user!.id;
           updateData.department_validated_at = new Date().toISOString();
           updateData.department_validation_notes = comments || null;
-          updateData.status = "en_attente_comite_validation";
-        } else if (validationType === "committee") {
-          updateData.validated_by_committee = user!.id;
-          updateData.committee_validated_at = new Date().toISOString();
-          updateData.committee_validation_notes = comments || null;
-          updateData.status = "valide_par_comite";
+          updateData.status = "valide_par_b";
         }
       } else {
         updateData.rejected_by = user!.id;
@@ -1361,21 +1348,21 @@ export function DepositValidationWorkflow() {
                 <div>
                   <h3 className="font-semibold mb-3">Historique des Validations</h3>
                   <div className="space-y-3">
-                    {selectedRequest.validated_by_service && (
-                      <div className="border-l-4 border-blue-500 pl-4 py-2">
+                    {selectedRequest.validated_by_committee && (
+                      <div className="border-l-4 border-green-500 pl-4 py-2">
                         <div className="flex items-center gap-2">
                           <Badge variant="default">
-                            Service DLBN - Approuvé
+                            Comité de Validation - Approuvé
                           </Badge>
-                          {selectedRequest.service_validated_at && (
+                          {selectedRequest.committee_validated_at && (
                             <span className="text-xs text-muted-foreground">
-                              {format(new Date(selectedRequest.service_validated_at), "dd/MM/yyyy à HH:mm")}
+                              {format(new Date(selectedRequest.committee_validated_at), "dd/MM/yyyy à HH:mm")}
                             </span>
                           )}
                         </div>
-                        {selectedRequest.service_validation_notes && (
+                        {selectedRequest.committee_validation_notes && (
                           <p className="text-sm mt-2 text-muted-foreground">
-                            {selectedRequest.service_validation_notes}
+                            {selectedRequest.committee_validation_notes}
                           </p>
                         )}
                       </div>
@@ -1396,26 +1383,6 @@ export function DepositValidationWorkflow() {
                         {selectedRequest.department_validation_notes && (
                           <p className="text-sm mt-2 text-muted-foreground">
                             {selectedRequest.department_validation_notes}
-                          </p>
-                        )}
-                      </div>
-                    )}
-
-                    {selectedRequest.validated_by_committee && (
-                      <div className="border-l-4 border-green-500 pl-4 py-2">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="default">
-                            Comité de Validation - Approuvé
-                          </Badge>
-                          {selectedRequest.committee_validated_at && (
-                            <span className="text-xs text-muted-foreground">
-                              {format(new Date(selectedRequest.committee_validated_at), "dd/MM/yyyy à HH:mm")}
-                            </span>
-                          )}
-                        </div>
-                        {selectedRequest.committee_validation_notes && (
-                          <p className="text-sm mt-2 text-muted-foreground">
-                            {selectedRequest.committee_validation_notes}
                           </p>
                         )}
                       </div>
@@ -1462,63 +1429,7 @@ export function DepositValidationWorkflow() {
               {/* Actions de validation */}
               {!selectedRequest.rejected_by && (
                 <div className="flex gap-3 justify-end">
-                  {!selectedRequest.validated_by_service && (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowPendingModal(true)}
-                        disabled={isLoading}
-                      >
-                        <Clock className="h-4 w-4 mr-2" />
-                        Mettre en attente
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => openRejectionModal(selectedRequest.id, "service")}
-                        disabled={isLoading}
-                      >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Rejeter (DLBN)
-                      </Button>
-                      <Button
-                        onClick={() => handleValidation(selectedRequest.id, "service", "approved")}
-                        disabled={isLoading}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Approuver (DLBN)
-                      </Button>
-                    </>
-                  )}
-
-                  {selectedRequest.validated_by_service && !selectedRequest.validated_by_department && (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowPendingModal(true)}
-                        disabled={isLoading}
-                      >
-                        <Clock className="h-4 w-4 mr-2" />
-                        Mettre en attente
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => openRejectionModal(selectedRequest.id, "department")}
-                        disabled={isLoading}
-                      >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Rejeter (ABN)
-                      </Button>
-                      <Button
-                        onClick={() => handleValidation(selectedRequest.id, "department", "approved")}
-                        disabled={isLoading}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Approuver (ABN)
-                      </Button>
-                    </>
-                  )}
-
-                  {selectedRequest.validated_by_department && !selectedRequest.validated_by_committee && (
+                  {!selectedRequest.validated_by_committee && (
                     <>
                       <Button
                         variant="outline"
@@ -1545,19 +1456,47 @@ export function DepositValidationWorkflow() {
                       </Button>
                     </>
                   )}
+
+                  {selectedRequest.validated_by_committee && !selectedRequest.validated_by_department && (
+                    <>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowPendingModal(true)}
+                        disabled={isLoading}
+                      >
+                        <Clock className="h-4 w-4 mr-2" />
+                        Mettre en attente
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => openRejectionModal(selectedRequest.id, "department")}
+                        disabled={isLoading}
+                      >
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Rejeter (ABN)
+                      </Button>
+                      <Button
+                        onClick={() => handleValidation(selectedRequest.id, "department", "approved")}
+                        disabled={isLoading}
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Approuver (ABN)
+                      </Button>
+                    </>
+                  )}
                 </div>
               )}
 
               {/* Boutons de génération de documents */}
-              {(selectedRequest.validated_by_service || selectedRequest.validated_by_department || selectedRequest.validated_by_committee) && (
+              {(selectedRequest.validated_by_department || selectedRequest.validated_by_committee) && (
                 <div className="flex flex-wrap gap-3 border-t pt-4">
-                  {selectedRequest.validated_by_service && (
+                  {selectedRequest.validated_by_committee && (
                     <Button
                       variant="outline"
-                      onClick={() => generateValidationFormDLBN(selectedRequest)}
+                      onClick={() => generateValidationFormComite(selectedRequest)}
                     >
                       <Download className="h-4 w-4 mr-2" />
-                      Attestation DLBN
+                      Attestation Comité
                     </Button>
                   )}
                   {selectedRequest.validated_by_department && (
@@ -1567,15 +1506,6 @@ export function DepositValidationWorkflow() {
                     >
                       <Download className="h-4 w-4 mr-2" />
                       Attestation ABN
-                    </Button>
-                  )}
-                  {selectedRequest.validated_by_committee && (
-                    <Button
-                      variant="outline"
-                      onClick={() => generateValidationFormComite(selectedRequest)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Attestation Comité
                     </Button>
                   )}
                 </div>
