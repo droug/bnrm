@@ -1407,7 +1407,9 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                   <Label>Type de publication</Label>
                   <InlineSelect
                     placeholder="Sélectionner le type"
-                    options={publicationTypePeriodicalOptions}
+                    options={publicationTypePeriodicalOptions.filter(opt => 
+                      opt.label.toLowerCase() !== "monographie simple"
+                    )}
                   />
                 </div>
 
