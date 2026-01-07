@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -63,6 +64,7 @@ export function ProfessionalRequestsManager() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showDocPreview, setShowDocPreview] = useState(false);
   const [showRejectionDialog, setShowRejectionDialog] = useState(false);
+  const [showApprovalDialog, setShowApprovalDialog] = useState(false);
 
   useEffect(() => {
     loadRequests();
@@ -730,7 +732,7 @@ export function ProfessionalRequestsManager() {
                   {selectedRequest.status === 'pending' && (
                     <>
                       <Button
-                        onClick={handleApprove}
+                        onClick={() => setShowApprovalDialog(true)}
                         disabled={loading}
                         className="bg-green-600 hover:bg-green-700 text-white"
                       >
@@ -831,6 +833,37 @@ export function ProfessionalRequestsManager() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Pop-up Confirmation de validation */}
+      <AlertDialog open={showApprovalDialog} onOpenChange={setShowApprovalDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-green-700 flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5" />
+              Confirmer la validation
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              Êtes-vous sûr de vouloir valider la demande de <strong>{selectedRequest?.company_name}</strong> ?
+              <br /><br />
+              Un email de confirmation avec un lien de création de mot de passe sera envoyé à l'adresse : 
+              <strong className="block mt-1">{selectedRequest?.registration_data?.email || selectedRequest?.registration_data?.contact_email || 'Non spécifié'}</strong>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={loading}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowApprovalDialog(false);
+                handleApprove();
+              }}
+              disabled={loading}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {loading ? 'Traitement...' : 'Confirmer la validation'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
