@@ -153,6 +153,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
   const [publicationDateInput, setPublicationDateInput] = useState<string>("");
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [publicationType, setPublicationType] = useState<string>("");
+  const [publicationTypeOther, setPublicationTypeOther] = useState<string>("");
   const [publicationTypes, setPublicationTypes] = useState<Array<{code: string, label: string}>>([]);
   const [authorPseudonym, setAuthorPseudonym] = useState<string>("");
   const [isPeriodic, setIsPeriodic] = useState<string>("");
@@ -715,10 +716,32 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                   <InlineSelect
                     placeholder="Sélectionner le type de publication"
                     value={publicationType}
-                    onChange={setPublicationType}
-                    options={publicationTypes.map(t => ({ value: t.code, label: t.label }))}
+                    onChange={(value) => {
+                      setPublicationType(value);
+                      if (value !== "autre") {
+                        setPublicationTypeOther("");
+                      }
+                    }}
+                    options={[
+                      { value: "coran", label: "Coran" },
+                      ...publicationTypes
+                        .filter(t => t.code.toLowerCase() !== "coran")
+                        .map(t => ({ value: t.code, label: t.label })),
+                      { value: "autre", label: "Autre" }
+                    ]}
                   />
                 </div>
+
+                {publicationType === "autre" && (
+                  <div className="space-y-2 animate-fade-in">
+                    <Label>Préciser le type de publication <span className="text-destructive">*</span></Label>
+                    <Input 
+                      placeholder="Saisir le type de publication"
+                      value={publicationTypeOther}
+                      onChange={(e) => setPublicationTypeOther(e.target.value)}
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label>Public ciblé</Label>
