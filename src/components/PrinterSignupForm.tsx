@@ -13,6 +13,111 @@ import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 
+// Mapping des régions vers leurs villes
+const citiesByRegion: Record<string, Array<{ value: string; label: string }>> = {
+  "casablanca-settat": [
+    { value: "casablanca", label: "Casablanca" },
+    { value: "mohammedia", label: "Mohammedia" },
+    { value: "el-jadida", label: "El Jadida" },
+    { value: "settat", label: "Settat" },
+    { value: "berrechid", label: "Berrechid" },
+    { value: "benslimane", label: "Benslimane" },
+    { value: "mediouna", label: "Médiouna" },
+    { value: "nouaceur", label: "Nouaceur" },
+  ],
+  "rabat-sale-kenitra": [
+    { value: "rabat", label: "Rabat" },
+    { value: "sale", label: "Salé" },
+    { value: "kenitra", label: "Kénitra" },
+    { value: "temara", label: "Témara" },
+    { value: "skhirat", label: "Skhirat" },
+    { value: "khemisset", label: "Khémisset" },
+    { value: "sidi-kacem", label: "Sidi Kacem" },
+    { value: "sidi-slimane", label: "Sidi Slimane" },
+  ],
+  "marrakech-safi": [
+    { value: "marrakech", label: "Marrakech" },
+    { value: "safi", label: "Safi" },
+    { value: "essaouira", label: "Essaouira" },
+    { value: "el-kelaa-des-sraghna", label: "El Kelâa des Sraghna" },
+    { value: "chichaoua", label: "Chichaoua" },
+    { value: "youssoufia", label: "Youssoufia" },
+    { value: "rehamna", label: "Rehamna" },
+  ],
+  "fes-meknes": [
+    { value: "fes", label: "Fès" },
+    { value: "meknes", label: "Meknès" },
+    { value: "taza", label: "Taza" },
+    { value: "ifrane", label: "Ifrane" },
+    { value: "sefrou", label: "Sefrou" },
+    { value: "moulay-yacoub", label: "Moulay Yacoub" },
+    { value: "el-hajeb", label: "El Hajeb" },
+    { value: "taounate", label: "Taounate" },
+    { value: "boulemane", label: "Boulemane" },
+  ],
+  "tanger-tetouan-alhoceima": [
+    { value: "tanger", label: "Tanger" },
+    { value: "tetouan", label: "Tétouan" },
+    { value: "al-hoceima", label: "Al Hoceïma" },
+    { value: "larache", label: "Larache" },
+    { value: "chefchaouen", label: "Chefchaouen" },
+    { value: "fnideq", label: "Fnideq" },
+    { value: "martil", label: "Martil" },
+    { value: "mdiq", label: "M'diq" },
+    { value: "ouazzane", label: "Ouazzane" },
+  ],
+  "souss-massa": [
+    { value: "agadir", label: "Agadir" },
+    { value: "inezgane", label: "Inezgane" },
+    { value: "ait-melloul", label: "Aït Melloul" },
+    { value: "taroudant", label: "Taroudant" },
+    { value: "tiznit", label: "Tiznit" },
+    { value: "chtouka-ait-baha", label: "Chtouka Aït Baha" },
+    { value: "tata", label: "Tata" },
+  ],
+  "oriental": [
+    { value: "oujda", label: "Oujda" },
+    { value: "nador", label: "Nador" },
+    { value: "berkane", label: "Berkane" },
+    { value: "taourirt", label: "Taourirt" },
+    { value: "jerada", label: "Jerada" },
+    { value: "driouch", label: "Driouch" },
+    { value: "figuig", label: "Figuig" },
+    { value: "guercif", label: "Guercif" },
+  ],
+  "beni-mellal-khenifra": [
+    { value: "beni-mellal", label: "Béni Mellal" },
+    { value: "khouribga", label: "Khouribga" },
+    { value: "fquih-ben-salah", label: "Fquih Ben Salah" },
+    { value: "azilal", label: "Azilal" },
+    { value: "khenifra", label: "Khénifra" },
+    { value: "kasba-tadla", label: "Kasba Tadla" },
+  ],
+  "draa-tafilalet": [
+    { value: "errachidia", label: "Errachidia" },
+    { value: "ouarzazate", label: "Ouarzazate" },
+    { value: "tinghir", label: "Tinghir" },
+    { value: "zagora", label: "Zagora" },
+    { value: "midelt", label: "Midelt" },
+  ],
+  "laayoune-sakia-elhamra": [
+    { value: "laayoune", label: "Laâyoune" },
+    { value: "boujdour", label: "Boujdour" },
+    { value: "smara", label: "Smara" },
+    { value: "tarfaya", label: "Tarfaya" },
+  ],
+  "guelmim-oued-noun": [
+    { value: "guelmim", label: "Guelmim" },
+    { value: "tan-tan", label: "Tan-Tan" },
+    { value: "assa-zag", label: "Assa-Zag" },
+    { value: "sidi-ifni", label: "Sidi Ifni" },
+  ],
+  "dakhla-oued-eddahab": [
+    { value: "dakhla", label: "Dakhla" },
+    { value: "aousserd", label: "Aousserd" },
+  ],
+};
+
 interface PrinterFormData {
   type: "morale" | "physique";
   nature: string;
@@ -66,7 +171,7 @@ const PrinterSignupForm = () => {
     const missingFields: string[] = [];
     
     // Validation des champs communs
-    if (!formData.nature) missingFields.push("Nature de l'imprimeur");
+    if (!formData.nature) missingFields.push(formData.type === "physique" ? "Genre" : "Nature de l'imprimeur");
     if (!formData.email) missingFields.push("Adresse email");
     if (!formData.phone || formData.phone.trim() === "+212" || formData.phone.trim() === "+212 ") {
       missingFields.push("Téléphone");
@@ -212,19 +317,30 @@ const PrinterSignupForm = () => {
             </RadioGroup>
           </div>
 
-          {/* Nature de l'imprimeur */}
+          {/* Nature de l'imprimeur / Genre */}
           <div className="space-y-2">
-            <Label htmlFor="nature">Nature de l'imprimeur *</Label>
+            <Label htmlFor="nature">
+              {formData.type === "physique" ? "Genre *" : "Nature de l'imprimeur *"}
+            </Label>
             <Select 
               value={formData.nature}
               onValueChange={(value) => setFormData(prev => ({ ...prev, nature: value }))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Sélectionnez la nature" />
+                <SelectValue placeholder={formData.type === "physique" ? "Sélectionnez le genre" : "Sélectionnez la nature"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="publique">Publique</SelectItem>
-                <SelectItem value="prive">Privé</SelectItem>
+                {formData.type === "physique" ? (
+                  <>
+                    <SelectItem value="homme">Homme</SelectItem>
+                    <SelectItem value="femme">Femme</SelectItem>
+                  </>
+                ) : (
+                  <>
+                    <SelectItem value="publique">Publique</SelectItem>
+                    <SelectItem value="prive">Privé</SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -325,12 +441,10 @@ const PrinterSignupForm = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="printerNameAr">Nom de l'imprimeur (Arabe) *</Label>
-                  <Input
-                    id="printerNameAr"
+                  <ArabicInputWithKeyboard
                     value={formData.printerNameAr || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, printerNameAr: e.target.value }))}
+                    onChange={(value) => setFormData(prev => ({ ...prev, printerNameAr: value }))}
                     placeholder="اسم الطابع"
-                    dir="rtl"
                   />
                 </div>
                 <div className="space-y-2">
@@ -458,7 +572,10 @@ const PrinterSignupForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="region">Région *</Label>
-                <Select onValueChange={(value) => setFormData(prev => ({ ...prev, region: value }))}>
+                <Select 
+                  value={formData.region}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, region: value, city: "" }))}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionnez une région" />
                   </SelectTrigger>
@@ -480,12 +597,22 @@ const PrinterSignupForm = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="city">Ville *</Label>
-                <Input
-                  id="city"
+                <Select 
                   value={formData.city}
-                  onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                  placeholder="Nom de la ville"
-                />
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, city: value }))}
+                  disabled={!formData.region}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={formData.region ? "Sélectionnez une ville" : "Sélectionnez d'abord une région"} />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {formData.region && citiesByRegion[formData.region]?.map((city) => (
+                      <SelectItem key={city.value} value={city.value}>
+                        {city.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
