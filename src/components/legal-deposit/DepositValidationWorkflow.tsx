@@ -491,10 +491,10 @@ export function DepositValidationWorkflow() {
         updateData.rejected_at = new Date().toISOString();
         updateData.rejection_reason = customRejectionReason || comments || null;
         
-        if (validationType === "service") {
-          updateData.status = "rejete_par_b";
-        } else if (validationType === "committee") {
+        if (validationType === "committee") {
           updateData.status = "rejete_par_comite";
+        } else if (validationType === "department") {
+          updateData.status = "rejete_par_b";
         } else {
           updateData.status = "rejete";
         }
@@ -949,13 +949,11 @@ export function DepositValidationWorkflow() {
   const getStatusBadge = (status: string) => {
     const statusConfig: any = {
       soumis: { label: "Soumis", variant: "secondary" },
-      en_attente_validation_b: { label: "Validation BNRM", variant: "default" },
-      en_attente_comite_validation: { label: "Validation Comité", variant: "default" },
-      valide_par_b: { label: "Validé BNRM", variant: "default" },
-      valide_par_comite: { label: "Validé", variant: "default" },
+      en_attente_validation_b: { label: "En attente ABN", variant: "default" },
+      valide_par_b: { label: "Validé", variant: "default" },
       rejete: { label: "Rejeté", variant: "destructive" },
-      rejete_par_b: { label: "Rejeté BNRM", variant: "destructive" },
       rejete_par_comite: { label: "Rejeté Comité", variant: "destructive" },
+      rejete_par_b: { label: "Rejeté ABN", variant: "destructive" },
     };
 
     const config = statusConfig[status] || { label: status, variant: "secondary" };
