@@ -12,7 +12,7 @@ export default function ProfessionalManagement() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Gestion des Professionnels</h1>
           <p className="text-muted-foreground">
-            Invitez et validez les inscriptions des professionnels (éditeurs, imprimeurs, producteurs, distributeurs)
+            Invitez et validez les inscriptions des professionnels (éditeurs, imprimeurs, producteurs)
           </p>
         </div>
 
