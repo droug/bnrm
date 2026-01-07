@@ -159,19 +159,33 @@ export function ProfessionalRequestsManager() {
         company_name: selectedRequest.company_name
       });
 
-      // Envoyer l'email de validation
-      const { data: authData } = await supabase.auth.admin.getUserById(selectedRequest.user_id);
-      const userEmail = authData?.user?.email;
+      // Récupérer l'email de l'utilisateur depuis le profil ou les données d'inscription
+      const userEmail = selectedRequest.registration_data?.email || 
+                       selectedRequest.registration_data?.contact_email;
       
       if (userEmail) {
-        await supabase.functions.invoke('send-registration-email', {
+        // Envoyer l'email de validation avec génération du lien de mot de passe
+        const { error: emailError } = await supabase.functions.invoke('send-registration-email', {
           body: {
             email_type: 'account_validated',
             recipient_email: userEmail,
             recipient_name: selectedRequest.registration_data?.contact_name || selectedRequest.company_name,
-            user_type: selectedRequest.professional_type
+            user_type: selectedRequest.professional_type,
+            user_id: selectedRequest.user_id
           }
         });
+
+        if (emailError) {
+          console.error("Erreur envoi email:", emailError);
+        } else {
+          toast({
+            title: 'Email envoyé',
+            description: 'Un email avec le lien de création de mot de passe a été envoyé',
+            className: 'bg-blue-50 border-blue-200'
+          });
+        }
+      } else {
+        console.warn("Aucun email trouvé pour l'utilisateur");
       }
 
       toast({
@@ -225,8 +239,8 @@ export function ProfessionalRequestsManager() {
       });
 
       // Envoyer l'email de rejet
-      const { data: authData } = await supabase.auth.admin.getUserById(selectedRequest.user_id);
-      const userEmail = authData?.user?.email;
+      const userEmail = selectedRequest.registration_data?.email || 
+                       selectedRequest.registration_data?.contact_email;
       
       if (userEmail) {
         await supabase.functions.invoke('send-registration-email', {

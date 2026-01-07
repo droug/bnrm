@@ -14,6 +14,7 @@ interface RegistrationEmailRequest {
   user_type?: string; // 'editor' | 'printer' | 'producer' | 'researcher' | 'visitor'
   rejection_reason?: string;
   reset_link?: string;
+  user_id?: string; // Pour générer le lien de réinitialisation
   additional_data?: Record<string, any>;
 }
 
@@ -24,9 +25,10 @@ serve(async (req) => {
 
   try {
     const request: RegistrationEmailRequest = await req.json();
-    const { email_type, recipient_email, recipient_name, user_type, rejection_reason, reset_link, additional_data } = request;
+    const { email_type, recipient_email, recipient_name, user_type, rejection_reason, user_id, additional_data } = request;
+    let { reset_link } = request;
 
-    console.log("Sending registration email:", { email_type, recipient_email, user_type });
+    console.log("Sending registration email:", { email_type, recipient_email, user_type, user_id });
 
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     if (!RESEND_API_KEY) {
@@ -38,6 +40,31 @@ serve(async (req) => {
     }
 
     const resend = new Resend(RESEND_API_KEY);
+    
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    // Pour les validations de compte, générer un lien de création de mot de passe
+    if (email_type === 'account_validated' && user_id && !reset_link) {
+      console.log("Generating password reset link for user:", user_id);
+      
+      const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+        type: 'recovery',
+        email: recipient_email,
+        options: {
+          redirectTo: `${Deno.env.get("SUPABASE_URL")?.replace('.supabase.co', '')}.lovable.app/auth?reset=true`
+        }
+      });
+
+      if (linkError) {
+        console.error("Error generating recovery link:", linkError);
+      } else if (linkData?.properties?.action_link) {
+        reset_link = linkData.properties.action_link;
+        console.log("Password reset link generated successfully");
+      }
+    }
     
     // Générer le contenu de l'email selon le type
     const { subject, html } = generateEmailContent(email_type, {
@@ -57,12 +84,6 @@ serve(async (req) => {
     });
 
     console.log("Email sent successfully:", emailResult);
-
-    // Créer une notification système également
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
 
     // Trouver l'utilisateur par email pour créer la notification
     const { data: userData } = await supabaseAdmin
@@ -226,16 +247,27 @@ function generateEmailContent(
 
     case 'account_validated':
       return {
-        subject: `Compte validé - Bienvenue à la BNRM`,
+        subject: `Compte validé - Créez votre mot de passe - BNRM`,
         html: `${baseStyle}
           <h2>Félicitations ${recipient_name} !</h2>
           
           <div class="info-box success-box">
             <h3>✅ Votre compte a été validé</h3>
-            <p>Votre inscription en tant que <strong>${roleLabel}</strong> a été approuvée.</p>
+            <p>Votre inscription en tant que <strong>${roleLabel}</strong> a été approuvée par la BNRM.</p>
           </div>
           
-          <p>Vous pouvez désormais accéder à l'ensemble des services de la Bibliothèque Nationale :</p>
+          ${reset_link ? `
+          <div class="info-box" style="background: #e3f2fd; border-left-color: #2196f3;">
+            <h3>🔐 Créez votre mot de passe</h3>
+            <p>Pour accéder à votre espace, vous devez d'abord créer votre mot de passe :</p>
+            <p style="text-align: center; margin: 20px 0;">
+              <a href="${reset_link}" class="btn" style="background: #2196f3;">Créer mon mot de passe</a>
+            </p>
+            <p style="font-size: 12px; color: #666;"><strong>⚠️ Important :</strong> Ce lien expire dans 24 heures.</p>
+          </div>
+          ` : ''}
+          
+          <p>Une fois votre mot de passe créé, vous pourrez accéder à l'ensemble des services de la Bibliothèque Nationale :</p>
           
           <ul>
             <li>Consulter et emprunter des ouvrages</li>
@@ -244,9 +276,11 @@ function generateEmailContent(
             <li>Réserver des espaces culturels</li>
           </ul>
           
+          ${!reset_link ? `
           <p style="text-align: center;">
             <a href="https://www.bnrm.ma/auth" class="btn">Accéder à mon espace</a>
           </p>
+          ` : ''}
           
           <p>Cordialement,<br><strong>L'équipe de la BNRM</strong></p>
         ${footerHtml}`
