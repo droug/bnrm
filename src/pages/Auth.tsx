@@ -17,9 +17,9 @@ export default function Auth() {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated - always to BNRM portal homepage
   if (user && !loading) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/" replace />;
   }
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
