@@ -512,12 +512,47 @@ const EditorSignupForm = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="city">Ville *</Label>
-                <Input
-                  id="city"
+                <Select 
                   value={formData.city}
-                  onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                  placeholder="Nom de la ville"
-                />
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, city: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionnez une ville" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    <SelectItem value="casablanca">Casablanca</SelectItem>
+                    <SelectItem value="rabat">Rabat</SelectItem>
+                    <SelectItem value="fes">Fès</SelectItem>
+                    <SelectItem value="marrakech">Marrakech</SelectItem>
+                    <SelectItem value="tanger">Tanger</SelectItem>
+                    <SelectItem value="agadir">Agadir</SelectItem>
+                    <SelectItem value="meknes">Meknès</SelectItem>
+                    <SelectItem value="oujda">Oujda</SelectItem>
+                    <SelectItem value="kenitra">Kénitra</SelectItem>
+                    <SelectItem value="tetouan">Tétouan</SelectItem>
+                    <SelectItem value="sale">Salé</SelectItem>
+                    <SelectItem value="nador">Nador</SelectItem>
+                    <SelectItem value="mohammedia">Mohammedia</SelectItem>
+                    <SelectItem value="el-jadida">El Jadida</SelectItem>
+                    <SelectItem value="beni-mellal">Béni Mellal</SelectItem>
+                    <SelectItem value="khouribga">Khouribga</SelectItem>
+                    <SelectItem value="safi">Safi</SelectItem>
+                    <SelectItem value="settat">Settat</SelectItem>
+                    <SelectItem value="temara">Témara</SelectItem>
+                    <SelectItem value="laayoune">Laâyoune</SelectItem>
+                    <SelectItem value="errachidia">Errachidia</SelectItem>
+                    <SelectItem value="taza">Taza</SelectItem>
+                    <SelectItem value="essaouira">Essaouira</SelectItem>
+                    <SelectItem value="ksar-el-kebir">Ksar el-Kébir</SelectItem>
+                    <SelectItem value="larache">Larache</SelectItem>
+                    <SelectItem value="guelmim">Guelmim</SelectItem>
+                    <SelectItem value="berkane">Berkane</SelectItem>
+                    <SelectItem value="taourirt">Taourirt</SelectItem>
+                    <SelectItem value="ouarzazate">Ouarzazate</SelectItem>
+                    <SelectItem value="dakhla">Dakhla</SelectItem>
+                    <SelectItem value="autre">Autre</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
