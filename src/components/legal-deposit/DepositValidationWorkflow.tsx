@@ -965,19 +965,14 @@ export function DepositValidationWorkflow() {
   const renderWorkflowSteps = (request: DepositRequest) => {
     const steps = [
       {
-        name: "Service DLBN",
-        validated: !!request.validated_by_service,
-        date: request.service_validated_at,
+        name: "Comité de Validation",
+        validated: !!request.validated_by_committee,
+        date: request.committee_validated_at,
       },
       {
         name: "Département ABN",
         validated: !!request.validated_by_department,
         date: request.department_validated_at,
-      },
-      {
-        name: "Comité de Validation",
-        validated: !!request.validated_by_committee,
-        date: request.committee_validated_at,
       },
     ];
 
@@ -1032,7 +1027,7 @@ export function DepositValidationWorkflow() {
             Workflow de Validation des Demandes
           </CardTitle>
           <CardDescription>
-            Validation multi-étapes: Service DLBN → Département ABN → Comité de Validation
+            Validation en 2 étapes: Comité de Validation → Département ABN
           </CardDescription>
         </CardHeader>
         <CardContent>
