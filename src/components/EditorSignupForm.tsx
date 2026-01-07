@@ -116,12 +116,62 @@ const EditorSignupForm = () => {
     // Clear errors if validation passes
     setValidationErrors([]);
 
-    // Form data NOT logged for privacy - contains personal/business information
-    
-    toast({
-      title: "Demande soumise",
-      description: "Votre demande d'inscription éditeur a été soumise avec succès.",
-    });
+    try {
+      // Prepare registration data
+      const registrationData = {
+        type: formData.type,
+        nature: formData.nature,
+        email: formData.email,
+        phone: formData.phone,
+        google_maps_link: formData.googleMapsLink,
+        region: formData.region,
+        city: formData.city,
+        contact_name: formData.type === "morale" ? formData.contactPerson : formData.otherContact,
+        ...(formData.type === "morale" ? {
+          name_ar: formData.nameAr,
+          name_fr: formData.nameFr,
+          commerce_registry: formData.commerceRegistry,
+          selected_editor: formData.selectedEditor,
+        } : {
+          name_ar: formData.editorNameAr,
+          name_fr: formData.editorNameFr,
+          cin: formData.cin,
+        })
+      };
+
+      const companyName = formData.type === "morale" 
+        ? formData.nameFr || formData.nameAr 
+        : formData.editorNameFr || formData.editorNameAr;
+
+      // Generate a temporary reference number
+      const tempRefNumber = `REQ-ED-${Date.now().toString(36).toUpperCase()}`;
+
+      // Insert into professional_registration_requests
+      const { error } = await supabase
+        .from('professional_registration_requests')
+        .insert({
+          professional_type: 'editor',
+          verified_deposit_number: tempRefNumber,
+          company_name: companyName,
+          registration_data: registrationData,
+          cndp_acceptance: true,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Demande soumise",
+        description: "Votre demande d'inscription éditeur a été soumise avec succès. Vous recevrez une notification après validation par la BNRM.",
+      });
+    } catch (error: any) {
+      console.error("Erreur lors de la soumission:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'envoi de votre demande.",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredEditors = editors.filter(editor =>
