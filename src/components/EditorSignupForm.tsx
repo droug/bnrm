@@ -358,12 +358,10 @@ const EditorSignupForm = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="editorNameAr">Nom de l'éditeur (Arabe) *</Label>
-                  <Input
-                    id="editorNameAr"
+                  <ArabicInputWithKeyboard
                     value={formData.editorNameAr || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, editorNameAr: e.target.value }))}
+                    onChange={(value) => setFormData(prev => ({ ...prev, editorNameAr: value }))}
                     placeholder="اسم الناشر"
-                    dir="rtl"
                   />
                 </div>
                 <div className="space-y-2">
