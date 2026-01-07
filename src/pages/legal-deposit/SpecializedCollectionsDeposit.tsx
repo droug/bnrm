@@ -6,13 +6,37 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { FolderOpen, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { UserTypeSelectionModal } from "@/components/legal-deposit/UserTypeSelectionModal";
+import { AuthChoiceModal } from "@/components/legal-deposit/AuthChoiceModal";
 
 export default function SpecializedCollectionsDeposit() {
   const [showForm, setShowForm] = useState(false);
+  const [showUserTypeModal, setShowUserTypeModal] = useState(false);
+  const [showAuthChoiceModal, setShowAuthChoiceModal] = useState(false);
+  const [selectedUserType, setSelectedUserType] = useState<"editeur" | "imprimeur">("editeur");
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleStartDeclaration = () => {
+    setShowUserTypeModal(true);
+  };
+
+  const handleUserTypeSelect = (type: "editeur" | "imprimeur") => {
+    setShowUserTypeModal(false);
+    setSelectedUserType(type);
+    
+    if (user) {
+      setShowForm(true);
+    } else {
+      setShowAuthChoiceModal(true);
+    }
+  };
+
+  const mappedUserType = selectedUserType === "editeur" ? "editor" : "printer";
 
   if (showForm) {
-    return <LegalDepositDeclaration depositType="collections_specialisees" onClose={() => setShowForm(false)} />;
+    return <LegalDepositDeclaration depositType="collections_specialisees" onClose={() => setShowForm(false)} initialUserType={mappedUserType} />;
   }
 
   return (
@@ -41,6 +65,9 @@ export default function SpecializedCollectionsDeposit() {
             </h1>
             <p className="text-xl text-muted-foreground">
               Formulaire de déclaration pour les collections spécialisées et documents rares
+            </p>
+            <p className="text-sm text-red-600 mt-2 font-medium">
+              Pour accéder au formulaire de demande de dépôt légal, il est obligatoire de disposer d'un compte Éditeur et d'un compte Imprimeur
             </p>
           </div>
 
@@ -80,7 +107,7 @@ export default function SpecializedCollectionsDeposit() {
           <div className="text-center">
             <Button
               size="lg"
-              onClick={() => setShowForm(true)}
+              onClick={handleStartDeclaration}
               className="px-8"
             >
               <FolderOpen className="h-5 w-5 mr-2" />
@@ -91,6 +118,21 @@ export default function SpecializedCollectionsDeposit() {
       </main>
       
       <Footer />
+
+      {/* Modal de sélection du type d'utilisateur */}
+      <UserTypeSelectionModal
+        open={showUserTypeModal}
+        onOpenChange={setShowUserTypeModal}
+        onSelectType={handleUserTypeSelect}
+      />
+
+      {/* Modal de choix connexion/inscription */}
+      <AuthChoiceModal
+        open={showAuthChoiceModal}
+        onOpenChange={setShowAuthChoiceModal}
+        userType={selectedUserType}
+        redirectPath="/depot-legal/collections-specialisees"
+      />
     </div>
   );
 }
