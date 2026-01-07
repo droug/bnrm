@@ -25,6 +25,7 @@ export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
       <div className="flex justify-between items-center mb-3">
         <div className="flex gap-2">
           <Button
+            type="button"
             size="sm"
             variant={showDiacritics ? "default" : "outline"}
             onClick={() => setShowDiacritics(!showDiacritics)}
@@ -32,6 +33,7 @@ export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
             التشكيل
           </Button>
           <Button
+            type="button"
             size="sm"
             variant="outline"
             onClick={() => onInsert(' ')}
@@ -41,6 +43,7 @@ export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
         </div>
         {onClose && (
           <Button
+            type="button"
             size="sm"
             variant="ghost"
             onClick={onClose}
@@ -55,6 +58,7 @@ export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
           {diacritics.map((char) => (
             <Button
               key={char}
+              type="button"
               variant="outline"
               size="sm"
               className="min-w-[40px] h-10 text-lg"
@@ -71,6 +75,7 @@ export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
               {row.map((char) => (
                 <Button
                   key={char}
+                  type="button"
                   variant="outline"
                   size="sm"
                   className="min-w-[40px] h-10 text-lg flex-shrink-0"
