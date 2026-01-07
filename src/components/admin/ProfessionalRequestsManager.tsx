@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { CheckCircle2, XCircle, FileText, Eye, Edit, Archive, Trash2, FileDown, FileCheck } from 'lucide-react';
+import { CheckCircle2, XCircle, FileText, Eye, Edit, Archive, Trash2, FileDown, FileCheck, Search } from 'lucide-react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
@@ -60,6 +60,7 @@ export function ProfessionalRequestsManager() {
   const [observations, setObservations] = useState('');
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [showDocPreview, setShowDocPreview] = useState(false);
   const [showRejectionDialog, setShowRejectionDialog] = useState(false);
 
@@ -515,6 +516,18 @@ export function ProfessionalRequestsManager() {
           </div>
         </CardHeader>
         <CardContent>
+          {/* Search field */}
+          <div className="mb-4">
+            <div className="relative max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher par nom, email, type..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </div>
           <div className="rounded-md border">
             <Table>
               <TableHeader>
@@ -529,14 +542,34 @@ export function ProfessionalRequestsManager() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {requests.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
-                      Aucune demande
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  requests.map((request) => (
+                {(() => {
+                  const filteredRequests = requests.filter(request => {
+                    if (!searchQuery.trim()) return true;
+                    const query = searchQuery.toLowerCase();
+                    const email = request.registration_data?.email?.toLowerCase() || '';
+                    const contactEmail = request.registration_data?.contact_email?.toLowerCase() || '';
+                    const contactName = request.registration_data?.contact_name?.toLowerCase() || '';
+                    return (
+                      request.company_name?.toLowerCase().includes(query) ||
+                      request.professional_type?.toLowerCase().includes(query) ||
+                      request.verified_deposit_number?.toLowerCase().includes(query) ||
+                      email.includes(query) ||
+                      contactEmail.includes(query) ||
+                      contactName.includes(query)
+                    );
+                  });
+                  
+                  if (filteredRequests.length === 0) {
+                    return (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center text-muted-foreground">
+                          {searchQuery ? 'Aucun résultat pour cette recherche' : 'Aucune demande'}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+                  
+                  return filteredRequests.map((request) => (
                     <TableRow key={request.id}>
                       <TableCell className="font-mono text-xs">
                         {request.id.substring(0, 8).toUpperCase()}
@@ -579,8 +612,8 @@ export function ProfessionalRequestsManager() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
+                  ));
+                })()}
               </TableBody>
             </Table>
           </div>
