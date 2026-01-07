@@ -170,6 +170,9 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
   const [supportType, setSupportType] = useState<string>("");
   const [targetAudience, setTargetAudience] = useState<string>("");
   const [targetAudienceOther, setTargetAudienceOther] = useState<string>("");
+  const [directorType, setDirectorType] = useState<string>("");
+  const [directorGender, setDirectorGender] = useState<string>("");
+  const [directorPseudonym, setDirectorPseudonym] = useState<string>("");
 
 
 
@@ -1283,26 +1286,48 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
             <div>
               <h3 className="text-2xl font-semibold mb-4">Directeur de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Informations d'identité */}
+                {/* Type du directeur */}
                 <div className="space-y-2">
-                  <Label>Nom et prénom</Label>
-                  <Input placeholder="Nom et prénom" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Genre</Label>
+                  <Label>Type</Label>
                   <InlineSelect
-                    placeholder="Sélectionner le genre"
+                    placeholder="Sélectionner le type"
+                    value={directorType}
+                    onChange={setDirectorType}
                     options={[
-                      { value: "homme", label: "Homme" },
-                      { value: "femme", label: "Femme" }
+                      { value: "personne_physique", label: "Personne physique" },
+                      { value: "personne_morale", label: "Personne morale (collectivités)" }
                     ]}
                   />
                 </div>
 
+                {/* Informations d'identité */}
                 <div className="space-y-2">
-                  <Label>Pseudonyme</Label>
-                  <Input placeholder="Pseudonyme" />
+                  <Label>{directorType === "personne_morale" ? "Nom de la collectivité" : "Nom et prénom"}</Label>
+                  <Input placeholder={directorType === "personne_morale" ? "Nom de la collectivité" : "Nom et prénom"} />
+                </div>
+
+                {directorType === "personne_physique" && (
+                  <div className="space-y-2 animate-fade-in">
+                    <Label>Genre</Label>
+                    <InlineSelect
+                      placeholder="Sélectionner le genre"
+                      value={directorGender}
+                      onChange={setDirectorGender}
+                      options={[
+                        { value: "homme", label: "Homme" },
+                        { value: "femme", label: "Femme" }
+                      ]}
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label>{directorType === "personne_morale" ? "Sigle" : "Pseudonyme"}</Label>
+                  <Input 
+                    placeholder={directorType === "personne_morale" ? "Sigle" : "Pseudonyme"}
+                    value={directorPseudonym}
+                    onChange={(e) => setDirectorPseudonym(e.target.value)}
+                  />
                 </div>
 
                 {/* Informations de contact */}
