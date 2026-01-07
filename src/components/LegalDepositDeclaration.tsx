@@ -1372,13 +1372,6 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                   />
                 </div>
 
-                {/* Informations personnelles */}
-
-                 <div className="space-y-2">
-                   <Label>Date de naissance</Label>
-                   <Input type="date" placeholder="Date de naissance" />
-                 </div>
-
                 {/* Champs personnalisés */}
                 {customFields
                   .filter((field) => field.section_key === "director_info")
