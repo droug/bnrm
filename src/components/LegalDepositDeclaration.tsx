@@ -724,8 +724,9 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                     }}
                     options={[
                       { value: "coran", label: "Coran" },
+                      { value: "traduction", label: "Traduction" },
                       ...publicationTypes
-                        .filter(t => t.code.toLowerCase() !== "coran")
+                        .filter(t => t.code.toLowerCase() !== "coran" && t.code.toLowerCase() !== "traduction")
                         .map(t => ({ value: t.code, label: t.label })),
                       { value: "autre", label: "Autre" }
                     ]}
