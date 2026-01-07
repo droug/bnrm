@@ -138,6 +138,9 @@ const EditorSignupForm = () => {
         <CardDescription>
           Créez votre compte éditeur pour accéder aux services de dépôt légal
         </CardDescription>
+        <p className="text-sm text-muted-foreground mt-2">
+          <span className="text-destructive font-medium">Note :</span> Les nouveaux comptes seront validés par la BNRM.
+        </p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
