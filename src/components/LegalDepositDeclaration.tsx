@@ -624,8 +624,12 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
               <h3 className="text-2xl font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Titre de l'ouvrage</Label>
-                  <Input placeholder="Titre de l'ouvrage" />
+                  <Label>Titre de l'ouvrage <span className="text-destructive">*</span></Label>
+                  <Input 
+                    placeholder="Titre de l'ouvrage" 
+                    value={formData.title || ""}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -1399,8 +1403,12 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
             <h3 className="text-2xl font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Titre du périodique</Label>
-                  <Input placeholder="Titre du périodique" />
+                  <Label>Titre du périodique <span className="text-destructive">*</span></Label>
+                  <Input 
+                    placeholder="Titre du périodique" 
+                    value={formData.title || ""}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -2112,8 +2120,12 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
               <h3 className="text-2xl font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 md:col-span-2">
-                  <Label>Titre de la publication</Label>
-                  <Input placeholder="Titre de la publication" />
+                  <Label>Titre de la publication <span className="text-destructive">*</span></Label>
+                  <Input 
+                    placeholder="Titre de la publication" 
+                    value={formData.title || ""}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -2860,8 +2872,12 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
               <h3 className="text-2xl font-semibold mb-4">Identification de la publication</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Titre de la publication</Label>
-                  <Input placeholder="Titre de la publication" />
+                  <Label>Titre de la publication <span className="text-destructive">*</span></Label>
+                  <Input 
+                    placeholder="Titre de la publication" 
+                    value={formData.title || ""}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  />
                 </div>
 
                 <div className="space-y-2">
