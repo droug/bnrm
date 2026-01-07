@@ -145,72 +145,82 @@ export function ProfessionalRequestsManager() {
 
     setLoading(true);
 
-    const { error } = await supabase.rpc('approve_professional_registration', {
-      p_request_id: selectedRequest.id,
-      p_role: selectedRequest.professional_type
+    // Utiliser l'Edge Function qui gère la création de compte si user_id est null
+    const { data, error } = await supabase.functions.invoke('approve-professional', {
+      body: {
+        request_id: selectedRequest.id,
+        professional_type: selectedRequest.professional_type
+      }
     });
 
-    if (error) {
+    if (error || !data?.success) {
+      const errorMessage = error?.message || data?.error || 'Erreur inconnue';
+      console.error("Erreur approbation:", errorMessage);
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive'
       });
-    } else {
-      await logActivity(selectedRequest.id, 'approved', {
-        professional_type: selectedRequest.professional_type,
-        company_name: selectedRequest.company_name
-      });
-
-      // Récupérer l'email de l'utilisateur depuis le profil ou les données d'inscription
-      const userEmail = selectedRequest.registration_data?.email || 
-                       selectedRequest.registration_data?.contact_email;
-      
-       if (userEmail) {
-         // Envoyer l'email de validation avec génération du lien de mot de passe
-         const { error: emailError } = await supabase.functions.invoke('send-registration-email', {
-           body: {
-             email_type: 'account_validated',
-             recipient_email: userEmail,
-             recipient_name: selectedRequest.registration_data?.contact_name || selectedRequest.company_name,
-             user_type: selectedRequest.professional_type,
-             user_id: selectedRequest.user_id
-           }
-         });
-
-         if (emailError) {
-           console.error("Erreur envoi email:", emailError);
-           toast({
-             title: 'Email non envoyé',
-             description: `Impossible d'envoyer l'email à ${userEmail} : ${emailError.message || 'Erreur inconnue'}`,
-             variant: 'destructive'
-           });
-         } else {
-           toast({
-             title: 'Email envoyé',
-             description: 'Un email avec le lien de création de mot de passe a été envoyé',
-             className: 'bg-blue-50 border-blue-200'
-           });
-         }
-       } else {
-         console.warn("Aucun email trouvé pour l'utilisateur");
-         toast({
-           title: 'Email manquant',
-           description: "Aucune adresse email n'est associée à cette demande (email/contact_email).",
-           variant: 'destructive'
-         });
-       }
-
-      toast({
-        title: 'Demande approuvée',
-        description: 'Le compte professionnel a été créé avec succès',
-        className: 'bg-green-50 border-green-200'
-      });
-
-      setSelectedRequest(null);
-      loadRequests();
+      setLoading(false);
+      return;
     }
 
+    // Log de l'activité
+    await logActivity(selectedRequest.id, 'approved', {
+      professional_type: selectedRequest.professional_type,
+      company_name: selectedRequest.company_name,
+      user_id: data.user_id
+    });
+
+    // Récupérer l'email de l'utilisateur
+    const userEmail = data.user_email || 
+                      selectedRequest.registration_data?.email || 
+                      selectedRequest.registration_data?.contact_email;
+
+    if (userEmail) {
+      // Envoyer l'email de validation avec le lien de mot de passe
+      const { error: emailError } = await supabase.functions.invoke('send-registration-email', {
+        body: {
+          email_type: 'account_validated',
+          recipient_email: userEmail,
+          recipient_name: selectedRequest.registration_data?.contact_name || selectedRequest.company_name,
+          user_type: selectedRequest.professional_type,
+          user_id: data.user_id,
+          reset_link: data.password_reset_link // Utiliser le lien généré par l'Edge Function
+        }
+      });
+
+      if (emailError) {
+        console.error("Erreur envoi email:", emailError);
+        toast({
+          title: 'Email non envoyé',
+          description: `Impossible d'envoyer l'email à ${userEmail}`,
+          variant: 'destructive'
+        });
+      } else {
+        toast({
+          title: 'Email envoyé',
+          description: `Un email avec le lien de création de mot de passe a été envoyé à ${userEmail}`,
+          className: 'bg-blue-50 border-blue-200'
+        });
+      }
+    } else {
+      console.warn("Aucun email trouvé pour l'utilisateur");
+      toast({
+        title: 'Email manquant',
+        description: "Aucune adresse email n'est associée à cette demande.",
+        variant: 'destructive'
+      });
+    }
+
+    toast({
+      title: 'Demande approuvée',
+      description: `Le compte professionnel "${selectedRequest.company_name}" a été créé avec succès`,
+      className: 'bg-green-50 border-green-200'
+    });
+
+    setSelectedRequest(null);
+    loadRequests();
     setLoading(false);
   };
 
