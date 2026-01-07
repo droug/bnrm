@@ -52,7 +52,7 @@ serve(async (req) => {
     let userEmail = request.registration_data?.email || request.registration_data?.contact_email;
     let passwordResetLink: string | null = null;
 
-    // Si user_id est null, créer un nouveau compte utilisateur
+    // Si user_id est null, créer ou récupérer le compte utilisateur
     if (!userId) {
       if (!userEmail) {
         return new Response(
@@ -61,34 +61,50 @@ serve(async (req) => {
         );
       }
 
-      console.log("Creating new user for email:", userEmail);
+      console.log("Processing user for email:", userEmail);
 
-      // Générer un mot de passe temporaire aléatoire
-      const tempPassword = crypto.randomUUID() + "Aa1!";
+      // Vérifier si un utilisateur existe déjà avec cet email
+      const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+      
+      const existingUser = existingUsers?.users?.find(
+        (u) => u.email?.toLowerCase() === userEmail.toLowerCase()
+      );
 
-      // Créer l'utilisateur avec l'API admin
-      const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-        email: userEmail,
-        password: tempPassword,
-        email_confirm: true, // Marquer l'email comme confirmé
-        user_metadata: {
-          first_name: request.registration_data?.contact_name || request.registration_data?.name_fr || request.company_name,
-          last_name: "",
-          professional_type: professional_type,
-          company_name: request.company_name,
+      if (existingUser) {
+        // L'utilisateur existe déjà, utiliser son ID
+        userId = existingUser.id;
+        console.log("User already exists, using existing ID:", userId);
+      } else {
+        // Créer un nouvel utilisateur
+        console.log("Creating new user for email:", userEmail);
+
+        // Générer un mot de passe temporaire aléatoire
+        const tempPassword = crypto.randomUUID() + "Aa1!";
+
+        // Créer l'utilisateur avec l'API admin
+        const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+          email: userEmail,
+          password: tempPassword,
+          email_confirm: true,
+          user_metadata: {
+            first_name: request.registration_data?.contact_name || request.registration_data?.name_fr || request.company_name,
+            last_name: "",
+            professional_type: professional_type,
+            company_name: request.company_name,
+          }
+        });
+
+        if (createError) {
+          console.error("Error creating user:", createError);
+          return new Response(
+            JSON.stringify({ success: false, error: `Erreur création utilisateur: ${createError.message}` }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
         }
-      });
 
-      if (createError) {
-        console.error("Error creating user:", createError);
-        return new Response(
-          JSON.stringify({ success: false, error: `Erreur création utilisateur: ${createError.message}` }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        userId = newUser.user.id;
+        console.log("User created successfully:", userId);
       }
-
-      userId = newUser.user.id;
-      console.log("User created successfully:", userId);
 
       // Mettre à jour la demande avec le user_id
       const { error: updateReqError } = await supabaseAdmin
@@ -100,7 +116,7 @@ serve(async (req) => {
         console.error("Error updating request with user_id:", updateReqError);
       }
 
-      // Créer le profil utilisateur
+      // Créer ou mettre à jour le profil utilisateur
       const { error: profileError } = await supabaseAdmin
         .from("profiles")
         .upsert({
