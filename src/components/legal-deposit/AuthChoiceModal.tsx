@@ -35,7 +35,7 @@ export const AuthChoiceModal = ({
 
   return (
     <CustomDialog open={open} onOpenChange={onOpenChange}>
-      <CustomDialogContent className="max-w-md p-6 relative">
+      <CustomDialogContent className="max-w-md p-6">
         {/* Bouton X en haut à droite */}
         <button
           onClick={handleClose}
