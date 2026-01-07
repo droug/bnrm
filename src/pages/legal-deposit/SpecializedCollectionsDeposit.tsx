@@ -100,6 +100,9 @@ export default function SpecializedCollectionsDeposit() {
                 <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
                 <p className="text-muted-foreground">Archives et fonds documentaires spécialisés</p>
               </div>
+              <p className="text-destructive text-sm mt-4 font-medium">
+                (La demande ne sera soumise à la BNRM qu'après confirmation réciproque éditeur / imprimeur)
+              </p>
             </CardContent>
           </Card>
 
