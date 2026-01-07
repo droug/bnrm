@@ -76,7 +76,7 @@ export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialog
         {showOverlay && (
           <div
             className={cn(
-              "dialog-overlay fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm animate-in fade-in-0",
+              "dialog-overlay fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm animate-in fade-in-0",
               overlayClassName
             )}
           />
@@ -88,7 +88,7 @@ export const CustomDialogContent = React.forwardRef<HTMLDivElement, CustomDialog
           role="dialog"
           aria-modal={showOverlay ? true : undefined}
           className={cn(
-            "dialog-content z-[61] grid w-full max-w-lg gap-4 border bg-background p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 sm:rounded-lg max-h-[90vh] overflow-y-auto",
+            "dialog-content z-[9999] grid w-full max-w-lg gap-4 border bg-background p-6 shadow-xl duration-200 animate-in fade-in-0 zoom-in-95 sm:rounded-lg max-h-[90vh] overflow-y-auto",
             positionClass,
             centeredClass,
             className
