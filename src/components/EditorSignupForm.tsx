@@ -84,7 +84,7 @@ const EditorSignupForm = () => {
     const missingFields: string[] = [];
     
     // Validation des champs communs
-    if (!formData.nature) missingFields.push("Nature de l'éditeur");
+    if (!formData.nature) missingFields.push(formData.type === "physique" ? "Genre" : "Nature de l'éditeur");
     if (!formData.email) missingFields.push("Adresse email");
     if (!formData.phone || formData.phone.trim() === "+212" || formData.phone.trim() === "+212 ") {
       missingFields.push("Téléphone");
@@ -237,19 +237,30 @@ const EditorSignupForm = () => {
             </RadioGroup>
           </div>
 
-          {/* Nature de l'éditeur */}
+          {/* Nature de l'éditeur / Genre */}
           <div className="space-y-2">
-            <Label htmlFor="nature">Nature de l'éditeur *</Label>
+            <Label htmlFor="nature">
+              {formData.type === "physique" ? "Genre *" : "Nature de l'éditeur *"}
+            </Label>
             <Select 
               value={formData.nature}
               onValueChange={(value) => setFormData(prev => ({ ...prev, nature: value }))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Sélectionnez la nature" />
+                <SelectValue placeholder={formData.type === "physique" ? "Sélectionnez le genre" : "Sélectionnez la nature"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="publique">Publique</SelectItem>
-                <SelectItem value="prive">Privé</SelectItem>
+                {formData.type === "physique" ? (
+                  <>
+                    <SelectItem value="homme">Homme</SelectItem>
+                    <SelectItem value="femme">Femme</SelectItem>
+                  </>
+                ) : (
+                  <>
+                    <SelectItem value="publique">Publique</SelectItem>
+                    <SelectItem value="prive">Privé</SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
           </div>
