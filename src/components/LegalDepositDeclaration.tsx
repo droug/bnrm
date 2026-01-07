@@ -143,6 +143,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [languageSearch, setLanguageSearch] = useState<string>("");
   const [multipleVolumes, setMultipleVolumes] = useState<string>("");
+  const [totalVolumes, setTotalVolumes] = useState<string>("");
   const [numberOfVolumes, setNumberOfVolumes] = useState<string>("");
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [publisherSearch, setPublisherSearch] = useState<string>("");
@@ -954,16 +955,28 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
 
                 {multipleVolumes === "yes" && (
-                  <div className="space-y-2">
-                    <Label>Numéro du volume</Label>
-                    <Input 
-                      type="number" 
-                      min="1"
-                      placeholder="Numéro du volume" 
-                      value={numberOfVolumes}
-                      onChange={(e) => setNumberOfVolumes(e.target.value)}
-                    />
-                  </div>
+                  <>
+                    <div className="space-y-2 animate-fade-in">
+                      <Label>Nombre de volumes</Label>
+                      <Input 
+                        type="number" 
+                        min="1"
+                        placeholder="Nombre total de volumes" 
+                        value={totalVolumes}
+                        onChange={(e) => setTotalVolumes(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2 animate-fade-in">
+                      <Label>Numéro du volume</Label>
+                      <Input 
+                        type="number" 
+                        min="1"
+                        placeholder="Numéro du volume" 
+                        value={numberOfVolumes}
+                        onChange={(e) => setNumberOfVolumes(e.target.value)}
+                      />
+                    </div>
+                  </>
                 )}
 
                 <div className="space-y-2">
