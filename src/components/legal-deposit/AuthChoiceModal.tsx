@@ -1,6 +1,6 @@
 import { CustomDialog, CustomDialogContent, CustomDialogHeader, CustomDialogTitle, CustomDialogDescription } from "@/components/ui/custom-portal-dialog";
 import { Button } from "@/components/ui/button";
-import { LogIn, UserPlus } from "lucide-react";
+import { LogIn, UserPlus, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface AuthChoiceModalProps {
@@ -29,9 +29,22 @@ export const AuthChoiceModal = ({
     navigate(`/signup?type=${signupType}&redirect=${encodeURIComponent(redirectPath)}`);
   };
 
+  const handleClose = () => {
+    onOpenChange(false);
+  };
+
   return (
     <CustomDialog open={open} onOpenChange={onOpenChange}>
-      <CustomDialogContent className="max-w-md p-6">
+      <CustomDialogContent className="max-w-md p-6 relative">
+        {/* Bouton X en haut à droite */}
+        <button
+          onClick={handleClose}
+          className="absolute top-4 right-4 p-1 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          aria-label="Fermer"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
         <CustomDialogHeader className="text-center pb-4">
           <CustomDialogTitle className="text-xl font-semibold">
             Accès requis
@@ -67,6 +80,17 @@ export const AuthChoiceModal = ({
                 {userType === "editeur" ? "Compte Éditeur" : userType === "producteur" ? "Compte Producteur" : "Compte Imprimeur"}
               </div>
             </div>
+          </Button>
+        </div>
+
+        {/* Bouton Annuler en bas */}
+        <div className="mt-6 pt-4 border-t">
+          <Button 
+            variant="ghost" 
+            className="w-full"
+            onClick={handleClose}
+          >
+            Annuler
           </Button>
         </div>
       </CustomDialogContent>
