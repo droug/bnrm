@@ -751,6 +751,15 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 )}
 
                 <div className="space-y-2">
+                  <Label>Titre de la collection</Label>
+                  <Input 
+                    placeholder="Titre de la collection"
+                    value={collectionTitle}
+                    onChange={(e) => setCollectionTitle(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Périodicité</Label>
                   <InlineSelect
                     placeholder="Sélectionner"
@@ -835,15 +844,6 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                     />
                   </div>
                 )}
-
-                <div className="space-y-2">
-                  <Label>Titre de la collection</Label>
-                  <Input 
-                    placeholder="Titre de la collection"
-                    value={collectionTitle}
-                    onChange={(e) => setCollectionTitle(e.target.value)}
-                  />
-                </div>
 
                 <div className="space-y-2">
                   <Label>Numéro dans la collection</Label>
