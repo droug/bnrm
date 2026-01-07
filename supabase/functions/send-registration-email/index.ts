@@ -35,7 +35,7 @@ serve(async (req) => {
       console.warn("RESEND_API_KEY not configured");
       return new Response(
         JSON.stringify({ success: false, message: "Email service not configured" }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 

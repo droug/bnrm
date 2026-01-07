@@ -166,30 +166,40 @@ export function ProfessionalRequestsManager() {
       const userEmail = selectedRequest.registration_data?.email || 
                        selectedRequest.registration_data?.contact_email;
       
-      if (userEmail) {
-        // Envoyer l'email de validation avec génération du lien de mot de passe
-        const { error: emailError } = await supabase.functions.invoke('send-registration-email', {
-          body: {
-            email_type: 'account_validated',
-            recipient_email: userEmail,
-            recipient_name: selectedRequest.registration_data?.contact_name || selectedRequest.company_name,
-            user_type: selectedRequest.professional_type,
-            user_id: selectedRequest.user_id
-          }
-        });
+       if (userEmail) {
+         // Envoyer l'email de validation avec génération du lien de mot de passe
+         const { error: emailError } = await supabase.functions.invoke('send-registration-email', {
+           body: {
+             email_type: 'account_validated',
+             recipient_email: userEmail,
+             recipient_name: selectedRequest.registration_data?.contact_name || selectedRequest.company_name,
+             user_type: selectedRequest.professional_type,
+             user_id: selectedRequest.user_id
+           }
+         });
 
-        if (emailError) {
-          console.error("Erreur envoi email:", emailError);
-        } else {
-          toast({
-            title: 'Email envoyé',
-            description: 'Un email avec le lien de création de mot de passe a été envoyé',
-            className: 'bg-blue-50 border-blue-200'
-          });
-        }
-      } else {
-        console.warn("Aucun email trouvé pour l'utilisateur");
-      }
+         if (emailError) {
+           console.error("Erreur envoi email:", emailError);
+           toast({
+             title: 'Email non envoyé',
+             description: `Impossible d'envoyer l'email à ${userEmail} : ${emailError.message || 'Erreur inconnue'}`,
+             variant: 'destructive'
+           });
+         } else {
+           toast({
+             title: 'Email envoyé',
+             description: 'Un email avec le lien de création de mot de passe a été envoyé',
+             className: 'bg-blue-50 border-blue-200'
+           });
+         }
+       } else {
+         console.warn("Aucun email trouvé pour l'utilisateur");
+         toast({
+           title: 'Email manquant',
+           description: "Aucune adresse email n'est associée à cette demande (email/contact_email).",
+           variant: 'destructive'
+         });
+       }
 
       toast({
         title: 'Demande approuvée',
@@ -245,17 +255,32 @@ export function ProfessionalRequestsManager() {
       const userEmail = selectedRequest.registration_data?.email || 
                        selectedRequest.registration_data?.contact_email;
       
-      if (userEmail) {
-        await supabase.functions.invoke('send-registration-email', {
-          body: {
-            email_type: 'account_rejected',
-            recipient_email: userEmail,
-            recipient_name: selectedRequest.registration_data?.contact_name || selectedRequest.company_name,
-            user_type: selectedRequest.professional_type,
-            rejection_reason: rejectionReason
-          }
-        });
-      }
+       if (userEmail) {
+         const { error: emailError } = await supabase.functions.invoke('send-registration-email', {
+           body: {
+             email_type: 'account_rejected',
+             recipient_email: userEmail,
+             recipient_name: selectedRequest.registration_data?.contact_name || selectedRequest.company_name,
+             user_type: selectedRequest.professional_type,
+             rejection_reason: rejectionReason
+           }
+         });
+
+         if (emailError) {
+           console.error("Erreur envoi email:", emailError);
+           toast({
+             title: 'Email non envoyé',
+             description: `Impossible d'envoyer l'email à ${userEmail} : ${emailError.message || 'Erreur inconnue'}`,
+             variant: 'destructive'
+           });
+         }
+       } else {
+         toast({
+           title: 'Email manquant',
+           description: "Aucune adresse email n'est associée à cette demande (email/contact_email).",
+           variant: 'destructive'
+         });
+       }
 
       toast({
         title: 'Demande rejetée',
