@@ -54,7 +54,7 @@ export default function Collections() {
     },
     {
       id: "audiovisual",
-      title: "Archives sonores et audiovisuelles",
+      title: "Audio-visuel",
       icon: Video,
       count: "2,890",
       description: "Enregistrements audio, vidéos documentaires et archives orales",

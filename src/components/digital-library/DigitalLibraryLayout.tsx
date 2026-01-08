@@ -78,7 +78,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
     { label: "Revues et journaux", href: "/digital-library/collections/periodicals", icon: FileText },
     { label: "Manuscrits", href: "/digital-library/collections/manuscripts", icon: BookOpen },
     { label: "Collections spécialisées", href: "/digital-library/collections/photos", icon: Image },
-    { label: "Archives sonores et audiovisuelles", href: "/digital-library/collections/audiovisual", icon: Music },
+    { label: "Audio-visuel", href: "/digital-library/collections/audiovisual", icon: Music },
   ];
 
   const themesSubmenu = [
