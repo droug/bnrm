@@ -19,6 +19,7 @@ import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import OcrImportTool from "@/components/digital-library/import/OcrImportTool";
 import PdfOcrTool from "@/components/digital-library/import/PdfOcrTool";
+import BulkImportModal from "@/components/digital-library/import/BulkImportModal";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -796,72 +797,16 @@ export default function DocumentsManager() {
               <FileDown className="h-4 w-4 mr-2" />
               Télécharger le modèle
             </Button>
-          <Dialog open={showBulkDialog} onOpenChange={setShowBulkDialog}>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <Upload className="h-4 w-4 mr-2" />
-                Import en masse
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Import en masse</DialogTitle>
-                <DialogDescription>
-                  Importez plusieurs documents via un fichier CSV ou Excel
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="border-2 border-dashed rounded-lg p-8 text-center">
-                  <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="font-semibold mb-2">Glissez-déposez votre fichier</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Formats acceptés : CSV, Excel
-                  </p>
-                  <Button>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Sélectionner un fichier
-                  </Button>
-                </div>
-                <div className="bg-muted p-4 rounded-lg">
-                  <p className="text-sm font-semibold mb-2">Format Excel attendu :</p>
-                  <div className="text-xs space-y-2">
-                    <p className="font-medium">Champs principaux :</p>
-                    <code className="text-xs block whitespace-pre-wrap break-all">
-                      id, titre, slug, type_contenu, statut, description, url_fichier, type_fichier, date_publication, visible, telechargement_actif, partage_social, partage_email, etc.
-                    </code>
-                    <p className="font-medium mt-2">Métadonnées bibliographiques :</p>
-                    <code className="text-xs block whitespace-pre-wrap break-all">
-                      isbn, issn, ismn, auteur_principal, co_auteurs, editeur, annee_publication, lieu_publication, edition, classification_dewey, classification_udc, nombre_pages, mots_cles, sujets, etc.
-                    </code>
-                    <p className="text-muted-foreground mt-2">
-                      Téléchargez le modèle Excel ci-dessous pour voir tous les champs disponibles avec des exemples.
-                    </p>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Les colonnes booléennes acceptent : true/false, oui/non, 1/0
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Types de contenu acceptés : livre, article, video, audio, manuscrit, periodique, these, rapport, multimedia
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Format des dates : YYYY-MM-DD (ex: 2024-01-15)
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Listes multiples (séparées par ;) : tags, mots_cles, sujets, co_auteurs, editeurs, illustrateurs, traducteurs, etc.
-                  </p>
-                  <Button 
-                    variant="link" 
-                    size="sm" 
-                    onClick={downloadTemplate}
-                    className="mt-2 h-auto p-0"
-                  >
-                    <FileDown className="h-3 w-3 mr-1" />
-                    Télécharger le modèle Excel complet avec exemples
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button variant="outline" onClick={() => setShowBulkDialog(true)}>
+            <Upload className="h-4 w-4 mr-2" />
+            Import en masse
+          </Button>
+
+          <BulkImportModal 
+            open={showBulkDialog} 
+            onOpenChange={setShowBulkDialog}
+            onSuccess={() => queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] })}
+          />
 
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
             <DialogTrigger asChild>
