@@ -13,7 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, EyeOff, ChevronLeft, ChevronRight, Plus, Trash2, Shield, Download, Camera, MousePointerClick, Square } from "lucide-react";
+import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, EyeOff, ChevronLeft, ChevronRight, Plus, Trash2, Shield, Download, Camera, MousePointerClick, Square, Sparkles } from "lucide-react";
 import { PageFlipBook } from "@/components/book-reader/PageFlipBook";
 
 export function PageAccessRestrictionsManager() {
@@ -505,9 +505,14 @@ export function PageAccessRestrictionsManager() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline" className="font-medium">
-                              {doc.content_type}
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="font-medium">
+                                {(doc.content_type as string) === 'rare_book' ? 'Livre rare' : doc.content_type}
+                              </Badge>
+                              {(doc.content_type as string) === 'rare_book' && (
+                                <Sparkles className="h-4 w-4 text-amber-500" />
+                              )}
+                            </div>
                           </TableCell>
                           <TableCell>
                             {restriction?.is_restricted ? (
@@ -589,7 +594,13 @@ export function PageAccessRestrictionsManager() {
               <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20">
                 <FileText className="h-6 w-6 text-primary" />
               </div>
-              Configuration des restrictions - {selectedDocument?.title}
+              <span className="flex-1">Configuration des restrictions - {selectedDocument?.title}</span>
+              {(selectedDocument?.content_type as string) === 'rare_book' && (
+                <Badge className="bg-amber-500 hover:bg-amber-600 text-white gap-1.5">
+                  <Sparkles className="h-3 w-3" />
+                  Livre rare
+                </Badge>
+              )}
             </DialogTitle>
             <DialogDescription className="text-base">
               Définir les pages accessibles aux utilisateurs non authentifiés
