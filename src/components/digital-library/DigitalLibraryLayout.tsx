@@ -278,6 +278,60 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            {/* Bouquets électroniques Dropdown - après Collections */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  aria-label="Accéder aux bouquets électroniques"
+                  aria-haspopup="true"
+                >
+                  <Library className="h-4 w-4" aria-hidden="true" />
+                  Bouquets électroniques
+                  <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[200px]">
+                <DropdownMenuLabel>Ressources électroniques</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {activeBundles && activeBundles.length > 0 ? (
+                  activeBundles.map((bundle) => (
+                    <DropdownMenuItem 
+                      key={bundle.id} 
+                      className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
+                      onClick={() => {
+                        if (bundle.website_url) {
+                          window.open(bundle.website_url, '_blank');
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        {bundle.provider_logo_url ? (
+                          <img 
+                            src={bundle.provider_logo_url} 
+                            alt={bundle.provider}
+                            className="h-4 w-4 object-contain"
+                          />
+                        ) : (
+                          <Globe className="h-4 w-4" aria-hidden="true" />
+                        )}
+                        <div className="flex flex-col">
+                          <span>{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
+                          <span className="text-xs text-muted-foreground">{bundle.provider}</span>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <DropdownMenuItem disabled className="text-muted-foreground text-sm">
+                    Aucun bouquet disponible
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Link to="/digital-library/search">
               <Button 
                 variant="ghost" 
@@ -350,61 +404,6 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-
-            {/* Bouquets électroniques Dropdown - toujours visible */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                  aria-label="Accéder aux bouquets électroniques"
-                  aria-haspopup="true"
-                >
-                  <Library className="h-4 w-4" aria-hidden="true" />
-                  Bouquets électroniques
-                  <ChevronDown className="h-3 w-3" aria-hidden="true" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[200px]">
-                <DropdownMenuLabel>Ressources électroniques</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {activeBundles && activeBundles.length > 0 ? (
-                  activeBundles.map((bundle) => (
-                    <DropdownMenuItem 
-                      key={bundle.id} 
-                      className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
-                      onClick={() => {
-                        if (bundle.website_url) {
-                          window.open(bundle.website_url, '_blank');
-                        }
-                      }}
-                    >
-                      <div className="flex items-center gap-2">
-                        {bundle.provider_logo_url ? (
-                          <img 
-                            src={bundle.provider_logo_url} 
-                            alt={bundle.provider}
-                            className="h-4 w-4 object-contain"
-                          />
-                        ) : (
-                          <Globe className="h-4 w-4" aria-hidden="true" />
-                        )}
-                        <div className="flex flex-col">
-                          <span>{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
-                          <span className="text-xs text-muted-foreground">{bundle.provider}</span>
-                        </div>
-                      </div>
-                    </DropdownMenuItem>
-                  ))
-                ) : (
-                  <DropdownMenuItem disabled className="text-muted-foreground text-sm">
-                    Aucun bouquet disponible
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             <Link to="/digital-library/news">
               <Button 
                 variant="ghost" 
