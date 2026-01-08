@@ -12536,6 +12536,10 @@ export type Database = {
         }[]
       }
       get_user_email: { Args: never; Returns: string }
+      get_user_party_request_ids: {
+        Args: { p_user_id: string }
+        Returns: string[]
+      }
       get_user_permissions: { Args: { user_uuid: string }; Returns: Json }
       get_user_primary_role: {
         Args: { _user_id: string }
