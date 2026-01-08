@@ -750,66 +750,6 @@ export function DepositValidationWorkflow() {
     
     doc.setFontSize(16);
     doc.setFont(undefined, "bold");
-    doc.setTextColor(102, 0, 102);
-    doc.text("ATTESTATION DE VALIDATION - DÉPARTEMENT ABN", 105, yPos, { align: "center" });
-    yPos += 8;
-    
-    doc.setFontSize(11);
-    doc.setFont(undefined, "normal");
-    doc.setTextColor(100, 100, 100);
-    doc.text("Agence Bibliographique Nationale", 105, yPos, { align: "center" });
-    yPos += 10;
-    
-    doc.setLineWidth(0.5);
-    doc.setDrawColor(102, 0, 102);
-    doc.line(20, yPos, 190, yPos);
-    yPos += 15;
-
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(11);
-    doc.text(`Rabat, le ${format(new Date(), "dd MMMM yyyy", { locale: fr })}`, 140, yPos);
-    yPos += 15;
-
-    // Ajouter tous les détails
-    yPos = addRequestDetailsToPDF(doc, request, yPos);
-
-    // Section validation
-    yPos += 10;
-    doc.setFontSize(12);
-    doc.setFont(undefined, "bold");
-    doc.setTextColor(102, 0, 102);
-    doc.text("DÉCISION: VALIDÉ PAR LE DÉPARTEMENT ABN", 20, yPos);
-    yPos += 8;
-    
-    doc.setFont(undefined, "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Date de validation: ${format(new Date(), "dd/MM/yyyy à HH:mm", { locale: fr })}`, 20, yPos);
-    yPos += 6;
-    if (comments) {
-      doc.text(`Observations: ${comments}`, 20, yPos);
-    }
-    
-    // Mention de validation précédente
-    if (request.service_validated_at) {
-      yPos += 10;
-      doc.setFontSize(9);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Préalablement validé par le Service DLBN le ${format(new Date(request.service_validated_at), "dd/MM/yyyy", { locale: fr })}`, 20, yPos);
-    }
-    
-    addBNRMFooter(doc, doc.getNumberOfPages());
-    doc.save(`Validation_ABN_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
-  };
-
-  const generateValidationFormComite = async (request: DepositRequest) => {
-    const doc = new jsPDF();
-    
-    let yPos = await addBNRMHeader(doc);
-    yPos += 10;
-    
-    doc.setFontSize(16);
-    doc.setFont(undefined, "bold");
     doc.setTextColor(0, 102, 51);
     doc.text("ATTESTATION DE VALIDATION FINALE", 105, yPos, { align: "center" });
     yPos += 8;
@@ -817,7 +757,7 @@ export function DepositValidationWorkflow() {
     doc.setFontSize(11);
     doc.setFont(undefined, "normal");
     doc.setTextColor(100, 100, 100);
-    doc.text("Comité de Validation du Dépôt Légal", 105, yPos, { align: "center" });
+    doc.text("Département de l'Agence Bibliographique Nationale", 105, yPos, { align: "center" });
     yPos += 10;
     
     doc.setLineWidth(0.5);
@@ -838,7 +778,7 @@ export function DepositValidationWorkflow() {
     doc.setFontSize(12);
     doc.setFont(undefined, "bold");
     doc.setTextColor(0, 102, 51);
-    doc.text("DÉCISION FINALE: VALIDÉ PAR LE COMITÉ", 20, yPos);
+    doc.text("DÉCISION FINALE: VALIDÉ PAR LE DÉPARTEMENT ABN", 20, yPos);
     yPos += 8;
     
     doc.setFont(undefined, "normal");
@@ -847,7 +787,7 @@ export function DepositValidationWorkflow() {
     doc.text(`Date de validation finale: ${format(new Date(), "dd/MM/yyyy à HH:mm", { locale: fr })}`, 20, yPos);
     yPos += 6;
     if (comments) {
-      doc.text(`Observations du comité: ${comments}`, 20, yPos);
+      doc.text(`Observations: ${comments}`, 20, yPos);
     }
     
     // Historique des validations
@@ -856,15 +796,68 @@ export function DepositValidationWorkflow() {
     doc.setTextColor(100, 100, 100);
     doc.text("Historique des validations:", 20, yPos);
     yPos += 5;
-    if (request.service_validated_at) {
-      doc.text(`• Service DLBN: ${format(new Date(request.service_validated_at), "dd/MM/yyyy", { locale: fr })}`, 25, yPos);
+    if (request.committee_validated_at) {
+      doc.text(`• Comité de Validation: ${format(new Date(request.committee_validated_at), "dd/MM/yyyy", { locale: fr })}`, 25, yPos);
       yPos += 4;
     }
-    if (request.department_validated_at) {
-      doc.text(`• Département ABN: ${format(new Date(request.department_validated_at), "dd/MM/yyyy", { locale: fr })}`, 25, yPos);
-      yPos += 4;
+    doc.text(`• Département ABN: ${format(new Date(), "dd/MM/yyyy", { locale: fr })}`, 25, yPos);
+    
+    addBNRMFooter(doc, doc.getNumberOfPages());
+    doc.save(`Validation_ABN_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
+  };
+
+  const generateValidationFormComite = async (request: DepositRequest) => {
+    const doc = new jsPDF();
+    
+    let yPos = await addBNRMHeader(doc);
+    yPos += 10;
+    
+    doc.setFontSize(16);
+    doc.setFont(undefined, "bold");
+    doc.setTextColor(0, 51, 102);
+    doc.text("ATTESTATION DE VALIDATION - COMITÉ", 105, yPos, { align: "center" });
+    yPos += 8;
+    
+    doc.setFontSize(11);
+    doc.setFont(undefined, "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text("Comité de Validation du Dépôt Légal", 105, yPos, { align: "center" });
+    yPos += 10;
+    
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(0, 51, 102);
+    doc.line(20, yPos, 190, yPos);
+    yPos += 15;
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.text(`Rabat, le ${format(new Date(), "dd MMMM yyyy", { locale: fr })}`, 140, yPos);
+    yPos += 15;
+
+    // Ajouter tous les détails
+    yPos = addRequestDetailsToPDF(doc, request, yPos);
+
+    // Section validation
+    yPos += 10;
+    doc.setFontSize(12);
+    doc.setFont(undefined, "bold");
+    doc.setTextColor(0, 51, 102);
+    doc.text("DÉCISION: VALIDÉ PAR LE COMITÉ DE VALIDATION", 20, yPos);
+    yPos += 8;
+    
+    doc.setFont(undefined, "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Date de validation: ${format(new Date(), "dd/MM/yyyy à HH:mm", { locale: fr })}`, 20, yPos);
+    yPos += 6;
+    if (comments) {
+      doc.text(`Observations du comité: ${comments}`, 20, yPos);
     }
-    doc.text(`• Comité de Validation: ${format(new Date(), "dd/MM/yyyy", { locale: fr })}`, 25, yPos);
+    
+    yPos += 10;
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text("Cette demande sera transmise au Département ABN pour validation finale.", 20, yPos);
     
     addBNRMFooter(doc, doc.getNumberOfPages());
     doc.save(`Validation_Comite_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
