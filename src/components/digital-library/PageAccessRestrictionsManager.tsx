@@ -861,53 +861,56 @@ export function PageAccessRestrictionsManager() {
                     </CardContent>
                   </Card>
 
-                  {/* Mode de restriction */}
-                  <Card className="shadow-md">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base">Mode de restriction</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <Button
-                        type="button"
-                        variant={restrictionMode === "range" ? "default" : "outline"}
-                        onClick={() => setRestrictionMode("range")}
-                        className="w-full h-auto py-4 flex items-center gap-3"
-                      >
-                        <BookOpen className="h-5 w-5" />
-                        <div className="text-left flex-1">
-                          <div className="font-semibold">Plage de pages</div>
-                          <div className="text-xs opacity-80">Définir début et fin</div>
-                        </div>
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={restrictionMode === "manual" ? "default" : "outline"}
-                        onClick={() => setRestrictionMode("manual")}
-                        className="w-full h-auto py-4 flex items-center gap-3"
-                      >
-                        <FileText className="h-5 w-5" />
-                        <div className="text-left flex-1">
-                          <div className="font-semibold">Sélection manuelle</div>
-                          <div className="text-xs opacity-80">Choisir page par page</div>
-                        </div>
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={restrictionMode === "percentage" ? "default" : "outline"}
-                        onClick={() => setRestrictionMode("percentage")}
-                        className="w-full h-auto py-4 flex items-center gap-3"
-                      >
-                        <Eye className="h-5 w-5" />
-                        <div className="text-left flex-1">
-                          <div className="font-semibold">Pourcentage de pages</div>
-                          <div className="text-xs opacity-80">Autoriser un % de pages</div>
-                        </div>
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  {/* Mode de restriction - Hidden when access mode is internal */}
+                  {accessMode !== "internal" && (
+                    <Card className="shadow-md">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-base">Mode de restriction</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <Button
+                          type="button"
+                          variant={restrictionMode === "range" ? "default" : "outline"}
+                          onClick={() => setRestrictionMode("range")}
+                          className="w-full h-auto py-4 flex items-center gap-3"
+                        >
+                          <BookOpen className="h-5 w-5" />
+                          <div className="text-left flex-1">
+                            <div className="font-semibold">Plage de pages</div>
+                            <div className="text-xs opacity-80">Définir début et fin</div>
+                          </div>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={restrictionMode === "manual" ? "default" : "outline"}
+                          onClick={() => setRestrictionMode("manual")}
+                          className="w-full h-auto py-4 flex items-center gap-3"
+                        >
+                          <FileText className="h-5 w-5" />
+                          <div className="text-left flex-1">
+                            <div className="font-semibold">Sélection manuelle</div>
+                            <div className="text-xs opacity-80">Choisir page par page</div>
+                          </div>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={restrictionMode === "percentage" ? "default" : "outline"}
+                          onClick={() => setRestrictionMode("percentage")}
+                          className="w-full h-auto py-4 flex items-center gap-3"
+                        >
+                          <Eye className="h-5 w-5" />
+                          <div className="text-left flex-1">
+                            <div className="font-semibold">Pourcentage de pages</div>
+                            <div className="text-xs opacity-80">Autoriser un % de pages</div>
+                          </div>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
 
-                  {/* Configuration selon le mode */}
-                  {restrictionMode === "percentage" ? (
+                  {/* Configuration selon le mode - Hidden when access mode is internal */}
+                  {accessMode !== "internal" && (
+                    restrictionMode === "percentage" ? (
                     <Card className="shadow-md">
                       <CardHeader className="pb-3">
                         <CardTitle className="text-base">Pourcentage de pages accessibles</CardTitle>
@@ -1234,8 +1237,9 @@ export function PageAccessRestrictionsManager() {
                         </div>
                       </CardContent>
                     </Card>
+                  )
                   )}
-                  
+
                   {/* Paramètres de sécurité */}
                   <Card className="shadow-md border-2 border-primary/20">
                     <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 pb-3">
