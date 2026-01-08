@@ -43,7 +43,7 @@ export default function CollectionDetails() {
       icon: "📚"
     },
     periodicals: { 
-      title: "Revues et périodiques", 
+      title: "Revues et journaux", 
       description: "Journaux marocains historiques, revues scientifiques et culturelles",
       icon: "📰"
     },
