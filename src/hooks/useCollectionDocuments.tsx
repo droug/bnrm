@@ -10,6 +10,7 @@ export interface DocumentFilters {
   language?: string;
   documentType?: string;
   material?: string;
+  isRare?: string;
   sortBy?: 'title' | 'author' | 'published_at' | 'created_at';
   sortOrder?: 'asc' | 'desc';
 }
@@ -93,6 +94,7 @@ export function useCollectionDocuments(collectionType: CollectionType) {
       language: searchParams.get('language') || undefined,
       documentType: searchParams.get('type') || undefined,
       material: searchParams.get('material') || undefined,
+      isRare: searchParams.get('isRare') || undefined,
       sortBy: (searchParams.get('sortBy') as any) || 'created_at',
       sortOrder: (searchParams.get('sortOrder') as any) || 'desc',
     };
