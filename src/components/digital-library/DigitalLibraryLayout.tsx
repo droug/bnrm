@@ -74,7 +74,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   }, [session, isAuthenticated]);
 
   const collectionsSubmenu = [
-    { label: "Livres numériques", href: "/digital-library/collections/books", icon: Book },
+    { label: "Livres", href: "/digital-library/collections/books", icon: Book },
     { label: "Revues et journaux", href: "/digital-library/collections/periodicals", icon: FileText },
     { label: "Manuscrits numérisés", href: "/digital-library/collections/manuscripts", icon: BookOpen },
     { label: "Photographies et cartes", href: "/digital-library/collections/photos", icon: Image },
