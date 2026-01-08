@@ -27,7 +27,7 @@ export default function Collections() {
     },
     {
       id: "periodicals",
-      title: "Revues et périodiques",
+      title: "Revues et journaux",
       icon: FileText,
       count: "8,320",
       description: "Journaux marocains historiques, revues scientifiques et culturelles",

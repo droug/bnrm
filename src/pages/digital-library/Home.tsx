@@ -176,7 +176,7 @@ export default function DigitalLibraryHome() {
           },
           {
             id: "periodicals",
-            title: "Revues et périodiques",
+            title: "Revues et journaux",
             icon: FileText,
             count: "8,320",
             href: "/digital-library/collections/periodicals",
