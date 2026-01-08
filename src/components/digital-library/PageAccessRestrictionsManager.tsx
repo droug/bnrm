@@ -36,6 +36,7 @@ export function PageAccessRestrictionsManager() {
   const [percentagePages, setPercentagePages] = useState<number[]>([]);
   const [showPercentagePages, setShowPercentagePages] = useState(false);
   const [allowPhysicalConsultation, setAllowPhysicalConsultation] = useState(false);
+  const [isRareBook, setIsRareBook] = useState(false);
   const [totalPages, setTotalPages] = useState(245);
   const [currentPreviewPage, setCurrentPreviewPage] = useState(1);
   const [viewMode, setViewMode] = useState<"single" | "double">("single");
@@ -870,7 +871,7 @@ export function PageAccessRestrictionsManager() {
                   {/* Consultation physique - Hidden when only internal access */}
                   {allowInternetAccess && (
                     <Card className="shadow-md">
-                      <CardContent className="p-6">
+                      <CardContent className="p-6 space-y-6">
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
                             <Label className="text-base font-semibold">Consultation physique autorisée</Label>
@@ -881,6 +882,26 @@ export function PageAccessRestrictionsManager() {
                           <Switch
                             checked={allowPhysicalConsultation}
                             onCheckedChange={setAllowPhysicalConsultation}
+                            className="ml-4"
+                          />
+                        </div>
+                        
+                        {/* Livre rare */}
+                        <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className="p-2 rounded-full bg-amber-500/20">
+                              <Sparkles className="h-5 w-5 text-amber-600" />
+                            </div>
+                            <div>
+                              <Label className="text-base font-semibold cursor-pointer">Livre rare</Label>
+                              <p className="text-sm text-muted-foreground mt-0.5">
+                                Marquer ce document comme livre rare ou précieux
+                              </p>
+                            </div>
+                          </div>
+                          <Switch
+                            checked={isRareBook}
+                            onCheckedChange={setIsRareBook}
                             className="ml-4"
                           />
                         </div>
