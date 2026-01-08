@@ -58,6 +58,7 @@ export function DepositValidationWorkflow() {
   const [activeTab, setActiveTab] = useState("pending");
   const [showPendingModal, setShowPendingModal] = useState(false);
   const [showRejectionModal, setShowRejectionModal] = useState(false);
+  const [showCommitteeConfirmModal, setShowCommitteeConfirmModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [pendingRejection, setPendingRejection] = useState<{
     requestId: string;
@@ -454,12 +455,11 @@ export function DepositValidationWorkflow() {
         
         setRequests(updatedRequests);
         
-        // Générer le document approprié selon le type d'approbation
-        if (status === "approved") {
-          await generateValidationForm(selectedRequest!, validationType);
-        } else if (status === "rejected") {
+        // Générer le document approprié selon le type d'approbation (seulement pour le rejet)
+        if (status === "rejected") {
           await generateRejectionLetter(selectedRequest!);
         }
+        // Note: Pour l'approbation du comité, pas de document généré - juste une confirmation
         
         toast({
           title: "Succès",
@@ -507,12 +507,11 @@ export function DepositValidationWorkflow() {
 
       if (error) throw error;
 
-      // Générer le document approprié selon le type d'approbation
-      if (status === "approved") {
-        await generateValidationForm(selectedRequest!, validationType);
-      } else if (status === "rejected") {
+      // Générer le document approprié selon le type d'approbation (seulement pour le rejet)
+      if (status === "rejected") {
         await generateRejectionLetter(selectedRequest!);
       }
+      // Note: Pour l'approbation du comité, pas de document généré - juste une confirmation
 
       toast({
         title: "Succès",
@@ -1476,7 +1475,7 @@ export function DepositValidationWorkflow() {
                         Rejeter (Comité)
                       </Button>
                       <Button
-                        onClick={() => handleValidation(selectedRequest.id, "committee", "approved")}
+                        onClick={() => setShowCommitteeConfirmModal(true)}
                         disabled={isLoading}
                       >
                         <CheckCircle className="h-4 w-4 mr-2" />
@@ -1669,6 +1668,53 @@ export function DepositValidationWorkflow() {
             >
               <XCircle className="h-4 w-4 mr-2" />
               Confirmer le rejet
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modale de confirmation d'approbation Comité */}
+      <Dialog open={showCommitteeConfirmModal} onOpenChange={setShowCommitteeConfirmModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-primary">
+              <CheckCircle className="h-5 w-5" />
+              Confirmation d'approbation
+            </DialogTitle>
+            <DialogDescription>
+              Confirmer l'approbation par le Comité de Validation
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <p className="text-sm font-medium mb-2">Demande concernée :</p>
+              <p className="text-sm text-muted-foreground">
+                N° {selectedRequest?.request_number}
+              </p>
+              <p className="text-sm font-medium mt-2">{selectedRequest?.title}</p>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Êtes-vous sûr de vouloir approuver cette demande ? Elle sera transmise au Département ABN pour validation finale.
+            </p>
+          </div>
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setShowCommitteeConfirmModal(false)}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={() => {
+                setShowCommitteeConfirmModal(false);
+                if (selectedRequest) {
+                  handleValidation(selectedRequest.id, "committee", "approved");
+                }
+              }}
+              disabled={isLoading}
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Confirmer l'approbation
             </Button>
           </div>
         </DialogContent>
