@@ -373,6 +373,7 @@ export function PageAccessRestrictionsManager() {
                   <SelectItem value="exhibition">Expositions</SelectItem>
                   <SelectItem value="manuscript">Manuscrits</SelectItem>
                   <SelectItem value="book">Livres</SelectItem>
+                  <SelectItem value="rare_book">Livres rares</SelectItem>
                   <SelectItem value="document">Documents</SelectItem>
                   <SelectItem value="article">Articles</SelectItem>
                   <SelectItem value="photo">Photos</SelectItem>

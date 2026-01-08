@@ -45,6 +45,7 @@ const documentSchema = z.object({
   copyright_expires_at: z.string().optional(),
   copyright_derogation: z.boolean().default(false),
   digitization_source: z.enum(["internal", "external"]).default("internal"),
+  is_rare_book: z.boolean().default(false),
 });
 
 export default function DocumentsManager() {
@@ -232,6 +233,7 @@ export default function DocumentsManager() {
       email_share_enabled: true,
       copyright_derogation: false,
       digitization_source: "internal",
+      is_rare_book: false,
     },
   });
 
@@ -919,6 +921,7 @@ export default function DocumentsManager() {
                               onChange={field.onChange}
                               options={[
                                 { value: "livre", label: "Livre" },
+                                { value: "livre_rare", label: "Livre rare" },
                                 { value: "article", label: "Article" },
                                 { value: "video", label: "Vidéo" },
                                 { value: "audio", label: "Audio" },
@@ -992,6 +995,27 @@ export default function DocumentsManager() {
                             <Textarea {...field} rows={3} placeholder="Description du document" />
                           </FormControl>
                           <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Checkbox Livre rare */}
+                    <FormField
+                      control={form.control}
+                      name="is_rare_book"
+                      render={({ field }) => (
+                        <FormItem className="col-span-2 flex items-center gap-3 p-3 border rounded-lg bg-amber-50/50">
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                          <div>
+                            <FormLabel className="text-sm font-medium cursor-pointer">
+                              📚 Livre rare
+                            </FormLabel>
+                            <FormDescription className="text-xs">
+                              Marquer ce document comme édition rare ou précieuse
+                            </FormDescription>
+                          </div>
                         </FormItem>
                       )}
                     />
@@ -1180,6 +1204,7 @@ export default function DocumentsManager() {
                               onChange={field.onChange}
                               options={[
                                 { value: "livre", label: "Livre" },
+                                { value: "livre_rare", label: "Livre rare" },
                                 { value: "article", label: "Article" },
                                 { value: "video", label: "Vidéo" },
                                 { value: "audio", label: "Audio" },
@@ -1253,6 +1278,27 @@ export default function DocumentsManager() {
                             <Textarea {...field} rows={3} placeholder="Description du document" />
                           </FormControl>
                           <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Checkbox Livre rare */}
+                    <FormField
+                      control={form.control}
+                      name="is_rare_book"
+                      render={({ field }) => (
+                        <FormItem className="col-span-2 flex items-center gap-3 p-3 border rounded-lg bg-amber-50/50">
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                          <div>
+                            <FormLabel className="text-sm font-medium cursor-pointer">
+                              📚 Livre rare
+                            </FormLabel>
+                            <FormDescription className="text-xs">
+                              Marquer ce document comme édition rare ou précieuse
+                            </FormDescription>
+                          </div>
                         </FormItem>
                       )}
                     />

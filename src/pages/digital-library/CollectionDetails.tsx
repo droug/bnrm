@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, BookOpen, SlidersHorizontal, Calendar, Languages, FileType, ArrowUpDown } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Search, BookOpen, SlidersHorizontal, Calendar, Languages, FileType, ArrowUpDown, Sparkles } from "lucide-react";
 import { useCollectionDocuments } from "@/hooks/useCollectionDocuments";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
@@ -240,7 +242,25 @@ export default function CollectionDetails() {
                         <SelectItem key={mat} value={mat}>{mat}</SelectItem>
                       ))}
                     </SelectContent>
-                  </Select>
+                </Select>
+                </div>
+              )}
+
+              {/* Filtre Livres rares - uniquement pour la collection books */}
+              {collectionType === 'books' && (
+                <div className="flex items-center gap-3 p-3 border rounded-lg bg-amber-50/50">
+                  <Sparkles className="h-5 w-5 text-amber-600" />
+                  <div className="flex-1">
+                    <Label htmlFor="rare-books" className="text-sm font-medium cursor-pointer">
+                      Livres rares
+                    </Label>
+                    <p className="text-xs text-muted-foreground">Afficher uniquement les éditions rares et précieuses</p>
+                  </div>
+                  <Switch
+                    id="rare-books"
+                    checked={filters.isRare === 'true'}
+                    onCheckedChange={(checked) => updateFilters({ isRare: checked ? 'true' : undefined })}
+                  />
                 </div>
               )}
             </div>
@@ -318,6 +338,7 @@ export default function CollectionDetails() {
                   language: undefined,
                   documentType: undefined,
                   material: undefined,
+                  isRare: undefined,
                   sortBy: 'created_at',
                   sortOrder: 'desc'
                 })}
