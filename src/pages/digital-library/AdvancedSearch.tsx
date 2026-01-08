@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Search, RotateCcw, BookOpen, User, FileText, Tag, Calendar, Hash, Library, Loader2 } from "lucide-react";
+import { Search, RotateCcw, BookOpen, User, FileText, Tag, Calendar, Hash, Library, Loader2, Sparkles } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
 import { AuthorAutocomplete } from "@/components/ui/author-autocomplete";
@@ -59,7 +60,11 @@ export default function AdvancedSearch() {
     documentType: "",
     collection: "",
     edition: "",
+    isRareBook: false,
   });
+
+  // État séparé pour le filtre rare book (non inclus dans formData car c'est un boolean)
+  const [isRareBookFilter, setIsRareBookFilter] = useState(false);
 
   // Fonction de recherche
   const performSearch = useCallback(async () => {
@@ -130,6 +135,11 @@ export default function AdvancedSearch() {
         baseQuery = baseQuery.eq('document_type', params.documentType);
       }
       
+      // Filtrer par livre rare
+      if (params.isRareBook === 'true') {
+        baseQuery = baseQuery.eq('document_type', 'rare_book');
+      }
+      
       // Filtrer par date
       if (params.dateFrom) {
         baseQuery = baseQuery.gte('publication_year', parseInt(params.dateFrom));
@@ -194,8 +204,13 @@ export default function AdvancedSearch() {
     const params = new URLSearchParams();
     
     Object.entries(formData).forEach(([key, value]) => {
-      if (value) params.append(key, value);
+      if (value && key !== 'isRareBook') params.append(key, value as string);
     });
+    
+    // Ajouter le filtre livre rare
+    if (isRareBookFilter) {
+      params.append('isRareBook', 'true');
+    }
     
     // Rester sur la page de recherche avancée avec les paramètres
     navigate(`/digital-library/search?${params.toString()}`);
@@ -222,7 +237,9 @@ export default function AdvancedSearch() {
       documentType: "",
       collection: "",
       edition: "",
+      isRareBook: false,
     });
+    setIsRareBookFilter(false);
     setSearchResults([]);
     setTotalResults(0);
     setCurrentPage(1);
@@ -334,6 +351,30 @@ export default function AdvancedSearch() {
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+                  
+                  <Separator />
+                  
+                  {/* Filtre Livres rares */}
+                  <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-amber-500/20">
+                        <Sparkles className="h-5 w-5 text-amber-600" />
+                      </div>
+                      <div>
+                        <Label htmlFor="rareBook-filter" className="text-base font-semibold cursor-pointer">
+                          Livres rares uniquement
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          Filtrer pour afficher uniquement les livres rares et précieux
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      id="rareBook-filter"
+                      checked={isRareBookFilter}
+                      onCheckedChange={setIsRareBookFilter}
+                    />
                   </div>
                 </TabsContent>
 
