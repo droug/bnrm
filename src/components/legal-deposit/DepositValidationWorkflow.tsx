@@ -1252,6 +1252,16 @@ export function DepositValidationWorkflow() {
                                     >
                                       <Info className="h-4 w-4" />
                                     </Button>
+                                    {activeTab === "validated" && request.validated_by_department && (
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => generateAccuseReception(request)}
+                                        title="Télécharger l'accusé de réception"
+                                      >
+                                        <Download className="h-4 w-4" />
+                                      </Button>
+                                    )}
                                   </div>
                                 </TableCell>
                               </TableRow>
