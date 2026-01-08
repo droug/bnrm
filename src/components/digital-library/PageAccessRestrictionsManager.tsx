@@ -1333,70 +1333,72 @@ export function PageAccessRestrictionsManager() {
                     </CardContent>
                   </Card>
                   
-                  {/* Affichage des pages non accessibles */}
-                  <Card className="shadow-md border-2 border-orange-200 dark:border-orange-800">
-                    <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 pb-3">
-                      <div className="flex items-center gap-2">
-                        <EyeOff className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                        <CardTitle className="text-base">Affichage des pages non accessibles</CardTitle>
-                      </div>
-                      <CardDescription className="text-xs">
-                        Choisissez comment les pages restreintes seront affichées aux visiteurs
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3 pt-4">
-                      <Button
-                        type="button"
-                        variant={restrictedPageDisplay === "blur" ? "default" : "outline"}
-                        onClick={() => setRestrictedPageDisplay("blur")}
-                        className="w-full h-auto py-4 flex items-center gap-3"
-                      >
-                        <div className="p-2 rounded-lg bg-primary/10">
-                          <Eye className="h-5 w-5" />
+                  {/* Affichage des pages non accessibles - Hidden when only internal access */}
+                  {allowInternetAccess && (
+                    <Card className="shadow-md border-2 border-orange-200 dark:border-orange-800">
+                      <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 pb-3">
+                        <div className="flex items-center gap-2">
+                          <EyeOff className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                          <CardTitle className="text-base">Affichage des pages non accessibles</CardTitle>
                         </div>
-                        <div className="text-left flex-1">
-                          <div className="font-semibold">Effet flou</div>
-                          <div className="text-xs opacity-80">Les pages sont visibles mais floues</div>
+                        <CardDescription className="text-xs">
+                          Choisissez comment les pages restreintes seront affichées aux visiteurs
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3 pt-4">
+                        <Button
+                          type="button"
+                          variant={restrictedPageDisplay === "blur" ? "default" : "outline"}
+                          onClick={() => setRestrictedPageDisplay("blur")}
+                          className="w-full h-auto py-4 flex items-center gap-3"
+                        >
+                          <div className="p-2 rounded-lg bg-primary/10">
+                            <Eye className="h-5 w-5" />
+                          </div>
+                          <div className="text-left flex-1">
+                            <div className="font-semibold">Effet flou</div>
+                            <div className="text-xs opacity-80">Les pages sont visibles mais floues</div>
+                          </div>
+                        </Button>
+                        
+                        <Button
+                          type="button"
+                          variant={restrictedPageDisplay === "empty" ? "default" : "outline"}
+                          onClick={() => setRestrictedPageDisplay("empty")}
+                          className="w-full h-auto py-4 flex items-center gap-3"
+                        >
+                          <div className="p-2 rounded-lg bg-primary/10">
+                            <Square className="h-5 w-5" />
+                          </div>
+                          <div className="text-left flex-1">
+                            <div className="font-semibold">Page vide</div>
+                            <div className="text-xs opacity-80">Une page blanche avec un message</div>
+                          </div>
+                        </Button>
+                        
+                        <Button
+                          type="button"
+                          variant={restrictedPageDisplay === "hidden" ? "default" : "outline"}
+                          onClick={() => setRestrictedPageDisplay("hidden")}
+                          className="w-full h-auto py-4 flex items-center gap-3"
+                        >
+                          <div className="p-2 rounded-lg bg-primary/10">
+                            <EyeOff className="h-5 w-5" />
+                          </div>
+                          <div className="text-left flex-1">
+                            <div className="font-semibold">Masquer complètement</div>
+                            <div className="text-xs opacity-80">Les pages sont totalement invisibles</div>
+                          </div>
+                        </Button>
+                        
+                        <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                          <p className="text-xs text-blue-900 dark:text-blue-100">
+                            💡 <strong>Conseil :</strong> L'effet flou permet aux visiteurs de voir qu'il y a du contenu, tandis que les pages vides indiquent clairement qu'un contenu existe mais n'est pas accessible.
+                          </p>
                         </div>
-                      </Button>
-                      
-                      <Button
-                        type="button"
-                        variant={restrictedPageDisplay === "empty" ? "default" : "outline"}
-                        onClick={() => setRestrictedPageDisplay("empty")}
-                        className="w-full h-auto py-4 flex items-center gap-3"
-                      >
-                        <div className="p-2 rounded-lg bg-primary/10">
-                          <Square className="h-5 w-5" />
-                        </div>
-                        <div className="text-left flex-1">
-                          <div className="font-semibold">Page vide</div>
-                          <div className="text-xs opacity-80">Une page blanche avec un message</div>
-                        </div>
-                      </Button>
-                      
-                      <Button
-                        type="button"
-                        variant={restrictedPageDisplay === "hidden" ? "default" : "outline"}
-                        onClick={() => setRestrictedPageDisplay("hidden")}
-                        className="w-full h-auto py-4 flex items-center gap-3"
-                      >
-                        <div className="p-2 rounded-lg bg-primary/10">
-                          <EyeOff className="h-5 w-5" />
-                        </div>
-                        <div className="text-left flex-1">
-                          <div className="font-semibold">Masquer complètement</div>
-                          <div className="text-xs opacity-80">Les pages sont totalement invisibles</div>
-                        </div>
-                      </Button>
-                      
-                      <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
-                        <p className="text-xs text-blue-900 dark:text-blue-100">
-                          💡 <strong>Conseil :</strong> L'effet flou permet aux visiteurs de voir qu'il y a du contenu, tandis que les pages vides indiquent clairement qu'un contenu existe mais n'est pas accessible.
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  )}
                 </>
               )}
             </div>
