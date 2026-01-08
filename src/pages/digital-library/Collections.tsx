@@ -18,7 +18,7 @@ export default function Collections() {
   const collections = [
     {
       id: "books",
-      title: "Livres numériques",
+      title: "Livres",
       icon: Book,
       count: "45,670",
       description: "Ouvrages numérisés sur le patrimoine marocain, littérature classique et contemporaine",

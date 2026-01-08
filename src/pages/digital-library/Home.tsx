@@ -168,7 +168,7 @@ export default function DigitalLibraryHome() {
         setFeaturedCollections([
           {
             id: "books",
-            title: "Livres numériques",
+            title: "Livres",
             icon: BookOpen,
             count: "45,670",
             href: "/digital-library/collections/books",

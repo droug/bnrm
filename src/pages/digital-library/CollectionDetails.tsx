@@ -38,7 +38,7 @@ export default function CollectionDetails() {
 
   const collectionInfo: Record<string, any> = {
     books: { 
-      title: "Livres numériques", 
+      title: "Livres", 
       description: "Ouvrages numérisés sur le patrimoine marocain, littérature classique et contemporaine",
       icon: "📚"
     },
