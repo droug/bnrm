@@ -473,28 +473,43 @@ export function LegalDepositDetailsView({ request }: LegalDepositDetailsViewProp
     const metadata = request.metadata || {};
     const documentsUrls = request.documents_urls || {};
     
-    // Mapping pour les labels en français
+    // Mapping pour les labels en français - correspondant aux formulaires
     const documentLabels: Record<string, string> = {
-      'cin': 'CNIE de l\'auteur',
-      'cnie': 'CNIE de l\'auteur',
-      'summary': 'Résumé du document',
-      'cover': 'Couverture',
-      'abstract': 'Résumé/Abstract',
+      'cin': 'Copie de la CNIE de l\'Auteur',
+      'cnie': 'Copie de la CNIE de l\'Auteur',
+      'cnie_document': 'Copie de la CNIE de l\'Auteur',
+      'cin_document': 'Copie de la CNIE de l\'Auteur',
+      'summary': 'Sommaire (PDF)',
+      'summary_document': 'Sommaire (PDF)',
+      'cover': 'Couverture ou capture (jpg)',
+      'cover_document': 'Couverture ou capture (jpg)',
+      'abstract': 'Résumé de l\'ouvrage (PDF)',
       'court_decision': 'Décision du Tribunal',
       'court-decision': 'Décision du Tribunal',
+      'courtDecision': 'Décision du Tribunal',
       'tribunal-decision': 'Décision du Tribunal',
-      'thesis-recommendation': 'Recommandation de soutenance de thèse',
-      'thesis_recommendation': 'Recommandation de soutenance de thèse',
-      'quran-authorization': 'Autorisation de publication Coran',
-      'quran_authorization': 'Autorisation de publication Coran',
+      'thesis-recommendation': 'Recommandation de publication (Thèses)',
+      'thesis_recommendation': 'Recommandation de publication (Thèses)',
+      'thesisRecommendation': 'Recommandation de publication (Thèses)',
+      'quran-authorization': 'Autorisation de la Fondation Mohammed VI (Corans)',
+      'quran_authorization': 'Autorisation de la Fondation Mohammed VI (Corans)',
+      'quranAuthorization': 'Autorisation de la Fondation Mohammed VI (Corans)',
       'supporting_document': 'Document justificatif',
+      'supportingDocument': 'Document justificatif',
       'additional_document': 'Document additionnel',
+      'additionalDocument': 'Document additionnel',
       'isbn_request': 'Demande ISBN',
+      'isbnRequest': 'Demande ISBN',
       'issn_request': 'Demande ISSN',
+      'issnRequest': 'Demande ISSN',
       'periodical_cover': 'Couverture du périodique',
+      'periodicalCover': 'Couverture du périodique',
       'periodical_sample': 'Exemplaire du périodique',
-      'software_manual': 'Manuel du logiciel',
-      'database_documentation': 'Documentation de la base de données'
+      'periodicalSample': 'Exemplaire du périodique',
+      'software_manual': 'Résumé de la publication (PDF)',
+      'softwareManual': 'Résumé de la publication (PDF)',
+      'database_documentation': 'Résumé de la publication ou descriptif (PDF)',
+      'databaseDocumentation': 'Résumé de la publication ou descriptif (PDF)'
     };
     
     // Documents from documents_urls field - parcourir toutes les clés
