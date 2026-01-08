@@ -1425,14 +1425,6 @@ export function DepositValidationWorkflow() {
                   {!selectedRequest.validated_by_committee && (
                     <>
                       <Button
-                        variant="outline"
-                        onClick={() => setShowPendingModal(true)}
-                        disabled={isLoading}
-                      >
-                        <Clock className="h-4 w-4 mr-2" />
-                        Mettre en attente
-                      </Button>
-                      <Button
                         variant="destructive"
                         onClick={() => openRejectionModal(selectedRequest.id, "committee")}
                         disabled={isLoading}
