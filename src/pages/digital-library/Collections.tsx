@@ -45,7 +45,7 @@ export default function Collections() {
     },
     {
       id: "photos",
-      title: "Photographies et cartes",
+      title: "Collections spécialisées",
       icon: Image,
       count: "15,890",
       description: "Collections de photographies historiques, cartes anciennes et lithographies",
