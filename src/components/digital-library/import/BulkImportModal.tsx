@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -21,10 +21,9 @@ import {
   Loader2,
   FileDown,
   FileText,
-  ArrowRight,
   Link2,
-  File,
-  Check
+  Check,
+  Info
 } from "lucide-react";
 import * as XLSX from 'xlsx';
 
@@ -69,22 +68,23 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
   const metadataInputRef = useRef<HTMLInputElement>(null);
   const documentsInputRef = useRef<HTMLInputElement>(null);
   
-  // Step management
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+  // Mode: 'metadata' | 'documents' | 'combined'
+  const [importMode, setImportMode] = useState<'metadata' | 'documents' | 'combined'>('combined');
   
-  // Step 1: Metadata
+  // Metadata state
   const [metadataFile, setMetadataFile] = useState<File | null>(null);
   const [metadataRows, setMetadataRows] = useState<MetadataRow[]>([]);
   const [metadataPreview, setMetadataPreview] = useState<MetadataRow[]>([]);
   
-  // Step 2: Documents
+  // Documents state
   const [documentFiles, setDocumentFiles] = useState<File[]>([]);
   const [fileMatches, setFileMatches] = useState<FileMatch[]>([]);
   
-  // Step 3: Processing
+  // Processing state
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [results, setResults] = useState<ImportResult[]>([]);
+  const [showResults, setShowResults] = useState(false);
 
   const downloadTemplate = () => {
     const headers = [
@@ -126,9 +126,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
     const ws = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Métadonnées');
-    
     ws['!cols'] = headers.map(() => ({ wch: 22 }));
-    
     XLSX.writeFile(wb, 'template_import_masse_metadonnees.xlsx');
     
     toast({
@@ -179,20 +177,13 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
     
     try {
       const data = await readExcelFile(file) as MetadataRow[];
-      
-      // Validate that 'cote' column exists
-      const hasCote = data.length > 0 && data[0].cote !== undefined;
-      if (!hasCote) {
-        toast({
-          title: "Colonne manquante",
-          description: "La colonne 'cote' est obligatoire pour l'association des fichiers",
-          variant: "destructive"
-        });
-        return;
-      }
-      
       setMetadataRows(data);
       setMetadataPreview(data.slice(0, 5));
+      
+      // Re-match files if already loaded
+      if (documentFiles.length > 0) {
+        matchFilesWithMetadata(documentFiles, data);
+      }
       
       toast({
         title: "Fichier chargé",
@@ -208,27 +199,10 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
     }
   };
 
-  const handleDocumentFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
-    // Filter only PDF files
-    const pdfFiles = files.filter(f => f.type === 'application/pdf' || f.name.endsWith('.pdf'));
-    
-    if (pdfFiles.length !== files.length) {
-      toast({
-        title: "Attention",
-        description: `${files.length - pdfFiles.length} fichier(s) non-PDF ont été ignorés`,
-        variant: "destructive"
-      });
-    }
-
-    setDocumentFiles(pdfFiles);
-    
-    // Match files with metadata based on cote (filename without extension)
-    const matches: FileMatch[] = pdfFiles.map(file => {
+  const matchFilesWithMetadata = (files: File[], metadata: MetadataRow[]) => {
+    const matches: FileMatch[] = files.map(file => {
       const fileNameWithoutExt = file.name.replace(/\.pdf$/i, '').trim();
-      const matchedRow = metadataRows.find(row => {
+      const matchedRow = metadata.find(row => {
         const cote = row.cote?.toString().trim();
         return cote === fileNameWithoutExt || 
                cote?.replace(/[-\s]/g, '') === fileNameWithoutExt.replace(/[-\s]/g, '');
@@ -243,58 +217,71 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
     });
 
     setFileMatches(matches);
-    
-    const matchedCount = matches.filter(m => m.matched).length;
-    toast({
-      title: "Fichiers analysés",
-      description: `${matchedCount}/${pdfFiles.length} fichiers associés aux métadonnées`
-    });
+    return matches;
   };
 
-  const processImport = async () => {
-    if (fileMatches.length === 0) return;
+  const handleDocumentFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const pdfFiles = files.filter(f => f.type === 'application/pdf' || f.name.endsWith('.pdf'));
+    
+    if (pdfFiles.length !== files.length) {
+      toast({
+        title: "Attention",
+        description: `${files.length - pdfFiles.length} fichier(s) non-PDF ont été ignorés`,
+        variant: "destructive"
+      });
+    }
+
+    setDocumentFiles(pdfFiles);
+    
+    // Match with metadata if available
+    const matches = matchFilesWithMetadata(pdfFiles, metadataRows);
+    
+    const matchedCount = matches.filter(m => m.matched).length;
+    if (metadataRows.length > 0) {
+      toast({
+        title: "Fichiers analysés",
+        description: `${matchedCount}/${pdfFiles.length} fichiers associés aux métadonnées`
+      });
+    } else {
+      toast({
+        title: "Fichiers chargés",
+        description: `${pdfFiles.length} fichier(s) PDF sélectionné(s)`
+      });
+    }
+  };
+
+  // Import metadata only (without PDF files)
+  const processMetadataOnlyImport = async () => {
+    if (metadataRows.length === 0) return;
 
     setIsProcessing(true);
     setProgress(0);
     setResults([]);
-    setCurrentStep(3);
+    setShowResults(true);
 
     const importResults: ImportResult[] = [];
-    const totalFiles = fileMatches.length;
+    const total = metadataRows.length;
 
-    for (let i = 0; i < fileMatches.length; i++) {
-      const match = fileMatches[i];
+    for (let i = 0; i < metadataRows.length; i++) {
+      const row = metadataRows[i];
       
       try {
-        if (!match.matched || !match.metadataRow) {
+        if (!row.cote || !row.titre) {
           importResults.push({
-            cote: match.cote,
-            title: match.file.name,
+            cote: row.cote || '(vide)',
+            title: row.titre || '(sans titre)',
             status: 'error',
-            message: 'Aucune métadonnée correspondante trouvée'
+            message: 'Cote ou titre manquant'
           });
           continue;
         }
 
-        const row = match.metadataRow;
         const cbnDocId = `CBN-${row.cote.replace(/[^a-zA-Z0-9]/g, '-')}`;
 
-        // Upload PDF to storage
-        const filePath = `documents/${cbnDocId}/${match.file.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('digital-library')
-          .upload(filePath, match.file, { upsert: true });
-
-        if (uploadError) {
-          throw new Error(`Erreur upload: ${uploadError.message}`);
-        }
-
-        // Get public URL
-        const { data: urlData } = supabase.storage
-          .from('digital-library')
-          .getPublicUrl(filePath);
-
-        // Check if cbn_document exists
+        // Check if already exists
         const { data: existingCbn } = await supabase
           .from('cbn_documents')
           .select('id')
@@ -304,7 +291,6 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
         let finalCbnId = existingCbn?.id;
 
         if (!existingCbn) {
-          // Create cbn_documents entry
           const { data: newCbn, error: cbnError } = await supabase
             .from('cbn_documents')
             .insert({
@@ -315,7 +301,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
               author: row.auteur || null,
               document_type: row.type_document || 'livre',
               publication_year: row.annee_publication ? parseInt(row.annee_publication) : null,
-              is_digitized: true,
+              is_digitized: false,
             })
             .select('id')
             .single();
@@ -335,7 +321,6 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
             document_type: row.type_document || 'livre',
             language: row.langue || null,
             publication_year: row.annee_publication ? parseInt(row.annee_publication) : null,
-            pdf_url: urlData.publicUrl,
             pages_count: row.nombre_pages ? parseInt(row.nombre_pages) : 1,
             digitization_source: row.source_numerisation || 'internal',
             digitization_quality: row.qualite_numerisation || null,
@@ -353,7 +338,214 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
           cote: row.cote,
           title: row.titre,
           status: 'success',
-          message: 'Document importé avec succès',
+          message: 'Métadonnées importées (sans PDF)',
+          documentId: finalCbnId
+        });
+
+      } catch (error: any) {
+        importResults.push({
+          cote: row.cote || '(vide)',
+          title: row.titre || '(sans titre)',
+          status: 'error',
+          message: error.message || 'Erreur inconnue'
+        });
+      }
+
+      setProgress(Math.round(((i + 1) / total) * 100));
+    }
+
+    finishImport(importResults);
+  };
+
+  // Import PDF files only (without metadata Excel)
+  const processDocumentsOnlyImport = async () => {
+    if (documentFiles.length === 0) return;
+
+    setIsProcessing(true);
+    setProgress(0);
+    setResults([]);
+    setShowResults(true);
+
+    const importResults: ImportResult[] = [];
+    const total = documentFiles.length;
+
+    for (let i = 0; i < documentFiles.length; i++) {
+      const file = documentFiles[i];
+      const cote = file.name.replace(/\.pdf$/i, '').trim();
+      
+      try {
+        const cbnDocId = `CBN-${cote.replace(/[^a-zA-Z0-9]/g, '-')}`;
+
+        // Upload PDF to storage
+        const filePath = `documents/${cbnDocId}/${file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('digital-library')
+          .upload(filePath, file, { upsert: true });
+
+        if (uploadError) {
+          throw new Error(`Erreur upload: ${uploadError.message}`);
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('digital-library')
+          .getPublicUrl(filePath);
+
+        // Check if cbn_document exists
+        const { data: existingCbn } = await supabase
+          .from('cbn_documents')
+          .select('id')
+          .eq('cote', cote)
+          .single();
+
+        let finalCbnId = existingCbn?.id;
+
+        if (!existingCbn) {
+          const { data: newCbn, error: cbnError } = await supabase
+            .from('cbn_documents')
+            .insert({
+              id: cbnDocId,
+              cote: cote,
+              title: cote, // Use cote as title when no metadata
+              document_type: 'livre',
+              is_digitized: true,
+            })
+            .select('id')
+            .single();
+
+          if (cbnError) throw cbnError;
+          finalCbnId = newCbn?.id || cbnDocId;
+        }
+
+        // Insert into digital_library_documents
+        const { error: docError } = await supabase
+          .from('digital_library_documents')
+          .insert({
+            cbn_document_id: finalCbnId,
+            title: cote,
+            pdf_url: urlData.publicUrl,
+            pages_count: 1,
+            digitization_source: 'internal',
+            publication_status: 'draft',
+          });
+
+        if (docError) throw docError;
+
+        importResults.push({
+          cote: cote,
+          title: file.name,
+          status: 'success',
+          message: 'PDF importé (métadonnées à compléter)',
+          documentId: finalCbnId
+        });
+
+      } catch (error: any) {
+        importResults.push({
+          cote: cote,
+          title: file.name,
+          status: 'error',
+          message: error.message || 'Erreur inconnue'
+        });
+      }
+
+      setProgress(Math.round(((i + 1) / total) * 100));
+    }
+
+    finishImport(importResults);
+  };
+
+  // Import both metadata and PDF files
+  const processCombinedImport = async () => {
+    if (fileMatches.length === 0) return;
+
+    setIsProcessing(true);
+    setProgress(0);
+    setResults([]);
+    setShowResults(true);
+
+    const importResults: ImportResult[] = [];
+    const total = fileMatches.length;
+
+    for (let i = 0; i < fileMatches.length; i++) {
+      const match = fileMatches[i];
+      
+      try {
+        const row = match.metadataRow;
+        const cote = row?.cote || match.cote;
+        const cbnDocId = `CBN-${cote.replace(/[^a-zA-Z0-9]/g, '-')}`;
+
+        // Upload PDF to storage
+        const filePath = `documents/${cbnDocId}/${match.file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('digital-library')
+          .upload(filePath, match.file, { upsert: true });
+
+        if (uploadError) {
+          throw new Error(`Erreur upload: ${uploadError.message}`);
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('digital-library')
+          .getPublicUrl(filePath);
+
+        // Check if cbn_document exists
+        const { data: existingCbn } = await supabase
+          .from('cbn_documents')
+          .select('id')
+          .eq('cote', cote)
+          .single();
+
+        let finalCbnId = existingCbn?.id;
+
+        if (!existingCbn) {
+          const { data: newCbn, error: cbnError } = await supabase
+            .from('cbn_documents')
+            .insert({
+              id: cbnDocId,
+              cote: cote,
+              title: row?.titre || cote,
+              title_ar: row?.titre_ar || null,
+              author: row?.auteur || null,
+              document_type: row?.type_document || 'livre',
+              publication_year: row?.annee_publication ? parseInt(row.annee_publication) : null,
+              is_digitized: true,
+            })
+            .select('id')
+            .single();
+
+          if (cbnError) throw cbnError;
+          finalCbnId = newCbn?.id || cbnDocId;
+        }
+
+        // Insert into digital_library_documents
+        const { error: docError } = await supabase
+          .from('digital_library_documents')
+          .insert({
+            cbn_document_id: finalCbnId,
+            title: row?.titre || cote,
+            title_ar: row?.titre_ar || null,
+            author: row?.auteur || null,
+            document_type: row?.type_document || 'livre',
+            language: row?.langue || null,
+            publication_year: row?.annee_publication ? parseInt(row.annee_publication) : null,
+            pdf_url: urlData.publicUrl,
+            pages_count: row?.nombre_pages ? parseInt(row.nombre_pages) : 1,
+            digitization_source: row?.source_numerisation || 'internal',
+            digitization_quality: row?.qualite_numerisation || null,
+            themes: row?.themes ? row.themes.split(';').map((t: string) => t.trim()) : null,
+            digital_collections: row?.collections ? row.collections.split(';').map((c: string) => c.trim()) : null,
+            access_level: row?.niveau_acces || 'public',
+            download_enabled: row?.telechargement_actif !== 'false',
+            print_enabled: row?.impression_active !== 'false',
+            publication_status: 'draft',
+          });
+
+        if (docError) throw docError;
+
+        importResults.push({
+          cote: cote,
+          title: row?.titre || match.file.name,
+          status: 'success',
+          message: match.matched ? 'Document complet importé' : 'PDF importé (sans métadonnées)',
           documentId: finalCbnId
         });
 
@@ -366,9 +558,13 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
         });
       }
 
-      setProgress(Math.round(((i + 1) / totalFiles) * 100));
+      setProgress(Math.round(((i + 1) / total) * 100));
     }
 
+    finishImport(importResults);
+  };
+
+  const finishImport = (importResults: ImportResult[]) => {
     setResults(importResults);
     
     const successCount = importResults.filter(r => r.status === 'success').length;
@@ -378,7 +574,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
     
     toast({
       title: "Import terminé",
-      description: `${successCount} documents importés, ${errorCount} erreurs`,
+      description: `${successCount} élément(s) importé(s), ${errorCount} erreur(s)`,
       variant: errorCount > 0 ? "destructive" : "default"
     });
 
@@ -405,7 +601,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
   };
 
   const resetModal = () => {
-    setCurrentStep(1);
+    setImportMode('combined');
     setMetadataFile(null);
     setMetadataRows([]);
     setMetadataPreview([]);
@@ -414,6 +610,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
     setResults([]);
     setProgress(0);
     setIsProcessing(false);
+    setShowResults(false);
   };
 
   const handleClose = () => {
@@ -426,6 +623,10 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
   const successCount = results.filter(r => r.status === 'success').length;
   const errorCount = results.filter(r => r.status === 'error').length;
 
+  const canImportMetadataOnly = metadataRows.length > 0;
+  const canImportDocumentsOnly = documentFiles.length > 0;
+  const canImportCombined = documentFiles.length > 0;
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -435,225 +636,13 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
             Import en masse des documents
           </DialogTitle>
           <DialogDescription>
-            Importez vos métadonnées Excel puis associez les fichiers PDF par numéro de cote
+            Importez les métadonnées Excel et/ou les fichiers PDF indépendamment
           </DialogDescription>
         </DialogHeader>
 
-        {/* Steps Indicator */}
-        <div className="flex items-center justify-center gap-2 py-4 border-b">
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${currentStep >= 1 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-            <FileSpreadsheet className="h-4 w-4" />
-            <span className="text-sm font-medium">1. Métadonnées</span>
-          </div>
-          <ArrowRight className="h-4 w-4 text-muted-foreground" />
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${currentStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-            <FileText className="h-4 w-4" />
-            <span className="text-sm font-medium">2. Documents PDF</span>
-          </div>
-          <ArrowRight className="h-4 w-4 text-muted-foreground" />
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${currentStep >= 3 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-            <CheckCircle2 className="h-4 w-4" />
-            <span className="text-sm font-medium">3. Résultats</span>
-          </div>
-        </div>
-
         <ScrollArea className="flex-1 pr-4">
-          {/* Step 1: Metadata Excel */}
-          {currentStep === 1 && (
-            <div className="space-y-6 py-4">
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Important</AlertTitle>
-                <AlertDescription>
-                  La colonne <strong>"cote"</strong> est obligatoire et doit correspondre exactement au nom des fichiers PDF (sans l'extension).
-                </AlertDescription>
-              </Alert>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Télécharger le modèle</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Button onClick={downloadTemplate} variant="outline" className="w-full">
-                      <Download className="h-4 w-4 mr-2" />
-                      Modèle Excel
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Colonnes clés</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-sm space-y-1">
-                    <div><strong>cote</strong> : Identifiant unique (= nom fichier)</div>
-                    <div><strong>titre</strong> : Titre du document</div>
-                    <div><strong>auteur</strong> : Auteur principal</div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Importer le fichier Excel</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div 
-                    className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
-                    onClick={() => metadataInputRef.current?.click()}
-                  >
-                    <FileSpreadsheet className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Cliquez pour sélectionner votre fichier Excel de métadonnées
-                    </p>
-                    <input
-                      ref={metadataInputRef}
-                      type="file"
-                      accept=".csv,.xlsx,.xls"
-                      onChange={handleMetadataFileChange}
-                      className="hidden"
-                    />
-                    {metadataFile && (
-                      <Badge variant="secondary" className="mt-2">
-                        {metadataFile.name} - {metadataRows.length} lignes
-                      </Badge>
-                    )}
-                  </div>
-
-                  {metadataPreview.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Aperçu (5 premières lignes) :</p>
-                      <ScrollArea className="h-40 border rounded-md">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Cote</TableHead>
-                              <TableHead>Titre</TableHead>
-                              <TableHead>Auteur</TableHead>
-                              <TableHead>Type</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {metadataPreview.map((row, idx) => (
-                              <TableRow key={idx}>
-                                <TableCell className="font-mono text-sm">{row.cote || '-'}</TableCell>
-                                <TableCell className="font-medium">{row.titre || '-'}</TableCell>
-                                <TableCell>{row.auteur || '-'}</TableCell>
-                                <TableCell>{row.type_document || '-'}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </ScrollArea>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Step 2: Documents Upload */}
-          {currentStep === 2 && (
-            <div className="space-y-6 py-4">
-              <Alert>
-                <Link2 className="h-4 w-4" />
-                <AlertTitle>Association automatique</AlertTitle>
-                <AlertDescription>
-                  Les fichiers PDF seront associés aux métadonnées si leur nom correspond à la colonne "cote".
-                  <br />Exemple : fichier <strong>PHI-2024-001.pdf</strong> → cote <strong>PHI-2024-001</strong>
-                </AlertDescription>
-              </Alert>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Sélectionner les fichiers PDF</CardTitle>
-                  <CardDescription>
-                    Métadonnées chargées : {metadataRows.length} lignes
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div 
-                    className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
-                    onClick={() => documentsInputRef.current?.click()}
-                  >
-                    <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Cliquez pour sélectionner vos fichiers PDF
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Vous pouvez sélectionner plusieurs fichiers
-                    </p>
-                    <input
-                      ref={documentsInputRef}
-                      type="file"
-                      accept=".pdf"
-                      multiple
-                      onChange={handleDocumentFilesChange}
-                      className="hidden"
-                    />
-                    {documentFiles.length > 0 && (
-                      <Badge variant="secondary" className="mt-2">
-                        {documentFiles.length} fichier(s) sélectionné(s)
-                      </Badge>
-                    )}
-                  </div>
-
-                  {fileMatches.length > 0 && (
-                    <div className="space-y-4">
-                      <div className="flex gap-4">
-                        <Badge variant="default" className="gap-1">
-                          <CheckCircle2 className="h-3 w-3" />
-                          {matchedCount} associé(s)
-                        </Badge>
-                        {unmatchedCount > 0 && (
-                          <Badge variant="destructive" className="gap-1">
-                            <XCircle className="h-3 w-3" />
-                            {unmatchedCount} non associé(s)
-                          </Badge>
-                        )}
-                      </div>
-
-                      <ScrollArea className="h-60 border rounded-md">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Fichier</TableHead>
-                              <TableHead>Cote extraite</TableHead>
-                              <TableHead>Titre associé</TableHead>
-                              <TableHead>Statut</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {fileMatches.map((match, idx) => (
-                              <TableRow key={idx} className={match.matched ? '' : 'bg-destructive/5'}>
-                                <TableCell className="font-mono text-sm">{match.file.name}</TableCell>
-                                <TableCell className="font-mono">{match.cote}</TableCell>
-                                <TableCell>{match.metadataRow?.titre || '-'}</TableCell>
-                                <TableCell>
-                                  {match.matched ? (
-                                    <Badge variant="default" className="gap-1">
-                                      <Check className="h-3 w-3" />
-                                      Associé
-                                    </Badge>
-                                  ) : (
-                                    <Badge variant="destructive">Non trouvé</Badge>
-                                  )}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </ScrollArea>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Step 3: Results */}
-          {currentStep === 3 && (
+          {showResults ? (
+            // Results view
             <div className="space-y-6 py-4">
               {isProcessing ? (
                 <Card>
@@ -738,41 +727,292 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
                 </>
               )}
             </div>
+          ) : (
+            // Import form view
+            <Tabs defaultValue="combined" className="py-4" onValueChange={(v) => setImportMode(v as any)}>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="metadata" className="gap-2">
+                  <FileSpreadsheet className="h-4 w-4" />
+                  Métadonnées seules
+                </TabsTrigger>
+                <TabsTrigger value="documents" className="gap-2">
+                  <FileText className="h-4 w-4" />
+                  PDF seuls
+                </TabsTrigger>
+                <TabsTrigger value="combined" className="gap-2">
+                  <Link2 className="h-4 w-4" />
+                  Combiné
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Metadata Only */}
+              <TabsContent value="metadata" className="space-y-4 mt-4">
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertTitle>Import des métadonnées uniquement</AlertTitle>
+                  <AlertDescription>
+                    Importez un fichier Excel pour créer les notices. Les PDF pourront être ajoutés ultérieurement.
+                  </AlertDescription>
+                </Alert>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Modèle Excel</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Button onClick={downloadTemplate} variant="outline" className="w-full">
+                        <Download className="h-4 w-4 mr-2" />
+                        Télécharger le modèle
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Colonnes clés</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm space-y-1">
+                      <div><strong>cote</strong> : Identifiant unique</div>
+                      <div><strong>titre</strong> : Titre du document</div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card>
+                  <CardContent className="pt-6">
+                    <div 
+                      className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
+                      onClick={() => metadataInputRef.current?.click()}
+                    >
+                      <FileSpreadsheet className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Cliquez pour sélectionner votre fichier Excel
+                      </p>
+                      <input
+                        ref={metadataInputRef}
+                        type="file"
+                        accept=".csv,.xlsx,.xls"
+                        onChange={handleMetadataFileChange}
+                        className="hidden"
+                      />
+                      {metadataFile && (
+                        <Badge variant="secondary" className="mt-2">
+                          {metadataFile.name} - {metadataRows.length} lignes
+                        </Badge>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {metadataPreview.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm">Aperçu</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ScrollArea className="h-32">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Cote</TableHead>
+                              <TableHead>Titre</TableHead>
+                              <TableHead>Auteur</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {metadataPreview.map((row, idx) => (
+                              <TableRow key={idx}>
+                                <TableCell className="font-mono">{row.cote || '-'}</TableCell>
+                                <TableCell>{row.titre || '-'}</TableCell>
+                                <TableCell>{row.auteur || '-'}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+
+              {/* Documents Only */}
+              <TabsContent value="documents" className="space-y-4 mt-4">
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertTitle>Import des PDF uniquement</AlertTitle>
+                  <AlertDescription>
+                    Importez des fichiers PDF. Le nom du fichier (sans .pdf) sera utilisé comme cote et titre provisoire.
+                  </AlertDescription>
+                </Alert>
+
+                <Card>
+                  <CardContent className="pt-6">
+                    <div 
+                      className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
+                      onClick={() => documentsInputRef.current?.click()}
+                    >
+                      <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Cliquez pour sélectionner vos fichiers PDF
+                      </p>
+                      <p className="text-xs text-muted-foreground">Sélection multiple autorisée</p>
+                      <input
+                        ref={documentsInputRef}
+                        type="file"
+                        accept=".pdf"
+                        multiple
+                        onChange={handleDocumentFilesChange}
+                        className="hidden"
+                      />
+                      {documentFiles.length > 0 && (
+                        <Badge variant="secondary" className="mt-2">
+                          {documentFiles.length} fichier(s) sélectionné(s)
+                        </Badge>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {documentFiles.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm">Fichiers à importer</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ScrollArea className="h-32">
+                        <div className="space-y-1">
+                          {documentFiles.map((file, idx) => (
+                            <div key={idx} className="flex items-center gap-2 text-sm">
+                              <FileText className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-mono">{file.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+
+              {/* Combined */}
+              <TabsContent value="combined" className="space-y-4 mt-4">
+                <Alert>
+                  <Link2 className="h-4 w-4" />
+                  <AlertTitle>Import combiné</AlertTitle>
+                  <AlertDescription>
+                    Importez les métadonnées Excel et les PDF. L'association se fait par correspondance entre la <strong>cote</strong> et le <strong>nom du fichier</strong>.
+                  </AlertDescription>
+                </Alert>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  {/* Metadata upload */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <FileSpreadsheet className="h-4 w-4" />
+                        Métadonnées (optionnel)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div 
+                        className="border-2 border-dashed rounded-lg p-4 text-center hover:border-primary/50 transition-colors cursor-pointer"
+                        onClick={() => metadataInputRef.current?.click()}
+                      >
+                        <p className="text-sm text-muted-foreground">
+                          {metadataFile ? metadataFile.name : 'Cliquez pour importer'}
+                        </p>
+                        {metadataRows.length > 0 && (
+                          <Badge variant="secondary" className="mt-1">{metadataRows.length} lignes</Badge>
+                        )}
+                      </div>
+                      <Button onClick={downloadTemplate} variant="outline" size="sm" className="w-full">
+                        <Download className="h-3 w-3 mr-2" />
+                        Modèle Excel
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Documents upload */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Documents PDF
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div 
+                        className="border-2 border-dashed rounded-lg p-4 text-center hover:border-primary/50 transition-colors cursor-pointer"
+                        onClick={() => documentsInputRef.current?.click()}
+                      >
+                        <p className="text-sm text-muted-foreground">
+                          {documentFiles.length > 0 ? `${documentFiles.length} fichier(s)` : 'Cliquez pour importer'}
+                        </p>
+                        {matchedCount > 0 && (
+                          <Badge variant="default" className="mt-1 gap-1">
+                            <Check className="h-3 w-3" />
+                            {matchedCount} associé(s)
+                          </Badge>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {fileMatches.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center justify-between">
+                        <span>Correspondances</span>
+                        <div className="flex gap-2">
+                          <Badge variant="default">{matchedCount} associé(s)</Badge>
+                          {unmatchedCount > 0 && (
+                            <Badge variant="destructive">{unmatchedCount} non associé(s)</Badge>
+                          )}
+                        </div>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ScrollArea className="h-40">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Fichier</TableHead>
+                              <TableHead>Titre associé</TableHead>
+                              <TableHead>Statut</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {fileMatches.map((match, idx) => (
+                              <TableRow key={idx} className={match.matched ? '' : 'bg-muted/50'}>
+                                <TableCell className="font-mono text-sm">{match.file.name}</TableCell>
+                                <TableCell>{match.metadataRow?.titre || '(nom fichier utilisé)'}</TableCell>
+                                <TableCell>
+                                  {match.matched ? (
+                                    <Badge variant="default" className="gap-1">
+                                      <Check className="h-3 w-3" />
+                                      Associé
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="outline">Sans métadonnées</Badge>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+            </Tabs>
           )}
         </ScrollArea>
 
         <DialogFooter className="border-t pt-4">
-          {currentStep === 1 && (
-            <>
-              <Button variant="outline" onClick={handleClose}>
-                Annuler
-              </Button>
-              <Button 
-                onClick={() => setCurrentStep(2)} 
-                disabled={metadataRows.length === 0}
-              >
-                Suivant
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </>
-          )}
-          
-          {currentStep === 2 && (
-            <>
-              <Button variant="outline" onClick={() => setCurrentStep(1)}>
-                Retour
-              </Button>
-              <Button 
-                onClick={processImport} 
-                disabled={matchedCount === 0}
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Lancer l'import ({matchedCount} fichier(s))
-              </Button>
-            </>
-          )}
-          
-          {currentStep === 3 && !isProcessing && (
+          {showResults && !isProcessing ? (
             <>
               <Button variant="outline" onClick={resetModal}>
                 Nouvel import
@@ -780,6 +1020,42 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
               <Button onClick={handleClose}>
                 Fermer
               </Button>
+            </>
+          ) : !showResults && (
+            <>
+              <Button variant="outline" onClick={handleClose}>
+                Annuler
+              </Button>
+              
+              {importMode === 'metadata' && (
+                <Button 
+                  onClick={processMetadataOnlyImport} 
+                  disabled={!canImportMetadataOnly || isProcessing}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Importer les métadonnées ({metadataRows.length})
+                </Button>
+              )}
+              
+              {importMode === 'documents' && (
+                <Button 
+                  onClick={processDocumentsOnlyImport} 
+                  disabled={!canImportDocumentsOnly || isProcessing}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Importer les PDF ({documentFiles.length})
+                </Button>
+              )}
+              
+              {importMode === 'combined' && (
+                <Button 
+                  onClick={processCombinedImport} 
+                  disabled={!canImportCombined || isProcessing}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Importer ({documentFiles.length} fichier(s))
+                </Button>
+              )}
             </>
           )}
         </DialogFooter>
