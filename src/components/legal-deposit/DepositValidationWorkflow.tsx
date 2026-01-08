@@ -742,7 +742,7 @@ export function DepositValidationWorkflow() {
     doc.save(`Validation_DLBN_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
   };
 
-  const generateValidationFormABN = async (request: DepositRequest) => {
+  const generateAccuseReception = async (request: DepositRequest) => {
     const doc = new jsPDF();
     
     let yPos = await addBNRMHeader(doc);
@@ -751,13 +751,11 @@ export function DepositValidationWorkflow() {
     doc.setFontSize(16);
     doc.setFont(undefined, "bold");
     doc.setTextColor(0, 102, 51);
-    doc.text("ATTESTATION DE VALIDATION FINALE", 105, yPos, { align: "center" });
+    doc.text("ACCUSÉ DE RÉCEPTION", 105, yPos, { align: "center" });
     yPos += 8;
     
-    doc.setFontSize(11);
-    doc.setFont(undefined, "normal");
-    doc.setTextColor(100, 100, 100);
-    doc.text("Département de l'Agence Bibliographique Nationale", 105, yPos, { align: "center" });
+    doc.setFontSize(12);
+    doc.text("Demande de Dépôt Légal", 105, yPos, { align: "center" });
     yPos += 10;
     
     doc.setLineWidth(0.5);
@@ -767,43 +765,85 @@ export function DepositValidationWorkflow() {
 
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(11);
+    doc.setFont(undefined, "normal");
     doc.text(`Rabat, le ${format(new Date(), "dd MMMM yyyy", { locale: fr })}`, 140, yPos);
     yPos += 15;
 
-    // Ajouter tous les détails
-    yPos = addRequestDetailsToPDF(doc, request, yPos);
+    // Référence de la demande
+    doc.setFontSize(11);
+    doc.setFont(undefined, "bold");
+    doc.text("Référence de la demande:", 20, yPos);
+    doc.setFont(undefined, "normal");
+    doc.text(request.request_number || "N/A", 75, yPos);
+    yPos += 8;
 
-    // Section validation finale
-    yPos += 10;
+    doc.setFont(undefined, "bold");
+    doc.text("Date de dépôt:", 20, yPos);
+    doc.setFont(undefined, "normal");
+    doc.text(format(new Date(request.created_at), "dd MMMM yyyy", { locale: fr }), 75, yPos);
+    yPos += 15;
+
+    // Corps du texte
+    doc.setFontSize(11);
+    const introText = "La Bibliothèque Nationale du Royaume du Maroc accuse réception de votre demande de dépôt légal concernant l'ouvrage suivant:";
+    const introLines = doc.splitTextToSize(introText, 170);
+    doc.text(introLines, 20, yPos);
+    yPos += introLines.length * 6 + 10;
+
+    // Détails de l'ouvrage
+    doc.setFillColor(245, 245, 245);
+    doc.rect(20, yPos - 5, 170, 35, "F");
+    
+    doc.setFont(undefined, "bold");
+    doc.text("Titre:", 25, yPos);
+    doc.setFont(undefined, "normal");
+    const titleLines = doc.splitTextToSize(request.title || "N/A", 130);
+    doc.text(titleLines, 55, yPos);
+    yPos += titleLines.length * 5 + 5;
+
+    doc.setFont(undefined, "bold");
+    doc.text("Auteur:", 25, yPos);
+    doc.setFont(undefined, "normal");
+    doc.text(request.author_name || "N/A", 55, yPos);
+    yPos += 8;
+
+    doc.setFont(undefined, "bold");
+    doc.text("Support:", 25, yPos);
+    doc.setFont(undefined, "normal");
+    doc.text(request.support_type || "N/A", 55, yPos);
+    yPos += 15;
+
+    // Message de confirmation
+    yPos += 5;
+    doc.setFontSize(11);
+    const confirmText = "Votre demande a été enregistrée et validée par nos services. Ce document constitue un accusé de réception officiel de votre dépôt légal.";
+    const confirmLines = doc.splitTextToSize(confirmText, 170);
+    doc.text(confirmLines, 20, yPos);
+    yPos += confirmLines.length * 6 + 10;
+
+    // Numéro de dépôt légal
     doc.setFontSize(12);
     doc.setFont(undefined, "bold");
     doc.setTextColor(0, 102, 51);
-    doc.text("DÉCISION FINALE: VALIDÉ PAR LE DÉPARTEMENT ABN", 20, yPos);
-    yPos += 8;
-    
-    doc.setFont(undefined, "normal");
+    doc.text("N° de Dépôt Légal attribué:", 20, yPos);
+    doc.text(request.request_number || "En cours d'attribution", 85, yPos);
+    yPos += 15;
+
+    // Date de validation
     doc.setFontSize(10);
+    doc.setFont(undefined, "normal");
     doc.setTextColor(0, 0, 0);
-    doc.text(`Date de validation finale: ${format(new Date(), "dd/MM/yyyy à HH:mm", { locale: fr })}`, 20, yPos);
-    yPos += 6;
-    if (comments) {
-      doc.text(`Observations: ${comments}`, 20, yPos);
-    }
-    
-    // Historique des validations
-    yPos += 10;
-    doc.setFontSize(9);
-    doc.setTextColor(100, 100, 100);
-    doc.text("Historique des validations:", 20, yPos);
+    doc.text(`Date de validation: ${format(new Date(), "dd/MM/yyyy", { locale: fr })}`, 20, yPos);
+    yPos += 15;
+
+    // Signature
+    doc.setFontSize(10);
+    doc.text("Le Directeur de la Bibliothèque Nationale", 120, yPos);
     yPos += 5;
-    if (request.committee_validated_at) {
-      doc.text(`• Comité de Validation: ${format(new Date(request.committee_validated_at), "dd/MM/yyyy", { locale: fr })}`, 25, yPos);
-      yPos += 4;
-    }
-    doc.text(`• Département ABN: ${format(new Date(), "dd/MM/yyyy", { locale: fr })}`, 25, yPos);
+    doc.text("du Royaume du Maroc", 135, yPos);
     
     addBNRMFooter(doc, doc.getNumberOfPages());
-    doc.save(`Validation_ABN_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
+    doc.save(`Accuse_Reception_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
   };
 
   const generateValidationFormComite = async (request: DepositRequest) => {
@@ -866,7 +906,7 @@ export function DepositValidationWorkflow() {
   // Fonction générique pour compatibilité
   const generateValidationForm = async (request: DepositRequest, validationType?: string) => {
     if (validationType === "department") {
-      await generateValidationFormABN(request);
+      await generateAccuseReception(request);
     } else if (validationType === "committee") {
       await generateValidationFormComite(request);
     } else {
@@ -1465,15 +1505,15 @@ export function DepositValidationWorkflow() {
                 </div>
               )}
 
-              {/* Bouton de génération de l'attestation - uniquement après validation ABN */}
+              {/* Bouton de génération de l'accusé de réception - uniquement après validation ABN */}
               {selectedRequest.validated_by_department && (
                 <div className="flex flex-wrap gap-3 border-t pt-4">
                   <Button
                     variant="outline"
-                    onClick={() => generateValidationFormABN(selectedRequest)}
+                    onClick={() => generateAccuseReception(selectedRequest)}
                   >
                     <Download className="h-4 w-4 mr-2" />
-                    Attestation de Validation
+                    Accusé de Réception
                   </Button>
                 </div>
               )}
