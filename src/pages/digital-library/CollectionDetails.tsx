@@ -58,7 +58,7 @@ export default function CollectionDetails() {
       icon: "🖼️"
     },
     audiovisual: { 
-      title: "Archives sonores et audiovisuelles", 
+      title: "Audio-visuel", 
       description: "Enregistrements audio, vidéos documentaires et archives orales",
       icon: "🎬"
     },
