@@ -47,7 +47,8 @@ export function PageAccessRestrictionsManager() {
   const [allowScreenshot, setAllowScreenshot] = useState(true);
   const [restrictedPageDisplay, setRestrictedPageDisplay] = useState<"blur" | "empty" | "hidden">("blur");
   const [allowRightClick, setAllowRightClick] = useState(true);
-  const [accessMode, setAccessMode] = useState<"internet" | "internal">("internet");
+  const [allowInternetAccess, setAllowInternetAccess] = useState(true);
+  const [allowInternalAccess, setAllowInternalAccess] = useState(false);
 
   // Fetch documents
   const { data: documents, isLoading } = useQuery({
@@ -809,14 +810,22 @@ export function PageAccessRestrictionsManager() {
                         <Shield className="h-4 w-4" />
                         Mode d'accès
                       </CardTitle>
+                      <CardDescription className="text-xs">
+                        Sélectionnez un ou plusieurs modes d'accès
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <Button
-                        type="button"
-                        variant={accessMode === "internet" ? "default" : "outline"}
-                        onClick={() => setAccessMode("internet")}
-                        className="w-full h-auto py-4 flex items-center gap-3"
+                      <div 
+                        className={`w-full h-auto py-4 px-4 flex items-center gap-3 rounded-md border cursor-pointer transition-colors ${
+                          allowInternetAccess ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
+                        }`}
+                        onClick={() => setAllowInternetAccess(!allowInternetAccess)}
                       >
+                        <Switch
+                          checked={allowInternetAccess}
+                          onCheckedChange={setAllowInternetAccess}
+                          className="data-[state=checked]:bg-primary-foreground data-[state=checked]:text-primary"
+                        />
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                         </svg>
@@ -824,13 +833,18 @@ export function PageAccessRestrictionsManager() {
                           <div className="font-semibold">Libre d'accès par Internet</div>
                           <div className="text-xs opacity-80">Accessible depuis n'importe où</div>
                         </div>
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={accessMode === "internal" ? "default" : "outline"}
-                        onClick={() => setAccessMode("internal")}
-                        className="w-full h-auto py-4 flex items-center gap-3"
+                      </div>
+                      <div 
+                        className={`w-full h-auto py-4 px-4 flex items-center gap-3 rounded-md border cursor-pointer transition-colors ${
+                          allowInternalAccess ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
+                        }`}
+                        onClick={() => setAllowInternalAccess(!allowInternalAccess)}
                       >
+                        <Switch
+                          checked={allowInternalAccess}
+                          onCheckedChange={setAllowInternalAccess}
+                          className="data-[state=checked]:bg-primary-foreground data-[state=checked]:text-primary"
+                        />
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
@@ -838,12 +852,12 @@ export function PageAccessRestrictionsManager() {
                           <div className="font-semibold">Accès interne uniquement</div>
                           <div className="text-xs opacity-80">Consultation sur place à la bibliothèque</div>
                         </div>
-                      </Button>
+                      </div>
                     </CardContent>
                   </Card>
 
-                  {/* Consultation physique - Hidden when access mode is internal */}
-                  {accessMode !== "internal" && (
+                  {/* Consultation physique - Hidden when only internal access */}
+                  {allowInternetAccess && (
                     <Card className="shadow-md">
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between">
@@ -863,8 +877,8 @@ export function PageAccessRestrictionsManager() {
                     </Card>
                   )}
 
-                  {/* Mode de restriction - Hidden when access mode is internal */}
-                  {accessMode !== "internal" && (
+                  {/* Mode de restriction - Hidden when only internal access */}
+                  {allowInternetAccess && (
                     <Card className="shadow-md">
                       <CardHeader className="pb-3">
                         <CardTitle className="text-base">Mode de restriction</CardTitle>
@@ -910,8 +924,8 @@ export function PageAccessRestrictionsManager() {
                     </Card>
                   )}
 
-                  {/* Configuration selon le mode - Hidden when access mode is internal */}
-                  {accessMode !== "internal" && (
+                  {/* Configuration selon le mode - Hidden when only internal access */}
+                  {allowInternetAccess && (
                     restrictionMode === "percentage" ? (
                     <Card className="shadow-md">
                       <CardHeader className="pb-3">
