@@ -842,24 +842,26 @@ export function PageAccessRestrictionsManager() {
                     </CardContent>
                   </Card>
 
-                  {/* Consultation physique */}
-                  <Card className="shadow-md">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <Label className="text-base font-semibold">Consultation physique autorisée</Label>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Autoriser la consultation du document complet sur place
-                          </p>
+                  {/* Consultation physique - Hidden when access mode is internal */}
+                  {accessMode !== "internal" && (
+                    <Card className="shadow-md">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <Label className="text-base font-semibold">Consultation physique autorisée</Label>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Autoriser la consultation du document complet sur place
+                            </p>
+                          </div>
+                          <Switch
+                            checked={allowPhysicalConsultation}
+                            onCheckedChange={setAllowPhysicalConsultation}
+                            className="ml-4"
+                          />
                         </div>
-                        <Switch
-                          checked={allowPhysicalConsultation}
-                          onCheckedChange={setAllowPhysicalConsultation}
-                          className="ml-4"
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  )}
 
                   {/* Mode de restriction - Hidden when access mode is internal */}
                   {accessMode !== "internal" && (
