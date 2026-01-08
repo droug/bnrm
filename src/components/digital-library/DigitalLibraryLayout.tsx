@@ -74,11 +74,11 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   }, [session, isAuthenticated]);
 
   const collectionsSubmenu = [
-    { label: "Livres", href: "/digital-library/collections/books", icon: Book },
-    { label: "Revues et journaux", href: "/digital-library/collections/periodicals", icon: FileText },
-    { label: "Manuscrits", href: "/digital-library/collections/manuscripts", icon: BookOpen },
-    { label: "Collections spécialisées", href: "/digital-library/collections/photos", icon: Image },
-    { label: "Audio-visuel", href: "/digital-library/collections/audiovisual", icon: Music },
+    { label: "Livres", href: "/digital-library/collections/books", icon: Book, count: "45,670", description: "Ouvrages numérisés" },
+    { label: "Revues et journaux", href: "/digital-library/collections/periodicals", icon: FileText, count: "8,320", description: "Publications périodiques" },
+    { label: "Manuscrits", href: "/digital-library/collections/manuscripts", icon: BookOpen, count: "12,450", description: "Manuscrits anciens" },
+    { label: "Collections spécialisées", href: "/digital-library/collections/photos", icon: Image, count: "15,890", description: "Photos, cartes et lithographies" },
+    { label: "Audio-visuel", href: "/digital-library/collections/audiovisual", icon: Music, count: "2,890", description: "Archives sonores et vidéos" },
   ];
 
   const themesSubmenu = [
@@ -266,12 +266,22 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   <ChevronDown className="h-3 w-3" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label="Sous-menu Collections">
+              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px]" role="menu" aria-label="Sous-menu Collections">
                 {collectionsSubmenu.map((item) => (
                   <Link key={item.href} to={item.href}>
-                    <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
-                      <item.icon className="h-4 w-4" aria-hidden="true" />
-                      {item.label}
+                    <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="p-1.5 rounded-md bg-primary/10">
+                          <item.icon className="h-4 w-4 text-primary" aria-hidden="true" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{item.label}</span>
+                          <span className="text-xs text-muted-foreground">{item.description}</span>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-primary/10 text-primary">
+                        {item.count}
+                      </span>
                     </DropdownMenuItem>
                   </Link>
                 ))}
