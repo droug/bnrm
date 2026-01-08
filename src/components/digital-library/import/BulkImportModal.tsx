@@ -11,6 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Download, 
   Upload, 
@@ -23,8 +26,14 @@ import {
   FileText,
   Link2,
   Check,
-  Info
+  Info,
+  ScanText
 } from "lucide-react";
+import * as pdfjsLib from 'pdfjs-dist';
+import Tesseract from 'tesseract.js';
+
+// Configure PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 import * as XLSX from 'xlsx';
 
 interface MetadataRow {
@@ -79,6 +88,11 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
   // Documents state
   const [documentFiles, setDocumentFiles] = useState<File[]>([]);
   const [fileMatches, setFileMatches] = useState<FileMatch[]>([]);
+  
+  // OCR settings for documents-only mode
+  const [enableOcr, setEnableOcr] = useState(false);
+  const [ocrLanguage, setOcrLanguage] = useState<string>('fra+ara');
+  const [ocrProgress, setOcrProgress] = useState<string>('');
   
   // Processing state
   const [isProcessing, setIsProcessing] = useState(false);
@@ -357,6 +371,48 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
     finishImport(importResults);
   };
 
+  // Helper: Extract pages as images from PDF
+  const extractPdfPagesAsImages = async (file: File): Promise<string[]> => {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const images: string[] = [];
+    
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const viewport = page.getViewport({ scale: 2 });
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const ctx = canvas.getContext('2d')!;
+      
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      images.push(canvas.toDataURL('image/png'));
+    }
+    
+    return images;
+  };
+
+  // Helper: Run OCR on images
+  const runOcrOnImages = async (images: string[], language: string): Promise<{ pageNum: number; text: string }[]> => {
+    const results: { pageNum: number; text: string }[] = [];
+    const tesseractLang = language.replace('+', '+'); // fra+ara format works
+    
+    for (let i = 0; i < images.length; i++) {
+      setOcrProgress(`OCR page ${i + 1}/${images.length}`);
+      try {
+        const result = await Tesseract.recognize(images[i], tesseractLang, {
+          logger: () => {}
+        });
+        results.push({ pageNum: i + 1, text: result.data.text });
+      } catch (err) {
+        results.push({ pageNum: i + 1, text: '' });
+      }
+    }
+    
+    return results;
+  };
+
   // Import PDF files only (without metadata Excel)
   const processDocumentsOnlyImport = async () => {
     if (documentFiles.length === 0) return;
@@ -365,6 +421,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
     setProgress(0);
     setResults([]);
     setShowResults(true);
+    setOcrProgress('');
 
     const importResults: ImportResult[] = [];
     const total = documentFiles.length;
@@ -376,7 +433,23 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
       try {
         const cbnDocId = `CBN-${cote.replace(/[^a-zA-Z0-9]/g, '-')}`;
 
+        // Extract page count and optionally OCR
+        let pagesCount = 1;
+        let ocrResults: { pageNum: number; text: string }[] = [];
+        
+        setOcrProgress(`Analyse du PDF: ${file.name}`);
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        pagesCount = pdf.numPages;
+
+        if (enableOcr) {
+          setOcrProgress(`Extraction des pages...`);
+          const images = await extractPdfPagesAsImages(file);
+          ocrResults = await runOcrOnImages(images, ocrLanguage);
+        }
+
         // Upload PDF to storage
+        setOcrProgress(`Upload: ${file.name}`);
         const filePath = `documents/${cbnDocId}/${file.name}`;
         const { error: uploadError } = await supabase.storage
           .from('digital-library')
@@ -405,7 +478,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
             .insert({
               id: cbnDocId,
               cote: cote,
-              title: cote, // Use cote as title when no metadata
+              title: cote,
               document_type: 'livre',
               is_digitized: true,
             })
@@ -417,24 +490,41 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
         }
 
         // Insert into digital_library_documents
-        const { error: docError } = await supabase
+        const { data: newDoc, error: docError } = await supabase
           .from('digital_library_documents')
           .insert({
             cbn_document_id: finalCbnId,
             title: cote,
             pdf_url: urlData.publicUrl,
-            pages_count: 1,
+            pages_count: pagesCount,
             digitization_source: 'internal',
             publication_status: 'draft',
-          });
+            ocr_processed: enableOcr && ocrResults.length > 0,
+          })
+          .select('id')
+          .single();
 
         if (docError) throw docError;
+
+        // Insert OCR pages if enabled
+        if (enableOcr && ocrResults.length > 0 && newDoc) {
+          setOcrProgress(`Enregistrement OCR: ${file.name}`);
+          const pagesData = ocrResults.map(r => ({
+            document_id: newDoc.id,
+            page_number: r.pageNum,
+            ocr_text: r.text,
+          }));
+
+          await supabase
+            .from('digital_library_pages')
+            .insert(pagesData);
+        }
 
         importResults.push({
           cote: cote,
           title: file.name,
           status: 'success',
-          message: 'PDF importé (métadonnées à compléter)',
+          message: enableOcr ? `PDF importé + OCR (${pagesCount} pages)` : 'PDF importé (métadonnées à compléter)',
           documentId: finalCbnId
         });
 
@@ -654,6 +744,11 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
                         <p className="text-sm text-muted-foreground">
                           Traitement des fichiers et métadonnées
                         </p>
+                        {ocrProgress && (
+                          <p className="text-xs text-muted-foreground mt-1 font-mono">
+                            {ocrProgress}
+                          </p>
+                        )}
                       </div>
                       <Progress value={progress} className="w-full max-w-md mx-auto" />
                       <p className="text-sm">{progress}%</p>
@@ -845,6 +940,57 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
                     Importez des fichiers PDF. Le nom du fichier (sans .pdf) sera utilisé comme cote et titre provisoire.
                   </AlertDescription>
                 </Alert>
+
+                {/* OCR Options */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <ScanText className="h-4 w-4" />
+                      OCR (Reconnaissance de texte)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="enable-ocr">Activer l'OCR</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Extraire le texte des pages pour la recherche
+                        </p>
+                      </div>
+                      <Switch
+                        id="enable-ocr"
+                        checked={enableOcr}
+                        onCheckedChange={setEnableOcr}
+                      />
+                    </div>
+                    
+                    {enableOcr && (
+                      <div className="space-y-2">
+                        <Label>Langues de reconnaissance</Label>
+                        <Select value={ocrLanguage} onValueChange={setOcrLanguage}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="fra">Français</SelectItem>
+                            <SelectItem value="ara">Arabe</SelectItem>
+                            <SelectItem value="eng">Anglais</SelectItem>
+                            <SelectItem value="fra+ara">Français + Arabe</SelectItem>
+                            <SelectItem value="fra+eng">Français + Anglais</SelectItem>
+                            <SelectItem value="ara+eng">Arabe + Anglais</SelectItem>
+                            <SelectItem value="fra+ara+eng">Français + Arabe + Anglais</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Alert className="bg-amber-50 border-amber-200">
+                          <AlertCircle className="h-4 w-4 text-amber-600" />
+                          <AlertDescription className="text-amber-700 text-xs">
+                            L'OCR peut prendre plusieurs minutes selon le nombre de pages.
+                          </AlertDescription>
+                        </Alert>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
 
                 <Card>
                   <CardContent className="pt-6">
