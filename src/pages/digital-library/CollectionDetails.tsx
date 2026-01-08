@@ -48,12 +48,12 @@ export default function CollectionDetails() {
       icon: "📰"
     },
     manuscripts: { 
-      title: "Manuscrits numérisés", 
+      title: "Manuscrits", 
       description: "Manuscrits arabes, berbères et hébraïques du patrimoine marocain",
       icon: "📜"
     },
     photos: { 
-      title: "Photographies et cartes", 
+      title: "Collections spécialisées", 
       description: "Collections de photographies historiques, cartes anciennes et lithographies",
       icon: "🖼️"
     },

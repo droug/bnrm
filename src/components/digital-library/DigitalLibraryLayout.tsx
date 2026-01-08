@@ -76,8 +76,8 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const collectionsSubmenu = [
     { label: "Livres", href: "/digital-library/collections/books", icon: Book },
     { label: "Revues et journaux", href: "/digital-library/collections/periodicals", icon: FileText },
-    { label: "Manuscrits numérisés", href: "/digital-library/collections/manuscripts", icon: BookOpen },
-    { label: "Photographies et cartes", href: "/digital-library/collections/photos", icon: Image },
+    { label: "Manuscrits", href: "/digital-library/collections/manuscripts", icon: BookOpen },
+    { label: "Collections spécialisées", href: "/digital-library/collections/photos", icon: Image },
     { label: "Archives sonores et audiovisuelles", href: "/digital-library/collections/audiovisual", icon: Music },
   ];
 
