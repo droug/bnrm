@@ -60,7 +60,6 @@ export function PageAccessRestrictionsManager() {
           *,
           page_access_restrictions (*)
         `)
-        .in('content_type', ['page', 'news'])
         .order('created_at', { ascending: false });
       
       if (error) throw error;
