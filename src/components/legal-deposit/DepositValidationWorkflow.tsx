@@ -1465,27 +1465,16 @@ export function DepositValidationWorkflow() {
                 </div>
               )}
 
-              {/* Boutons de génération de documents */}
-              {(selectedRequest.validated_by_department || selectedRequest.validated_by_committee) && (
+              {/* Bouton de génération de l'attestation - uniquement après validation ABN */}
+              {selectedRequest.validated_by_department && (
                 <div className="flex flex-wrap gap-3 border-t pt-4">
-                  {selectedRequest.validated_by_committee && (
-                    <Button
-                      variant="outline"
-                      onClick={() => generateValidationFormComite(selectedRequest)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Attestation Comité
-                    </Button>
-                  )}
-                  {selectedRequest.validated_by_department && (
-                    <Button
-                      variant="outline"
-                      onClick={() => generateValidationFormABN(selectedRequest)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Attestation ABN
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    onClick={() => generateValidationFormABN(selectedRequest)}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Attestation de Validation
+                  </Button>
                 </div>
               )}
 
