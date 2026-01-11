@@ -453,8 +453,6 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
       console.log(`[BulkImport] Traitement fichier ${i + 1}/${total}: ${file.name}`);
       
       try {
-        const cbnDocId = `CBN-${cote.replace(/[^a-zA-Z0-9]/g, '-')}`;
-
         // Extract page count and optionally OCR
         let pagesCount = 1;
         let ocrResults: { pageNum: number; text: string }[] = [];
@@ -470,9 +468,12 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
           ocrResults = await runOcrOnImages(images, ocrLanguage);
         }
 
+        // Generate a safe folder name for storage (not used as DB id)
+        const storageFolderName = `CBN-${cote.replace(/[^a-zA-Z0-9]/g, '-')}`;
+
         // Upload PDF to storage
         setOcrProgress(`Upload: ${file.name}`);
-        const filePath = `documents/${cbnDocId}/${file.name}`;
+        const filePath = `documents/${storageFolderName}/${file.name}`;
         const { error: uploadError } = await supabase.storage
           .from('digital-library')
           .upload(filePath, file, { upsert: true });
@@ -498,7 +499,6 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
           const { data: newCbn, error: cbnError } = await supabase
             .from('cbn_documents')
             .insert({
-              id: cbnDocId,
               cote: cote,
               title: cote,
               document_type: 'livre',
@@ -508,7 +508,11 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
             .single();
 
           if (cbnError) throw cbnError;
-          finalCbnId = newCbn?.id || cbnDocId;
+          finalCbnId = newCbn?.id;
+
+          if (!finalCbnId) {
+            throw new Error("Impossible de créer la notice CBN (id manquant)");
+          }
         }
 
         // Insert into digital_library_documents
@@ -583,10 +587,12 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
       try {
         const row = match.metadataRow;
         const cote = row?.cote || match.cote;
-        const cbnDocId = `CBN-${cote.replace(/[^a-zA-Z0-9]/g, '-')}`;
+
+        // Generate a safe folder name for storage (not used as DB id)
+        const storageFolderName = `CBN-${cote.replace(/[^a-zA-Z0-9]/g, '-')}`;
 
         // Upload PDF to storage
-        const filePath = `documents/${cbnDocId}/${match.file.name}`;
+        const filePath = `documents/${storageFolderName}/${match.file.name}`;
         const { error: uploadError } = await supabase.storage
           .from('digital-library')
           .upload(filePath, match.file, { upsert: true });
@@ -612,7 +618,6 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
           const { data: newCbn, error: cbnError } = await supabase
             .from('cbn_documents')
             .insert({
-              id: cbnDocId,
               cote: cote,
               title: row?.titre || cote,
               title_ar: row?.titre_ar || null,
@@ -625,7 +630,11 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
             .single();
 
           if (cbnError) throw cbnError;
-          finalCbnId = newCbn?.id || cbnDocId;
+          finalCbnId = newCbn?.id;
+
+          if (!finalCbnId) {
+            throw new Error("Impossible de créer la notice CBN (id manquant)");
+          }
         }
 
         // Insert into digital_library_documents
