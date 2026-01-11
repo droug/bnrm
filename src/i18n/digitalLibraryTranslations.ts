@@ -89,6 +89,26 @@ export const digitalLibraryTranslations = {
     // Global repositories
     'dl.home.globalRepositories': 'Réservoirs mondiaux de données',
     'dl.home.globalRepositoriesDesc': 'Accédez aux plus grandes bibliothèques numériques mondiales',
+    'dl.home.exploreByTheme': 'Explorer par thème',
+    'dl.home.allNews': 'Toutes les actualités',
+    'dl.home.readMore': 'Lire la suite',
+    'dl.home.internationalResources': 'Ressources internationales',
+    'dl.home.immersiveDiscovery': 'Découverte immersive',
+    'dl.home.visitExhibition': 'Visiter l\'exposition',
+    'dl.home.moroccoThroughAges': 'Le Maroc à travers les âges',
+    'dl.home.moroccoExhibitionDesc': 'Une exposition virtuelle interactive présentant l\'histoire du Maroc à travers documents rares, manuscrits anciens et photographies historiques. Découvrez des siècles de patrimoine culturel dans une expérience immersive unique.',
+    'dl.home.globalReposSubtitle': 'Ces réservoirs permettent la centralisation et le partage du patrimoine documentaire et culturel à l\'échelle internationale',
+    'dl.home.explore': 'Explorer',
+    
+    // Document types
+    'dl.docTypes.manuscript': 'Manuscrit',
+    'dl.docTypes.book': 'Livre',
+    'dl.docTypes.article': 'Article',
+    'dl.docTypes.document': 'Document',
+    'dl.docTypes.periodical': 'Périodique',
+    'dl.docTypes.photo': 'Photographie',
+    'dl.docTypes.audiovisual': 'Archives A/V',
+    
     
     // ============= Virtual exhibition =============
     'dl.exhibition.title': 'Exposition Virtuelle',
@@ -101,6 +121,7 @@ export const digitalLibraryTranslations = {
     'dl.exhibition.of': 'sur',
     
     // ============= Collections page =============
+    'dl.collectionsPage.photos': 'Photographies',
     'dl.collectionsPage.title': 'Collections Numériques',
     'dl.collectionsPage.subtitle': 'Explorez nos fonds documentaires numérisés classés par type et thématique',
     'dl.collectionsPage.filterCollections': 'Filtrer les collections',

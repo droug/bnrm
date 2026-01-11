@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Autoplay from "embla-carousel-autoplay";
 import { format } from "date-fns";
+import { useLanguage } from "@/hooks/useLanguage";
 import document1 from "@/assets/digital-library/document-1.jpg";
 import document2 from "@/assets/digital-library/document-2.jpg";
 import document3 from "@/assets/digital-library/document-3.jpg";
@@ -29,6 +30,7 @@ import libraryBanner from "@/assets/digital-library/library-banner.jpg";
 export default function DigitalLibraryHome() {
   const navigate = useNavigate();
   const { session } = useAuth();
+  const { t, language } = useLanguage();
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -98,10 +100,10 @@ export default function DigitalLibraryHome() {
             return {
               id: item.id,
               title: item.title,
-              author: item.author || 'Auteur inconnu',
-              type: item.is_manuscript ? 'Manuscrit' : 
-                    item.document_type === 'book' ? 'Livre' : 
-                    item.document_type === 'article' ? 'Article' : 'Document',
+              author: item.author || t('dl.home.unknownAuthor'),
+              type: item.is_manuscript ? t('dl.docTypes.manuscript') : 
+                    item.document_type === 'book' ? t('dl.docTypes.book') : 
+                    item.document_type === 'article' ? t('dl.docTypes.article') : t('dl.docTypes.document'),
               date: item.created_at,
               isAvailable: true,
               cote: item.document_type?.toUpperCase() || 'DOC',
@@ -168,7 +170,7 @@ export default function DigitalLibraryHome() {
         setFeaturedCollections([
           {
             id: "books",
-            title: "Livres",
+            titleKey: "dl.collections.books",
             icon: BookOpen,
             count: "45,670",
             href: "/digital-library/collections/books",
@@ -176,7 +178,7 @@ export default function DigitalLibraryHome() {
           },
           {
             id: "periodicals",
-            title: "Revues et journaux",
+            titleKey: "dl.collections.periodicals",
             icon: FileText,
             count: "8,320",
             href: "/digital-library/collections/periodicals",
@@ -184,7 +186,7 @@ export default function DigitalLibraryHome() {
           },
           {
             id: "photos",
-            title: "Photographies",
+            titleKey: "dl.collectionsPage.photos",
             icon: Image,
             count: "15,890",
             href: "/digital-library/collections/photos",
@@ -192,7 +194,7 @@ export default function DigitalLibraryHome() {
           },
           {
             id: "audiovisual",
-            title: "Archives A/V",
+            titleKey: "dl.collections.audiovisual",
             icon: Music,
             count: "2,890",
             href: "/digital-library/collections/audiovisual",
@@ -222,9 +224,9 @@ export default function DigitalLibraryHome() {
       } else {
         // Valeurs par défaut
         setFeaturedThemes([
-          { id: "history", title: "Histoire & Patrimoine", emoji: "🏛️", href: "/digital-library/themes/history" },
-          { id: "arts", title: "Arts & Culture", emoji: "🎨", href: "/digital-library/themes/arts" },
-          { id: "literature", title: "Littérature & Poésie", emoji: "✍️", href: "/digital-library/themes/literature" },
+          { id: "history", titleKey: "dl.themes.history", emoji: "🏛️", href: "/digital-library/themes/history" },
+          { id: "arts", titleKey: "dl.themes.arts", emoji: "🎨", href: "/digital-library/themes/arts" },
+          { id: "literature", titleKey: "dl.themes.literature", emoji: "✍️", href: "/digital-library/themes/literature" },
         ]);
       }
 
@@ -260,9 +262,9 @@ export default function DigitalLibraryHome() {
       } else {
         // Valeurs par défaut
         setStatsData([
-          { label: "Manuscrits numérisés", value: "12,450" },
-          { label: "Documents historiques", value: "5,230" },
-          { label: "Images et cartes", value: "8,760" },
+          { labelKey: "dl.home.digitizedManuscripts", value: "12,450" },
+          { labelKey: "dl.home.historicalDocuments", value: "5,230" },
+          { labelKey: "dl.home.imagesAndMaps", value: "8,760" },
         ]);
       }
     };
@@ -291,10 +293,10 @@ export default function DigitalLibraryHome() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-8">
             <h1 className="text-5xl font-bold text-white mb-4 animate-fade-in drop-shadow-lg">
-              Bienvenue à la Bibliothèque Numérique
+              {t('dl.home.welcome')}
             </h1>
             <p className="text-xl text-white/90 max-w-3xl mx-auto animate-fade-in drop-shadow-md">
-              Accédez à plus de 100,000 documents numérisés du patrimoine marocain
+              {t('dl.home.accessDocuments')}
             </p>
           </div>
 
@@ -319,17 +321,17 @@ export default function DigitalLibraryHome() {
                                <Badge className="mb-3">{item.type}</Badge>
                                <h3 className="text-2xl font-bold mb-2 text-white">{item.title}</h3>
                                <p className="text-white/80 mb-4">{item.author}</p>
-                               <p className="text-sm text-white/70 mb-4">Ajouté le {new Date(item.date).toLocaleDateString('fr-FR')}</p>
-                                 <div className="flex gap-2 mt-6">
-                                   <Button 
-                                     size="lg" 
-                                     className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
-                                     onClick={() => handleConsultDocument(item)}
-                                   >
-                                     <BookOpen className="h-5 w-5 mr-2" />
-                                     Consulter
-                                   </Button>
-                                </div>
+                                <p className="text-sm text-white/70 mb-4">{t('dl.home.addedOn')} {new Date(item.date).toLocaleDateString(language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR')}</p>
+                                  <div className="flex gap-2 mt-6">
+                                    <Button 
+                                      size="lg" 
+                                      className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
+                                      onClick={() => handleConsultDocument(item)}
+                                    >
+                                      <BookOpen className="h-5 w-5 mr-2" />
+                                      {t('dl.home.consult')}
+                                    </Button>
+                                 </div>
                             </div>
                             <div className="w-full md:w-48 h-64 rounded-lg overflow-hidden hover-scale shadow-xl">
                               <img 
@@ -351,12 +353,12 @@ export default function DigitalLibraryHome() {
           )}
           {loading && (
             <div className="max-w-5xl mx-auto text-center py-12">
-              <p className="text-white/90 drop-shadow-md">Chargement des documents...</p>
+              <p className="text-white/90 drop-shadow-md">{t('dl.home.loadingDocuments')}</p>
             </div>
           )}
           {!loading && newItems.length === 0 && (
             <div className="max-w-5xl mx-auto text-center py-12">
-              <p className="text-white/90 drop-shadow-md">Aucun document disponible pour le moment</p>
+              <p className="text-white/90 drop-shadow-md">{t('dl.home.noDocumentsAvailable')}</p>
             </div>
           )}
         </div>
@@ -368,12 +370,12 @@ export default function DigitalLibraryHome() {
           <div>
             <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
               <Sparkles className="h-8 w-8 text-primary" />
-              Derniers ajouts
+              {t('dl.home.latestAdditions')}
             </h2>
-            <p className="text-muted-foreground mt-1">Documents récemment ajoutés à nos collections</p>
+            <p className="text-muted-foreground mt-1">{t('dl.home.recentlyAdded')}</p>
           </div>
           <Link to="/digital-library/search?sort=recent">
-            <Button variant="outline">Voir tout</Button>
+            <Button variant="outline">{t('dl.home.viewAll')}</Button>
           </Link>
         </div>
 
@@ -399,7 +401,7 @@ export default function DigitalLibraryHome() {
                     onClick={() => handleConsultDocument(item)}
                   >
                     <BookOpen className="h-4 w-4 mr-2" />
-                    Consulter
+                    {t('dl.home.consult')}
                   </Button>
                 </CardContent>
               </Card>
@@ -408,7 +410,7 @@ export default function DigitalLibraryHome() {
         )}
         {!loading && newItems.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Aucun document récent disponible</p>
+            <p className="text-muted-foreground">{t('dl.home.noRecentDocuments')}</p>
           </div>
         )}
       </section>
@@ -416,7 +418,7 @@ export default function DigitalLibraryHome() {
       {/* Featured Collections */}
       <section className="bg-muted/30 py-12">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-foreground mb-6">Collections phares</h2>
+          <h2 className="text-3xl font-bold text-foreground mb-6">{t('dl.home.featuredCollectionsTitle')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredCollections.map((collection) => (
               <Link key={collection.id} to={collection.href}>
@@ -425,7 +427,7 @@ export default function DigitalLibraryHome() {
                     <div className="mx-auto p-4 bg-primary/10 rounded-full w-fit mb-4">
                       <collection.icon className="h-8 w-8 text-primary" />
                     </div>
-                    <CardTitle className="text-lg">{collection.title}</CardTitle>
+                    <CardTitle className="text-lg">{collection.titleKey ? t(collection.titleKey) : collection.title}</CardTitle>
                     <CardDescription className="text-2xl font-bold text-primary">
                       {collection.count}
                     </CardDescription>
@@ -439,7 +441,7 @@ export default function DigitalLibraryHome() {
 
       {/* Featured Themes */}
       <section className="container mx-auto px-4 py-12">
-        <h2 className="text-3xl font-bold text-foreground mb-6">Explorer par thème</h2>
+        <h2 className="text-3xl font-bold text-foreground mb-6">{t('dl.home.exploreByTheme')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {featuredThemes.map((theme) => (
             <Link key={theme.id} to={theme.href}>
@@ -448,7 +450,7 @@ export default function DigitalLibraryHome() {
                   <div className="text-6xl mb-4 group-hover:scale-110 transition-transform">
                     {theme.emoji}
                   </div>
-                  <CardTitle>{theme.title}</CardTitle>
+                  <CardTitle>{theme.titleKey ? t(theme.titleKey) : theme.title}</CardTitle>
                 </CardHeader>
               </Card>
             </Link>
@@ -463,10 +465,10 @@ export default function DigitalLibraryHome() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
                 <Calendar className="h-8 w-8 text-primary" />
-                Actualités récentes
+                {t('dl.home.latestNews')}
               </h2>
               <Link to="/digital-library/news">
-                <Button variant="outline">Toutes les actualités</Button>
+                <Button variant="outline">{t('dl.home.allNews')}</Button>
               </Link>
             </div>
 
@@ -492,7 +494,7 @@ export default function DigitalLibraryHome() {
                   </CardHeader>
                   <CardContent>
                     <Link to={`/digital-library/news/${article.id}`}>
-                      <Button variant="outline" className="w-full">Lire la suite</Button>
+                      <Button variant="outline" className="w-full">{t('dl.home.readMore')}</Button>
                     </Link>
                   </CardContent>
                 </Card>
@@ -511,7 +513,7 @@ export default function DigitalLibraryHome() {
                 {statsData.map((stat, index) => (
                   <div key={index}>
                     <div className="text-4xl font-bold text-primary mb-2">{stat.value}</div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                    <div className="text-sm text-muted-foreground">{stat.labelKey ? t(stat.labelKey) : stat.label}</div>
                   </div>
                 ))}
               </div>
