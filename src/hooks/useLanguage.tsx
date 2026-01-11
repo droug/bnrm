@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { digitalLibraryTranslations } from '@/i18n/digitalLibraryTranslations';
 
 export type Language = 'fr' | 'ar' | 'ber' | 'en';
 
@@ -986,6 +987,11 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const t = (key: string): string => {
+    // Check digital library translations first, then fallback to general translations
+    const dlTranslations = digitalLibraryTranslations[language] as Record<string, string>;
+    if (dlTranslations && dlTranslations[key]) {
+      return dlTranslations[key];
+    }
     return translations[language][key] || key;
   };
 

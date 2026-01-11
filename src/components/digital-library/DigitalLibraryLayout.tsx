@@ -74,31 +74,31 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   }, [session, isAuthenticated]);
 
   const collectionsSubmenu = [
-    { label: "Livres", href: "/digital-library/collections/books", icon: Book, count: "45,670", description: "Ouvrages numérisés" },
-    { label: "Revues et journaux", href: "/digital-library/collections/periodicals", icon: FileText, count: "8,320", description: "Publications périodiques" },
-    { label: "Manuscrits", href: "/digital-library/collections/manuscripts", icon: BookOpen, count: "12,450", description: "Manuscrits anciens" },
-    { label: "Collections spécialisées", href: "/digital-library/collections/photos", icon: Image, count: "15,890", description: "Photos, cartes et lithographies" },
-    { label: "Audio-visuel", href: "/digital-library/collections/audiovisual", icon: Music, count: "2,890", description: "Archives sonores et vidéos" },
+    { labelKey: "dl.collections.books", descKey: "dl.collections.books.desc", href: "/digital-library/collections/books", icon: Book, count: "45,670" },
+    { labelKey: "dl.collections.periodicals", descKey: "dl.collections.periodicals.desc", href: "/digital-library/collections/periodicals", icon: FileText, count: "8,320" },
+    { labelKey: "dl.collections.manuscripts", descKey: "dl.collections.manuscripts.desc", href: "/digital-library/collections/manuscripts", icon: BookOpen, count: "12,450" },
+    { labelKey: "dl.collections.specialized", descKey: "dl.collections.specialized.desc", href: "/digital-library/collections/photos", icon: Image, count: "15,890" },
+    { labelKey: "dl.collections.audiovisual", descKey: "dl.collections.audiovisual.desc", href: "/digital-library/collections/audiovisual", icon: Music, count: "2,890" },
   ];
 
   const themesSubmenu = [
-    { label: "Histoire & Patrimoine", href: "/digital-library/themes/history" },
-    { label: "Arts & Culture", href: "/digital-library/themes/arts" },
-    { label: "Sciences & Techniques", href: "/digital-library/themes/sciences" },
-    { label: "Religion & Philosophie", href: "/digital-library/themes/religion" },
-    { label: "Littérature & Poésie", href: "/digital-library/themes/literature" },
+    { labelKey: "dl.themes.history", href: "/digital-library/themes/history" },
+    { labelKey: "dl.themes.arts", href: "/digital-library/themes/arts" },
+    { labelKey: "dl.themes.sciences", href: "/digital-library/themes/sciences" },
+    { labelKey: "dl.themes.religion", href: "/digital-library/themes/religion" },
+    { labelKey: "dl.themes.literature", href: "/digital-library/themes/literature" },
   ];
 
   const userMenu = isAuthenticated ? [
-    { label: "Mon espace personnel", href: "/digital-library/my-space" },
-    { label: "Mes demandes", href: "/digital-library/mes-demandes" },
-    { label: "Mes emprunts numériques", href: "/digital-library/my-loans" },
-    { label: "Mes annotations", href: "/digital-library/my-notes" },
-    { label: "Paramètres du compte", href: "/digital-library/account-settings" },
+    { labelKey: "dl.myPersonalSpace", href: "/digital-library/my-space" },
+    { labelKey: "dl.myRequests", href: "/digital-library/mes-demandes" },
+    { labelKey: "dl.myDigitalLoans", href: "/digital-library/my-loans" },
+    { labelKey: "dl.myAnnotations", href: "/digital-library/my-notes" },
+    { labelKey: "dl.accountSettings", href: "/digital-library/account-settings" },
   ] : [];
 
   const adminMenu = isLibrarian ? [
-    { label: "Administration", href: "/admin/digital-library" },
+    { labelKey: "dl.administration", href: "/admin/digital-library" },
   ] : [];
 
   const languages = [
@@ -133,12 +133,12 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               <Link 
                 to="/digital-library" 
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md"
-                aria-label="Retour à l'accueil de la bibliothèque numérique"
+                aria-label={t('dl.backToPortal')}
               >
                 <BookOpen className="h-8 w-8 text-primary" aria-hidden="true" />
                 <div>
-                  <h1 className="text-lg font-bold text-foreground">Bibliothèque Numérique</h1>
-                  <p className="text-xs text-muted-foreground">BNRM - Patrimoine Numérique du Maroc</p>
+                  <h1 className="text-lg font-bold text-foreground">{t('dl.title')}</h1>
+                  <p className="text-xs text-muted-foreground">{t('dl.subtitle')}</p>
                 </div>
               </Link>
             </div>
@@ -148,8 +148,8 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               <Link to="/admin/digital-library">
                 <Button variant="outline" size="sm" className="gap-2 border-primary/40 hover:border-primary hover:bg-primary/10">
                   <Shield className="h-4 w-4" />
-                  <span className="hidden sm:inline">Gestion Bibliothèque Numérique</span>
-                  <span className="sm:hidden">Gestion</span>
+                  <span className="hidden sm:inline">{t('dl.manageLibrary')}</span>
+                  <span className="sm:hidden">{t('dl.administration')}</span>
                 </Button>
               </Link>
             )}
@@ -169,8 +169,8 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     <ChevronDown className="h-3 w-3" aria-hidden="true" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-card z-50" role="menu" aria-label="Menu des langues">
-                  <DropdownMenuLabel>Choisir une langue</DropdownMenuLabel>
+                <DropdownMenuContent align="end" className="bg-card z-50" role="menu" aria-label={t('dl.chooseLanguage')}>
+                  <DropdownMenuLabel>{t('dl.chooseLanguage')}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {languages.map((lang) => (
                     <DropdownMenuItem
@@ -196,20 +196,20 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       variant="outline" 
                       size="sm" 
                       className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                      aria-label="Se connecter"
+                      aria-label={t('dl.login')}
                     >
                       <LogIn className="h-4 w-4" aria-hidden="true" />
-                      <span className="hidden sm:inline">Connexion</span>
+                      <span className="hidden sm:inline">{t('dl.login')}</span>
                     </Button>
                   </Link>
                   <Link to="/abonnements">
                     <Button 
                       size="sm" 
                       className="gap-2 text-sm bg-primary hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                      aria-label="S'inscrire ou adhérer"
+                      aria-label={t('dl.membership')}
                     >
                       <UserPlus className="h-4 w-4" aria-hidden="true" />
-                      <span className="hidden sm:inline">Adhésion</span>
+                      <span className="hidden sm:inline">{t('dl.membership')}</span>
                     </Button>
                   </Link>
                 </div>
@@ -227,30 +227,30 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     >
                       <User className="h-4 w-4" aria-hidden="true" />
                       <span className="hidden sm:inline">
-                        {userProfile?.firstName || session?.user?.email?.split('@')[0] || 'Mon compte'}
+                        {userProfile?.firstName || session?.user?.email?.split('@')[0] || t('dl.myAccount')}
                       </span>
                       <ChevronDown className="h-3 w-3" aria-hidden="true" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="bg-card z-50 w-56" role="menu" aria-label="Menu utilisateur">
-                    <DropdownMenuLabel>Mon espace</DropdownMenuLabel>
+                  <DropdownMenuContent align="end" className="bg-card z-50 w-56" role="menu" aria-label={t('dl.myAccount')}>
+                    <DropdownMenuLabel>{t('dl.myPersonalSpace')}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {userMenu.map((item) => (
                       <Link key={item.href} to={item.href}>
                         <DropdownMenuItem className="cursor-pointer focus:bg-accent focus:text-accent-foreground">
-                          {item.label}
+                          {t(item.labelKey)}
                         </DropdownMenuItem>
                       </Link>
                     ))}
                     {isLibrarian && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuLabel>Administration</DropdownMenuLabel>
+                        <DropdownMenuLabel>{t('dl.administration')}</DropdownMenuLabel>
                         {adminMenu.map((item) => (
                           <Link key={item.href} to={item.href}>
                             <DropdownMenuItem className="cursor-pointer focus:bg-accent focus:text-accent-foreground">
                               <Settings className="h-4 w-4 mr-2" aria-hidden="true" />
-                              {item.label}
+                              {t(item.labelKey)}
                             </DropdownMenuItem>
                           </Link>
                         ))}
@@ -265,7 +265,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       }}
                     >
                       <LogOut className="h-4 w-4" aria-hidden="true" />
-                      Déconnexion
+                      {t('dl.logout')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -281,10 +281,10 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 size="sm" 
                 className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" 
                 role="menuitem"
-                aria-label="Accueil de la bibliothèque numérique"
+                aria-label={t('dl.home')}
               >
                 <Home className="h-4 w-4" aria-hidden="true" />
-                Accueil
+                {t('dl.home')}
               </Button>
             </Link>
 
@@ -297,14 +297,14 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" 
                   role="menuitem" 
                   aria-haspopup="true"
-                  aria-label="Menu des collections"
+                  aria-label={t('dl.collections')}
                 >
                   <BookOpen className="h-4 w-4" aria-hidden="true" />
-                  Collections
+                  {t('dl.collections')}
                   <ChevronDown className="h-3 w-3" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px]" role="menu" aria-label="Sous-menu Collections">
+              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px]" role="menu" aria-label={t('dl.collections')}>
                 {collectionsSubmenu.map((item) => (
                   <Link key={item.href} to={item.href}>
                     <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3">
@@ -313,8 +313,8 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                           <item.icon className="h-4 w-4 text-primary" aria-hidden="true" />
                         </div>
                         <div className="flex flex-col">
-                          <span className="font-medium">{item.label}</span>
-                          <span className="text-xs text-muted-foreground">{item.description}</span>
+                          <span className="font-medium">{t(item.labelKey)}</span>
+                          <span className="text-xs text-muted-foreground">{t(item.descKey)}</span>
                         </div>
                       </div>
                       <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-primary/10 text-primary">
@@ -333,16 +333,16 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   variant="ghost" 
                   size="sm" 
                   className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                  aria-label="Accéder aux bouquets électroniques"
+                  aria-label={t('dl.electronicBundles')}
                   aria-haspopup="true"
                 >
                   <Library className="h-4 w-4" aria-hidden="true" />
-                  Bouquets électroniques
+                  {t('dl.electronicBundles')}
                   <ChevronDown className="h-3 w-3" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="bg-card z-50 min-w-[200px]">
-                <DropdownMenuLabel>Ressources électroniques</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('dl.electronicResources')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {activeBundles && activeBundles.length > 0 ? (
                   activeBundles.map((bundle) => (
@@ -374,7 +374,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   ))
                 ) : (
                   <DropdownMenuItem disabled className="text-muted-foreground text-sm">
-                    Aucun bouquet disponible
+                    {t('dl.noBundlesAvailable')}
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
@@ -385,10 +385,10 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 variant="ghost" 
                 size="sm" 
                 className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                aria-label="Recherche avancée dans la bibliothèque"
+                aria-label={t('dl.advancedSearch')}
               >
                 <Search className="h-4 w-4" aria-hidden="true" />
-                Recherche avancée
+                {t('dl.advancedSearch')}
               </Button>
             </Link>
 
@@ -400,19 +400,19 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     variant="ghost" 
                     size="sm" 
                     className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                    aria-label="Services aux lecteurs"
+                    aria-label={t('dl.readerServices')}
                     aria-haspopup="true"
                   >
                     <BookmarkCheck className="h-4 w-4" aria-hidden="true" />
-                    Services aux lecteurs
+                    {t('dl.readerServices')}
                     <ChevronDown className="h-3 w-3" aria-hidden="true" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label="Sous-menu Services aux lecteurs">
+                <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label={t('dl.readerServices')}>
                   <Link to="/abonnements">
                     <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
                       <UserPlus className="h-4 w-4" aria-hidden="true" />
-                      Adhésion
+                      {t('dl.membership')}
                     </DropdownMenuItem>
                   </Link>
                   <DropdownMenuItem 
@@ -420,14 +420,14 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     onClick={() => setShowReservationDialog(true)}
                   >
                     <BookmarkCheck className="h-4 w-4" aria-hidden="true" />
-                    Demande de Réservation
+                    {t('dl.reservationRequest')}
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground"
                     onClick={() => setShowDigitizationDialog(true)}
                   >
                     <FileDigit className="h-4 w-4" aria-hidden="true" />
-                    Demande de Numérisation
+                    {t('dl.digitizationRequest')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -440,11 +440,11 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   variant="ghost" 
                   size="sm" 
                   className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                  aria-label="Explorer par thème"
+                  aria-label={t('dl.exploreByTheme')}
                   aria-haspopup="true"
                 >
                   <Globe className="h-4 w-4" aria-hidden="true" />
-                  Explorer par thème
+                  {t('dl.exploreByTheme')}
                   <ChevronDown className="h-3 w-3" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
@@ -452,7 +452,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 {themesSubmenu.map((item) => (
                   <Link key={item.href} to={item.href}>
                     <DropdownMenuItem className="cursor-pointer focus:bg-accent focus:text-accent-foreground">
-                      {item.label}
+                      {t(item.labelKey)}
                     </DropdownMenuItem>
                   </Link>
                 ))}
@@ -463,10 +463,10 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 variant="ghost" 
                 size="sm" 
                 className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                aria-label="Consulter les actualités et événements"
+                aria-label={t('dl.newsEvents')}
               >
                 <Calendar className="h-4 w-4" aria-hidden="true" />
-                Actualités & Événements
+                {t('dl.newsEvents')}
               </Button>
             </Link>
 
@@ -475,10 +475,10 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 variant="ghost" 
                 size="sm" 
                 className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                aria-label="Aide et foire aux questions"
+                aria-label={t('dl.helpFaq')}
               >
                 <HelpCircle className="h-4 w-4" aria-hidden="true" />
-                Aide & FAQ
+                {t('dl.helpFaq')}
               </Button>
             </Link>
           </div>
