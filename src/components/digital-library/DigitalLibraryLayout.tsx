@@ -1,7 +1,7 @@
 import { ReactNode, useState, useEffect } from "react";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
-import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield, Library } from "lucide-react";
+import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield, Library, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useAuth } from "@/hooks/useAuth";
@@ -371,6 +371,12 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label="Sous-menu Services aux lecteurs">
+                  <Link to="/abonnements">
+                    <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
+                      <UserPlus className="h-4 w-4" aria-hidden="true" />
+                      Adhésion
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuItem 
                     className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground"
                     onClick={() => setShowReservationDialog(true)}
