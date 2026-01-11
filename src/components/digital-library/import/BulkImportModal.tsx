@@ -32,8 +32,8 @@ import {
 import * as pdfjsLib from 'pdfjs-dist';
 import Tesseract from 'tesseract.js';
 
-// Configure PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// Configure PDF.js worker - use unpkg CDN which is more reliable
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs`;
 import * as XLSX from 'xlsx';
 
 interface MetadataRow {
