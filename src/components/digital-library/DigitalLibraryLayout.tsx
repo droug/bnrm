@@ -191,7 +191,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               {/* Boutons Connexion/Adhésion pour utilisateurs non connectés */}
               {!isAuthenticated && (
                 <div className="flex items-center gap-2">
-                  <Link to="/auth">
+                  <Link to="/auth?redirect=/digital-library">
                     <Button 
                       variant="outline" 
                       size="sm" 
