@@ -300,7 +300,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
           .from('cbn_documents')
           .select('id')
           .eq('cote', row.cote)
-          .single();
+          .maybeSingle();
 
         let finalCbnId = existingCbn?.id;
 
@@ -425,10 +425,14 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
 
     const importResults: ImportResult[] = [];
     const total = documentFiles.length;
+    
+    console.log(`[BulkImport] Démarrage import de ${total} fichier(s)`);
 
-    for (let i = 0; i < documentFiles.length; i++) {
+    for (let i = 0; i < total; i++) {
       const file = documentFiles[i];
       const cote = file.name.replace(/\.pdf$/i, '').trim();
+      
+      console.log(`[BulkImport] Traitement fichier ${i + 1}/${total}: ${file.name}`);
       
       try {
         const cbnDocId = `CBN-${cote.replace(/[^a-zA-Z0-9]/g, '-')}`;
@@ -468,7 +472,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
           .from('cbn_documents')
           .select('id')
           .eq('cote', cote)
-          .single();
+          .maybeSingle();
 
         let finalCbnId = existingCbn?.id;
 
@@ -582,7 +586,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
           .from('cbn_documents')
           .select('id')
           .eq('cote', cote)
-          .single();
+          .maybeSingle();
 
         let finalCbnId = existingCbn?.id;
 
