@@ -30,10 +30,11 @@ import {
   ScanText
 } from "lucide-react";
 import * as pdfjsLib from 'pdfjs-dist';
+import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import Tesseract from 'tesseract.js';
 
-// Configure PDF.js worker - use unpkg CDN which is more reliable
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs`;
+// Configure PDF.js worker (bundled by Vite) to avoid CDN/CORS issues
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
 import * as XLSX from 'xlsx';
 
 interface MetadataRow {

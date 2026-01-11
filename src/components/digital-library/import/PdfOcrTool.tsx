@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { FileUp, Loader2, FileText, CheckCircle2, AlertCircle, Download, Copy } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import Tesseract from 'tesseract.js';
+import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 interface PageOcrResult {
   pageNumber: number;
@@ -135,9 +136,9 @@ export default function PdfOcrTool() {
     try {
       // Dynamically import PDF.js
       const pdfjsLib = await import('pdfjs-dist');
-      
-      // Configure worker
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+
+      // Configure worker (bundled by Vite) to avoid CDN/CORS issues
+      pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
 
       // Load PDF
       const arrayBuffer = await selectedFile.arrayBuffer();
