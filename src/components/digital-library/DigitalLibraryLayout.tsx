@@ -1,7 +1,7 @@
 import { ReactNode, useState, useEffect } from "react";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
-import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield, Library, UserPlus, LogIn } from "lucide-react";
+import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield, Library, UserPlus, LogIn, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useAuth } from "@/hooks/useAuth";
@@ -256,6 +256,17 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                         ))}
                       </>
                     )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      className="gap-2 cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+                      onClick={async () => {
+                        await supabase.auth.signOut();
+                        window.location.href = '/digital-library';
+                      }}
+                    >
+                      <LogOut className="h-4 w-4" aria-hidden="true" />
+                      Déconnexion
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
