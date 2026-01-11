@@ -196,39 +196,51 @@ export default function BulkDocumentImport({ onSuccess }: BulkDocumentImportProp
             continue;
           }
 
-          // Générer cbn_document_id si non fourni
-          const cbnDocId = row.cbn_document_id || `DL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          let finalCbnId: string | undefined;
 
-          // Vérifier si cbn_document existe
-          const { data: existingCbn } = await supabase
-            .from('cbn_documents')
-            .select('id')
-            .eq('id', cbnDocId)
-            .single();
+          // If user provided a cbn_document_id (UUID), check if it exists
+          if (row.cbn_document_id) {
+            const { data: existingCbn } = await supabase
+              .from('cbn_documents')
+              .select('id')
+              .eq('id', row.cbn_document_id)
+              .maybeSingle();
+            
+            if (existingCbn) {
+              finalCbnId = existingCbn.id;
+            }
+          }
 
-          if (!existingCbn) {
-            // Créer entrée cbn_documents
-            const { error: cbnError } = await supabase
+          // If no existing cbn_document found, create one (let DB generate UUID)
+          if (!finalCbnId) {
+            const generatedCote = `DL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const { data: newCbn, error: cbnError } = await supabase
               .from('cbn_documents')
               .insert({
-                id: cbnDocId,
-                cote: cbnDocId,
+                cote: generatedCote,
                 title: row.titre,
                 title_ar: row.titre_ar || null,
                 author: row.auteur || null,
                 document_type: row.type_document || 'livre',
                 publication_year: row.annee_publication ? parseInt(row.annee_publication) : null,
                 is_digitized: true,
-              });
+              })
+              .select('id')
+              .single();
 
             if (cbnError) throw cbnError;
+            finalCbnId = newCbn?.id;
+
+            if (!finalCbnId) {
+              throw new Error("Impossible de créer la notice CBN (id manquant)");
+            }
           }
 
           // Insérer dans digital_library_documents
           const { error: docError } = await supabase
             .from('digital_library_documents')
             .insert({
-              cbn_document_id: cbnDocId,
+              cbn_document_id: finalCbnId,
               title: row.titre,
               title_ar: row.titre_ar || null,
               author: row.auteur || null,

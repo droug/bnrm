@@ -80,39 +80,51 @@ export default function SingleDocumentImport({ onSuccess }: SingleDocumentImport
 
   const createDocument = useMutation({
     mutationFn: async (values: DocumentFormValues) => {
-      // Générer un cbn_document_id si non fourni
-      const cbnDocId = values.cbn_document_id || `DL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      
-      // Créer d'abord une entrée dans cbn_documents si nécessaire
-      const { data: existingCbn } = await supabase
-        .from('cbn_documents')
-        .select('id')
-        .eq('id', cbnDocId)
-        .single();
-      
-      if (!existingCbn) {
-        // Créer l'entrée cbn_documents
-        const { error: cbnError } = await supabase
+      let finalCbnId: string | undefined;
+
+      // If user provided a cbn_document_id (UUID), check if it exists
+      if (values.cbn_document_id) {
+        const { data: existingCbn } = await supabase
+          .from('cbn_documents')
+          .select('id')
+          .eq('id', values.cbn_document_id)
+          .maybeSingle();
+        
+        if (existingCbn) {
+          finalCbnId = existingCbn.id;
+        }
+      }
+
+      // If no existing cbn_document found, create one (let DB generate UUID)
+      if (!finalCbnId) {
+        const generatedCote = `DL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const { data: newCbn, error: cbnError } = await supabase
           .from('cbn_documents')
           .insert({
-            id: cbnDocId,
-            cote: cbnDocId,
+            cote: generatedCote,
             title: values.title,
             title_ar: values.title_ar || null,
             author: values.author || null,
             document_type: values.document_type || 'livre',
             publication_year: values.publication_year || null,
             is_digitized: true,
-          });
+          })
+          .select('id')
+          .single();
         
         if (cbnError) throw cbnError;
+        finalCbnId = newCbn?.id;
+
+        if (!finalCbnId) {
+          throw new Error("Impossible de créer la notice CBN (id manquant)");
+        }
       }
       
       // Créer le document dans digital_library_documents
       const { error } = await supabase
         .from('digital_library_documents')
         .insert({
-          cbn_document_id: cbnDocId,
+          cbn_document_id: finalCbnId,
           title: values.title,
           title_ar: values.title_ar || null,
           author: values.author || null,
