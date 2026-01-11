@@ -235,34 +235,48 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
   };
 
   const handleDocumentFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
+    const pickedFiles = Array.from(e.target.files || []);
+    if (pickedFiles.length === 0) return;
 
-    const pdfFiles = files.filter(f => f.type === 'application/pdf' || f.name.endsWith('.pdf'));
-    
-    if (pdfFiles.length !== files.length) {
+    // Allow selecting the same file again (and allow additive selection across multiple picker opens)
+    e.target.value = "";
+
+    const pdfFiles = pickedFiles.filter((f) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
+
+    if (pdfFiles.length !== pickedFiles.length) {
       toast({
         title: "Attention",
-        description: `${files.length - pdfFiles.length} fichier(s) non-PDF ont été ignorés`,
-        variant: "destructive"
+        description: `${pickedFiles.length - pdfFiles.length} fichier(s) non-PDF ont été ignorés`,
+        variant: "destructive",
       });
     }
 
-    setDocumentFiles(pdfFiles);
-    
+    // Merge with existing selection (users often pick files in multiple rounds)
+    const merged = (() => {
+      const byKey = new Map<string, File>();
+      [...documentFiles, ...pdfFiles].forEach((f) => {
+        byKey.set(`${f.name}-${f.size}-${f.lastModified}`, f);
+      });
+      return Array.from(byKey.values());
+    })();
+
+    const addedCount = Math.max(0, merged.length - documentFiles.length);
+
+    setDocumentFiles(merged);
+
     // Match with metadata if available
-    const matches = matchFilesWithMetadata(pdfFiles, metadataRows);
-    
-    const matchedCount = matches.filter(m => m.matched).length;
+    const matches = matchFilesWithMetadata(merged, metadataRows);
+
+    const matchedCount = matches.filter((m) => m.matched).length;
     if (metadataRows.length > 0) {
       toast({
         title: "Fichiers analysés",
-        description: `${matchedCount}/${pdfFiles.length} fichiers associés aux métadonnées`
+        description: `${matchedCount}/${merged.length} fichiers associés aux métadonnées`,
       });
     } else {
       toast({
         title: "Fichiers chargés",
-        description: `${pdfFiles.length} fichier(s) PDF sélectionné(s)`
+        description: addedCount > 0 ? `+${addedCount} ajouté(s), total ${merged.length}` : `${merged.length} fichier(s) PDF sélectionné(s)`,
       });
     }
   };
