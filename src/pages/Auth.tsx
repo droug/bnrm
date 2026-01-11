@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,13 +13,17 @@ import { toast } from "sonner";
 
 export default function Auth() {
   const { user, signIn, signUp, loading } = useAuth();
+  const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
 
-  // Redirect if already authenticated - always to BNRM portal homepage
+  // Get redirect URL from query params (default to "/" for BNRM portal)
+  const redirectTo = searchParams.get("redirect") || "/";
+
+  // Redirect if already authenticated - to the appropriate destination
   if (user && !loading) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
