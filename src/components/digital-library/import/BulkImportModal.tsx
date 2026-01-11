@@ -308,7 +308,6 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
           continue;
         }
 
-        const cbnDocId = `CBN-${row.cote.replace(/[^a-zA-Z0-9]/g, '-')}`;
 
         // Check if already exists
         const { data: existingCbn } = await supabase
@@ -323,7 +322,6 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
           const { data: newCbn, error: cbnError } = await supabase
             .from('cbn_documents')
             .insert({
-              id: cbnDocId,
               cote: row.cote,
               title: row.titre,
               title_ar: row.titre_ar || null,
@@ -336,8 +334,13 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
             .single();
 
           if (cbnError) throw cbnError;
-          finalCbnId = newCbn?.id || cbnDocId;
+          finalCbnId = newCbn?.id;
+
+          if (!finalCbnId) {
+            throw new Error("Impossible de créer la notice CBN (id manquant)");
+          }
         }
+
 
         // Insert into digital_library_documents
         const { error: docError } = await supabase
