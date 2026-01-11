@@ -1,7 +1,7 @@
 import { ReactNode, useState, useEffect } from "react";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
-import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield, Library, UserPlus } from "lucide-react";
+import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield, Library, UserPlus, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useAuth } from "@/hooks/useAuth";
@@ -187,6 +187,33 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
               <ThemeSwitcher />
+              
+              {/* Boutons Connexion/Adhésion pour utilisateurs non connectés */}
+              {!isAuthenticated && (
+                <div className="flex items-center gap-2">
+                  <Link to="/auth">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                      aria-label="Se connecter"
+                    >
+                      <LogIn className="h-4 w-4" aria-hidden="true" />
+                      <span className="hidden sm:inline">Connexion</span>
+                    </Button>
+                  </Link>
+                  <Link to="/abonnements">
+                    <Button 
+                      size="sm" 
+                      className="gap-2 text-sm bg-primary hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                      aria-label="S'inscrire ou adhérer"
+                    >
+                      <UserPlus className="h-4 w-4" aria-hidden="true" />
+                      <span className="hidden sm:inline">Adhésion</span>
+                    </Button>
+                  </Link>
+                </div>
+              )}
               
               {/* Menu Utilisateur */}
               {isAuthenticated && (
