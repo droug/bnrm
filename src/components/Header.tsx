@@ -432,8 +432,9 @@ const Header = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => {
-                  if (location.pathname.startsWith("/admin/digital-library")) {
-                    navigate("/admin/digital-library/documents");
+                  // Bibliothèque Numérique => toujours vers page d'accueil DL
+                  if (isDigitalLibrary) {
+                    navigate("/digital-library");
                     return;
                   }
 
@@ -448,7 +449,12 @@ const Header = () => {
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                <span>{language === 'ar' ? 'رجوع' : 'Retour'}</span>
+                <span>
+                  {isDigitalLibrary 
+                    ? (language === 'ar' ? "العودة إلى الصفحة الرئيسية" : "Retour vers page d'accueil")
+                    : (language === 'ar' ? 'رجوع' : 'Retour')
+                  }
+                </span>
               </Button>
             </div>
           </div>
