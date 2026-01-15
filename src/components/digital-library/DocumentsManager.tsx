@@ -1592,7 +1592,7 @@ export default function DocumentsManager() {
                     />
                   </TableHead>
                   <TableHead className="min-w-[200px]">Titre</TableHead>
-                  <TableHead className="w-28">N° Cote</TableHead>
+                  <TableHead className="w-28 text-center">N° Cote</TableHead>
                   <TableHead className="w-28">Type</TableHead>
                   <TableHead className="w-36">Auteur</TableHead>
                   <TableHead className="w-16 text-center">OCR</TableHead>
@@ -1617,7 +1617,7 @@ export default function DocumentsManager() {
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                       <span className="text-sm font-mono">{(doc as any).cbn_documents?.cote || '-'}</span>
                     </TableCell>
                     <TableCell>
