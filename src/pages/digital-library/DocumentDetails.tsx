@@ -48,6 +48,7 @@ export default function DocumentDetails() {
   const [loading, setLoading] = useState(true);
   const [document, setDocument] = useState<any>(null);
   const [accessRestrictions, setAccessRestrictions] = useState<any>(null);
+  const [pageAccessRestrictions, setPageAccessRestrictions] = useState<any>(null);
   const [isManuscript, setIsManuscript] = useState(false);
   const [authorName, setAuthorName] = useState<string>("");
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -75,6 +76,15 @@ export default function DocumentDetails() {
         .maybeSingle();
       
       setAccessRestrictions(restrictionsData);
+
+      // Charger les restrictions de pages (mode d'accès internet/interne)
+      const { data: pageRestrictionsData } = await supabase
+        .from('page_access_restrictions')
+        .select('*')
+        .eq('content_id', documentId)
+        .maybeSingle();
+      
+      setPageAccessRestrictions(pageRestrictionsData);
 
       // Essayer d'abord la table cbn_documents (source principale de la recherche)
       const { data: cbnData, error: cbnError } = await supabase
@@ -451,6 +461,36 @@ export default function DocumentDetails() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Mode d'accès */}
+                {pageAccessRestrictions?.is_restricted && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">Mode d'accès</p>
+                    <div className="flex flex-wrap gap-2">
+                      {pageAccessRestrictions?.allow_internet_access && (
+                        <Badge variant="default" className="text-xs gap-1.5">
+                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                          </svg>
+                          Accès Internet
+                        </Badge>
+                      )}
+                      {pageAccessRestrictions?.allow_internal_access && (
+                        <Badge variant="secondary" className="text-xs gap-1.5">
+                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                          Consultation sur place
+                        </Badge>
+                      )}
+                      {pageAccessRestrictions?.is_rare_book && (
+                        <Badge className="text-xs gap-1.5 bg-amber-500 hover:bg-amber-600 text-white">
+                          ✨ Livre rare
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Niveau d'accès */}
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-2">Niveau d'accès</p>

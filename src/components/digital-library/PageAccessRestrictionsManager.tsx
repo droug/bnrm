@@ -122,6 +122,9 @@ export function PageAccessRestrictionsManager() {
         allow_screenshot: data.allowScreenshot,
         allow_right_click: data.allowRightClick,
         restricted_page_display: data.restrictedPageDisplay,
+        allow_internet_access: data.allowInternetAccess,
+        allow_internal_access: data.allowInternalAccess,
+        is_rare_book: data.isRareBook,
       };
 
       const { error } = await supabase
@@ -180,6 +183,9 @@ export function PageAccessRestrictionsManager() {
       setAllowScreenshot(restriction.allow_screenshot !== false);
       setAllowRightClick(restriction.allow_right_click !== false);
       setRestrictedPageDisplay(restriction.restricted_page_display || "blur");
+      setAllowInternetAccess(restriction.allow_internet_access !== false);
+      setAllowInternalAccess(restriction.allow_internal_access || false);
+      setIsRareBook(restriction.is_rare_book || false);
       
       if (restriction.restriction_mode === 'range' && restriction.manual_pages?.length > 0) {
         const pages = [...restriction.manual_pages].sort((a, b) => a - b);
@@ -224,6 +230,9 @@ export function PageAccessRestrictionsManager() {
       setAllowScreenshot(true);
       setAllowRightClick(true);
       setRestrictedPageDisplay("blur");
+      setAllowInternetAccess(true);
+      setAllowInternalAccess(false);
+      setIsRareBook(false);
     }
   };
 
@@ -240,6 +249,9 @@ export function PageAccessRestrictionsManager() {
       allowScreenshot,
       allowRightClick,
       restrictedPageDisplay,
+      allowInternetAccess,
+      allowInternalAccess,
+      isRareBook,
     });
   };
 

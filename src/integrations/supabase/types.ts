@@ -7345,11 +7345,18 @@ export type Database = {
       }
       page_access_restrictions: {
         Row: {
+          allow_download: boolean | null
+          allow_internal_access: boolean | null
+          allow_internet_access: boolean | null
+          allow_physical_consultation: boolean | null
+          allow_right_click: boolean | null
+          allow_screenshot: boolean | null
           content_id: string
           created_at: string | null
           created_by: string | null
           end_page: number | null
           id: string
+          is_rare_book: boolean | null
           is_restricted: boolean | null
           manual_pages: number[] | null
           restricted_page_display: string | null
@@ -7358,11 +7365,18 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          allow_download?: boolean | null
+          allow_internal_access?: boolean | null
+          allow_internet_access?: boolean | null
+          allow_physical_consultation?: boolean | null
+          allow_right_click?: boolean | null
+          allow_screenshot?: boolean | null
           content_id: string
           created_at?: string | null
           created_by?: string | null
           end_page?: number | null
           id?: string
+          is_rare_book?: boolean | null
           is_restricted?: boolean | null
           manual_pages?: number[] | null
           restricted_page_display?: string | null
@@ -7371,11 +7385,18 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          allow_download?: boolean | null
+          allow_internal_access?: boolean | null
+          allow_internet_access?: boolean | null
+          allow_physical_consultation?: boolean | null
+          allow_right_click?: boolean | null
+          allow_screenshot?: boolean | null
           content_id?: string
           created_at?: string | null
           created_by?: string | null
           end_page?: number | null
           id?: string
+          is_rare_book?: boolean | null
           is_restricted?: boolean | null
           manual_pages?: number[] | null
           restricted_page_display?: string | null
