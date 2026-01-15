@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import BulkImportPage from "@/components/digital-library/import/BulkImportPage";
+import DigitalLibraryDocumentImporter from "@/components/digital-library/import/DigitalLibraryDocumentImporter";
 
 export default function DigitalLibraryBulkImport() {
   const { user } = useAuth();
@@ -38,7 +38,8 @@ export default function DigitalLibraryBulkImport() {
           Retour
         </Button>
 
-        <BulkImportPage 
+        <DigitalLibraryDocumentImporter 
+          defaultTab="bulk-pdf"
           onSuccess={() => {
             // Optionnel : naviguer vers la liste après succès
           }}
