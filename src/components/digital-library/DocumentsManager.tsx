@@ -1584,19 +1584,19 @@ export default function DocumentsManager() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12">
+                  <TableHead className="w-10">
                     <Checkbox 
                       checked={filteredDocuments && filteredDocuments.length > 0 && filteredDocuments.every(doc => selectedDocIds.includes(doc.id))}
                       onCheckedChange={toggleSelectAll}
                       aria-label="Sélectionner tous"
                     />
                   </TableHead>
-                  <TableHead>Titre</TableHead>
-                  <TableHead>N° Cote</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Auteur</TableHead>
-                  <TableHead>OCR</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="min-w-[200px]">Titre</TableHead>
+                  <TableHead className="w-28">N° Cote</TableHead>
+                  <TableHead className="w-28">Type</TableHead>
+                  <TableHead className="w-36">Auteur</TableHead>
+                  <TableHead className="w-16 text-center">OCR</TableHead>
+                  <TableHead className="w-32 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
