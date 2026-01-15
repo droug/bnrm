@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, EyeOff, Plus, Trash2, Shield, Download, Camera, MousePointerClick, Square, Sparkles, ArrowLeft } from "lucide-react";
+import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, EyeOff, Plus, Trash2, Shield, Download, Camera, MousePointerClick, Square, Sparkles, ArrowLeft, BookOpenCheck, ScrollText } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export function PageAccessRestrictionsManager() {
@@ -46,6 +46,10 @@ export function PageAccessRestrictionsManager() {
   const [allowRightClick, setAllowRightClick] = useState(true);
   const [allowInternetAccess, setAllowInternetAccess] = useState(true);
   const [allowInternalAccess, setAllowInternalAccess] = useState(false);
+  
+  // Paramètres de vue
+  const [allowDoublePageView, setAllowDoublePageView] = useState(true);
+  const [allowScrollView, setAllowScrollView] = useState(true);
 
   // Fetch documents
   const { data: documents, isLoading } = useQuery({
@@ -125,6 +129,8 @@ export function PageAccessRestrictionsManager() {
         allow_internet_access: data.allowInternetAccess,
         allow_internal_access: data.allowInternalAccess,
         is_rare_book: data.isRareBook,
+        allow_double_page_view: data.allowDoublePageView,
+        allow_scroll_view: data.allowScrollView,
       };
 
       const { error } = await supabase
@@ -186,6 +192,8 @@ export function PageAccessRestrictionsManager() {
       setAllowInternetAccess(restriction.allow_internet_access !== false);
       setAllowInternalAccess(restriction.allow_internal_access || false);
       setIsRareBook(restriction.is_rare_book || false);
+      setAllowDoublePageView(restriction.allow_double_page_view !== false);
+      setAllowScrollView(restriction.allow_scroll_view !== false);
       
       if (restriction.restriction_mode === 'range' && restriction.manual_pages?.length > 0) {
         const pages = [...restriction.manual_pages].sort((a, b) => a - b);
@@ -233,6 +241,8 @@ export function PageAccessRestrictionsManager() {
       setAllowInternetAccess(true);
       setAllowInternalAccess(false);
       setIsRareBook(false);
+      setAllowDoublePageView(true);
+      setAllowScrollView(true);
     }
   };
 
@@ -252,6 +262,8 @@ export function PageAccessRestrictionsManager() {
       allowInternetAccess,
       allowInternalAccess,
       isRareBook,
+      allowDoublePageView,
+      allowScrollView,
     });
   };
 
@@ -778,6 +790,46 @@ export function PageAccessRestrictionsManager() {
                         </div>
                       </div>
                       <Switch checked={allowRightClick} onCheckedChange={setAllowRightClick} />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Paramètres de vue */}
+                <Card className="border-2 border-blue-200 dark:border-blue-800">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 pb-3">
+                    <div className="flex items-center gap-2">
+                      <BookOpenCheck className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      <CardTitle className="text-base">Paramètres de vue</CardTitle>
+                    </div>
+                    <CardDescription className="text-xs">
+                      Contrôlez les modes d'affichage disponibles dans le lecteur
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3 pt-4">
+                    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="p-2 rounded-lg bg-blue-500/10">
+                          <BookOpenCheck className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <Label className="text-sm font-semibold">Vue double page</Label>
+                          <p className="text-xs text-muted-foreground">Affichage de deux pages côte à côte</p>
+                        </div>
+                      </div>
+                      <Switch checked={allowDoublePageView} onCheckedChange={setAllowDoublePageView} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="p-2 rounded-lg bg-blue-500/10">
+                          <ScrollText className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <Label className="text-sm font-semibold">Mode défilement</Label>
+                          <p className="text-xs text-muted-foreground">Navigation par défilement vertical</p>
+                        </div>
+                      </div>
+                      <Switch checked={allowScrollView} onCheckedChange={setAllowScrollView} />
                     </div>
                   </CardContent>
                 </Card>

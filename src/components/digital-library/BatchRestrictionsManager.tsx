@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SimpleDropdown } from "@/components/cbn/SimpleDropdown";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Lock, Unlock, Search, Filter, FileText, X, Shield, Download, Camera, MousePointerClick, Layers, Eye, EyeOff, Info, Square } from "lucide-react";
+import { Lock, Unlock, Search, Filter, FileText, X, Shield, Download, Camera, MousePointerClick, Layers, Eye, EyeOff, Info, Square, BookOpenCheck, ScrollText } from "lucide-react";
 
 export function BatchRestrictionsManager() {
   const { toast } = useToast();
@@ -42,6 +42,10 @@ export function BatchRestrictionsManager() {
   const [allowScreenshot, setAllowScreenshot] = useState(true);
   const [allowRightClick, setAllowRightClick] = useState(true);
   const [restrictedPageDisplay, setRestrictedPageDisplay] = useState<"blur" | "empty" | "hidden">("blur");
+  
+  // Paramètres de vue
+  const [allowDoublePageView, setAllowDoublePageView] = useState(true);
+  const [allowScrollView, setAllowScrollView] = useState(true);
   
   // État pour le dialog de détails
   const [selectedDocumentForDetails, setSelectedDocumentForDetails] = useState<any>(null);
@@ -125,6 +129,8 @@ export function BatchRestrictionsManager() {
           allow_screenshot: data.allowScreenshot,
           allow_right_click: data.allowRightClick,
           restricted_page_display: data.restrictedPageDisplay,
+          allow_double_page_view: data.allowDoublePageView,
+          allow_scroll_view: data.allowScrollView,
         };
 
         const { error } = await supabase
@@ -234,6 +240,8 @@ export function BatchRestrictionsManager() {
       allowScreenshot,
       allowRightClick,
       restrictedPageDisplay,
+      allowDoublePageView,
+      allowScrollView,
     });
   };
 
@@ -1056,6 +1064,54 @@ export function BatchRestrictionsManager() {
                         id="allow-right-click"
                         checked={allowRightClick}
                         onCheckedChange={setAllowRightClick}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Paramètres de vue */}
+                <Card className="border-blue-200 dark:border-blue-800">
+                  <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-t-lg">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <BookOpenCheck className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      Paramètres de vue
+                    </CardTitle>
+                    <CardDescription>
+                      Contrôlez les modes d'affichage disponibles dans le lecteur
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <Label htmlFor="allow-double-page" className="flex items-center gap-2">
+                          <BookOpenCheck className="h-4 w-4" />
+                          Autoriser la vue double page
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Affichage de deux pages côte à côte
+                        </p>
+                      </div>
+                      <Switch
+                        id="allow-double-page"
+                        checked={allowDoublePageView}
+                        onCheckedChange={setAllowDoublePageView}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <Label htmlFor="allow-scroll" className="flex items-center gap-2">
+                          <ScrollText className="h-4 w-4" />
+                          Autoriser le mode défilement
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Navigation par défilement vertical
+                        </p>
+                      </div>
+                      <Switch
+                        id="allow-scroll"
+                        checked={allowScrollView}
+                        onCheckedChange={setAllowScrollView}
                       />
                     </div>
                   </CardContent>
