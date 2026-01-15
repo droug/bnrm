@@ -84,7 +84,7 @@ export default function AdvancedSearch() {
       // Recherche générale
       if (params.keyword) {
         const term = params.keyword;
-        baseQuery = baseQuery.or(`title.ilike.%${term}%,author.ilike.%${term}%,description.ilike.%${term}%`);
+        baseQuery = baseQuery.or(`title.ilike.%${term}%,author.ilike.%${term}%,cote.ilike.%${term}%,notes.ilike.%${term}%`);
       }
       
       // Recherche par auteur
