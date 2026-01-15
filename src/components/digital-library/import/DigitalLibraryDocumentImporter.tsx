@@ -3,12 +3,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Progress } from "@/components/ui/progress";
-import { FileText, Upload, FileSearch, UploadCloud, Wand2, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { FileText, Upload, FileSearch, UploadCloud, Wand2, Loader2, CheckCircle2, AlertCircle, FileSpreadsheet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import SingleDocumentImport from "./SingleDocumentImport";
 import BulkDocumentImport from "./BulkDocumentImport";
+import BulkPdfImport from "./BulkPdfImport";
 import OcrImportTool from "./OcrImportTool";
 
 interface DigitalLibraryDocumentImporterProps {
@@ -127,26 +127,32 @@ export default function DigitalLibraryDocumentImporter({
       </Card>
 
       <Tabs defaultValue={defaultTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="single" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Import unitaire</span>
-            <span className="sm:hidden">Unitaire</span>
+            <span className="hidden sm:inline">Unitaire</span>
+          </TabsTrigger>
+          <TabsTrigger value="bulk-pdf" className="flex items-center gap-2">
+            <Upload className="h-4 w-4" />
+            <span className="hidden sm:inline">PDF en masse</span>
+            <span className="sm:hidden">PDF</span>
           </TabsTrigger>
           <TabsTrigger value="bulk" className="flex items-center gap-2">
-            <Upload className="h-4 w-4" />
-            <span className="hidden sm:inline">Import en masse</span>
-            <span className="sm:hidden">Masse</span>
+            <FileSpreadsheet className="h-4 w-4" />
+            <span className="hidden sm:inline">Excel</span>
           </TabsTrigger>
           <TabsTrigger value="ocr" className="flex items-center gap-2">
             <FileSearch className="h-4 w-4" />
-            <span className="hidden sm:inline">Indexation OCR</span>
-            <span className="sm:hidden">OCR</span>
+            <span className="hidden sm:inline">OCR</span>
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="single">
           <SingleDocumentImport onSuccess={onSuccess} />
+        </TabsContent>
+
+        <TabsContent value="bulk-pdf">
+          <BulkPdfImport onSuccess={onSuccess} />
         </TabsContent>
 
         <TabsContent value="bulk">
