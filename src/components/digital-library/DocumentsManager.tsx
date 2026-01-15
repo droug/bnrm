@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PortalSelect } from "@/components/ui/portal-select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil, Wand2, Loader2, FileSearch, CheckCircle2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import OcrImportTool from "@/components/digital-library/import/OcrImportTool";
@@ -75,6 +76,8 @@ export default function DocumentsManager() {
   const [ocrDocumentTarget, setOcrDocumentTarget] = useState<any>(null);
   const [ocrBaseUrl, setOcrBaseUrl] = useState("");
   const [ocrLanguage, setOcrLanguage] = useState("ar");
+  const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
+  const [bulkOcrRunning, setBulkOcrRunning] = useState(false);
 
   // Exemple de doublons détectés
   const sampleDuplicates = [
@@ -419,6 +422,89 @@ export default function DocumentsManager() {
       setOcrProcessingDocId(null);
       setOcrDocumentTarget(null);
     }
+  };
+
+  // Toggle document selection
+  const toggleDocumentSelection = (docId: string) => {
+    setSelectedDocIds(prev => 
+      prev.includes(docId) 
+        ? prev.filter(id => id !== docId)
+        : [...prev, docId]
+    );
+  };
+
+  // Select/deselect all filtered documents
+  const toggleSelectAll = () => {
+    if (!filteredDocuments) return;
+    
+    const allFilteredIds = filteredDocuments.map(doc => doc.id);
+    const allSelected = allFilteredIds.every(id => selectedDocIds.includes(id));
+    
+    if (allSelected) {
+      setSelectedDocIds(prev => prev.filter(id => !allFilteredIds.includes(id)));
+    } else {
+      setSelectedDocIds(prev => [...new Set([...prev, ...allFilteredIds])]);
+    }
+  };
+
+  // Run OCR on selected documents
+  const runBulkOcrOnSelected = async () => {
+    if (selectedDocIds.length === 0) {
+      toast({
+        title: "Aucun document sélectionné",
+        description: "Veuillez sélectionner au moins un document pour lancer l'OCR",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setBulkOcrRunning(true);
+    const results: { docId: string; title: string; success: boolean; pages?: number; error?: string }[] = [];
+
+    for (const docId of selectedDocIds) {
+      const doc = documents?.find(d => d.id === docId);
+      if (!doc) continue;
+
+      try {
+        const { data, error } = await supabase.functions.invoke('batch-ocr-indexing', {
+          body: {
+            documentId: docId,
+            language: (doc as any).language || 'ar',
+            baseUrl: (doc as any).base_url || ''
+          }
+        });
+
+        if (error) throw error;
+
+        results.push({
+          docId,
+          title: doc.title || 'Sans titre',
+          success: true,
+          pages: data?.processedPages || 0
+        });
+      } catch (error: any) {
+        results.push({
+          docId,
+          title: doc?.title || 'Sans titre',
+          success: false,
+          error: error.message
+        });
+      }
+    }
+
+    setBulkOcrRunning(false);
+    queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
+
+    const successCount = results.filter(r => r.success).length;
+    const totalPages = results.filter(r => r.success).reduce((sum, r) => sum + (r.pages || 0), 0);
+
+    toast({
+      title: "OCR en masse terminé",
+      description: `${successCount}/${results.length} documents traités, ${totalPages} pages indexées`,
+    });
+
+    // Clear selection after bulk OCR
+    setSelectedDocIds([]);
   };
 
   // Filter documents
@@ -1444,12 +1530,40 @@ export default function DocumentsManager() {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle>Documents ({filteredDocuments?.length || 0})</CardTitle>
-              <CardDescription>Liste complète des documents numérisés</CardDescription>
+              <CardDescription>
+                Liste complète des documents numérisés
+                {selectedDocIds.length > 0 && (
+                  <span className="ml-2 text-primary font-medium">
+                    • {selectedDocIds.length} sélectionné(s)
+                  </span>
+                )}
+              </CardDescription>
             </div>
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Exporter
-            </Button>
+            <div className="flex gap-2">
+              {selectedDocIds.length > 0 && (
+                <Button 
+                  onClick={runBulkOcrOnSelected}
+                  disabled={bulkOcrRunning}
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                >
+                  {bulkOcrRunning ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      OCR en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="h-4 w-4 mr-2" />
+                      OCR ({selectedDocIds.length})
+                    </>
+                  )}
+                </Button>
+              )}
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Exporter
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -1459,6 +1573,13 @@ export default function DocumentsManager() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox 
+                      checked={filteredDocuments && filteredDocuments.length > 0 && filteredDocuments.every(doc => selectedDocIds.includes(doc.id))}
+                      onCheckedChange={toggleSelectAll}
+                      aria-label="Sélectionner tous"
+                    />
+                  </TableHead>
                   <TableHead>Titre</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Auteur</TableHead>
@@ -1470,7 +1591,14 @@ export default function DocumentsManager() {
               </TableHeader>
               <TableBody>
                 {filteredDocuments.map((doc) => (
-                  <TableRow key={doc.id}>
+                  <TableRow key={doc.id} className={selectedDocIds.includes(doc.id) ? "bg-primary/5" : ""}>
+                    <TableCell>
+                      <Checkbox 
+                        checked={selectedDocIds.includes(doc.id)}
+                        onCheckedChange={() => toggleDocumentSelection(doc.id)}
+                        aria-label={`Sélectionner ${doc.title}`}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div>
                         <p className="font-medium">{doc.title}</p>
