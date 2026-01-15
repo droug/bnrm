@@ -10132,6 +10132,189 @@ export type Database = {
         }
         Relationships: []
       }
+      sigb_duplicate_cases: {
+        Row: {
+          created_at: string
+          existing_document_id: string | null
+          id: string
+          match_fields: Json | null
+          match_score: number | null
+          match_type: string
+          notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          run_id: string | null
+          source_data: Json | null
+          source_record_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          existing_document_id?: string | null
+          id?: string
+          match_fields?: Json | null
+          match_score?: number | null
+          match_type: string
+          notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          run_id?: string | null
+          source_data?: Json | null
+          source_record_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          existing_document_id?: string | null
+          id?: string
+          match_fields?: Json | null
+          match_score?: number | null
+          match_type?: string
+          notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          run_id?: string | null
+          source_data?: Json | null
+          source_record_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sigb_duplicate_cases_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "sigb_sync_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sigb_duplicate_events: {
+        Row: {
+          action: string
+          case_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          performed_by: string | null
+        }
+        Insert: {
+          action: string
+          case_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          performed_by?: string | null
+        }
+        Update: {
+          action?: string
+          case_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          performed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sigb_duplicate_events_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "sigb_duplicate_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sigb_duplicate_settings: {
+        Row: {
+          auto_merge_threshold: number | null
+          auto_reject_threshold: number | null
+          created_at: string
+          fuzzy_match_enabled: boolean | null
+          id: string
+          is_active: boolean | null
+          match_fields: Json | null
+          match_strategy: string
+          similarity_algorithm: string | null
+          updated_at: string
+        }
+        Insert: {
+          auto_merge_threshold?: number | null
+          auto_reject_threshold?: number | null
+          created_at?: string
+          fuzzy_match_enabled?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          match_fields?: Json | null
+          match_strategy?: string
+          similarity_algorithm?: string | null
+          updated_at?: string
+        }
+        Update: {
+          auto_merge_threshold?: number | null
+          auto_reject_threshold?: number | null
+          created_at?: string
+          fuzzy_match_enabled?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          match_fields?: Json | null
+          match_strategy?: string
+          similarity_algorithm?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sigb_metadata_mapping: {
+        Row: {
+          config_id: string | null
+          created_at: string
+          default_value: string | null
+          id: string
+          is_active: boolean | null
+          is_required: boolean | null
+          sort_order: number | null
+          source_field: string
+          target_field: string
+          transformation_rule: string | null
+          updated_at: string
+        }
+        Insert: {
+          config_id?: string | null
+          created_at?: string
+          default_value?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_required?: boolean | null
+          sort_order?: number | null
+          source_field: string
+          target_field: string
+          transformation_rule?: string | null
+          updated_at?: string
+        }
+        Update: {
+          config_id?: string | null
+          created_at?: string
+          default_value?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_required?: boolean | null
+          sort_order?: number | null
+          source_field?: string
+          target_field?: string
+          transformation_rule?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sigb_metadata_mapping_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "sigb_sync_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sigb_sync_config: {
         Row: {
           api_endpoint_path: string | null
@@ -10312,6 +10495,159 @@ export type Database = {
             columns: ["config_id"]
             isOneToOne: false
             referencedRelation: "sigb_configuration"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sigb_sync_rejections: {
+        Row: {
+          can_retry: boolean | null
+          created_at: string
+          id: string
+          rejection_details: Json | null
+          rejection_reason: string
+          run_id: string | null
+          source_data: Json | null
+          source_record_id: string
+        }
+        Insert: {
+          can_retry?: boolean | null
+          created_at?: string
+          id?: string
+          rejection_details?: Json | null
+          rejection_reason: string
+          run_id?: string | null
+          source_data?: Json | null
+          source_record_id: string
+        }
+        Update: {
+          can_retry?: boolean | null
+          created_at?: string
+          id?: string
+          rejection_details?: Json | null
+          rejection_reason?: string
+          run_id?: string | null
+          source_data?: Json | null
+          source_record_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sigb_sync_rejections_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "sigb_sync_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sigb_sync_run_items: {
+        Row: {
+          created_at: string
+          document_id: string | null
+          error_message: string | null
+          id: string
+          mapped_data: Json | null
+          processed_at: string | null
+          run_id: string
+          source_data: Json | null
+          source_record_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          document_id?: string | null
+          error_message?: string | null
+          id?: string
+          mapped_data?: Json | null
+          processed_at?: string | null
+          run_id: string
+          source_data?: Json | null
+          source_record_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          document_id?: string | null
+          error_message?: string | null
+          id?: string
+          mapped_data?: Json | null
+          processed_at?: string | null
+          run_id?: string
+          source_data?: Json | null
+          source_record_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sigb_sync_run_items_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "sigb_sync_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sigb_sync_runs: {
+        Row: {
+          completed_at: string | null
+          config_id: string | null
+          created_at: string
+          created_records: number | null
+          duplicate_records: number | null
+          error_message: string | null
+          failed_records: number | null
+          id: string
+          processed_records: number | null
+          run_type: string | null
+          skipped_records: number | null
+          started_at: string
+          status: string
+          total_records: number | null
+          triggered_by: string | null
+          updated_records: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          config_id?: string | null
+          created_at?: string
+          created_records?: number | null
+          duplicate_records?: number | null
+          error_message?: string | null
+          failed_records?: number | null
+          id?: string
+          processed_records?: number | null
+          run_type?: string | null
+          skipped_records?: number | null
+          started_at?: string
+          status?: string
+          total_records?: number | null
+          triggered_by?: string | null
+          updated_records?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          config_id?: string | null
+          created_at?: string
+          created_records?: number | null
+          duplicate_records?: number | null
+          error_message?: string | null
+          failed_records?: number | null
+          id?: string
+          processed_records?: number | null
+          run_type?: string | null
+          skipped_records?: number | null
+          started_at?: string
+          status?: string
+          total_records?: number | null
+          triggered_by?: string | null
+          updated_records?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sigb_sync_runs_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "sigb_sync_config"
             referencedColumns: ["id"]
           },
         ]
