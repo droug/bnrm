@@ -11,16 +11,16 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, EyeOff, ChevronLeft, ChevronRight, Plus, Trash2, Shield, Download, Camera, MousePointerClick, Square, Sparkles } from "lucide-react";
-import { PageFlipBook } from "@/components/book-reader/PageFlipBook";
+import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, EyeOff, Plus, Trash2, Shield, Download, Camera, MousePointerClick, Square, Sparkles, ArrowLeft } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export function PageAccessRestrictionsManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
-  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<any>(null);
   
   // Filtres de recherche
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,10 +38,6 @@ export function PageAccessRestrictionsManager() {
   const [allowPhysicalConsultation, setAllowPhysicalConsultation] = useState(false);
   const [isRareBook, setIsRareBook] = useState(false);
   const [totalPages, setTotalPages] = useState(245);
-  const [currentPreviewPage, setCurrentPreviewPage] = useState(1);
-  const [viewMode, setViewMode] = useState<"single" | "double">("single");
-  const [zoom, setZoom] = useState(100);
-  const [rotation, setRotation] = useState(0);
   
   // Paramètres de sécurité
   const [allowDownload, setAllowDownload] = useState(true);
@@ -73,15 +69,12 @@ export function PageAccessRestrictionsManager() {
     if (!documents) return [];
     
     return documents.filter((doc) => {
-      // Filtre par recherche textuelle
       const matchesSearch = searchQuery === "" || 
         doc.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         doc.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());
       
-      // Filtre par type
       const matchesType = filterType === "all" || doc.content_type === filterType;
       
-      // Filtre par statut de restriction
       const restriction = doc.page_access_restrictions?.[0];
       const matchesStatus = filterStatus === "all" || 
         (filterStatus === "restricted" && restriction?.is_restricted) ||
@@ -94,11 +87,9 @@ export function PageAccessRestrictionsManager() {
   // Mutation pour créer ou mettre à jour une restriction
   const saveRestriction = useMutation({
     mutationFn: async (data: any) => {
-      // Convertir les plages en tableau de pages
       let allowedPages: number[] = [];
       
       if (data.restrictionMode === 'range') {
-        // Fusionner toutes les plages
         data.pageRanges.forEach((range: {start: number, end: number}) => {
           for (let i = range.start; i <= range.end; i++) {
             if (!allowedPages.includes(i)) {
@@ -108,10 +99,8 @@ export function PageAccessRestrictionsManager() {
         });
         allowedPages.sort((a, b) => a - b);
       } else if (data.restrictionMode === 'percentage') {
-        // Utiliser les pages du pourcentage (modifiées manuellement ou calculées)
         allowedPages = data.percentagePages.length > 0 ? data.percentagePages : [];
         if (allowedPages.length === 0) {
-          // Fallback: calculer si aucune page n'est définie
           const numPages = Math.ceil((totalPages * data.percentageValue) / 100);
           for (let i = 1; i <= numPages; i++) {
             allowedPages.push(i);
@@ -145,7 +134,7 @@ export function PageAccessRestrictionsManager() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents-with-restrictions'] });
-      setShowEditDialog(false);
+      setSelectedDocument(null);
       toast({ 
         title: "Restriction enregistrée", 
         description: "Les paramètres d'accès aux pages ont été mis à jour." 
@@ -174,6 +163,8 @@ export function PageAccessRestrictionsManager() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents-with-restrictions'] });
       toast({ title: "Restriction supprimée" });
+      setShowDeleteConfirm(false);
+      setDocumentToDelete(null);
     }
   });
 
@@ -190,7 +181,6 @@ export function PageAccessRestrictionsManager() {
       setAllowRightClick(restriction.allow_right_click !== false);
       setRestrictedPageDisplay(restriction.restricted_page_display || "blur");
       
-      // Reconstruire les plages à partir des pages manuelles
       if (restriction.restriction_mode === 'range' && restriction.manual_pages?.length > 0) {
         const pages = [...restriction.manual_pages].sort((a, b) => a - b);
         const ranges: Array<{start: number, end: number}> = [];
@@ -212,7 +202,6 @@ export function PageAccessRestrictionsManager() {
       
       setManualPages(restriction.manual_pages || []);
       
-      // Calculer le pourcentage si c'est le mode percentage
       if (restriction.restriction_mode === 'percentage' && restriction.manual_pages?.length > 0) {
         const percentage = Math.round((restriction.manual_pages.length / totalPages) * 100);
         setPercentageValue(percentage);
@@ -236,26 +225,6 @@ export function PageAccessRestrictionsManager() {
       setAllowRightClick(true);
       setRestrictedPageDisplay("blur");
     }
-    
-    setCurrentPreviewPage(1);
-    setViewMode("single");
-    setZoom(100);
-    setRotation(0);
-    setShowEditDialog(true);
-  };
-
-  // Obtenir l'image de la page actuelle pour la preview
-  const getCurrentPageImage = (page: number) => {
-    return selectedDocument?.file_url || "/placeholder.svg";
-  };
-
-  // Générer les images pour le flip book
-  const generatePageImages = () => {
-    const images = [];
-    for (let i = 0; i < totalPages; i++) {
-      images.push(selectedDocument?.file_url || "/placeholder.svg");
-    }
-    return images;
   };
 
   const handleSaveRestriction = () => {
@@ -274,7 +243,6 @@ export function PageAccessRestrictionsManager() {
     });
   };
 
-  // Calculer les pages basées sur le pourcentage
   const calculatePercentagePages = () => {
     const numPages = Math.ceil((totalPages * percentageValue) / 100);
     const pages = [];
@@ -289,7 +257,6 @@ export function PageAccessRestrictionsManager() {
     });
   };
 
-  // Basculer une page dans la liste percentage
   const togglePercentagePage = (page: number) => {
     if (percentagePages.includes(page)) {
       setPercentagePages(percentagePages.filter(p => p !== page));
@@ -299,11 +266,572 @@ export function PageAccessRestrictionsManager() {
   };
 
   const handleRemoveRestriction = (doc: any) => {
-    if (confirm("Voulez-vous vraiment supprimer la restriction d'accès pour ce document ?")) {
-      deleteRestriction.mutate(doc.id);
-    }
+    setDocumentToDelete(doc);
+    setShowDeleteConfirm(true);
   };
 
+  // Si un document est sélectionné, afficher le panneau de configuration
+  if (selectedDocument) {
+    return (
+      <div className="space-y-6">
+        {/* En-tête avec bouton retour */}
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            onClick={() => setSelectedDocument(null)}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Retour à la liste
+          </Button>
+        </div>
+
+        {/* Titre du document */}
+        <Card className="border-primary/20">
+          <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-lg bg-primary/10">
+                <FileText className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex-1">
+                <CardTitle className="text-xl flex items-center gap-3">
+                  {selectedDocument.title}
+                  {(selectedDocument.content_type as string) === 'rare_book' && (
+                    <Badge className="bg-amber-500 hover:bg-amber-600 text-white gap-1.5">
+                      <Sparkles className="h-3 w-3" />
+                      Livre rare
+                    </Badge>
+                  )}
+                </CardTitle>
+                <CardDescription>Configuration des restrictions d'accès aux pages</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+
+        {/* Panneau de configuration */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Colonne gauche - Paramètres principaux */}
+          <div className="space-y-6">
+            {/* Activer/Désactiver la restriction */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <Label className="text-base font-semibold">Activer la restriction</Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Limiter l'accès aux pages pour les visiteurs non connectés
+                    </p>
+                  </div>
+                  <Switch
+                    checked={isRestricted}
+                    onCheckedChange={setIsRestricted}
+                    className="ml-4"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {isRestricted && (
+              <>
+                {/* Mode d'accès */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      Mode d'accès
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Sélectionnez un ou plusieurs modes d'accès
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div 
+                      className={`w-full py-4 px-4 flex items-center gap-3 rounded-md border cursor-pointer transition-colors ${
+                        allowInternetAccess ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
+                      }`}
+                      onClick={() => setAllowInternetAccess(!allowInternetAccess)}
+                    >
+                      <Switch
+                        checked={allowInternetAccess}
+                        onCheckedChange={setAllowInternetAccess}
+                        className="data-[state=checked]:bg-primary-foreground data-[state=checked]:text-primary"
+                      />
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                      </svg>
+                      <div className="text-left flex-1">
+                        <div className="font-semibold">Libre d'accès par Internet</div>
+                        <div className="text-xs opacity-80">Accessible depuis n'importe où</div>
+                      </div>
+                    </div>
+                    <div 
+                      className={`w-full py-4 px-4 flex items-center gap-3 rounded-md border cursor-pointer transition-colors ${
+                        allowInternalAccess ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
+                      }`}
+                      onClick={() => setAllowInternalAccess(!allowInternalAccess)}
+                    >
+                      <Switch
+                        checked={allowInternalAccess}
+                        onCheckedChange={setAllowInternalAccess}
+                        className="data-[state=checked]:bg-primary-foreground data-[state=checked]:text-primary"
+                      />
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                      <div className="text-left flex-1">
+                        <div className="font-semibold">Accès interne uniquement</div>
+                        <div className="text-xs opacity-80">Consultation sur place à la bibliothèque</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Consultation physique */}
+                {allowInternetAccess && (
+                  <Card>
+                    <CardContent className="p-6 space-y-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <Label className="text-base font-semibold">Consultation physique autorisée</Label>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Autoriser la consultation du document complet sur place
+                          </p>
+                        </div>
+                        <Switch
+                          checked={allowPhysicalConsultation}
+                          onCheckedChange={setAllowPhysicalConsultation}
+                          className="ml-4"
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="p-2 rounded-full bg-amber-500/20">
+                            <Sparkles className="h-5 w-5 text-amber-600" />
+                          </div>
+                          <div>
+                            <Label className="text-base font-semibold cursor-pointer">Livre rare</Label>
+                            <p className="text-sm text-muted-foreground mt-0.5">
+                              Marquer ce document comme livre rare ou précieux
+                            </p>
+                          </div>
+                        </div>
+                        <Switch
+                          checked={isRareBook}
+                          onCheckedChange={setIsRareBook}
+                          className="ml-4"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Mode de restriction */}
+                {allowInternetAccess && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Mode de restriction</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <Button
+                        type="button"
+                        variant={restrictionMode === "range" ? "default" : "outline"}
+                        onClick={() => setRestrictionMode("range")}
+                        className="w-full h-auto py-4 flex items-center gap-3"
+                      >
+                        <BookOpen className="h-5 w-5" />
+                        <div className="text-left flex-1">
+                          <div className="font-semibold">Plage de pages</div>
+                          <div className="text-xs opacity-80">Définir début et fin</div>
+                        </div>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={restrictionMode === "manual" ? "default" : "outline"}
+                        onClick={() => setRestrictionMode("manual")}
+                        className="w-full h-auto py-4 flex items-center gap-3"
+                      >
+                        <FileText className="h-5 w-5" />
+                        <div className="text-left flex-1">
+                          <div className="font-semibold">Sélection manuelle</div>
+                          <div className="text-xs opacity-80">Choisir page par page</div>
+                        </div>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={restrictionMode === "percentage" ? "default" : "outline"}
+                        onClick={() => setRestrictionMode("percentage")}
+                        className="w-full h-auto py-4 flex items-center gap-3"
+                      >
+                        <Eye className="h-5 w-5" />
+                        <div className="text-left flex-1">
+                          <div className="font-semibold">Pourcentage de pages</div>
+                          <div className="text-xs opacity-80">Autoriser un % de pages</div>
+                        </div>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Colonne droite - Configuration détaillée */}
+          <div className="space-y-6">
+            {isRestricted && allowInternetAccess && (
+              <>
+                {/* Configuration selon le mode */}
+                {restrictionMode === "percentage" ? (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Pourcentage de pages accessibles</CardTitle>
+                      <CardDescription className="text-xs">
+                        Définissez le pourcentage de pages accessibles aux visiteurs non connectés
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        <Label htmlFor="percentage-input" className="text-sm font-medium">
+                          Pourcentage (%)
+                        </Label>
+                        <div className="flex gap-3 items-center">
+                          <Input
+                            id="percentage-input"
+                            type="number"
+                            min={1}
+                            max={100}
+                            value={percentageValue}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 1;
+                              setPercentageValue(Math.min(100, Math.max(1, val)));
+                              setShowPercentagePages(false);
+                            }}
+                            className="h-11 text-lg font-semibold"
+                          />
+                          <span className="text-2xl font-bold text-muted-foreground">%</span>
+                        </div>
+                      </div>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={calculatePercentagePages}
+                        className="w-full"
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Calculer et visualiser les pages
+                      </Button>
+                      
+                      {showPercentagePages && percentagePages.length > 0 && (
+                        <Accordion type="single" collapsible className="w-full">
+                          <AccordionItem value="page-list" className="border rounded-lg">
+                            <AccordionTrigger className="px-4 hover:no-underline">
+                              <div className="flex items-center gap-2 text-sm">
+                                <FileText className="h-4 w-4" />
+                                <span>Voir et modifier les pages ({percentagePages.length})</span>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-4 pb-4">
+                              <ScrollArea className="h-48 pr-4">
+                                <div className="grid grid-cols-6 gap-2">
+                                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                                    const isSelected = percentagePages.includes(pageNum);
+                                    return (
+                                      <Button
+                                        key={pageNum}
+                                        type="button"
+                                        variant={isSelected ? "default" : "outline"}
+                                        size="sm"
+                                        onClick={() => togglePercentagePage(pageNum)}
+                                        className={`h-8 ${isSelected ? 'bg-primary' : ''}`}
+                                      >
+                                        {pageNum}
+                                      </Button>
+                                    );
+                                  })}
+                                </div>
+                              </ScrollArea>
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      )}
+                      
+                      <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
+                        <p className="text-sm font-semibold mb-2">Résumé :</p>
+                        <div className="space-y-1 text-sm">
+                          <p className="text-muted-foreground">
+                            • Total de pages : <span className="font-semibold text-foreground">{totalPages}</span>
+                          </p>
+                          <p className="text-muted-foreground">
+                            • Pages calculées : <span className="font-semibold text-foreground">{Math.ceil((totalPages * percentageValue) / 100)}</span> pages ({percentageValue}%)
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : restrictionMode === "range" ? (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Configuration des plages de pages</CardTitle>
+                      <CardDescription className="text-xs">
+                        Définissez une ou plusieurs plages de pages accessibles
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {pageRanges.map((range, index) => (
+                        <div key={index} className="flex gap-3 items-end p-3 border rounded-lg bg-muted/30">
+                          <div className="flex-1 space-y-2">
+                            <Label className="text-xs font-medium">Début</Label>
+                            <Input
+                              type="number"
+                              min={1}
+                              max={totalPages}
+                              value={range.start}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value) || 1;
+                                const newRanges = [...pageRanges];
+                                newRanges[index].start = Math.min(totalPages, Math.max(1, val));
+                                setPageRanges(newRanges);
+                              }}
+                              className="h-9"
+                            />
+                          </div>
+                          <div className="flex-1 space-y-2">
+                            <Label className="text-xs font-medium">Fin</Label>
+                            <Input
+                              type="number"
+                              min={range.start}
+                              max={totalPages}
+                              value={range.end}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value) || 1;
+                                const newRanges = [...pageRanges];
+                                newRanges[index].end = Math.min(totalPages, Math.max(range.start, val));
+                                setPageRanges(newRanges);
+                              }}
+                              className="h-9"
+                            />
+                          </div>
+                          {pageRanges.length > 1 && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                const newRanges = pageRanges.filter((_, i) => i !== index);
+                                setPageRanges(newRanges);
+                              }}
+                              className="h-9 w-9 p-0 hover:bg-destructive/10 hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPageRanges([...pageRanges, { start: 1, end: 10 }])}
+                        className="w-full"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Ajouter une plage
+                      </Button>
+                      
+                      <div className="p-3 bg-muted/50 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-2 font-medium">
+                          Résumé des pages accessibles :
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {pageRanges.map((range, index) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              {range.start === range.end ? 
+                                `Page ${range.start}` : 
+                                `Pages ${range.start}-${range.end}`
+                              }
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Sélection manuelle des pages</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">
+                          Numéros de pages (séparés par des virgules)
+                        </Label>
+                        <Input
+                          placeholder="Ex: 1,5,10,15,20"
+                          value={manualPages.join(",")}
+                          onChange={(e) => {
+                            const pages = e.target.value
+                              .split(",")
+                              .map(p => parseInt(p.trim()))
+                              .filter(p => !isNaN(p) && p >= 1 && p <= totalPages);
+                            setManualPages(pages);
+                          }}
+                          className="h-10"
+                        />
+                      </div>
+                      
+                      {manualPages.length > 0 && (
+                        <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="text-sm font-semibold">
+                              {manualPages.length} page(s) accessible(s)
+                            </p>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setManualPages([])}
+                              className="h-7 text-xs"
+                            >
+                              <X className="h-3 w-3 mr-1" />
+                              Tout effacer
+                            </Button>
+                          </div>
+                          <ScrollArea className="h-24">
+                            <div className="flex flex-wrap gap-2">
+                              {manualPages.sort((a, b) => a - b).map((page) => (
+                                <Badge 
+                                  key={page} 
+                                  variant="secondary"
+                                  className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors px-3 py-1"
+                                  onClick={() => setManualPages(manualPages.filter(p => p !== page))}
+                                >
+                                  {page}
+                                  <X className="h-3 w-3 ml-1.5" />
+                                </Badge>
+                              ))}
+                            </div>
+                          </ScrollArea>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Paramètres de sécurité */}
+                <Card className="border-2 border-primary/20">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 pb-3">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-primary" />
+                      <CardTitle className="text-base">Paramètres de sécurité</CardTitle>
+                    </div>
+                    <CardDescription className="text-xs">
+                      Contrôlez les actions autorisées pour les utilisateurs
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3 pt-4">
+                    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Download className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <Label className="text-sm font-semibold">Téléchargement</Label>
+                          <p className="text-xs text-muted-foreground">Autoriser le téléchargement</p>
+                        </div>
+                      </div>
+                      <Switch checked={allowDownload} onCheckedChange={setAllowDownload} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Camera className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <Label className="text-sm font-semibold">Capture d'écran</Label>
+                          <p className="text-xs text-muted-foreground">Autoriser les captures</p>
+                        </div>
+                      </div>
+                      <Switch checked={allowScreenshot} onCheckedChange={setAllowScreenshot} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <MousePointerClick className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <Label className="text-sm font-semibold">Clic droit</Label>
+                          <p className="text-xs text-muted-foreground">Autoriser le menu contextuel</p>
+                        </div>
+                      </div>
+                      <Switch checked={allowRightClick} onCheckedChange={setAllowRightClick} />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Affichage des pages non accessibles */}
+                <Card className="border-2 border-orange-200 dark:border-orange-800">
+                  <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 pb-3">
+                    <div className="flex items-center gap-2">
+                      <EyeOff className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                      <CardTitle className="text-base">Affichage des pages non accessibles</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3 pt-4">
+                    <div className="grid grid-cols-3 gap-3">
+                      <Button
+                        type="button"
+                        variant={restrictedPageDisplay === "blur" ? "default" : "outline"}
+                        onClick={() => setRestrictedPageDisplay("blur")}
+                        className="h-auto py-3 flex flex-col items-center gap-2"
+                      >
+                        <Eye className="h-5 w-5" />
+                        <span className="text-xs">Effet flou</span>
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant={restrictedPageDisplay === "empty" ? "default" : "outline"}
+                        onClick={() => setRestrictedPageDisplay("empty")}
+                        className="h-auto py-3 flex flex-col items-center gap-2"
+                      >
+                        <Square className="h-5 w-5" />
+                        <span className="text-xs">Page vide</span>
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant={restrictedPageDisplay === "hidden" ? "default" : "outline"}
+                        onClick={() => setRestrictedPageDisplay("hidden")}
+                        className="h-auto py-3 flex flex-col items-center gap-2"
+                      >
+                        <EyeOff className="h-5 w-5" />
+                        <span className="text-xs">Masquer</span>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+
+            {/* Boutons d'action */}
+            <div className="flex gap-3 pt-4">
+              <Button variant="outline" onClick={() => setSelectedDocument(null)} className="flex-1">
+                Annuler
+              </Button>
+              <Button onClick={handleSaveRestriction} disabled={saveRestriction.isPending} className="flex-1 gap-2">
+                <Save className="h-4 w-4" />
+                {saveRestriction.isPending ? "Enregistrement..." : "Enregistrer"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Vue liste des documents
   return (
     <div className="space-y-8">
       {/* En-tête avec gradient */}
@@ -394,113 +922,75 @@ export function PageAccessRestrictionsManager() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="restricted">
-                    <div className="flex items-center gap-2">
-                      <Lock className="h-4 w-4 text-destructive" />
-                      Restreints
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="public">
-                    <div className="flex items-center gap-2">
-                      <Unlock className="h-4 w-4 text-green-600" />
-                      Publics
-                    </div>
-                  </SelectItem>
+                  <SelectItem value="restricted">Restreints</SelectItem>
+                  <SelectItem value="public">Publics</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          {/* Résultats */}
           <div className="mt-6 flex items-center justify-between p-4 bg-muted/50 rounded-lg">
             <div className="flex items-center gap-2 text-sm font-medium">
               <FileText className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">
-                Résultats: 
-              </span>
-              <span className="text-foreground font-bold">
-                {filteredDocuments.length} document(s)
-              </span>
+              <span className="text-muted-foreground">Résultats:</span>
+              <span className="text-foreground font-bold">{filteredDocuments.length} document(s)</span>
             </div>
-            {(searchQuery || filterType !== "all" || filterStatus !== "all") && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setSearchQuery("");
-                  setFilterType("all");
-                  setFilterStatus("all");
-                }}
-              >
-                <X className="h-4 w-4 mr-2" />
-                Réinitialiser
-              </Button>
-            )}
           </div>
         </CardContent>
       </Card>
 
       {/* Liste des documents */}
       <Card className="shadow-lg">
-        <CardHeader className="bg-muted/30 border-b">
-          <CardTitle className="text-xl flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-primary" />
-            Documents de la bibliothèque
+        <CardHeader className="bg-muted/30">
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" />
+            Documents
           </CardTitle>
+          <CardDescription>
+            Sélectionnez un document pour configurer ses restrictions d'accès
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-center space-y-3">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <p className="text-muted-foreground">Chargement des documents...</p>
-              </div>
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Document</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead>Restriction</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
+                <TableHeader>
+                  <TableRow className="bg-muted/30">
+                    <TableHead className="font-semibold">Document</TableHead>
+                    <TableHead className="font-semibold">Type</TableHead>
+                    <TableHead className="font-semibold">Statut</TableHead>
+                    <TableHead className="font-semibold">Pages accessibles</TableHead>
+                    <TableHead className="text-right font-semibold">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
                   {filteredDocuments.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-12">
-                        <div className="flex flex-col items-center gap-4">
-                          <div className="rounded-full bg-muted p-6">
-                            <Search className="h-12 w-12 text-muted-foreground" />
-                          </div>
-                          <div className="space-y-2">
-                            <p className="text-lg font-medium">Aucun document trouvé</p>
-                            <p className="text-sm text-muted-foreground">
-                              Essayez de modifier vos critères de recherche
-                            </p>
-                          </div>
-                        </div>
+                      <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                        <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p className="text-lg font-medium">Aucun document trouvé</p>
+                        <p className="text-sm">Modifiez vos critères de recherche</p>
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredDocuments.map((doc) => {
                       const restriction = doc.page_access_restrictions?.[0];
+                      
                       return (
-                        <TableRow key={doc.id} className="hover:bg-muted/50 transition-colors">
-                          <TableCell className="font-medium py-4">
+                        <TableRow key={doc.id} className="hover:bg-muted/30 transition-colors">
+                          <TableCell>
                             <div className="flex items-center gap-3">
-                              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                                <FileText className="h-5 w-5 text-primary" />
+                              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                                <FileText className="h-6 w-6 text-primary" />
                               </div>
                               <div>
-                                <p className="font-semibold">{doc.title}</p>
+                                <p className="font-medium line-clamp-1">{doc.title}</p>
                                 {doc.excerpt && (
-                                  <p className="text-xs text-muted-foreground line-clamp-1">
-                                    {doc.excerpt}
-                                  </p>
+                                  <p className="text-xs text-muted-foreground line-clamp-1">{doc.excerpt}</p>
                                 )}
                               </div>
                             </div>
@@ -530,26 +1020,7 @@ export function PageAccessRestrictionsManager() {
                           </TableCell>
                           <TableCell>
                             {restriction?.is_restricted ? (
-                              <div className="flex items-center gap-2">
-                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                  {restriction.restriction_mode === 'range' ? (
-                                    <BookOpen className="h-4 w-4 text-primary" />
-                                  ) : (
-                                    <FileText className="h-4 w-4 text-primary" />
-                                  )}
-                                </div>
-                                <div className="text-sm">
-                                  {restriction.restriction_mode === 'range' ? (
-                                    <span className="font-medium">
-                                      {restriction.manual_pages?.length || 0} pages
-                                    </span>
-                                  ) : (
-                                    <span className="font-medium">
-                                      {restriction.manual_pages?.length || 0} pages
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
+                              <span className="text-sm font-medium">{restriction.manual_pages?.length || 0} pages</span>
                             ) : (
                               <span className="text-sm text-muted-foreground">Aucune restriction</span>
                             )}
@@ -587,866 +1058,27 @@ export function PageAccessRestrictionsManager() {
         </CardContent>
       </Card>
 
-      {/* Dialog d'édition */}
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden flex flex-col">
-          <DialogHeader className="border-b pb-4">
-            <DialogTitle className="flex items-center gap-3 text-2xl">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20">
-                <FileText className="h-6 w-6 text-primary" />
-              </div>
-              <span className="flex-1">Configuration des restrictions - {selectedDocument?.title}</span>
-              {(selectedDocument?.content_type as string) === 'rare_book' && (
-                <Badge className="bg-amber-500 hover:bg-amber-600 text-white gap-1.5">
-                  <Sparkles className="h-3 w-3" />
-                  Livre rare
-                </Badge>
-              )}
-            </DialogTitle>
-            <DialogDescription className="text-base">
-              Définir les pages accessibles aux utilisateurs non authentifiés
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="flex-1 overflow-hidden flex gap-6 py-6 min-h-0">
-            {/* Prévisualisation de l'ouvrage - Style BookReader */}
-            <div className="flex-1 flex flex-col gap-4 min-h-0">
-              <Card className="flex-1 flex flex-col overflow-hidden shadow-xl">
-                <CardHeader className="bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border-b px-6 py-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-background shadow-sm">
-                        <Eye className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">Prévisualisation de l'ouvrage</CardTitle>
-                        <CardDescription className="text-xs">
-                          Naviguez et sélectionnez les pages accessibles
-                        </CardDescription>
-                      </div>
-                    </div>
-                    
-                    {/* Navigation des pages */}
-                    <div className="flex items-center gap-3">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setCurrentPreviewPage(Math.max(1, currentPreviewPage - 1))}
-                        disabled={currentPreviewPage === 1}
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-                      <div className="flex items-center gap-2 px-4 py-2 bg-background rounded-lg shadow-sm border">
-                        <Input
-                          type="number"
-                          value={currentPreviewPage}
-                          onChange={(e) => {
-                            const val = parseInt(e.target.value) || 1;
-                            setCurrentPreviewPage(Math.min(totalPages, Math.max(1, val)));
-                          }}
-                          className="w-16 text-center h-8"
-                        />
-                        <span className="text-sm font-medium text-muted-foreground">/ {totalPages}</span>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setCurrentPreviewPage(Math.min(totalPages, currentPreviewPage + 1))}
-                        disabled={currentPreviewPage === totalPages}
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="flex-1 p-0 bg-muted/30 relative overflow-hidden">
-                  {/* Image de la page - Style BookReader */}
-                  <div className="absolute inset-0 flex items-center justify-center p-8">
-                    {viewMode === "double" ? (
-                      <PageFlipBook 
-                        images={generatePageImages()}
-                        currentPage={currentPreviewPage}
-                        onPageChange={setCurrentPreviewPage}
-                        zoom={zoom}
-                        rotation={rotation}
-                      />
-                    ) : (
-                      <Card className="max-w-4xl w-full shadow-2xl">
-                        <CardContent className="p-0 relative">
-                          <div 
-                            className="aspect-[3/4] bg-gradient-to-br from-background to-muted flex items-center justify-center overflow-hidden rounded-lg"
-                            style={{ 
-                              transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-                              transformOrigin: 'center',
-                              transition: 'transform 0.3s ease'
-                            }}
-                          >
-                            <img 
-                              src={getCurrentPageImage(currentPreviewPage)}
-                              alt={`Page ${currentPreviewPage}`}
-                              className="w-full h-full object-contain"
-                            />
-                            
-                            {/* Badge de sélection */}
-                            {restrictionMode === 'manual' && manualPages.includes(currentPreviewPage) && (
-                              <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600 text-white text-base px-4 py-2 shadow-lg">
-                                <Lock className="h-4 w-4 mr-2" />
-                                Page accessible
-                              </Badge>
-                            )}
-                            {restrictionMode === 'percentage' && percentagePages.includes(currentPreviewPage) && (
-                              <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600 text-white text-base px-4 py-2 shadow-lg">
-                                <Lock className="h-4 w-4 mr-2" />
-                                Page accessible
-                              </Badge>
-                            )}
-                            
-                            {/* Numéro de page */}
-                            <Badge className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-sm px-4 py-2 shadow-lg">
-                              Page {currentPreviewPage}
-                            </Badge>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                  
-                  {/* Contrôles de vue */}
-                  <div className="absolute bottom-4 right-4 flex gap-2">
-                    <Button
-                      size="sm"
-                      variant={viewMode === "single" ? "default" : "outline"}
-                      onClick={() => setViewMode("single")}
-                      className="shadow-lg"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Simple
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={viewMode === "double" ? "default" : "outline"}
-                      onClick={() => setViewMode("double")}
-                      className="shadow-lg"
-                    >
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Double
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {/* Actions rapides sur la page courante */}
-              {(restrictionMode === 'manual' || (restrictionMode === 'percentage' && showPercentagePages)) && (
-                <Card className="shadow-md">
-                  <CardContent className="p-4">
-                    <Button
-                      className="w-full h-12 text-base"
-                      variant={
-                        restrictionMode === 'manual' 
-                          ? (manualPages.includes(currentPreviewPage) ? "destructive" : "default")
-                          : (percentagePages.includes(currentPreviewPage) ? "destructive" : "default")
-                      }
-                      onClick={() => {
-                        if (restrictionMode === 'manual') {
-                          if (manualPages.includes(currentPreviewPage)) {
-                            setManualPages(manualPages.filter(p => p !== currentPreviewPage));
-                            toast({ 
-                              title: "Page retirée", 
-                              description: `La page ${currentPreviewPage} ne sera plus accessible` 
-                            });
-                          } else {
-                            setManualPages([...manualPages, currentPreviewPage].sort((a, b) => a - b));
-                            toast({ 
-                              title: "Page ajoutée", 
-                              description: `La page ${currentPreviewPage} sera accessible` 
-                            });
-                          }
-                        } else {
-                          togglePercentagePage(currentPreviewPage);
-                          toast({
-                            title: percentagePages.includes(currentPreviewPage) ? "Page retirée" : "Page ajoutée",
-                            description: percentagePages.includes(currentPreviewPage) 
-                              ? `La page ${currentPreviewPage} ne sera plus accessible`
-                              : `La page ${currentPreviewPage} sera accessible`
-                          });
-                        }
-                      }}
-                    >
-                      {(restrictionMode === 'manual' ? manualPages : percentagePages).includes(currentPreviewPage) ? (
-                        <>
-                          <Unlock className="h-5 w-5 mr-2" />
-                          Retirer l'accès à cette page
-                        </>
-                      ) : (
-                        <>
-                          <Lock className="h-5 w-5 mr-2" />
-                          Autoriser l'accès à cette page
-                        </>
-                      )}
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-
-            {/* Panneau de configuration - Droite */}
-            <div className="w-96 space-y-4 overflow-y-auto pr-2 max-h-full"
-              style={{ maxHeight: 'calc(95vh - 180px)' }}
+      {/* Dialog de confirmation de suppression */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Voulez-vous vraiment supprimer la restriction d'accès pour "{documentToDelete?.title}" ? 
+              Le document deviendra entièrement public.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => documentToDelete && deleteRestriction.mutate(documentToDelete.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {/* Activer/Désactiver la restriction */}
-              <Card className="shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <Label className="text-base font-semibold">Activer la restriction</Label>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Limiter l'accès aux pages pour les visiteurs non connectés
-                      </p>
-                    </div>
-                    <Switch
-                      checked={isRestricted}
-                      onCheckedChange={setIsRestricted}
-                      className="ml-4"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {isRestricted && (
-                <>
-                  {/* Mode d'accès - Internet ou Interne */}
-                  <Card className="shadow-md">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <Shield className="h-4 w-4" />
-                        Mode d'accès
-                      </CardTitle>
-                      <CardDescription className="text-xs">
-                        Sélectionnez un ou plusieurs modes d'accès
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div 
-                        className={`w-full h-auto py-4 px-4 flex items-center gap-3 rounded-md border cursor-pointer transition-colors ${
-                          allowInternetAccess ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
-                        }`}
-                        onClick={() => setAllowInternetAccess(!allowInternetAccess)}
-                      >
-                        <Switch
-                          checked={allowInternetAccess}
-                          onCheckedChange={setAllowInternetAccess}
-                          className="data-[state=checked]:bg-primary-foreground data-[state=checked]:text-primary"
-                        />
-                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                        </svg>
-                        <div className="text-left flex-1">
-                          <div className="font-semibold">Libre d'accès par Internet</div>
-                          <div className="text-xs opacity-80">Accessible depuis n'importe où</div>
-                        </div>
-                      </div>
-                      <div 
-                        className={`w-full h-auto py-4 px-4 flex items-center gap-3 rounded-md border cursor-pointer transition-colors ${
-                          allowInternalAccess ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
-                        }`}
-                        onClick={() => setAllowInternalAccess(!allowInternalAccess)}
-                      >
-                        <Switch
-                          checked={allowInternalAccess}
-                          onCheckedChange={setAllowInternalAccess}
-                          className="data-[state=checked]:bg-primary-foreground data-[state=checked]:text-primary"
-                        />
-                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                        <div className="text-left flex-1">
-                          <div className="font-semibold">Accès interne uniquement</div>
-                          <div className="text-xs opacity-80">Consultation sur place à la bibliothèque</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Consultation physique - Hidden when only internal access */}
-                  {allowInternetAccess && (
-                    <Card className="shadow-md">
-                      <CardContent className="p-6 space-y-6">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <Label className="text-base font-semibold">Consultation physique autorisée</Label>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Autoriser la consultation du document complet sur place
-                            </p>
-                          </div>
-                          <Switch
-                            checked={allowPhysicalConsultation}
-                            onCheckedChange={setAllowPhysicalConsultation}
-                            className="ml-4"
-                          />
-                        </div>
-                        
-                        {/* Livre rare */}
-                        <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
-                          <div className="flex items-center gap-3 flex-1">
-                            <div className="p-2 rounded-full bg-amber-500/20">
-                              <Sparkles className="h-5 w-5 text-amber-600" />
-                            </div>
-                            <div>
-                              <Label className="text-base font-semibold cursor-pointer">Livre rare</Label>
-                              <p className="text-sm text-muted-foreground mt-0.5">
-                                Marquer ce document comme livre rare ou précieux
-                              </p>
-                            </div>
-                          </div>
-                          <Switch
-                            checked={isRareBook}
-                            onCheckedChange={setIsRareBook}
-                            className="ml-4"
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Mode de restriction - Hidden when only internal access */}
-                  {allowInternetAccess && (
-                    <Card className="shadow-md">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-base">Mode de restriction</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <Button
-                          type="button"
-                          variant={restrictionMode === "range" ? "default" : "outline"}
-                          onClick={() => setRestrictionMode("range")}
-                          className="w-full h-auto py-4 flex items-center gap-3"
-                        >
-                          <BookOpen className="h-5 w-5" />
-                          <div className="text-left flex-1">
-                            <div className="font-semibold">Plage de pages</div>
-                            <div className="text-xs opacity-80">Définir début et fin</div>
-                          </div>
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={restrictionMode === "manual" ? "default" : "outline"}
-                          onClick={() => setRestrictionMode("manual")}
-                          className="w-full h-auto py-4 flex items-center gap-3"
-                        >
-                          <FileText className="h-5 w-5" />
-                          <div className="text-left flex-1">
-                            <div className="font-semibold">Sélection manuelle</div>
-                            <div className="text-xs opacity-80">Choisir page par page</div>
-                          </div>
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={restrictionMode === "percentage" ? "default" : "outline"}
-                          onClick={() => setRestrictionMode("percentage")}
-                          className="w-full h-auto py-4 flex items-center gap-3"
-                        >
-                          <Eye className="h-5 w-5" />
-                          <div className="text-left flex-1">
-                            <div className="font-semibold">Pourcentage de pages</div>
-                            <div className="text-xs opacity-80">Autoriser un % de pages</div>
-                          </div>
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Configuration selon le mode - Hidden when only internal access */}
-                  {allowInternetAccess && (
-                    restrictionMode === "percentage" ? (
-                    <Card className="shadow-md">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-base">Pourcentage de pages accessibles</CardTitle>
-                        <CardDescription className="text-xs">
-                          Définissez le pourcentage de pages accessibles aux visiteurs non connectés
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-3">
-                          <Label htmlFor="percentage-input" className="text-sm font-medium">
-                            Pourcentage (%)
-                          </Label>
-                          <div className="flex gap-3 items-center">
-                            <Input
-                              id="percentage-input"
-                              type="number"
-                              min={1}
-                              max={100}
-                              value={percentageValue}
-                              onChange={(e) => {
-                                const val = parseInt(e.target.value) || 1;
-                                setPercentageValue(Math.min(100, Math.max(1, val)));
-                                setShowPercentagePages(false);
-                              }}
-                              className="h-11 text-lg font-semibold"
-                            />
-                            <span className="text-2xl font-bold text-muted-foreground">%</span>
-                          </div>
-                        </div>
-                        
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={calculatePercentagePages}
-                          className="w-full"
-                        >
-                          <Eye className="h-4 w-4 mr-2" />
-                          Calculer et visualiser les pages
-                        </Button>
-                        
-                        {showPercentagePages && percentagePages.length > 0 && (
-                          <>
-                            <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                              <div className="flex items-center justify-between mb-3">
-                                <p className="text-sm font-semibold">Pages sélectionnées :</p>
-                                <Badge variant="default" className="text-sm">
-                                  {percentagePages.length} / {totalPages} pages
-                                </Badge>
-                              </div>
-                              <div className="space-y-2 text-sm">
-                                <p className="text-muted-foreground">
-                                  • Pourcentage : <span className="font-semibold text-foreground">{Math.round((percentagePages.length / totalPages) * 100)}%</span>
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  Vous pouvez modifier cette sélection ci-dessous
-                                </p>
-                              </div>
-                            </div>
-                            
-                            <Accordion type="single" collapsible className="w-full">
-                              <AccordionItem value="page-list" className="border rounded-lg">
-                                <AccordionTrigger className="px-4 hover:no-underline">
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <FileText className="h-4 w-4" />
-                                    <span>Voir et modifier les pages ({percentagePages.length})</span>
-                                  </div>
-                                </AccordionTrigger>
-                                <AccordionContent className="px-4 pb-4">
-                                  <ScrollArea className="h-64 pr-4">
-                                    <div className="grid grid-cols-5 gap-2">
-                                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
-                                        const isSelected = percentagePages.includes(pageNum);
-                                        return (
-                                          <Button
-                                            key={pageNum}
-                                            type="button"
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => togglePercentagePage(pageNum)}
-                                            className={`h-10 ${isSelected ? 'bg-primary' : ''}`}
-                                          >
-                                            {pageNum}
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </ScrollArea>
-                                  
-                                  <div className="mt-4 flex gap-2">
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => {
-                                        const allPages = Array.from({ length: totalPages }, (_, i) => i + 1);
-                                        setPercentagePages(allPages);
-                                      }}
-                                      className="flex-1"
-                                    >
-                                      <Plus className="h-4 w-4 mr-1" />
-                                      Tout sélectionner
-                                    </Button>
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => setPercentagePages([])}
-                                      className="flex-1"
-                                    >
-                                      <X className="h-4 w-4 mr-1" />
-                                      Tout désélectionner
-                                    </Button>
-                                  </div>
-                                </AccordionContent>
-                              </AccordionItem>
-                            </Accordion>
-                          </>
-                        )}
-                        
-                        <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                          <p className="text-sm font-semibold mb-2">Résumé :</p>
-                          <div className="space-y-1 text-sm">
-                            <p className="text-muted-foreground">
-                              • Total de pages : <span className="font-semibold text-foreground">{totalPages}</span>
-                            </p>
-                            <p className="text-muted-foreground">
-                              • Pourcentage ciblé : <span className="font-semibold text-foreground">{percentageValue}%</span>
-                            </p>
-                            <p className="text-muted-foreground">
-                              • Pages calculées : <span className="font-semibold text-foreground">{Math.ceil((totalPages * percentageValue) / 100)}</span> pages
-                            </p>
-                            {showPercentagePages && (
-                              <p className="text-muted-foreground">
-                                • Pages actuellement sélectionnées : <span className="font-semibold text-foreground">{percentagePages.length}</span> pages
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
-                          <p className="text-xs text-blue-900 dark:text-blue-100">
-                            💡 <strong>Comment ça marche :</strong>
-                            <br />1. Définissez le pourcentage souhaité
-                            <br />2. Cliquez sur "Calculer et visualiser"
-                            <br />3. Modifiez les pages si nécessaire
-                            <br />4. Enregistrez les restrictions
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : restrictionMode === "range" ? (
-                    <Card className="shadow-md">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-base">Configuration des plages de pages</CardTitle>
-                        <CardDescription className="text-xs">
-                          Définissez une ou plusieurs plages de pages accessibles
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        {pageRanges.map((range, index) => (
-                          <div key={index} className="flex gap-3 items-end p-3 border rounded-lg bg-muted/30">
-                            <div className="flex-1 space-y-2">
-                              <Label htmlFor={`start-page-${index}`} className="text-xs font-medium">
-                                Début
-                              </Label>
-                              <Input
-                                id={`start-page-${index}`}
-                                type="number"
-                                min={1}
-                                max={totalPages}
-                                value={range.start}
-                                onChange={(e) => {
-                                  const val = parseInt(e.target.value) || 1;
-                                  const newRanges = [...pageRanges];
-                                  newRanges[index].start = Math.min(totalPages, Math.max(1, val));
-                                  setPageRanges(newRanges);
-                                }}
-                                className="h-9"
-                              />
-                            </div>
-                            <div className="flex-1 space-y-2">
-                              <Label htmlFor={`end-page-${index}`} className="text-xs font-medium">
-                                Fin
-                              </Label>
-                              <Input
-                                id={`end-page-${index}`}
-                                type="number"
-                                min={range.start}
-                                max={totalPages}
-                                value={range.end}
-                                onChange={(e) => {
-                                  const val = parseInt(e.target.value) || 1;
-                                  const newRanges = [...pageRanges];
-                                  newRanges[index].end = Math.min(totalPages, Math.max(range.start, val));
-                                  setPageRanges(newRanges);
-                                }}
-                                className="h-9"
-                              />
-                            </div>
-                            {pageRanges.length > 1 && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => {
-                                  const newRanges = pageRanges.filter((_, i) => i !== index);
-                                  setPageRanges(newRanges);
-                                }}
-                                className="h-9 w-9 p-0 hover:bg-destructive/10 hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                        ))}
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setPageRanges([...pageRanges, { start: 1, end: 10 }]);
-                          }}
-                          className="w-full"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Ajouter une plage
-                        </Button>
-                        
-                        <div className="p-3 bg-muted/50 rounded-lg">
-                          <p className="text-xs text-muted-foreground mb-2 font-medium">
-                            Résumé des pages accessibles :
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {pageRanges.map((range, index) => (
-                              <Badge key={index} variant="secondary" className="text-xs">
-                                {range.start === range.end ? 
-                                  `Page ${range.start}` : 
-                                  `Pages ${range.start}-${range.end}`
-                                }
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
-                          <p className="text-xs text-blue-900 dark:text-blue-100">
-                            💡 <strong>Exemples :</strong>
-                            <br />• Les 10 premières pages : 1-10
-                            <br />• Les 10 dernières pages : {totalPages - 9}-{totalPages}
-                            <br />• Pages 5-15 + dernières : Ajoutez deux plages
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <Card className="shadow-md">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-base">Sélection manuelle des pages</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium">
-                            Numéros de pages (séparés par des virgules)
-                          </Label>
-                          <Input
-                            placeholder="Ex: 1,5,10,15,20"
-                            value={manualPages.join(",")}
-                            onChange={(e) => {
-                              const pages = e.target.value
-                                .split(",")
-                                .map(p => parseInt(p.trim()))
-                                .filter(p => !isNaN(p) && p >= 1 && p <= totalPages);
-                              setManualPages(pages);
-                            }}
-                            className="h-10"
-                          />
-                        </div>
-                        
-                        {manualPages.length > 0 && (
-                          <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                            <div className="flex items-center justify-between mb-3">
-                              <p className="text-sm font-semibold">
-                                {manualPages.length} page(s) accessible(s)
-                              </p>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => setManualPages([])}
-                                className="h-7 text-xs"
-                              >
-                                <X className="h-3 w-3 mr-1" />
-                                Tout effacer
-                              </Button>
-                            </div>
-                            <ScrollArea className="h-32">
-                              <div className="flex flex-wrap gap-2">
-                                {manualPages.sort((a, b) => a - b).map((page) => (
-                                  <Badge 
-                                    key={page} 
-                                    variant="secondary"
-                                    className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors px-3 py-1"
-                                    onClick={() => {
-                                      setManualPages(manualPages.filter(p => p !== page));
-                                      if (currentPreviewPage === page) {
-                                        toast({ 
-                                          title: "Page retirée", 
-                                          description: `La page ${page} ne sera plus accessible` 
-                                        });
-                                      }
-                                    }}
-                                  >
-                                    {page}
-                                    <X className="h-3 w-3 ml-1.5" />
-                                  </Badge>
-                                ))}
-                              </div>
-                            </ScrollArea>
-                          </div>
-                        )}
-                        
-                        <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
-                          <p className="text-xs text-blue-900 dark:text-blue-100">
-                            💡 <strong>Astuce :</strong> Naviguez dans la prévisualisation et cliquez sur le bouton pour ajouter/retirer l'accès page par page
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )
-                  )}
-
-                  {/* Paramètres de sécurité */}
-                  <Card className="shadow-md border-2 border-primary/20">
-                    <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 pb-3">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-5 w-5 text-primary" />
-                        <CardTitle className="text-base">Paramètres de sécurité</CardTitle>
-                      </div>
-                      <CardDescription className="text-xs">
-                        Contrôlez les actions autorisées pour les utilisateurs
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4 pt-4">
-                      <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="p-2 rounded-lg bg-primary/10">
-                            <Download className="h-4 w-4 text-primary" />
-                          </div>
-                          <div>
-                            <Label className="text-sm font-semibold cursor-pointer">Téléchargement</Label>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              Autoriser le téléchargement du document
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          checked={allowDownload}
-                          onCheckedChange={setAllowDownload}
-                          className="ml-4"
-                        />
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="p-2 rounded-lg bg-primary/10">
-                            <Camera className="h-4 w-4 text-primary" />
-                          </div>
-                          <div>
-                            <Label className="text-sm font-semibold cursor-pointer">Capture d'écran</Label>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              Autoriser les captures d'écran
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          checked={allowScreenshot}
-                          onCheckedChange={setAllowScreenshot}
-                          className="ml-4"
-                        />
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="p-2 rounded-lg bg-primary/10">
-                            <MousePointerClick className="h-4 w-4 text-primary" />
-                          </div>
-                          <div>
-                            <Label className="text-sm font-semibold cursor-pointer">Clic droit</Label>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              Autoriser le menu contextuel du clic droit
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          checked={allowRightClick}
-                          onCheckedChange={setAllowRightClick}
-                          className="ml-4"
-                        />
-                      </div>
-                      
-                      <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
-                        <p className="text-xs text-amber-900 dark:text-amber-100">
-                          ⚠️ <strong>Note :</strong> Ces paramètres de sécurité s'appliquent au niveau du navigateur et peuvent être contournés par des utilisateurs techniques.
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  {/* Affichage des pages non accessibles - Hidden when only internal access */}
-                  {allowInternetAccess && (
-                    <Card className="shadow-md border-2 border-orange-200 dark:border-orange-800">
-                      <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 pb-3">
-                        <div className="flex items-center gap-2">
-                          <EyeOff className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                          <CardTitle className="text-base">Affichage des pages non accessibles</CardTitle>
-                        </div>
-                        <CardDescription className="text-xs">
-                          Choisissez comment les pages restreintes seront affichées aux visiteurs
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-3 pt-4">
-                        <Button
-                          type="button"
-                          variant={restrictedPageDisplay === "blur" ? "default" : "outline"}
-                          onClick={() => setRestrictedPageDisplay("blur")}
-                          className="w-full h-auto py-4 flex items-center gap-3"
-                        >
-                          <div className="p-2 rounded-lg bg-primary/10">
-                            <Eye className="h-5 w-5" />
-                          </div>
-                          <div className="text-left flex-1">
-                            <div className="font-semibold">Effet flou</div>
-                            <div className="text-xs opacity-80">Les pages sont visibles mais floues</div>
-                          </div>
-                        </Button>
-                        
-                        <Button
-                          type="button"
-                          variant={restrictedPageDisplay === "empty" ? "default" : "outline"}
-                          onClick={() => setRestrictedPageDisplay("empty")}
-                          className="w-full h-auto py-4 flex items-center gap-3"
-                        >
-                          <div className="p-2 rounded-lg bg-primary/10">
-                            <Square className="h-5 w-5" />
-                          </div>
-                          <div className="text-left flex-1">
-                            <div className="font-semibold">Page vide</div>
-                            <div className="text-xs opacity-80">Une page blanche avec un message</div>
-                          </div>
-                        </Button>
-                        
-                        <Button
-                          type="button"
-                          variant={restrictedPageDisplay === "hidden" ? "default" : "outline"}
-                          onClick={() => setRestrictedPageDisplay("hidden")}
-                          className="w-full h-auto py-4 flex items-center gap-3"
-                        >
-                          <div className="p-2 rounded-lg bg-primary/10">
-                            <EyeOff className="h-5 w-5" />
-                          </div>
-                          <div className="text-left flex-1">
-                            <div className="font-semibold">Masquer complètement</div>
-                            <div className="text-xs opacity-80">Les pages sont totalement invisibles</div>
-                          </div>
-                        </Button>
-                        
-                        <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
-                          <p className="text-xs text-blue-900 dark:text-blue-100">
-                            💡 <strong>Conseil :</strong> L'effet flou permet aux visiteurs de voir qu'il y a du contenu, tandis que les pages vides indiquent clairement qu'un contenu existe mais n'est pas accessible.
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-
-          <DialogFooter className="border-t pt-4">
-            <Button variant="outline" onClick={() => setShowEditDialog(false)} className="h-10">
-              Annuler
-            </Button>
-            <Button onClick={handleSaveRestriction} disabled={saveRestriction.isPending} className="h-10 gap-2">
-              <Save className="h-4 w-4" />
-              {saveRestriction.isPending ? "Enregistrement..." : "Enregistrer"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
