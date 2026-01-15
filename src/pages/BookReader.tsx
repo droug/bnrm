@@ -415,11 +415,22 @@ const BookReader = () => {
           // (On évite de générer des centaines d'URLs pour les très gros documents.)
           if (pagesCount > 0 && pagesCount <= 100) {
             const firstPageUrl = `/digital-library-pages/${realDocumentId}/page_1.jpg`;
-            const firstPageExists = await fetch(firstPageUrl, { method: 'HEAD' })
-              .then((r) => r.ok)
-              .catch(() => false);
+            console.log('🔍 Checking for page images at:', firstPageUrl);
+            
+            let firstPageExists = false;
+            try {
+              const response = await fetch(firstPageUrl, { method: 'HEAD' });
+              // Vérifier que c'est bien une image et pas une page d'erreur HTML
+              const contentType = response.headers.get('content-type');
+              firstPageExists = response.ok && contentType?.startsWith('image/');
+              console.log('🔍 Response:', response.ok, 'Content-Type:', contentType, 'Exists:', firstPageExists);
+            } catch (e) {
+              console.log('🔍 Fetch error:', e);
+              firstPageExists = false;
+            }
 
             if (firstPageExists) {
+              console.log('✅ Using page images');
               const pages = Array.from({ length: pagesCount }, (_, i) => (
                 `/digital-library-pages/${realDocumentId}/page_${i + 1}.jpg`
               ));
@@ -427,15 +438,18 @@ const BookReader = () => {
               setDocumentImage(pages[0]);
             } else if (dlData.pdf_url) {
               // Si pas d'images mais un PDF, utiliser le rendu PDF
+              console.log('📄 No page images found, using PDF URL:', dlData.pdf_url);
               setPdfUrl(dlData.pdf_url);
               setDocumentPages([]);
               setDocumentImage(dlData.cover_image_url || manuscriptPage1);
             } else {
+              console.log('⚠️ No page images and no PDF URL');
               setDocumentPages([]);
               setDocumentImage(dlData.cover_image_url || manuscriptPage1);
             }
           } else if (dlData.pdf_url) {
             // Document avec beaucoup de pages ou sans pages_count - utiliser PDF
+            console.log('📄 Setting PDF URL (large doc):', dlData.pdf_url);
             setPdfUrl(dlData.pdf_url);
             setDocumentPages([]);
             setDocumentImage(dlData.cover_image_url || manuscriptPage1);
