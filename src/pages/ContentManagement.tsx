@@ -29,7 +29,8 @@ import {
   Workflow,
   Shield,
   ArrowLeft,
-  Home
+  Home,
+  Library
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate, Link } from "react-router-dom";
@@ -40,6 +41,7 @@ import ArchivingManager from "@/components/ArchivingManager";
 import WorkflowManager from "@/components/WorkflowManager";
 import LegalDepositManager from "@/components/LegalDepositManager";
 import { ActivityMonitor } from "@/components/ActivityMonitor";
+import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 
 interface Content {
   id: string;
@@ -420,12 +422,16 @@ export default function ContentManagement() {
 
         {/* Onglets par type */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="all">Tous ({stats.total})</TabsTrigger>
             <TabsTrigger value="news">Actualités ({stats.byType.news})</TabsTrigger>
             <TabsTrigger value="event">Événements ({stats.byType.event})</TabsTrigger>
             <TabsTrigger value="exhibition">Expositions ({stats.byType.exhibition})</TabsTrigger>
             <TabsTrigger value="page">Pages ({stats.byType.page})</TabsTrigger>
+            <TabsTrigger value="featured-works" className="gap-1">
+              <Library className="h-4 w-4" />
+              Carousel BN
+            </TabsTrigger>
           </TabsList>
 
           {/* Onglets de contenu */}
@@ -610,6 +616,11 @@ export default function ContentManagement() {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+            
+            {/* Onglet Carousel Bibliothèque Numérique */}
+            <TabsContent value="featured-works">
+              <FeaturedWorksManager />
             </TabsContent>
         </Tabs>
       </main>

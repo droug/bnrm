@@ -3817,6 +3817,71 @@ export type Database = {
           },
         ]
       }
+      digital_library_featured_works: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          custom_author: string | null
+          custom_category: string | null
+          custom_date: string | null
+          custom_description: string | null
+          custom_image_url: string | null
+          custom_link: string | null
+          custom_title: string | null
+          custom_title_ar: string | null
+          display_order: number
+          document_id: string | null
+          id: string
+          is_active: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          custom_author?: string | null
+          custom_category?: string | null
+          custom_date?: string | null
+          custom_description?: string | null
+          custom_image_url?: string | null
+          custom_link?: string | null
+          custom_title?: string | null
+          custom_title_ar?: string | null
+          display_order?: number
+          document_id?: string | null
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          custom_author?: string | null
+          custom_category?: string | null
+          custom_date?: string | null
+          custom_description?: string | null
+          custom_image_url?: string | null
+          custom_link?: string | null
+          custom_title?: string | null
+          custom_title_ar?: string | null
+          display_order?: number
+          document_id?: string | null
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "digital_library_featured_works_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "digital_library_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       digital_library_pages: {
         Row: {
           created_at: string

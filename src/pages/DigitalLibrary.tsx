@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -18,6 +18,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import digitalLibraryHero from "@/assets/digital-library-hero.jpg";
 import manuscript1 from "@/assets/manuscript-1.jpg";
 import manuscript2 from "@/assets/manuscript-2.jpg";
@@ -29,11 +31,60 @@ import zelligePattern3 from "@/assets/zellige-pattern-3.jpg";
 import zelligePattern5 from "@/assets/zellige-pattern-5.jpg";
 import zelligePattern6 from "@/assets/zellige-pattern-6.jpg";
 
+// Fallback images for featured works
+const fallbackImages = [manuscript1, manuscript2, manuscript3];
+
 const DigitalLibrary = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<{type: string, value: string}[]>([]);
+
+  // Fetch featured works from database
+  const { data: featuredWorks = [], isLoading: isFeaturedLoading } = useQuery({
+    queryKey: ['featured-works-public'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('digital_library_featured_works')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      
+      if (error) throw error;
+      
+      // Fetch document details for each work with document_id
+      const worksWithDocs = await Promise.all(
+        (data || []).map(async (work: any, index: number) => {
+          let docData = null;
+          if (work.document_id) {
+            const { data: doc } = await supabase
+              .from('digital_library_documents')
+              .select('id, title, title_ar, author, cover_image_url, document_type, publication_year, views_count')
+              .eq('id', work.document_id)
+              .single();
+            docData = doc;
+          }
+          
+          // Build the featured work object with fallbacks
+          return {
+            id: work.id,
+            documentId: work.document_id || null,
+            title: docData?.title || work.custom_title || "Sans titre",
+            titleAr: docData?.title_ar || work.custom_title_ar || null,
+            author: docData?.author || work.custom_author || "Auteur inconnu",
+            image: docData?.cover_image_url || work.custom_image_url || fallbackImages[index % fallbackImages.length],
+            category: work.custom_category || docData?.document_type || "Document",
+            date: work.custom_date || (docData?.publication_year ? String(docData.publication_year) : ""),
+            description: work.custom_description || "",
+            views: docData?.views_count ? String(docData.views_count) : "0",
+            link: work.custom_link || (work.document_id ? `/digital-library/document/${work.document_id}` : null)
+          };
+        })
+      );
+      
+      return worksWithDocs;
+    }
+  });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,62 +205,51 @@ const DigitalLibrary = () => {
     }
   ];
 
-  const featuredWorks = [
+  // Static fallback data for when no featured works are configured
+  const staticFeaturedWorks = [
     {
+      id: 'static-1',
+      documentId: null,
       title: "Al-Kulliyat fi al-Tibb (Le Canon de la Médecine)",
+      titleAr: null,
       author: "Ibn Sina (Avicenne) - Copie marocaine",
       views: "5,234",
       category: "Manuscrits",
       image: manuscript1,
       date: "XVe siècle",
-      description: "Manuscrit médical en arabe classique, calligraphie maghrébie"
+      description: "Manuscrit médical en arabe classique, calligraphie maghrébie",
+      link: null
     },
     {
+      id: 'static-2',
+      documentId: null,
       title: "Es-Saada (Le Bonheur) - Journal historique",
+      titleAr: null,
       author: "Archives nationales marocaines",
       views: "3,890",
       category: "Périodiques",
       image: manuscript2,
       date: "1904-1920",
-      description: "Premier journal marocain en langue arabe"
+      description: "Premier journal marocain en langue arabe",
+      link: null
     },
     {
+      id: 'static-3',
+      documentId: null,
       title: "Al-Muqaddima (Les Prolégomènes)",
+      titleAr: null,
       author: "Ibn Khaldoun",
       views: "7,120",
       category: "Manuscrits",
       image: manuscript3,
       date: "XIVe siècle",
-      description: "Œuvre fondatrice de sociologie et d'histoire"
-    },
-    {
-      title: "Rihla (Voyages)",
-      author: "Ibn Battuta",
-      views: "4,567",
-      category: "Manuscrits",
-      image: manuscript1,
-      date: "XIVe siècle",
-      description: "Récit des voyages du célèbre explorateur marocain"
-    },
-    {
-      title: "Kitab al-Shifa (Le Livre de la guérison)",
-      author: "Ibn Sina - Édition maghrébine",
-      views: "3,456",
-      category: "Manuscrits",
-      image: manuscript2,
-      date: "XIIe siècle",
-      description: "Encyclopédie philosophique et scientifique"
-    },
-    {
-      title: "L'Indépendance Marocaine",
-      author: "Archives de la résistance",
-      views: "2,890",
-      category: "Périodiques",
-      image: manuscript3,
-      date: "1944-1956",
-      description: "Documents sur le mouvement national"
+      description: "Œuvre fondatrice de sociologie et d'histoire",
+      link: null
     }
   ];
+
+  // Use database featured works if available, otherwise fall back to static data
+  const displayedFeaturedWorks = featuredWorks.length > 0 ? featuredWorks : staticFeaturedWorks;
 
   const internationalRepositories = [
     { name: "Bibliothèque Nationale de France", code: "BNF", url: "#" },
@@ -488,8 +528,8 @@ const DigitalLibrary = () => {
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredWorks.slice(0, 3).map((work, index) => (
-              <Link key={index} to={`/digital-library/book-reader/${index}`}>
+            {displayedFeaturedWorks.slice(0, 3).map((work, index) => (
+              <Link key={work.id} to={work.link || `/digital-library/document/${work.documentId || index}`}>
                 <Card className="h-full hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer border-3 border-gold/30 hover:border-primary group overflow-hidden">
                   {/* Image */}
                   <div className="aspect-[3/4] relative overflow-hidden">
@@ -546,8 +586,8 @@ const DigitalLibrary = () => {
                     Découvrez les derniers documents numérisés et ajoutés à notre bibliothèque numérique.
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                    {featuredWorks.slice(0, 4).map((work, item) => (
-                      <Link key={item} to={`/digital-library/book-reader/${item}`}>
+                    {displayedFeaturedWorks.slice(0, 4).map((work) => (
+                      <Link key={work.id} to={work.link || `/digital-library/document/${work.documentId || work.id}`}>
                         <div className="aspect-[3/4] rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer shadow-md hover:shadow-xl relative group">
                           <img 
                             src={work.image} 
@@ -572,8 +612,8 @@ const DigitalLibrary = () => {
                     Les documents les plus consultés par notre communauté.
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                    {[...featuredWorks].sort((a, b) => parseInt(b.views.replace(',', '')) - parseInt(a.views.replace(',', ''))).slice(0, 4).map((work, item) => (
-                      <Link key={item} to={`/digital-library/book-reader/${item}`}>
+                    {[...displayedFeaturedWorks].sort((a, b) => parseInt(b.views.replace(',', '')) - parseInt(a.views.replace(',', ''))).slice(0, 4).map((work) => (
+                      <Link key={work.id} to={work.link || `/digital-library/document/${work.documentId || work.id}`}>
                         <div className="aspect-[3/4] rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer shadow-md hover:shadow-xl relative group">
                           <img 
                             src={work.image} 
@@ -602,8 +642,8 @@ const DigitalLibrary = () => {
                     Sélection personnalisée basée sur les manuscrits andalous et maghrébins.
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                    {featuredWorks.slice(2, 6).map((work, item) => (
-                      <Link key={item} to={`/digital-library/book-reader/${item + 2}`}>
+                    {displayedFeaturedWorks.slice(0, 4).map((work) => (
+                      <Link key={work.id} to={work.link || `/digital-library/document/${work.documentId || work.id}`}>
                         <div className="aspect-[3/4] rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer shadow-md hover:shadow-xl relative group">
                           <img 
                             src={work.image} 
