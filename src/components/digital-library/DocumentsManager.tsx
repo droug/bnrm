@@ -16,10 +16,11 @@ import { PortalSelect } from "@/components/ui/portal-select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil, Wand2, Loader2, FileSearch, CheckCircle2, AlertCircle } from "lucide-react";
+import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil, Wand2, Loader2, FileSearch, CheckCircle2, AlertCircle, Database } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import OcrImportTool from "@/components/digital-library/import/OcrImportTool";
 import PdfOcrTool from "@/components/digital-library/import/PdfOcrTool";
+import SigbSyncManager from "@/components/digital-library/SigbSyncManager";
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -879,11 +880,15 @@ export default function DocumentsManager() {
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-lg">
+        <TabsList className="grid w-full grid-cols-4 max-w-xl">
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="ocr" className="flex items-center gap-1">
             <FileSearch className="h-4 w-4" />
             OCR
+          </TabsTrigger>
+          <TabsTrigger value="sigb" className="flex items-center gap-1">
+            <Database className="h-4 w-4" />
+            SIGB
           </TabsTrigger>
           <TabsTrigger value="duplicates">Doublons</TabsTrigger>
         </TabsList>
@@ -1856,6 +1861,10 @@ export default function DocumentsManager() {
               <OcrImportTool />
             </TabsContent>
           </Tabs>
+        </TabsContent>
+
+        <TabsContent value="sigb" className="space-y-6">
+          <SigbSyncManager />
         </TabsContent>
 
         <TabsContent value="duplicates" className="space-y-6">
