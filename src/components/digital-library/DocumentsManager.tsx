@@ -648,10 +648,26 @@ export default function DocumentsManager() {
       if (error) throw error;
 
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
-      toast({
-        title: "OCR terminé",
-        description: `${data?.processedPages || 0} pages traitées pour "${ocrDocumentTarget.title}"`
-      });
+      
+      // Check if we got a PDF pending status
+      const docResult = data?.documents?.[0];
+      if (docResult?.status === 'pdf_pending_client_ocr') {
+        toast({
+          title: "OCR en attente",
+          description: "L'OCR sur les PDF nécessite un traitement côté client. Utilisez l'outil OCR manuel pour ce document.",
+        });
+      } else if (docResult?.status === 'already_indexed') {
+        toast({
+          title: "Déjà indexé",
+          description: `Toutes les pages de "${ocrDocumentTarget.title}" sont déjà indexées`
+        });
+      } else {
+        const pagesProcessed = data?.totalPagesProcessed || docResult?.pagesProcessed || 0;
+        toast({
+          title: "OCR terminé",
+          description: `${pagesProcessed} page(s) traitée(s) pour "${ocrDocumentTarget.title}"`
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Erreur OCR",

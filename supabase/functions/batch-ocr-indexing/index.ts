@@ -107,29 +107,31 @@ serve(async (req) => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
   try {
-    const { documentId, documentIds, language = 'ar', baseUrl } = await req.json();
+    const { documentId, documentIds, language = 'ar', baseUrl, pdfUrl } = await req.json();
 
-    if (!baseUrl) {
-      throw new Error('baseUrl is required (e.g., https://your-domain.com)');
-    }
+    // Allow either baseUrl for image-based OCR or pdfUrl for direct PDF OCR
+    const hasPdfUrl = !!pdfUrl;
+    const hasBaseUrl = !!baseUrl;
 
     console.log('Starting batch OCR indexing...');
     console.log('Document ID:', documentId || 'none');
     console.log('Document IDs:', documentIds?.length || 0);
     console.log('Language:', language);
-    console.log('Base URL:', baseUrl);
+    console.log('Base URL:', baseUrl || 'none');
+    console.log('PDF URL:', pdfUrl || 'none');
 
     // Récupérer les documents à traiter
     let query = supabase
       .from('digital_library_documents')
-      .select('id, title, pages_count, ocr_processed')
-      .is('deleted_at', null)
-      .gt('pages_count', 0);
+      .select('id, title, pages_count, ocr_processed, pdf_url');
 
     if (documentIds && documentIds.length > 0) {
-      query = query.in('id', documentIds);
+      query = query.in('id', documentIds).is('deleted_at', null);
     } else if (documentId) {
-      query = query.eq('id', documentId);
+      query = query.eq('id', documentId).is('deleted_at', null);
+    } else {
+      // Only filter for pages_count > 0 when not targeting specific documents
+      query = query.is('deleted_at', null).gt('pages_count', 0);
     }
 
     const { data: documents, error: docError } = await query;
@@ -143,6 +145,14 @@ serve(async (req) => {
       );
     }
 
+    // If processing a single document with pdfUrl, we'll process the PDF directly
+    // For batch or image-based processing, baseUrl is still needed
+    const isSingleDocWithPdf = documents.length === 1 && (hasPdfUrl || documents[0].pdf_url);
+    
+    if (!isSingleDocWithPdf && !hasBaseUrl && documents.some(d => d.pages_count > 0)) {
+      throw new Error('baseUrl is required for image-based OCR processing. Provide pdfUrl for direct PDF processing.');
+    }
+
     const results: any[] = [];
     let totalPagesProcessed = 0;
 
@@ -152,7 +162,76 @@ serve(async (req) => {
         break;
       }
 
-      console.log(`Processing document: ${doc.title} (${doc.pages_count} pages)`);
+      // Determine the PDF URL to use
+      const documentPdfUrl = pdfUrl || doc.pdf_url;
+      const useDirectPdf = !!documentPdfUrl && !hasBaseUrl;
+
+      console.log(`Processing document: ${doc.title} (pages_count: ${doc.pages_count}, pdf_url: ${documentPdfUrl ? 'yes' : 'no'})`);
+
+      // If we have a PDF and no pages_count, we need to process the PDF directly
+      if (useDirectPdf && documentPdfUrl) {
+        console.log(`Processing PDF directly: ${documentPdfUrl}`);
+        
+        const docResults = {
+          documentId: doc.id,
+          title: doc.title,
+          pagesProcessed: 0,
+          pagesSkipped: 0,
+          errors: [] as string[]
+        };
+
+        try {
+          // Fetch the PDF file
+          const pdfResponse = await fetch(documentPdfUrl);
+          if (!pdfResponse.ok) {
+            throw new Error(`Failed to fetch PDF: ${pdfResponse.status}`);
+          }
+
+          const pdfBuffer = await pdfResponse.arrayBuffer();
+          const base64Pdf = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
+          
+          console.log(`PDF loaded, size: ${pdfBuffer.byteLength} bytes`);
+
+          // For now, we'll use a simplified approach: send the first few pages as images
+          // In a production environment, you'd use a PDF rendering library
+          // Since we can't easily render PDF pages in Deno, we'll mark this for client-side processing
+          
+          // Update the document to indicate OCR should be done client-side
+          await supabase
+            .from('digital_library_documents')
+            .update({ 
+              ocr_pending: true,
+              language: language 
+            })
+            .eq('id', doc.id);
+
+          docResults.pagesProcessed = 0;
+          results.push({
+            ...docResults,
+            status: 'pdf_pending_client_ocr',
+            message: 'PDF detected. OCR should be performed client-side for best results.'
+          });
+          
+          continue;
+        } catch (pdfError: any) {
+          console.error(`Error processing PDF for ${doc.title}:`, pdfError);
+          docResults.errors.push(pdfError.message);
+          results.push(docResults);
+          continue;
+        }
+      }
+
+      // Image-based processing (requires baseUrl)
+      if (!hasBaseUrl) {
+        console.log(`Skipping document ${doc.title}: no baseUrl and no PDF`);
+        results.push({
+          documentId: doc.id,
+          title: doc.title,
+          status: 'skipped',
+          reason: 'No baseUrl provided for image-based OCR'
+        });
+        continue;
+      }
 
       // Vérifier quelles pages sont déjà indexées
       const { data: existingPages } = await supabase
