@@ -12,6 +12,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { 
   RefreshCw, 
   Plus, 
@@ -24,7 +26,10 @@ import {
   Calendar,
   Database,
   History,
-  Loader2
+  Loader2,
+  Key,
+  Link,
+  Shield
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -43,6 +48,17 @@ interface SigbConfig {
   last_sync_records_count: number;
   next_sync_at: string | null;
   created_at: string;
+  // API Configuration
+  auth_type: string;
+  api_key_header: string;
+  api_key_value: string | null;
+  basic_auth_username: string | null;
+  basic_auth_password: string | null;
+  bearer_token: string | null;
+  custom_headers: Record<string, string>;
+  request_timeout_seconds: number;
+  api_endpoint_path: string;
+  response_format: string;
 }
 
 interface SigbSyncHistory {
@@ -75,12 +91,20 @@ const dayOfWeekLabels: Record<number, string> = {
   7: "Dimanche"
 };
 
+const authTypeLabels: Record<string, string> = {
+  none: "Aucune authentification",
+  api_key: "Clé API",
+  basic_auth: "Authentification basique",
+  bearer_token: "Token Bearer (OAuth)"
+};
+
 export default function SigbSyncManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showConfigDialog, setShowConfigDialog] = useState(false);
   const [editingConfig, setEditingConfig] = useState<SigbConfig | null>(null);
   const [syncingConfigId, setSyncingConfigId] = useState<string | null>(null);
+  const [dialogTab, setDialogTab] = useState("general");
 
   // Form state
   const [formData, setFormData] = useState({
@@ -90,7 +114,18 @@ export default function SigbSyncManager() {
     sync_frequency: "daily",
     sync_time: "02:00",
     sync_day_of_week: 1,
-    sync_day_of_month: 1
+    sync_day_of_month: 1,
+    // API Configuration
+    auth_type: "none",
+    api_key_header: "X-API-Key",
+    api_key_value: "",
+    basic_auth_username: "",
+    basic_auth_password: "",
+    bearer_token: "",
+    custom_headers: "{}",
+    request_timeout_seconds: 30,
+    api_endpoint_path: "/api/export",
+    response_format: "json"
   });
 
   // Fetch configurations
@@ -135,6 +170,14 @@ export default function SigbSyncManager() {
         nextSync.setDate(nextSync.getDate() + 1);
       }
 
+      // Parse custom headers
+      let parsedHeaders = {};
+      try {
+        parsedHeaders = JSON.parse(data.custom_headers || "{}");
+      } catch (e) {
+        console.warn("Invalid JSON for custom headers, using empty object");
+      }
+
       const record = {
         name: data.name,
         sigb_url: data.sigb_url,
@@ -143,7 +186,18 @@ export default function SigbSyncManager() {
         sync_time: data.sync_time + ':00',
         sync_day_of_week: data.sync_day_of_week,
         sync_day_of_month: data.sync_day_of_month,
-        next_sync_at: data.is_active ? nextSync.toISOString() : null
+        next_sync_at: data.is_active ? nextSync.toISOString() : null,
+        // API Configuration
+        auth_type: data.auth_type,
+        api_key_header: data.api_key_header,
+        api_key_value: data.api_key_value || null,
+        basic_auth_username: data.basic_auth_username || null,
+        basic_auth_password: data.basic_auth_password || null,
+        bearer_token: data.bearer_token || null,
+        custom_headers: parsedHeaders,
+        request_timeout_seconds: data.request_timeout_seconds,
+        api_endpoint_path: data.api_endpoint_path,
+        response_format: data.response_format
       };
 
       if (data.id) {
@@ -208,13 +262,33 @@ export default function SigbSyncManager() {
       if (historyError) throw historyError;
 
       try {
+        // Build headers for the request
+        const headers: Record<string, string> = {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ...(config.custom_headers || {})
+        };
+
+        // Add authentication headers
+        if (config.auth_type === 'api_key' && config.api_key_value) {
+          headers[config.api_key_header || 'X-API-Key'] = config.api_key_value;
+        } else if (config.auth_type === 'bearer_token' && config.bearer_token) {
+          headers['Authorization'] = `Bearer ${config.bearer_token}`;
+        } else if (config.auth_type === 'basic_auth' && config.basic_auth_username) {
+          const credentials = btoa(`${config.basic_auth_username}:${config.basic_auth_password || ''}`);
+          headers['Authorization'] = `Basic ${credentials}`;
+        }
+
         // Call edge function
         const { data, error } = await supabase.functions.invoke('sigb-metadata-sync', {
           body: {
-            sigbUrl: config.sigb_url,
+            sigbUrl: config.sigb_url + (config.api_endpoint_path || ''),
             mode: 'manual',
             configId: config.id,
-            historyId: historyRecord.id
+            historyId: historyRecord.id,
+            authHeaders: headers,
+            timeout: config.request_timeout_seconds || 30,
+            responseFormat: config.response_format || 'json'
           }
         });
 
@@ -295,8 +369,19 @@ export default function SigbSyncManager() {
       sync_frequency: "daily",
       sync_time: "02:00",
       sync_day_of_week: 1,
-      sync_day_of_month: 1
+      sync_day_of_month: 1,
+      auth_type: "none",
+      api_key_header: "X-API-Key",
+      api_key_value: "",
+      basic_auth_username: "",
+      basic_auth_password: "",
+      bearer_token: "",
+      custom_headers: "{}",
+      request_timeout_seconds: 30,
+      api_endpoint_path: "/api/export",
+      response_format: "json"
     });
+    setDialogTab("general");
   };
 
   const openEditDialog = (config: SigbConfig) => {
@@ -308,8 +393,19 @@ export default function SigbSyncManager() {
       sync_frequency: config.sync_frequency,
       sync_time: config.sync_time?.substring(0, 5) || "02:00",
       sync_day_of_week: config.sync_day_of_week,
-      sync_day_of_month: config.sync_day_of_month
+      sync_day_of_month: config.sync_day_of_month,
+      auth_type: config.auth_type || "none",
+      api_key_header: config.api_key_header || "X-API-Key",
+      api_key_value: config.api_key_value || "",
+      basic_auth_username: config.basic_auth_username || "",
+      basic_auth_password: config.basic_auth_password || "",
+      bearer_token: config.bearer_token || "",
+      custom_headers: JSON.stringify(config.custom_headers || {}, null, 2),
+      request_timeout_seconds: config.request_timeout_seconds || 30,
+      api_endpoint_path: config.api_endpoint_path || "/api/export",
+      response_format: config.response_format || "json"
     });
+    setDialogTab("general");
     setShowConfigDialog(true);
   };
 
@@ -335,6 +431,19 @@ export default function SigbSyncManager() {
         return <Badge className="bg-blue-100 text-blue-800"><Loader2 className="h-3 w-3 mr-1 animate-spin" /> En cours</Badge>;
       default:
         return <Badge variant="secondary">Jamais exécuté</Badge>;
+    }
+  };
+
+  const getAuthBadge = (authType: string) => {
+    switch (authType) {
+      case 'api_key':
+        return <Badge variant="outline" className="text-blue-600"><Key className="h-3 w-3 mr-1" /> Clé API</Badge>;
+      case 'basic_auth':
+        return <Badge variant="outline" className="text-orange-600"><Shield className="h-3 w-3 mr-1" /> Basic Auth</Badge>;
+      case 'bearer_token':
+        return <Badge variant="outline" className="text-purple-600"><Shield className="h-3 w-3 mr-1" /> Bearer</Badge>;
+      default:
+        return <Badge variant="outline" className="text-gray-400">Sans auth</Badge>;
     }
   };
 
@@ -386,9 +495,9 @@ export default function SigbSyncManager() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nom</TableHead>
-                    <TableHead>URL</TableHead>
+                    <TableHead>URL / Endpoint</TableHead>
+                    <TableHead>Auth</TableHead>
                     <TableHead>Fréquence</TableHead>
-                    <TableHead>Heure</TableHead>
                     <TableHead>Statut</TableHead>
                     <TableHead>Dernière sync</TableHead>
                     <TableHead>Actions</TableHead>
@@ -407,24 +516,24 @@ export default function SigbSyncManager() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="max-w-[200px] truncate" title={config.sigb_url}>
-                        {config.sigb_url}
-                      </TableCell>
-                      <TableCell>{frequencyLabels[config.sync_frequency]}</TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {config.sync_time?.substring(0, 5)}
-                          {config.sync_frequency === 'weekly' && (
-                            <span className="text-muted-foreground text-xs">
-                              ({dayOfWeekLabels[config.sync_day_of_week]})
-                            </span>
-                          )}
-                          {config.sync_frequency === 'monthly' && (
-                            <span className="text-muted-foreground text-xs">
-                              (le {config.sync_day_of_month})
-                            </span>
-                          )}
+                        <div className="max-w-[200px]">
+                          <div className="truncate text-sm" title={config.sigb_url}>
+                            {config.sigb_url}
+                          </div>
+                          <div className="text-xs text-muted-foreground truncate">
+                            {config.api_endpoint_path}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>{getAuthBadge(config.auth_type)}</TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          {frequencyLabels[config.sync_frequency]}
+                          <div className="flex items-center gap-1 text-muted-foreground text-xs">
+                            <Clock className="h-3 w-3" />
+                            {config.sync_time?.substring(0, 5)}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>{getStatusBadge(config.last_sync_status)}</TableCell>
@@ -547,114 +656,280 @@ export default function SigbSyncManager() {
 
         {/* Configuration Dialog */}
         <Dialog open={showConfigDialog} onOpenChange={setShowConfigDialog}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingConfig ? "Modifier la configuration" : "Nouvelle configuration SIGB"}
               </DialogTitle>
               <DialogDescription>
-                Configurez la synchronisation automatique des métadonnées depuis votre SIGB
+                Configurez la connexion et la synchronisation automatique des métadonnées
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nom de la configuration *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Ex: SIGB Production"
-                />
-              </div>
+            <Tabs value={dialogTab} onValueChange={setDialogTab}>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="general" className="flex items-center gap-1">
+                  <Settings2 className="h-4 w-4" />
+                  Général
+                </TabsTrigger>
+                <TabsTrigger value="api" className="flex items-center gap-1">
+                  <Link className="h-4 w-4" />
+                  API
+                </TabsTrigger>
+                <TabsTrigger value="auth" className="flex items-center gap-1">
+                  <Shield className="h-4 w-4" />
+                  Authentification
+                </TabsTrigger>
+              </TabsList>
 
-              <div className="space-y-2">
-                <Label htmlFor="sigb_url">URL de l'API SIGB *</Label>
-                <Input
-                  id="sigb_url"
-                  value={formData.sigb_url}
-                  onChange={(e) => setFormData({ ...formData, sigb_url: e.target.value })}
-                  placeholder="https://votre-sigb.com/api/export"
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <Label htmlFor="is_active">Synchronisation active</Label>
-                <Switch
-                  id="is_active"
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Fréquence de synchronisation</Label>
-                <Select
-                  value={formData.sync_frequency}
-                  onValueChange={(value) => setFormData({ ...formData, sync_frequency: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="hourly">Toutes les heures</SelectItem>
-                    <SelectItem value="daily">Quotidienne</SelectItem>
-                    <SelectItem value="weekly">Hebdomadaire</SelectItem>
-                    <SelectItem value="monthly">Mensuelle</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="sync_time">Heure de synchronisation</Label>
-                <Input
-                  id="sync_time"
-                  type="time"
-                  value={formData.sync_time}
-                  onChange={(e) => setFormData({ ...formData, sync_time: e.target.value })}
-                />
-              </div>
-
-              {formData.sync_frequency === 'weekly' && (
+              <TabsContent value="general" className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label>Jour de la semaine</Label>
+                  <Label htmlFor="name">Nom de la configuration *</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Ex: SIGB Production"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="sigb_url">URL de base du SIGB *</Label>
+                  <Input
+                    id="sigb_url"
+                    value={formData.sigb_url}
+                    onChange={(e) => setFormData({ ...formData, sigb_url: e.target.value })}
+                    placeholder="https://votre-sigb.com"
+                  />
+                  <p className="text-xs text-muted-foreground">URL de base sans le chemin de l'API</p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="is_active">Synchronisation active</Label>
+                  <Switch
+                    id="is_active"
+                    checked={formData.is_active}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Fréquence de synchronisation</Label>
                   <Select
-                    value={formData.sync_day_of_week.toString()}
-                    onValueChange={(value) => setFormData({ ...formData, sync_day_of_week: parseInt(value) })}
+                    value={formData.sync_frequency}
+                    onValueChange={(value) => setFormData({ ...formData, sync_frequency: value })}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(dayOfWeekLabels).map(([value, label]) => (
+                      <SelectItem value="hourly">Toutes les heures</SelectItem>
+                      <SelectItem value="daily">Quotidienne</SelectItem>
+                      <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                      <SelectItem value="monthly">Mensuelle</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="sync_time">Heure de synchronisation</Label>
+                  <Input
+                    id="sync_time"
+                    type="time"
+                    value={formData.sync_time}
+                    onChange={(e) => setFormData({ ...formData, sync_time: e.target.value })}
+                  />
+                </div>
+
+                {formData.sync_frequency === 'weekly' && (
+                  <div className="space-y-2">
+                    <Label>Jour de la semaine</Label>
+                    <Select
+                      value={formData.sync_day_of_week.toString()}
+                      onValueChange={(value) => setFormData({ ...formData, sync_day_of_week: parseInt(value) })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(dayOfWeekLabels).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {formData.sync_frequency === 'monthly' && (
+                  <div className="space-y-2">
+                    <Label>Jour du mois</Label>
+                    <Select
+                      value={formData.sync_day_of_month.toString()}
+                      onValueChange={(value) => setFormData({ ...formData, sync_day_of_month: parseInt(value) })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
+                          <SelectItem key={day} value={day.toString()}>{day}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="api" className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="api_endpoint_path">Chemin de l'endpoint API</Label>
+                  <Input
+                    id="api_endpoint_path"
+                    value={formData.api_endpoint_path}
+                    onChange={(e) => setFormData({ ...formData, api_endpoint_path: e.target.value })}
+                    placeholder="/api/export"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    URL complète: {formData.sigb_url}{formData.api_endpoint_path}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Format de réponse attendu</Label>
+                  <Select
+                    value={formData.response_format}
+                    onValueChange={(value) => setFormData({ ...formData, response_format: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="json">JSON</SelectItem>
+                      <SelectItem value="xml">XML</SelectItem>
+                      <SelectItem value="marc">MARC / UNIMARC</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="request_timeout_seconds">Timeout de la requête (secondes)</Label>
+                  <Input
+                    id="request_timeout_seconds"
+                    type="number"
+                    min={5}
+                    max={120}
+                    value={formData.request_timeout_seconds}
+                    onChange={(e) => setFormData({ ...formData, request_timeout_seconds: parseInt(e.target.value) })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="custom_headers">Headers personnalisés (JSON)</Label>
+                  <Textarea
+                    id="custom_headers"
+                    value={formData.custom_headers}
+                    onChange={(e) => setFormData({ ...formData, custom_headers: e.target.value })}
+                    placeholder='{"X-Custom-Header": "valeur"}'
+                    rows={4}
+                    className="font-mono text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Headers additionnels à envoyer avec chaque requête
+                  </p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="auth" className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Type d'authentification</Label>
+                  <Select
+                    value={formData.auth_type}
+                    onValueChange={(value) => setFormData({ ...formData, auth_type: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(authTypeLabels).map(([value, label]) => (
                         <SelectItem key={value} value={value}>{label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-              )}
 
-              {formData.sync_frequency === 'monthly' && (
-                <div className="space-y-2">
-                  <Label>Jour du mois</Label>
-                  <Select
-                    value={formData.sync_day_of_month.toString()}
-                    onValueChange={(value) => setFormData({ ...formData, sync_day_of_month: parseInt(value) })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
-                        <SelectItem key={day} value={day.toString()}>{day}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-            </div>
+                {formData.auth_type === 'api_key' && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="api_key_header">Nom du header</Label>
+                      <Input
+                        id="api_key_header"
+                        value={formData.api_key_header}
+                        onChange={(e) => setFormData({ ...formData, api_key_header: e.target.value })}
+                        placeholder="X-API-Key"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="api_key_value">Clé API</Label>
+                      <Input
+                        id="api_key_value"
+                        type="password"
+                        value={formData.api_key_value}
+                        onChange={(e) => setFormData({ ...formData, api_key_value: e.target.value })}
+                        placeholder="Votre clé API"
+                      />
+                    </div>
+                  </>
+                )}
 
-            <DialogFooter>
+                {formData.auth_type === 'basic_auth' && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="basic_auth_username">Nom d'utilisateur</Label>
+                      <Input
+                        id="basic_auth_username"
+                        value={formData.basic_auth_username}
+                        onChange={(e) => setFormData({ ...formData, basic_auth_username: e.target.value })}
+                        placeholder="Utilisateur"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="basic_auth_password">Mot de passe</Label>
+                      <Input
+                        id="basic_auth_password"
+                        type="password"
+                        value={formData.basic_auth_password}
+                        onChange={(e) => setFormData({ ...formData, basic_auth_password: e.target.value })}
+                        placeholder="Mot de passe"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {formData.auth_type === 'bearer_token' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="bearer_token">Token Bearer / OAuth</Label>
+                    <Textarea
+                      id="bearer_token"
+                      value={formData.bearer_token}
+                      onChange={(e) => setFormData({ ...formData, bearer_token: e.target.value })}
+                      placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      rows={3}
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                )}
+
+                {formData.auth_type === 'none' && (
+                  <div className="p-4 bg-muted/50 rounded-lg text-center text-muted-foreground">
+                    <Shield className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>Aucune authentification requise</p>
+                    <p className="text-xs mt-1">L'API sera appelée sans credentials</p>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+
+            <DialogFooter className="mt-6">
               <Button variant="outline" onClick={() => setShowConfigDialog(false)}>
                 Annuler
               </Button>

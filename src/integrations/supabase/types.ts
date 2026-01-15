@@ -10134,8 +10134,16 @@ export type Database = {
       }
       sigb_sync_config: {
         Row: {
+          api_endpoint_path: string | null
+          api_key_header: string | null
+          api_key_value: string | null
+          auth_type: string | null
+          basic_auth_password: string | null
+          basic_auth_username: string | null
+          bearer_token: string | null
           created_at: string
           created_by: string | null
+          custom_headers: Json | null
           id: string
           is_active: boolean | null
           last_sync_at: string | null
@@ -10143,6 +10151,8 @@ export type Database = {
           last_sync_status: string | null
           name: string
           next_sync_at: string | null
+          request_timeout_seconds: number | null
+          response_format: string | null
           sigb_url: string
           sync_day_of_month: number | null
           sync_day_of_week: number | null
@@ -10151,8 +10161,16 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          api_endpoint_path?: string | null
+          api_key_header?: string | null
+          api_key_value?: string | null
+          auth_type?: string | null
+          basic_auth_password?: string | null
+          basic_auth_username?: string | null
+          bearer_token?: string | null
           created_at?: string
           created_by?: string | null
+          custom_headers?: Json | null
           id?: string
           is_active?: boolean | null
           last_sync_at?: string | null
@@ -10160,6 +10178,8 @@ export type Database = {
           last_sync_status?: string | null
           name: string
           next_sync_at?: string | null
+          request_timeout_seconds?: number | null
+          response_format?: string | null
           sigb_url: string
           sync_day_of_month?: number | null
           sync_day_of_week?: number | null
@@ -10168,8 +10188,16 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          api_endpoint_path?: string | null
+          api_key_header?: string | null
+          api_key_value?: string | null
+          auth_type?: string | null
+          basic_auth_password?: string | null
+          basic_auth_username?: string | null
+          bearer_token?: string | null
           created_at?: string
           created_by?: string | null
+          custom_headers?: Json | null
           id?: string
           is_active?: boolean | null
           last_sync_at?: string | null
@@ -10177,6 +10205,8 @@ export type Database = {
           last_sync_status?: string | null
           name?: string
           next_sync_at?: string | null
+          request_timeout_seconds?: number | null
+          response_format?: string | null
           sigb_url?: string
           sync_day_of_month?: number | null
           sync_day_of_week?: number | null
