@@ -170,7 +170,7 @@ serve(async (req) => {
 
       // If we have a PDF and no pages_count, we need to process the PDF directly
       if (useDirectPdf && documentPdfUrl) {
-        console.log(`Processing PDF directly: ${documentPdfUrl}`);
+        console.log(`Document has PDF URL: ${documentPdfUrl}`);
         
         const docResults = {
           documentId: doc.id,
@@ -181,40 +181,34 @@ serve(async (req) => {
         };
 
         try {
-          // Fetch the PDF file
-          const pdfResponse = await fetch(documentPdfUrl);
-          if (!pdfResponse.ok) {
-            throw new Error(`Failed to fetch PDF: ${pdfResponse.status}`);
+          // Just verify the PDF is accessible with a HEAD request (don't load the whole file)
+          const headResponse = await fetch(documentPdfUrl, { method: 'HEAD' });
+          
+          if (!headResponse.ok) {
+            throw new Error(`PDF not accessible: ${headResponse.status}`);
           }
 
-          const pdfBuffer = await pdfResponse.arrayBuffer();
-          const base64Pdf = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
-          
-          console.log(`PDF loaded, size: ${pdfBuffer.byteLength} bytes`);
+          const contentLength = headResponse.headers.get('content-length');
+          console.log(`PDF accessible, size: ${contentLength || 'unknown'} bytes`);
 
-          // For now, we'll use a simplified approach: send the first few pages as images
-          // In a production environment, you'd use a PDF rendering library
-          // Since we can't easily render PDF pages in Deno, we'll mark this for client-side processing
-          
           // Update the document to indicate OCR should be done client-side
+          // PDFs require client-side rendering which isn't available in edge functions
           await supabase
             .from('digital_library_documents')
             .update({ 
-              ocr_pending: true,
               language: language 
             })
             .eq('id', doc.id);
 
-          docResults.pagesProcessed = 0;
           results.push({
             ...docResults,
-            status: 'pdf_pending_client_ocr',
-            message: 'PDF detected. OCR should be performed client-side for best results.'
+            status: 'pdf_requires_client_processing',
+            message: 'Le traitement OCR des PDF doit être effectué côté client. Utilisez l\'outil OCR manuel dans l\'interface.'
           });
           
           continue;
         } catch (pdfError: any) {
-          console.error(`Error processing PDF for ${doc.title}:`, pdfError);
+          console.error(`Error checking PDF for ${doc.title}:`, pdfError);
           docResults.errors.push(pdfError.message);
           results.push(docResults);
           continue;

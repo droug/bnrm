@@ -651,10 +651,10 @@ export default function DocumentsManager() {
       
       // Check if we got a PDF pending status
       const docResult = data?.documents?.[0];
-      if (docResult?.status === 'pdf_pending_client_ocr') {
+      if (docResult?.status === 'pdf_requires_client_processing' || docResult?.status === 'pdf_pending_client_ocr') {
         toast({
-          title: "OCR en attente",
-          description: "L'OCR sur les PDF nécessite un traitement côté client. Utilisez l'outil OCR manuel pour ce document.",
+          title: "OCR côté client requis",
+          description: "Le traitement OCR des PDF nécessite l'outil OCR manuel. Accédez à l'onglet 'Import de documents' > 'Outil OCR'.",
         });
       } else if (docResult?.status === 'already_indexed') {
         toast({
