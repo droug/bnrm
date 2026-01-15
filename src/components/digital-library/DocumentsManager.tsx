@@ -36,7 +36,8 @@ import documentPreview2Page2 from "@/assets/document-preview-2-page2.jpg";
 import documentPreview3Page2 from "@/assets/document-preview-3-page2.jpg";
 
 const documentSchema = z.object({
-  title: z.string().min(1, "Le titre est requis"),
+  cote: z.string().min(1, "Le N° de cote est requis"),
+  title: z.string().optional(),
   author: z.string().optional(),
   file_type: z.string().optional(),
   publication_date: z.string().optional(),
@@ -276,27 +277,66 @@ export default function DocumentsManager() {
   // Add document
   const addDocument = useMutation({
     mutationFn: async (values: z.infer<typeof documentSchema>) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const { error } = await supabase
-        .from('content')
+      // First, check if a cbn_document with this cote already exists
+      const { data: existingCbn } = await supabase
+        .from('cbn_documents')
+        .select('id, title, author, publication_year, document_type')
+        .eq('cote', values.cote)
+        .maybeSingle();
+
+      let cbnDocumentId: string;
+
+      if (existingCbn) {
+        // Use existing cbn_document
+        cbnDocumentId = existingCbn.id;
+      } else {
+        // Create new cbn_document entry
+        const { data: newCbn, error: cbnError } = await supabase
+          .from('cbn_documents')
+          .insert({
+            cote: values.cote,
+            title: values.title || `Document ${values.cote}`,
+            author: values.author || null,
+            document_type: values.file_type || 'book',
+            publication_year: values.publication_date ? parseInt(values.publication_date.split('-')[0]) : null,
+          })
+          .select('id')
+          .single();
+
+        if (cbnError) throw cbnError;
+        cbnDocumentId = newCbn.id;
+      }
+
+      // Check if digital_library_document already exists for this cbn_document
+      const { data: existingDl } = await supabase
+        .from('digital_library_documents')
+        .select('id')
+        .eq('cbn_document_id', cbnDocumentId)
+        .maybeSingle();
+
+      if (existingDl) {
+        throw new Error(`Un document numérique existe déjà pour la cote ${values.cote}`);
+      }
+
+      // Create the digital_library_document
+      const { error: dlError } = await supabase
+        .from('digital_library_documents')
         .insert([{
-          title: values.title,
-          author_id: user?.id,
-          content_body: values.description || '',
-          content_type: 'page' as const,
-          slug: values.title.toLowerCase().replace(/\s+/g, '-'),
+          cbn_document_id: cbnDocumentId,
+          title: values.title || existingCbn?.title || `Document ${values.cote}`,
+          author: values.author || existingCbn?.author || null,
+          document_type: values.file_type || existingCbn?.document_type || 'book',
+          publication_year: values.publication_date 
+            ? parseInt(values.publication_date.split('-')[0]) 
+            : existingCbn?.publication_year || null,
+          pdf_url: values.file_url || null,
           download_enabled: values.download_enabled,
-          is_visible: values.is_visible,
-          social_share_enabled: values.social_share_enabled,
-          email_share_enabled: values.email_share_enabled,
-          copyright_expires_at: values.copyright_expires_at || null,
-          copyright_derogation: values.copyright_derogation,
-          file_url: values.file_url || null,
-          file_type: values.file_type || null,
+          publication_status: values.is_visible ? 'published' : 'draft',
+          digitization_source: values.digitization_source,
+          pages_count: 0,
         }]);
-      
-      if (error) throw error;
+
+      if (dlError) throw dlError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
@@ -1018,21 +1058,40 @@ export default function DocumentsManager() {
               <DialogHeader>
                 <DialogTitle>Ajouter un document</DialogTitle>
                 <DialogDescription>
-                  Remplissez les informations du document à ajouter
+                  Saisissez le N° de cote. Les métadonnées seront récupérées automatiquement depuis le catalogue.
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit((values) => addDocument.mutate(values))} className="space-y-4">
+                  {/* Cote - Required field first */}
+                  <FormField
+                    control={form.control}
+                    name="cote"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>N° Cote *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Ex: BNR-2024-001" className="font-mono" />
+                        </FormControl>
+                        <FormDescription>
+                          Identifiant unique du document dans le catalogue. Les autres métadonnées seront récupérées automatiquement.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="title"
                       render={({ field }) => (
                         <FormItem className="col-span-2">
-                          <FormLabel>Titre *</FormLabel>
+                          <FormLabel>Titre</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Titre du document" />
+                            <Input {...field} placeholder="Titre du document (optionnel)" />
                           </FormControl>
+                          <FormDescription className="text-xs">Sera récupéré via la cote si non renseigné</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
