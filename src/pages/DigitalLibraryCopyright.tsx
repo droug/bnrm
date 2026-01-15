@@ -17,15 +17,7 @@ export default function DigitalLibraryCopyright() {
   const { isAdmin, isLibrarian, loading: rolesLoading } = useSecureRoles();
   const navigate = useNavigate();
 
-  if (rolesLoading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
-  }
-
-  if (!user || (!isAdmin && !isLibrarian)) {
-    return <Navigate to="/" replace />;
-  }
-
-  // Fetch documents with copyright information
+  // Fetch documents with copyright information - MUST be called unconditionally
   const { data: documents, isLoading } = useQuery({
     queryKey: ['copyright-documents'],
     queryFn: async () => {
@@ -37,7 +29,8 @@ export default function DigitalLibraryCopyright() {
       
       if (error) throw error;
       return data;
-    }
+    },
+    enabled: !rolesLoading && !!user && (isAdmin || isLibrarian)
   });
 
   // Calculate documents expiring soon (within 3 months)
@@ -58,6 +51,15 @@ export default function DigitalLibraryCopyright() {
     if (daysLeft < 60) return 'secondary';
     return 'default';
   };
+
+  // Early returns AFTER all hooks are called
+  if (rolesLoading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+  }
+
+  if (!user || (!isAdmin && !isLibrarian)) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
