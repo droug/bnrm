@@ -25,11 +25,7 @@ export default function DigitalLibraryBulkImport() {
   }
 
   const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate("/admin/digital-library/documents");
-    }
+    navigate("/admin/digital-library/documents");
   };
 
   return (

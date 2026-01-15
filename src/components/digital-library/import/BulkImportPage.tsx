@@ -36,6 +36,24 @@ import * as XLSX from 'xlsx';
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
 
+const sanitizeStorageSegment = (input: string) => {
+  return input
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+};
+
+const sanitizePdfFileName = (fileName: string) => {
+  const name = fileName.trim();
+  const dot = name.lastIndexOf(".");
+  const base = dot >= 0 ? name.slice(0, dot) : name;
+  const ext = dot >= 0 ? name.slice(dot).toLowerCase() : ".pdf";
+  const safeBase = sanitizeStorageSegment(base) || "document";
+  const safeExt = /^\.[a-z0-9]+$/.test(ext) ? ext : ".pdf";
+  return `${safeBase}${safeExt}`;
+};
 interface MetadataRow {
   cote: string;
   titre: string;
@@ -419,8 +437,8 @@ export default function BulkImportPage({ onSuccess }: BulkImportPageProps) {
         }
 
         const storageFolderName = `CBN-${cote.replace(/[^a-zA-Z0-9]/g, '-')}`;
-        const filePath = `documents/${storageFolderName}/${file.name}`;
-        
+        const safeFileName = sanitizePdfFileName(file.name);
+        const filePath = `documents/${storageFolderName}/${safeFileName}`;
         setOcrProgress(`Upload: ${file.name}`);
         const { error: uploadError } = await supabase.storage
           .from('digital-library')
@@ -529,8 +547,8 @@ export default function BulkImportPage({ onSuccess }: BulkImportPageProps) {
         const cote = row?.cote || match.cote;
 
         const storageFolderName = `CBN-${cote.replace(/[^a-zA-Z0-9]/g, '-')}`;
-        const filePath = `documents/${storageFolderName}/${match.file.name}`;
-        
+        const safeFileName = sanitizePdfFileName(match.file.name);
+        const filePath = `documents/${storageFolderName}/${safeFileName}`;
         const { error: uploadError } = await supabase.storage
           .from('digital-library')
           .upload(filePath, match.file, { upsert: true });
