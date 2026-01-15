@@ -258,7 +258,7 @@ export default function DocumentsManager() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('digital_library_documents')
-        .select('*, cbn_documents(cote)')
+        .select('*, cbn_documents!fk_digital_library_cbn_document(cote)')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
