@@ -258,7 +258,7 @@ export default function DocumentsManager() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('digital_library_documents')
-        .select('*')
+        .select('*, cbn_documents(cote)')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -1592,10 +1592,9 @@ export default function DocumentsManager() {
                     />
                   </TableHead>
                   <TableHead>Titre</TableHead>
+                  <TableHead>N° Cote</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Auteur</TableHead>
-                  <TableHead className="text-center">Téléchargement</TableHead>
-                  <TableHead className="text-center">Impression</TableHead>
                   <TableHead>OCR</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -1619,22 +1618,13 @@ export default function DocumentsManager() {
                       </div>
                     </TableCell>
                     <TableCell>
+                      <span className="text-sm font-mono">{(doc as any).cbn_documents?.cote || '-'}</span>
+                    </TableCell>
+                    <TableCell>
                       <Badge variant="outline">{doc.document_type || doc.file_format || 'Non défini'}</Badge>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">{doc.author || '-'}</span>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Switch
-                        checked={doc.download_enabled ?? false}
-                        onCheckedChange={() => toggleField.mutate({ id: doc.id, field: 'download_enabled', value: doc.download_enabled ?? false })}
-                      />
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Switch
-                        checked={doc.print_enabled ?? false}
-                        onCheckedChange={() => toggleField.mutate({ id: doc.id, field: 'print_enabled', value: doc.print_enabled ?? false })}
-                      />
                     </TableCell>
                     <TableCell>
                       {doc.ocr_processed ? (
