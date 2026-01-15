@@ -107,14 +107,15 @@ serve(async (req) => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
   try {
-    const { documentId, language = 'ar', baseUrl } = await req.json();
+    const { documentId, documentIds, language = 'ar', baseUrl } = await req.json();
 
     if (!baseUrl) {
       throw new Error('baseUrl is required (e.g., https://your-domain.com)');
     }
 
     console.log('Starting batch OCR indexing...');
-    console.log('Document ID:', documentId || 'all pending');
+    console.log('Document ID:', documentId || 'none');
+    console.log('Document IDs:', documentIds?.length || 0);
     console.log('Language:', language);
     console.log('Base URL:', baseUrl);
 
@@ -125,7 +126,9 @@ serve(async (req) => {
       .is('deleted_at', null)
       .gt('pages_count', 0);
 
-    if (documentId) {
+    if (documentIds && documentIds.length > 0) {
+      query = query.in('id', documentIds);
+    } else if (documentId) {
       query = query.eq('id', documentId);
     }
 

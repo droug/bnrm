@@ -187,6 +187,15 @@ export default function DocumentsManager() {
   };
 
   const handleBatchOcr = async () => {
+    if (selectedDocIds.length === 0) {
+      toast({
+        title: "Aucun document sélectionné",
+        description: "Veuillez sélectionner au moins un document pour lancer l'OCR en masse",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setBatchOcrRunning(true);
     setBatchOcrResult(null);
 
@@ -196,7 +205,8 @@ export default function DocumentsManager() {
       const { data, error } = await supabase.functions.invoke('batch-ocr-indexing', {
         body: {
           language: 'ar',
-          baseUrl
+          baseUrl,
+          documentIds: selectedDocIds
         }
       });
 
@@ -207,8 +217,9 @@ export default function DocumentsManager() {
       setBatchOcrResult(data);
       toast({
         title: "Indexation OCR terminée",
-        description: `${data.totalPagesProcessed} pages traitées`
+        description: `${data.totalPagesProcessed} pages traitées sur ${selectedDocIds.length} document(s)`
       });
+      setSelectedDocIds([]);
     } catch (error: any) {
       console.error('Batch OCR error:', error);
       toast({
@@ -821,7 +832,7 @@ export default function DocumentsManager() {
         </div>
         <Button 
           onClick={handleBatchOcr}
-          disabled={batchOcrRunning}
+          disabled={batchOcrRunning || selectedDocIds.length === 0}
           className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
         >
           {batchOcrRunning ? (
@@ -832,7 +843,7 @@ export default function DocumentsManager() {
           ) : (
             <>
               <Wand2 className="h-4 w-4 mr-2" />
-              OCR Auto (tous)
+              OCR en masse {selectedDocIds.length > 0 && `(${selectedDocIds.length})`}
             </>
           )}
         </Button>
