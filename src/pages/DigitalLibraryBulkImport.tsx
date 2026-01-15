@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import DigitalLibraryDocumentImporter from "@/components/digital-library/import/DigitalLibraryDocumentImporter";
+import BulkImportPage from "@/components/digital-library/import/BulkImportPage";
 
 export default function DigitalLibraryBulkImport() {
   const { user } = useAuth();
@@ -24,21 +24,28 @@ export default function DigitalLibraryBulkImport() {
     return <Navigate to="/" replace />;
   }
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/admin/digital-library/documents");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto p-6">
         <Button
           variant="ghost"
-          onClick={() => navigate("/admin/digital-library")}
+          onClick={handleBack}
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour
         </Button>
 
-        <DigitalLibraryDocumentImporter 
-          defaultTab="bulk"
+        <BulkImportPage 
           onSuccess={() => {
             // Optionnel : naviguer vers la liste après succès
           }}
