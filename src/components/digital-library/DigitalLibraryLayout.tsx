@@ -307,24 +307,22 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px]" role="menu" aria-label={t('dl.collections')}>
                 {collectionsSubmenu.map((item) => (
-                  <SimpleTooltip key={item.href} content={t(item.tooltipKey)} side="bottom">
-                    <Link to={item.href} className="block">
-                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3">
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="p-1.5 rounded-md bg-primary/10">
-                            <item.icon className="h-4 w-4 text-primary" aria-hidden="true" />
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{t(item.labelKey)}</span>
-                            <span className="text-xs text-muted-foreground">{t(item.descKey)}</span>
-                          </div>
+                  <Link key={item.href} to={item.href} className="block" title={t(item.tooltipKey)}>
+                    <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="p-1.5 rounded-md bg-primary/10">
+                          <item.icon className="h-4 w-4 text-primary" aria-hidden="true" />
                         </div>
-                        <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-primary/10 text-primary">
-                          {item.count}
-                        </span>
-                      </DropdownMenuItem>
-                    </Link>
-                  </SimpleTooltip>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{t(item.labelKey)}</span>
+                          <span className="text-xs text-muted-foreground">{t(item.descKey)}</span>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-primary/10 text-primary">
+                        {item.count}
+                      </span>
+                    </DropdownMenuItem>
+                  </Link>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
