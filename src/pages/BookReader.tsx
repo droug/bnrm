@@ -12,6 +12,7 @@ import manuscriptPage4 from "@/assets/manuscript-page-4.jpg";
 import { PageFlipBook } from "@/components/book-reader/PageFlipBook";
 import { DocumentSearchInBook } from "@/components/digital-library/DocumentSearchInBook";
 import { SidebarSearchInBook } from "@/components/digital-library/SidebarSearchInBook";
+import { PdfPageRenderer } from "@/components/digital-library/PdfPageRenderer";
 import { ReproductionAuthChoiceModal } from "@/components/digital-library/ReproductionAuthChoiceModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -155,6 +156,7 @@ const BookReader = () => {
   const [isOcrProcessed, setIsOcrProcessed] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [actualTotalPages, setActualTotalPages] = useState(245);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const getDefaultPageRotations = (docId?: string): Record<number, number> => {
     if (!docId) return {};
@@ -423,10 +425,20 @@ const BookReader = () => {
               ));
               setDocumentPages(pages);
               setDocumentImage(pages[0]);
+            } else if (dlData.pdf_url) {
+              // Si pas d'images mais un PDF, utiliser le rendu PDF
+              setPdfUrl(dlData.pdf_url);
+              setDocumentPages([]);
+              setDocumentImage(dlData.cover_image_url || manuscriptPage1);
             } else {
               setDocumentPages([]);
               setDocumentImage(dlData.cover_image_url || manuscriptPage1);
             }
+          } else if (dlData.pdf_url) {
+            // Document avec beaucoup de pages ou sans pages_count - utiliser PDF
+            setPdfUrl(dlData.pdf_url);
+            setDocumentPages([]);
+            setDocumentImage(dlData.cover_image_url || manuscriptPage1);
           } else {
             setDocumentPages([]);
             setDocumentImage(dlData.cover_image_url || manuscriptPage1);
@@ -1400,8 +1412,12 @@ const BookReader = () => {
               ) : viewMode === "scroll" ? (
                 /* Mode défilement vertical */
                 <div className="flex flex-col items-center gap-6 pb-8">
-                  {generatePageImages().map((pageImage, index) => {
+                  {(pdfUrl && documentPages.length === 0 
+                    ? Array.from({ length: actualTotalPages }, (_, i) => i) 
+                    : generatePageImages()
+                  ).map((item, index) => {
                     const pageNum = index + 1;
+                    const pageImage = typeof item === 'string' ? item : null;
                     const isAccessible = isPageAccessible(pageNum);
                     
                     // Si le mode est "hidden" et la page n'est pas accessible, ne pas afficher
@@ -1433,21 +1449,41 @@ const BookReader = () => {
                               }}
                             >
                               {isAccessible ? (
-                                <img 
-                                  src={pageImage}
-                                  alt={`Page ${pageNum}`}
-                                  className="w-full h-auto object-contain"
-                                  loading="lazy"
-                                />
-                              ) : restrictedPageDisplay === "blur" ? (
-                                /* Mode flou - Afficher l'image avec un effet blur */
-                                <div className="relative w-full">
+                                pdfUrl && documentPages.length === 0 ? (
+                                  <PdfPageRenderer
+                                    pdfUrl={pdfUrl}
+                                    pageNumber={pageNum}
+                                    scale={1.2}
+                                    rotation={rotation + (pageRotations[pageNum] ?? 0)}
+                                  />
+                                ) : (
                                   <img 
                                     src={pageImage}
                                     alt={`Page ${pageNum}`}
-                                    className="w-full h-auto object-contain filter blur-lg"
+                                    className="w-full h-auto object-contain"
                                     loading="lazy"
                                   />
+                                )
+                              ) : restrictedPageDisplay === "blur" ? (
+                                /* Mode flou - Afficher l'image avec un effet blur */
+                                <div className="relative w-full">
+                                  {pdfUrl && !pageImage ? (
+                                    <div className="filter blur-lg">
+                                      <PdfPageRenderer
+                                        pdfUrl={pdfUrl}
+                                        pageNumber={pageNum}
+                                        scale={1.2}
+                                        rotation={rotation + (pageRotations[pageNum] ?? 0)}
+                                      />
+                                    </div>
+                                  ) : (
+                                    <img 
+                                      src={pageImage || ''}
+                                      alt={`Page ${pageNum}`}
+                                      className="w-full h-auto object-contain filter blur-lg"
+                                      loading="lazy"
+                                    />
+                                  )}
                                   <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                                     <div className="text-center p-4 bg-background/90 rounded-lg shadow-lg">
                                       <AlertCircle className="h-8 w-8 mx-auto mb-2 text-amber-500" />
@@ -1497,18 +1533,32 @@ const BookReader = () => {
                   <Card className="shadow-2xl max-w-full max-h-full">
                     <CardContent className="p-0">
                       <div 
-                        className="aspect-[3/4] w-full max-w-[600px] h-auto max-h-[calc(100vh-200px)] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden"
+                        className="w-full max-w-[600px] h-auto max-h-[calc(100vh-200px)] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden"
                         style={{
                           transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[currentPage] ?? 0)}deg)`,
                           transformOrigin: 'center',
                           transition: 'transform 0.3s ease'
                         }}
                       >
-                        <img 
-                          src={getCurrentPageImage(currentPage)}
-                          alt={`Page ${currentPage}`}
-                          className="w-full h-full object-contain"
-                        />
+                        {pdfUrl && documentPages.length === 0 ? (
+                          <PdfPageRenderer
+                            pdfUrl={pdfUrl}
+                            pageNumber={currentPage}
+                            scale={1.5}
+                            rotation={rotation + (pageRotations[currentPage] ?? 0)}
+                            onPageLoad={(totalPages) => {
+                              if (actualTotalPages !== totalPages) {
+                                setActualTotalPages(totalPages);
+                              }
+                            }}
+                          />
+                        ) : (
+                          <img 
+                            src={getCurrentPageImage(currentPage)}
+                            alt={`Page ${currentPage}`}
+                            className="w-full h-full object-contain"
+                          />
+                        )}
                         {bookmarks.includes(currentPage) && (
                           <Badge className="absolute top-4 right-4 bg-primary/90">
                             <Bookmark className="h-3 w-3 mr-1 fill-current" />
