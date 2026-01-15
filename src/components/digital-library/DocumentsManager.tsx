@@ -24,6 +24,16 @@ import OcrImportTool from "@/components/digital-library/import/OcrImportTool";
 import PdfOcrTool from "@/components/digital-library/import/PdfOcrTool";
 import SigbSyncManager from "@/components/digital-library/SigbSyncManager";
 import { FileUpload } from "@/components/ui/file-upload";
+import Tesseract from 'tesseract.js';
+import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+// Map language codes to Tesseract language codes
+const TESSERACT_LANG_MAP: Record<string, string> = {
+  'ar': 'ara',
+  'fr': 'fra',
+  'en': 'eng',
+  'ber': 'ara+fra+eng'
+};
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -83,6 +93,9 @@ export default function DocumentsManager() {
   const [ocrLanguage, setOcrLanguage] = useState("ar");
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [bulkOcrRunning, setBulkOcrRunning] = useState(false);
+  const [clientOcrProgress, setClientOcrProgress] = useState(0);
+  const [clientOcrCurrentPage, setClientOcrCurrentPage] = useState(0);
+  const [clientOcrTotalPages, setClientOcrTotalPages] = useState(0);
   
   // File upload state for add document dialog
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -604,6 +617,33 @@ export default function DocumentsManager() {
     setShowOcrDialog(true);
   };
 
+  // Convert PDF page to image using canvas
+  const convertPdfPageToImage = async (pdfDoc: any, pageNum: number): Promise<string> => {
+    const page = await pdfDoc.getPage(pageNum);
+    const scale = 2.0; // Good balance between quality and performance
+    const viewport = page.getViewport({ scale });
+    
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d')!;
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+    
+    await page.render({
+      canvasContext: context,
+      viewport: viewport
+    }).promise;
+    
+    return canvas.toDataURL('image/png');
+  };
+
+  // Perform OCR on a single page using Tesseract.js
+  const performOcrOnPage = async (imageData: string, lang: string): Promise<string> => {
+    const tesseractLang = TESSERACT_LANG_MAP[lang] || 'ara';
+    
+    const result = await Tesseract.recognize(imageData, tesseractLang);
+    return result.data.text.trim();
+  };
+
   // Lancer l'OCR avec les paramètres du dialogue
   const runOcrForDocument = async () => {
     if (!ocrDocumentTarget) return;
@@ -623,6 +663,9 @@ export default function DocumentsManager() {
 
     setShowOcrDialog(false);
     setOcrProcessingDocId(ocrDocumentTarget.id);
+    setClientOcrProgress(0);
+    setClientOcrCurrentPage(0);
+    setClientOcrTotalPages(0);
     
     try {
       // Mettre à jour le base_url et la langue du document si différent
@@ -636,37 +679,120 @@ export default function DocumentsManager() {
         .update(updates)
         .eq('id', ocrDocumentTarget.id);
 
-      const { data, error } = await supabase.functions.invoke('batch-ocr-indexing', {
-        body: {
-          documentId: ocrDocumentTarget.id,
-          language: ocrLanguage,
-          baseUrl: hasBaseUrl ? ocrBaseUrl : undefined,
-          pdfUrl: hasPdfUrl ? ocrDocumentTarget.pdf_url : undefined
+      // If document has PDF, process it client-side
+      if (hasPdfUrl && !hasBaseUrl) {
+        toast({
+          title: "Téléchargement du PDF...",
+          description: "Préparation du traitement OCR côté client"
+        });
+
+        // Fetch PDF
+        const pdfResponse = await fetch(ocrDocumentTarget.pdf_url);
+        if (!pdfResponse.ok) {
+          throw new Error(`Impossible de télécharger le PDF: ${pdfResponse.status}`);
         }
-      });
 
-      if (error) throw error;
+        const pdfBuffer = await pdfResponse.arrayBuffer();
 
-      queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
-      
-      // Check if we got a PDF pending status
-      const docResult = data?.documents?.[0];
-      if (docResult?.status === 'pdf_requires_client_processing' || docResult?.status === 'pdf_pending_client_ocr') {
+        // Load PDF.js
+        const pdfjsLib = await import('pdfjs-dist');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
+
+        const pdfDoc = await pdfjsLib.getDocument({ data: pdfBuffer }).promise;
+        const numPages = pdfDoc.numPages;
+
+        setClientOcrTotalPages(numPages);
+
         toast({
-          title: "OCR côté client requis",
-          description: "Le traitement OCR des PDF nécessite l'outil OCR manuel. Accédez à l'onglet 'Import de documents' > 'Outil OCR'.",
+          title: "OCR en cours",
+          description: `Traitement de ${numPages} pages avec Tesseract.js (local)`
         });
-      } else if (docResult?.status === 'already_indexed') {
-        toast({
-          title: "Déjà indexé",
-          description: `Toutes les pages de "${ocrDocumentTarget.title}" sont déjà indexées`
-        });
-      } else {
-        const pagesProcessed = data?.totalPagesProcessed || docResult?.pagesProcessed || 0;
+
+        let successCount = 0;
+
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+          setClientOcrCurrentPage(pageNum);
+          setClientOcrProgress(Math.round((pageNum / numPages) * 100));
+
+          try {
+            // Convert page to image
+            const imageData = await convertPdfPageToImage(pdfDoc, pageNum);
+            
+            // Perform OCR
+            const ocrText = await performOcrOnPage(imageData, ocrLanguage);
+
+            if (ocrText) {
+              // Check if page already exists
+              const { data: existing } = await supabase
+                .from('digital_library_pages')
+                .select('id')
+                .eq('document_id', ocrDocumentTarget.id)
+                .eq('page_number', pageNum)
+                .maybeSingle();
+
+              if (existing) {
+                await supabase
+                  .from('digital_library_pages')
+                  .update({ ocr_text: ocrText })
+                  .eq('id', existing.id);
+              } else {
+                await supabase
+                  .from('digital_library_pages')
+                  .insert({
+                    document_id: ocrDocumentTarget.id,
+                    page_number: pageNum,
+                    ocr_text: ocrText
+                  });
+              }
+              successCount++;
+            }
+          } catch (pageError) {
+            console.error(`Error processing page ${pageNum}:`, pageError);
+          }
+        }
+
+        // Update document
+        await supabase
+          .from('digital_library_documents')
+          .update({ 
+            ocr_processed: true,
+            pages_count: numPages
+          })
+          .eq('id', ocrDocumentTarget.id);
+
+        queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
+        
         toast({
           title: "OCR terminé",
-          description: `${pagesProcessed} page(s) traitée(s) pour "${ocrDocumentTarget.title}"`
+          description: `${successCount}/${numPages} page(s) traitée(s) pour "${ocrDocumentTarget.title}"`
         });
+      } else {
+        // Use server-side processing for image-based OCR
+        const { data, error } = await supabase.functions.invoke('batch-ocr-indexing', {
+          body: {
+            documentId: ocrDocumentTarget.id,
+            language: ocrLanguage,
+            baseUrl: hasBaseUrl ? ocrBaseUrl : undefined
+          }
+        });
+
+        if (error) throw error;
+
+        queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
+        
+        const docResult = data?.documents?.[0];
+        if (docResult?.status === 'already_indexed') {
+          toast({
+            title: "Déjà indexé",
+            description: `Toutes les pages de "${ocrDocumentTarget.title}" sont déjà indexées`
+          });
+        } else {
+          const pagesProcessed = data?.totalPagesProcessed || docResult?.pagesProcessed || 0;
+          toast({
+            title: "OCR terminé",
+            description: `${pagesProcessed} page(s) traitée(s) pour "${ocrDocumentTarget.title}"`
+          });
+        }
       }
     } catch (error: any) {
       toast({
@@ -677,6 +803,9 @@ export default function DocumentsManager() {
     } finally {
       setOcrProcessingDocId(null);
       setOcrDocumentTarget(null);
+      setClientOcrProgress(0);
+      setClientOcrCurrentPage(0);
+      setClientOcrTotalPages(0);
     }
   };
 
@@ -1925,10 +2054,17 @@ export default function DocumentsManager() {
                           variant="outline"
                           onClick={() => openOcrDialog(doc)}
                           disabled={ocrProcessingDocId === doc.id}
-                          title="Lancer l'OCR"
+                          title={ocrProcessingDocId === doc.id && clientOcrTotalPages > 0 
+                            ? `OCR en cours: page ${clientOcrCurrentPage}/${clientOcrTotalPages} (${clientOcrProgress}%)`
+                            : "Lancer l'OCR"}
                         >
                           {ocrProcessingDocId === doc.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <div className="flex items-center gap-1">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              {clientOcrTotalPages > 0 && (
+                                <span className="text-xs">{clientOcrProgress}%</span>
+                              )}
+                            </div>
                           ) : (
                             <Wand2 className="h-4 w-4" />
                           )}
