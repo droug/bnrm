@@ -112,6 +112,7 @@ const BookReader = () => {
   
   // Access restrictions from database
   const [accessRestrictions, setAccessRestrictions] = useState<any>(null);
+  const [pageAccessRestrictions, setPageAccessRestrictions] = useState<any>(null);
   const [consultationPercentage, setConsultationPercentage] = useState(100);
   const [maxAllowedPage, setMaxAllowedPage] = useState(245);
   const [hasValidSubscription, setHasValidSubscription] = useState(false);
@@ -123,6 +124,11 @@ const BookReader = () => {
   const [startPage, setStartPage] = useState(1);
   const [endPage, setEndPage] = useState(10);
   const [manualPages, setManualPages] = useState<number[]>([]);
+  
+  // View mode restrictions (from page_access_restrictions)
+  const [allowDoublePageViewRestriction, setAllowDoublePageViewRestriction] = useState(true);
+  const [allowScrollViewRestriction, setAllowScrollViewRestriction] = useState(true);
+  const [restrictedPageDisplay, setRestrictedPageDisplay] = useState<"blur" | "empty" | "hidden">("blur");
   
   // Bookmarks
   const [bookmarks, setBookmarks] = useState<number[]>([]);
@@ -227,12 +233,55 @@ const BookReader = () => {
       
       setLoading(true);
       try {
-        // Charger les restrictions d'accès
+        // Charger les restrictions d'accès depuis digital_library_access_restrictions
         const { data: restrictionsData } = await supabase
           .from('digital_library_access_restrictions')
           .select('*')
           .eq('document_id', id)
           .maybeSingle();
+        
+        // Charger les restrictions de page depuis page_access_restrictions
+        const { data: pageRestrictionsData } = await supabase
+          .from('page_access_restrictions')
+          .select('*')
+          .eq('content_id', id)
+          .maybeSingle();
+        
+        // Appliquer les restrictions de page_access_restrictions
+        if (pageRestrictionsData) {
+          setPageAccessRestrictions(pageRestrictionsData);
+          
+          // Paramètres de sécurité depuis page_access_restrictions
+          if (pageRestrictionsData.allow_download === false) {
+            setAllowDownload(false);
+          }
+          if (pageRestrictionsData.allow_screenshot === false) {
+            setBlockScreenCapture(true);
+          }
+          if (pageRestrictionsData.allow_right_click === false) {
+            setBlockRightClick(true);
+          }
+          
+          // Modes de vue
+          setAllowDoublePageViewRestriction(pageRestrictionsData.allow_double_page_view !== false);
+          setAllowScrollViewRestriction(pageRestrictionsData.allow_scroll_view !== false);
+          const displayMode = pageRestrictionsData.restricted_page_display;
+          if (displayMode === "blur" || displayMode === "empty" || displayMode === "hidden") {
+            setRestrictedPageDisplay(displayMode);
+          }
+          
+          // Restriction des pages
+          if (pageRestrictionsData.is_restricted) {
+            setRestrictPageAccess(true);
+            setManualPages(pageRestrictionsData.manual_pages || []);
+            setStartPage(pageRestrictionsData.start_page || 1);
+            setEndPage(pageRestrictionsData.end_page || 10);
+            const mode = pageRestrictionsData.restriction_mode;
+            if (mode === "range" || mode === "manual") {
+              setPageRestrictionMode(mode);
+            }
+          }
+        }
         
         // Vérifier l'abonnement de l'utilisateur si nécessaire
         let userHasValidSubscription = false;
@@ -274,13 +323,21 @@ const BookReader = () => {
         
         if (restrictionsData) {
           setAccessRestrictions(restrictionsData);
-          setBlockRightClick(restrictionsData.block_right_click || false);
-          setBlockScreenCapture(restrictionsData.block_screenshot || false);
+          // Ne pas écraser si déjà défini par page_access_restrictions
+          if (!pageRestrictionsData?.allow_right_click === false) {
+            setBlockRightClick(restrictionsData.block_right_click || false);
+          }
+          if (!pageRestrictionsData?.allow_screenshot === false) {
+            setBlockScreenCapture(restrictionsData.block_screenshot || false);
+          }
           
           // Si abonnement requis mais pas valide, appliquer les restrictions
           const canFullAccess = !restrictionsData.requires_subscription || userHasValidSubscription;
           
-          setAllowDownload(canFullAccess && restrictionsData.allow_download !== false);
+          // Ne pas écraser si déjà défini par page_access_restrictions
+          if (pageRestrictionsData?.allow_download !== false) {
+            setAllowDownload(canFullAccess && restrictionsData.allow_download !== false);
+          }
           setAllowSharing(canFullAccess && restrictionsData.allow_sharing !== false);
           
           // Calculer le pourcentage de consultation
@@ -1207,8 +1264,16 @@ const BookReader = () => {
                 <Button 
                   variant={viewMode === "double" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setViewMode("double")}
-                  title="Mode livre (double page)"
+                  onClick={() => {
+                    if (!allowDoublePageViewRestriction) {
+                      toast.error("Le mode double page est désactivé pour ce document");
+                      return;
+                    }
+                    setViewMode("double");
+                  }}
+                  title={allowDoublePageViewRestriction ? "Mode livre (double page)" : "Mode non disponible"}
+                  disabled={!allowDoublePageViewRestriction}
+                  className={!allowDoublePageViewRestriction ? "opacity-50 cursor-not-allowed" : ""}
                 >
                   <BookOpen className="h-4 w-4 mr-1" />
                   Double
@@ -1216,8 +1281,16 @@ const BookReader = () => {
                 <Button 
                   variant={viewMode === "scroll" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setViewMode("scroll")}
-                  title="Mode défilement vertical"
+                  onClick={() => {
+                    if (!allowScrollViewRestriction) {
+                      toast.error("Le mode défilement est désactivé pour ce document");
+                      return;
+                    }
+                    setViewMode("scroll");
+                  }}
+                  title={allowScrollViewRestriction ? "Mode défilement vertical" : "Mode non disponible"}
+                  disabled={!allowScrollViewRestriction}
+                  className={!allowScrollViewRestriction ? "opacity-50 cursor-not-allowed" : ""}
                 >
                   <ChevronDown className="h-4 w-4 mr-1" />
                   Scroll
@@ -1309,6 +1382,11 @@ const BookReader = () => {
                     const pageNum = index + 1;
                     const isAccessible = isPageAccessible(pageNum);
                     
+                    // Si le mode est "hidden" et la page n'est pas accessible, ne pas afficher
+                    if (!isAccessible && restrictedPageDisplay === "hidden") {
+                      return null;
+                    }
+                    
                     return (
                       <div 
                         key={pageNum} 
@@ -1339,7 +1417,27 @@ const BookReader = () => {
                                   className="w-full h-auto object-contain"
                                   loading="lazy"
                                 />
+                              ) : restrictedPageDisplay === "blur" ? (
+                                /* Mode flou - Afficher l'image avec un effet blur */
+                                <div className="relative w-full">
+                                  <img 
+                                    src={pageImage}
+                                    alt={`Page ${pageNum}`}
+                                    className="w-full h-auto object-contain filter blur-lg"
+                                    loading="lazy"
+                                  />
+                                  <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                    <div className="text-center p-4 bg-background/90 rounded-lg shadow-lg">
+                                      <AlertCircle className="h-8 w-8 mx-auto mb-2 text-amber-500" />
+                                      <p className="text-sm font-medium">Page restreinte</p>
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        {getAccessDeniedMessage()}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
                               ) : (
+                                /* Mode empty - Page vide */
                                 <div className="w-full aspect-[3/4] flex items-center justify-center bg-muted/50">
                                   <div className="text-center p-8">
                                     <AlertCircle className="h-12 w-12 mx-auto mb-4 text-amber-500" />
