@@ -71,19 +71,27 @@ export function PageAccessRestrictionsManager() {
   // Filtrer les documents
   const filteredDocuments = useMemo(() => {
     if (!documents) return [];
-    
+
+    const getRestriction = (doc: any) => {
+      const pr = doc?.page_access_restrictions;
+      if (!pr) return null;
+      return Array.isArray(pr) ? (pr[0] ?? null) : pr;
+    };
+
     return documents.filter((doc) => {
-      const matchesSearch = searchQuery === "" || 
+      const matchesSearch =
+        searchQuery === "" ||
         doc.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         doc.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       const matchesType = filterType === "all" || doc.content_type === filterType;
-      
-      const restriction = doc.page_access_restrictions?.[0];
-      const matchesStatus = filterStatus === "all" || 
+
+      const restriction = getRestriction(doc);
+      const matchesStatus =
+        filterStatus === "all" ||
         (filterStatus === "restricted" && restriction?.is_restricted) ||
         (filterStatus === "public" && (!restriction || !restriction.is_restricted));
-      
+
       return matchesSearch && matchesType && matchesStatus;
     });
   }, [documents, searchQuery, filterType, filterStatus]);
@@ -179,7 +187,9 @@ export function PageAccessRestrictionsManager() {
 
   const handleEditDocument = (doc: any) => {
     setSelectedDocument(doc);
-    const restriction = doc.page_access_restrictions?.[0];
+    const restriction = Array.isArray(doc.page_access_restrictions)
+      ? doc.page_access_restrictions?.[0]
+      : doc.page_access_restrictions;
     
     if (restriction) {
       setIsRestricted(restriction.is_restricted);
