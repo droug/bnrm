@@ -19,16 +19,20 @@ export default function ContentManagementSystem() {
         </p>
       </div>
 
-      <Tabs defaultValue="pages" className="space-y-6">
+      <Tabs defaultValue="carrousel-bn" className="space-y-6">
         <TabsList className="grid w-full grid-cols-7">
+          <TabsTrigger value="carrousel-bn">Carrousel BN</TabsTrigger>
           <TabsTrigger value="pages">Pages</TabsTrigger>
           <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
           <TabsTrigger value="media">Médias</TabsTrigger>
           <TabsTrigger value="actualites">Actualités</TabsTrigger>
           <TabsTrigger value="evenements">Événements</TabsTrigger>
           <TabsTrigger value="menus">Menus</TabsTrigger>
-          <TabsTrigger value="carousel-bn">Carousel BN</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="carrousel-bn" className="space-y-4">
+          <FeaturedWorksManager />
+        </TabsContent>
 
         <TabsContent value="pages" className="space-y-4">
           <CmsPagesManager />
@@ -52,10 +56,6 @@ export default function ContentManagementSystem() {
 
         <TabsContent value="menus" className="space-y-4">
           <CmsMenusManager />
-        </TabsContent>
-
-        <TabsContent value="carousel-bn" className="space-y-4">
-          <FeaturedWorksManager />
         </TabsContent>
       </Tabs>
     </div>
