@@ -430,12 +430,14 @@ const Header = () => {
         {showBackButton && (
           <div className="border-b py-2">
             <div className="container mx-auto px-4">
-                <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => {
-                  // Bibliothèque Numérique => toujours vers page d'accueil DL
-                  if (isDigitalLibrary) {
+                  const isDigitalLibraryAdmin = location.pathname.startsWith("/admin/digital-library");
+
+                  // Bibliothèque Numérique (front ou backoffice) => toujours vers page d'accueil DL
+                  if (isDigitalLibrary || isDigitalLibraryAdmin) {
                     navigate("/digital-library");
                     return;
                   }
@@ -449,10 +451,11 @@ const Header = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 <span>
-                  {isDigitalLibrary 
-                    ? (language === 'ar' ? "العودة إلى الصفحة الرئيسية" : "Retour vers page d'accueil")
-                    : (language === 'ar' ? 'رجوع' : 'Retour')
-                  }
+                  {isDigitalLibrary || location.pathname.startsWith("/admin/digital-library")
+                    ? (language === "ar" ? "العودة إلى الصفحة الرئيسية" : "Retour vers page d'accueil")
+                    : language === "ar"
+                      ? "رجوع"
+                      : "Retour"}
                 </span>
               </Button>
             </div>
