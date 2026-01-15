@@ -894,10 +894,15 @@ export default function DocumentsManager() {
               <FileDown className="h-4 w-4 mr-2" />
               Télécharger le modèle
             </Button>
-          <Button variant="outline" onClick={() => setShowBulkDialog(true)}>
-            <Upload className="h-4 w-4 mr-2" />
-            Import en masse
-          </Button>
+            <Button variant="outline" onClick={() => setShowBulkDialog(true)}>
+              <Upload className="h-4 w-4 mr-2" />
+              Import en masse
+            </Button>
+            <Button onClick={() => setShowAddDialog(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter un document
+            </Button>
+          </div>
 
           <BulkImportModal 
             open={showBulkDialog} 
@@ -906,12 +911,6 @@ export default function DocumentsManager() {
           />
 
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Ajouter un document
-              </Button>
-            </DialogTrigger>
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Ajouter un document</DialogTitle>
@@ -1469,7 +1468,6 @@ export default function DocumentsManager() {
               </Form>
             </DialogContent>
           </Dialog>
-        </div>
 
       {/* Filters */}
       <Card>
