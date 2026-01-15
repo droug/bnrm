@@ -307,7 +307,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px]" role="menu" aria-label={t('dl.collections')}>
                 {collectionsSubmenu.map((item) => (
-                  <SimpleTooltip key={item.href} content={t(item.tooltipKey)} side="right">
+                  <SimpleTooltip key={item.href} content={t(item.tooltipKey)} side="bottom">
                     <Link to={item.href} className="block">
                       <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3">
                         <div className="flex items-center gap-3 flex-1">
