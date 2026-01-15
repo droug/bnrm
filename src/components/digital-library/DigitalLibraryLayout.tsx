@@ -1,8 +1,9 @@
 import { ReactNode, useState, useEffect } from "react";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
-import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield, Library, UserPlus, LogIn, LogOut } from "lucide-react";
+import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield, Library, UserPlus, LogIn, LogOut, Scroll, Newspaper, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SimpleTooltip } from "@/components/ui/simple-tooltip";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalSearchBar from "@/components/GlobalSearchBar";
@@ -74,11 +75,11 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   }, [session, isAuthenticated]);
 
   const collectionsSubmenu = [
-    { labelKey: "dl.collections.books", descKey: "dl.collections.books.desc", href: "/digital-library/collections/books", icon: Book, count: "45,670" },
-    { labelKey: "dl.collections.periodicals", descKey: "dl.collections.periodicals.desc", href: "/digital-library/collections/periodicals", icon: FileText, count: "8,320" },
-    { labelKey: "dl.collections.manuscripts", descKey: "dl.collections.manuscripts.desc", href: "/digital-library/collections/manuscripts", icon: BookOpen, count: "12,450" },
-    { labelKey: "dl.collections.specialized", descKey: "dl.collections.specialized.desc", href: "/digital-library/collections/photos", icon: Image, count: "15,890" },
-    { labelKey: "dl.collections.audiovisual", descKey: "dl.collections.audiovisual.desc", href: "/digital-library/collections/audiovisual", icon: Music, count: "2,890" },
+    { labelKey: "dl.collections.manuscripts", descKey: "dl.collections.manuscripts.desc", tooltipKey: "dl.collections.manuscripts.tooltip", href: "/digital-library/collections/manuscripts", icon: Scroll, count: "12,450" },
+    { labelKey: "dl.collections.books", descKey: "dl.collections.books.desc", tooltipKey: "dl.collections.books.tooltip", href: "/digital-library/collections/books", icon: Book, count: "45,670" },
+    { labelKey: "dl.collections.periodicals", descKey: "dl.collections.periodicals.desc", tooltipKey: "dl.collections.periodicals.tooltip", href: "/digital-library/collections/periodicals", icon: Newspaper, count: "8,320" },
+    { labelKey: "dl.collections.specialized", descKey: "dl.collections.specialized.desc", tooltipKey: "dl.collections.specialized.tooltip", href: "/digital-library/collections/photos", icon: Map, count: "15,890" },
+    { labelKey: "dl.collections.audiovisual", descKey: "dl.collections.audiovisual.desc", tooltipKey: "dl.collections.audiovisual.tooltip", href: "/digital-library/collections/audiovisual", icon: Music, count: "2,890" },
   ];
 
   const themesSubmenu = [
@@ -306,22 +307,24 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px]" role="menu" aria-label={t('dl.collections')}>
                 {collectionsSubmenu.map((item) => (
-                  <Link key={item.href} to={item.href}>
-                    <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3">
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="p-1.5 rounded-md bg-primary/10">
-                          <item.icon className="h-4 w-4 text-primary" aria-hidden="true" />
+                  <SimpleTooltip key={item.href} content={t(item.tooltipKey)} side="right">
+                    <Link to={item.href} className="block">
+                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="p-1.5 rounded-md bg-primary/10">
+                            <item.icon className="h-4 w-4 text-primary" aria-hidden="true" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{t(item.labelKey)}</span>
+                            <span className="text-xs text-muted-foreground">{t(item.descKey)}</span>
+                          </div>
                         </div>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{t(item.labelKey)}</span>
-                          <span className="text-xs text-muted-foreground">{t(item.descKey)}</span>
-                        </div>
-                      </div>
-                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-primary/10 text-primary">
-                        {item.count}
-                      </span>
-                    </DropdownMenuItem>
-                  </Link>
+                        <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-primary/10 text-primary">
+                          {item.count}
+                        </span>
+                      </DropdownMenuItem>
+                    </Link>
+                  </SimpleTooltip>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
