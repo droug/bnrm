@@ -608,10 +608,14 @@ export default function DocumentsManager() {
   const runOcrForDocument = async () => {
     if (!ocrDocumentTarget) return;
     
-    if (!ocrBaseUrl.trim()) {
+    // Check if document has a PDF URL or a base URL for images
+    const hasPdfUrl = !!ocrDocumentTarget.pdf_url;
+    const hasBaseUrl = !!ocrBaseUrl.trim();
+    
+    if (!hasPdfUrl && !hasBaseUrl) {
       toast({
         title: "Erreur",
-        description: "Veuillez saisir l'URL de base des images",
+        description: "Ce document n'a pas de fichier PDF. Veuillez saisir l'URL de base des images ou ajouter un PDF au document.",
         variant: "destructive"
       });
       return;
@@ -621,19 +625,23 @@ export default function DocumentsManager() {
     setOcrProcessingDocId(ocrDocumentTarget.id);
     
     try {
-      // Mettre à jour le base_url du document si différent
-      if (ocrBaseUrl !== ocrDocumentTarget.base_url) {
-        await supabase
-          .from('digital_library_documents')
-          .update({ base_url: ocrBaseUrl, language: ocrLanguage })
-          .eq('id', ocrDocumentTarget.id);
+      // Mettre à jour le base_url et la langue du document si différent
+      const updates: any = { language: ocrLanguage };
+      if (hasBaseUrl && ocrBaseUrl !== ocrDocumentTarget.base_url) {
+        updates.base_url = ocrBaseUrl;
       }
+      
+      await supabase
+        .from('digital_library_documents')
+        .update(updates)
+        .eq('id', ocrDocumentTarget.id);
 
       const { data, error } = await supabase.functions.invoke('batch-ocr-indexing', {
         body: {
           documentId: ocrDocumentTarget.id,
           language: ocrLanguage,
-          baseUrl: ocrBaseUrl
+          baseUrl: hasBaseUrl ? ocrBaseUrl : undefined,
+          pdfUrl: hasPdfUrl ? ocrDocumentTarget.pdf_url : undefined
         }
       });
 
@@ -2492,22 +2500,39 @@ export default function DocumentsManager() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="ocr-base-url">URL de base des images *</Label>
-              <Input
-                id="ocr-base-url"
-                placeholder="https://storage.example.com"
-                value={ocrBaseUrl}
-                onChange={(e) => setOcrBaseUrl(e.target.value)}
-              />
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p><strong>Formats d'URL recherchés :</strong></p>
-                <ul className="list-disc list-inside ml-2 space-y-0.5">
-                  <li>{ocrBaseUrl || "https://..."}/digital-library-pages/{ocrDocumentTarget?.id?.slice(0, 8)}.../<strong>page_1.jpg</strong></li>
-                  <li>{ocrBaseUrl || "https://..."}/digital-library-pages/{ocrDocumentTarget?.id?.slice(0, 8)}.../<strong>img_p1_1.jpg</strong></li>
-                </ul>
+            {/* Show PDF info if available */}
+            {ocrDocumentTarget?.pdf_url && (
+              <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span className="text-sm font-medium">Fichier PDF disponible</span>
+                </div>
+                <p className="text-xs text-green-600 dark:text-green-500 mt-1">
+                  L'OCR sera effectué directement sur le PDF du document.
+                </p>
               </div>
-            </div>
+            )}
+            
+            {/* Show base URL field only if no PDF */}
+            {!ocrDocumentTarget?.pdf_url && (
+              <div className="space-y-2">
+                <Label htmlFor="ocr-base-url">URL de base des images</Label>
+                <Input
+                  id="ocr-base-url"
+                  placeholder="https://storage.example.com"
+                  value={ocrBaseUrl}
+                  onChange={(e) => setOcrBaseUrl(e.target.value)}
+                />
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p><strong>Formats d'URL recherchés :</strong></p>
+                  <ul className="list-disc list-inside ml-2 space-y-0.5">
+                    <li>{ocrBaseUrl || "https://..."}/digital-library-pages/{ocrDocumentTarget?.id?.slice(0, 8)}.../<strong>page_1.jpg</strong></li>
+                    <li>{ocrBaseUrl || "https://..."}/digital-library-pages/{ocrDocumentTarget?.id?.slice(0, 8)}.../<strong>img_p1_1.jpg</strong></li>
+                  </ul>
+                </div>
+              </div>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="ocr-language">Langue du document</Label>
               <Select value={ocrLanguage} onValueChange={setOcrLanguage}>
@@ -2518,6 +2543,7 @@ export default function DocumentsManager() {
                   <SelectItem value="ar">Arabe</SelectItem>
                   <SelectItem value="fr">Français</SelectItem>
                   <SelectItem value="en">Anglais</SelectItem>
+                  <SelectItem value="ber">Amazigh (Tifinagh)</SelectItem>
                   <SelectItem value="mixed">Mixte (Arabe/Français)</SelectItem>
                 </SelectContent>
               </Select>
@@ -2527,9 +2553,6 @@ export default function DocumentsManager() {
                 <p className="text-sm">
                   <strong>Nombre de pages:</strong> {ocrDocumentTarget.pages_count}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  Les images doivent être nommées page_1.jpg, page_2.jpg... ou img_p1_1.jpg, img_p2_1.jpg...
-                </p>
               </div>
             )}
           </div>
@@ -2537,7 +2560,10 @@ export default function DocumentsManager() {
             <Button variant="outline" onClick={() => setShowOcrDialog(false)}>
               Annuler
             </Button>
-            <Button onClick={runOcrForDocument} disabled={!ocrBaseUrl.trim()}>
+            <Button 
+              onClick={runOcrForDocument} 
+              disabled={!ocrDocumentTarget?.pdf_url && !ocrBaseUrl.trim()}
+            >
               <Wand2 className="h-4 w-4 mr-2" />
               Lancer l'OCR
             </Button>
