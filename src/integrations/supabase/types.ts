@@ -7345,12 +7345,14 @@ export type Database = {
       }
       page_access_restrictions: {
         Row: {
+          allow_double_page_view: boolean | null
           allow_download: boolean | null
           allow_internal_access: boolean | null
           allow_internet_access: boolean | null
           allow_physical_consultation: boolean | null
           allow_right_click: boolean | null
           allow_screenshot: boolean | null
+          allow_scroll_view: boolean | null
           content_id: string
           created_at: string | null
           created_by: string | null
@@ -7365,12 +7367,14 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          allow_double_page_view?: boolean | null
           allow_download?: boolean | null
           allow_internal_access?: boolean | null
           allow_internet_access?: boolean | null
           allow_physical_consultation?: boolean | null
           allow_right_click?: boolean | null
           allow_screenshot?: boolean | null
+          allow_scroll_view?: boolean | null
           content_id: string
           created_at?: string | null
           created_by?: string | null
@@ -7385,12 +7389,14 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          allow_double_page_view?: boolean | null
           allow_download?: boolean | null
           allow_internal_access?: boolean | null
           allow_internet_access?: boolean | null
           allow_physical_consultation?: boolean | null
           allow_right_click?: boolean | null
           allow_screenshot?: boolean | null
+          allow_scroll_view?: boolean | null
           content_id?: string
           created_at?: string | null
           created_by?: string | null
