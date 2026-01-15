@@ -13,14 +13,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PortalSelect } from "@/components/ui/portal-select";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil, Wand2, Loader2, FileSearch, CheckCircle2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import OcrImportTool from "@/components/digital-library/import/OcrImportTool";
 import PdfOcrTool from "@/components/digital-library/import/PdfOcrTool";
-import BulkImportModal from "@/components/digital-library/import/BulkImportModal";
+
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -57,7 +57,7 @@ export default function DocumentsManager() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingDocument, setEditingDocument] = useState<any>(null);
-  const [showBulkDialog, setShowBulkDialog] = useState(false);
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [filterVisible, setFilterVisible] = useState<string>("all");
   const [filterDownload, setFilterDownload] = useState<string>("all");
@@ -894,7 +894,7 @@ export default function DocumentsManager() {
               <FileDown className="h-4 w-4 mr-2" />
               Télécharger le modèle
             </Button>
-            <Button variant="outline" onClick={() => setShowBulkDialog(true)}>
+            <Button variant="outline" onClick={() => navigate("/admin/digital-library/bulk-import")}>
               <Upload className="h-4 w-4 mr-2" />
               Import en masse
             </Button>
@@ -903,12 +903,6 @@ export default function DocumentsManager() {
               Ajouter un document
             </Button>
           </div>
-
-          <BulkImportModal 
-            open={showBulkDialog} 
-            onOpenChange={setShowBulkDialog}
-            onSuccess={() => queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] })}
-          />
 
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
