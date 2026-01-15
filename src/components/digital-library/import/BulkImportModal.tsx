@@ -77,6 +77,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
   const queryClient = useQueryClient();
   const metadataInputRef = useRef<HTMLInputElement>(null);
   const documentsInputRef = useRef<HTMLInputElement>(null);
+  const pdfOnlyInputRef = useRef<HTMLInputElement>(null);
   
   // Mode: 'metadata' | 'documents' | 'combined'
   const [importMode, setImportMode] = useState<'metadata' | 'documents' | 'combined'>('combined');
@@ -1027,7 +1028,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
                   <CardContent className="pt-6">
                     <div 
                       className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
-                      onClick={() => documentsInputRef.current?.click()}
+                      onClick={() => pdfOnlyInputRef.current?.click()}
                     >
                       <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                       <p className="text-sm text-muted-foreground mb-2">
@@ -1035,7 +1036,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
                       </p>
                       <p className="text-xs text-muted-foreground">Sélection multiple autorisée</p>
                       <input
-                        ref={documentsInputRef}
+                        ref={pdfOnlyInputRef}
                         type="file"
                         accept=".pdf"
                         multiple
