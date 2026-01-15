@@ -5,6 +5,7 @@ import CmsMediaManager from "@/components/cms/CmsMediaManager";
 import CmsActualitesManager from "@/components/cms/CmsActualitesManager";
 import CmsEvenementsManager from "@/components/cms/CmsEvenementsManager";
 import CmsMenusManager from "@/components/cms/CmsMenusManager";
+import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 
 export default function ContentManagementSystem() {
   return (
@@ -19,13 +20,14 @@ export default function ContentManagementSystem() {
       </div>
 
       <Tabs defaultValue="pages" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="pages">Pages</TabsTrigger>
           <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
           <TabsTrigger value="media">Médias</TabsTrigger>
           <TabsTrigger value="actualites">Actualités</TabsTrigger>
           <TabsTrigger value="evenements">Événements</TabsTrigger>
           <TabsTrigger value="menus">Menus</TabsTrigger>
+          <TabsTrigger value="carousel-bn">Carousel BN</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pages" className="space-y-4">
@@ -50,6 +52,10 @@ export default function ContentManagementSystem() {
 
         <TabsContent value="menus" className="space-y-4">
           <CmsMenusManager />
+        </TabsContent>
+
+        <TabsContent value="carousel-bn" className="space-y-4">
+          <FeaturedWorksManager />
         </TabsContent>
       </Tabs>
     </div>
