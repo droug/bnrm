@@ -1617,8 +1617,10 @@ export default function DocumentsManager() {
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center">
-                      <span className="text-sm font-mono">{(doc as any).cbn_documents?.cote || '-'}</span>
+                    <TableCell>
+                      <div className="flex justify-center">
+                        <span className="text-sm font-mono">{(doc as any).cbn_documents?.cote || '-'}</span>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">{doc.document_type || doc.file_format || 'Non défini'}</Badge>
