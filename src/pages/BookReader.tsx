@@ -361,24 +361,46 @@ const BookReader = () => {
           }
         }
 
-        // Essayer d'abord digital_library_documents
-        const { data: dlData, error: dlError } = await supabase
+        // Essayer d'abord digital_library_documents par id
+        let dlData = null;
+        let dlError = null;
+        
+        const { data: dlByIdData, error: dlByIdError } = await supabase
           .from('digital_library_documents')
-          .select('id, cbn_document_id, ocr_processed, title, author, publication_year, cover_image_url, pages_count, document_type')
+          .select('id, cbn_document_id, ocr_processed, title, author, publication_year, cover_image_url, pages_count, document_type, pdf_url')
           .eq('id', id)
           .maybeSingle();
+        
+        if (dlByIdData && !dlByIdError) {
+          dlData = dlByIdData;
+          dlError = dlByIdError;
+        } else {
+          // Si non trouvé par id, essayer par cbn_document_id
+          const { data: dlByCbnIdData, error: dlByCbnIdError } = await supabase
+            .from('digital_library_documents')
+            .select('id, cbn_document_id, ocr_processed, title, author, publication_year, cover_image_url, pages_count, document_type, pdf_url')
+            .eq('cbn_document_id', id)
+            .maybeSingle();
+          
+          dlData = dlByCbnIdData;
+          dlError = dlByCbnIdError;
+        }
 
         if (dlData && !dlError) {
           const pagesCount = dlData.pages_count || 0;
+          // Utiliser l'ID réel du document (pas cbn_document_id) pour les opérations
+          const realDocumentId = dlData.id;
           setIsOcrProcessed(dlData.ocr_processed || false);
 
           // Utiliser les données de digital_library_documents directement
           setDocumentData({
-            id: dlData.id,
+            id: realDocumentId, // Important: utiliser l'ID réel
+            cbn_document_id: dlData.cbn_document_id,
             title: dlData.title,
             author: dlData.author || 'Auteur inconnu',
             publication_year: dlData.publication_year,
             document_type: dlData.document_type,
+            pdf_url: dlData.pdf_url,
             excerpt: `Document numérisé - ${pagesCount || 50} pages`,
           });
 
@@ -390,14 +412,14 @@ const BookReader = () => {
           // Si des images de pages existent dans /public/digital-library-pages/{documentId}/, les utiliser.
           // (On évite de générer des centaines d'URLs pour les très gros documents.)
           if (pagesCount > 0 && pagesCount <= 100) {
-            const firstPageUrl = `/digital-library-pages/${dlData.id}/page_1.jpg`;
+            const firstPageUrl = `/digital-library-pages/${realDocumentId}/page_1.jpg`;
             const firstPageExists = await fetch(firstPageUrl, { method: 'HEAD' })
               .then((r) => r.ok)
               .catch(() => false);
 
             if (firstPageExists) {
               const pages = Array.from({ length: pagesCount }, (_, i) => (
-                `/digital-library-pages/${dlData.id}/page_${i + 1}.jpg`
+                `/digital-library-pages/${realDocumentId}/page_${i + 1}.jpg`
               ));
               setDocumentPages(pages);
               setDocumentImage(pages[0]);
@@ -1132,7 +1154,7 @@ const BookReader = () => {
 
                 <TabsContent value="search" className="mt-6">
                   <SidebarSearchInBook 
-                    documentId={id || ''}
+                    documentId={documentData?.id || id || ''}
                     onPageSelect={(pageNumber, highlightText) => {
                       goToPage(pageNumber);
                     }}
@@ -1601,9 +1623,9 @@ const BookReader = () => {
         </main>
 
         {/* Document Search Panel */}
-        {showSearch && id && (
+        {showSearch && (documentData?.id || id) && (
           <DocumentSearchInBook 
-            documentId={id}
+            documentId={documentData?.id || id || ''}
             onPageSelect={(pageNumber, highlightText) => {
               goToPage(pageNumber);
               setShowSearch(false);
