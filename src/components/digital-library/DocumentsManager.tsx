@@ -363,8 +363,22 @@ export default function DocumentsManager() {
   // Delete document
   const deleteDocument = useMutation({
     mutationFn: async (id: string) => {
+      // First, get the document to check for associated files in storage
+      const { data: docData } = await supabase
+        .from('digital_library_documents')
+        .select('file_url, cover_image_url')
+        .eq('id', id)
+        .single();
+
+      // Delete associated pages if any
+      await supabase
+        .from('digital_library_pages')
+        .delete()
+        .eq('document_id', id);
+
+      // Delete the document from digital_library_documents
       const { error } = await supabase
-        .from('content')
+        .from('digital_library_documents')
         .delete()
         .eq('id', id);
       
@@ -372,9 +386,76 @@ export default function DocumentsManager() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
-      toast({ title: "Document supprimé" });
+      toast({ title: "Document supprimé avec succès" });
+    },
+    onError: (error) => {
+      toast({ 
+        title: "Erreur lors de la suppression", 
+        description: error.message, 
+        variant: "destructive" 
+      });
     }
   });
+
+  // Bulk delete documents
+  const [bulkDeleteRunning, setBulkDeleteRunning] = useState(false);
+  
+  const runBulkDelete = async () => {
+    if (selectedDocIds.length === 0) {
+      toast({
+        title: "Aucun document sélectionné",
+        description: "Veuillez sélectionner au moins un document à supprimer",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const confirmMessage = `Êtes-vous sûr de vouloir supprimer ${selectedDocIds.length} document(s) ? Cette action est irréversible.`;
+    if (!confirm(confirmMessage)) return;
+
+    setBulkDeleteRunning(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const docId of selectedDocIds) {
+      try {
+        // Delete associated pages
+        await supabase
+          .from('digital_library_pages')
+          .delete()
+          .eq('document_id', docId);
+
+        // Delete the document
+        const { error } = await supabase
+          .from('digital_library_documents')
+          .delete()
+          .eq('id', docId);
+
+        if (error) throw error;
+        successCount++;
+      } catch (error) {
+        console.error(`Error deleting document ${docId}:`, error);
+        errorCount++;
+      }
+    }
+
+    setBulkDeleteRunning(false);
+    queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
+    setSelectedDocIds([]);
+
+    if (errorCount === 0) {
+      toast({
+        title: "Suppression réussie",
+        description: `${successCount} document(s) supprimé(s) avec succès`
+      });
+    } else {
+      toast({
+        title: "Suppression partielle",
+        description: `${successCount} supprimé(s), ${errorCount} erreur(s)`,
+        variant: "destructive"
+      });
+    }
+  };
 
   // Ouvrir le dialogue OCR pour un document
   const openOcrDialog = (doc: any) => {
@@ -1549,23 +1630,42 @@ export default function DocumentsManager() {
             </div>
             <div className="flex gap-2">
               {selectedDocIds.length > 0 && (
-                <Button 
-                  onClick={runBulkOcrOnSelected}
-                  disabled={bulkOcrRunning}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-                >
-                  {bulkOcrRunning ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      OCR en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Wand2 className="h-4 w-4 mr-2" />
-                      OCR ({selectedDocIds.length})
-                    </>
-                  )}
-                </Button>
+                <>
+                  <Button 
+                    onClick={runBulkDelete}
+                    disabled={bulkDeleteRunning || bulkOcrRunning}
+                    variant="destructive"
+                  >
+                    {bulkDeleteRunning ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Suppression...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Supprimer ({selectedDocIds.length})
+                      </>
+                    )}
+                  </Button>
+                  <Button 
+                    onClick={runBulkOcrOnSelected}
+                    disabled={bulkOcrRunning || bulkDeleteRunning}
+                    className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                  >
+                    {bulkOcrRunning ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        OCR en cours...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="h-4 w-4 mr-2" />
+                        OCR ({selectedDocIds.length})
+                      </>
+                    )}
+                  </Button>
+                </>
               )}
               <Button variant="outline" size="sm">
                 <Download className="h-4 w-4 mr-2" />
