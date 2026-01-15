@@ -10132,6 +10132,107 @@ export type Database = {
         }
         Relationships: []
       }
+      sigb_sync_config: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          last_sync_records_count: number | null
+          last_sync_status: string | null
+          name: string
+          next_sync_at: string | null
+          sigb_url: string
+          sync_day_of_month: number | null
+          sync_day_of_week: number | null
+          sync_frequency: string | null
+          sync_time: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          last_sync_records_count?: number | null
+          last_sync_status?: string | null
+          name: string
+          next_sync_at?: string | null
+          sigb_url: string
+          sync_day_of_month?: number | null
+          sync_day_of_week?: number | null
+          sync_frequency?: string | null
+          sync_time?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          last_sync_records_count?: number | null
+          last_sync_status?: string | null
+          name?: string
+          next_sync_at?: string | null
+          sigb_url?: string
+          sync_day_of_month?: number | null
+          sync_day_of_week?: number | null
+          sync_frequency?: string | null
+          sync_time?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sigb_sync_history: {
+        Row: {
+          config_id: string
+          details: Json | null
+          error_message: string | null
+          id: string
+          records_failed: number | null
+          records_imported: number | null
+          records_updated: number | null
+          status: string
+          sync_completed_at: string | null
+          sync_started_at: string
+        }
+        Insert: {
+          config_id: string
+          details?: Json | null
+          error_message?: string | null
+          id?: string
+          records_failed?: number | null
+          records_imported?: number | null
+          records_updated?: number | null
+          status?: string
+          sync_completed_at?: string | null
+          sync_started_at?: string
+        }
+        Update: {
+          config_id?: string
+          details?: Json | null
+          error_message?: string | null
+          id?: string
+          records_failed?: number | null
+          records_imported?: number | null
+          records_updated?: number | null
+          status?: string
+          sync_completed_at?: string | null
+          sync_started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sigb_sync_history_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "sigb_sync_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sigb_sync_logs: {
         Row: {
           config_id: string | null
