@@ -22,6 +22,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import OcrImportTool from "@/components/digital-library/import/OcrImportTool";
 import PdfOcrTool from "@/components/digital-library/import/PdfOcrTool";
 import SigbSyncManager from "@/components/digital-library/SigbSyncManager";
+import { FileUpload } from "@/components/ui/file-upload";
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -81,6 +82,10 @@ export default function DocumentsManager() {
   const [ocrLanguage, setOcrLanguage] = useState("ar");
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [bulkOcrRunning, setBulkOcrRunning] = useState(false);
+  
+  // File upload state for add document dialog
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   
   // Delete confirmation states
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -277,77 +282,116 @@ export default function DocumentsManager() {
   // Add document
   const addDocument = useMutation({
     mutationFn: async (values: z.infer<typeof documentSchema>) => {
-      // First, check if a cbn_document with this cote already exists
-      const { data: existingCbn } = await supabase
-        .from('cbn_documents')
-        .select('id, title, author, publication_year, document_type')
-        .eq('cote', values.cote)
-        .maybeSingle();
-
-      let cbnDocumentId: string;
-
-      if (existingCbn) {
-        // Use existing cbn_document
-        cbnDocumentId = existingCbn.id;
-      } else {
-        // Create new cbn_document entry
-        const { data: newCbn, error: cbnError } = await supabase
+      setIsUploading(true);
+      
+      try {
+        // First, check if a cbn_document with this cote already exists
+        const { data: existingCbn } = await supabase
           .from('cbn_documents')
-          .insert({
-            cote: values.cote,
-            title: values.title || `Document ${values.cote}`,
-            author: values.author || null,
-            document_type: values.file_type || 'book',
-            publication_year: values.publication_date ? parseInt(values.publication_date.split('-')[0]) : null,
-          })
+          .select('id, title, author, publication_year, document_type')
+          .eq('cote', values.cote)
+          .maybeSingle();
+
+        let cbnDocumentId: string;
+
+        if (existingCbn) {
+          // Use existing cbn_document
+          cbnDocumentId = existingCbn.id;
+        } else {
+          // Create new cbn_document entry
+          const { data: newCbn, error: cbnError } = await supabase
+            .from('cbn_documents')
+            .insert({
+              cote: values.cote,
+              title: values.title || `Document ${values.cote}`,
+              author: values.author || null,
+              document_type: values.file_type || 'book',
+              publication_year: values.publication_date ? parseInt(values.publication_date.split('-')[0]) : null,
+            })
+            .select('id')
+            .single();
+
+          if (cbnError) throw cbnError;
+          cbnDocumentId = newCbn.id;
+        }
+
+        // Check if digital_library_document already exists for this cbn_document
+        const { data: existingDl } = await supabase
+          .from('digital_library_documents')
           .select('id')
-          .single();
+          .eq('cbn_document_id', cbnDocumentId)
+          .maybeSingle();
 
-        if (cbnError) throw cbnError;
-        cbnDocumentId = newCbn.id;
+        if (existingDl) {
+          throw new Error(`Un document numérique existe déjà pour la cote ${values.cote}`);
+        }
+
+        // Handle file upload if a file is provided
+        let uploadedPdfUrl = values.file_url || null;
+        
+        if (uploadFile) {
+          // Sanitize filename: remove special chars, accents, spaces
+          const sanitizedCote = values.cote
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") // Remove accents
+            .replace(/[^a-zA-Z0-9-_]/g, "_") // Replace special chars with underscore
+            .toLowerCase();
+          
+          const fileExtension = uploadFile.name.split('.').pop()?.toLowerCase() || 'pdf';
+          const fileName = `${sanitizedCote}_${Date.now()}.${fileExtension}`;
+          const filePath = `documents/${fileName}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('digital-library')
+            .upload(filePath, uploadFile, {
+              cacheControl: '3600',
+              upsert: false,
+            });
+
+          if (uploadError) throw new Error(`Erreur d'upload: ${uploadError.message}`);
+
+          // Get the public URL
+          const { data: publicUrlData } = supabase.storage
+            .from('digital-library')
+            .getPublicUrl(filePath);
+
+          uploadedPdfUrl = publicUrlData.publicUrl;
+        }
+
+        // Create the digital_library_document
+        const { error: dlError } = await supabase
+          .from('digital_library_documents')
+          .insert([{
+            cbn_document_id: cbnDocumentId,
+            title: values.title || existingCbn?.title || `Document ${values.cote}`,
+            author: values.author || existingCbn?.author || null,
+            document_type: values.file_type || existingCbn?.document_type || 'book',
+            publication_year: values.publication_date 
+              ? parseInt(values.publication_date.split('-')[0]) 
+              : existingCbn?.publication_year || null,
+            pdf_url: uploadedPdfUrl,
+            download_enabled: values.download_enabled,
+            publication_status: values.is_visible ? 'published' : 'draft',
+            digitization_source: values.digitization_source,
+            pages_count: 0,
+          }]);
+
+        if (dlError) throw dlError;
+      } finally {
+        setIsUploading(false);
       }
-
-      // Check if digital_library_document already exists for this cbn_document
-      const { data: existingDl } = await supabase
-        .from('digital_library_documents')
-        .select('id')
-        .eq('cbn_document_id', cbnDocumentId)
-        .maybeSingle();
-
-      if (existingDl) {
-        throw new Error(`Un document numérique existe déjà pour la cote ${values.cote}`);
-      }
-
-      // Create the digital_library_document
-      const { error: dlError } = await supabase
-        .from('digital_library_documents')
-        .insert([{
-          cbn_document_id: cbnDocumentId,
-          title: values.title || existingCbn?.title || `Document ${values.cote}`,
-          author: values.author || existingCbn?.author || null,
-          document_type: values.file_type || existingCbn?.document_type || 'book',
-          publication_year: values.publication_date 
-            ? parseInt(values.publication_date.split('-')[0]) 
-            : existingCbn?.publication_year || null,
-          pdf_url: values.file_url || null,
-          download_enabled: values.download_enabled,
-          publication_status: values.is_visible ? 'published' : 'draft',
-          digitization_source: values.digitization_source,
-          pages_count: 0,
-        }]);
-
-      if (dlError) throw dlError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
       setShowAddDialog(false);
+      setUploadFile(null);
       form.reset();
       toast({ title: "Document ajouté avec succès" });
     },
     onError: (error) => {
       toast({ 
         title: "Erreur", 
-        description: error.message, 
+        description: error.message,
         variant: "destructive" 
       });
     }
@@ -1174,15 +1218,36 @@ export default function DocumentsManager() {
                       )}
                     />
 
+                    {/* File Upload Section */}
+                    <div className="col-span-2 space-y-2">
+                      <Label>Fichier PDF</Label>
+                      <FileUpload
+                        accept=".pdf"
+                        maxSize={100}
+                        value={uploadFile}
+                        onChange={setUploadFile}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Téléversez le fichier PDF du document. Formats acceptés: PDF (max. 100 MB)
+                      </p>
+                    </div>
+
                     <FormField
                       control={form.control}
                       name="file_url"
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>URL du fichier</FormLabel>
+                        <FormItem className="col-span-2">
+                          <FormLabel>Ou URL du fichier</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="https://..." />
+                            <Input 
+                              {...field} 
+                              placeholder="https://..." 
+                              disabled={!!uploadFile}
+                            />
                           </FormControl>
+                          <FormDescription className="text-xs">
+                            Laissez vide si vous avez téléversé un fichier ci-dessus
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -1294,11 +1359,25 @@ export default function DocumentsManager() {
                   </div>
 
                   <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => {
+                        setShowAddDialog(false);
+                        setUploadFile(null);
+                      }}
+                    >
                       Annuler
                     </Button>
-                    <Button type="submit" disabled={addDocument.isPending}>
-                      {addDocument.isPending ? "Ajout..." : "Ajouter le document"}
+                    <Button type="submit" disabled={addDocument.isPending || isUploading}>
+                      {(addDocument.isPending || isUploading) ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          {isUploading ? "Téléversement..." : "Ajout..."}
+                        </>
+                      ) : (
+                        "Ajouter le document"
+                      )}
                     </Button>
                   </DialogFooter>
                 </form>
