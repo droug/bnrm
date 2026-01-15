@@ -1,3 +1,4 @@
+// Force cache regeneration: v2 - 2026-01-15
 import { useState, useEffect, useRef } from "react";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
