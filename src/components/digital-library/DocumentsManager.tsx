@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PortalSelect } from "@/components/ui/portal-select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil, Wand2, Loader2, FileSearch, CheckCircle2, AlertCircle, Database } from "lucide-react";
@@ -79,6 +80,11 @@ export default function DocumentsManager() {
   const [ocrLanguage, setOcrLanguage] = useState("ar");
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [bulkOcrRunning, setBulkOcrRunning] = useState(false);
+  
+  // Delete confirmation states
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<any>(null);
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
 
   // Exemple de doublons détectés
   const sampleDuplicates = [
@@ -410,9 +416,12 @@ export default function DocumentsManager() {
       return;
     }
 
-    const confirmMessage = `Êtes-vous sûr de vouloir supprimer ${selectedDocIds.length} document(s) ? Cette action est irréversible.`;
-    if (!confirm(confirmMessage)) return;
+    // Show confirmation dialog instead of native confirm
+    setShowBulkDeleteConfirm(true);
+  };
 
+  const executeBulkDelete = async () => {
+    setShowBulkDeleteConfirm(false);
     setBulkDeleteRunning(true);
     let successCount = 0;
     let errorCount = 0;
@@ -455,6 +464,20 @@ export default function DocumentsManager() {
         variant: "destructive"
       });
     }
+  };
+
+  // Single document delete with confirmation
+  const handleDeleteClick = (doc: any) => {
+    setDocumentToDelete(doc);
+    setShowDeleteConfirm(true);
+  };
+
+  const executeDeleteDocument = () => {
+    if (documentToDelete) {
+      deleteDocument.mutate(documentToDelete.id);
+    }
+    setShowDeleteConfirm(false);
+    setDocumentToDelete(null);
   };
 
   // Ouvrir le dialogue OCR pour un document
@@ -1783,11 +1806,7 @@ export default function DocumentsManager() {
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => {
-                            if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
-                              deleteDocument.mutate(doc.id);
-                            }
-                          }}
+                          onClick={() => handleDeleteClick(doc)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -2384,6 +2403,52 @@ export default function DocumentsManager() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Single Document Delete Confirmation */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent className="z-[10001]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer le document "{documentToDelete?.title}" ? 
+              Cette action est irréversible et supprimera également toutes les pages associées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={executeDeleteDocument}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Confirmation */}
+      <AlertDialog open={showBulkDeleteConfirm} onOpenChange={setShowBulkDeleteConfirm}>
+        <AlertDialogContent className="z-[10001]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression en masse</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer {selectedDocIds.length} document(s) ? 
+              Cette action est irréversible et supprimera également toutes les pages associées à ces documents.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={executeBulkDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Supprimer {selectedDocIds.length} document(s)
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
