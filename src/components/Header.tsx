@@ -432,6 +432,11 @@ const Header = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => {
+                  if (location.pathname.startsWith("/admin/digital-library")) {
+                    navigate("/admin/digital-library/documents");
+                    return;
+                  }
+
                   if (window.history.length > 1) {
                     navigate(-1);
                   } else {
