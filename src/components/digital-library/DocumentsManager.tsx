@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PortalSelect } from "@/components/ui/portal-select";
@@ -86,6 +87,7 @@ export default function DocumentsManager() {
   // File upload state for add document dialog
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   
   // Delete confirmation states
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -341,14 +343,42 @@ export default function DocumentsManager() {
           const fileName = `${sanitizedCote}_${Date.now()}.${fileExtension}`;
           const filePath = `documents/${fileName}`;
           
-          const { error: uploadError } = await supabase.storage
-            .from('digital-library')
-            .upload(filePath, uploadFile, {
-              cacheControl: '3600',
-              upsert: false,
+          // Upload with progress tracking using XMLHttpRequest
+          setUploadProgress(0);
+          
+          const { data: { session } } = await supabase.auth.getSession();
+          const accessToken = session?.access_token;
+          
+          const uploadUrl = `https://safeppmznupzqkqmzjzt.supabase.co/storage/v1/object/digital-library/${filePath}`;
+          
+          await new Promise<void>((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            
+            xhr.upload.addEventListener('progress', (event) => {
+              if (event.lengthComputable) {
+                const progress = Math.round((event.loaded / event.total) * 100);
+                setUploadProgress(progress);
+              }
             });
-
-          if (uploadError) throw new Error(`Erreur d'upload: ${uploadError.message}`);
+            
+            xhr.addEventListener('load', () => {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                resolve();
+              } else {
+                reject(new Error(`Erreur d'upload: ${xhr.statusText || 'Échec du téléversement'}`));
+              }
+            });
+            
+            xhr.addEventListener('error', () => {
+              reject(new Error('Erreur réseau lors du téléversement'));
+            });
+            
+            xhr.open('POST', uploadUrl);
+            xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+            xhr.setRequestHeader('x-upsert', 'false');
+            xhr.setRequestHeader('Cache-Control', '3600');
+            xhr.send(uploadFile);
+          });
 
           // Get the public URL
           const { data: publicUrlData } = supabase.storage
@@ -379,12 +409,14 @@ export default function DocumentsManager() {
         if (dlError) throw dlError;
       } finally {
         setIsUploading(false);
+        setUploadProgress(0);
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
       setShowAddDialog(false);
       setUploadFile(null);
+      setUploadProgress(0);
       form.reset();
       toast({ title: "Document ajouté avec succès" });
     },
@@ -1227,6 +1259,15 @@ export default function DocumentsManager() {
                         value={uploadFile}
                         onChange={setUploadFile}
                       />
+                      {isUploading && uploadProgress > 0 && (
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Téléversement en cours...</span>
+                            <span className="font-medium">{uploadProgress}%</span>
+                          </div>
+                          <Progress value={uploadProgress} className="h-2" />
+                        </div>
+                      )}
                       <p className="text-xs text-muted-foreground">
                         Téléversez le fichier PDF du document. Formats acceptés: PDF (max. 100 MB)
                       </p>
