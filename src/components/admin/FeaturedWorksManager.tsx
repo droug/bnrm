@@ -27,7 +27,10 @@ import {
   BookOpen,
   Link as LinkIcon,
   Search,
-  GripVertical
+  GripVertical,
+  Upload,
+  Loader2,
+  X
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -74,6 +77,7 @@ export default function FeaturedWorksManager() {
   const [formMode, setFormMode] = useState<'document' | 'custom'>('document');
   const [searchQuery, setSearchQuery] = useState("");
   const [coteSearch, setCoteSearch] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -507,13 +511,96 @@ export default function FeaturedWorksManager() {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label>URL de l'image</Label>
-                    <Input
-                      type="url"
-                      value={formData.custom_image_url}
-                      onChange={(e) => setFormData(prev => ({ ...prev, custom_image_url: e.target.value }))}
-                      placeholder="https://..."
-                    />
+                    <Label>Image de l'œuvre</Label>
+                    <div className="space-y-3">
+                      {/* Image preview */}
+                      {formData.custom_image_url && (
+                        <div className="relative inline-block">
+                          <img 
+                            src={formData.custom_image_url} 
+                            alt="Aperçu" 
+                            className="w-24 h-32 object-cover rounded border"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute -top-2 -right-2 h-6 w-6"
+                            onClick={() => setFormData(prev => ({ ...prev, custom_image_url: "" }))}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {/* Upload button */}
+                      <div className="flex gap-2">
+                        <div className="relative">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                            disabled={isUploading}
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              
+                              if (file.size > 5 * 1024 * 1024) {
+                                toast({ title: "Erreur", description: "L'image ne doit pas dépasser 5 Mo", variant: "destructive" });
+                                return;
+                              }
+                              
+                              setIsUploading(true);
+                              try {
+                                const fileExt = file.name.split('.').pop();
+                                const fileName = `featured-works/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+                                
+                                const { error: uploadError } = await supabase.storage
+                                  .from('digital-library')
+                                  .upload(fileName, file);
+                                
+                                if (uploadError) throw uploadError;
+                                
+                                const { data: { publicUrl } } = supabase.storage
+                                  .from('digital-library')
+                                  .getPublicUrl(fileName);
+                                
+                                setFormData(prev => ({ ...prev, custom_image_url: publicUrl }));
+                                toast({ title: "Image téléchargée avec succès" });
+                              } catch (error: any) {
+                                toast({ title: "Erreur", description: error.message, variant: "destructive" });
+                              } finally {
+                                setIsUploading(false);
+                              }
+                            }}
+                          />
+                          <Button type="button" variant="outline" disabled={isUploading} className="gap-2">
+                            {isUploading ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Upload className="h-4 w-4" />
+                            )}
+                            {isUploading ? "Téléchargement..." : "Télécharger une image"}
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                          <span className="bg-background px-2 text-muted-foreground">ou saisir une URL</span>
+                        </div>
+                      </div>
+                      
+                      <Input
+                        type="url"
+                        value={formData.custom_image_url}
+                        onChange={(e) => setFormData(prev => ({ ...prev, custom_image_url: e.target.value }))}
+                        placeholder="https://..."
+                      />
+                    </div>
                   </div>
                 </TabsContent>
               </Tabs>
