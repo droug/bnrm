@@ -3,12 +3,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { FileText, Upload, FileSearch, UploadCloud, Wand2, Loader2, CheckCircle2, AlertCircle, FileSpreadsheet } from "lucide-react";
+import { FileText, Upload, FileSearch, UploadCloud, Wand2, Loader2, CheckCircle2, AlertCircle, FileSpreadsheet, Film } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import SingleDocumentImport from "./SingleDocumentImport";
 import BulkDocumentImport from "./BulkDocumentImport";
 import BulkPdfImport from "./BulkPdfImport";
+import BulkAudiovisualImport from "./BulkAudiovisualImport";
 import OcrImportTool from "./OcrImportTool";
 
 interface DigitalLibraryDocumentImporterProps {
@@ -127,15 +128,19 @@ export default function DigitalLibraryDocumentImporter({
       </Card>
 
       <Tabs defaultValue={defaultTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="single" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
             <span className="hidden sm:inline">Unitaire</span>
           </TabsTrigger>
           <TabsTrigger value="bulk-pdf" className="flex items-center gap-2">
             <Upload className="h-4 w-4" />
-            <span className="hidden sm:inline">PDF en masse</span>
-            <span className="sm:hidden">PDF</span>
+            <span className="hidden sm:inline">PDF</span>
+          </TabsTrigger>
+          <TabsTrigger value="bulk-av" className="flex items-center gap-2">
+            <Film className="h-4 w-4" />
+            <span className="hidden sm:inline">Audio/Vidéo</span>
+            <span className="sm:hidden">AV</span>
           </TabsTrigger>
           <TabsTrigger value="bulk" className="flex items-center gap-2">
             <FileSpreadsheet className="h-4 w-4" />
@@ -153,6 +158,10 @@ export default function DigitalLibraryDocumentImporter({
 
         <TabsContent value="bulk-pdf">
           <BulkPdfImport onSuccess={onSuccess} />
+        </TabsContent>
+
+        <TabsContent value="bulk-av">
+          <BulkAudiovisualImport onSuccess={onSuccess} />
         </TabsContent>
 
         <TabsContent value="bulk">
