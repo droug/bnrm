@@ -5,6 +5,7 @@ import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, C
 import SearchBar from "@/components/SearchBar";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SmartChatBot from "@/components/SmartChatBot";
 import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
@@ -34,6 +35,7 @@ const Header = () => {
   const { user, profile, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const { goBack } = useNavigationHistory();
   const isHomePage = location.pathname === "/";
 
   // Menu data structure with bilingual support
@@ -438,11 +440,8 @@ const Header = () => {
                     return;
                   }
 
-                  if (window.history.length > 1) {
-                    navigate(-1);
-                  } else {
-                    navigate('/');
-                  }
+                  // Utiliser l'historique de session pour les autres pages
+                  goBack();
                 }}
                 className="gap-2 hover:bg-accent transition-all duration-300"
               >

@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigationHistory } from "@/hooks/useNavigationHistory";
+import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ import BulkImportPage from "@/components/digital-library/import/BulkImportPage";
 export default function DigitalLibraryBulkImport() {
   const { user } = useAuth();
   const { isAdmin, isLibrarian, loading: rolesLoading } = useSecureRoles();
-  const navigate = useNavigate();
+  const { goBack } = useNavigationHistory();
 
   if (rolesLoading) {
     return (
@@ -24,17 +25,13 @@ export default function DigitalLibraryBulkImport() {
     return <Navigate to="/" replace />;
   }
 
-  const handleBack = () => {
-    navigate("/admin/digital-library/documents");
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto p-6">
         <Button
           variant="ghost"
-          onClick={handleBack}
+          onClick={() => goBack("/admin/digital-library/documents")}
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
