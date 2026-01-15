@@ -73,6 +73,7 @@ export default function FeaturedWorksManager() {
   const [editingWork, setEditingWork] = useState<FeaturedWork | null>(null);
   const [formMode, setFormMode] = useState<'document' | 'custom'>('document');
   const [searchQuery, setSearchQuery] = useState("");
+  const [coteSearch, setCoteSearch] = useState("");
   
   // Form state
   const [formData, setFormData] = useState({
@@ -118,7 +119,32 @@ export default function FeaturedWorksManager() {
     }
   });
 
-  // Search documents for linking
+  // Search documents by cote
+  const { data: coteResults = [] } = useQuery({
+    queryKey: ['search-documents-cote', coteSearch],
+    queryFn: async () => {
+      if (!coteSearch || coteSearch.length < 1) return [];
+      
+      const { data, error } = await supabase
+        .from('digital_library_documents')
+        .select('id, title, author, cover_image_url, document_type, publication_year, cbn_documents(cote)')
+        .not('cbn_document_id', 'is', null)
+        .limit(20);
+      
+      if (error) throw error;
+      
+      // Filter by cote on client side since it's a joined field
+      return (data || []).filter((doc: any) => 
+        doc.cbn_documents?.cote?.toLowerCase().includes(coteSearch.toLowerCase())
+      ).map((doc: any) => ({
+        ...doc,
+        cote: doc.cbn_documents?.cote
+      }));
+    },
+    enabled: coteSearch.length >= 1
+  });
+
+  // Search documents by title/author
   const { data: searchResults = [] } = useQuery({
     queryKey: ['search-documents', searchQuery],
     queryFn: async () => {
@@ -126,12 +152,15 @@ export default function FeaturedWorksManager() {
       
       const { data, error } = await supabase
         .from('digital_library_documents')
-        .select('id, title, author, cover_image_url, document_type, publication_year')
+        .select('id, title, author, cover_image_url, document_type, publication_year, cbn_documents(cote)')
         .or(`title.ilike.%${searchQuery}%,author.ilike.%${searchQuery}%`)
         .limit(10);
       
       if (error) throw error;
-      return data as DigitalLibraryDocument[];
+      return (data || []).map((doc: any) => ({
+        ...doc,
+        cote: doc.cbn_documents?.cote
+      }));
     },
     enabled: searchQuery.length >= 2
   });
@@ -252,6 +281,7 @@ export default function FeaturedWorksManager() {
     setEditingWork(null);
     setFormMode('document');
     setSearchQuery("");
+    setCoteSearch("");
     setIsDialogOpen(false);
   };
 
@@ -333,21 +363,75 @@ export default function FeaturedWorksManager() {
                 </TabsList>
                 
                 <TabsContent value="document" className="space-y-4 mt-4">
+                  {/* Cote search field - FIRST */}
                   <div className="space-y-2">
-                    <Label>Rechercher un document</Label>
+                    <Label className="font-semibold">Recherche par Cote</Label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Entrez la cote du document..."
+                        value={coteSearch}
+                        onChange={(e) => { setCoteSearch(e.target.value); setSearchQuery(""); }}
+                        className="pl-10"
+                      />
+                    </div>
+                    
+                    {coteResults.length > 0 && (
+                      <div className="border rounded-md max-h-48 overflow-y-auto">
+                        {coteResults.map((doc: any) => (
+                          <div
+                            key={doc.id}
+                            onClick={() => {
+                              setFormData(prev => ({ ...prev, document_id: doc.id }));
+                              setCoteSearch("");
+                            }}
+                            className={`p-3 cursor-pointer hover:bg-accent flex items-center gap-3 border-b last:border-b-0 ${
+                              formData.document_id === doc.id ? 'bg-accent' : ''
+                            }`}
+                          >
+                            {doc.cover_image_url ? (
+                              <img src={doc.cover_image_url} alt="" className="w-10 h-14 object-cover rounded" />
+                            ) : (
+                              <div className="w-10 h-14 bg-muted rounded flex items-center justify-center">
+                                <BookOpen className="h-5 w-5 text-muted-foreground" />
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <Badge variant="outline" className="mb-1">{doc.cote}</Badge>
+                              <div className="font-medium line-clamp-1">{doc.title}</div>
+                              <div className="text-sm text-muted-foreground">{doc.author || "Auteur inconnu"}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">ou</span>
+                    </div>
+                  </div>
+
+                  {/* Title/Author search field */}
+                  <div className="space-y-2">
+                    <Label>Recherche par titre ou auteur</Label>
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         placeholder="Titre ou auteur..."
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => { setSearchQuery(e.target.value); setCoteSearch(""); }}
                         className="pl-10"
                       />
                     </div>
                     
                     {searchResults.length > 0 && (
                       <div className="border rounded-md max-h-48 overflow-y-auto">
-                        {searchResults.map((doc) => (
+                        {searchResults.map((doc: any) => (
                           <div
                             key={doc.id}
                             onClick={() => {
@@ -366,6 +450,7 @@ export default function FeaturedWorksManager() {
                               </div>
                             )}
                             <div className="flex-1">
+                              {doc.cote && <Badge variant="outline" className="mb-1">{doc.cote}</Badge>}
                               <div className="font-medium line-clamp-1">{doc.title}</div>
                               <div className="text-sm text-muted-foreground">{doc.author || "Auteur inconnu"}</div>
                             </div>
@@ -373,22 +458,22 @@ export default function FeaturedWorksManager() {
                         ))}
                       </div>
                     )}
-                    
-                    {formData.document_id && (
-                      <div className="p-3 bg-accent/50 rounded-md flex items-center gap-3">
-                        <BookOpen className="h-5 w-5 text-primary" />
-                        <span className="font-medium">Document sélectionné</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setFormData(prev => ({ ...prev, document_id: "" }))}
-                        >
-                          Changer
-                        </Button>
-                      </div>
-                    )}
                   </div>
+                    
+                  {formData.document_id && (
+                    <div className="p-3 bg-accent/50 rounded-md flex items-center gap-3">
+                      <BookOpen className="h-5 w-5 text-primary" />
+                      <span className="font-medium">Document sélectionné</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setFormData(prev => ({ ...prev, document_id: "" }))}
+                      >
+                        Changer
+                      </Button>
+                    </div>
+                  )}
                 </TabsContent>
                 
                 <TabsContent value="custom" className="space-y-4 mt-4">
