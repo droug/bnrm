@@ -117,18 +117,18 @@ export const BNRMNumberAttribution = () => {
 
   const fetchData = async () => {
     try {
-      // Les demandes peuvent déjà avoir un numéro attribué (ISBN/ISSN) tout en gardant le statut "valide_par_b".
-      // On les affiche donc dans "Attribués" et on ne garde dans "Demandes à traiter" que celles sans numéro attribué.
-      const { data: validatedRequests, error: validatedError } = await supabase
+      // Demandes à traiter = status 'valide_par_b' (peu importe si un numéro est déjà attribué dans metadata)
+      const { data: pendingData, error: pendingError } = await supabase
         .from("legal_deposit_requests")
         .select("*")
         .eq("status", "valide_par_b")
         .order("created_at", { ascending: true });
 
-      if (validatedError) {
-        console.error("Error fetching validated requests:", validatedError);
+      if (pendingError) {
+        console.error("Error fetching pending requests:", pendingError);
       }
 
+      // Demandes attribuées = status 'attribue' uniquement
       const { data: attributedRequests, error: attributedError } = await supabase
         .from("legal_deposit_requests")
         .select("*")
@@ -139,12 +139,8 @@ export const BNRMNumberAttribution = () => {
         console.error("Error fetching attributed requests:", attributedError);
       }
 
-      const validatedRows = validatedRequests || [];
-      const pendingRows = validatedRows.filter((r) => !hasAnyAttributedNumber(r));
-      const attributedRowsFromValidated = validatedRows.filter((r) => hasAnyAttributedNumber(r));
-
-      // Pending requests (à traiter)
-      const transformedRequests = pendingRows.map((req) => {
+      // Pending requests (à traiter) - toutes les demandes valide_par_b
+      const transformedRequests = (pendingData || []).map((req) => {
         const metadata = (req.metadata as Record<string, any>) || {};
         return {
           id: req.id,
@@ -178,10 +174,8 @@ export const BNRMNumberAttribution = () => {
 
       setPendingRequests(transformedRequests);
 
-      // Attributions (historique)
-      const allAttributedRows = [...(attributedRequests || []), ...attributedRowsFromValidated];
-
-      const transformedAttributions: NumberAttribution[] = allAttributedRows.map((req) => {
+      // Attributions (historique) - uniquement les demandes avec status 'attribue'
+      const transformedAttributions: NumberAttribution[] = (attributedRequests || []).map((req) => {
         const metadata = (req.metadata as Record<string, any>) || {};
 
         // Détecter quel numéro est attribué en priorité (ISBN > ISSN > DL)
