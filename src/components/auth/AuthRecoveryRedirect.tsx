@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AUTH_ENTRY_SNAPSHOT_KEY } from "@/auth/urlSnapshot";
@@ -12,8 +12,12 @@ import { AUTH_ENTRY_SNAPSHOT_KEY } from "@/auth/urlSnapshot";
 export function AuthRecoveryRedirect() {
   const navigate = useNavigate();
   const location = useLocation();
+  const hasRedirected = useRef(false);
 
   useEffect(() => {
+    // Prevent multiple redirects
+    if (hasRedirected.current) return;
+
     const parseParams = (value: string) => {
       const v = value.startsWith("#") || value.startsWith("?") ? value.slice(1) : value;
       return new URLSearchParams(v);
@@ -46,6 +50,9 @@ export function AuthRecoveryRedirect() {
       new URLSearchParams(location.search).get("reset") === "true";
 
     const goToReset = () => {
+      if (hasRedirected.current) return;
+      hasRedirected.current = true;
+      
       try {
         sessionStorage.removeItem(AUTH_ENTRY_SNAPSHOT_KEY);
       } catch {
@@ -56,18 +63,20 @@ export function AuthRecoveryRedirect() {
     };
 
     const snapshot = readSnapshot();
+    const currentHash = window.location.hash;
+    const currentSearch = window.location.search;
+    
     const recoveryLike =
-      isRecoveryLike(window.location.hash, window.location.search) ||
+      isRecoveryLike(currentHash, currentSearch) ||
       (snapshot ? isRecoveryLike(snapshot.hash ?? "", snapshot.search ?? "") : false);
 
-    // If we land on any route with a recovery/invite snapshot and Supabase already has a session,
-    // force the reset UI.
+    // IMMEDIATE redirect if we detect recovery in URL - don't wait for session
     if (recoveryLike && !isAlreadyOnReset()) {
+      // Give Supabase a tiny moment to process the token, then redirect
       setTimeout(() => {
-        supabase.auth.getSession().then(({ data }) => {
-          if (data.session) goToReset();
-        });
-      }, 0);
+        goToReset();
+      }, 100);
+      return;
     }
 
     const {
