@@ -28,6 +28,8 @@ createRoot(document.getElementById("root")!).render(
           <AuthProvider>
             <PermissionsProvider>
               <App />
+              <Toaster />
+              <Sonner />
             </PermissionsProvider>
           </AuthProvider>
         </TooltipProvider>
