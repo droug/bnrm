@@ -104,10 +104,12 @@ export const BNRMNumberAttribution = () => {
   const fetchData = async () => {
     try {
       // Fetch approved requests from legal_deposit_requests that need number attribution
+      // Only fetch requests with status 'valide_par_b' that are NOT yet attributed
       const { data: requests, error: requestsError } = await supabase
         .from("legal_deposit_requests")
         .select("*")
         .eq("status", "valide_par_b")
+        .neq("status", "attribue")
         .order("created_at", { ascending: true });
 
       if (requestsError) {
