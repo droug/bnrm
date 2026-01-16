@@ -5,47 +5,83 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Mail, Send, CheckCircle, XCircle, Loader2, Server, Shield, AlertCircle, ExternalLink } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Mail, Send, CheckCircle, XCircle, Loader2, Eye, EyeOff, Server, Shield, AlertCircle, ExternalLink, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-// Configuration Gmail actuelle (valeurs par défaut fonctionnelles)
-const GMAIL_CONFIG = {
+interface SmtpConfig {
+  host: string;
+  port: string;
+  user: string;
+  password: string;
+  from: string;
+  encryption: "none" | "tls" | "ssl";
+  enabled: boolean;
+}
+
+// Configuration Gmail par défaut
+const DEFAULT_CONFIG: SmtpConfig = {
   host: "smtp.gmail.com",
   port: "587",
-  encryption: "STARTTLS",
-  description: "Gmail SMTP avec mot de passe d'application"
+  user: "",
+  password: "",
+  from: "",
+  encryption: "tls",
+  enabled: true
 };
 
 export function SmtpConfigCard() {
   const { toast } = useToast();
-  const [enabled, setEnabled] = useState(true);
+  const [config, setConfig] = useState<SmtpConfig>(DEFAULT_CONFIG);
+  const [showPassword, setShowPassword] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [testEmail, setTestEmail] = useState("");
   const [testResult, setTestResult] = useState<"success" | "error" | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  // Charger l'état d'activation depuis localStorage
+  // Charger la configuration depuis localStorage
   useEffect(() => {
     const saved = localStorage.getItem("smtp_config_display");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setEnabled(parsed.enabled !== false);
+        setConfig(prev => ({
+          ...prev,
+          host: parsed.host || DEFAULT_CONFIG.host,
+          port: parsed.port || DEFAULT_CONFIG.port,
+          user: parsed.user || "",
+          from: parsed.from || "",
+          encryption: parsed.encryption || DEFAULT_CONFIG.encryption,
+          enabled: parsed.enabled !== false
+        }));
       } catch (e) {
         console.error("Error loading SMTP config:", e);
       }
     }
   }, []);
 
-  const handleToggleEnabled = (checked: boolean) => {
-    setEnabled(checked);
-    localStorage.setItem("smtp_config_display", JSON.stringify({ enabled: checked }));
+  const handleConfigChange = (field: keyof SmtpConfig, value: string | boolean) => {
+    setConfig(prev => ({ ...prev, [field]: value }));
+    setHasChanges(true);
+  };
+
+  const handleSave = () => {
+    // Sauvegarder la configuration pour l'affichage
+    localStorage.setItem("smtp_config_display", JSON.stringify({
+      host: config.host,
+      port: config.port,
+      user: config.user,
+      from: config.from,
+      encryption: config.encryption,
+      enabled: config.enabled
+    }));
+
+    setHasChanges(false);
     toast({
-      title: checked ? "Notifications activées" : "Notifications désactivées",
-      description: checked 
-        ? "Les emails seront envoyés automatiquement." 
-        : "Les emails ne seront pas envoyés.",
+      title: "Configuration enregistrée",
+      description: "Les paramètres d'affichage ont été sauvegardés. N'oubliez pas de mettre à jour les secrets Supabase.",
     });
   };
 
@@ -106,14 +142,14 @@ export function SmtpConfigCard() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 Configuration Notification Mail
-                {enabled ? (
+                {config.enabled ? (
                   <Badge variant="default" className="bg-green-500">Actif</Badge>
                 ) : (
                   <Badge variant="secondary">Inactif</Badge>
                 )}
               </CardTitle>
               <CardDescription>
-                Serveur SMTP configuré pour l'envoi des notifications
+                Configurer le serveur SMTP pour l'envoi des notifications par email
               </CardDescription>
             </div>
           </div>
@@ -128,16 +164,28 @@ export function SmtpConfigCard() {
 
       {isExpanded && (
         <CardContent className="space-y-6">
-          {/* Configuration actuelle */}
-          <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
-            <div className="flex items-start gap-3">
-              <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-              <div className="flex-1">
-                <p className="font-medium text-green-700 dark:text-green-300">Configuration Gmail active</p>
-                <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                  Le serveur SMTP est configuré et opérationnel.
-                </p>
-              </div>
+          {/* Alerte secrets */}
+          <div className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
+            <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
+            <div className="text-sm flex-1">
+              <p className="font-medium text-amber-700 dark:text-amber-300">Configuration des secrets requise</p>
+              <p className="text-amber-600 dark:text-amber-400 mt-1">
+                Pour que les modifications prennent effet, vous devez mettre à jour les secrets Supabase correspondants :
+                <code className="mx-1 px-1 bg-amber-100 dark:bg-amber-900 rounded">SMTP_HOST</code>,
+                <code className="mx-1 px-1 bg-amber-100 dark:bg-amber-900 rounded">SMTP_PORT</code>,
+                <code className="mx-1 px-1 bg-amber-100 dark:bg-amber-900 rounded">SMTP_USER</code>,
+                <code className="mx-1 px-1 bg-amber-100 dark:bg-amber-900 rounded">SMTP_PASSWORD</code>,
+                <code className="mx-1 px-1 bg-amber-100 dark:bg-amber-900 rounded">SMTP_FROM</code>
+              </p>
+              <a 
+                href="https://supabase.com/dashboard/project/safeppmznupzqkqmzjzt/settings/functions"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 mt-2 text-amber-700 dark:text-amber-300 hover:underline font-medium"
+              >
+                <ExternalLink className="h-3 w-3" />
+                Gérer les secrets Supabase
+              </a>
             </div>
           </div>
 
@@ -150,62 +198,120 @@ export function SmtpConfigCard() {
               </p>
             </div>
             <Switch
-              checked={enabled}
-              onCheckedChange={handleToggleEnabled}
+              checked={config.enabled}
+              onCheckedChange={(checked) => handleConfigChange('enabled', checked)}
             />
           </div>
 
-          {/* Paramètres SMTP actuels (lecture seule) */}
-          <div className="space-y-4">
-            <h4 className="font-medium flex items-center gap-2">
-              <Server className="h-4 w-4" />
-              Paramètres SMTP actuels
-            </h4>
-            
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="p-3 bg-muted/30 rounded-lg">
-                <Label className="text-xs text-muted-foreground">Serveur SMTP</Label>
-                <p className="font-mono text-sm mt-1">{GMAIL_CONFIG.host}</p>
-              </div>
-              
-              <div className="p-3 bg-muted/30 rounded-lg">
-                <Label className="text-xs text-muted-foreground">Port</Label>
-                <p className="font-mono text-sm mt-1">{GMAIL_CONFIG.port}</p>
-              </div>
-              
-              <div className="p-3 bg-muted/30 rounded-lg">
-                <Label className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Shield className="h-3 w-3" />
-                  Chiffrement
-                </Label>
-                <p className="font-mono text-sm mt-1">{GMAIL_CONFIG.encryption}</p>
-              </div>
-              
-              <div className="p-3 bg-muted/30 rounded-lg">
-                <Label className="text-xs text-muted-foreground">Type</Label>
-                <p className="font-mono text-sm mt-1">{GMAIL_CONFIG.description}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Alerte secrets */}
-          <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
-            <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5" />
-            <div className="text-sm flex-1">
-              <p className="font-medium text-blue-700 dark:text-blue-300">Gestion des secrets</p>
-              <p className="text-blue-600 dark:text-blue-400 mt-1">
-                Les identifiants SMTP (SMTP_USER, SMTP_PASSWORD, SMTP_FROM) sont configurés de manière sécurisée 
-                via les secrets Supabase.
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Serveur SMTP */}
+            <div className="space-y-2">
+              <Label htmlFor="smtp-host" className="flex items-center gap-2">
+                <Server className="h-4 w-4" />
+                Serveur SMTP
+              </Label>
+              <Input
+                id="smtp-host"
+                placeholder="smtp.gmail.com"
+                value={config.host}
+                onChange={(e) => handleConfigChange('host', e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Gmail: smtp.gmail.com | Outlook: smtp.office365.com
               </p>
-              <a 
-                href="https://supabase.com/dashboard/project/safeppmznupzqkqmzjzt/settings/functions"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 mt-2 text-blue-700 dark:text-blue-300 hover:underline font-medium"
+            </div>
+
+            {/* Port */}
+            <div className="space-y-2">
+              <Label htmlFor="smtp-port">Port</Label>
+              <Select 
+                value={config.port} 
+                onValueChange={(value) => handleConfigChange('port', value)}
               >
-                <ExternalLink className="h-3 w-3" />
-                Gérer les secrets Supabase
-              </a>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner le port" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="25">25 (SMTP standard)</SelectItem>
+                  <SelectItem value="465">465 (SSL/TLS)</SelectItem>
+                  <SelectItem value="587">587 (STARTTLS) - Recommandé</SelectItem>
+                  <SelectItem value="2525">2525 (Alternatif)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Chiffrement */}
+            <div className="space-y-2">
+              <Label htmlFor="smtp-encryption" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Chiffrement
+              </Label>
+              <Select 
+                value={config.encryption} 
+                onValueChange={(value: "none" | "tls" | "ssl") => handleConfigChange('encryption', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Type de chiffrement" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Aucun</SelectItem>
+                  <SelectItem value="tls">TLS/STARTTLS - Recommandé</SelectItem>
+                  <SelectItem value="ssl">SSL</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Utilisateur */}
+            <div className="space-y-2">
+              <Label htmlFor="smtp-user">Nom d'utilisateur (email)</Label>
+              <Input
+                id="smtp-user"
+                type="email"
+                placeholder="votre-email@gmail.com"
+                value={config.user}
+                onChange={(e) => handleConfigChange('user', e.target.value)}
+              />
+            </div>
+
+            {/* Mot de passe */}
+            <div className="space-y-2">
+              <Label htmlFor="smtp-password">Mot de passe d'application</Label>
+              <div className="relative">
+                <Input
+                  id="smtp-password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••••••••••"
+                  value={config.password}
+                  onChange={(e) => handleConfigChange('password', e.target.value)}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Pour Gmail, utilisez un <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">mot de passe d'application</a>
+              </p>
+            </div>
+
+            {/* Adresse d'expédition */}
+            <div className="space-y-2">
+              <Label htmlFor="smtp-from">Adresse d'expédition</Label>
+              <Input
+                id="smtp-from"
+                type="email"
+                placeholder="votre-email@gmail.com"
+                value={config.from}
+                onChange={(e) => handleConfigChange('from', e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Doit correspondre à l'email d'authentification pour Gmail
+              </p>
             </div>
           </div>
 
@@ -263,10 +369,14 @@ export function SmtpConfigCard() {
             )}
           </div>
 
-          {/* Bouton fermer */}
-          <div className="flex justify-end pt-4 border-t">
+          {/* Boutons d'action */}
+          <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={() => setIsExpanded(false)}>
               Fermer
+            </Button>
+            <Button onClick={handleSave} disabled={!hasChanges}>
+              <Save className="h-4 w-4 mr-2" />
+              Enregistrer
             </Button>
           </div>
         </CardContent>
